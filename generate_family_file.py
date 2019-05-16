@@ -91,8 +91,9 @@ class FamilyFileGenerator(object):
             else:
                 makeiw = self.dointerwiki
 
-            if makeiw == 'y':
-                pass
+            if makeiw == 'n':
+                self.langs = [wiki for wiki in self.langs
+                              if wiki['url'] == w.iwpath]
             elif makeiw == 'e':
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
@@ -100,9 +101,6 @@ class FamilyFileGenerator(object):
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
-            else:
-                self.langs = [wiki for wiki in self.langs
-                              if wiki['url'] == w.iwpath]
 
     def getapis(self):
         """Load other language pages."""
