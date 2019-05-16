@@ -1256,6 +1256,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
+        if PY2:  # Must not be unicode in Python 2
+            interface = str(interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
