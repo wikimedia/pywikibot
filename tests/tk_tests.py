@@ -28,13 +28,6 @@ class TestTkdialog(TestCase):
 
     net = True
 
-    @classmethod
-    def setUpClass(cls):
-        """Set up test class."""
-        if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
-            raise unittest.SkipTest('Tkdialog tests are disabled on Travis-CI')
-        super(TestTkdialog, cls).setUpClass()
-
     def testTkdialog(self):
         """Test Tk dialog."""
         try:
@@ -50,13 +43,6 @@ class TestTkinter(DefaultSiteTestCase):
 
     net = True
 
-    @classmethod
-    def setUpClass(cls):
-        """Set up test class."""
-        if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
-            raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
-        super(TestTkinter, cls).setUpClass()
-
     def testTkinter(self):
         """Test Tkinter window."""
         root = tkinter.Tk()
@@ -68,6 +54,12 @@ class TestTkinter(DefaultSiteTestCase):
         myapp.bind('<Control-d>', myapp.debug)
         v = myapp.edit(content, highlight=page.title())
         assert v is None
+
+
+def setUpModule():  # noqa: N802
+    """Skip Travis tests if PYWIKIBOT_TEST_GUI variable is not set."""
+    if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
+        raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
 
 
 if __name__ == '__main__':  # pragma: no cover
