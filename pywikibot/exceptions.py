@@ -12,7 +12,6 @@ Error: Base class, all exceptions should the subclass of this class.
   - InvalidTitle: Invalid page title
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - Server504Error: Server timed out with HTTP 504 code
-  - PageNotFound: Page not found (deprecated)
   - i18n.TranslationError: i18n/l10n message not available
   - UnknownExtension: Extension is not defined for this site
 
