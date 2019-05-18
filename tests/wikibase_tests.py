@@ -2187,6 +2187,8 @@ class TestJSON(WikidataTestCase):
         self.wdp.aliases['de'].remove('NYC')
         del self.wdp.aliases['nl']
         del self.wdp.claims['P213']
+        del self.wdp.sitelinks['afwiki']
+        self.wdp.sitelinks['nlwiki']._badges = set()
         expected = {
             'labels': {
                 'en': {
@@ -2213,6 +2215,17 @@ class TestJSON(WikidataTestCase):
                         'remove': ''
                     }
                 ]
+            },
+            'sitelinks': {
+                'afwiki': {
+                    'site': 'afwiki',
+                    'title': '',
+                },
+                'nlwiki': {
+                    'site': 'nlwiki',
+                    'title': 'New York City',
+                    'badges': ['']
+                }
             }
         }
         diff = self.wdp.toJSON(diffto=self.wdp._content)

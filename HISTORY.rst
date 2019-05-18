@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Add support for badges on Wikibase item sitelinks (T128202)
+* Refactor Link and introduce BaseLink (T66457)
 * Deprecation warning: support for Python 2 will be dropped (T213287)
 * botirc.IRCBot has been dropped
 * Avoid using outdated browseragents (T222959)

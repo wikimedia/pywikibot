@@ -12,7 +12,9 @@ import re
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.page import Link, Page
+from pywikibot import Site
+from pywikibot.page import Link, Page, SiteLink
+from pywikibot.site import Namespace
 from pywikibot.exceptions import Error, InvalidTitle
 
 from tests.aspects import (
@@ -1030,6 +1032,30 @@ class TestInvalidInterwikiLinks(WikimediaDefaultSiteTestCase):
             'bulba:this-will-never-work is not a local page on wikipedia:en, '
             'and the interwiki prefix bulba is not supported by Pywikibot!',
             link.parse)
+
+
+class TestSiteLink(WikimediaDefaultSiteTestCase):
+
+    """Test parsing namespaces when creating SiteLinks."""
+
+    def _test_link(self, link, title, namespace, site_code, site_fam):
+        """Test the separate contents of the link."""
+        self.assertEqual(link.title, title)
+        self.assertEqual(link.namespace, namespace)
+        self.assertEqual(link.site, Site(site_code, site_fam))
+        self.assertEqual(link.badges, [])
+
+    def test_site_link(self):
+        """Test parsing of title."""
+        self._test_link(SiteLink('enwiki', 'Foobar'),
+                        'Foobar', Namespace.MAIN, 'en', 'wikipedia')
+        self._test_link(SiteLink('svwiki', 'Mall:!!'),
+                        '!!', Namespace.TEMPLATE, 'sv', 'wikipedia')
+        self._test_link(SiteLink('dewikibooks', 'Vorlage:!!'),
+                        '!!', Namespace.TEMPLATE, 'de', 'wikibooks')
+        self._test_link(SiteLink('enwiki', 'Ai Weiwei: Never Sorry'),
+                        'Ai Weiwei: Never Sorry', Namespace.MAIN,
+                        'en', 'wikipedia')
 
 
 if __name__ == '__main__':  # pragma: no cover
