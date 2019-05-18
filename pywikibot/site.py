@@ -3146,7 +3146,7 @@ class APISite(BaseSite):
                                 )
         self._update_page(page, query)
 
-    @deprecated('page.exists()')
+    @deprecated('page.exists()', since='20180218')
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         return page.pageid > 0

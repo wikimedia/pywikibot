@@ -586,7 +586,7 @@ class TimeoutError(Error):
     pass
 
 
-@__deprecated
+@__deprecated(since='20141214')
 class DeprecatedPageNotFoundError(Error):
 
     """Page not found (deprecated)."""
@@ -594,7 +594,7 @@ class DeprecatedPageNotFoundError(Error):
     pass
 
 
-@__deprecated
+@__deprecated(since='20141218')
 class _EmailUserError(UserRightsError, NotEmailableError):
 
     """Email related error."""

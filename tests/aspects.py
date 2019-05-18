@@ -1586,8 +1586,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         else:
             msg = '{0} is deprecated'.format(deprecated)
             if instead:
-                msg += '; use {0} instead'.format(instead)
-            msg += '.'
+                msg += '; use {0} instead.'.format(instead)
         return msg
 
     def assertDeprecationParts(self, deprecated=None, instead=None):
