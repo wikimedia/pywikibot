@@ -47,7 +47,8 @@ from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
-    first_upper, redirect_func, remove_last_args, UnicodeType
+    first_upper, redirect_func, remove_last_args, UnicodeType,
+    StringTypes
 )
 from pywikibot.tools.ip import is_IP, ip_regexp
 
@@ -78,6 +79,7 @@ __all__ = (
     'Claim',
     'Revision',
     'FileInfo',
+    'BaseLink',
     'Link',
     'html2unicode',
     'UnicodeToAsciiHtml',
@@ -174,12 +176,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
             is the preferred syntax when using an already-normalized title
             obtained from api.php or a database dump. WARNING: may produce
             invalid objects if page title isn't in normal form!
-          - If the first argument is a Link, create a Page from that link.
+          - If the first argument is a BaseLink, create a Page from that link.
             This is the preferred syntax when using a title scraped from
             wikitext, URLs, or another non-normalized source.
 
         @param source: the source of the page
-        @type source: Link, Page (or subclass), or Site
+        @type source: BaseLink (or subclass), Page (or subclass), or Site
         @param title: normalized title of the page; required if source is a
             Site, ignored otherwise
         @type title: str
@@ -203,7 +205,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 # overwrite title
                 self._link = Link(title, source=source.site,
                                   default_namespace=ns)
-        elif isinstance(source, Link):
+        elif isinstance(source, BaseLink):
             self._link = source
             self._revisions = {}
         else:
@@ -240,10 +242,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def namespace(self):
         """
-        Return the number of the namespace of the page.
+        Return the namespace of the page.
 
         @return: namespace of the page
-        @rtype: Namespace
+        @rtype: pywikibot.Namespace
         """
         return self._link.namespace
 
@@ -322,8 +324,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         title = self._link.canonical_title()
         label = self._link.title
-        if with_section and self._link.section:
-            section = '#' + self._link.section
+        if with_section and self.section():
+            section = '#' + self.section()
         else:
             section = ''
         if as_link:
@@ -381,9 +383,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
         The section is the part of the title following a '#' character, if
         any. If no section is present, return None.
 
-        @rtype: str
+        @rtype: str or None
         """
-        return self._link.section
+        try:
+            section = self._link.section
+        except AttributeError:
+            section = None
+        return section
 
     def __unicode__(self):
         """Return a unicode string representation."""
@@ -5544,23 +5550,243 @@ class FileInfo(DotReadableDict):
         return self.__dict__ == other.__dict__
 
 
-class Link(ComparableMixin):
+class BaseLink(ComparableMixin):
 
     """
     A MediaWiki link (local or interwiki).
 
     Has the following attributes:
 
-      - site: The Site object for the wiki linked to
-      - namespace: The namespace of the page linked to (int)
       - title: The title of the page linked to (unicode); does not include
         namespace or section
+      - namespace: The Namespace object of the page linked to
+      - site: The Site object for the wiki linked to
+    """
+
+    # Components used for __repr__
+    _items = ('title', 'namespace', '_sitekey')
+
+    def __init__(self, title, namespace=None, site=None):
+        """
+        Initializer.
+
+        @param title: the title of the page linked to (unicode); does not
+            include namespace or section
+        @type title: unicode
+        @param namespace: the namespace of the page linked to. Can be provided
+            as either an int, a Namespace instance or a str, defaults to the
+            MAIN namespace.
+        @type namespace: int, pywikibot.Namespace or str
+        @param site: the Site object for the wiki linked to. Can be provided as
+            either a Site instance or a db key, defaults to pywikibot.Site().
+        @type site: pywikibot.Site or str
+        """
+        self.title = title
+
+        if isinstance(namespace, pywikibot.site.Namespace):
+            self._namespace = namespace
+        else:
+            # postpone evaluation of namespace until needed
+            self._nskey = namespace
+
+        site = site or pywikibot.Site()
+        if isinstance(site, pywikibot.site.BaseSite):
+            self._site = site
+            self._sitekey = site.dbName()
+        else:
+            self._sitekey = site
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        assert isinstance(self._items, tuple)
+        assert all(isinstance(item, StringTypes) for item in self._items)
+
+        attrs = ('{0!r}'.format(getattr(self, attr)) for attr in self._items)
+        return 'pywikibot.page.{0}({1})'.format(
+            self.__class__.__name__, ', '.join(attrs))
+
+    def lookup_namespace(self):
+        """
+        Look up the namespace given the provided namespace id or name.
+
+        @TODO Invalid namespaces are ignored as per Link.__init__,
+            ideally both should raise some type of exception.
+
+        @rtype: pywikibot.Namespace
+        """
+        default_nskey = Namespace.MAIN
+        self._nskey = self._nskey or default_nskey
+
+        if isinstance(self._nskey, UnicodeType):
+            ns = self.site.namespaces.lookup_name(self._nskey)
+            if ns:
+                return ns
+            else:
+                self._nskey = default_nskey
+
+        if isinstance(self._nskey, int):
+            try:
+                ns = self.site.namespaces[self._nskey]
+            except KeyError:
+                ns = self.site.namespaces[default_nskey]
+            return ns
+
+    @property
+    def site(self):
+        """
+        Return the site of the link.
+
+        @rtype: pywikibot.Site
+        """
+        if not hasattr(self, '_site'):
+            self._site = pywikibot.site.APISite.fromDBName(self._sitekey)
+        return self._site
+
+    @property
+    def namespace(self):
+        """
+        Return the namespace of the link.
+
+        @rtype: pywikibot.Namespace
+        """
+        if not hasattr(self, '_namespace'):
+            self._namespace = self.lookup_namespace()
+        return self._namespace
+
+    def canonical_title(self):
+        """Return full page title, including localized namespace."""
+        # Avoid that ':' will be added to the title for Main ns.
+        if self.namespace != Namespace.MAIN:
+            return '%s:%s' % (self.site.namespace(self.namespace),
+                              self.title)
+        else:
+            return self.title
+
+    def ns_title(self, onsite=None):
+        """
+        Return full page title, including namespace.
+
+        @param onsite: site object
+            if specified, present title using onsite local namespace,
+            otherwise use self canonical namespace.
+
+        @raise pywikibot.Error: no corresponding namespace is found in onsite
+        """
+        if onsite is None:
+            name = self.namespace.canonical_name
+        else:
+            # look for corresponding ns in onsite by name comparison
+            for alias in self.namespace:
+                namespace = onsite.namespaces.lookup_name(alias)
+                if namespace is not None:
+                    name = namespace.custom_name
+                    break
+            else:
+                # not found
+                raise pywikibot.Error(
+                    'No corresponding namespace found for namespace %s on %s.'
+                    % (self.namespace, onsite))
+
+        if self.namespace != Namespace.MAIN:
+            return '%s:%s' % (name, self.title)
+        else:
+            return self.title
+
+    def astext(self, onsite=None):
+        """
+        Return a text representation of the link.
+
+        @param onsite: if specified, present as a (possibly interwiki) link
+            from the given site; otherwise, present as an internal link on
+            the site.
+        """
+        if onsite is None:
+            onsite = self.site
+        title = self.title
+        if self.namespace != Namespace.MAIN:
+            title = onsite.namespace(self.namespace) + ':' + title
+        if onsite == self.site:
+            return '[[%s]]' % title
+        if onsite.family == self.site.family:
+            return '[[%s:%s]]' % (self.site.code, title)
+        if self.site.family.name == self.site.code:
+            # use this form for sites like commons, where the
+            # code is the same as the family name
+            return '[[%s:%s]]' % (self.site.code, title)
+        return '[[%s:%s:%s]]' % (self.site.family.name, self.site.code, title)
+
+    if not PY2:
+        def __str__(self):
+            """Return a string representation."""
+            return self.__unicode__()
+    else:  # PY2
+        def __str__(self):
+            """Return a string representation."""
+            return self.__bytes__()
+
+    def __bytes__(self):
+        """Return a byte representation."""
+        return self.astext().encode('ascii', 'backslashreplace')
+
+    def _cmpkey(self):
+        """
+        Key for comparison of BaseLink objects.
+
+        BaseLink objects are "equal" if and only if they are on the same site
+        and have the same normalized title.
+
+        BaseLink objects are sortable by site, then namespace, then title.
+        """
+        return (self.site, self.namespace, self.title)
+
+    def __unicode__(self):
+        """
+        Return a unicode string representation.
+
+        @rtype: str
+        """
+        return self.astext()
+
+    def __hash__(self):
+        """A stable identifier to be used as a key in hash-tables."""
+        return hash((self.site.sitename, self.canonical_title()))
+
+    @classmethod
+    def fromPage(cls, page):
+        """
+        Create a BaseLink to a Page.
+
+        @param page: target Page
+        @type page: Page
+
+        @rtype: BaseLink
+        """
+        title = page.title(with_ns=False,
+                           allow_interwiki=False,
+                           with_section=False)
+
+        return cls(title, namespace=page.namespace(), site=page.site)
+
+
+class Link(BaseLink):
+
+    """
+    A MediaWiki wikitext link (local or interwiki).
+
+    Constructs a Link object based on a wikitext link and a source site.
+
+    Extends BaseLink by the following attributes:
+
       - section: The section of the page linked to (unicode or None); this
         contains any text following a '#' character in the title
       - anchor: The anchor text (unicode or None); this contains any text
         following a '|' character inside the link
-
     """
+
+    # @TODO Kept as is to not change repr() but is it suitable when missing
+    # 3 of 5 attributes?
+    # Components used for __repr__
+    _items = ('title', 'site')
 
     illegal_titles_pattern = re.compile(
         # Matching titles will be held as illegal.
@@ -5647,10 +5873,6 @@ class Link(ComparableMixin):
 
         if source_is_page:
             self._text = source.title(with_section=False) + self._text
-
-    def __repr__(self):
-        """Return a more complete string representation."""
-        return 'pywikibot.page.Link(%r, %r)' % (self.title, self.site)
 
     def parse_site(self):
         """
@@ -5829,7 +6051,7 @@ class Link(ComparableMixin):
         """
         Return the namespace of the link.
 
-        @rtype: Namespace
+        @rtype: pywikibot.Namespace
         """
         if not hasattr(self, '_namespace'):
             self.parse()
@@ -5868,45 +6090,7 @@ class Link(ComparableMixin):
             self.parse()
         return self._anchor
 
-    def canonical_title(self):
-        """Return full page title, including localized namespace."""
-        # Avoid that ':' will be added to the title for Main ns.
-        if self.namespace != Namespace.MAIN:
-            return '%s:%s' % (self.site.namespace(self.namespace),
-                              self.title)
-        else:
-            return self.title
-
-    def ns_title(self, onsite=None):
-        """
-        Return full page title, including namespace.
-
-        @param onsite: site object
-            if specified, present title using onsite local namespace,
-            otherwise use self canonical namespace.
-
-        @raise pywikibot.Error: no corresponding namespace is found in onsite
-        """
-        if onsite is None:
-            name = self.namespace.canonical_name
-        else:
-            # look for corresponding ns in onsite by name comparison
-            for alias in self.namespace:
-                namespace = onsite.namespaces.lookup_name(alias)
-                if namespace is not None:
-                    name = namespace.custom_name
-                    break
-            else:
-                # not found
-                raise pywikibot.Error(
-                    'No corresponding namespace found for namespace %s on %s.'
-                    % (self.namespace, onsite))
-
-        if self.namespace != Namespace.MAIN:
-            return '%s:%s' % (name, self.title)
-        else:
-            return self.title
-
+    # @TODO: shouldn't anchor also be added?
     def astext(self, onsite=None):
         """
         Return a text representation of the link.
@@ -5917,30 +6101,13 @@ class Link(ComparableMixin):
         """
         if onsite is None:
             onsite = self._source
-        title = self.title
-        if self.namespace != Namespace.MAIN:
-            title = onsite.namespace(self.namespace) + ':' + title
+        text = super(Link, self).astext(onsite)
         if self.section:
-            title = title + '#' + self.section
-        if onsite == self.site:
-            return '[[%s]]' % title
-        if onsite.family == self.site.family:
-            return '[[%s:%s]]' % (self.site.code, title)
-        if self.site.family.name == self.site.code:
-            # use this form for sites like commons, where the
-            # code is the same as the family name
-            return '[[%s:%s]]' % (self.site.code, title)
-        return '[[%s:%s:%s]]' % (self.site.family.name, self.site.code, title)
+            text = '{0}#{1}]]'.format(text.rstrip(']'), self.section)
 
-    if not PY2:
-        def __str__(self):
-            """Return a string representation."""
-            return self.__unicode__()
-    else:
-        def __str__(self):
-            """Return a string representation."""
-            return self.astext().encode('ascii', 'backslashreplace')
+        return text
 
+    # @TODO: Left as is but shouldn't section be included per description?
     def _cmpkey(self):
         """
         Key for comparison of Link objects.
@@ -5951,18 +6118,6 @@ class Link(ComparableMixin):
         Link objects are sortable by site, then namespace, then title.
         """
         return (self.site, self.namespace, self.title)
-
-    def __unicode__(self):
-        """
-        Return a unicode string representation.
-
-        @rtype: str
-        """
-        return self.astext()
-
-    def __hash__(self):
-        """A stable identifier to be used as a key in hash-tables."""
-        return hash((self.site.sitename, self.canonical_title()))
 
     @classmethod
     def fromPage(cls, page, source=None):
@@ -5976,13 +6131,13 @@ class Link(ComparableMixin):
 
         @rtype: Link
         """
+        base_link = BaseLink.fromPage(page)
         link = cls.__new__(cls)
-        link._site = page.site
+        link._site = base_link.site
+        link._title = base_link.title
+        link._namespace = base_link.namespace
+
         link._section = page.section()
-        link._namespace = page.namespace()
-        link._title = page.title(with_ns=False,
-                                 allow_interwiki=False,
-                                 with_section=False)
         link._anchor = None
         link._source = source or pywikibot.Site()
 
