@@ -430,60 +430,61 @@ class CommonscatBot(SingleSiteBot):
 
         """
         pywikibot.log('getCommonscat: ' + name)
+        commonsSite = self.site.image_repository()
+
         try:
-            commonsSite = self.site.image_repository()
             # This can throw a pywikibot.BadTitle
             commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
-
-            if not commonsPage.exists():
-                pywikibot.output('Commons category does not exist. '
-                                 'Examining deletion log...')
-                logpages = commonsSite.logevents(logtype='delete',
-                                                 page=commonsPage)
-                for logitem in logpages:
-                    loguser = logitem.user()
-                    logcomment = logitem.comment()
-                    # Some logic to extract the target page.
-                    regex = (
-                        r'moved to \[\[\:?Category:'
-                        r'(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|'
-                        r'Robot: Changing Category:(.+) '
-                        r'to Category:(?P<newcat2>.+)')
-                    m = re.search(regex, logcomment, flags=re.I)
-                    if m:
-                        if m.group('newcat1'):
-                            return self.checkCommonscatLink(m.group('newcat1'))
-                        elif m.group('newcat2'):
-                            return self.checkCommonscatLink(m.group('newcat2'))
-                    else:
-                        pywikibot.output(
-                            "getCommonscat: {} deleted by {}. Couldn't find "
-                            'move target in "{}"'
-                            .format(commonsPage, loguser, logcomment))
-                        return ''
-                return ''
-            elif commonsPage.isRedirectPage():
-                pywikibot.log('getCommonscat: The category is a redirect')
-                return self.checkCommonscatLink(
-                    commonsPage.getRedirectTarget().title(with_ns=False))
-            elif (pywikibot.Page(commonsPage.site,
-                  'Template:Category redirect') in commonsPage.templates()):
-                pywikibot.log(
-                    'getCommonscat: The category is a category redirect')
-                for template in commonsPage.templatesWithParams():
-                    if (
-                        template[0].title(with_ns=False) == 'Category redirect'
-                        and len(template[1]) > 0
-                    ):
-                        return self.checkCommonscatLink(template[1][0])
-            elif commonsPage.isDisambig():
-                pywikibot.log('getCommonscat: The category is disambiguation')
-                return ''
-            else:
-                return commonsPage.title(with_ns=False)
         except pywikibot.BadTitle:
             # Funky title so not correct
             return ''
+
+        if not commonsPage.exists():
+            pywikibot.output('Commons category does not exist. '
+                             'Examining deletion log...')
+            logpages = commonsSite.logevents(logtype='delete',
+                                             page=commonsPage)
+            for logitem in logpages:
+                loguser = logitem.user()
+                logcomment = logitem.comment()
+                # Some logic to extract the target page.
+                regex = (
+                    r'moved to \[\[\:?Category:'
+                    r'(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|'
+                    r'Robot: Changing Category:(.+) '
+                    r'to Category:(?P<newcat2>.+)')
+                m = re.search(regex, logcomment, flags=re.I)
+                if m:
+                    if m.group('newcat1'):
+                        return self.checkCommonscatLink(m.group('newcat1'))
+                    elif m.group('newcat2'):
+                        return self.checkCommonscatLink(m.group('newcat2'))
+                else:
+                    pywikibot.output(
+                        "getCommonscat: {} deleted by {}. Couldn't find "
+                        'move target in "{}"'
+                        .format(commonsPage, loguser, logcomment))
+                    return ''
+            return ''
+        elif commonsPage.isRedirectPage():
+            pywikibot.log('getCommonscat: The category is a redirect')
+            return self.checkCommonscatLink(
+                commonsPage.getRedirectTarget().title(with_ns=False))
+        elif (pywikibot.Page(commonsPage.site,
+              'Template:Category redirect') in commonsPage.templates()):
+            pywikibot.log(
+                'getCommonscat: The category is a category redirect')
+            for template in commonsPage.templatesWithParams():
+                if (
+                    template[0].title(with_ns=False) == 'Category redirect'
+                    and len(template[1]) > 0
+                ):
+                    return self.checkCommonscatLink(template[1][0])
+        elif commonsPage.isDisambig():
+            pywikibot.log('getCommonscat: The category is disambiguation')
+            return ''
+
+        return commonsPage.title(with_ns=False)
 
 
 def main(*args):
