@@ -1,9 +1,9 @@
 Welcome to Pywikibot!
 =====================
 
-.. warning::
+.. note::
 
-    **This documentation is incomplete**, and needs quite some work.
+    This documentation is incomplete, and needs quite some work.
 
     If you are not familiar with Pywikibot, please start at the
     documentation:
