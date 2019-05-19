@@ -1209,6 +1209,7 @@ class BaseBot(OptionHandler):
 
         self._treat_counter = 0
         self._save_counter = 0
+        self._skip_counter = 0
         self._generator_completed = False
 
     @property
@@ -1380,9 +1381,12 @@ class BaseBot(OptionHandler):
         May be overridden by subclasses.
         """
         self.teardown()
-        pywikibot.output('\n%i pages read'
-                         '\n%i pages written'
-                         % (self._treat_counter, self._save_counter))
+        pywikibot.output('\n{} pages read'
+                         '\n{} pages written'
+                         '\n{} pages skipped'
+                         .format(self._treat_counter,
+                                 self._save_counter,
+                                 self._skip_counter))
         if hasattr(self, '_start_ts'):
             delta = (pywikibot.Timestamp.now() - self._start_ts)
             seconds = int(delta.total_seconds())
@@ -1500,6 +1504,7 @@ class BaseBot(OptionHandler):
                     .format(page.__class__))
 
                 if self.skip_page(page):
+                    self._skip_counter += 1
                     continue
 
                 # Process the page
