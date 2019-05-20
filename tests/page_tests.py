@@ -1185,10 +1185,14 @@ class TestShortLink(DefaultSiteTestCase):
         """Test create_short_link function."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
-        self.assertEqual(p1.create_short_link(), 'w.wiki/3Cy')
-        self.assertEqual(p1.create_short_link(with_protocol=True),
-                         'https://w.wiki/3Cy')
-        self.assertEqual(p1.create_short_link(permalink=True), 'w.wiki/3Cz')
+        with self.subTest(parameters='defaulted'):
+            self.assertEqual(p1.create_short_link(), 'w.wiki/3Cy')
+        with self.subTest(with_protocol=True):
+            self.assertEqual(p1.create_short_link(with_protocol=True),
+                             'https://w.wiki/3Cy')
+        with self.subTest(permalink=True):
+            self.assertEqual(p1.create_short_link(permalink=True),
+                             'w.wiki/3Cz')
 
 
 if __name__ == '__main__':  # pragma: no cover
