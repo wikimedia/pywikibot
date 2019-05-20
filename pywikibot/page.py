@@ -5609,9 +5609,6 @@ class BaseLink(ComparableMixin):
         """
         Look up the namespace given the provided namespace id or name.
 
-        @TODO Invalid namespaces are ignored as per Link.__init__,
-            ideally both should raise some type of exception.
-
         @rtype: pywikibot.Namespace
         """
         default_nskey = Namespace.MAIN
@@ -5783,8 +5780,6 @@ class Link(BaseLink):
         following a '|' character inside the link
     """
 
-    # @TODO Kept as is to not change repr() but is it suitable when missing
-    # 3 of 5 attributes?
     # Components used for __repr__
     _items = ('title', 'site')
 
@@ -6090,7 +6085,6 @@ class Link(BaseLink):
             self.parse()
         return self._anchor
 
-    # @TODO: shouldn't anchor also be added?
     def astext(self, onsite=None):
         """
         Return a text representation of the link.
@@ -6107,7 +6101,6 @@ class Link(BaseLink):
 
         return text
 
-    # @TODO: Left as is but shouldn't section be included per description?
     def _cmpkey(self):
         """
         Key for comparison of Link objects.
