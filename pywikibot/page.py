@@ -66,6 +66,8 @@ else:
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 
+PROTOCOL_REGEX = r'\Ahttps?://'
+
 __all__ = (
     'BasePage',
     'Page',
@@ -2218,7 +2220,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.content_model == 'flow-board'
 
-    def create_short_link(self, permalink=False, with_protocol=False):
+    def create_short_link(self, permalink=False, with_protocol=True):
         """
         Return a shortened link that points to that page.
 
@@ -2228,8 +2230,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param permalink: If true, the link will point to the actual revision
             of the page.
         @type permalink: bool
-        @param with_protocol: If true, the link will have https propotol
-            prepend.
+        @param with_protocol: If true, and if it's not already included,
+            the link will have http(s) protocol prepended. On Wikimedia wikis
+            the protocol is already present.
         @type with_protocol: bool
         @return: The reduced link.
         @rtype: str
@@ -2241,7 +2244,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         url = self.permalink() if permalink else self.full_url()
 
         link = wiki.create_short_link(url)
-        if with_protocol:
+        if re.match(PROTOCOL_REGEX, link):
+            if not with_protocol:
+                return re.sub(PROTOCOL_REGEX, '', link)
+        elif with_protocol:
             return '{}://{}'.format(wiki.protocol(), link)
         return link
 
