@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* weblib module will be removed in next release (T85001)
 * Bugfixes and improvements
 * Localisation updates
 
