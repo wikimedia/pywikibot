@@ -71,7 +71,7 @@ __all__ = (
     'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
-    'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
+    'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
     'CurrentPageBot', 'AutomaticTWSummaryBot',
     'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
     'RedirectPageBot', 'NoRedirectPageBot',
@@ -91,6 +91,11 @@ import time
 import warnings
 from warnings import warn
 import webbrowser
+
+try:
+    import configparser
+except ImportError:  # PY2
+    import ConfigParser as configparser  # noqa: N813
 
 from textwrap import fill
 
@@ -1713,6 +1718,56 @@ class MultipleSitesBot(BaseBot):
         page = super(MultipleSitesBot, self).init_page(item)
         self._site = page.site
         return page
+
+
+class ConfigParserBot(BaseBot):
+
+    """A bot class that can read options from scripts.ini file.
+
+    All options must be predefined in availableOptions dictionary. The type
+    of these options is responsible for the correct interpretation of the
+    options type given by the .ini file. They can be interpreted as bool,
+    int, float or str (default). The settings file may be like:
+
+    [add_text]
+    # edit summary for the bot.
+    summary = Bot: Aggiungo template Categorizzare
+
+    [shell] ; Shell options
+    always: true
+
+    The option values are interpreted in this order::
+
+    - availableOptions default setting
+    - script.ini options settings
+    - command line arguments
+    """
+
+    INI = 'scripts.ini'
+
+    def setOptions(self, **kwargs):
+        """Read settings from scripts.ini file."""
+        conf = configparser.ConfigParser()
+        section = calledModuleName()
+
+        if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
+            pywikibot.output('Reading settings from {} file.'.format(self.INI))
+            args = {}
+            for option, value in self.availableOptions.items():
+                if not conf.has_option(section, option):
+                    continue
+                # use a convenience parser method, default to get()
+                method = getattr(conf, 'get' + type(value).__name__,
+                                 getattr(conf, 'get'))
+                args[option] = method(section, option)
+            for opt in set(conf.options(section)) - set(args):
+                pywikibot.warning(
+                    opt + ' is not a valid option. It was ignored.')
+            args.update(kwargs)
+        else:
+            args = kwargs
+
+        super(ConfigParserBot, self).setOptions(**args)
 
 
 class CurrentPageBot(BaseBot):
