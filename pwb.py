@@ -204,8 +204,8 @@ def find_alternates(filename, script_paths):
         wait_time = config.pwb_autostart_waittime
         output(color_format(
             'NOTE: Starting the most similar script '
-            '{lightyellow}{}.py{default}\n'
-            '      in {} seconds; type CTRL-C to stop.',
+            '{lightyellow}{0}.py{default}\n'
+            '      in {1} seconds; type CTRL-C to stop.',
             script, wait_time))
         try:
             sleep(wait_time)  # Wait a bit to let it be cancelled
