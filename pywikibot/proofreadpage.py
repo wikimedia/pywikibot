@@ -53,6 +53,7 @@ else:
 import pywikibot
 from pywikibot.comms import http
 from pywikibot.data.api import Request
+from pywikibot.exceptions import OtherPageSaveError
 from pywikibot.tools import ModuleDeprecationWrapper
 
 _logger = 'proofreadpage'
@@ -750,6 +751,8 @@ class IndexPage(pywikibot.Page):
 
     """Index Page page used in Mediawiki ProofreadPage extension."""
 
+    INDEX_TEMPLATE = ':MediaWiki:Proofreadpage_index_template'
+
     def __init__(self, source, title=''):
         """Instantiate a IndexPage object.
 
@@ -808,6 +811,36 @@ class IndexPage(pywikibot.Page):
             return title.group(1)
         else:
             return None
+
+    def save(self, *args, **kwargs):  # See Page.save().
+        """
+        Save page after validating the content.
+
+        Trying to save any other content fails silently with a parameterless
+        INDEX_TEMPLATE being saved.
+        """
+        if not self.has_valid_content():
+            raise OtherPageSaveError(
+                self, 'An IndexPage must consist only of a single call to '
+                '{{%s}}.' % self.INDEX_TEMPLATE)
+        kwargs['contentformat'] = 'text/x-wiki'
+        kwargs['contentmodel'] = 'proofread-index'
+        super(IndexPage, self).save(*args, **kwargs)
+
+    def has_valid_content(self):
+        """Test page only contains a single call to the index template."""
+        if (not self.text.startswith('{{' + self.INDEX_TEMPLATE)
+                or not self.text.endswith('}}')):
+            return False
+
+        # Discard all inner templates as only top-level ones matter
+        tmplts = pywikibot.textlib.extract_templates_and_params_regex_simple(
+            self.text)
+        if len(tmplts) != 1 or tmplts[0][0] != self.INDEX_TEMPLATE:
+            # Only a single call to the INDEX_TEMPLATE is allowed
+            return False
+
+        return True
 
     def purge(self):
         """Overwrite purge method.
