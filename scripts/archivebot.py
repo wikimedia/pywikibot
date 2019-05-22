@@ -380,8 +380,8 @@ class DiscussionThread(object):
         """
         Check whether thread has to be archived.
 
-        @return: the archivation reason as a dict of localization args
-        @rtype: dict
+        @return: the archivation reason as a tuple of localization args
+        @rtype: tuple
         """
         # Archived by timestamp
         algo = archiver.get_attr('algo')
@@ -393,7 +393,7 @@ class DiscussionThread(object):
             maxage = str2time(re_t.group(1), self.timestamp)
             if self.now - self.timestamp > maxage:
                 duration = str2localized_duration(archiver.site, re_t.group(1))
-                return {'duration': duration}
+                return ('duration', duration)
         # TODO: handle marked with template
         return None
 
@@ -693,7 +693,7 @@ class PageArchiver(object):
                              for a in self.archives.values())
             # Find out the reasons and return them localized
             translated_whys = set()
-            for why, arg in whys.items():
+            for why, arg in whys:
                 # Archived by timestamp
                 if why == 'duration':
                     translated_whys.add(
