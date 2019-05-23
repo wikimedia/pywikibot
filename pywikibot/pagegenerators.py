@@ -670,11 +670,8 @@ class GeneratorFactory(object):
         @return: The generator or None if invalid 'total' value.
         @rtype: LogeventsPageGenerator
         """
-        # TODO: Check if logtype is one of the allowed log types
-
-        # 'start or None', because start might be an empty string
         total = None
-        start = start or None
+        start = start or None  # because start might be an empty string
         if isinstance(start, UnicodeType) and len(start) == 8:
             start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
         elif start is not None:
