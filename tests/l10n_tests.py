@@ -107,9 +107,10 @@ class TestSites(TestCase):
         for package in PACKAGES:
             keys = i18n.twget_keys(package)
             for key in keys:
-                self.assertIn(key, languages,
-                              "'{}' - json key '{}' is not a site language"
-                              .format(package, key))
+                with self.subTest(package=package, key=key):
+                    self.assertIn(key, languages,
+                                  "'{}' - json key '{}' is not a site language"
+                                  .format(package, key))
 
 
 def setUpModule():  # noqa: N802
