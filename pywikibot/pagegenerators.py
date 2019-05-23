@@ -526,17 +526,18 @@ class GeneratorFactory(object):
                     self.gens[i].set_maximum_items(self.limit)
                 except AttributeError:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
-        if len(self.gens) == 0:
-            if (self.titlefilter_list
-                or self.titlenotfilter_list
-                or self.articlefilter_list
-                or self.claimfilter_list
-                or self.catfilter_list
-                or self.subpage_max_depth is not None
-                    or self.qualityfilter_list):
-                pywikibot.warning(
-                    'filter(s) specified but no generators.')
+
+        if not self.gens:
+            if any((self.titlefilter_list,
+                    self.titlenotfilter_list,
+                    self.articlefilter_list,
+                    self.claimfilter_list,
+                    self.catfilter_list,
+                    self.qualityfilter_list,
+                    self.subpage_max_depth is not None)):
+                pywikibot.warning('filter(s) specified but no generators.')
             return None
+
         elif len(self.gens) == 1:
             dupfiltergen = self.gens[0]
             if hasattr(self, '_single_gen_filter_unique'):
@@ -544,13 +545,11 @@ class GeneratorFactory(object):
             if self.intersect:
                 pywikibot.warning(
                     '"-intersect" ignored as only one generator is specified.')
+        elif self.intersect:
+            # By definition no duplicates are possible.
+            dupfiltergen = intersect_generators(self.gens)
         else:
-            if self.intersect:
-                # By definition no duplicates are possible.
-                dupfiltergen = intersect_generators(self.gens)
-            else:
-                dupfiltergen = _filter_unique_pages(itertools.chain(
-                    *self.gens))
+            dupfiltergen = _filter_unique_pages(itertools.chain(*self.gens))
 
         # Add on subpage filter generator
         if self.subpage_max_depth is not None:
