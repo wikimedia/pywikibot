@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from distutils.version import StrictVersion
 
-from pywikibot.tools import ip
+from pywikibot.tools import ip, PY2
 
 from tests import unittest_print
 from tests.aspects import unittest, TestCase, DeprecationTestCase
@@ -25,30 +25,23 @@ class TestIPBase(TestCase):
     def setUp(self):
         """Set up test."""
         self.total = 0
-        self.fail = 0
-        self.errors = []
         super(TestIPBase, self).setUp()
 
     def tearDown(self):
         """Tear down test."""
         super(TestIPBase, self).tearDown()
-        if not self.fail:
-            unittest_print('{0} tests done'.format(self.total))
-        else:
-            unittest_print(
-                '{0} of {1} tests failed:\n{2}'.format(
-                    self.fail, self.total, '\n'.join(self.errors)))
+        unittest_print('{} subtests done'.format(self.total))
 
     def ipv6test(self, result, ip_address):
         """Perform one ip_address test."""
         self.total += 1
-        try:
-            self.assertEqual(result, self._do_ip_test(ip_address))
-        except AssertionError:
-            self.fail += 1
-            self.errors.append(
-                '"{}" match should be {} - not OK'
-                .format(ip_address, result))
+        with self.subTest(ip_address=ip_address):
+            msg = '"{}" match should be {} - not OK'.format(
+                ip_address, result) if PY2 else None
+            if result:
+                self.assertTrue(self._do_ip_test(ip_address), msg)
+            else:
+                self.assertFalse(self._do_ip_test(ip_address), msg)
 
     def _run_tests(self):
         """Test various IP."""
@@ -674,7 +667,6 @@ class IPRegexTestCase(TestIPBase, DeprecationTestCase):
         self._run_tests()
         self._test_T76286_failures()
         self._test_T105443_failures()
-        self.assertEqual(self.fail, 0)
         self.assertDeprecationParts('page.ip_regexp', 'tools.ip.is_IP')
         self.assertLength(self.deprecation_messages, self.total)
 
@@ -696,23 +688,19 @@ class IPAddressModuleTestCase(TestIPBase):
 
     def test_ipaddress_module(self):
         """Test ipaddress module."""
-        unittest_print('testing {0}'.format(ip.ip_address.__module__))
         self._run_tests()
-        self.assertEqual(self.fail, 0)
 
     @expected_failure_if(ip.ip_address.__module__ == 'ipaddress'
                          or ip.ip_address.__name__ == 'ip_address_patched')
     def test_T76286_failures(self):
         """Test known bugs in the ipaddress module."""
         self._test_T76286_failures()
-        self.assertEqual(self.fail, 0)
 
     @expected_failure_if(ip.ip_address.__module__ == 'ipaddr'
                          and ip._ipaddr_version == StrictVersion('2.1.10'))
     def test_T105443_failures(self):
         """Test known bugs in the ipaddr module."""
         self._test_T105443_failures()
-        self.assertEqual(self.fail, 0)
 
 
 if __name__ == '__main__':  # pragma: no cover
