@@ -43,7 +43,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'an', 'yue', 'wo', 'ang', 'tt', 'mt', 'sd', 'gn', 'mr', 'ie', 'so',
         'gd', 'csb', 'ug', 'ia', 'st', 'roa-rup', 'si', 'hif', 'mi', 'ay',
         'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu', 'gv', 'kw', 'rw', 'ts',
-        'ne', 'om', 'su', 'qu', 'ss', 'ha', 'iu', 'am', 'dv', 'tpi', 'yi',
+        'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am', 'dv', 'tpi', 'yi',
         'ti', 'sg', 'tn', 'ks',
     ]
 
