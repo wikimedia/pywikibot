@@ -4300,6 +4300,9 @@ class WikibasePage(BasePage):
             were successful.
         @type callback: callable
         """
+        if claim.on_item is not None:
+            raise ValueError(
+                'The provided Claim instance is already used in an entity')
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
         for snaks in claim.qualifiers.values():
@@ -4960,6 +4963,23 @@ class Claim(Property):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def copy(self):
+        """
+        Create an independent copy of this object.
+
+        @rtype: Claim
+        """
+        data = self.toJSON()
+        if self.isQualifier:
+            ret = self.qualifierFromJSON(self.repo, data)
+        elif self.isReference:
+            ret = self.referenceFromJSON(self.repo, data)
+            ret.hash = None
+        else:
+            ret = self.fromJSON(self.repo, data)
+            ret.snak = None
+        return ret
+
     @classmethod
     def fromJSON(cls, site, data):
         """
@@ -5209,6 +5229,10 @@ class Claim(Property):
         @param claims: the claims to add
         @type claims: list of pywikibot.Claim
         """
+        for claim in claims:
+            if claim.on_item is not None:
+                raise ValueError(
+                    'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
             data = self.repo.editSource(self, claims, new=True, **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
@@ -5249,6 +5273,9 @@ class Claim(Property):
         @param qualifier: the qualifier to add
         @type qualifier: Claim
         """
+        if qualifier.on_item is not None:
+            raise ValueError(
+                'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
             data = self.repo.editQualifier(self, qualifier, **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
