@@ -769,6 +769,80 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
         self.assertEqual(list(gen), self.pages)
 
 
+class TestIndexPageHasValidContent(IndexPageTestCase):
+
+    """Unit tests for has_valid_content()."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    index_name = 'Index:Phosphor (1888).djvu'
+    valid_template = '{{%s|foo=bar}}' % IndexPage.INDEX_TEMPLATE
+    other_template = '{{PoTM|bar=foobar}}'
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare tests by creating an IndexPage instance."""
+        super(TestIndexPageHasValidContent, cls).setUpClass()
+        cls.index = IndexPage(cls.site, cls.index_name)
+
+    def test_has_valid_content_empty(self):
+        """Test empty page is invalid."""
+        self.index.text = ''
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_non_template(self):
+        """Test non-template is invalid."""
+        self.index.text = 'foobar'
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_valid(self):
+        """Test correct Index template is valid."""
+        self.index.text = self.valid_template
+        self.assertTrue(self.index.has_valid_content())
+
+    def test_has_valid_content_prefixed(self):
+        """Test prefixing Index template is invalid."""
+        self.index.text = 'pre {}'.format(self.valid_template)
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_postfixed(self):
+        """Test postfixing Index template is invalid."""
+        self.index.text = '{}post'.format(self.valid_template)
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_pre_and_postfixed(self):
+        """Test pre- and postfixing Index template is invalid."""
+        self.index.text = 'pre{}post'.format(self.valid_template)
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_second_template(self):
+        """Test postfixing a second template is invalid."""
+        self.index.text = self.valid_template + self.other_template
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_wrong_template(self):
+        """Test incorrect template is invalid."""
+        self.index.text = self.other_template
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_missnamed_template(self):
+        """Test nested templates is valid."""
+        self.index.text = '{{%s_bar|foo=bar}}' % IndexPage.INDEX_TEMPLATE
+        self.assertFalse(self.index.has_valid_content())
+
+    def test_has_valid_content_nested_template(self):
+        """Test nested templates is valid."""
+        self.index.text = ('{{%s|foo=%s}}'
+                           % (IndexPage.INDEX_TEMPLATE, self.other_template))
+        self.assertTrue(self.index.has_valid_content())
+
+    def test_has_valid_content_multiple_valid(self):
+        """Test multiple Index templates is invalid."""
+        self.index.text = self.valid_template * 2
+        self.assertFalse(self.index.has_valid_content())
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
