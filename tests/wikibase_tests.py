@@ -1588,6 +1588,8 @@ class TestClaim(WikidataTestCase):
         qualifier.setTarget('foo')
         copy = qualifier.copy()
         self.assertEqual(qualifier, copy)
+        self.assertTrue(qualifier.isQualifier)
+        self.assertTrue(copy.isQualifier)
 
     def test_claim_copy_is_equal_source(self):
         """
@@ -1600,6 +1602,8 @@ class TestClaim(WikidataTestCase):
         source.setTarget(pywikibot.ItemPage(wikidata, 'Q328'))
         copy = source.copy()
         self.assertEqual(source, copy)
+        self.assertTrue(source.isReference)
+        self.assertTrue(copy.isReference)
 
 
 class TestClaimSetValue(WikidataTestCase):

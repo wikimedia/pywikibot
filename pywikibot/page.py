@@ -4981,16 +4981,17 @@ class Claim(Property):
 
         @rtype: Claim
         """
-        data = self.toJSON()
-        if self.isQualifier:
-            ret = self.qualifierFromJSON(self.repo, data)
-        elif self.isReference:
-            ret = self.referenceFromJSON(self.repo, data)
-            ret.hash = None
-        else:
-            ret = self.fromJSON(self.repo, data)
-            ret.snak = None
-        return ret
+        is_qualifier = self.isQualifier
+        is_reference = self.isReference
+        self.isQualifier = False
+        self.isReference = False
+        copy = self.fromJSON(self.repo, self.toJSON())
+        for cl in (self, copy):
+            cl.isQualifier = is_qualifier
+            cl.isReference = is_reference
+        copy.hash = None
+        copy.snak = None
+        return copy
 
     @classmethod
     def fromJSON(cls, site, data):
@@ -5054,7 +5055,7 @@ class Claim(Property):
         for prop in prop_list:
             for claimsnak in data['snaks'][prop]:
                 claim = cls.fromJSON(site, {'mainsnak': claimsnak,
-                                            'hash': data['hash']})
+                                            'hash': data.get('hash')})
                 claim.isReference = True
                 if claim.getID() not in source:
                     source[claim.getID()] = []
@@ -5073,7 +5074,7 @@ class Claim(Property):
         @rtype: Claim
         """
         claim = cls.fromJSON(site, {'mainsnak': data,
-                                    'hash': data['hash']})
+                                    'hash': data.get('hash')})
         claim.isQualifier = True
         return claim
 
