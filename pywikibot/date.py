@@ -465,23 +465,20 @@ def dh(value, pattern, encf, decf, filter=None):
 
         params = encf(value)
 
-        # name 'MakeParameter' kept to avoid breaking blame below
-        MakeParameter = _make_parameter
-
         if type(params) in _listTypes:
             assert len(params) == len(decoders), (
                 'parameter count ({0}) does not match decoder count ({1})'
                 .format(len(params), len(decoders)))
             # convert integer parameters into their textual representation
-            params = [MakeParameter(decoders[i], param)
-                      for i, param in enumerate(params)]
-            return strPattern % tuple(params)
+            params = tuple(_make_parameter(decoders[i], param)
+                           for i, param in enumerate(params))
+            return strPattern % params
         else:
             assert len(decoders) == 1, (
                 'A single parameter does not match {0} decoders.'
                 .format(len(decoders)))
             # convert integer parameter into its textual representation
-            return strPattern % MakeParameter(decoders[0], params)
+            return strPattern % _make_parameter(decoders[0], params)
 
 
 def _make_parameter(decoder, param):
