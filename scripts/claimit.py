@@ -95,7 +95,7 @@ class ClaimRobot(WikidataBot):
             # The generator might yield pages from multiple sites
             site = page.site if page is not None else None
             self.user_add_claim_unless_exists(
-                item, claim, self.exists_arg, site)
+                item, claim.copy(), self.exists_arg, site)
 
 
 def main(*args):

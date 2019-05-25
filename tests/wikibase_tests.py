@@ -1559,6 +1559,48 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim1, claim2)
         self.assertEqual(claim2, claim1)
 
+    def test_claim_copy_is_equal(self):
+        """
+        Test making a copy of a claim.
+
+        The copy of a claim should be always equal to the claim.
+        """
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P31')
+        claim.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier.setTarget('foo')
+        source = pywikibot.Claim(wikidata, 'P143', is_reference=True)
+        source.setTarget(pywikibot.ItemPage(wikidata, 'Q328'))
+        claim.addQualifier(qualifier)
+        claim.addSource(source)
+        copy = claim.copy()
+        self.assertEqual(claim, copy)
+
+    def test_claim_copy_is_equal_qualifier(self):
+        """
+        Test making a copy of a claim.
+
+        The copy of a qualifier should be always equal to the qualifier.
+        """
+        wikidata = self.get_repo()
+        qualifier = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier.setTarget('foo')
+        copy = qualifier.copy()
+        self.assertEqual(qualifier, copy)
+
+    def test_claim_copy_is_equal_source(self):
+        """
+        Test making a copy of a claim.
+
+        The copy of a source should be always equal to the source.
+        """
+        wikidata = self.get_repo()
+        source = pywikibot.Claim(wikidata, 'P143', is_reference=True)
+        source.setTarget(pywikibot.ItemPage(wikidata, 'Q328'))
+        copy = source.copy()
+        self.assertEqual(source, copy)
+
 
 class TestClaimSetValue(WikidataTestCase):
 
