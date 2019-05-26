@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, unicode_literals
 import io
 import sys
 
+from pywikibot.tools import PY2
+
 from tests import join_tests_path, create_path_func
 from tests.utils import execute, execute_pwb
 from tests.aspects import unittest, PwbTestCase
@@ -89,6 +91,7 @@ class TestPwb(PwbTestCase):
         self.assertEqual(stderr.readline().strip(),
                          'ERROR: pywikibot.py not found! Misspelling?')
 
+    @unittest.skipIf(PY2, 'cannot be safely tested with Python 2 (T224364)')
     def test_one_similar_script(self):
         """Test shell.py script call which gives one similar result."""
         result = [
