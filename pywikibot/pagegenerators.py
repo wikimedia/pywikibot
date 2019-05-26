@@ -2904,12 +2904,13 @@ def DayPageGenerator(start_month=1, end_month=12, site=None, year=2000):
     """
     if site is None:
         site = pywikibot.Site()
-    fd = date.FormatDate(site)
-    firstPage = pywikibot.Page(site, fd(start_month, 1))
+    lang = site.lang
+    firstPage = pywikibot.Page(site, date.format_date(start_month, 1, lang))
     pywikibot.output('Starting with %s' % firstPage.title(as_link=True))
     for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
-            yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
+            yield pywikibot.Page(
+                pywikibot.Link(date.format_date(month, day, lang), site))
 
 
 def WikidataPageFromItemGenerator(gen, site):
