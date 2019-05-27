@@ -60,10 +60,10 @@ def multi(value, tuplst):
         for func, pred in tuplst:
             try:
                 res = func(value)
-                if pred(res):
-                    return res
-            except Exception:
-                pass
+            except ValueError:
+                continue
+            if pred(res):
+                return res
     else:
         # Find a predicate that gives true for this int value, and run a
         # function
