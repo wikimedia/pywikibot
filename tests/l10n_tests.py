@@ -103,7 +103,9 @@ class TestSites(TestCase):
     def test_valid_sites(self):
         """Test whether language key has a corresponding site."""
         codes = self.site.family.languages_by_size
-        languages = [pywikibot.Site(code, self.family).lang for code in codes]
+        languages = {pywikibot.Site(code, self.family).lang for code in codes}
+        # langs used by foreign wikis
+        languages.update(('pt-br', 'zh-tw'))
         for package in PACKAGES:
             keys = i18n.twget_keys(package)
             for key in keys:
