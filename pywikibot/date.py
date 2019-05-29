@@ -2226,7 +2226,7 @@ class FormatDate(object):
 
     def __call__(self, m, d):
         """Return a formatted month and day."""
-        return formats['Day_' + enMonthNames[m - 1]][self.site.lang](d)
+        return formats[dayMnthFmts[m - 1]][self.site.lang](d)
 
 
 def formatYear(lang, year):
