@@ -28,6 +28,9 @@ from pywikibot.tools import first_lower, first_upper, deprecated, UnicodeType
 enMonthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November',
                 'December']
+waMonthNames = ['djanvî', 'fevrî', 'måss', 'avri', 'may', 'djun', 'djulete',
+                'awousse', 'setimbe', 'octôbe', 'nôvimbe', 'decimbe']
+
 dayMnthFmts = ['Day_' + str(s) for s in enMonthNames]  # e.g. 'Day_January'
 yrMnthFmts = ['Year_' + str(s) for s in enMonthNames]  # e.g. 'Year_January'
 
@@ -836,9 +839,7 @@ formats = {
         'vo': lambda v: slh(v, ['Yanul', 'Febul', 'Mäzul', 'Prilul', 'Mayul',
                                 'Yunul', 'Yulul', 'Gustul', 'Setul', 'Tobul',
                                 'Novul', 'Dekul']),
-        'wa': lambda v: slh(v, ['djanvî', 'fevrî', 'Måss (moes)', 'avri',
-                                'may', 'djun', 'djulete', 'awousse', 'setimbe',
-                                'octôbe', 'nôvimbe', 'decimbe']),
+        'wa': lambda v: slh(v, waMonthNames),
         'zh': lambda v: slh(v, makeMonthList('%d月')),
     },
 
@@ -2030,8 +2031,6 @@ addFmt1('zh', False, makeMonthList('%d月%%d日'))
 
 # Walloon names depend on the day number, thus we must generate various
 # different patterns
-waMonthNames = ['djanvî', 'fevrî', 'måss', 'avri', 'may', 'djun', 'djulete',
-                'awousse', 'setimbe', 'octôbe', 'nôvimbe', 'decimbe']
 
 # For month names beginning with a consonant...
 for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
