@@ -259,8 +259,9 @@ def main(*args):
             if not notitle:
                 page_fmt = Formatter(page, outputlang)
                 output_list += [page_fmt.output(num=i, fmt=fmt)]
-                pywikibot.stdout(output_list[-1])
             if page_get:
+                if output_list:
+                    pywikibot.stdout(output_list.pop(-1))
                 try:
                     pywikibot.stdout(page.text)
                 except pywikibot.Error as err:
@@ -271,10 +272,12 @@ def main(*args):
                                  .format(page.title(), filename))
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
-        pywikibot.output('{0} page(s) found'.format(i))
+        text = '\n'.join(output_list)
         if page_target:
-            page_target.text = '\n'.join(output_list)
+            page_target.text = text
             page_target.save(summary=summary)
+        pywikibot.stdout(text)
+        pywikibot.output('{0} page(s) found'.format(i))
         return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
