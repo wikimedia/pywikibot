@@ -2151,7 +2151,7 @@ formatLimits = {
 }
 
 # All month of year articles are in the same format
-_formatLimit_MonthOfYear = (lambda v: 1 <= 1900 and v < 2051, 1900, 2051)
+_formatLimit_MonthOfYear = (lambda v: 1900 <= v < 2051, 1900, 2051)
 for month in yrMnthFmts:
     formatLimits[month] = _formatLimit_MonthOfYear
 
