@@ -162,10 +162,10 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
         self.assertEqual(req._params['one'], ['1'])
         # test compliance with dict interface
         # req.keys() should contain 'action', 'foo', 'bar', 'one'
-        self.assertEqual(len(req.keys()), 4)
+        self.assertLength(req.keys(), 4)
         self.assertIn('test', req._encoded_items().values())
         for item in req.items():
-            self.assertEqual(len(item), 2, item)
+            self.assertLength(item, 2)
 
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
@@ -189,12 +189,12 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test common initialization."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi._init()
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi), len(pi.preloaded_modules))
+        self.assertLength(pi, pi.preloaded_modules)
 
         self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
@@ -212,7 +212,7 @@ class TestParamInfo(DefaultSiteTestCase):
                 assert 'query' not in modules
             original_generate_submodules(modules)
         pi = api.ParamInfo(self.site, {'query', 'main'})
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         original_generate_submodules = pi._generate_submodules
         pi._generate_submodules = patched_generate_submodules
         pi._init()
@@ -225,7 +225,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('query', api.ParamInfo.init_modules)
         pi = api.ParamInfo(site, {'pageset'})
         self.assertNotIn('query', api.ParamInfo.init_modules)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi._init()
 
         self.assertIn('main', pi._paraminfo)
@@ -234,13 +234,12 @@ class TestParamInfo(DefaultSiteTestCase):
 
         if 'query' in pi.preloaded_modules:
             self.assertIn('query', pi._paraminfo)
-            self.assertEqual(len(pi), 4)
+            self.assertLength(pi, 4)
         else:
             self.assertNotIn('query', pi._paraminfo)
-            self.assertEqual(len(pi), 3)
+            self.assertLength(pi, 3)
 
-        self.assertEqual(len(pi),
-                         len(pi.preloaded_modules))
+        self.assertLength(pi, pi.preloaded_modules)
 
         if site.mw_version >= '1.21':
             # 'generator' was added to 'pageset' in 1.21
@@ -251,7 +250,7 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test requesting the generator parameter."""
         site = self.get_site()
         pi = api.ParamInfo(site, {'pageset', 'query'})
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi._init()
 
         self.assertIn('main', pi._paraminfo)
@@ -270,13 +269,13 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test requesting the module info."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
+        self.assertLength(pi, 1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['info']['prefix'], 'in')
 
@@ -294,13 +293,13 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test requesting the module revisions."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi.fetch(['revisions'])
         self.assertIn('query+revisions', pi._paraminfo)
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
+        self.assertLength(pi, 1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['revisions']['prefix'], 'rv')
 
@@ -318,7 +317,7 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test requesting multiple modules in one fetch."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
         pi.fetch(['info', 'revisions'])
         self.assertIn('query+info', pi._paraminfo)
         self.assertIn('query+revisions', pi._paraminfo)
@@ -326,13 +325,13 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertEqual(len(pi), 2 + len(pi.preloaded_modules))
+        self.assertLength(pi, 2 + len(pi.preloaded_modules))
 
     def test_with_invalid_module(self):
         """Test requesting different kind of invalid modules."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertEqual(len(pi), 0)
+        self.assertIsEmpty(pi)
 
         with patch.object(pywikibot, 'warning') as w:
             pi.fetch('foobar')
@@ -345,7 +344,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertEqual(len(pi), len(pi.preloaded_modules))
+        self.assertLength(pi, pi.preloaded_modules)
 
     def test_submodules(self):
         """Test another module apart from query having submodules."""
@@ -444,7 +443,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
+        self.assertLength(pi, 1 + len(pi.preloaded_modules))
 
         self.assertIn('query+revisions', pi.prefix_map)
 
@@ -458,13 +457,10 @@ class TestParamInfo(DefaultSiteTestCase):
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)
-
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertEqual(len(pi),
-                         1 + len(pi.preloaded_modules))
-
+        self.assertLength(pi, 1 + len(pi.preloaded_modules))
         self.assertIn('query+revisions', pi.prefix_map)
 
 
@@ -528,19 +524,19 @@ class TestOptionSet(TestCase):
         options['anon'] = True
         self.assertCountEqual(['anon'], options._enabled)
         self.assertEqual(set(), options._disabled)
-        self.assertEqual(1, len(options))
+        self.assertLength(options, 1)
         self.assertEqual(['anon'], list(options))
         self.assertEqual(['anon'], list(options.api_iter()))
         options['bot'] = False
         self.assertCountEqual(['anon'], options._enabled)
         self.assertCountEqual(['bot'], options._disabled)
-        self.assertEqual(2, len(options))
+        self.assertLength(options, 2)
         self.assertEqual(['anon', 'bot'], list(options))
         self.assertEqual(['anon', '!bot'], list(options.api_iter()))
         options.clear()
         self.assertEqual(set(), options._enabled)
         self.assertEqual(set(), options._disabled)
-        self.assertEqual(0, len(options))
+        self.assertIsEmpty(options)
         self.assertEqual([], list(options))
         self.assertEqual([], list(options.api_iter()))
 
@@ -550,12 +546,12 @@ class TestOptionSet(TestCase):
         options['invalid_name'] = True
         options['anon'] = True
         self.assertIn('invalid_name', options._enabled)
-        self.assertEqual(2, len(options))
+        self.assertLength(options, 2)
         self.assertRaises(KeyError, options._set_site, self.get_site(),
                           'recentchanges', 'show')
-        self.assertEqual(2, len(options))
+        self.assertLength(options, 2)
         options._set_site(self.get_site(), 'recentchanges', 'show', True)
-        self.assertEqual(1, len(options))
+        self.assertLength(options, 1)
         self.assertRaises(TypeError, options._set_site, self.get_site(),
                           'recentchanges', 'show')
 
@@ -707,7 +703,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('pageid', pagedata)
             self.assertIn('lastrevid', pagedata)
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     def test_one_continuation(self):
         """Test PropertyGenerator with prop 'revisions'."""
@@ -727,7 +723,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     def test_two_continuations(self):
         """Test PropertyGenerator with prop 'revisions' and 'coordinates'."""
@@ -747,7 +743,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     @allowed_failure
     def test_many_continuations_limited(self):
@@ -776,7 +772,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
         # FIXME: AssertionError: 30 != 6150
 
     @allowed_failure
@@ -798,7 +794,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
         # FIXME: AssertionError: 30 != 11550
 
     # FIXME: test disabled as it takes longer than 10 minutes
@@ -819,7 +815,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
 
 class TestDryQueryGeneratorNamespaceParam(TestCase):
