@@ -13,9 +13,12 @@ checks:
   method-lines:
     config:
       threshold: 30
-  similar-code:
+
+plugins:
+  duplication:
+    enabled: true
     config:
-      threshold: 3
+      count_threshold: 3
 
 exclude_patterns:
 - "docs/"
