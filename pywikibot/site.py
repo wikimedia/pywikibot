@@ -1820,25 +1820,6 @@ class RemovedSite(BaseSite):
         super(RemovedSite, self).__init__(code, fam, user, sysop)
 
 
-class NonMWAPISite(BaseSite):
-
-    """API interface to non MediaWiki sites."""
-
-    def __init__(self, url):
-        """Initializer."""
-        self.netloc = urlparse(url).netloc
-
-    def __getattribute__(self, attr):
-        """Return attribute if present else raise NotImplementedError."""
-        whitelist = ['__getattribute__', 'netloc']
-        if attr in whitelist:
-            return super(NonMWAPISite, self).__getattribute__(attr)
-        else:
-            raise NotImplementedError('The attribute %s has not been on '
-                                      'site %s implemented yet.'
-                                      % (attr, self.netloc))
-
-
 class APISite(BaseSite):
 
     """

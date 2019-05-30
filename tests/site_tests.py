@@ -3531,27 +3531,6 @@ class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
                           pywikibot.Site, 'en', 'wikidata')
 
 
-class TestNonMWAPISite(TestCase):
-
-    """Test the BaseSite subclass, site.NonMWAPISite."""
-
-    net = False
-
-    def test_non_mw_sites(self):
-        """Test NonMWAPISite for sites not using MediaWiki."""
-        self._run_test('http://moinmo.in/$1')
-        self._run_test('http://twiki.org/cgi-bin/view/$1')
-        self._run_test('http://www.usemod.com/cgi-bin/wiki.pl?$1')
-        self._run_test('https://developer.mozilla.org/en/docs/$1')
-        self._run_test('http://www.tvtropes.org/pmwiki/pmwiki.php/Main/$1')
-
-    def _run_test(self, url):
-        """Run test method."""
-        site = pywikibot.site.NonMWAPISite(url)
-        with self.assertRaises(NotImplementedError):
-            site.attr
-
-
 class TestSiteProofreadinfo(DefaultSiteTestCase):
 
     """Test proofreadinfo information."""
