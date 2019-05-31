@@ -2660,26 +2660,10 @@ class APISite(BaseSite):
         return _namespaces
 
     @deprecated('has_extension', since='20140819')
+    @remove_last_args(('unknown', ))
     def hasExtension(self, name, unknown=None):
-        """Determine whether extension `name` is loaded.
-
-        Use L{has_extension} instead!
-
-        @param name: The extension to check for, case insensitive
-        @type name: str
-        @param unknown: Old parameter which shouldn't be used anymore.
-        @return: If the extension is loaded
-        @rtype: bool
-        """
-        if unknown is not None:
-            pywikibot.debug('unknown argument of hasExtension is deprecated.',
-                            _logger)
-        extensions = self.siteinfo['extensions']
-        name = name.lower()
-        for ext in extensions:
-            if ext['name'].lower() == name:
-                return True
-        return False
+        """DEPRECATED. Determine whether extension `name` is loaded."""
+        return self.has_extension(name)
 
     def has_extension(self, name):
         """Determine whether extension `name` is loaded.
