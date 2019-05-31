@@ -522,7 +522,7 @@ class imageFetcher(threading.Thread):
         for (regex, repl) in licenseTemplates[imagepage.site.lang]:
             text = re.sub(regex, '', text, flags=re.IGNORECASE)
 
-        text = pywikibot.removeCategoryLinks(text, imagepage.site()).strip()
+        text = pywikibot.removeCategoryLinks(text, imagepage.site())
 
         description = self.convertLinks(text.strip(), imagepage.site())
         date = self.getUploadDate(imagepage)
