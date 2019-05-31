@@ -97,7 +97,7 @@ __all__ = (
     'html2unicode', 'url2unicode', 'unicode2html',
     'stdout', 'output', 'warning', 'error', 'critical', 'debug',
     'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
-    'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
+    'handle_args', 'handleArgs', 'showHelp', 'log',
     'calledModuleName', 'Bot', 'CurrentPageBot', 'WikidataBot',
     'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'NoMoveTarget',
     'SectionError',
