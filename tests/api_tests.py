@@ -31,7 +31,7 @@ from tests.aspects import (
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
 )
-from tests.utils import allowed_failure, FakeLoginManager, PatchedHttp
+from tests.utils import FakeLoginManager, PatchedHttp
 
 if not PY2:
     from urllib.parse import unquote_to_bytes
@@ -745,7 +745,6 @@ class TestPropertyGenerator(TestCase):
             count += 1
         self.assertLength(links, count)
 
-    @allowed_failure
     def test_many_continuations_limited(self):
         """Test PropertyGenerator with many limited props."""
         mainpage = self.get_mainpage()
@@ -773,12 +772,9 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('pageid', pagedata)
             count += 1
         self.assertLength(links, count)
-        # FIXME: AssertionError: 30 != 6150
 
-    @allowed_failure
     def test_two_continuations_limited(self):
         """Test PropertyGenerator with many limited props and continuations."""
-        # FIXME: test fails
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
         titles = [l.title(with_section=False)
@@ -788,27 +784,6 @@ class TestPropertyGenerator(TestCase):
             parameters={'titles': '|'.join(titles)})
         # Force the generator into continuation mode
         gen.set_query_increment(5)
-
-        count = 0
-        for pagedata in gen:
-            self.assertIsInstance(pagedata, dict)
-            self.assertIn('pageid', pagedata)
-            count += 1
-        self.assertLength(links, count)
-        # FIXME: AssertionError: 30 != 11550
-
-    # FIXME: test disabled as it takes longer than 10 minutes
-    def _test_two_continuations_limited_long_test(self):
-        """Long duration test, with total & step that are a real scenario."""
-        mainpage = self.get_mainpage()
-        links = list(mainpage.backlinks(total=300))
-        titles = [l.title(with_section=False)
-                  for l in links]
-        gen = api.PropertyGenerator(
-            site=self.site, prop='info|categoryinfo|langlinks|templates',
-            parameters={'titles': '|'.join(titles)})
-        # Force the generator into continuation mode
-        gen.set_query_increment(50)
 
         count = 0
         for pagedata in gen:
