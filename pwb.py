@@ -211,17 +211,16 @@ def find_alternates(filename, script_paths):
             sleep(wait_time)  # Wait a bit to let it be cancelled
         except KeyboardInterrupt:
             return None
-        return scripts[script]
-
-    msg = '\nThe most similar scripts are:'
-    alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
-    try:
-        prefix, script = input_choice('Which script to be run:',
-                                      alternatives, default='1')
-    except QuitKeyboardInterrupt:
-        return None
-    print()
-    return scripts[script[0]]
+    else:
+        msg = '\nThe most similar scripts are:'
+        alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
+        try:
+            prefix, script = input_choice('Which script to be run:',
+                                          alternatives, default='1')
+        except QuitKeyboardInterrupt:
+            return None
+        print()
+    return scripts[script]
 
 
 def find_filename(filename):
