@@ -525,7 +525,7 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
     return parser.textdata
 
 
-# thanks to https://docs.python.org/2/library/htmlparser.html
+# thanks to https://docs.python.org/3/library/html.parser.html
 class _GetDataHTML(HTMLParser):
     textdata = ''
     keeptags = []
