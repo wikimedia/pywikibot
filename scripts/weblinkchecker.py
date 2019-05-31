@@ -484,7 +484,7 @@ class LinkChecker(object):
         except httplib.error as error:
             return False, 'HTTP Error: {}'.format(error.__class__.__name__)
         except socket.error as error:
-            # https://docs.python.org/2/library/socket.html :
+            # https://docs.python.org/3/library/socket.html :
             # socket.error :
             # The accompanying value is either a string telling what went
             # wrong or a pair (errno, string) representing an error

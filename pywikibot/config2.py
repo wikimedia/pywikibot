@@ -460,7 +460,7 @@ transliteration_target = None
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is 'utf-8'; 'utf-8-sig' recognizes BOM.
 # For a complete list please see:
-# https://docs.python.org/2/library/codecs.html#standard-encodings
+# https://docs.python.org/3/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
 # tkinter isn't yet ready
@@ -1161,7 +1161,7 @@ if OSWIN32 and editor is None:
 
 if OSWIN32 and editor:
     # single character string literals from
-    # https://docs.python.org/2/reference/lexical_analysis.html#string-literals
+    # https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
     # encode('unicode-escape') also changes Unicode characters
     if set(editor) & set('\a\b\f\n\r\t\v'):
         warning(

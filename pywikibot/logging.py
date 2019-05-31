@@ -159,7 +159,7 @@ def warning(text, decoder=None, newline=True, **kwargs):
     @param newline: If True, a line feed will be added after printing the text.
     @type newline: bool
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/2/howto/logging-cookbook.html#logging-cookbook.
+        https://docs.python.org/3/howto/logging-cookbook.html.
     """
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
