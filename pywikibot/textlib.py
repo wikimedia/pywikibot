@@ -1015,13 +1015,14 @@ def getLanguageLinks(text, insite=None, template_subpage=False):
 def removeLanguageLinks(text, site=None, marker=''):
     """Return text with all inter-language links removed.
 
-    If a link to an unknown language is encountered, a warning is printed.
+    If a link to an unknown language is encountered, a warning
+    is printed.
 
     @param text: The text that needs to be modified.
     @type text: str
     @param site: The site that the text is coming from.
     @type site: pywikibot.Site
-    @param marker: If defined, marker is placed after the the last language
+    @param marker: If defined, marker is placed after the last language
         link, or at the end of text if there are no language links.
     @type marker: str
     @return: The modified text.
@@ -1048,17 +1049,18 @@ def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     """
     Return text with inter-language links and preceding separators removed.
 
-    If a link to an unknown language is encountered, a warning is printed.
+    If a link to an unknown language is encountered, a warning
+    is printed.
 
     @param text: The text that needs to be modified.
     @type text: str
     @param site: The site that the text is coming from.
     @type site: pywikibot.Site
-    @param marker: If defined, marker is placed after the the last interwiki
-        link, or at the end of text if there are no interwiki links.
+    @param marker: If defined, marker is placed after the last language
+        link, or at the end of text if there are no language links.
     @type marker: str
-    @param separator: The separator string that will be removed if is followed
-        by the language links.
+    @param separator: The separator string that will be removed
+        if followed by the language links.
     @type separator: str
     @return: The modified text
     @rtype: str
@@ -1308,8 +1310,15 @@ def getCategoryLinks(text, site=None, include=[], expand_text=False):
 def removeCategoryLinks(text, site=None, marker=''):
     """Return text with all category links removed.
 
-    Put the string marker after the last replacement (at the end of the text
-    if there is no replacement).
+    @param text: The text that needs to be modified.
+    @type text: str
+    @param site: The site that the text is coming from.
+    @type site: pywikibot.Site
+    @param marker: If defined, marker is placed after the last category
+        link, or at the end of text if there are no category links.
+    @type marker: str
+    @return: The modified text.
+    @rtype: str
     """
     # This regular expression will find every link that is possibly an
     # interwiki link, plus trailing whitespace. The language code is grouped.
@@ -1333,11 +1342,20 @@ def removeCategoryLinks(text, site=None, marker=''):
 
 def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     """
-    Return text with all category links and preceding separators removed.
+    Return text with category links and preceding separators removed.
 
-    Put the string marker after the last replacement (at the end of the text
-    if there is no replacement).
-
+    @param text: The text that needs to be modified.
+    @type text: str
+    @param site: The site that the text is coming from.
+    @type site: pywikibot.Site
+    @param marker: If defined, marker is placed after the last category
+        link, or at the end of text if there are no category links.
+    @type marker: str
+    @param separator: The separator string that will be removed
+        if followed by the category links.
+    @type separator: str
+    @return: The modified text
+    @rtype: str
     """
     if site is None:
         site = pywikibot.Site()
