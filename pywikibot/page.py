@@ -917,7 +917,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         not actually exist on the wiki.
 
         @return: Page or None if self is a special page.
-        @rtype: Page or None
+        @rtype: typing.Optional[pywikibot.Page]
         """
         ns = self.namespace()
         if ns < 0:  # Special page
@@ -1039,6 +1039,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each referring page (default False)
+        @rtype: typing.Iterable[pywikibot.Page]
         """
         # N.B.: this method intentionally overlaps with backlinks() and
         # embeddedin(). Depending on the interface, it may be more efficient
@@ -3417,7 +3418,7 @@ class User(Page):
                             page title (optional)
         @type subpage: str
         @return: Page object of user page or user subpage
-        @rtype: Page
+        @rtype: pywikibot.Page
         """
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
@@ -3436,7 +3437,7 @@ class User(Page):
                             talk page title (optional)
         @type subpage: str
         @return: Page object of user talk page or user talk subpage
-        @rtype: Page
+        @rtype: pywikibot.Page
         """
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
