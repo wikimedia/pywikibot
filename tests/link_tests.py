@@ -410,7 +410,7 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
-    """Link tests."""
+    """Test link to a different family."""
 
     sites = {
         'enws': {
@@ -467,7 +467,7 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
-    """Link tests."""
+    """Test link from family without lang code to a different family."""
 
     sites = {
         'wikidata': {
@@ -524,7 +524,7 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
-    """Link tests."""
+    """Test wikibase links."""
 
     sites = {
         'wikidata': {
@@ -585,7 +585,7 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
 class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
 
-    """Link tests."""
+    """Test links to one site target family."""
 
     family = 'species'
     code = 'species'
@@ -617,7 +617,7 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
 
 class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
-    """Link tests."""
+    """Test partially qualified links to same site."""
 
     family = 'wikipedia'
     code = 'en'
@@ -666,7 +666,7 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
 class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
 
-    """Link tests."""
+    """Test partially qualified links to different code."""
 
     family = 'wikipedia'
     code = 'en'
@@ -695,7 +695,7 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
 
 class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
-    """Link tests."""
+    """Test partially qualified links to different family."""
 
     family = 'wikipedia'
     code = 'en'
@@ -753,7 +753,7 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
-    """Link tests."""
+    """Test link to a different family without preleading colon."""
 
     sites = {
         'enws': {
@@ -810,7 +810,7 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
-    """Link tests."""
+    """Test implicit link from family without lang code to other family."""
 
     sites = {
         'wikidata': {
@@ -867,7 +867,7 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
 class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
-    """Link tests."""
+    """Test wikibase links without preleading colon."""
 
     family = 'wikidata'
     code = 'test'
@@ -916,7 +916,7 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
 class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
 
-    """Link tests."""
+    """Test links to one site target family without preleading colon."""
 
     family = 'species'
     code = 'species'
