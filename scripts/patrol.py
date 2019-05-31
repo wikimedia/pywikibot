@@ -61,7 +61,7 @@ import pywikibot
 
 from pywikibot import pagegenerators
 
-from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
+from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt, suggest_help
 
 _logger = 'patrol'
 
@@ -127,7 +127,7 @@ class PatrolBot(SingleSiteBot):
 
     def load_whitelist(self):
         """Load most recent watchlist_page for further processing."""
-        if isinstance(mwparserfromhell, Exception):
+        if isinstance(mwparserfromhell, ImportError):
             raise mwparserfromhell
         # Check for a more recent version after versionchecktime in sec.
         if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts
@@ -478,6 +478,10 @@ def main(*args):
             recentchanges = True
 
     bot = PatrolBot(**options)
+
+    if isinstance(mwparserfromhell, ImportError):
+        suggest_help(missing_dependencies=('mwparserfromhell',))
+        return
 
     if newpages or usercontribs:
         pywikibot.output('Newpages:')

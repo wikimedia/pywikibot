@@ -501,14 +501,15 @@ def main(*args):
         elif arg == '-autonomous':
             autonomous = True
 
-    if isinstance(flickrapi, Exception):
-        pywikibot.error('This script requires the python flickrapi module. \n'
-                        'See: http://stuvel.eu/projects/flickrapi')
+    if isinstance(flickrapi, ImportError):
+        pywikibot.bot.suggest_help(missing_dependencies=('flickrapi',))
 
     elif not config.flickr['api_key']:
-        pywikibot.warning('Flickr api key not found! Get yourself an api key\n'
-                          'Any flickr user can get a key at\n'
-                          'https://www.flickr.com/services/api/keys/apply/')
+        additional_message = (
+            'Flickr api key not found! Get yourself an api key\n'
+            'Any flickr user can get a key at\n'
+            'https://www.flickr.com/services/api/keys/apply/')
+        pywikibot.bot.suggest_help(additional_message=additional_message)
 
     elif user_id or group_id or photoset_id:
         if 'api_secret' in config.flickr and config.flickr['api_secret']:

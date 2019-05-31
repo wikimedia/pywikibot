@@ -32,7 +32,10 @@ if not PY2:
     import csv
     from urllib.parse import urlparse
 else:
-    import unicodecsv as csv
+    try:
+        import unicodecsv as csv
+    except ImportError as e:
+        csv = e
     from urlparse import urlparse
 
 
@@ -261,10 +264,16 @@ def main(*args):
 
     config_generator = genFactory.getCombinedGenerator()
 
-    if not config_generator or not csv_dir:
+    if isinstance(csv, ImportError):
+        missing_dependencies = ('unicodecsv',)
+    else:
+        missing_dependencies = None
+
+    if not config_generator or not csv_dir or missing_dependencies:
         pywikibot.bot.suggest_help(
             missing_parameters=[] if csv_dir else ['-csvdir'],
-            missing_generator=not config_generator)
+            missing_generator=not config_generator,
+            missing_dependencies=missing_dependencies)
         return False
 
     for config_page in config_generator:

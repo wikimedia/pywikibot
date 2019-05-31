@@ -134,16 +134,14 @@ def main(*args):
         else:
             unknown_parameters.append(arg)
 
-    if isinstance(pycountry, Exception):
-        additional_text = ('This script requires the python-pycountry module\n'
-                           'See: https://pypi.org/project/pycountry')
-        exception = pycountry
+    if isinstance(pycountry, ImportError):
+        missing_dependencies = ('pycountry',)
     else:
-        additional_text = exception = None
+        missing_dependencies = None
 
-    if additional_text or exception or unknown_parameters:
+    if missing_dependencies or unknown_parameters:
         suggest_help(unknown_parameters=unknown_parameters,
-                     exception=exception, additional_text=additional_text)
+                     missing_dependencies=missing_dependencies)
         return
 
     bot = StatesRedirectBot(start, force)

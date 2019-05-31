@@ -135,7 +135,7 @@ from pywikibot import (
     comms, i18n, config, pagegenerators, textlib, weblib, config2,
 )
 
-from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
@@ -1015,6 +1015,9 @@ def main(*args):
         bot = WeblinkCheckerRobot(gen, HTTPignore, config.weblink_dead_days)
         try:
             bot.run()
+        except ImportError:
+            suggest_help(missing_dependencies=('memento_client',))
+            return False
         finally:
             waitTime = 0
             # Don't wait longer than 30 seconds for threads to finish.
@@ -1047,7 +1050,7 @@ def main(*args):
             bot.history.save()
         return True
     else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+        suggest_help(missing_generator=True)
         return False
 
 
