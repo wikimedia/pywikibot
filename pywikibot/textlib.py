@@ -644,7 +644,7 @@ def replace_links(text, replace, site=None):
         callable
     @param site: a Site object to use. It should match the origin
         or target site of the text
-    @type site: pywikibot.APISite
+    @type site: pywikibot.site.APISite
     """
     def to_link(source):
         """Return the link from source when it's a Page otherwise itself."""

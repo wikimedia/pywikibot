@@ -1859,9 +1859,9 @@ class APISite(BaseSite):
         @param dbname: database name
         @type dbname: str
         @param site: Site to load sitematrix from. (Default meta.wikimedia.org)
-        @type site: APISite
+        @type site: pywikibot.site.APISite
         @return: site object for the database name
-        @rtype: APISite
+        @rtype: pywikibot.site.APISite
         """
         # TODO this only works for some WMF sites
         if not site:
@@ -3633,6 +3633,7 @@ class APISite(BaseSite):
         @param total: Maximum number of pages to retrieve in total.
         @param content: if True, load the current content of each iterated page
             (default False)
+        @rtype: typing.Iterable[pywikibot.Page]
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -3692,6 +3693,7 @@ class APISite(BaseSite):
             list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
             (default False)
+        @rtype: typing.Iterable[pywikibot.Page]
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -3723,6 +3725,7 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
+        @rtype: typing.Iterable[pywikibot.Page]
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -6886,7 +6889,7 @@ class APISite(BaseSite):
             shows all protection levels.
         @type level: str or False
         @return: The pages which are protected.
-        @rtype: Iterable[pywikibot.Page]
+        @rtype: typing.Iterable[pywikibot.Page]
         """
         namespaces = self.namespaces.resolve(namespace)
         # always assert that, so we are be sure that type could be 'create'
@@ -7009,7 +7012,7 @@ class APISite(BaseSite):
         @type lint_from: str representing digit or integer
 
         @return: pages with Linter errors.
-        @rtype: Iterable[pywikibot.Page]
+        @rtype: typing.Iterable[pywikibot.Page]
 
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',

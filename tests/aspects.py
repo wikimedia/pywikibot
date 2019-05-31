@@ -193,11 +193,11 @@ class TestCaseBase(unittest.TestCase):
         if additional items are in the iterator.
 
         @param gen: Page generator
-        @type gen: Iterable[pywikibot.BasePage]
+        @type gen: typing.Iterable[pywikibot.Page]
         @param count: number of pages to get
         @type count: int
         @param site: Site of expected pages
-        @type site: pywikibot.APISite
+        @type site: pywikibot.site.APISite
         """
         original_iter = iter(gen)
 
@@ -281,11 +281,11 @@ class TestCaseBase(unittest.TestCase):
         Only iterates to the length of titles plus two.
 
         @param gen: Page generator
-        @type gen: Iterable[pywikibot.BasePage]
+        @type gen: typing.Iterable[pywikibot.Page]
         @param titles: Expected titles
         @type titles: iterator
         @param site: Site of expected pages
-        @type site: pywikibot.APISite
+        @type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -298,11 +298,11 @@ class TestCaseBase(unittest.TestCase):
         Only iterates to the length of titles plus two.
 
         @param gen: Page generator
-        @type gen: Iterable[pywikibot.BasePage]
+        @type gen: typing.Iterable[pywikibot.Page]
         @param titles: Expected titles
         @type titles: iterator
         @param site: Site of expected pages
-        @type site: pywikibot.APISite
+        @type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -1075,7 +1075,7 @@ class TestCase(TestTimerMixin, TestCaseBase):
         """Create a Page object for the sites main page.
 
         @param site: Override current site, obtained using L{get_site}.
-        @type site: pywikibot.APISite or None
+        @type site: pywikibot.site.APISite or None
         @param force: Get an unused Page object
         @type force: bool
         @rtype: pywikibot.Page
