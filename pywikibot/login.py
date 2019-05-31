@@ -336,10 +336,6 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         pywikibot.log('Should be logged in now')
         return True
 
-    def showCaptchaWindow(self, url):
-        """Open a window to show the captcha for the given URL."""
-        pass
-
 
 class BotPassword(object):
 
