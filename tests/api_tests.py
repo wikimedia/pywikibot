@@ -653,15 +653,12 @@ class TestDryPageGenerator(TestCase):
                 r"invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')
 
-    def test_limit_equal_total(self):
+    def test_limit_range(self):
         """Test that PageGenerator yields the requested amount of pages."""
-        self.gen.set_maximum_items(4)
-        self.assertPageTitlesEqual(self.gen, self.titles)
-
-    def test_limit_one(self):
-        """Test that PageGenerator yields the requested amount of pages."""
-        self.gen.set_maximum_items(1)
-        self.assertPageTitlesEqual(self.gen, self.titles[0:1])
+        for i in range(1, 6):
+            with self.subTest(amount=i):
+                self.gen.set_maximum_items(i)
+                self.assertPageTitlesEqual(self.gen, self.titles[:i])
 
     def test_limit_zero(self):
         """Test that a limit of zero is the same as limit None."""
