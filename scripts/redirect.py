@@ -487,10 +487,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         done = not self.getOption('delete')
         try:
             targetPage = redir_page.getRedirectTarget()
-        except pywikibot.CircularRedirect:
-            pywikibot.output('{0} is a circular redirect.'
-                             .format(redir_page.title()))
-        except pywikibot.InvalidTitle:
+        except (pywikibot.CircularRedirect,
+                pywikibot.InvalidTitle,
+                RuntimeError):
             pywikibot.exception()
         except pywikibot.InterwikiRedirectPage:
             pywikibot.output('{0} is on another site.'
@@ -573,15 +572,15 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                         'Skipping: Redirect target {0} is not a redirect.'
                         .format(newRedir.title(as_link=True)))
                     break  # do nothing
-                # else target found
             except pywikibot.SectionError:
                 pywikibot.warning(
                     "Redirect target section {0} doesn't exist."
                     .format(newRedir.title(as_link=True)))
             except (pywikibot.CircularRedirect,
                     pywikibot.InterwikiRedirectPage,
-                    pywikibot.UnsupportedPage) as e:
-                pywikibot.exception(e)
+                    pywikibot.UnsupportedPage,
+                    RuntimeError):
+                pywikibot.exception()
                 pywikibot.output('Skipping {0}.'.format(newRedir))
                 break
             except pywikibot.BadTitle as e:
