@@ -1674,7 +1674,7 @@ class SingleSiteBot(BaseBot):
         return page
 
     def skip_page(self, page):
-        """Skip page it's site is not on the defined site."""
+        """Skip page if it is not on the defined site."""
         if page.site != self.site:
             pywikibot.warning(
                 fill('Skipped {page} due to: '
