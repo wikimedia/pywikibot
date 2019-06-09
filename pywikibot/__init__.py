@@ -102,11 +102,12 @@ __all__ = (
     'Page', 'PageCreatedConflict', 'PageDeletedConflict', 'PageNotSaved',
     'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
     'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
-    'showHelp', 'Site', 'SiteDefinitionError', 'SpamfilterError', 'stdout',
-    'TitleblacklistError', 'translate', 'ui', 'unicode2html', 'UnicodeMixin',
-    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'UserActionRefuse', 'UserBlocked',
-    'warning', 'WikiBaseError', 'WikidataBot',
+    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink', 'SpamfilterError',
+    'stdout', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'UnicodeMixin', 'UnknownExtension', 'UnknownFamily', 'UnknownSite',
+    'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
+    'UserActionRefuse', 'UserBlocked', 'warning', 'WikiBaseError',
+    'WikidataBot',
 )
 __all__ += textlib_methods
 

@@ -6,23 +6,30 @@
     "sitelinks": {
         "afwiki": {
             "site": "afwiki",
-            "title": "New York Stad"
+            "title": "New York Stad",
+            "badges": []
         },
         "enwiki": {
             "site": "enwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "enwikivoyage": {
             "site": "enwikivoyage",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": [
+                "Q17437798"
+            ]
         },
         "eswiki": {
             "site": "eswiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "eswikivoyage": {
             "site": "eswikivoyage",
-            "title": "Ciudad de Nueva York"
+            "title": "Ciudad de Nueva York",
+            "badges": []
         }
    },
     "title": "Q60",

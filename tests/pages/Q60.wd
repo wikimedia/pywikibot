@@ -3945,855 +3945,1088 @@
     "sitelinks": {
         "afwiki": {
             "site": "afwiki",
-            "title": "New York Stad"
+            "title": "New York Stad",
+            "badges": []
         },
         "alswiki": {
             "site": "alswiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "amwiki": {
             "site": "amwiki",
-            "title": "\u1292\u12cd \u12ee\u122d\u12ad \u12a8\u1270\u121b"
+            "title": "\u1292\u12cd \u12ee\u122d\u12ad \u12a8\u1270\u121b",
+            "badges": []
         },
         "angwiki": {
             "site": "angwiki",
-            "title": "N\u012bweoforw\u012bcburg"
+            "title": "N\u012bweoforw\u012bcburg",
+            "badges": []
         },
         "anwiki": {
             "site": "anwiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "arcwiki": {
             "site": "arcwiki",
-            "title": "\u0722\u071d\u0718 \u071d\u0718\u072a\u0729 (\u0721\u0715\u071d\u0722\u072c\u0710)"
+            "title": "\u0722\u071d\u0718 \u071d\u0718\u072a\u0729 (\u0721\u0715\u071d\u0722\u072c\u0710)",
+            "badges": []
         },
         "arwiki": {
             "site": "arwiki",
-            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643 (\u0645\u062f\u064a\u0646\u0629)"
+            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643 (\u0645\u062f\u064a\u0646\u0629)",
+            "badges": []
         },
         "arzwiki": {
             "site": "arzwiki",
-            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643"
+            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643",
+            "badges": []
         },
         "astwiki": {
             "site": "astwiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "aswiki": {
             "site": "aswiki",
-            "title": "\u09a8\u09bf\u0989\u09af\u09bc\u09f0\u09cd\u0995 \u09ae\u09b9\u09be\u09a8\u0997\u09f0"
+            "title": "\u09a8\u09bf\u0989\u09af\u09bc\u09f0\u09cd\u0995 \u09ae\u09b9\u09be\u09a8\u0997\u09f0",
+            "badges": []
         },
         "aywiki": {
             "site": "aywiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "azwiki": {
             "site": "azwiki",
-            "title": "Nyu York"
+            "title": "Nyu York",
+            "badges": []
         },
         "barwiki": {
             "site": "barwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "bat_smgwiki": {
             "site": "bat_smgwiki",
-            "title": "Niojuorks"
+            "title": "Niojuorks",
+            "badges": []
         },
         "bawiki": {
             "site": "bawiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "bclwiki": {
             "site": "bclwiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "be_x_oldwiki": {
             "site": "be_x_oldwiki",
-            "title": "\u041d\u044c\u044e-\u0401\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0401\u0440\u043a",
+            "badges": []
         },
         "bewiki": {
             "site": "bewiki",
-            "title": "\u0413\u043e\u0440\u0430\u0434 \u041d\u044c\u044e-\u0401\u0440\u043a"
+            "title": "\u0413\u043e\u0440\u0430\u0434 \u041d\u044c\u044e-\u0401\u0440\u043a",
+            "badges": []
         },
         "bgwiki": {
             "site": "bgwiki",
-            "title": "\u041d\u044e \u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044e \u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "bnwiki": {
             "site": "bnwiki",
-            "title": "\u09a8\u09bf\u0989 \u0987\u09af\u09bc\u09b0\u09cd\u0995 \u09b8\u09bf\u099f\u09bf"
+            "title": "\u09a8\u09bf\u0989 \u0987\u09af\u09bc\u09b0\u09cd\u0995 \u09b8\u09bf\u099f\u09bf",
+            "badges": []
         },
         "bowiki": {
             "site": "bowiki",
-            "title": "\u0f53\u0f7a\u0f60\u0f74\u0f0b\u0f61\u0f7c\u0f62\u0f0b\u0f40\u0f0d"
+            "title": "\u0f53\u0f7a\u0f60\u0f74\u0f0b\u0f61\u0f7c\u0f62\u0f0b\u0f40\u0f0d",
+            "badges": []
         },
         "brwiki": {
             "site": "brwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "bswiki": {
             "site": "bswiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "bugwiki": {
             "site": "bugwiki",
-            "title": "Kuta New York"
+            "title": "Kuta New York",
+            "badges": []
         },
         "bxrwiki": {
             "site": "bxrwiki",
-            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0445\u043e\u0442\u043e"
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0445\u043e\u0442\u043e",
+            "badges": []
         },
         "cawiki": {
             "site": "cawiki",
-            "title": "Nova York"
+            "title": "Nova York",
+            "badges": []
         },
         "cdowiki": {
             "site": "cdowiki",
-            "title": "Ni\u016b-i\u00f3k-ch\u00ea"
+            "title": "Ni\u016b-i\u00f3k-ch\u00ea",
+            "badges": []
         },
         "cebwiki": {
             "site": "cebwiki",
-            "title": "Dakbayan sa New York"
+            "title": "Dakbayan sa New York",
+            "badges": []
         },
         "cewiki": {
             "site": "cewiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ckbwiki": {
             "site": "ckbwiki",
-            "title": "\u0646\u06cc\u0648\u06cc\u06c6\u0631\u06a9 (\u0634\u0627\u0631)"
+            "title": "\u0646\u06cc\u0648\u06cc\u06c6\u0631\u06a9 (\u0634\u0627\u0631)",
+            "badges": []
         },
         "commonswiki": {
             "site": "commonswiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "cowiki": {
             "site": "cowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "crhwiki": {
             "site": "crhwiki",
-            "title": "Nyu York"
+            "title": "Nyu York",
+            "badges": []
         },
         "cswiki": {
             "site": "cswiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "cvwiki": {
             "site": "cvwiki",
-            "title": "\u00c7\u0115\u043d\u0115 \u0419\u043e\u0440\u043a"
+            "title": "\u00c7\u0115\u043d\u0115 \u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "cywiki": {
             "site": "cywiki",
-            "title": "Dinas Efrog Newydd"
+            "title": "Dinas Efrog Newydd",
+            "badges": []
         },
         "dawiki": {
             "site": "dawiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "dewiki": {
             "site": "dewiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "dewikiquote": {
             "site": "dewikiquote",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "dewikisource": {
             "site": "dewikisource",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "dewikivoyage": {
             "site": "dewikivoyage",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": [
+                "Q17559452"
+            ]
         },
         "diqwiki": {
             "site": "diqwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "dsbwiki": {
             "site": "dsbwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "elwiki": {
             "site": "elwiki",
-            "title": "\u039d\u03ad\u03b1 \u03a5\u03cc\u03c1\u03ba\u03b7"
+            "title": "\u039d\u03ad\u03b1 \u03a5\u03cc\u03c1\u03ba\u03b7",
+            "badges": []
         },
         "enwiki": {
             "site": "enwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "enwikiquote": {
             "site": "enwikiquote",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "enwikivoyage": {
             "site": "enwikivoyage",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": [
+                "Q17437798"
+            ]
         },
         "eowiki": {
             "site": "eowiki",
-            "title": "Novjorko"
+            "title": "Novjorko",
+            "badges": []
         },
         "eswiki": {
             "site": "eswiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "eswikivoyage": {
             "site": "eswikivoyage",
-            "title": "Ciudad de Nueva York"
+            "title": "Ciudad de Nueva York",
+            "badges": []
         },
         "etwiki": {
             "site": "etwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "euwiki": {
             "site": "euwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": [
+                "Q17437796"
+            ]
         },
         "extwiki": {
             "site": "extwiki",
-            "title": "Nueva York"
+            "title": "Nueva York",
+            "badges": []
         },
         "fawiki": {
             "site": "fawiki",
-            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9",
+            "badges": []
         },
         "fiu_vrowiki": {
             "site": "fiu_vrowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "fiwiki": {
             "site": "fiwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": [
+                "Q17559452"
+            ]
         },
         "fowiki": {
             "site": "fowiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": [
+                "Q17437796"
+            ]
         },
         "frpwiki": {
             "site": "frpwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "frrwiki": {
             "site": "frrwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "frwiki": {
             "site": "frwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "frwikivoyage": {
             "site": "frwikivoyage",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "fywiki": {
             "site": "fywiki",
-            "title": "New York (st\u00ead)"
+            "title": "New York (st\u00ead)",
+            "badges": []
         },
         "ganwiki": {
             "site": "ganwiki",
-            "title": "\u7d10\u7d04\u5e02"
+            "title": "\u7d10\u7d04\u5e02",
+            "badges": []
         },
         "gawiki": {
             "site": "gawiki",
-            "title": "Nua-Eabhrac (cathair)"
+            "title": "Nua-Eabhrac (cathair)",
+            "badges": []
         },
         "gdwiki": {
             "site": "gdwiki",
-            "title": "Eabhraig Nuadh (baile)"
+            "title": "Eabhraig Nuadh (baile)",
+            "badges": []
         },
         "glwiki": {
             "site": "glwiki",
-            "title": "Nova York"
+            "title": "Nova York",
+            "badges": []
         },
         "gnwiki": {
             "site": "gnwiki",
-            "title": "T\u00e1va Nueva York"
+            "title": "T\u00e1va Nueva York",
+            "badges": []
         },
         "gvwiki": {
             "site": "gvwiki",
-            "title": "Caayr York Noa"
+            "title": "Caayr York Noa",
+            "badges": []
         },
         "hakwiki": {
             "site": "hakwiki",
-            "title": "N\u00e9u-yok-s\u1e73"
+            "title": "N\u00e9u-yok-s\u1e73",
+            "badges": [
+                "Q17437796"
+            ]
         },
         "hewiki": {
             "site": "hewiki",
-            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7"
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7",
+            "badges": []
         },
         "hewikivoyage": {
             "site": "hewikivoyage",
-            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7"
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7",
+            "badges": []
         },
         "hifwiki": {
             "site": "hifwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "hiwiki": {
             "site": "hiwiki",
-            "title": "\u0928\u094d\u092f\u0942\u092f\u0949\u0930\u094d\u0915 \u0928\u0917\u0930"
+            "title": "\u0928\u094d\u092f\u0942\u092f\u0949\u0930\u094d\u0915 \u0928\u0917\u0930",
+            "badges": []
         },
         "hrwiki": {
             "site": "hrwiki",
-            "title": "New York City, New York"
+            "title": "New York City, New York",
+            "badges": []
         },
         "hsbwiki": {
             "site": "hsbwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "htwiki": {
             "site": "htwiki",
-            "title": "Nouy\u00f2k"
+            "title": "Nouy\u00f2k",
+            "badges": []
         },
         "huwiki": {
             "site": "huwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "hywiki": {
             "site": "hywiki",
-            "title": "\u0546\u0575\u0578\u0582 \u0545\u0578\u0580\u0584"
+            "title": "\u0546\u0575\u0578\u0582 \u0545\u0578\u0580\u0584",
+            "badges": [
+                "Q17437796"
+            ]
         },
         "iawiki": {
             "site": "iawiki",
-            "title": "New York (citate)"
+            "title": "New York (citate)",
+            "badges": []
         },
         "idwiki": {
             "site": "idwiki",
-            "title": "Kota New York"
+            "title": "Kota New York",
+            "badges": [
+                "Q17437798"
+            ]
         },
         "iewiki": {
             "site": "iewiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "igwiki": {
             "site": "igwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "ikwiki": {
             "site": "ikwiki",
-            "title": "Tchiaq York Iniqpak"
+            "title": "Tchiaq York Iniqpak",
+            "badges": []
         },
         "ilowiki": {
             "site": "ilowiki",
-            "title": "Siudad ti New York"
+            "title": "Siudad ti New York",
+            "badges": []
         },
         "iowiki": {
             "site": "iowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "iswiki": {
             "site": "iswiki",
-            "title": "New York-borg"
+            "title": "New York-borg",
+            "badges": []
         },
         "itwiki": {
             "site": "itwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "itwikiquote": {
             "site": "itwikiquote",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "itwikivoyage": {
             "site": "itwikivoyage",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "jawiki": {
             "site": "jawiki",
-            "title": "\u30cb\u30e5\u30fc\u30e8\u30fc\u30af"
+            "title": "\u30cb\u30e5\u30fc\u30e8\u30fc\u30af",
+            "badges": []
         },
         "jbowiki": {
             "site": "jbowiki",
-            "title": "niu,IORK. zei tcadu"
+            "title": "niu,IORK. zei tcadu",
+            "badges": []
         },
         "jvwiki": {
             "site": "jvwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "kabwiki": {
             "site": "kabwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "kawiki": {
             "site": "kawiki",
-            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8"
+            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8",
+            "badges": []
         },
         "kkwiki": {
             "site": "kkwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "kmwiki": {
             "site": "kmwiki",
-            "title": "\u1791\u17b8\u1780\u17d2\u179a\u17bb\u1784\u1789\u17bc\u179c\u1799\u17c9\u1780"
+            "title": "\u1791\u17b8\u1780\u17d2\u179a\u17bb\u1784\u1789\u17bc\u179c\u1799\u17c9\u1780",
+            "badges": []
         },
         "knwiki": {
             "site": "knwiki",
-            "title": "\u0ca8\u0ccd\u0caf\u0cc2 \u0caf\u0cbe\u0cb0\u0ccd\u0c95\u0ccd \u0ca8\u0c97\u0cb0"
+            "title": "\u0ca8\u0ccd\u0caf\u0cc2 \u0caf\u0cbe\u0cb0\u0ccd\u0c95\u0ccd \u0ca8\u0c97\u0cb0",
+            "badges": []
         },
         "kowiki": {
             "site": "kowiki",
-            "title": "\ub274\uc695"
+            "title": "\ub274\uc695",
+            "badges": []
         },
         "krcwiki": {
             "site": "krcwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "kuwiki": {
             "site": "kuwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "kwwiki": {
             "site": "kwwiki",
-            "title": "Evrek Nowydh"
+            "title": "Evrek Nowydh",
+            "badges": []
         },
         "kywiki": {
             "site": "kywiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ladwiki": {
             "site": "ladwiki",
-            "title": "Mueva York (sivdad)"
+            "title": "Mueva York (sivdad)",
+            "badges": []
         },
         "lawiki": {
             "site": "lawiki",
-            "title": "Novum Eboracum (urbs)"
+            "title": "Novum Eboracum (urbs)",
+            "badges": []
         },
         "lbwiki": {
             "site": "lbwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "lezwiki": {
             "site": "lezwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "lijwiki": {
             "site": "lijwiki",
-            "title": "Niorche"
+            "title": "Niorche",
+            "badges": []
         },
         "liwiki": {
             "site": "liwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "lmowiki": {
             "site": "lmowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "lnwiki": {
             "site": "lnwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "ltwiki": {
             "site": "ltwiki",
-            "title": "Niujorkas"
+            "title": "Niujorkas",
+            "badges": []
         },
         "lvwiki": {
             "site": "lvwiki",
-            "title": "\u0145ujorka"
+            "title": "\u0145ujorka",
+            "badges": []
         },
         "mgwiki": {
             "site": "mgwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "mhrwiki": {
             "site": "mhrwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "miwiki": {
             "site": "miwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "mkwiki": {
             "site": "mkwiki",
-            "title": "\u040a\u0443\u0458\u043e\u0440\u043a (\u0433\u0440\u0430\u0434)"
+            "title": "\u040a\u0443\u0458\u043e\u0440\u043a (\u0433\u0440\u0430\u0434)",
+            "badges": []
         },
         "mlwiki": {
             "site": "mlwiki",
-            "title": "\u0d28\u0d4d\u0d2f\u0d42\u0d2f\u0d4b\u0d7c\u0d15\u0d4d\u0d15\u0d4d \u0d28\u0d17\u0d30\u0d02"
+            "title": "\u0d28\u0d4d\u0d2f\u0d42\u0d2f\u0d4b\u0d7c\u0d15\u0d4d\u0d15\u0d4d \u0d28\u0d17\u0d30\u0d02",
+            "badges": []
         },
         "mnwiki": {
             "site": "mnwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a \u0445\u043e\u0442"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a \u0445\u043e\u0442",
+            "badges": []
         },
         "mrjwiki": {
             "site": "mrjwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "mrwiki": {
             "site": "mrwiki",
-            "title": "\u0928\u094d\u092f\u0942 \u092f\u0949\u0930\u094d\u0915 \u0936\u0939\u0930"
+            "title": "\u0928\u094d\u092f\u0942 \u092f\u0949\u0930\u094d\u0915 \u0936\u0939\u0930",
+            "badges": []
         },
         "mswiki": {
             "site": "mswiki",
-            "title": "Bandar Raya New York"
+            "title": "Bandar Raya New York",
+            "badges": []
         },
         "mwlwiki": {
             "site": "mwlwiki",
-            "title": "Nuoba Iorque"
+            "title": "Nuoba Iorque",
+            "badges": []
         },
         "mznwiki": {
             "site": "mznwiki",
-            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9",
+            "badges": []
         },
         "nahwiki": {
             "site": "nahwiki",
-            "title": "\u0100ltep\u0113tl Yancu\u012bc York"
+            "title": "\u0100ltep\u0113tl Yancu\u012bc York",
+            "badges": []
         },
         "napwiki": {
             "site": "napwiki",
-            "title": "Nova York"
+            "title": "Nova York",
+            "badges": []
         },
         "nawiki": {
             "site": "nawiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "nds_nlwiki": {
             "site": "nds_nlwiki",
-            "title": "Niej-York"
+            "title": "Niej-York",
+            "badges": []
         },
         "ndswiki": {
             "site": "ndswiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "newiki": {
             "site": "newiki",
-            "title": "\u0928\u094d\u092f\u0942\u092f\u094b\u0930\u094d\u0915 \u0936\u0939\u0930"
+            "title": "\u0928\u094d\u092f\u0942\u092f\u094b\u0930\u094d\u0915 \u0936\u0939\u0930",
+            "badges": []
         },
         "newwiki": {
             "site": "newwiki",
-            "title": "\u0928\u094d\u092f\u0941 \u092f\u0930\u094d\u0915 \u0928\u0917\u0930"
+            "title": "\u0928\u094d\u092f\u0941 \u092f\u0930\u094d\u0915 \u0928\u0917\u0930",
+            "badges": []
         },
         "nlwiki": {
             "site": "nlwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": [
+                "Q17437796"
+            ]
         },
         "nlwikivoyage": {
             "site": "nlwikivoyage",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "nnwiki": {
             "site": "nnwiki",
-            "title": "New York by"
+            "title": "New York by",
+            "badges": []
         },
         "novwiki": {
             "site": "novwiki",
-            "title": "Novi York"
+            "title": "Novi York",
+            "badges": []
         },
         "nowiki": {
             "site": "nowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "nrmwiki": {
             "site": "nrmwiki",
-            "title": "Nouvieau York"
+            "title": "Nouvieau York",
+            "badges": []
         },
         "ocwiki": {
             "site": "ocwiki",
-            "title": "N\u00f2va York"
+            "title": "N\u00f2va York",
+            "badges": []
         },
         "oswiki": {
             "site": "oswiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "pamwiki": {
             "site": "pamwiki",
-            "title": "New York Lakanbalen"
+            "title": "New York Lakanbalen",
+            "badges": []
         },
         "papwiki": {
             "site": "papwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "pawiki": {
             "site": "pawiki",
-            "title": "\u0a28\u0a3f\u0a0a\u0a2f\u0a3e\u0a30\u0a15 \u0a38\u0a3c\u0a39\u0a3f\u0a30"
+            "title": "\u0a28\u0a3f\u0a0a\u0a2f\u0a3e\u0a30\u0a15 \u0a38\u0a3c\u0a39\u0a3f\u0a30",
+            "badges": []
         },
         "pdcwiki": {
             "site": "pdcwiki",
-            "title": "Nei Yarrick Schtadt"
+            "title": "Nei Yarrick Schtadt",
+            "badges": []
         },
         "pflwiki": {
             "site": "pflwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "plwiki": {
             "site": "plwiki",
-            "title": "Nowy Jork"
+            "title": "Nowy Jork",
+            "badges": []
         },
         "plwikivoyage": {
             "site": "plwikivoyage",
-            "title": "Nowy Jork"
+            "title": "Nowy Jork",
+            "badges": []
         },
         "pmswiki": {
             "site": "pmswiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "pnbwiki": {
             "site": "pnbwiki",
-            "title": "\u0646\u06cc\u0648 \u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+            "title": "\u0646\u06cc\u0648 \u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631",
+            "badges": []
         },
         "ptwiki": {
             "site": "ptwiki",
-            "title": "Nova Iorque"
+            "title": "Nova Iorque",
+            "badges": []
         },
         "ptwikivoyage": {
             "site": "ptwikivoyage",
-            "title": "Nova York"
+            "title": "Nova York",
+            "badges": []
         },
         "quwiki": {
             "site": "quwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "rmwiki": {
             "site": "rmwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "rmywiki": {
             "site": "rmywiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "roa_tarawiki": {
             "site": "roa_tarawiki",
-            "title": "Nu\u00e8ve York"
+            "title": "Nu\u00e8ve York",
+            "badges": []
         },
         "rowiki": {
             "site": "rowiki",
-            "title": "New York (ora\u0219)"
+            "title": "New York (ora\u0219)",
+            "badges": []
         },
         "rowikivoyage": {
             "site": "rowikivoyage",
-            "title": "New York (ora\u0219)"
+            "title": "New York (ora\u0219)",
+            "badges": []
         },
         "ruewiki": {
             "site": "ruewiki",
-            "title": "\u041d\u044e \u0419\u043e\u0440\u043a (\u043c\u0456\u0441\u0442\u043e)"
+            "title": "\u041d\u044e \u0419\u043e\u0440\u043a (\u043c\u0456\u0441\u0442\u043e)",
+            "badges": []
         },
         "ruwiki": {
             "site": "ruwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ruwikisource": {
             "site": "ruwikisource",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ruwikivoyage": {
             "site": "ruwikivoyage",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "sahwiki": {
             "site": "sahwiki",
-            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "sawiki": {
             "site": "sawiki",
-            "title": "\u0928\u094d\u200d\u092f\u0942 \u092f\u093e\u0930\u094d\u0915"
+            "title": "\u0928\u094d\u200d\u092f\u0942 \u092f\u093e\u0930\u094d\u0915",
+            "badges": []
         },
         "scnwiki": {
             "site": "scnwiki",
-            "title": "Nova York"
+            "title": "Nova York",
+            "badges": []
         },
         "scowiki": {
             "site": "scowiki",
-            "title": "New York Ceety"
+            "title": "New York Ceety",
+            "badges": []
         },
         "scwiki": {
             "site": "scwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "shwiki": {
             "site": "shwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "simplewiki": {
             "site": "simplewiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "skwiki": {
             "site": "skwiki",
-            "title": "New York (mesto)"
+            "title": "New York (mesto)",
+            "badges": []
         },
         "slwiki": {
             "site": "slwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "sowiki": {
             "site": "sowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "sqwiki": {
             "site": "sqwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "srnwiki": {
             "site": "srnwiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "srwiki": {
             "site": "srwiki",
-            "title": "\u040a\u0443\u0458\u043e\u0440\u043a"
+            "title": "\u040a\u0443\u0458\u043e\u0440\u043a",
+            "badges": []
         },
         "stqwiki": {
             "site": "stqwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "svwiki": {
             "site": "svwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "svwikivoyage": {
             "site": "svwikivoyage",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "swwiki": {
             "site": "swwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "szlwiki": {
             "site": "szlwiki",
-            "title": "Nowy Jork"
+            "title": "Nowy Jork",
+            "badges": []
         },
         "tawiki": {
             "site": "tawiki",
-            "title": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+            "title": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd",
+            "badges": []
         },
         "tewiki": {
             "site": "tewiki",
-            "title": "\u0c28\u0c4d\u0c2f\u0c42\u0c2f\u0c3e\u0c30\u0c4d\u0c15\u0c4d"
+            "title": "\u0c28\u0c4d\u0c2f\u0c42\u0c2f\u0c3e\u0c30\u0c4d\u0c15\u0c4d",
+            "badges": []
         },
         "tgwiki": {
             "site": "tgwiki",
-            "title": "\u041d\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "thwiki": {
             "site": "thwiki",
-            "title": "\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+            "title": "\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01",
+            "badges": []
         },
         "tkwiki": {
             "site": "tkwiki",
-            "title": "N\u00fdu-\u00ddork \u015f\u00e4heri"
+            "title": "N\u00fdu-\u00ddork \u015f\u00e4heri",
+            "badges": []
         },
         "tlwiki": {
             "site": "tlwiki",
-            "title": "Lungsod ng New York"
+            "title": "Lungsod ng New York",
+            "badges": []
         },
         "tpiwiki": {
             "site": "tpiwiki",
-            "title": "Niu Yok Siti"
+            "title": "Niu Yok Siti",
+            "badges": []
         },
         "trwiki": {
             "site": "trwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "ttwiki": {
             "site": "ttwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "twwiki": {
             "site": "twwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "tywiki": {
             "site": "tywiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "udmwiki": {
             "site": "udmwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ugwiki": {
             "site": "ugwiki",
-            "title": "Nyu York Shehiri"
+            "title": "Nyu York Shehiri",
+            "badges": []
         },
         "ukwiki": {
             "site": "ukwiki",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "ukwikivoyage": {
             "site": "ukwikivoyage",
-            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a",
+            "badges": []
         },
         "urwiki": {
             "site": "urwiki",
-            "title": "\u0646\u06cc\u0648\u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+            "title": "\u0646\u06cc\u0648\u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631",
+            "badges": []
         },
         "uzwiki": {
             "site": "uzwiki",
-            "title": "Nyu York shahri"
+            "title": "Nyu York shahri",
+            "badges": []
         },
         "vecwiki": {
             "site": "vecwiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "vepwiki": {
             "site": "vepwiki",
-            "title": "Nju Jork"
+            "title": "Nju Jork",
+            "badges": []
         },
         "viwiki": {
             "site": "viwiki",
-            "title": "Th\u00e0nh ph\u1ed1 New York"
+            "title": "Th\u00e0nh ph\u1ed1 New York",
+            "badges": [
+                "Q17437798"
+            ]
         },
         "viwikivoyage": {
             "site": "viwikivoyage",
-            "title": "Th\u00e0nh ph\u1ed1 New York"
+            "title": "Th\u00e0nh ph\u1ed1 New York",
+            "badges": []
         },
         "vowiki": {
             "site": "vowiki",
-            "title": "New York (zif)"
+            "title": "New York (zif)",
+            "badges": []
         },
         "warwiki": {
             "site": "warwiki",
-            "title": "Syudad han New York"
+            "title": "Syudad han New York",
+            "badges": []
         },
         "wuuwiki": {
             "site": "wuuwiki",
-            "title": "\u7ebd\u7ea6\u5e02"
+            "title": "\u7ebd\u7ea6\u5e02",
+            "badges": []
         },
         "xalwiki": {
             "site": "xalwiki",
-            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0431\u0430\u043b\u04bb\u0441\u043d"
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0431\u0430\u043b\u04bb\u0441\u043d",
+            "badges": []
         },
         "xmfwiki": {
             "site": "xmfwiki",
-            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8"
+            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8",
+            "badges": []
         },
         "yiwiki": {
             "site": "yiwiki",
-            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d0\u05e8\u05e7 (\u05e9\u05d8\u05d0\u05d8)"
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d0\u05e8\u05e7 (\u05e9\u05d8\u05d0\u05d8)",
+            "badges": []
         },
         "yowiki": {
             "site": "yowiki",
-            "title": "New York"
+            "title": "New York",
+            "badges": []
         },
         "zawiki": {
             "site": "zawiki",
-            "title": "Niujyoz"
+            "title": "Niujyoz",
+            "badges": []
         },
         "zeawiki": {
             "site": "zeawiki",
-            "title": "New York City"
+            "title": "New York City",
+            "badges": []
         },
         "zh_classicalwiki": {
             "site": "zh_classicalwiki",
-            "title": "\u7d10\u7d04\u5e02"
+            "title": "\u7d10\u7d04\u5e02",
+            "badges": []
         },
         "zh_min_nanwiki": {
             "site": "zh_min_nanwiki",
-            "title": "New York Chh\u012b"
+            "title": "New York Chh\u012b",
+            "badges": []
         },
         "zh_yuewiki": {
             "site": "zh_yuewiki",
-            "title": "\u7d10\u7d04\u5e02"
+            "title": "\u7d10\u7d04\u5e02",
+            "badges": []
         },
         "zhwiki": {
             "site": "zhwiki",
-            "title": "\u7ebd\u7ea6"
+            "title": "\u7ebd\u7ea6",
+            "badges": []
         },
         "zhwikivoyage": {
             "site": "zhwikivoyage",
-            "title": "\u7d10\u7d04"
+            "title": "\u7d10\u7d04",
+            "badges": []
         },
         "zuwiki": {
             "site": "zuwiki",
-            "title": "New York (idolobha)"
+            "title": "New York (idolobha)",
+            "badges": []
         }
     }
 }

@@ -83,6 +83,8 @@ __all__ = (
     'FileInfo',
     'BaseLink',
     'Link',
+    'SiteLink',
+    'SiteLinkCollection',
     'html2unicode',
     'UnicodeToAsciiHtml',
     'unicode2html',
@@ -4519,10 +4521,9 @@ class ItemPage(WikibasePage):
             raise pywikibot.IsRedirectPage(self)
 
         # sitelinks
-        self.sitelinks = {}
+        self.sitelinks = SiteLinkCollection(self.site)
         for dbname in self._content.get('sitelinks', {}):
-            self.sitelinks[dbname] = self._content[
-                'sitelinks'][dbname]['title']
+            self.sitelinks[dbname] = self._content['sitelinks'][dbname]
 
         data['sitelinks'] = self.sitelinks
         return data
@@ -4556,7 +4557,44 @@ class ItemPage(WikibasePage):
         """
         data = super(ItemPage, self).toJSON(diffto=diffto)
 
-        self._diff_to('sitelinks', 'site', 'title', diffto, data)
+        sitelinks = {dbname: sitelink.toJSON()
+                     for (dbname, sitelink) in self.sitelinks.items()}
+
+        if diffto and 'sitelinks' in diffto:
+            to_nuke = []
+            diffto_sitelinks = diffto['sitelinks']
+
+            for dbname, sitelink in sitelinks.items():
+                if dbname in diffto_sitelinks:
+                    diffto_link = diffto_sitelinks[dbname]
+                    if diffto_link.get('title') == sitelink.get('title'):
+                        # compare badges
+                        tmp_badges = []
+                        diffto_badges = diffto_link.get('badges', [])
+                        badges = sitelink.get('badges', [])
+                        for badge in set(diffto_badges) - set(badges):
+                            tmp_badges.append('')
+                        for badge in set(badges) - set(diffto_badges):
+                            tmp_badges.append(badge)
+
+                        if tmp_badges:
+                            sitelinks[dbname]['badges'] = tmp_badges
+                        else:
+                            to_nuke.append(dbname)
+
+            # find removed sitelinks
+            for dbname in (set(diffto_sitelinks.keys())
+                           - set(sitelinks.keys())):
+                badges = [''] * len(diffto_sitelinks[dbname].get('badges', []))
+                sitelinks[dbname] = {'site': dbname, 'title': ''}
+                if badges:
+                    sitelinks[dbname]['badges'] = badges
+
+            for dbname in to_nuke:
+                del sitelinks[dbname]
+
+        if sitelinks:
+            data['sitelinks'] = sitelinks
 
         return data
 
@@ -4574,11 +4612,10 @@ class ItemPage(WikibasePage):
             self.get()
         if family is not None and not isinstance(family, Family):
             family = Family.load(family)
-        for dbname in self.sitelinks:
-            pg = Page(pywikibot.site.APISite.fromDBName(dbname),
-                      self.sitelinks[dbname])
-            pg._item = self
-            if family is None or family == pg.site.family:
+        for sl in self.sitelinks.values():
+            if family is None or family == sl.site.family:
+                pg = pywikibot.Page(sl)
+                pg._item = self
                 yield pg
 
     def getSitelink(self, site, force=False):
@@ -4599,7 +4636,7 @@ class ItemPage(WikibasePage):
         if dbname not in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
-            return self.sitelinks[dbname]
+            return self.sitelinks[dbname].title
 
     def setSitelink(self, sitelink, **kwargs):
         """
@@ -6243,6 +6280,156 @@ class Link(BaseLink):
         elif label is not None:
             link._anchor = ''
         return link
+
+
+class SiteLink(BaseLink):
+
+    """
+    A single sitelink in a Wikibase item.
+
+    Extends BaseLink by the following attribute:
+
+      - badges: Any badges associated with the sitelink
+    """
+
+    # Components used for __repr__
+    _items = ('_sitekey', '_rawtitle', 'badges')
+
+    def __init__(self, title, site=None, badges=None):
+        """
+        Initializer.
+
+        @param title: the title of the linked page including namespace
+        @type title: str
+        @param site: the Site object for the wiki linked to. Can be provided as
+            either a Site instance or a db key, defaults to pywikibot.Site().
+        @type site: pywikibot.Site or str
+        @param badges: list of badges
+        @type badges: [pywikibot.ItemPage]
+        """
+        # split of namespace from title
+        namespace = None
+        self._rawtitle = title
+        if ':' in title:
+            site, namespace, title = SiteLink._parse_namespace(title, site)
+
+        super(SiteLink, self).__init__(title, namespace, site)
+
+        badges = badges or []
+        self._badges = set(badges)
+
+    @staticmethod
+    def _parse_namespace(title, site=None):
+        """
+        Parse enough of a title with a ':' to determine the namespace.
+
+        @param site: the Site object for the wiki linked to. Can be provided as
+            either a Site instance or a db key, defaults to pywikibot.Site().
+        @type site: pywikibot.Site or str
+        @param title: the title of the linked page including namespace
+        @type title: str
+
+        @return: a (site, namespace, title) tuple
+        @rtype: (pywikibot.Site, pywikibot.Namespace or None, str)
+        """
+        # need a Site instance to evaluate local namespaces
+        site = site or pywikibot.Site()
+        if not isinstance(site, pywikibot.site.BaseSite):
+            site = pywikibot.site.APISite.fromDBName(site)
+
+        prefix = title[:title.index(':')].lower()  # part of text before :
+        ns = site.namespaces.lookup_name(prefix)
+        if ns:  # The prefix is a namespace in the source wiki
+            namespace, _, title = title.partition(':')
+        else:  # The ':' is part of the actual title see e.g. Q3700510
+            namespace = None
+
+        return (site, namespace, title)
+
+    @property
+    def badges(self):
+        """
+        Return a list of all badges associated with the link.
+
+        @rtype: [pywikibot.ItemPage]
+        """
+        return list(self._badges)
+
+    @classmethod
+    def fromJSON(cls, data, site=None):
+        """
+        Create a SiteLink object from JSON returned in the API call.
+
+        @param data: JSON containing SiteLink data
+        @type data: dict
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+
+        @rtype: SiteLink
+        """
+        sl = cls(data['title'], data['site'])
+        repo = site or sl.site.data_repository()
+        for badge in data.get('badges', []):
+            sl._badges.add(pywikibot.ItemPage(repo, badge))
+        return sl
+
+    def toJSON(self):
+        """
+        Convert the SiteLink to a JSON object for the Wikibase API.
+
+        @return: Wikibase JSON
+        @rtype: dict
+        """
+        json = {
+            'site': self._sitekey,
+            'title': self._rawtitle,
+            'badges': [badge.title() for badge in self.badges]
+        }
+        return json
+
+
+class SiteLinkCollection(dict):
+    """A structure holding SiteLinks for a Wikibase item."""
+
+    def __init__(self, repo, *args):
+        """
+        Initializer.
+
+        @param repo: the Wikibase site on which badges are defined
+        @type repo: pywikibot.site.DataSite
+        """
+        super(SiteLinkCollection, self).__init__(*args)
+        self.repo = repo
+
+    def __getitem__(self, key):
+        """
+        Get the SiteLink with the given key.
+
+        @param key: site key as Site instance or db key
+        @type key: pywikibot.Site or str
+        @rtype: SiteLink
+        """
+        if isinstance(key, pywikibot.site.BaseSite):
+            key = key.dbName()
+        return super(SiteLinkCollection, self).__getitem__(key)
+
+    def __setitem__(self, key, val):
+        """
+        Set the SiteLink for a given key.
+
+        @param key: site key as Site instance or db key
+        @type key: pywikibot.Site or str
+        @param val: page name as a string or JSON containing SiteLink data
+        @type val: dict or str
+        @rtype: SiteLink
+        """
+        if isinstance(key, pywikibot.site.BaseSite):
+            key = key.dbName()
+        if isinstance(val, UnicodeType):
+            val = SiteLink(val, key)
+        else:
+            val = SiteLink.fromJSON(val, self.repo)
+        return super(SiteLinkCollection, self).__setitem__(key, val)
 
 
 # Utility functions for parsing page titles
