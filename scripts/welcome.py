@@ -186,7 +186,7 @@ from pywikibot import config, i18n
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning, PY2, UnicodeType
+from pywikibot.tools import PY2, UnicodeType
 
 if PY2:
     import cPickle as pickle  # noqa: N813
@@ -932,9 +932,25 @@ def load_word_function(raw):
 globalvar = Global()
 
 
-def main(*args):
-    """
-    Process command line arguments and invoke bot.
+def _handle_offset(val):
+    """Handle -offset arg."""
+    if not val:
+        val = pywikibot.input(
+            'Which time offset for new users would you like to use? '
+            '(yyyymmddhhmmss or yyyymmdd)')
+    try:
+        globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
+    except ValueError:
+        # upon request, we could check for software version here
+        raise ValueError(fill(
+            'Mediawiki has changed, -offset:# is not supported anymore, but '
+            '-offset:TIMESTAMP is, assuming TIMESTAMP is yyyymmddhhmmss or '
+            'yyyymmdd. -timeoffset is now also supported. Please read this '
+            'script source header for documentation.'))
+
+
+def handle_args(args):
+    """Process command line arguments.
 
     If args is an empty list, sys.argv is used.
 
@@ -942,7 +958,7 @@ def main(*args):
     @type args: str
     """
     for arg in pywikibot.handle_args(args):
-        arg, sep, val = arg.partition(':')
+        arg, _, val = arg.partition(':')
         if arg == '-edit':
             globalvar.attachEditCount = int(val or pywikibot.input(
                 'After how many edits would you like to welcome new users? '
@@ -956,20 +972,7 @@ def main(*args):
                 'For how many seconds would you like to bot to sleep before '
                 'checking again?'))
         elif arg == '-offset':
-            if not val:
-                val = pywikibot.input(
-                    'Which time offset for new users would you like to use? '
-                    '(yyyymmddhhmmss or yyyymmdd)')
-            try:
-                globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
-            except ValueError:
-                # upon request, we could check for software version here
-                raise ValueError(fill(
-                    'Mediawiki has changed, -offset:# is not supported '
-                    'anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP is '
-                    'yyyymmddhhmmss or yyyymmdd. -timeoffset is now also '
-                    'supported. Please read this script source header for '
-                    'documentation.'))
+            _handle_offset(val)
         elif arg == '-file':
             globalvar.randomSign = True
             globalvar.signFileName = val or pywikibot.input(
@@ -1001,10 +1004,17 @@ def main(*args):
                 'welcome log?'))
         elif arg == '-quiet':
             globalvar.quiet = True
-        elif arg == '-quick':
-            issue_deprecation_warning('The usage of "-quick" option', None, 2,
-                                      since='20160211')
+        else:
+            pywikibot.warning('Unknown option "{}"'.format(arg))
 
+
+def main(*args):
+    """Invoke bot.
+
+    @param args: command line arguments
+    @type args: str
+    """
+    handle_args(args)
     # Filename and Pywikibot path
     # file where is stored the random signature index
     filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
