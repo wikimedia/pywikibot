@@ -141,11 +141,27 @@ def main(*args):
         targetpage = pywikibot.Page(tosite, target_title)
         edithistpage = pywikibot.Page(tosite, target_title + '/edithistory')
 
-        if targetpage.exists() and not overwrite:
-            pywikibot.output(
-                'Skipped {0} (target page {1} exists)'.format(
-                    page.title(as_link=True, force_interwiki=True),
-                    targetpage.title(as_link=True)
+        if targetpage.exists():
+            if not overwrite:
+                pywikibot.warning(
+                    'Skipped {0} (target page {1} exists)'.format(
+                        page.title(as_link=True, force_interwiki=True),
+                        targetpage.title(as_link=True)
+                    )
+                )
+                continue
+            if not targetpage.botMayEdit():
+                pywikibot.warning(
+                    'Target page {0} is not editable by bots'.format(
+                        targetpage.title(as_link=True)
+                    )
+                )
+                continue
+
+        if not page.exists():
+            pywikibot.warning(
+                "Page {0} doesn't exist".format(
+                    page.title(as_link=True)
                 )
             )
             continue
