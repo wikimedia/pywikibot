@@ -123,28 +123,31 @@ def check_protection_level(operation, level, levels, default=None):
     @return: a valid protection level
     @rtype: str
     """
-    if level not in levels:
-        first_char = []
-        default_char = None
-        num = 1
-        for level in levels:
-            for c in level:
-                if c not in first_char:
-                    first_char.append(c)
-                    break
-            else:
-                first_char.append(str(num))
-                num += 1
-            if level == default:
-                default_char = first_char[-1]
-        choice = pywikibot.input_choice('Choice a protection level to {0}:'
-                                        .format(operation),
-                                        zip(levels, first_char),
-                                        default=default_char)
-
-        return levels[first_char.index(choice)]
-    else:
+    if level in levels:
         return level
+
+    # ask for a valid level
+    levels = sorted(levels)  # sort to be deterministic
+    first_char = []
+    default_char = None
+    num = 1
+    for level in levels:
+        for c in level:
+            if c not in first_char:
+                first_char.append(c)
+                break
+        else:
+            first_char.append(str(num))
+            num += 1
+        if level == default:
+            default_char = first_char[-1]
+
+    choice = pywikibot.input_choice('Choose a protection level to {0}:'
+                                    .format(operation),
+                                    zip(levels, first_char),
+                                    default=default_char)
+
+    return levels[first_char.index(choice)]
 
 
 def main(*args):
