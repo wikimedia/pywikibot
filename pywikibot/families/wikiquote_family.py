@@ -18,14 +18,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiquote'
 
     closed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
         'als', 'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk',
         'kr', 'ks', 'kw', 'lb', 'na', 'nds', 'qu', 'simple',
         'tk', 'tt', 'ug', 'vo', 'za', 'zh-min-nan',
     ]
 
     removed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
         'tokipona',
     ]
 
