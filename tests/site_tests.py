@@ -3349,48 +3349,19 @@ class TestSametitleSite(TestCase):
         self.assertFalse(site.sametitle('Invalid:Foo', 'Invalid:foo'))
 
 
-class TestObsoleteSite(TestCase):
+class TestObsoleteSite(DefaultSiteTestCase):
 
     """Test 'closed' and obsolete code sites."""
 
-    # hostname() fails, so it is provided here otherwise the
-    # test class fails with hostname not defined for mh.wikipedia.org
-    sites = {
-        'mhwp': {
-            'family': 'wikipedia',
-            'code': 'mh',
-            'hostname': 'mh.wikipedia.org',
-        },
-        # pywikibot should never attempt to access jp.wikipedia.org,
-        # however this entry ensures that there is a change in the builds
-        # if jp.wikipedia.org goes offline.
-        'jpwp': {
-            'family': 'wikipedia',
-            'code': 'jp',
-            'hostname': 'jp.wikipedia.org',
-        },
-        'jawp': {
-            'family': 'wikipedia',
-            'code': 'ja',
-        },
-    }
-
-    @classmethod
-    def setUpClass(cls):
-        """Setup the class."""
-        with patch.object(pywikibot, 'warn') as warn_mock:
-            super(TestObsoleteSite, cls).setUpClass()
-        warn_mock.assert_called_once_with(
-            'Site wikipedia:ja instantiated using different code "jp"',
-            UserWarning, 2)
-
     def test_locked_site(self):
         """Test Wikimedia closed/locked site."""
-        site = self.get_site('mhwp')
+        with suppress_warnings('Interwiki removal mh is in wikipedia codes'):
+            site = pywikibot.Site('mh', 'wikipedia')
+        self.assertIsInstance(site, pywikibot.site.ClosedSite)
         self.assertEqual(site.code, 'mh')
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)
-        self.assertIsNotNone(site.hostname)
+        self.assertEqual(site.hostname(), 'mh.wikipedia.org')
         r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
         self.assertEqual(r.status, 200)
@@ -3408,7 +3379,9 @@ class TestObsoleteSite(TestCase):
 
     def test_alias_code_site(self):
         """Test Wikimedia site with an alias code."""
-        site = self.get_site('jpwp')
+        with suppress_warnings(
+                'Site wikipedia:ja instantiated using different code "jp"'):
+            site = pywikibot.Site('jp', 'wikipedia')
         self.assertIsInstance(site.obsolete, bool)
         self.assertEqual(site.code, 'ja')
         self.assertFalse(site.obsolete)
