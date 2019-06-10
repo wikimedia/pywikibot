@@ -1569,8 +1569,11 @@ class SubdomainFamily(Family):
     def langs(cls):
         """Property listing family languages."""
         codes = cls.codes
+
         if hasattr(cls, 'test_codes'):
-            codes = codes + cls.test_codes
+            codes += cls.test_codes
+        if hasattr(cls, 'closed_wikis'):
+            codes += cls.closed_wikis
 
         # shortcut this classproperty
         cls.langs = {code: '{0}.{1}'.format(code, cls.domain)

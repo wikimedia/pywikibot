@@ -64,7 +64,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         cls.domains.append(cls.langs['beta'])
         return cls.domains
 
-    languages_by_size += ['mul', 'beta']
+    languages_by_size.append('mul')
 
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
