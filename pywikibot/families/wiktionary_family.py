@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,8 +21,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
         'aa', 'ab', 'ak', 'als', 'as', 'av', 'ba', 'bh', 'bi', 'bm', 'bo',
-        'ch', 'cr', 'dz', 'ik', 'mh', 'mo', 'pi', 'rm', 'rn', 'sc', 'sn',
-        'to', 'tw', 'xh', 'yo', 'za',
+        'ch', 'cr', 'dz', 'ik', 'mh', 'pi', 'rm', 'rn', 'sc', 'sn', 'to', 'tw',
+        'xh', 'yo', 'za',
     ]
 
     removed_wikis = [

@@ -19,8 +19,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
-        'aa', 'advisory', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mo',
-        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability'
+        'aa', 'advisory', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mus',
+        'ng', 'quality', 'strategy', 'ten', 'usability'
     ]
 
     removed_wikis = [

@@ -1661,6 +1661,9 @@ class WikimediaFamily(Family):
         # Language aliases
         'nb': 'no',  # T86924
 
+        # closed wiki redirection aliases
+        'mo': 'ro',
+
         # Incomplete language code change. T86915
         'minnan': 'zh-min-nan',
         'nan': 'zh-min-nan',
