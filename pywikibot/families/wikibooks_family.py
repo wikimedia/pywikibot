@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikibooks'
 
     closed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
         'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay',
         'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'gn', 'got',
         'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
@@ -28,7 +28,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     removed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
         'dk', 'tokipona',
     ]
 

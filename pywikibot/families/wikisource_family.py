@@ -19,11 +19,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikisource'
 
     closed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
         'ang', 'ht',
     ]
     removed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
         'tokipona',
     ]
 
