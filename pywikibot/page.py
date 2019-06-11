@@ -4636,7 +4636,7 @@ class ItemPage(WikibasePage):
         if dbname not in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
-            return self.sitelinks[dbname].title
+            return self.sitelinks[dbname].canonical_title()
 
     def setSitelink(self, sitelink, **kwargs):
         """
