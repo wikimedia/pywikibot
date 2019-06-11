@@ -1047,13 +1047,13 @@ class TestSiteLink(WikimediaDefaultSiteTestCase):
 
     def test_site_link(self):
         """Test parsing of title."""
-        self._test_link(SiteLink('enwiki', 'Foobar'),
+        self._test_link(SiteLink('Foobar', 'enwiki'),
                         'Foobar', Namespace.MAIN, 'en', 'wikipedia')
-        self._test_link(SiteLink('svwiki', 'Mall:!!'),
+        self._test_link(SiteLink('Mall:!!', 'svwiki'),
                         '!!', Namespace.TEMPLATE, 'sv', 'wikipedia')
-        self._test_link(SiteLink('dewikibooks', 'Vorlage:!!'),
+        self._test_link(SiteLink('Vorlage:!!', 'dewikibooks'),
                         '!!', Namespace.TEMPLATE, 'de', 'wikibooks')
-        self._test_link(SiteLink('enwiki', 'Ai Weiwei: Never Sorry'),
+        self._test_link(SiteLink('Ai Weiwei: Never Sorry', 'enwiki'),
                         'Ai Weiwei: Never Sorry', Namespace.MAIN,
                         'en', 'wikipedia')
 
