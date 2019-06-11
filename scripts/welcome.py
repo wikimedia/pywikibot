@@ -830,53 +830,52 @@ class WelcomeBot(SingleSiteBot):
                     pywikibot.output('{} has been already welcomed.'
                                      .format(users.username))
                     continue
-                else:
-                    if self.badNameFilter(users.username):
-                        self.reportBadAccount(users.username)
-                        continue
-                    welcome_text = self.welcome_text
-                    if globalvar.randomSign:
-                        if self.site.family.name != 'wikinews':
-                            welcome_text = (welcome_text
-                                            % choice(self.defineSign()))
-                        if (self.site.family.name != 'wiktionary'
-                                or self.site.code != 'it'):
-                            welcome_text += timeselected
-                    elif self.site.sitename != 'wikinews:it':
-                        welcome_text = welcome_text % globalvar.defaultSign
-                    final_text = i18n.translate(
-                        self.site, final_new_text_additions)
-                    if final_text:
-                        welcome_text += final_text
-                    welcome_comment = i18n.twtranslate(self.site,
-                                                       'welcome-welcome')
-                    try:
-                        # append welcomed, welcome_count++
-                        ustp.put(welcome_text, welcome_comment,
-                                 minor=False)
-                        welcomed_count += 1
-                        self.welcomed_users.append(users)
-                    except pywikibot.EditConflict:
-                        showStatus(4)
-                        pywikibot.output('An edit conflict has occurred, '
-                                         'skipping this user.')
 
+                if self.badNameFilter(users.username):
+                    self.reportBadAccount(users.username)
+                    continue
+
+                welcome_text = self.welcome_text
+                if globalvar.randomSign:
+                    if self.site.family.name != 'wikinews':
+                        welcome_text = welcome_text % choice(self.defineSign())
+                    if (self.site.family.name != 'wiktionary'
+                            or self.site.code != 'it'):
+                        welcome_text += timeselected
+                elif self.site.sitename != 'wikinews:it':
+                    welcome_text = welcome_text % globalvar.defaultSign
+
+                final_text = i18n.translate(self.site,
+                                            final_new_text_additions)
+                if final_text:
+                    welcome_text += final_text
+                welcome_comment = i18n.twtranslate(self.site,
+                                                   'welcome-welcome')
+                try:
+                    # append welcomed, welcome_count++
+                    ustp.put(welcome_text, welcome_comment, minor=False)
+                except pywikibot.EditConflict:
+                    showStatus(4)
+                    pywikibot.output(
+                        'An edit conflict has occurred, skipping this user.')
+                else:
+                    self.welcomed_users.append(users)
+
+                welcomed_count = len(self.welcomed_users)
                 if globalvar.makeWelcomeLog:
                     showStatus(5)
-                    if welcomed_count == 1:
-                        pywikibot.output('One user has been welcomed.')
-                    elif welcomed_count == 0:
-                        pywikibot.output('No users have been welcomed.')
+                    if welcomed_count == 0:
+                        count = 'No users have'
+                    elif welcomed_count == 1:
+                        count = 'One user has'
                     else:
-                        pywikibot.output('{} users have been welcomed.'
-                                         .format(welcomed_count))
+                        count = '{} users have'.format(welcomed_count)
+                    pywikibot.output(count + ' been welcomed.')
+
                     if welcomed_count >= globalvar.dumpToLog:
                         if self.makelogpage(self.welcomed_users):
                             self.welcomed_users = []
                             welcomed_count = 0
-                        else:
-                            continue
-                # If we haven't to report, do nothing.
 
             if globalvar.makeWelcomeLog and welcomed_count > 0:
                 showStatus()
