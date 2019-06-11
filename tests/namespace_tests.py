@@ -64,7 +64,7 @@ class TestNamespaceObject(TestCase):
 
     def testNamespaceTypes(self):
         """Test cases for methods manipulating Namespace names."""
-        ns = Namespace.builtin_namespaces(use_image_name=False)
+        ns = Namespace.builtin_namespaces()
 
         self.assertIsInstance(ns, dict)
         self.assertTrue(all(x in ns for x in range(0, 16)))
@@ -116,7 +116,7 @@ class TestNamespaceObject(TestCase):
 
     def testNamespaceToString(self):
         """Test Namespace __str__ and __unicode__."""
-        ns = Namespace.builtin_namespaces(use_image_name=False)
+        ns = Namespace.builtin_namespaces()
 
         self.assertEqual(str(ns[0]), ':')
         self.assertEqual(str(ns[1]), 'Talk:')
@@ -250,7 +250,7 @@ class TestNamespaceDictDeprecated(CapturingTestCase, DeprecationTestCase):
 
     def test_resolve_equal(self):
         """Test Namespace.resolve success."""
-        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+        namespaces = Namespace.builtin_namespaces()
         main_ns = namespaces[0]
         file_ns = namespaces[6]
         special_ns = namespaces[-1]
@@ -334,7 +334,7 @@ class TestNamespaceCollections(TestCase):
 
     def test_set(self):
         """Test converting sequence of Namespace to a set."""
-        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+        namespaces = Namespace.builtin_namespaces()
 
         self.assertTrue(all(isinstance(x, int) for x in namespaces))
         self.assertTrue(all(isinstance(x, int) for x in namespaces.keys()))
@@ -348,7 +348,7 @@ class TestNamespaceCollections(TestCase):
 
     def test_set_minus(self):
         """Test performing set minus operation on set of Namespace objects."""
-        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+        namespaces = Namespace.builtin_namespaces()
 
         excluded_namespaces = {-1, -2}
 
