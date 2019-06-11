@@ -783,31 +783,26 @@ class WelcomeBot(SingleSiteBot):
         """Check whether the user is to be skipped."""
         if users.isBlocked():
             showStatus(3)
-            pywikibot.output('{} has been blocked!'
-                             .format(users.username))
+            pywikibot.output('{} has been blocked!'.format(users.username))
 
         elif 'bot' in users.groups():
             showStatus(3)
-            pywikibot.output('{} is a bot!'
-                             .format(users.username))
+            pywikibot.output('{} is a bot!'.format(users.username))
 
         elif 'bot' in users.username.lower():
             showStatus(3)
             pywikibot.output('{} might be a global bot!'
                              .format(users.username))
 
-        elif users.editCount() == 0:
-            if not globalvar.quiet:
+        elif users.editCount() < globalvar.attachEditCount:
+            if not users.editCount() == 0:
+                showStatus(1)
+                pywikibot.output('{0} has only {1} contributions.'
+                                 .format(users.username, users.editCount()))
+            elif not globalvar.quiet:
                 showStatus(1)
                 pywikibot.output('{} has no contributions.'
                                  .format(users.username))
-
-        elif users.editCount() < globalvar.attachEditCount:
-            showStatus(1)
-            pywikibot.output('{0} has only {1} contributions.'
-                             .format(users.username,
-                                     users.editCount()))
-
         else:
             return super(WelcomeBot, self).skip_page(users)
 
@@ -971,17 +966,20 @@ def handle_args(args):
     for arg in pywikibot.handle_args(args):
         arg, _, val = arg.partition(':')
         if arg == '-edit':
-            globalvar.attachEditCount = int(val or pywikibot.input(
-                'After how many edits would you like to welcome new users? '
-                '(0 is allowed)'))
+            globalvar.attachEditCount = int(
+                val if val.isdigit() else pywikibot.input(
+                    'After how many edits would you like to welcome new users?'
+                    ' (0 is allowed)'))
         elif arg == '-timeoffset':
-            globalvar.timeoffset = int(val or pywikibot.input(
-                'Which time offset (in minutes) for new users would you like '
-                'to use?'))
+            globalvar.timeoffset = int(
+                val if val.isdigit() else pywikibot.input(
+                    'Which time offset (in minutes) for new users would you '
+                    'like to use?'))
         elif arg == '-time':
-            globalvar.timeRecur = int(val or pywikibot.input(
-                'For how many seconds would you like to bot to sleep before '
-                'checking again?'))
+            globalvar.timeRecur = int(
+                val if val.isdigit() else pywikibot.input(
+                    'For how many seconds would you like to bot to sleep '
+                    'before checking again?'))
         elif arg == '-offset':
             _handle_offset(val)
         elif arg == '-file':
@@ -993,12 +991,15 @@ def handle_args(args):
                 'Which signature to use?')
             globalvar.defaultSign += timeselected
         elif arg == '-limit':
-            globalvar.queryLimit = int(val or pywikibot.input(
-                'How many of the latest new users would you like to load?'))
+            globalvar.queryLimit = int(
+                val if val.isdigit() else pywikibot.input(
+                    'How many of the latest new users would you like to '
+                    'load?'))
         elif arg == '-numberlog':
-            globalvar.dumpToLog = int(val or pywikibot.input(
-                'After how many welcomed users would you like to update the '
-                'welcome log?'))
+            globalvar.dumpToLog = int(
+                val if val.isdigit() else pywikibot.input(
+                    'After how many welcomed users would you like to update '
+                    'the welcome log?'))
         elif arg in mapping:
             setattr(globalvar, *mapping[arg])
         else:
