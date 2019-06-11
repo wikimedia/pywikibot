@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from collections import OrderedDict, namedtuple
 from contextlib import suppress
 from html.parser import HTMLParser
-from typing import Optional, Union
+from typing import List, NamedTuple, Optional, Tuple, Union
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -834,6 +834,7 @@ def replace_links(text: str, replace, site=None) -> str:
 # -------------------------------
 _Heading = namedtuple('_Heading', ('text', 'start', 'end'))
 _Section = namedtuple('_Section', ('title', 'content'))
+_Content = namedtuple('_Content', ('header', 'sections', 'footer'))
 
 
 def _extract_headings(text: str, site) -> list:
@@ -864,16 +865,21 @@ def _extract_sections(text: str, headings) -> list:
     return []
 
 
-def extract_sections(text: str, site=None) -> tuple:
+def extract_sections(
+    text: str, site=None
+) -> NamedTuple('_Content', [('header', str),  # noqa: F821
+                             ('body', List[Tuple[str, str]]),  # noqa: F821
+                             ('footer', str)]):  # noqa: F821
     """
     Return section headings and contents found in text.
 
-    @return: The returned tuple contains the text parsed into three
-        parts: The first part is a string containing header part above
-        the first heading. The last part is also a string containing
-        footer part after the last section. The middle part is a list
-        of tuples, each tuple containing a string with section heading
-        and a string with section content. Example article::
+    @return: The returned namedtuple contains the text parsed into
+        header, contents and footer parts: The header part is a string
+        containing text part above the first heading. The footer part
+        is also a string containing text part after the last section.
+        The section part is a list of tuples, each tuple containing a
+        string with section heading and a string with section content.
+        Example article::
 
             '''A''' is a thing.
 
@@ -885,15 +891,14 @@ def extract_sections(text: str, site=None) -> tuple:
 
             [[Category:Things starting with A]]
 
-        ...is parsed into the following tuple::
+        ...is parsed into the following namedtuple::
 
-            (header, body, footer)
-            header = "'''A''' is a thing."
-            body = [('== History of A ==', 'Some history...'),
-                    ('== Usage of A ==', 'Some usage...')]
-            footer = '[[Category:Things starting with A]]'
+            result = extract_sections(text, site)
+            result.header = "'''A''' is a thing."
+            result.body = [('== History of A ==', 'Some history...'),
+                           ('== Usage of A ==', 'Some usage...')]
+            result.footer = '[[Category:Things starting with A]]'
 
-    @rtype: tuple of (str, list of tuples, str)
     """
     headings = _extract_headings(text, site)
     sections = _extract_sections(text, headings)
@@ -912,7 +917,7 @@ def extract_sections(text: str, site=None) -> tuple:
                 sections[-1].title, last_section_content[:-len(footer)])
         else:
             header = header[:-len(footer)]
-    return header, sections, footer
+    return _Content(header, sections, footer)
 
 
 # -----------------------------------------------
