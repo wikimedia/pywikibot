@@ -1,6 +1,5 @@
 # This file is DEPRECATED! Use `pip install pywikibot[security]` instead.
-
-requests>=2.20.0
-
-# requests security extra
-requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
+#
+# The period below installs pywikibot[security] from setup.py automatically
+# on Python < 2.7.9.
+.
