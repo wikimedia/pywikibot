@@ -111,8 +111,8 @@ class TestSites(TestCase):
             for key in keys:
                 with self.subTest(package=package, key=key):
                     self.assertIn(key, languages,
-                                  "'{}' - json key '{}' is not a site language"
-                                  .format(package, key))
+                                  "json key '{}' is not a site language"
+                                  .format(key))
 
 
 def setUpModule():  # noqa: N802
