@@ -28,35 +28,42 @@ class TestValidTemplateMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        def test_method(site):
+        def test_method(site, package):
 
             def test_template(self):
                 """Test validity of template."""
                 lang = site.lang
                 if lang not in keys:
                     return
-                msg = i18n.twtranslate(lang, package, fallback=False)
-                if msg:
-                    # check whether the message contains a template
-                    templates = extract_templates_and_params_regex_simple(msg)
-                    self.assertIsInstance(templates, list)
-                    self.assertIsNotEmpty(templates)
 
-                    # known problem
-                    if site.code == 'simple':
-                        raise unittest.SkipTest(
-                            "'simple' wiki has 'en' language code but "
-                            'missing template. Must be solved by the '
-                            'corresponding script.')
-                    # check whether template exists
-                    title = templates[0][0]
-                    page = pywikibot.Page(site, title, ns=10)
-                    self.assertTrue(
-                        page.exists(),
-                        msg='Invalid L10N in package "{package}"\n'
-                        'template "{title}" does not exist for lang '
-                        '"{site.lang}" on site "{site}"'
-                        .format(package=package, title=title, site=site))
+                if not i18n.twhas_key(lang, package):
+                    return
+
+                msg = i18n.twtranslate(lang, package, fallback=False)
+
+                # check whether the message contains a template
+                templates = extract_templates_and_params_regex_simple(msg)
+                self.assertIsInstance(templates, list)
+                self.assertIsNotEmpty(templates)
+
+                # known problems
+                if (package == PACKAGES[0] and site.code in ['simple', 'test2']
+                        or package == PACKAGES[1] and site.code == 'test'):
+                    raise unittest.SkipTest(
+                        "{site} wiki has '{site.lang}' language code but "
+                        "missing template for package '{package}'. Must be "
+                        'solved by the corresponding script.'
+                        .format(site=site, package=package))
+
+                # check whether template exists
+                title = templates[0][0]
+                page = pywikibot.Page(site, title, ns=10)
+                self.assertTrue(
+                    page.exists(),
+                    msg='Invalid L10N in package "{package}"\n'
+                    'template "{title}" does not exist for lang '
+                    '"{site.lang}" on site "{site}"'
+                    .format(package=package, title=title, site=site))
 
             return test_template
 
@@ -75,7 +82,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                 test_name = ('test_{}_{}'
                              .format(package, code)).replace('-', '_')
                 cls.add_method(
-                    dct, test_name, test_method(current_site),
+                    dct, test_name, test_method(current_site, package),
                     doc_suffix='{0} and language {1}'.format(
                         package, code))
 
