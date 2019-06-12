@@ -1690,14 +1690,6 @@ class WikimediaFamily(Family):
     # Completely removed
     removed_wikis = []
 
-    # Mappings which should be in effect, even for
-    # closed/removed wikis
-    interwiki_replacement_overrides = {
-        # Moldovan projects are closed, however
-        # Romanian was to be the replacement.
-        'mo': 'ro',
-    }
-
     # WikimediaFamily uses wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
     # wikibase code and item number:
@@ -1728,7 +1720,6 @@ class WikimediaFamily(Family):
     def interwiki_replacements(cls):
         """Return an interwiki code replacement mapping."""
         rv = cls.code_aliases.copy()
-        rv.update(cls.interwiki_replacement_overrides)
         return FrozenDict(rv)
 
     def shared_image_repository(self, code):
