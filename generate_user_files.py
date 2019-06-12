@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -440,8 +440,10 @@ def main(*args):
 
     local_args = pywikibot.handle_args(args)
     if local_args:
-        pywikibot.output('Unknown arguments: %s' % ' '.join(local_args))
-        return False
+        pywikibot.output('Unknown argument{}: {}'
+                         .format('s' if len(local_args) > 1 else '',
+                                 ', '.join(local_args)))
+        return
 
     pywikibot.output('You can abort at any time by pressing ctrl-c')
     if config.mylang is not None:
