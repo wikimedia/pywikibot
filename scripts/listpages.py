@@ -200,7 +200,7 @@ def main(*args):
             fmt = value.replace('\\03{{', '\03{{')
             if not fmt.strip():
                 notitle = True
-        elif option == '-outputlang:':
+        elif option == '-outputlang':
             outputlang = value
         elif option == '-get':
             page_get = True
