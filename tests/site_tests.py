@@ -321,28 +321,28 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def test_constructors(self):
         """Test cases for site constructors."""
+        test_list = [
+            ['enwiki', ('en', 'wikipedia')],
+            ['eswikisource', ('es', 'wikisource')],
+            ['dewikinews', ('de', 'wikinews')],
+            ['ukwikivoyage', ('uk', 'wikivoyage')],
+            ['metawiki', ('meta', 'meta')],
+            ['commonswiki', ('commons', 'commons')],
+            ['wikidatawiki', ('wikidata', 'wikidata')],
+            ['testwikidatawiki', ('test', 'wikidata')],
+            ['testwiki', ('test', 'test')],  # see T225729
+            ['test2wiki', ('test2', 'wikipedia')],  # see T225729
+            ['sourceswiki', ('mul', 'wikisource')],  # see T226960
+        ]
         if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
             site = self.site
         else:
             site = None
-        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki', site),
-                         pywikibot.Site('en', 'wikipedia'))
-        self.assertEqual(
-            pywikibot.site.APISite.fromDBName('eswikisource', site),
-            pywikibot.Site('es', 'wikisource'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews', site),
-                         pywikibot.Site('de', 'wikinews'))
-        self.assertEqual(
-            pywikibot.site.APISite.fromDBName('ukwikivoyage', site),
-            pywikibot.Site('uk', 'wikivoyage'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('metawiki', site),
-                         pywikibot.Site('meta', 'meta'))
-        self.assertEqual(
-            pywikibot.site.APISite.fromDBName('commonswiki', site),
-            pywikibot.Site('commons', 'commons'))
-        self.assertEqual(
-            pywikibot.site.APISite.fromDBName('wikidatawiki', site),
-            pywikibot.Site('wikidata', 'wikidata'))
+        for dbname, site_tuple in test_list:
+            with self.subTest(dbname=dbname):
+                self.assertEqual(
+                    pywikibot.site.APISite.fromDBName(dbname, site),
+                    pywikibot.Site(*site_tuple))
 
     def test_language_methods(self):
         """Test cases for languages() and related methods."""
