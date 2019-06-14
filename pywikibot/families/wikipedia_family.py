@@ -114,7 +114,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     interwiki_forwarded_from = [
         'commons',
         'incubator',
+        'mediawiki',
         'meta',
+        'outreach',
         'species',
         'strategy',
         'test',
