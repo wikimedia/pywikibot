@@ -1258,7 +1258,10 @@ class Family(object):
             if code in self.codes:
                 pywikibot.warn('Interwiki removal %s is in %s codes'
                                % (code, self))
-            return 'RemovedSite'
+            if code in self.closed_wikis:
+                return 'ClosedSite'
+            if code in self.removed_wikis:
+                return 'RemovedSite'
 
         return config.site_interface
 

@@ -3390,10 +3390,11 @@ class TestObsoleteSite(TestCase):
         self.assertEqual(site.code, 'mh')
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)
-        self.assertRaises(KeyError, site.hostname)
+        self.assertIsNotNone(site.hostname)
         r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
         self.assertEqual(r.status, 200)
+        self.assertEqual(site.siteinfo['lang'], 'mh')
 
     def test_removed_site(self):
         """Test Wikimedia offline site."""

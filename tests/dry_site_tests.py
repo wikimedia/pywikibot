@@ -11,7 +11,7 @@ import pywikibot
 from pywikibot.tools import deprecated
 from pywikibot.site import must_be, need_version
 from pywikibot.comms.http import user_agent
-from pywikibot.exceptions import UnknownSite
+from pywikibot.exceptions import UserRightsError
 
 from tests.aspects import (
     unittest,
@@ -137,6 +137,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.code = 'test'
         self.family = lambda: None
         self.family.name = 'test'
+        self.sitename = self.family.name + ':' + self.code
         self._logged_in_as = None
         self.obsolete = False
         super(TestMustBe, self).setUp()
@@ -145,6 +146,10 @@ class TestMustBe(DebugOnlyTestCase):
     def login(self, sysop):
         """Fake the log in and just store who logged in."""
         self._logged_in_as = 'sysop' if sysop else 'user'
+
+    def has_group(self, group):
+        """Fake the groups user belongs to."""
+        return False
 
     def testMockInTest(self):
         """Test that setUp and login work."""
@@ -198,7 +203,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.obsolete = True
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
-        self.assertRaises(UnknownSite, self.call_this_user_req_function,
+        self.assertRaises(UserRightsError, self.call_this_user_req_function,
                           args, kwargs)
 
 

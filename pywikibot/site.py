@@ -66,6 +66,7 @@ from pywikibot.exceptions import (
     UnknownExtension,
     UnknownSite,
     UserBlocked,
+    UserRightsError,
 )
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
@@ -1307,10 +1308,11 @@ def must_be(group=None, right=None):
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
-            if self.obsolete:
-                raise UnknownSite('Language %s in family %s is obsolete'
-                                  % (self.code, self.family.name))
             grp = kwargs.pop('as_group', group)
+            if self.obsolete and not self.has_group('steward'):
+                raise UserRightsError('Site {} has been closed. Only steward '
+                                      'can perform requested action.'
+                                      .format(self.sitename))
             if grp == 'user':
                 self.login(False)
             elif grp == 'sysop':
@@ -7454,6 +7456,63 @@ class APISite(BaseSite):
                               class_name='APISite', since='20141218')
     isAllowed = redirect_func(has_right, old_name='isAllowed',
                               class_name='APISite', since='20141218')
+
+
+class ClosedSite(APISite):
+    """Site closed to read-only mode."""
+
+    def __init__(self, code, fam, user=None, sysop=None):
+        """Initializer."""
+        super(ClosedSite, self).__init__(code, fam, user, sysop)
+
+    def _closed_error(self, notice=''):
+        """An error instead of pointless API call."""
+        pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
+                                                             notice))
+
+    def page_restrictions(self, page):
+        """Return a dictionary reflecting page protections."""
+        if not self.page_exists(page):
+            raise NoPage(page)
+        if not hasattr(page, '_protection'):
+            page._protection = {'edit': ('steward', 'infinity'),
+                                'move': ('steward', 'infinity'),
+                                'delete': ('steward', 'infinity'),
+                                'upload': ('steward', 'infinity'),
+                                'create': ('steward', 'infinity')}
+        return page._protection
+
+    def page_can_be_edited(self, page):
+        """Determine if the page can be edited."""
+        rest = self.page_restrictions(page)
+        sysop_protected = 'edit' in rest and rest['edit'][0] == 'steward'
+        try:
+            api.LoginManager(site=self, sysop=sysop_protected)
+        except NoUsername:
+            return False
+        return True
+
+    def recentchanges(self, **kwargs):
+        """An error instead of pointless API call."""
+        self._closed_error('No recent changes can be returned.')
+
+    def is_uploaddisabled(self):
+        """Return True if upload is disabled on site."""
+        if not hasattr(self, '_uploaddisabled'):
+            self._uploaddisabled = True
+        return self._uploaddisabled
+
+    def newpages(self, **kwargs):
+        """An error instead of pointless API call."""
+        self._closed_error('No new pages can be returned.')
+
+    def newfiles(self, **kwargs):
+        """An error instead of pointless API call."""
+        self._closed_error('No new files can be returned.')
+
+    def newimages(self, *args, **kwargs):
+        """An error instead of pointless API call."""
+        self._closed_error('No new images can be returned.')
 
 
 class DataSite(APISite):
