@@ -71,43 +71,33 @@ class TestLink(DefaultDrySiteTestCase):
 
     def test_valid(self):
         """Test that valid titles are correctly normalized."""
-        self.assertEqual(Link('Sandbox', self.get_site()).title, 'Sandbox')
-        self.assertEqual(Link('A "B"', self.get_site()).title, 'A "B"')
-        self.assertEqual(Link("A 'B'", self.get_site()).title, "A 'B'")
-        self.assertEqual(Link('.com', self.get_site()).title, '.com')
-        self.assertEqual(Link('~', self.get_site()).title, '~')
-        self.assertEqual(Link('"', self.get_site()).title, '"')
-        self.assertEqual(Link("'", self.get_site()).title, "'")
-        self.assertEqual(Link('Talk:Sandbox', self.get_site()).title,
-                         'Sandbox')
-        self.assertEqual(Link('Talk:Foo:Sandbox', self.get_site()).title,
-                         'Foo:Sandbox')
-        self.assertEqual(Link('File:Example.svg', self.get_site()).title,
-                         'Example.svg')
-        self.assertEqual(Link('File_talk:Example.svg', self.get_site()).title,
-                         'Example.svg')
-        self.assertEqual(Link('Foo/.../Sandbox', self.get_site()).title,
-                         'Foo/.../Sandbox')
-        self.assertEqual(Link('Sandbox/...', self.get_site()).title,
-                         'Sandbox/...')
-        self.assertEqual(Link('A~~', self.get_site()).title, 'A~~')
-        self.assertEqual(Link(':A', self.get_site()).title, 'A')
-        # Length is 256 total, but only title part matters
-        self.assertEqual(Link('Category:' + 'X' * 248, self.get_site()).title,
-                         'X' * 248)
-        self.assertEqual(Link('X' * 252, self.get_site()).title, 'X' * 252)
-        self.assertEqual(Link('A%20B', self.get_site()).title, 'A B')
-        self.assertEqual(Link('A &eacute; B', self.get_site()).title, 'A é B')
-        self.assertEqual(Link('A &#233; B', self.get_site()).title, 'A é B')
-        self.assertEqual(Link('A &#x00E9; B', self.get_site()).title, 'A é B')
-        self.assertEqual(Link('A &nbsp; B', self.get_site()).title, 'A B')
-        self.assertEqual(Link('A &#160; B', self.get_site()).title, 'A B')
+        site = self.get_site()
+        title_tests = ['Sandbox', 'A "B"', "A 'B'", '.com', '~', '"', "'",
+                       'Foo/.../Sandbox', 'Sandbox/...', 'A~~', 'X' * 252]
+        for title in title_tests:
+            with self.subTest(title=title):
+                self.assertEqual(Link(title, site).title, title)
 
-        anchor_link = Link('A | B', self.get_site())
+        self.assertEqual(Link('Talk:Sandbox', site).title, 'Sandbox')
+        self.assertEqual(Link('Talk:Foo:Sandbox', site).title, 'Foo:Sandbox')
+        self.assertEqual(Link('File:Example.svg', site).title, 'Example.svg')
+        self.assertEqual(Link('File_talk:Example.svg', site).title,
+                         'Example.svg')
+        self.assertEqual(Link(':A', site).title, 'A')
+        # Length is 256 total, but only title part matters
+        self.assertEqual(Link('Category:' + 'X' * 248, site).title, 'X' * 248)
+        self.assertEqual(Link('A%20B', site).title, 'A B')
+        self.assertEqual(Link('A &eacute; B', site).title, 'A é B')
+        self.assertEqual(Link('A &#233; B', site).title, 'A é B')
+        self.assertEqual(Link('A &#x00E9; B', site).title, 'A é B')
+        self.assertEqual(Link('A &nbsp; B', site).title, 'A B')
+        self.assertEqual(Link('A &#160; B', site).title, 'A B')
+
+        anchor_link = Link('A | B', site)
         self.assertEqual(anchor_link.title, 'A')
         self.assertEqual(anchor_link.anchor, ' B')
 
-        section_link = Link('A%23B', self.get_site())
+        section_link = Link('A%23B', site)
         self.assertEqual(section_link.title, 'A')
         self.assertEqual(section_link.section, 'B')
 
