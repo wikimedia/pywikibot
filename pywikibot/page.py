@@ -2976,7 +2976,10 @@ class Category(Page):
     @deprecated_args(step=None)
     def members(self, recurse=False, namespaces=None, total=None,
                 content=False):
-        """Yield all category contents (subcats, pages, and files)."""
+        """Yield all category contents (subcats, pages, and files).
+
+        @rtype: typing.Iterable[pywikibot.Page]
+        """
         for member in self.site.categorymembers(
                 self, namespaces, total=total, content=content):
             yield member

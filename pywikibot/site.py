@@ -3875,6 +3875,7 @@ class APISite(BaseSite):
         @type member_type: str or iterable of str;
             values: page, subcat, file
 
+        @rtype: typing.Iterable[pywikibot.Page]
         @raises KeyError: a namespace identifier was not resolved
         @raises NotImplementedError: startprefix or endprefix parameters are
             given but site.version is less than 1.18.
