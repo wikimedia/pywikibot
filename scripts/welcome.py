@@ -956,6 +956,18 @@ def handle_args(args):
     @param args: command line arguments
     @type args: str
     """
+    mapping = {
+        # option: (attribute, value),
+        '-break': ('recursive', False),
+        '-nlog': ('makeWelcomeLog', False),
+        '-ask': ('confirm', True),
+        '-filter': ('filtBadName', True),
+        '-savedata': ('saveSignIndex', True),
+        '-random': ('randomSign', True),
+        '-sul': ('welcomeAuto', True),
+        '-quiet': ('quiet', True),
+    }
+
     for arg in pywikibot.handle_args(args):
         arg, _, val = arg.partition(':')
         if arg == '-edit':
@@ -980,20 +992,6 @@ def handle_args(args):
             globalvar.defaultSign = val or pywikibot.input(
                 'Which signature to use?')
             globalvar.defaultSign += timeselected
-        elif arg == '-break':
-            globalvar.recursive = False
-        elif arg == '-nlog':
-            globalvar.makeWelcomeLog = False
-        elif arg == '-ask':
-            globalvar.confirm = True
-        elif arg == '-filter':
-            globalvar.filtBadName = True
-        elif arg == '-savedata':
-            globalvar.saveSignIndex = True
-        elif arg == '-random':
-            globalvar.randomSign = True
-        elif arg == '-sul':
-            globalvar.welcomeAuto = True
         elif arg == '-limit':
             globalvar.queryLimit = int(val or pywikibot.input(
                 'How many of the latest new users would you like to load?'))
@@ -1001,8 +999,8 @@ def handle_args(args):
             globalvar.dumpToLog = int(val or pywikibot.input(
                 'After how many welcomed users would you like to update the '
                 'welcome log?'))
-        elif arg == '-quiet':
-            globalvar.quiet = True
+        elif arg in mapping:
+            setattr(globalvar, *mapping[arg])
         else:
             pywikibot.warning('Unknown option "{}"'.format(arg))
 
