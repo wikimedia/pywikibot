@@ -1740,7 +1740,10 @@ class TokenWallet(object):
     """Container for tokens."""
 
     def __init__(self, site):
-        """Initializer."""
+        """Initializer.
+
+        @type site: pywikibot.site.APISite
+        """
         self.site = site
         self._tokens = {}
         self.failed_cache = set()  # cache unavailable tokens.
@@ -1755,7 +1758,8 @@ class TokenWallet(object):
             in one request.
         @type all: bool
         """
-        assert self.site.user(), 'User must login in this site'
+        if self.site.user() is None:
+            self.site.login()
 
         self._tokens.setdefault(self.site.user(), {}).update(
             self.site.get_tokens(types, all=all))
@@ -1771,7 +1775,8 @@ class TokenWallet(object):
 
     def __getitem__(self, key):
         """Get token value for the given key."""
-        assert self.site.user(), 'User must login in this site'
+        if self.site.user() is None:
+            self.site.login()
 
         user_tokens = self._tokens.setdefault(self.site.user(), {})
         # always preload all for users without tokens
