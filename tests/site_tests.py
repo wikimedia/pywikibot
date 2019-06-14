@@ -3718,9 +3718,7 @@ class TestLoginLogout(DefaultSiteTestCase):
             self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
             self.assertNotIn('_userinfo', site.__dict__.keys())
 
-            self.assertRaisesRegexp(AssertionError,
-                                    'User must login in this site',
-                                    site.logout)
+            self.assertIsNone(site.user())
 
 
 if __name__ == '__main__':  # pragma: no cover
