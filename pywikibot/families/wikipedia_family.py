@@ -116,7 +116,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'incubator',
         'meta',
         'species',
-        'strategy',
         'test',
         'wikimania'
     ]
