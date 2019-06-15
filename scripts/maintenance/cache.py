@@ -82,12 +82,12 @@ from pywikibot.data import api
 
 # The follow attributes are used by eval()
 from pywikibot.page import User
-from pywikibot.site import APISite, DataSite, LoginStatus
+from pywikibot.site import APISite, ClosedSite, DataSite, LoginStatus
 
 from pywikibot.tools import PYTHON_VERSION
 
 __all__ = (
-    'User', 'APISite', 'DataSite', 'LoginStatus',
+    'User', 'APISite', 'ClosedSite', 'DataSite', 'LoginStatus',
     'ParseError', 'CacheEntry', 'process_entries', 'main',
     'has_password', 'is_logout', 'empty_response', 'not_accessed',
     'incorrect_hash',
