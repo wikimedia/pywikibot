@@ -118,7 +118,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'meta',
         'outreach',
         'species',
-        'strategy',
         'test',
         'wikimania'
     ]
