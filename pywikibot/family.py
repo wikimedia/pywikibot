@@ -675,7 +675,6 @@ class Family(object):
         'wikiti':           'wikiti',
         'wikiversity':      'wikiversity',
         'wikivoyage':       'wikivoyage',
-        'betawikiversity':  'betawikiversity',
         'wikiwikiweb':      'wikiwikiweb',
         'wikt':             'wiktionary',
         'wiktionary':       'wiktionary',
