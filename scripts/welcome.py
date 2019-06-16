@@ -209,11 +209,9 @@ locale.setlocale(locale.LC_ALL, '')
 #
 # ATTENTION: Projects not listed won't write a log to the wiki.
 logbook = {
-    'ar': 'Project:سجل الترحيب',
     'fr': ('Wikipedia:Prise de décision/'
            'Accueil automatique des nouveaux par un robot/log'),
     'ga': 'Project:Log fáilte',
-    'it': 'Project:Benvenuto Bot/Log',
     'ja': '利用者:Alexbot/Welcomebotログ',
     'nl': 'Project:Logboek welkom',
     'no': 'Project:Velkomstlogg',
