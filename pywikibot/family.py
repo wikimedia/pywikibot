@@ -692,7 +692,6 @@ class Family(object):
         'wmcl':             'wmcl',
         'wmcn':             'wmcn',
         'wmco':             'wmco',
-        'wmat':             'wmat',
         'wmcz':             'wmcz',
         'wmdc':             'wmdc',
         'securewikidc':     'securewikidc',
