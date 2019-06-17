@@ -672,7 +672,7 @@ class DeprecatedRegex(LazyRegex):
     def __getattr__(self, attr):
         """Issue deprecation warning."""
         issue_deprecation_warning(
-            self._name, self._instead, 2, since=self._since)
+            self._name, self._instead, since=self._since)
         return super(DeprecatedRegex, self).__getattr__(attr)
 
 
@@ -1214,7 +1214,7 @@ class SelfCallMixin(object):
         """Do nothing and just return itself."""
         if hasattr(self, '_own_desc'):
             issue_deprecation_warning('Calling {0}'.format(self._own_desc),
-                                      'it directly', 2, since='20150515')
+                                      'it directly', since='20150515')
         return self
 
 
@@ -1561,14 +1561,14 @@ def _build_msg_string(instead, since):
     return msg.format(since=since)
 
 
-def issue_deprecation_warning(name, instead, depth, warning_class=None,
+def issue_deprecation_warning(name, instead=None, depth=2, warning_class=None,
                               since=None):
     """Issue a deprecation warning.
 
     @param name: the name of the deprecated object
     @type name: str
     @param instead: suggested replacement for the deprecated object
-    @type instead: str
+    @type instead: str or None
     @param depth: depth + 1 will be used as stacklevel for the warnings
     @type depth: int
     @param warning_class: a warning class (category) to be used, defaults to
@@ -1576,7 +1576,7 @@ def issue_deprecation_warning(name, instead, depth, warning_class=None,
     @type warning_class: type
     @param since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
-    @type since: str
+    @type since: str or None
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -1857,7 +1857,7 @@ def redirect_func(target, source_module=None, target_module=None,
     @rtype: callable
     """
     def call(*a, **kw):
-        issue_deprecation_warning(old_name, new_name, 2, since=since)
+        issue_deprecation_warning(old_name, new_name, since=since)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__

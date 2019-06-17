@@ -325,7 +325,7 @@ def _get_regexes(keys, site):
                                             'category', 'file'):
                         issue_deprecation_warning(
                             'site=None',
-                            "a valid site for '{}' regex".format(exc), 2,
+                            "a valid site for '{}' regex".format(exc),
                             since='20151006')
                         site = pywikibot.Site()
 

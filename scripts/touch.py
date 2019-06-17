@@ -115,7 +115,7 @@ def main(*args):
             bot_class = PurgeBot
         elif arg == '-redir':
             issue_deprecation_warning(
-                '\n-redir', None, 1, ArgumentDeprecationWarning,
+                '\n-redir', depth=1, warning_class=ArgumentDeprecationWarning,
                 since='20150514')
         elif arg.startswith('-'):
             options[arg[1:].lower()] = True

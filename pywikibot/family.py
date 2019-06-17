@@ -965,15 +965,15 @@ class Family(object):
         if name == 'nocapitalize':
             issue_deprecation_warning('nocapitalize',
                                       "APISite.siteinfo['case'] or "
-                                      "Namespace.case == 'case-sensitive'", 2,
+                                      "Namespace.case == 'case-sensitive'",
                                       since='20150214')
         elif name == 'known_families':
             issue_deprecation_warning('known_families',
-                                      'APISite.interwiki(prefix)', 2,
+                                      'APISite.interwiki(prefix)',
                                       since='20150503')
         elif name == 'shared_data_repository':
             issue_deprecation_warning('shared_data_repository',
-                                      'APISite.data_repository()', 2,
+                                      'APISite.data_repository()',
                                       since='20151023')
         return super(Family, self).__getattribute__(name)
 
