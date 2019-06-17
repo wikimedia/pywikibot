@@ -6426,12 +6426,12 @@ class SiteLinkCollection(dict):
         @type val: dict or str
         @rtype: SiteLink
         """
-        if isinstance(key, pywikibot.site.BaseSite):
-            key = key.dbName()
         if isinstance(val, UnicodeType):
             val = SiteLink(val, key)
         else:
             val = SiteLink.fromJSON(val, self.repo)
+        if isinstance(key, pywikibot.site.BaseSite):
+            key = key.dbName()
         return super(SiteLinkCollection, self).__setitem__(key, val)
 
 
