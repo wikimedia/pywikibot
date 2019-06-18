@@ -446,7 +446,7 @@ _MSGS = {
     1: 'NoAct',
     2: 'Match',
     3: 'Skip',
-    4: 'Warning',
+    4: 'Warn',
     5: 'Done',
 }
 
