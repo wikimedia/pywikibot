@@ -2925,6 +2925,7 @@ class Category(Page):
             lexically; not valid if sortby="timestamp"; overrides "endsort"
             (requires MW 1.18+)
         @type endprefix: str
+        @rtype: typing.Iterable[pywikibot.Page]
         """
         seen = set()
         for member in self.site.categorymembers(self,
