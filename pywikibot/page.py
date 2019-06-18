@@ -1412,6 +1412,17 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Purge the server's cache for this page.
 
+        @keyword redirects: Automatically resolve redirects.
+        @type redirects: bool
+        @keyword converttitles: Convert titles to other variants if necessary.
+            Only works if the wiki's content language supports variant
+            conversion.
+        @type converttitles: bool
+        @keyword forcelinkupdate: Update the links tables.
+        @type forcelinkupdate: bool
+        @keyword forcerecursivelinkupdate: Update the links table, and update
+            the links tables for any page that uses this page as a template.
+        @type forcerecursivelinkupdate: bool
         @rtype: bool
         """
         self.clear_cache()

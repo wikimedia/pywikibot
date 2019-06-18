@@ -6049,32 +6049,50 @@ class APISite(BaseSite):
         return ('unwatched' if unwatch else 'watched') in result['watch']
 
     @must_be(group='user')
-    def purgepages(self, pages, **kwargs):
+    def purgepages(
+        self, pages, forcelinkupdate=False, forcerecursivelinkupdate=False,
+        converttitles=False, redirects=False
+    ):
         """
         Purge the server's cache for one or multiple pages.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Purge}
-
         @param pages: list of Page objects
+        @param redirects: Automatically resolve redirects.
+        @type redirects: bool
+        @param converttitles: Convert titles to other variants if necessary.
+            Only works if the wiki's content language supports variant
+            conversion.
+        @type converttitles: bool
+        @param forcelinkupdate: Update the links tables.
+        @type forcelinkupdate: bool
+        @param forcerecursivelinkupdate: Update the links table, and update the
+            links tables for any page that uses this page as a template.
+        @type forcerecursivelinkupdate: bool
         @return: True if API returned expected response; False otherwise
         @rtype: bool
         """
         req = self._simple_request(action='purge',
                                    titles=[page for page in set(pages)])
-        linkupdate_args = ['forcelinkupdate', 'forcerecursivelinkupdate']
-        for arg in kwargs:
-            if arg in linkupdate_args + ['redirects', 'converttitles']:
-                req[arg] = kwargs[arg]
+        if converttitles:
+            req['converttitles'] = True
+        if redirects:
+            req['redirects'] = True
+        if forcelinkupdate:
+            req['forcelinkupdate'] = True
+        if forcerecursivelinkupdate:
+            req['forcerecursivelinkupdate'] = True
         result = req.submit()
-        if 'purge' not in result:
+        try:
+            result = result['purge']
+        except KeyError:
             pywikibot.error(
                 'purgepages: Unexpected API response:\n%s' % result)
             return False
-        result = result['purge']
-        purged = ['purged' in page for page in result]
-        if any(kwargs.get(arg) for arg in linkupdate_args):
-            purged += ['linkupdate' in page for page in result]
-        return all(purged)
+        if not all('purged' in page for page in result):
+            return False
+        if forcelinkupdate or forcerecursivelinkupdate:
+            return all('linkupdate' in page for page in result)
+        return True
 
     @deprecated('Site().exturlusage', since='20090529')
     def linksearch(self, siteurl, limit=None, euprotocol=None):
