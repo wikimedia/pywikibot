@@ -2111,7 +2111,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
         try:
             # no such rcid, revid or too old revid
-            result = list(mysite.patrol(**params))
+            list(mysite.patrol(**params))
         except api.APIError as error:
             if error.code == 'badtoken':
                 self.skipTest(error)

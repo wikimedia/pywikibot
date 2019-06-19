@@ -107,18 +107,14 @@ def main(*args):
     day = 'None'
     mode = 'None'
     summary = ''
-    action_summary = ''
     robot = None
 
     m = ReCheck()
     for line in page.text.split('\n'):
-        if nobots.search(line):
-            # NO BOTS!!!
-            pass
-        elif example.search(line):
-            # Example line
-            pass
-        elif speedymode.search(line):
+        if nobots.search(line) or example.search(line):
+            # NO BOTS or example line
+            continue
+        if speedymode.search(line):
             mode = 'Speedy'
             day = 'None'
         elif movemode.search(line):

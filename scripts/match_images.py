@@ -24,7 +24,7 @@ Expect the code to change a lot!
 """
 #
 # (c) Multichill, 2009
-# (c) Pywikibot team, 2009-2018
+# (c) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,7 +54,6 @@ def match_image_pages(imagePageA, imagePageB):
     imageB = get_image_from_image_page(imagePageB)
 
     (imA_width, imA_height) = imageA.size
-    (imB_width, imB_height) = imageB.size
 
     imageB = imageB.resize((imA_width, imA_height))
 
@@ -113,7 +112,6 @@ def match_image_pages(imagePageA, imagePageB):
 
 def get_image_from_image_page(imagePage):
     """Get the image object to work based on an imagePage object."""
-    imageBuffer = None
     imageURL = imagePage.fileUrl()
     imageURLopener = http.fetch(imageURL)
     imageBuffer = io.BytesIO(imageURLopener.raw[:])
@@ -147,8 +145,6 @@ def main(*args):
     images = []
     other_family = ''
     other_lang = ''
-    imagePageA = None
-    imagePageB = None
 
     # Read commandline parameters.
     local_args = pywikibot.handle_args(args)

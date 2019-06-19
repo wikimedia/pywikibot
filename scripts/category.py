@@ -1365,9 +1365,6 @@ def main(*args):
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
 
-    # The generator gives the pages that should be worked upon.
-    gen = None
-
     # When this is True then the custom edit summary given for removing
     # categories from articles will also be used as the deletion reason.
     # Otherwise it will generate deletion specific comments.
@@ -1444,7 +1441,6 @@ def main(*args):
         else:
             gen_factory.handleArg(arg)
 
-    cat_db = None
     bot = None
 
     cat_db = CategoryDatabase(rebuild=rebuild)

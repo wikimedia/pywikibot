@@ -33,7 +33,6 @@ class TestThankFlowPost(TestCase):
 
     def test_thank_post(self):
         """Test thanks for Flow posts."""
-        found_log = False
         site = self.get_site()
         topic = Topic(site, self._topic_title)
         for post in reversed(topic.replies()):

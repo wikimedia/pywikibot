@@ -425,7 +425,6 @@ def main(*args):
     # that are also used by other scripts and that determine on which pages
     # to work on.
     usercontribs = None
-    gen = None
     recentchanges = False
     newpages = False
     repeat = False

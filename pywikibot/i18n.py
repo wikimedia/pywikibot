@@ -435,20 +435,19 @@ def _get_translation(lang, twtitle):
     if twtitle in _cache[lang]:
         return _cache[lang][twtitle]
     message_bundle = twtitle.split('-')[0]
-    trans_text = None
     filename = '%s/%s.json' % (message_bundle, lang)
     try:
         trans_text = pkgutil.get_data(
             _messages_package_name, filename).decode('utf-8')
     except (OSError, IOError):  # file open can cause several exceptions
         _cache[lang][twtitle] = None
-        return
+        return None
     transdict = json.loads(trans_text)
     _cache[lang].update(transdict)
     try:
         return transdict[twtitle]
     except KeyError:
-        return
+        return None
 
 
 def _extract_plural(code, message, parameters):

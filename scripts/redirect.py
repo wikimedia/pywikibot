@@ -203,7 +203,6 @@ class RedirectGenerator(OptionHandler):
     def get_redirect_pages_via_api(self):
         """Yield Pages that are redirects."""
         for ns in self.namespaces:
-            done = False
             gen = self.site.allpages(start=self.api_start,
                                      namespace=ns,
                                      filterredir=True)

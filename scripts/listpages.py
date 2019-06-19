@@ -177,7 +177,6 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    gen = None
     notitle = False
     fmt = '1'
     outputlang = None

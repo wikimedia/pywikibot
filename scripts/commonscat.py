@@ -400,8 +400,6 @@ class CommonscatBot(SingleSiteBot):
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             wikipediaPage.site.code, commonscatTemplates,
             fallback=i18n.DEFAULT_FALLBACK)
-        commonscatTemplate = ''
-        commonscatTarget = ''
         commonscatLinktext = ''
         commonscatNote = ''
         # See if commonscat is present

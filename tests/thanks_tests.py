@@ -32,7 +32,6 @@ class TestThankRevision(TestCase):
               there must make edits made before reruns of this test.
               Please see https://phabricator.wikimedia.org/T137836.
         """
-        found_log = False
         site = self.get_site()
         data = site.recentchanges(total=20)
         for rev in data:

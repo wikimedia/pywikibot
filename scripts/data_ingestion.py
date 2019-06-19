@@ -63,7 +63,7 @@ class Photo(pywikibot.FilePage):
             urlparse(URL)[2])[1]
         self.metadata['_ext'] = ext = filename.split('.')[-1]
         if ext == filename:
-            self.metadata['_ext'] = ext = None
+            self.metadata['_ext'] = None
         self.contents = None
 
         if not site:
