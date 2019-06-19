@@ -1285,6 +1285,7 @@ from pywikibot.page import (  # noqa: E402
     FilePage,
     Category,
     Link,
+    SiteLink,
     User,
     ItemPage,
     PropertyPage,
