@@ -125,7 +125,7 @@ class CoordImportRobot(WikidataBot):
         Try import coordinate from the given page to the given item.
 
         @return: whether any coordinates were found and the import
-        was successful
+            was successful
         @rtype: bool
         """
         coordinate = page.coordinates(primary_only=True)
