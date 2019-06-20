@@ -1885,7 +1885,7 @@ class APISite(BaseSite):
                     if site['dbname'] == dbname:
                         if site['code'] == 'wiki':
                             site['code'] = 'wikipedia'
-                        return cls(lang, site['code'])
+                        return pywikibot.Site(lang, site['code'])
             else:  # key == 'specials'
                 for site in val:
                     if site['dbname'] == dbname:
