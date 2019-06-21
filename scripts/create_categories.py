@@ -14,6 +14,9 @@ The following command line parameters are supported:
 
 -basename       The base to be used for the new category names.
 
+-overwrite:     Existing category is skipped by default. Use this option to
+                overwrite a category.
+
 Example:
 
     python pwb.py create_categories \
@@ -45,12 +48,13 @@ class CreateCategoriesBot(Bot):
 
     """Category creator bot."""
 
-    def __init__(self, generator, parent, basename, **kwargs):
+    def __init__(self, generator, parent, basename, overwrite, **kwargs):
         """Initializer."""
         super(CreateCategoriesBot, self).__init__(**kwargs)
         self.generator = generator
         self.parent = parent
         self.basename = basename
+        self.overwrite = overwrite
         self.comment = 'Creating new category'
 
     def treat(self, page):
@@ -63,14 +67,17 @@ class CreateCategoriesBot(Bot):
                    '[[Category:%(title)s]]\n'
                    % {'parent': self.parent, 'title': title})
 
-        if not newpage.exists():
-            pywikibot.output(newpage.title())
-            self.userPut(newpage, '', newtext, summary=self.comment,
-                         ignore_save_related_errors=True,
-                         ignore_server_errors=True)
-        else:
-            pywikibot.output('{} already exists, skipping'
-                             .format(newpage.title()))
+        pywikibot.output(newpage.title())
+        self.userPut(newpage, '', newtext, summary=self.comment,
+                     ignore_save_related_errors=True,
+                     ignore_server_errors=True)
+
+    def skip_page(self, page):
+        """Skip page if it is not overwritten."""
+        if page.exists() and not self.overwrite:
+            pywikibot.output('{} already exists, skipping'.format(page))
+            return True
+        return super(CreateCategoriesBot, self).skip_page(page)
 
 
 def main(*args):
@@ -84,6 +91,7 @@ def main(*args):
     """
     parent = None
     basename = None
+    overwrite = False
     options = {}
 
     # Process global args and prepare generator args parser
@@ -93,6 +101,8 @@ def main(*args):
     for arg in local_args:
         if arg == '-always':
             options['always'] = True
+        elif arg == '-overwrite':
+            overwrite = True
         elif arg.startswith('-parent:'):
             parent = arg[len('-parent:'):].strip()
         elif arg.startswith('-basename'):
@@ -108,7 +118,8 @@ def main(*args):
 
     generator = gen_factory.getCombinedGenerator()
     if generator and not missing:
-        bot = CreateCategoriesBot(generator, parent, basename, **options)
+        bot = CreateCategoriesBot(generator, parent,
+                                  basename, overwrite, **options)
         bot.run()
         pywikibot.output('All done')
         return True
