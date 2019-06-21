@@ -43,20 +43,15 @@ from pywikibot.tools import (
 )
 from pywikibot.tools.formatter import color_format
 
-if not PY2:
-    # Subclassing necessary to fix a possible bug of the email package
-    # in py3: see http://bugs.python.org/issue19003
-    # The following solution might be removed if/once the bug is fixed,
-    # unless the fix is not backported to py3.x versions that should
-    # instead support PWB.
-    from urllib.parse import urlencode, unquote
+if PYTHON_VERSION[:2] == (3, 4):  # T113120
+    # Subclassing necessary to fix a bug of the email package
+    # in Python 3.4: see http://bugs.python.org/issue19003
 
+    from email.generator import BytesGenerator
+    from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
     from io import BytesIO
 
-    import email.generator
-    from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
-
-    class CTEBinaryBytesGenerator(email.generator.BytesGenerator):
+    class CTEBinaryBytesGenerator(BytesGenerator):
 
         """Workaround for bug in python 3 email handling of CTE binary."""
 
@@ -85,8 +80,12 @@ if not PY2:
 
     MIMEMultipart = CTEBinaryMIMEMultipart
 else:
-    from urllib import urlencode, unquote
     from email.mime.multipart import MIMEMultipart
+
+if not PY2:
+    from urllib.parse import urlencode, unquote
+else:
+    from urllib import urlencode, unquote
 
 _logger = 'data.api'
 
