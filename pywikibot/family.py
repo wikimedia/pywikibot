@@ -1569,7 +1569,7 @@ class SubdomainFamily(Family):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        codes = cls.codes
+        codes = cls.codes[:]
 
         if hasattr(cls, 'test_codes'):
             codes += cls.test_codes
