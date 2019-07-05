@@ -4,8 +4,23 @@ Release history
 Current release
 ---------------
 
+* Make Family.langs property more robust (T226934)
+* Remove strategy family
+* Handle closed_wikis as read-only (T74674)
+* TokenWallet: login automatically
+* Add closed_wikis to Family.langs property (T225413)
+* Redirect 'mo' site code to 'ro' and remove interwiki_replacement_overrides (T225417, T89451)
 * Add support for badges on Wikibase item sitelinks (T128202)
+* Remove login.showCaptchaWindow() method
+* New parameter supplied in suggest_help function for missing dependencies
+* Remove NonMWAPISite class
+* Introduce Claim.copy and prevent adding already saved claims (T220131)
+* Fix create_short_link method after MediaWiki changes (T223865)
+* Validate proofreadpage.IndexPage contents before saving it
 * Refactor Link and introduce BaseLink (T66457)
+* Count skipped pages in BaseBot class
+* 'actionthrottledtext' is a retryable wikibase error (T192912)
+* Clear tokens on logout(T222508)
 * Deprecation warning: support for Python 2 will be dropped (T213287)
 * botirc.IRCBot has been dropped
 * Avoid using outdated browseragents (T222959)
@@ -48,7 +63,7 @@ Current release
 
 * Support python version 3.7
 * pagegenerators.py: add -querypage parameter to yield pages provided by any special page (T214234)
-* Fix comparison of str, bytes and int literal with
+* Fix comparison of str, bytes and int literal
 * site.py: add generic self.querypage() to query SpecialPages
 * echo.Notification has a new event_id property as integer
 * Bugfixes and improvements
