@@ -283,7 +283,7 @@ class TestProofreadPageValidSite(TestCase):
             pagedict = next(iter(rvgen))
             loaded_text = pagedict.get('revisions')[0].get('*')
         except (StopIteration, TypeError, KeyError, ValueError, IndexError):
-            page_text = ''
+            loaded_text = ''
 
         page_text = page._page_to_json()
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
