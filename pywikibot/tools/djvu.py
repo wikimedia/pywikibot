@@ -81,7 +81,7 @@ class DjVuFile(object):
         """
         self._filename = file
         filename = os.path.expanduser(file)
-        filename = os.path.abspath(file)
+        filename = os.path.abspath(filename)
         # Check file exists and has read permissions.
         with open(filename):
             self.file = filename
