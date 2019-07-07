@@ -57,11 +57,11 @@ extra_deps = {
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.7.5',
         'pydocstyle<=3.0.0;python_version<"3"',
-        'pydocstyle>=2.5.0,!=4.0.0;python_version>="3.4"',
+        'pydocstyle>=4.0.0;python_version>="3.4"',
         'hacking',
         'flake8-coding',
         'flake8-comprehensions',
-        'flake8-docstrings>=1.1.0',
+        'flake8-docstrings>=1.3.1',
         'flake8-future-import',
         'flake8-mock>=0.3',
         'flake8-print>=2.0.1',
