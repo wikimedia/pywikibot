@@ -37,7 +37,7 @@ test_deps = ['bz2file', 'mock']
 
 dependencies = ['requests>=2.20.0']
 
-pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle>=2.5.0'
+pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle>=2.5.0,!=4.0.0'
 if PY2:
     pillow = 'Pillow<7.0.0'
 elif PYTHON_VERSION < (3, 5):
