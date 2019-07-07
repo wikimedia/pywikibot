@@ -218,14 +218,13 @@ class _MultiTemplateMatchBuilder(object):
         else:
             pattern = re.escape(old)
         # namespaces may be any mixed case
-        namespaces = [''.join('[{0}{1}]'.format(char.upper(), char.lower())
-                              for char in ns)
-                      for ns in namespace]
+        namespaces = [_ignore_case(ns) for ns in namespace]
+        namespaces.append(_ignore_case('msg'))
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces)
-                                   + r':|[mM][sS][gG]:)?' + pattern
-                                   + r'(?P<parameters>\s*\|.+?|) *}}',
-                                   flags)
+        templateRegex = re.compile(
+            r'\{\{ *(%(namespace)s:)?%(pattern)s(?P<parameters>\s*\|.+?|) *}}'
+            % {'namespace': ':|'.join(namespaces), 'pattern': pattern},
+            flags)
         return templateRegex
 
     def search_any_predicate(self, templates):
