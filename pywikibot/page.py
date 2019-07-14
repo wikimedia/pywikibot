@@ -3949,7 +3949,7 @@ class WikibasePage(BasePage):
         if args or kwargs:
             raise NotImplementedError(
                 '{0}.get does not implement var args: {1!r} and {2!r}'.format(
-                    self.__class__, args, kwargs))
+                    self.__class__.__name__, args, kwargs))
 
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if force or not hasattr(self, '_content'):
