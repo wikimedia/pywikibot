@@ -144,15 +144,15 @@ class SparqlQuery(object):
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
-                if not self.last_response.text:
-                    return None
-                try:
-                    return json.loads(self.last_response.text)
-                except ValueError:
-                    return None
             except Timeout:
                 self.wait()
                 continue
+            if not self.last_response.text:
+                return None
+            try:
+                return json.loads(self.last_response.text)
+            except ValueError:
+                return None
 
     def wait(self):
         """Determine how long to wait after a failed request."""
