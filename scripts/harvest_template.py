@@ -267,7 +267,10 @@ class HarvestRobot(WikidataBot):
             # We found the template we were looking for
             for field, value in fielddict.items():
                 field = field.strip()
-                value = value.strip()
+                # todo: extend the list of tags to ignore
+                value = textlib.removeDisabledParts(
+                    # todo: eventually we may want to import the references
+                    value, tags=['ref'], site=page.site).strip()
                 if not field or not value:
                     continue
 
