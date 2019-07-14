@@ -1022,7 +1022,10 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
-        error.assert_called_with('Login failed (Failed).')
+        try:
+            error.assert_called_with('Login failed (readapidenied).')
+        except AssertionError:  # MW version is older than 1.34.0-wmf.13
+            error.assert_called_with('Login failed (Failed).')
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
