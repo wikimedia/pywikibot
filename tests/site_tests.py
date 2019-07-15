@@ -3660,17 +3660,13 @@ class TestLoginLogout(DefaultSiteTestCase):
 
     """Test for login and logout methods."""
 
-    @unittest.skipIf(os.environ.get('APPVEYOR', 'false') in ('true', 'True'),
-                     'No user defined for APPVEYOR tests')
+    user = True
+
     def test_login_logout(self):
         """Validate login and logout methods by toggling the state."""
         site = self.get_site()
         loginstatus = pywikibot.site.LoginStatus
 
-        self.assertFalse(site.logged_in())
-        self.assertEqual(site._loginstatus, loginstatus.NOT_ATTEMPTED)
-
-        site.login()
         self.assertTrue(site.logged_in())
         self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
                                           loginstatus.AS_USER))
