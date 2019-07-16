@@ -47,38 +47,10 @@ Arabic Wiktionary:
 from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
+from pywikibot.bot import suggest_help
 from pywikibot import pagegenerators
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
-
-
-class WikiTransferException(Exception):
-
-    """Base class for exceptions from this script.
-
-    Makes it easier for clients to catch all expected exceptions that the
-    script might throw
-    """
-
-    pass
-
-
-class TargetSiteMissing(WikiTransferException):
-
-    """Thrown when the target site is the same as the source site.
-
-    Based on the way each are initialized, this is likely to happen when the
-    target site simply hasn't been specified.
-    """
-
-    pass
-
-
-class TargetPagesMissing(WikiTransferException):
-
-    """Thrown if no page range has been specified to operate on."""
-
-    pass
 
 
 def main(*args):
@@ -114,13 +86,16 @@ def main(*args):
         elif arg == '-overwrite':
             overwrite = True
 
-    tosite = pywikibot.Site(tolang, tofamily)
-    if fromsite == tosite:
-        raise TargetSiteMissing('Target site not different from source site')
-
     gen = gen_factory.getCombinedGenerator()
-    if not gen:
-        raise TargetPagesMissing('Target pages not specified')
+
+    tosite = pywikibot.Site(tolang, tofamily)
+    additional_text = ('Target site not different from source site.'
+                       if fromsite == tosite else '')
+
+    if additional_text or not gen:
+        suggest_help(missing_generator=not gen,
+                     additional_text=additional_text)
+        return
 
     gen_args = ' '.join(gen_args)
     pywikibot.output("""
@@ -196,13 +171,4 @@ def main(*args):
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except TargetSiteMissing:
-        pywikibot.error('Need to specify a target site and/or language')
-        pywikibot.error('Try running this script with -help for help/usage')
-        pywikibot.exception()
-    except TargetPagesMissing:
-        pywikibot.error('Need to specify a page range')
-        pywikibot.error('Try running this script with -help for help/usage')
-        pywikibot.exception()
+    main()
