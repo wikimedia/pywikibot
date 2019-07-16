@@ -3781,6 +3781,48 @@ class WikibaseEntity(object):
         """
         return {}
 
+    def exists(self):
+        """
+        Determine if an entity exists in the data repository.
+
+        @rtype: bool
+        """
+        if not hasattr(self, '_content'):
+            try:
+                self.get()
+                return True
+            except pywikibot.NoWikibaseEntity:
+                return False
+        return 'missing' not in self._content
+
+    def get(self, force=False):
+        """
+        Fetch all entity data and cache it.
+
+        @param force: override caching
+        @type force: bool
+        @raise NoWikibaseEntity: if this entity doesn't exist
+        @return: actual data which entity holds
+        @rtype: dict
+        """
+        if force or not hasattr(self, '_content'):
+            identification = self._defined_by()
+            if not identification:
+                raise pywikibot.NoWikibaseEntity(self)
+
+            try:
+                data = self.repo.loadcontent(identification)
+            except APIError as err:
+                if err.code == 'no-such-entity':
+                    raise pywikibot.NoWikibaseEntity(self)
+                raise
+            item_index, content = data.popitem()
+            self.id = item_index
+            self._content = content
+        if 'missing' in self._content:
+            raise pywikibot.NoWikibaseEntity(self)
+        return {}
+
     def concept_uri(self):
         """Return the full concept URI."""
         # todo: raise when self.id is -1
@@ -3946,7 +3988,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 return True
             except pywikibot.NoPage:
                 return False
-        return 'lastrevid' in self._content
+        return 'missing' not in self._content
 
     def botMayEdit(self):
         """
@@ -3982,30 +4024,18 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         # todo: this variable is specific to ItemPage
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
-        if force or not hasattr(self, '_content'):
-            identification = self._defined_by()
-            if not identification:
-                raise pywikibot.NoPage(self)
-
-            try:
-                data = self.repo.loadcontent(identification)
-            except APIError as err:
-                if err.code == 'no-such-entity':
-                    raise pywikibot.NoPage(self)
-                raise
-            item_index = list(data.keys())[0]
-            if lazy_loading_id or item_index != '-1':
-                self.id = item_index
-
-            self._content = data[item_index]
-        if 'lastrevid' in self._content:
-            self.latest_revision_id = self._content['lastrevid']
-        else:
+        try:
+            data = WikibaseEntity.get(self, force=force)
+        except pywikibot.NoWikibaseEntity:
             if lazy_loading_id:
                 p = Page(self._site, self._title)
                 if not p.exists():
                     raise pywikibot.NoPage(p)
+                # todo: raise a nicer exception here (T87345)
             raise pywikibot.NoPage(self)
+
+        if 'lastrevid' in self._content:
+            self.latest_revision_id = self._content['lastrevid']
 
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
@@ -4038,11 +4068,11 @@ class WikibasePage(BasePage, WikibaseEntity):
                 c.on_item = self
                 self.claims[pid].append(c)
 
-        return {'aliases': self.aliases,
-                'labels': self.labels,
-                'descriptions': self.descriptions,
-                'claims': self.claims,
-                }
+        data['labels'] = self.labels
+        data['descriptions'] = self.descriptions
+        data['aliases'] = self.aliases
+        data['claims'] = self.claims
+        return data
 
     def _diff_to(self, type_key, key_name, value_name, diffto, data):
         assert type_key not in data, 'Key type must be defined in data'

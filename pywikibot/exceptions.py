@@ -56,6 +56,7 @@ ServerError: a problem with the server.
 
 WikiBaseError: any issue specific to Wikibase.
 
+  - NoWikibaseEntity: entity doesn't exist
   - CoordinateGlobeUnknownException: globe is not implemented yet.
   - EntityTypeUnknownException: entity type is not available on the site.
 
@@ -562,6 +563,22 @@ class WikiBaseError(Error):
     """Wikibase related error."""
 
     pass
+
+
+class NoWikibaseEntity(WikiBaseError):
+
+    """This entity doesn't exist."""
+
+    def __init__(self, entity):
+        """
+        Initializer.
+
+        @param entity: Wikibase entity
+        @type entity: WikibaseEntity
+        """
+        super(NoWikibaseEntity, self).__init__(
+            "Entity '%s' doesn't exist on %s" % (entity.id, entity.repo))
+        self.entity = entity
 
 
 class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
