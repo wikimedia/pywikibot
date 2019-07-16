@@ -394,14 +394,15 @@ class TestRepeatingGenerator(RecentChangesTestCase):
 
     def test_RepeatingGenerator(self):
         """Test RepeatingGenerator."""
-        items = list(
-            pagegenerators.RepeatingGenerator(self.site.recentchanges,
-                                              key_func=lambda x: x['revid'],
-                                              sleep_duration=10,
-                                              reverse=True,
-                                              namespaces=[0],
-                                              total=self.length)
-        )
+        with suppress_warnings(category=DeprecationWarning):
+            gen = pagegenerators.RepeatingGenerator(
+                self.site.recentchanges,
+                key_func=lambda x: x['revid'],
+                sleep_duration=10,
+                reverse=True,
+                namespaces=[0],
+                total=self.length)
+        items = list(gen)
         self.assertLength(items, self.length)
         timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
                       for item in items]
