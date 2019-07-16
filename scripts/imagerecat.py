@@ -80,31 +80,32 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
 
     """
     for page in generator:
-        if page.exists() and (page.namespace() == 6) and \
-           (not page.isRedirectPage()):
-            imagepage = pywikibot.FilePage(page.site, page.title())
-            pywikibot.output('Working on ' + imagepage.title())
+        if not page.exists() or page.namespace() != 6 or page.isRedirectPage():
+            continue
 
-            if (onlyUncat and not pywikibot.Page(
-                    imagepage.site, 'Template:Uncategorized')
-                    in imagepage.templates()):
-                pywikibot.output('No Uncategorized template found')
-            else:
-                currentCats = getCurrentCats(imagepage)
-                if onlyFilter:
-                    commonshelperCats = []
-                    usage = []
-                    galleries = []
-                else:
-                    (commonshelperCats, usage,
-                     galleries) = getCommonshelperCats(imagepage)
-                newcats = applyAllFilters(commonshelperCats + currentCats)
+        imagepage = pywikibot.FilePage(page.site, page.title())
+        pywikibot.output('Working on ' + imagepage.title())
 
-                if len(newcats) > 0 and not(set(currentCats) == set(newcats)):
-                    for cat in newcats:
-                        pywikibot.output(' Found new cat: ' + cat)
-                    saveImagePage(imagepage, newcats, usage, galleries,
-                                  onlyFilter)
+        if (onlyUncat and not pywikibot.Page(
+                imagepage.site, 'Template:Uncategorized')
+                in imagepage.templates()):
+            pywikibot.output('No Uncategorized template found')
+            continue
+
+        currentCats = getCurrentCats(imagepage)
+        if onlyFilter:
+            commonshelperCats = []
+            usage = []
+            galleries = []
+        else:
+            (commonshelperCats, usage,
+             galleries) = getCommonshelperCats(imagepage)
+        newcats = applyAllFilters(commonshelperCats + currentCats)
+
+        if newcats and set(currentCats) != set(newcats):
+            for cat in newcats:
+                pywikibot.output(' Found new cat: ' + cat)
+            saveImagePage(imagepage, newcats, usage, galleries, onlyFilter)
 
 
 def getCurrentCats(imagepage):
