@@ -108,7 +108,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
-_private_values = {'authenticate', 'proxy', 'db_password'}
+_private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {'use_SSL_onlogin', 'use_SSL_always',
                          'available_ssl_project', 'fake_user_agent',
                          'special_page_limit'}
@@ -873,11 +873,6 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 replicate_replace = {}
 
 # ############# FURTHER SETTINGS ##############
-
-# Proxy configuration
-
-# TODO: proxy support
-proxy = None
 
 # Simulate settings
 
