@@ -203,6 +203,8 @@ def user_agent(site=None, format_string=None):
 
     script_comments = []
     username = ''
+    if config.user_agent_description:
+        script_comments.append(config.user_agent_description)
     if site:
         script_comments.append(str(site))
 
