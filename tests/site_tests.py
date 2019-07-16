@@ -805,7 +805,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_newfiles(self):
         """Test the site.newfiles() method."""
         my_site = self.get_site()
-        the_list = list(my_site.newfiles(total=10))
+        with suppress_warnings(category=DeprecationWarning):
+            gen = my_site.newfiles(total=10)
+        the_list = list(gen)
         self.assertLessEqual(len(the_list), 10)
         self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 4
                             for tup in the_list))
