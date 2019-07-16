@@ -17,14 +17,6 @@ environment:
 
     # Test the lowest supported release of each major Python version.
 
-    - PYTHON: "C:\\Python274"
-      PYTHON_VERSION: "2.7.4"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python341"
-      PYTHON_VERSION: "3.4.1"
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python274-x64"
       PYTHON_VERSION: "2.7.4"
       PYTHON_ARCH: "64"
