@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 
 from pywikibot.echo import Notification
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import unittest, DefaultDrySiteTestCase
 
@@ -44,8 +45,10 @@ class TestNotification(DefaultDrySiteTestCase):
         notif = Notification.fromJSON(self.get_site(), self.data)
         self.assertIsInstance(notif, Notification)
         self.assertEqual(notif.site, self.get_site())
-        self.assertEqual(notif.id, self.data['id'])
-        self.assertEqual(int(notif.id), notif.event_id)
+        with suppress_warnings(category=DeprecationWarning):
+            notif_id = notif.id
+        self.assertEqual(notif_id, self.data['id'])
+        self.assertEqual(int(notif_id), notif.event_id)
         self.assertEqual(notif.type, self.data['type'])
         self.assertEqual(notif.category, self.data['category'])
         self.assertIsInstance(notif.timestamp, pywikibot.Timestamp)
