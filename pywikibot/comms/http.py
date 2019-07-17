@@ -216,7 +216,7 @@ def user_agent(site=None, format_string=None):
     values.update({
         'family': site.family.name if site else '',
         'code': site.code if site else '',
-        'lang': site.lang if site else '',
+        'lang': site.code if site else '',  # TODO: use site.lang, if known
         'site': str(site) if site else '',
         'username': username,
         'script_comments': '; '.join(script_comments)
