@@ -156,6 +156,10 @@ disambiguation_comment = collections.defaultdict(dict)
 user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
                      '{http_backend} {python}')
 
+# User agent description
+# This is a free-form string that can be user to describe specific bot/tool,
+# provide contact information, etc.
+user_agent_description = None
 # Fake user agent.
 # Some external websites reject bot-like user agents. It is possible to use
 # fake user agents in requests to these websites.
