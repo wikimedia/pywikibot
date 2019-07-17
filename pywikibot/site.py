@@ -1886,10 +1886,10 @@ class APISite(BaseSite):
                         if site['code'] == 'wiki':
                             site['code'] = 'wikipedia'
                         return cls(lang, site['code'])
-            else:
+            else:  # key == 'specials'
                 for site in val:
                     if site['dbname'] == dbname:
-                        return cls(site['code'], site['code'])
+                        return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of %s.' % dbname)
 
     @deprecated(since='20141225')

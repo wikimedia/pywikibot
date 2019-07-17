@@ -9,6 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import collections
 from importlib import import_module
+from itertools import chain
 import logging
 from os.path import basename, dirname, splitext
 import re
@@ -1315,7 +1316,7 @@ class Family(object):
         else:
             domain = False
         if domain is not False:
-            for code in self.codes:
+            for code in chain(self.codes, getattr(self, 'test_codes', ())):
                 if code in ignored:
                     continue
                 if self._hostname(code)[1] == parsed.netloc:

@@ -17,7 +17,6 @@ class Family(family.WikimediaFamily):
     """Family class for Wikidata."""
 
     name = 'wikidata'
-    test_codes = ('test', 'beta')
 
     langs = {
         'wikidata': 'www.wikidata.org',
