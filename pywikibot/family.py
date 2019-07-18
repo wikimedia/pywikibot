@@ -1264,9 +1264,6 @@ class Family(object):
 
         return config.site_interface
 
-    # List of codes which aren't returned by from_url; True returns None always
-    _ignore_from_url = []
-
     def from_url(self, url):
         """
         Return whether this family matches the given url.
@@ -1291,9 +1288,6 @@ class Family(object):
             which would work with the given URL.
         @raises ValueError: When text is present after $1.
         """
-        if self._ignore_from_url is True:
-            return None
-
         parsed = urlparse.urlparse(url)
         if not re.match('(https?)?$', parsed.scheme):
             return None
@@ -1316,8 +1310,6 @@ class Family(object):
 
         matched_sites = []
         for code in chain(self.codes, getattr(self, 'test_codes', ())):
-            if code in self._ignore_from_url:
-                continue
             if self._hostname(code)[1] == parsed.netloc:
                 # Use the code and family instead of the url
                 # This is only creating a Site instance if domain matches
