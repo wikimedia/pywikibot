@@ -61,10 +61,11 @@ class TestGenerateUserFiles(TestCase):
     def test_get_site_and_lang(self):
         """Test get_site_and_lang function with parameters."""
         family, code, user = guf.get_site_and_lang(
-            default_family='test', default_lang='foo', default_username='bar',
+            default_family='wikisource', default_lang='foo',
+            default_username='bar',
             force=True)
-        self.assertEqual(family, 'test')
-        self.assertEqual(code, 'test')
+        self.assertEqual(family, 'wikisource')
+        self.assertEqual(code, 'en')
         self.assertEqual(user, 'bar')
 
     def test_parse_sections(self):

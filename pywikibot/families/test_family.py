@@ -7,17 +7,17 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from pywikibot import family
+from pywikibot.families.wikipedia_family import Family
+from pywikibot.tools import issue_deprecation_warning
+
+issue_deprecation_warning(
+    'test_family', 'wikipedia_family', since='20190718')
+# Also remove the ``if fam == 'test':`` condition in pywikibot.__init__
+# whenever this module is removed.
 
 
-# The test wikipedia family
-class Family(family.SingleSiteFamily, family.WikimediaFamily):
+class Family(Family):
 
     """Family class for test.wikipedia.org."""
 
     name = 'test'
-    domain = 'test.wikipedia.org'
-    interwiki_forward = 'wikipedia'
-
-    # 'test' family should resolve to be in the 'wikipedia' family
-    _ignore_from_url = True

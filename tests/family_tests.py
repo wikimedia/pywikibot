@@ -120,8 +120,6 @@ class TestFamily(TestCase):
         family = Family.load('test')
         self.assertIn('dk', family.obsolete)
         self.assertIn('dk', family.interwiki_replacements)
-        self.assertEqual(family.obsolete, family.interwiki_replacements)
-        self.assertEqual(family.interwiki_removals, set())
 
     def test_set_obsolete(self):
         """Test obsolete can be set."""
@@ -247,11 +245,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
                                                  family.path(code)))
                     # Families can switch off if they want to be detected using
                     # URL. This applies for test:test (there is test:wikipedia)
-                    if (family._ignore_from_url
-                            or code in family._ignore_from_url):
-                        self.assertIsNone(family.from_url(url))
-                    else:
-                        self.assertEqual(family.from_url(url), code)
+                    self.assertEqual(family.from_url(url), code)
 
 
 class TestOldFamilyMethod(DeprecationTestCase):
