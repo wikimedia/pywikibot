@@ -571,10 +571,9 @@ class PageArchiver(object):
         """Load and validate archiver template."""
         pywikibot.output('Looking for: {{%s}} in %s' % (self.tpl.title(),
                                                         self.page))
-        for tpl in self.page.templatesWithParams():
-            if tpl[0] == pywikibot.Page(self.site, self.tpl.title(), ns=10):
-                for param in tpl[1]:
-                    item, value = param.split('=', 1)
+        for tpl in self.page.raw_extracted_templates:
+            if tpl[0] == self.tpl.title():
+                for item, value in tpl[1].items():
                     self.set_attr(item.strip(), value.strip())
                 break
         else:
