@@ -18,3 +18,6 @@ class Family(family.SingleSiteFamily, family.WikimediaFamily):
     name = 'test'
     domain = 'test.wikipedia.org'
     interwiki_forward = 'wikipedia'
+
+    # 'test' family should resolve to be in the 'wikipedia' family
+    _ignore_from_url = True

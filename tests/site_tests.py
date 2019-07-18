@@ -330,7 +330,7 @@ class TestSiteObject(DefaultSiteTestCase):
             ['commonswiki', ('commons', 'commons')],
             ['wikidatawiki', ('wikidata', 'wikidata')],
             ['testwikidatawiki', ('test', 'wikidata')],
-            ['testwiki', ('test', 'test')],  # see T225729
+            ['testwiki', ('test', 'wikipedia')],  # see T225729, T228300
             ['test2wiki', ('test2', 'wikipedia')],  # see T225729
             ['sourceswiki', ('mul', 'wikisource')],  # see T226960
         ]
