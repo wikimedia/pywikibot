@@ -2605,7 +2605,6 @@ class FilePage(Page):
     @deprecated('FilePage.latest_file_info.sha1', since='20141106')
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-        # TODO: check whether this needs a User-Agent header added
         req = http.fetch(self.fileUrl())
         h = hashlib.md5()
         h.update(req.raw)
