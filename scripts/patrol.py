@@ -264,21 +264,19 @@ class PatrolBot(SingleSiteBot):
     def is_wikisource_author_page(self, title):
         """Initialise author_ns if site family is 'wikisource' else pass."""
         if self.site.family.name != 'wikisource':
-            return
+            return False
 
-        author_ns = 0
         try:
             author_ns = self.site.family.authornamespaces[self.site.lang][0]
         except (AttributeError, KeyError):
-            pass
-        if author_ns:
-            author_ns_prefix = self.site.namespace(author_ns)
-        pywikibot.debug('Author ns: {0}; name: {1}'
-                        .format(author_ns, author_ns_prefix), _logger)
-        if title.find(author_ns_prefix + ':') == 0:
-            author_page_name = title[len(author_ns_prefix) + 1:]
+            author_ns = 0
+
+        author_ns_prefix = self.site.namespace(author_ns) + ':'
+        if title.startswith(author_ns_prefix):
+            author_page_name = title[len(author_ns_prefix):]
             verbose_output('Found author ' + author_page_name)
             return True
+        return False
 
     def run(self, feed):
         """Process 'whitelist' page absent in generator."""
