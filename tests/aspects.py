@@ -1490,7 +1490,7 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:
             os.environ[str('PYWIKIBOT_DIR')] = self.orig_pywikibot_dir
 
-    def _execute(self, args, data_in=None, timeout=0, error=None):
+    def _execute(self, args, data_in=None, timeout=None, error=None):
         site = self.get_site()
 
         args = args + ['-family:' + site.family.name,

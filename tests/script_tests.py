@@ -234,9 +234,10 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 data_in = script_input.get(script_name)
 
-                timeout = 0
                 if is_autorun:
                     timeout = 5
+                else:
+                    timeout = None
 
                 if self._results and script_name in self._results:
                     error = self._results[script_name]
