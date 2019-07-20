@@ -11,7 +11,7 @@ import inspect
 import json
 import os
 import re
-import subprocess
+from subprocess import PIPE, Popen
 import sys
 import time
 import traceback
@@ -672,16 +672,10 @@ def execute(command, data_in=None, timeout=0, error=None):
 
     # Set EDITOR to an executable that ignores all arguments and does nothing.
     env[str('EDITOR')] = str('call' if OSWIN32 else 'true')
-
-    options = {
-        'stdout': subprocess.PIPE,
-        'stderr': subprocess.PIPE
-    }
-    if data_in is not None:
-        options['stdin'] = subprocess.PIPE
-
     try:
-        p = subprocess.Popen(command, env=env, **options)
+        p = Popen(
+            command, env=env, stdout=PIPE, stderr=PIPE,
+            stdin=PIPE if data_in is not None else None)
     except TypeError as e:
         # Generate a more informative error
         if OSWIN32 and PY2:
