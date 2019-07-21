@@ -572,7 +572,7 @@ class PageArchiver(object):
         pywikibot.output('Looking for: {{%s}} in %s' % (self.tpl.title(),
                                                         self.page))
         for tpl in self.page.raw_extracted_templates:
-            if tpl[0] == self.tpl.title():
+            if tpl[0] == self.tpl.title(with_ns=False):
                 for item, value in tpl[1].items():
                     self.set_attr(item.strip(), value.strip())
                 break
