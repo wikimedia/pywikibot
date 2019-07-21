@@ -257,22 +257,21 @@ def main(*args):
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
-        if arg.startswith('-hours:'):
-            opts['hours'] = float(arg[7:])
+        opt, _, value = arg.partition(':')
+        if opt.startswith('-'):
+            opt = opt[1:]
+        else:
+            continue
+        if opt == 'hours':
+            opts[opt] = float(value)
             opts['no_repeat'] = False
-        elif arg.startswith('-delay:'):
-            opts['delay'] = int(arg[7:])
-        elif arg.startswith('-text'):
-            if len(arg) == 5:
-                opts['text'] = pywikibot.input(
-                    'What text do you want to substitute?')
-            else:
-                opts['text'] = arg[6:]
-        elif arg.startswith('-summary'):
-            if len(arg) == len('-summary'):
-                opts['summary'] = pywikibot.input('Enter the summary:')
-            else:
-                opts['summary'] = arg[9:]
+        elif opt == 'delay':
+            opts[opt] = int(value)
+        elif opt == 'text':
+            opts[opt] = value or pywikibot.input(
+                'What text do you want to substitute?')
+        elif opt == 'summary':
+            opts[opt] = value or pywikibot.input('Enter the summary:')
         else:
             gen_factory.handleArg(arg)
 
