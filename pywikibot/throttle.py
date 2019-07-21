@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -286,9 +286,12 @@ class Throttle(object):
         """Seize the throttle lock due to server lag.
 
         Usually the self.retry-after value from response_header of the last
-        request if available which will be used for wait time. Default value
-        set by api and stored in self.retry_after is 5. If neither retry_after
-        nor lagtime is set, fallback to 5.
+        request if available which will be used for wait time. Otherwise
+        lagtime from api maxlag is used. If neither retry_after nor lagtime is
+        set, fallback to config.retry_wait.
+
+        If the lagtime is disproportionately high compared to retry-after
+        value, the wait time will be increased.
 
         This method is used by api.request. It will prevent any thread from
         accessing this site.
@@ -300,7 +303,9 @@ class Throttle(object):
         """
         started = time.time()
         with self.lock:
-            waittime = self.retry_after or lagtime or 5
+            waittime = lagtime or config.retry_wait
+            if self.retry_after:
+                waittime = max(self.retry_after, waittime / 5)
             # wait not more than retry_max seconds
             delay = min(waittime, config.retry_max)
             # account for any time we waited while acquiring the lock
