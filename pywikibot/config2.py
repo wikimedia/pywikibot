@@ -112,7 +112,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {'use_SSL_onlogin', 'use_SSL_always',
                          'available_ssl_project', 'fake_user_agent',
-                         'special_page_limit', 'sysopnames'}
+                         'special_page_limit', 'sysopnames', 'proxy'}
 
 # ############# ACCOUNT SETTINGS ##############
 
