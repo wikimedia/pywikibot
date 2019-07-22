@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Increase the throttling delay if maxlag >> retry-after (T210606)
+* deprecate test_family: Site('test', 'test'), use wikipedia_family: Site('test', 'wikipedia') instead (T228375, T228300)
+* Add "user_agent_description" option in config.py
+* APISite.fromDBName works for all known dbnames (T225590, 225723, 226960)
+* remove the unimplemented "proxy" variable in config.py
 * Make Family.langs property more robust (T226934)
 * Remove strategy family
 * Handle closed_wikis as read-only (T74674)
