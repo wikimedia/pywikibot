@@ -3706,7 +3706,104 @@ class User(Page):
         return self.isRegistered() and 'bot' not in self.groups()
 
 
-class WikibasePage(BasePage):
+class WikibaseEntity(object):
+
+    """
+    The base interface for Wikibase entities.
+
+    Each entity is identified by a data repository it belongs to
+    and an identifier.
+    """
+
+    def __init__(self, repo, id_=None):
+        """
+        Initializer.
+
+        @param repo: Entity repository.
+        @type repo: DataSite
+        @param id_: Entity identifier.
+        @type id_: str or None, -1 and None mean non-existing
+        """
+        self.repo = repo
+        self.id = id_ if id_ is not None else '-1'
+        if self.id != '-1' and not self.is_valid_id(self.id):
+            raise pywikibot.InvalidTitle(
+                "'%s' is not a valid %s page title"
+                % (self.id, self.entity_type))
+
+    def __repr__(self):
+        if self.id != '-1':
+            return 'pywikibot.page.{0}({1!r}, {2!r})'.format(
+                self.__class__.__name__, self.repo, self.id)
+        else:
+            return 'pywikibot.page.{0}({1!r})'.format(
+                self.__class__.__name__, self.repo)
+
+    @classmethod
+    def is_valid_id(cls, entity_id):
+        """
+        Whether the string can be a valid id of the entity type.
+
+        @param entity_id: The ID to test.
+        @type entity_id: basestring
+
+        @rtype: bool
+        """
+        if not hasattr(cls, 'title_pattern'):
+            return True
+
+        # todo: use re.fullmatch when Python 3.4+ required
+        return bool(re.match(cls.title_pattern + '$', entity_id))
+
+    def _defined_by(self, singular=False):
+        """
+        Internal function to provide the API parameters to identify the entity.
+
+        An empty dict is returned if the entity has not been created yet.
+
+        @param singular: Whether the parameter names should use the singular
+                         form
+        @type singular: bool
+        @return: API parameters
+        @rtype: dict
+        """
+        params = {}
+        if self.id != '-1':
+            if singular:
+                params['id'] = self.id
+            else:
+                params['ids'] = self.id
+        return params
+
+    def getID(self, numeric=False):
+        """
+        Get the identifier of this entity.
+
+        @param numeric: Strip the first letter and return an int
+        @type numeric: bool
+        """
+        if numeric:
+            return int(self.id[1:]) if self.id != '-1' else -1
+        else:
+            return self.id
+
+    def get_data_for_new_entity(self):
+        """
+        Return data required for creation of a new entity.
+
+        Override it if you need.
+
+        @rtype: dict
+        """
+        return {}
+
+    def concept_uri(self):
+        """Return the full concept URI."""
+        # todo: raise when self.id is -1
+        return '{0}{1}'.format(self.repo.concept_base_uri, self.id)
+
+
+class WikibasePage(BasePage, WikibaseEntity):
 
     """
     The base page for the Wikibase extension.
@@ -3784,12 +3881,12 @@ class WikibasePage(BasePage):
                 self._namespace = entity_type_ns
                 kwargs['ns'] = self._namespace.id
 
-        super(WikibasePage, self).__init__(site, title, **kwargs)
+        BasePage.__init__(self, site, title, **kwargs)
 
         # If a title was not provided,
         # avoid checks which may cause an exception.
         if not title:
-            self.repo = site
+            WikibaseEntity.__init__(self, site)
             return
 
         if self._namespace:
@@ -3808,66 +3905,14 @@ class WikibasePage(BasePage):
                 raise ValueError('%r: Namespace "%r" is not valid'
                                  % (self.site, ns))
 
-        # .site forces a parse of the Link title to determine site
-        self.repo = self.site
-        # Link.__init__, called from Page.__init__, has cleaned the title
-        # stripping whitespace and uppercasing the first letter according
-        # to the namespace case=first-letter.
-        self.id = self._link.title
-        if not self.is_valid_id(self.id):
-            raise pywikibot.InvalidTitle(
-                "'%s' is not a valid %s page title"
-                % (self.id, self.entity_type))
-
-    def _defined_by(self, singular=False):
-        """
-        Internal function to provide the API parameters to identify the entity.
-
-        The API parameters may be 'id' if the ItemPage has one,
-        or 'site'&'title' if instantiated via ItemPage.fromPage with
-        lazy_load enabled.
-
-        Once an item's "p/q##" is looked up, that will be used for all future
-        requests.
-
-        An empty dict is returned if the ItemPage is instantiated without
-        either ID (internally it has id = '-1') or site&title.
-
-        @param singular: Whether the parameter names should use the singular
-                         form
-        @type singular: bool
-        @return: API parameters
-        @rtype: dict
-        """
-        params = {}
-        if singular:
-            id = 'id'
-            site = 'site'
-            title = 'title'
-        else:
-            id = 'ids'
-            site = 'sites'
-            title = 'titles'
-
-        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
-
-        # id overrides all
-        if hasattr(self, 'id'):
-            if self.id != '-1':
-                params[id] = self.id
-        elif lazy_loading_id:
-            params[site] = self._site.dbName()
-            params[title] = self._title
-        else:
-            # if none of the above applies, this item is in an invalid state
-            # which needs to be raise as an exception, but also logged in case
-            # an exception handler is catching the generic Error.
-            pywikibot.error('%s is in invalid state'
-                            % self.__class__.__name__)
-            raise pywikibot.Error('%s is in invalid state'
-                                  % self.__class__.__name__)
-
-        return params
+        WikibaseEntity.__init__(
+            self,
+            # .site forces a parse of the Link title to determine site
+            self.site,
+            # Link.__init__, called from Page.__init__, has cleaned the title
+            # stripping whitespace and uppercasing the first letter according
+            # to the namespace case=first-letter.
+            self._link.title)
 
     def __getattribute__(self, name):
         """Low-level attribute getter. Deprecates lastrevid."""
@@ -3951,6 +3996,7 @@ class WikibasePage(BasePage):
                 '{0}.get does not implement var args: {1!r} and {2!r}'.format(
                     self.__class__.__name__, args, kwargs))
 
+        # todo: this variable is specific to ItemPage
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if force or not hasattr(self, '_content'):
             identification = self._defined_by()
@@ -4014,16 +4060,6 @@ class WikibasePage(BasePage):
                 'claims': self.claims,
                 }
 
-    def get_data_for_new_entity(self):
-        """
-        Return data required for creation of new page.
-
-        Override it if you need.
-
-        @rtype: dict
-        """
-        return {}
-
     def _diff_to(self, type_key, key_name, value_name, diffto, data):
         assert type_key not in data, 'Key type must be defined in data'
         source = self._normalizeLanguages(getattr(self, type_key)).copy()
@@ -4047,7 +4083,7 @@ class WikibasePage(BasePage):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing claim data
+        @param diffto: JSON containing entity data
         @type diffto: dict
 
         @rtype: dict
@@ -4108,38 +4144,6 @@ class WikibasePage(BasePage):
         if claims:
             data['claims'] = claims
         return data
-
-    def getID(self, numeric=False, force=False):
-        """
-        Get the entity identifier.
-
-        @param numeric: Strip the first letter and return an int
-        @type numeric: bool
-        @param force: Force an update of new data
-        @type force: bool
-        """
-        if not hasattr(self, 'id') or force:
-            self.get(force=force)
-        if numeric:
-            return int(self.id[1:]) if self.id != '-1' else -1
-
-        return self.id
-
-    @classmethod
-    def is_valid_id(cls, entity_id):
-        """
-        Whether the string can be a valid id of the entity type.
-
-        @param entity_id: The ID to test.
-        @type entity_id: basestring
-
-        @rtype: bool
-        """
-        if not hasattr(cls, 'title_pattern'):
-            return True
-
-        # todo: use re.fullmatch when Python 3.4+ required
-        return bool(re.match(cls.title_pattern + '$', entity_id))
 
     @property
     def latest_revision_id(self):
@@ -4259,6 +4263,7 @@ class WikibasePage(BasePage):
                                        baserevid=baserevid, **kwargs)
         self.latest_revision_id = updates['entity']['lastrevid']
 
+        # todo: this variable is specific to ItemPage
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if lazy_loading_id or self.id == '-1':
             self.__init__(self.site, title=updates['entity']['id'])
@@ -4375,7 +4380,7 @@ class ItemPage(WikibasePage):
 
     _cache_attrs = WikibasePage._cache_attrs + ('sitelinks',)
     entity_type = 'item'
-    title_pattern = r'(Q[1-9]\d*|-1)'
+    title_pattern = r'Q[1-9]\d*'
 
     def __init__(self, site, title=None, ns=None):
         """
@@ -4405,6 +4410,56 @@ class ItemPage(WikibasePage):
         super(ItemPage, self).__init__(site, title, ns=ns)
 
         assert self.id == self._link.title
+
+    def _defined_by(self, singular=False):
+        """
+        Internal function to provide the API parameters to identify the item.
+
+        The API parameters may be 'id' if the ItemPage has one,
+        or 'site'&'title' if instantiated via ItemPage.fromPage with
+        lazy_load enabled.
+
+        Once an item's Q## is looked up, that will be used for all future
+        requests.
+
+        An empty dict is returned if the ItemPage is instantiated without
+        either ID (internally it has id = '-1') or site&title.
+
+        @param singular: Whether the parameter names should use the singular
+                         form
+        @type singular: bool
+        @return: API parameters
+        @rtype: dict
+        """
+        params = {}
+        if singular:
+            id = 'id'
+            site = 'site'
+            title = 'title'
+        else:
+            id = 'ids'
+            site = 'sites'
+            title = 'titles'
+
+        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
+
+        # id overrides all
+        if hasattr(self, 'id'):
+            if self.id != '-1':
+                params[id] = self.id
+        elif lazy_loading_id:
+            params[site] = self._site.dbName()
+            params[title] = self._title
+        else:
+            # if none of the above applies, this item is in an invalid state
+            # which needs to be raise as an exception, but also logged in case
+            # an exception handler is catching the generic Error.
+            pywikibot.error('%s is in invalid state'
+                            % self.__class__.__name__)
+            raise pywikibot.Error('%s is in invalid state'
+                                  % self.__class__.__name__)
+
+        return params
 
     def title(self, **kwargs):
         """
@@ -4439,6 +4494,19 @@ class ItemPage(WikibasePage):
                 del self._site
 
         return super(ItemPage, self).title(**kwargs)
+
+    def getID(self, numeric=False, force=False):
+        """
+        Get the entity identifier.
+
+        @param numeric: Strip the first letter and return an int
+        @type numeric: bool
+        @param force: Force an update of new data
+        @type force: bool
+        """
+        if not hasattr(self, 'id') or force:
+            self.get(force=force)
+        return super(WikibasePage, self).getID(numeric=numeric)
 
     @classmethod
     def fromPage(cls, page, lazy_load=False):
@@ -4543,11 +4611,6 @@ class ItemPage(WikibasePage):
         data['sitelinks'] = self.sitelinks
         return data
 
-    @need_version('1.28-wmf.23')
-    def concept_uri(self):
-        """Return the full concept URI."""
-        return '{0}{1}'.format(self.site.concept_base_uri, self.id)
-
     def getRedirectTarget(self):
         """Return the redirect target for this page."""
         target = super(ItemPage, self).getRedirectTarget()
@@ -4565,7 +4628,7 @@ class ItemPage(WikibasePage):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing claim data
+        @param diffto: JSON containing entity data
         @type diffto: dict
 
         @rtype: dict
@@ -4755,9 +4818,11 @@ class ItemPage(WikibasePage):
             return self._isredir
         return super(ItemPage, self).isRedirectPage()
 
-    # alias for backwards compatibility
-    concept_url = redirect_func(concept_uri, old_name='concept_url',
-                                class_name='ItemPage', since='20170222')
+
+# alias for backwards compatibility
+ItemPage.concept_url = redirect_func(
+    ItemPage.concept_uri, old_name='concept_url', class_name='ItemPage',
+    since='20170222')
 
 
 class Property(object):
@@ -4872,7 +4937,7 @@ class PropertyPage(WikibasePage, Property):
 
     _cache_attrs = WikibasePage._cache_attrs + ('_type',)
     entity_type = 'property'
-    title_pattern = r'(P[1-9]\d*|-1)'
+    title_pattern = r'P[1-9]\d*'
 
     def __init__(self, source, title=None, datatype=None):
         """
@@ -4932,8 +4997,19 @@ class PropertyPage(WikibasePage, Property):
 
         @rtype: Claim
         """
+        # todo: raise when self.id is -1
         return Claim(self.site, self.getID(), datatype=self.type,
                      *args, **kwargs)
+
+    def getID(self, numeric=False):
+        """
+        Get the identifier of this property.
+
+        @param numeric: Strip the first letter and return an int
+        @type numeric: bool
+        """
+        # enforce this parent's implementation
+        return WikibasePage.getID(self, numeric=numeric)
 
     def get_data_for_new_entity(self):
         """Return data required for creation of new property."""
