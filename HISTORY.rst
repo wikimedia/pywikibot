@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20190722
+------------
+
 * Increase the throttling delay if maxlag >> retry-after (T210606)
 * deprecate test_family: Site('test', 'test'), use wikipedia_family: Site('test', 'wikipedia') instead (T228375, T228300)
 * Add "user_agent_description" option in config.py
