@@ -3897,11 +3897,10 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if 'entity_type' in kwargs:
             entity_type = kwargs.pop('entity_type')
-            if entity_type == 'item':
-                entity_type_ns = site.item_namespace
-            elif entity_type == 'property':
-                entity_type_ns = site.property_namespace
-            else:
+            try:
+                entity_type_ns = site.get_namespace_for_entity_type(
+                    entity_type)
+            except pywikibot.EntityTypeUnknownException:
                 raise ValueError('Wikibase entity type "%s" unknown'
                                  % entity_type)
 

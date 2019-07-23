@@ -58,6 +58,7 @@ from pywikibot.exceptions import (
     NoCreateError,
     NoPage,
     NoUsername,
+    NoWikibaseEntity,
     PageCreatedConflict,
     PageDeletedConflict,
     PageRelatedError,
@@ -7679,18 +7680,31 @@ class DataSite(APISite):
 
     def _cache_entity_namespaces(self):
         """Find namespaces for each known wikibase entity type."""
-        self._item_namespace = False
-        self._property_namespace = False
+        self._entity_namespaces = {}
+        for entity_type in self._type_to_class.keys():
+            for namespace in self.namespaces.values():
+                if not hasattr(namespace, 'defaultcontentmodel'):
+                    continue
 
-        for namespace in self.namespaces.values():
-            if not hasattr(namespace, 'defaultcontentmodel'):
-                continue
+                content_model = namespace.defaultcontentmodel
+                if content_model == ('wikibase-' + entity_type):
+                    self._entity_namespaces[entity_type] = namespace
+                    break
 
-            content_model = namespace.defaultcontentmodel
-            if content_model == 'wikibase-item':
-                self._item_namespace = namespace
-            elif content_model == 'wikibase-property':
-                self._property_namespace = namespace
+    def get_namespace_for_entity_type(self, entity_type):
+        """
+        Return namespace for given entity type.
+
+        @return: corresponding namespace
+        @rtype: Namespace
+        """
+        if not hasattr(self, '_entity_namespaces'):
+            self._cache_entity_namespaces()
+        if entity_type in self._entity_namespaces:
+            return self._entity_namespaces[entity_type]
+        raise EntityTypeUnknownException(
+            '{0!r} does not support entity type "{1}"'
+            .format(self, entity_type))
 
     @property
     def item_namespace(self):
@@ -7701,14 +7715,8 @@ class DataSite(APISite):
         @rtype: Namespace
         """
         if self._item_namespace is None:
-            self._cache_entity_namespaces()
-
-        if isinstance(self._item_namespace, Namespace):
-            return self._item_namespace
-        else:
-            raise EntityTypeUnknownException(
-                '%r does not support entity type "item"'
-                % self)
+            self._item_namespace = self.get_namespace_for_entity_type('item')
+        return self._item_namespace
 
     @property
     def property_namespace(self):
@@ -7719,14 +7727,23 @@ class DataSite(APISite):
         @rtype: Namespace
         """
         if self._property_namespace is None:
-            self._cache_entity_namespaces()
+            self._property_namespace = self.get_namespace_for_entity_type(
+                'property')
+        return self._property_namespace
 
-        if isinstance(self._property_namespace, Namespace):
-            return self._property_namespace
-        else:
-            raise EntityTypeUnknownException(
-                '%r does not support entity type "property"'
-                % self)
+    def get_entity_for_entity_id(self, entity_id):
+        """
+        Return a new instance for given entity id.
+
+        @raises NoWikibaseEntity: there is no entity with the id
+        @return: a WikibaseEntity subclass
+        @rtype: WikibaseEntity
+        """
+        for cls in self._type_to_class.values():
+            if cls.is_valid_id(entity_id):
+                return cls(self, entity_id)
+
+        raise NoWikibaseEntity(pywikibot.page.WikibaseEntity(self, entity_id))
 
     @property
     @need_version('1.28-wmf.3')
@@ -7926,6 +7943,8 @@ class DataSite(APISite):
         @param groupsize: how many pages to query at a time
         @type groupsize: int
         """
+        if not hasattr(self, '_entity_namespaces'):
+            self._cache_entity_namespaces()
         for sublist in itergroup(pagelist, groupsize):
             req = {'ids': [], 'titles': [], 'sites': []}
             for p in sublist:
@@ -7935,7 +7954,7 @@ class DataSite(APISite):
                         req[key].append(ident[key])
                 else:
                     if p.site == self and p.namespace() in (
-                            self.item_namespace, self.property_namespace):
+                            self._entity_namespaces.values()):
                         req['ids'].append(p.title(with_ns=False))
                     else:
                         assert p.site.has_data_repository, \
