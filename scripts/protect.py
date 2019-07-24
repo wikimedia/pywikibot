@@ -64,6 +64,10 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
+from pywikibot.tools import PY2
+
+if PY2:
+    from future_builtins import zip
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

@@ -86,6 +86,7 @@ if not PY2:
     from itertools import zip_longest
     from urllib.parse import urlencode, urlparse
 else:
+    from future_builtins import zip
     from itertools import izip_longest as zip_longest
     from urllib import urlencode
     from urlparse import urlparse

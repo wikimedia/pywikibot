@@ -24,8 +24,8 @@ from pywikibot.tools import first_lower, first_upper, formatter, PY2
 
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
-if not PY2:
-    xrange = range
+if PY2:
+    from future_builtins import zip
 
 
 class CaseChecker(object):
@@ -172,18 +172,18 @@ class CaseChecker(object):
                 self.titleList = [self.Page(t) for t in f]
             self.failedTitles += '.failed'
 
-        ziplist = zip(self.localSuspects, self.latinSuspects)
+        iterzip = zip(self.localSuspects, self.latinSuspects)
         self.lclToLatDict = {
-            ord(local): latin for local, latin in ziplist}
+            ord(local): latin for local, latin in iterzip}
         self.latToLclDict = {
-            ord(latin): local for local, latin in ziplist}
+            ord(latin): local for local, latin in iterzip}
 
         if self.localKeyboard is not None:
-            ziplist = zip(self.localKeyboard, self.latinKeyboard)
+            iterzip = zip(self.localKeyboard, self.latinKeyboard)
             self.lclToLatKeybDict = {
-                ord(local): latin for local, latin in ziplist}
+                ord(local): latin for local, latin in iterzip}
             self.latToLclKeybDict = {
-                ord(latin): local for local, latin in ziplist}
+                ord(latin): local for local, latin in iterzip}
         else:
             self.lclToLatKeybDict = {}
             self.latToLclKeybDict = {}
@@ -513,7 +513,7 @@ class CaseChecker(object):
                 # try to match one of the knownWords
                 bwLen = len(badWord)
                 kw = [w for w in self.knownWords if len(w) == bwLen]
-                for p in xrange(bwLen):
+                for p in range(bwLen):
                     if len(kw) == 0:
                         break
                     c = badWord[p]
@@ -559,7 +559,7 @@ class CaseChecker(object):
                 # combinations from the bad words list, and convert just the
                 # picked words to cyrilic, whereas making all other words as
                 # latin character.
-                for itemCntToPick in xrange(len(ambigBadWords) + 1):
+                for itemCntToPick in range(len(ambigBadWords) + 1):
                     title2 = title
                     for uc in itertools.combinations(list(ambigBadWords),
                                                      itemCntToPick):

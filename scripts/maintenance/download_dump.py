@@ -14,7 +14,7 @@ This script supports the following command line parameters:
 
 """
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 # (C) Yifei He, 2017
 #
 # Distributed under the terms of the MIT license.
@@ -22,10 +22,8 @@ This script supports the following command line parameters:
 from __future__ import absolute_import, division, unicode_literals
 
 import binascii
-
 import os.path
 import sys
-
 from os import remove, symlink, urandom
 
 try:
@@ -45,10 +43,12 @@ except ImportError:   # py2
         from os import rename as replace
 
 import pywikibot
-
 from pywikibot import Bot
-
 from pywikibot.comms.http import fetch
+from pywikibot.tools import PY2
+
+if PY2:
+    from future_builtins import map
 
 
 class DownloadDumpBot(Bot):
