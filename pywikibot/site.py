@@ -1072,15 +1072,30 @@ class BaseSite(ComparableMixin):
             otherwise, raise an exception if page can't be locked
 
         """
+        title = page.title(with_section=False)
+
         self._pagemutex.acquire()
         try:
-            while page.title(with_section=False) in self._locked_pages:
+            while title in self._locked_pages:
                 if not block:
-                    raise PageInUse(page.title(with_section=False))
+                    raise PageInUse(title)
+
+                # The mutex must be released so that page can be unlocked
+                self._pagemutex.release()
                 time.sleep(.25)
-            self._locked_pages.append(page.title(with_section=False))
+                self._pagemutex.acquire()
+
+            self._locked_pages.append(title)
         finally:
-            self._pagemutex.release()
+            # time.sleep may raise an exception from signal handler (eg:
+            # KeyboardInterrupt) while the lock is released, and there is no
+            # reason to acquire the lock again given that our caller will
+            # receive the exception. The state of the lock is therefore
+            # undefined at the point of this finally block.
+            try:
+                self._pagemutex.release()
+            except RuntimeError:
+                pass
 
     def unlock_page(self, page):
         """
