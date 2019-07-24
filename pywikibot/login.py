@@ -80,43 +80,28 @@ class LoginManager(object):
 
         @raises NoUsername: No username is configured for the requested site.
         """
-        self.site = site or pywikibot.Site()
-        if user:
-            self.username = user
-        elif sysop:
-            config_names = config.sysopnames
-            family_sysopnames = (
-                config_names[self.site.family.name] or config_names['*']
-            )
-            self.username = family_sysopnames.get(self.site.code, None)
-            try:
-                self.username = self.username or family_sysopnames['*']
-            except KeyError:
-                raise NoUsername(""" \
-ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
-If you have a sysop account for that site, please add a line to user-config.py:
+        site = self.site = site or pywikibot.Site()
+        if not user:
+            if sysop:
+                config_names = config.sysopnames
+            else:
+                config_names = config.usernames
 
-sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                                 % {'fam_name': self.site.family.name,
-                                    'wiki_code': self.site.code})
-        else:
-            config_names = config.usernames
-            family_usernames = (
-                config_names[self.site.family.name] or config_names['*']
-            )
-            self.username = family_usernames.get(self.site.code, None)
+            code_to_usr = config_names[site.family.name] or config_names['*']
             try:
-                self.username = self.username or family_usernames['*']
+                user = code_to_usr.get(site.code) or code_to_usr['*']
             except KeyError:
-                raise NoUsername(""" \
-ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
-If you have an account for that site, please add a line to user-config.py:
-
-usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                                 % {'fam_name': self.site.family.name,
-                                    'wiki_code': self.site.code})
+                raise NoUsername(
+                    'ERROR: '
+                    '{account} for {fam_name}:{wiki_code} is undefined.\n'
+                    'If you have a {account} for that site, '
+                    'please add a line to user-config.py as follows:\n'
+                    "{account}s['{fam_name}']['{wiki_code}'] = 'myUsername'"
+                    .format(
+                        fam_name=site.family.name, wiki_code=site.code,
+                        account='sysopname' if sysop else 'username'))
         self.password = password
-        self.login_name = self.username
+        self.login_name = self.username = user
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
