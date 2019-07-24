@@ -43,9 +43,15 @@ from pywikibot.tools import (
 )
 from pywikibot.tools.formatter import color_format
 
-if PYTHON_VERSION[:2] == (3, 4):  # T113120
-    # Subclassing necessary to fix a bug of the email package
-    # in Python 3.4: see http://bugs.python.org/issue19003
+if not PY2:
+    from urllib.parse import urlencode, unquote
+
+    # Bug: T113120, T228841
+    # Subclassing necessary to fix bug of the email package in Python 3:
+    # see https://bugs.python.org/issue19003
+    # see https://bugs.python.org/issue18886
+    # The following solution might be removed if the bug is fixed for
+    # Python versions which are supported by PWB.
 
     from email.generator import BytesGenerator
     from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
@@ -80,12 +86,8 @@ if PYTHON_VERSION[:2] == (3, 4):  # T113120
 
     MIMEMultipart = CTEBinaryMIMEMultipart
 else:
-    from email.mime.multipart import MIMEMultipart
-
-if not PY2:
-    from urllib.parse import urlencode, unquote
-else:
     from urllib import urlencode, unquote
+    from email.mime.multipart import MIMEMultipart
 
 _logger = 'data.api'
 
