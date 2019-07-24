@@ -17,7 +17,7 @@ import pywikibot
 from pywikibot.comms.http import fetch
 from pywikibot import config
 from pywikibot.exceptions import ServerError
-from pywikibot.tools import MediaWikiVersion, PY2, PYTHON_VERSION
+from pywikibot.tools import MediaWikiVersion, PY2
 
 if not PY2:
     from html.parser import HTMLParser
@@ -230,7 +230,7 @@ class WikiHTMLPageParser(HTMLParser):
 
     def __init__(self, url):
         """Initializer."""
-        if PYTHON_VERSION < (3, 4):
+        if PY2:
             HTMLParser.__init__(self)
         else:
             super().__init__(convert_charrefs=True)

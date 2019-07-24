@@ -44,7 +44,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, PY2, PYTHON_VERSION, UnicodeType
+from pywikibot.tools import deprecated, PY2, UnicodeType
 
 cache = None
 _logger = 'version'
@@ -463,7 +463,7 @@ def get_module_filename(module):
     """
     if hasattr(module, '__file__') and os.path.exists(module.__file__):
         filename = module.__file__
-        if PYTHON_VERSION < (3, 4):
+        if PY2:
             filename = os.path.abspath(filename)
         if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
             filename = filename[:-1]
