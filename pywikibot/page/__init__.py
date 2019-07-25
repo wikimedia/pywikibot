@@ -26,6 +26,10 @@ import sys
 import unicodedata
 
 from collections import Counter, defaultdict, namedtuple, OrderedDict
+try:
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import MutableMapping
 from itertools import chain
 from warnings import warn
 
@@ -3707,6 +3711,384 @@ class User(Page):
         return self.isRegistered() and 'bot' not in self.groups()
 
 
+class LanguageDict(MutableMapping):
+
+    """
+    A structure holding language data for a Wikibase entity.
+
+    Language data are mappings from a language to a string. It can be
+    labels, descriptions and others.
+    """
+
+    def __init__(self, data=None):
+        super(LanguageDict, self).__init__()
+        self._data = {}
+        if data:
+            self.update(data)
+
+    @classmethod
+    def fromJSON(cls, data, repo=None):
+        this = cls({key: value['value'] for key, value in data.items()})
+        return this
+
+    def __getitem__(self, key):
+        key = self.normalizeKey(key)
+        return self._data[key]
+
+    def __setitem__(self, key, value):
+        key = self.normalizeKey(key)
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        key = self.normalizeKey(key)
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __contains__(self, key):
+        key = self.normalizeKey(key)
+        return key in self._data
+
+    @staticmethod
+    def normalizeKey(key):
+        """
+        Helper function to replace site objects with their language codes.
+
+        @rtype: str
+        """
+        if isinstance(key, pywikibot.site.BaseSite):
+            key = key.lang
+        return key
+
+    @classmethod
+    def normalizeData(cls, data):
+        norm_data = {}
+        for key, value in data.items():
+            if isinstance(value, UnicodeType):
+                norm_data[key] = {'language': key, 'value': value}
+            else:
+                norm_data[key] = value
+        return norm_data
+
+    def toJSON(self, diffto=None):
+        data = {}
+        if diffto:
+            for key in diffto:
+                if key not in self:
+                    data[key] = {'language': key, 'value': ''}
+                elif self[key] != diffto[key]['value']:
+                    data[key] = {'language': key, 'value': self[key]}
+            for key in self:
+                if key not in diffto:
+                    data[key] = {'language': key, 'value': self[key]}
+        else:
+            for key in self:
+                data[key] = {'language': key, 'value': self[key]}
+        return data
+
+
+class AliasesDict(MutableMapping):
+
+    """
+    A structure holding aliases for a Wikibase entity.
+
+    It is a mapping from a language to a list of strings.
+    """
+
+    def __init__(self, data=None):
+        super(AliasesDict, self).__init__()
+        self._data = {}
+        if data:
+            self.update(data)
+
+    @classmethod
+    def fromJSON(cls, data, repo=None):
+        this = cls()
+        for key, value in data.items():
+            this[key] = [val['value'] for val in value]
+        return this
+
+    def __getitem__(self, key):
+        key = LanguageDict.normalizeKey(key)
+        return self._data[key]
+
+    def __setitem__(self, key, value):
+        key = LanguageDict.normalizeKey(key)
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        key = LanguageDict.normalizeKey(key)
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __contains__(self, key):
+        key = LanguageDict.normalizeKey(key)
+        return key in self._data
+
+    @classmethod
+    def normalizeData(cls, data):
+        norm_data = {}
+        for key, values in data.items():
+            if isinstance(values, list):
+                strings = []
+                for value in values:
+                    if isinstance(value, UnicodeType):
+                        strings.append({'language': key, 'value': value})
+                    else:
+                        strings.append(value)
+                norm_data[key] = strings
+        return norm_data
+
+    def toJSON(self, diffto=None):
+        data = {}
+        if diffto:
+            for lang, strings in diffto.items():
+                if len(self.get(lang, [])) > 0:
+                    if tuple(sorted(val['value'] for val in strings)) != tuple(
+                            sorted(self[lang])):
+                        data[lang] = [{'language': lang, 'value': i}
+                                      for i in self[lang]]
+                else:
+                    data[lang] = [
+                        {'language': lang, 'value': i['value'], 'remove': ''}
+                        for i in strings]
+        else:
+            for lang, values in self.items():
+                data[lang] = [{'language': lang, 'value': i} for i in values]
+        return data
+
+
+class ClaimCollection(MutableMapping):
+    """A structure holding claims for a Wikibase entity."""
+
+    def __init__(self, repo):
+        super(ClaimCollection, self).__init__()
+        self.repo = repo
+        self._data = {}
+
+    @classmethod
+    def fromJSON(cls, data, repo):
+        this = cls(repo)
+        for key, claims in data.items():
+            this[key] = [Claim.fromJSON(repo, claim) for claim in claims]
+        return this
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __contains__(self, key):
+        return key in self._data
+
+    @classmethod
+    def normalizeData(cls, data):
+        # no normalization here, should there be?
+        return data
+
+    def toJSON(self, diffto=None):
+        claims = {}
+        for prop in self:
+            if len(self[prop]) > 0:
+                claims[prop] = [claim.toJSON() for claim in self[prop]]
+
+        if diffto:
+            temp = defaultdict(list)
+            props_add = set(claims.keys())
+            props_orig = set(diffto.keys())
+            for prop in (props_orig | props_add):
+                if prop not in props_orig:
+                    temp[prop].extend(claims[prop])
+                    continue
+                if prop not in props_add:
+                    temp[prop].extend(
+                        {'id': claim['id'], 'remove': ''}
+                        for claim in diffto[prop] if 'id' in claim)
+                    continue
+
+                claim_ids = set()
+                claim_map = {
+                    json['id']: json for json in diffto[prop]
+                    if 'id' in json}
+                for claim, json in zip(self[prop], claims[prop]):
+                    if 'id' in json:
+                        claim_ids.add(json['id'])
+                        if json['id'] in claim_map:
+                            other = Claim.fromJSON(
+                                self.repo, claim_map[json['id']])
+                            if claim.same_as(other, ignore_rank=False,
+                                             ignore_refs=False):
+                                continue
+                    temp[prop].append(json)
+
+                for claim in diffto[prop]:
+                    if 'id' in claim and claim['id'] not in claim_ids:
+                        temp[prop].append({'id': claim['id'], 'remove': ''})
+
+            claims = temp
+
+        return claims
+
+
+class SiteLinkCollection(MutableMapping):
+    """A structure holding SiteLinks for a Wikibase item."""
+
+    def __init__(self, repo, data=None):
+        """
+        Initializer.
+
+        @param repo: the Wikibase site on which badges are defined
+        @type repo: pywikibot.site.DataSite
+        """
+        super(SiteLinkCollection, self).__init__()
+        self.repo = repo
+        self._data = {}
+        if data:
+            self.update(data)
+
+    @staticmethod
+    def getdbName(site):
+        """
+        Helper function to obtain a dbName for a Site.
+
+        @param site: The site to look up.
+        @type site: pywikibot.site.BaseSite or str
+        """
+        if isinstance(site, pywikibot.site.BaseSite):
+            return site.dbName()
+        return site
+
+    def __getitem__(self, key):
+        """
+        Get the SiteLink with the given key.
+
+        @param key: site key as Site instance or db key
+        @type key: pywikibot.Site or str
+        @rtype: SiteLink
+        """
+        key = self.getdbName(key)
+        return self._data[key]
+
+    def __setitem__(self, key, val):
+        """
+        Set the SiteLink for a given key.
+
+        @param key: site key as Site instance or db key
+        @type key: pywikibot.Site or str
+        @param val: page name as a string or JSON containing SiteLink data
+        @type val: dict or str
+        @rtype: SiteLink
+        """
+        if isinstance(val, UnicodeType):
+            val = SiteLink(val, key)
+        else:
+            val = SiteLink.fromJSON(val, self.repo)
+        key = self.getdbName(key)
+        self._data[key] = val
+
+    def __delitem__(self, key):
+        key = self.getdbName(key)
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def __contains__(self, key):
+        key = self.getdbName(key)
+        return key in self._data
+
+    @classmethod
+    def fromJSON(cls, data, repo):
+        """Construct a new SiteLinkCollection from JSON."""
+        return cls(repo, data)
+
+    @classmethod
+    def normalizeData(cls, data):
+        """
+        Helper function to expand data into the Wikibase API structure.
+
+        @param data: Data to normalize
+        @type data: list
+
+        @return: the altered dict from parameter data.
+        @rtype: dict
+        """
+        norm_data = {}
+        for obj in data:
+            if isinstance(obj, Page):
+                db_name = obj.site.dbName()
+                norm_data[db_name] = {'site': db_name, 'title': obj.title()}
+            else:
+                # TODO: Do some verification here
+                db_name = obj['site']
+                norm_data[db_name] = obj
+        return norm_data
+
+    def toJSON(self, diffto=None):
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        @param diffto: JSON containing entity data
+        @type diffto: dict
+
+        @rtype: dict
+        """
+        data = {dbname: sitelink.toJSON()
+                for (dbname, sitelink) in self.items()}
+        if diffto:
+            to_nuke = []
+            for dbname, sitelink in data.items():
+                if dbname in diffto:
+                    diffto_link = diffto[dbname]
+                    if diffto_link.get('title') == sitelink.get('title'):
+                        # compare badges
+                        tmp_badges = []
+                        diffto_badges = diffto_link.get('badges', [])
+                        badges = sitelink.get('badges', [])
+                        for badge in set(diffto_badges) - set(badges):
+                            tmp_badges.append('')
+                        for badge in set(badges) - set(diffto_badges):
+                            tmp_badges.append(badge)
+                        if tmp_badges:
+                            data[dbname]['badges'] = tmp_badges
+                        else:
+                            to_nuke.append(dbname)
+            # find removed sitelinks
+            for dbname in (set(diffto.keys()) - set(self.keys())):
+                badges = [''] * len(diffto[dbname].get('badges', []))
+                data[dbname] = {'site': dbname, 'title': ''}
+                if badges:
+                    data[dbname]['badges'] = badges
+            for dbname in to_nuke:
+                del data[dbname]
+        return data
+
+
 class WikibaseEntity(object):
 
     """
@@ -3714,7 +4096,21 @@ class WikibaseEntity(object):
 
     Each entity is identified by a data repository it belongs to
     and an identifier.
+
+    @cvar DATA_ATTRIBUTES: dictionary which maps data attributes (eg. 'labels',
+        'claims') to appropriate collection classes (eg. LanguageDict,
+        ClaimsCollection)
+    @type DATA_ATTRIBUTES: dict
+
+    @cvar entity_type: entity type identifier
+    @type entity_type: str
+
+    @cvar title_pattern: regular expression which matches all possible
+        entity ids for this entity type
+    @type title_pattern: str
     """
+
+    DATA_ATTRIBUTES = {}
 
     def __init__(self, repo, id_=None):
         """
@@ -3810,7 +4206,18 @@ class WikibaseEntity(object):
 
         @rtype: dict
         """
-        return {}
+        data = {}
+        for key in self.DATA_ATTRIBUTES:
+            attr = getattr(self, key, None)
+            if attr is None:
+                continue
+            if diffto:
+                value = attr.toJSON(diffto=diffto.get(key))
+            else:
+                value = attr.toJSON()
+            if value:
+                data[key] = value
+        return data
 
     @classmethod
     def _normalizeData(cls, data):
@@ -3823,7 +4230,11 @@ class WikibaseEntity(object):
         @return: the altered dict from parameter data.
         @rtype: dict
         """
-        return {}
+        norm_data = {}
+        for key, attr in cls.DATA_ATTRIBUTES.items():
+            if key in data:
+                norm_data[key] = attr.normalizeData(data[key])
+        return norm_data
 
     def exists(self):
         """
@@ -3865,7 +4276,13 @@ class WikibaseEntity(object):
             self._content = content
         if 'missing' in self._content:
             raise pywikibot.NoWikibaseEntity(self)
-        return {}
+
+        data = {}
+        for key, cls in self.DATA_ATTRIBUTES.items():
+            value = cls.fromJSON(self._content.get(key, {}), self.repo)
+            setattr(self, key, value)
+            data[key] = value
+        return data
 
     def editEntity(self, data=None, **kwargs):
         """
@@ -3903,14 +4320,12 @@ class WikibaseEntity(object):
 class WikibasePage(BasePage, WikibaseEntity):
 
     """
-    The base page for the Wikibase extension.
+    Mixin base class for Wikibase entities which are also pages (eg. items).
 
     There should be no need to instantiate this directly.
     """
 
-    _cache_attrs = BasePage._cache_attrs + (
-        '_content', 'labels', 'descriptions', 'aliases', 'claims',
-    )
+    _cache_attrs = BasePage._cache_attrs + ('_content', )
 
     def __init__(self, site, title='', **kwargs):
         """
@@ -4110,137 +4525,6 @@ class WikibasePage(BasePage, WikibaseEntity):
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
 
-        # labels
-        self.labels = {}
-        for lang in self._content.get('labels', {}):
-            if 'removed' not in self._content['labels'][lang]:  # T56767
-                self.labels[lang] = self._content['labels'][lang]['value']
-
-        # descriptions
-        self.descriptions = {}
-        for lang in self._content.get('descriptions', {}):
-            self.descriptions[lang] = self._content[
-                'descriptions'][lang]['value']
-
-        # aliases
-        self.aliases = {}
-        for lang in self._content.get('aliases', {}):
-            self.aliases[lang] = []
-            for value in self._content['aliases'][lang]:
-                self.aliases[lang].append(value['value'])
-
-        # claims
-        self.claims = {}
-        for pid in self._content.get('claims', {}):
-            self.claims[pid] = []
-            for claim in self._content['claims'][pid]:
-                c = Claim.fromJSON(self.repo, claim)
-                c.on_item = self
-                self.claims[pid].append(c)
-
-        data['labels'] = self.labels
-        data['descriptions'] = self.descriptions
-        data['aliases'] = self.aliases
-        data['claims'] = self.claims
-        return data
-
-    def _diff_to(self, type_key, key_name, value_name, diffto, data):
-        assert type_key not in data, 'Key type must be defined in data'
-        source = self._normalizeLanguages(getattr(self, type_key)).copy()
-        diffto = {} if not diffto else diffto.get(type_key, {})
-        new = set(source.keys())
-        for key in diffto:
-            if key in new:
-                if source[key] == diffto[key][value_name]:
-                    del source[key]
-            else:
-                source[key] = ''
-        for key, value in source.items():
-            source[key] = {key_name: key, value_name: value}
-        if source:
-            data[type_key] = source
-
-    def toJSON(self, diffto=None):
-        """
-        Create JSON suitable for Wikibase API.
-
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
-
-        @param diffto: JSON containing entity data
-        @type diffto: dict
-
-        @rtype: dict
-        """
-        data = {}
-        self._diff_to('labels', 'language', 'value', diffto, data)
-
-        self._diff_to('descriptions', 'language', 'value', diffto, data)
-
-        aliases = self._normalizeLanguages(self.aliases).copy()
-        if diffto:
-            for lang, strings in diffto.get('aliases', {}).items():
-                if len(aliases.get(lang, [])) > 0:
-                    if tuple(sorted(val['value'] for val in strings)) != tuple(
-                            sorted(aliases[lang])):
-                        aliases[lang] = [{'language': lang, 'value': i}
-                                         for i in aliases[lang]]
-                    else:
-                        del aliases[lang]
-                else:
-                    aliases[lang] = [
-                        {'language': lang, 'value': i['value'], 'remove': ''}
-                        for i in strings]
-        else:
-            for lang, values in aliases.items():
-                aliases[lang] = [{'language': lang, 'value': i}
-                                 for i in values]
-
-        if aliases:
-            data['aliases'] = aliases
-
-        claims = {}
-        for prop in self.claims:
-            if len(self.claims[prop]) > 0:
-                claims[prop] = [claim.toJSON() for claim in self.claims[prop]]
-
-        if diffto and 'claims' in diffto:
-            temp = defaultdict(list)
-            props_add = set(claims.keys())
-            props_orig = set(diffto['claims'].keys())
-            for prop in (props_orig | props_add):
-                if prop not in props_orig:
-                    temp[prop].extend(claims[prop])
-                    continue
-                if prop not in props_add:
-                    temp[prop].extend(
-                        {'id': claim['id'], 'remove': ''}
-                        for claim in diffto['claims'][prop] if 'id' in claim)
-                    continue
-
-                claim_ids = set()
-                claim_map = {
-                    json['id']: json for json in diffto['claims'][prop]
-                    if 'id' in json}
-                for claim, json in zip(self.claims[prop], claims[prop]):
-                    if 'id' in json:
-                        claim_ids.add(json['id'])
-                        if json['id'] in claim_map:
-                            other = Claim.fromJSON(
-                                self.repo, claim_map[json['id']])
-                            if claim.same_as(other, ignore_rank=False,
-                                             ignore_refs=False):
-                                continue
-                    temp[prop].append(json)
-
-                for claim in diffto['claims'][prop]:
-                    if 'id' in claim and claim['id'] not in claim_ids:
-                        temp[prop].append({'id': claim['id'], 'remove': ''})
-
-            claims = temp
-
-        if claims:
-            data['claims'] = claims
         return data
 
     @property
@@ -4261,68 +4545,6 @@ class WikibasePage(BasePage, WikibaseEntity):
     @latest_revision_id.deleter
     def latest_revision_id(self):
         self.clear_cache()
-
-    @staticmethod
-    def _normalizeLanguages(data):
-        """
-        Helper function to replace site objects with their language codes.
-
-        @param data: The dict to normalize.
-        @type data: dict
-
-        @return: the altered dict from parameter data.
-        @rtype: dict
-        """
-        for key in list(data):
-            if isinstance(key, pywikibot.site.BaseSite):
-                data[key.lang] = data[key]
-                del data[key]
-        return data
-
-    @classmethod
-    def _normalizeData(cls, data):
-        """
-        Helper function to expand data into the Wikibase API structure.
-
-        @param data: The dict to normalize
-        @type data: dict
-
-        @return: the altered dict from parameter data.
-        @rtype: dict
-        """
-        WikibaseEntity._normalizeData(data)
-        for prop in ('labels', 'descriptions'):
-            if prop not in data:
-                continue
-            data[prop] = cls._normalizeLanguages(data[prop])
-            for key, value in data[prop].items():
-                if isinstance(value, UnicodeType):
-                    data[prop][key] = {'language': key, 'value': value}
-
-        if 'aliases' in data:
-            data['aliases'] = cls._normalizeLanguages(data['aliases'])
-            for key, values in data['aliases'].items():
-                if isinstance(values, list):
-                    strings = []
-                    for value in values:
-                        if isinstance(value, UnicodeType):
-                            strings.append({'language': key, 'value': value})
-                        else:
-                            strings.append(value)
-                    data['aliases'][key] = strings
-
-        return data
-
-    def getdbName(self, site):
-        """
-        Helper function to obtain a dbName for a Site.
-
-        @param site: The site to look up.
-        @type site: Site
-        """
-        if isinstance(site, pywikibot.site.BaseSite):
-            return site.dbName()
-        return site
 
     @allow_asynchronous
     def editEntity(self, data=None, **kwargs):
@@ -4462,9 +4684,17 @@ class ItemPage(WikibasePage):
     been looked up, the item is then defined by the qid.
     """
 
-    _cache_attrs = WikibasePage._cache_attrs + ('sitelinks',)
+    _cache_attrs = WikibasePage._cache_attrs + (
+        'labels', 'descriptions', 'aliases', 'claims', 'sitelinks')
     entity_type = 'item'
     title_pattern = r'Q[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'labels': LanguageDict,
+        'descriptions': LanguageDict,
+        'aliases': AliasesDict,
+        'claims': ClaimCollection,
+        'sitelinks': SiteLinkCollection,
+    }
 
     def __init__(self, site, title=None, ns=None):
         """
@@ -4472,7 +4702,7 @@ class ItemPage(WikibasePage):
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
-        @param title: id number of item, "Q###",
+        @param title: identifier of item, "Q###",
                       -1 or None for an empty item.
         @type title: str
         @type ns: namespace
@@ -4689,12 +4919,6 @@ class ItemPage(WikibasePage):
         if self.isRedirectPage() and not get_redirect:
             raise pywikibot.IsRedirectPage(self)
 
-        # sitelinks
-        self.sitelinks = SiteLinkCollection(self.site)
-        for dbname in self._content.get('sitelinks', {}):
-            self.sitelinks[dbname] = self._content['sitelinks'][dbname]
-
-        data['sitelinks'] = self.sitelinks
         return data
 
     def getRedirectTarget(self):
@@ -4706,61 +4930,6 @@ class ItemPage(WikibasePage):
                                   'model %s instead of wikibase-item' %
                                   (self, target, cmodel))
         return self.__class__(target.site, target.title(), target.namespace())
-
-    def toJSON(self, diffto=None):
-        """
-        Create JSON suitable for Wikibase API.
-
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
-
-        @param diffto: JSON containing entity data
-        @type diffto: dict
-
-        @rtype: dict
-        """
-        data = super(ItemPage, self).toJSON(diffto=diffto)
-
-        sitelinks = {dbname: sitelink.toJSON()
-                     for (dbname, sitelink) in self.sitelinks.items()}
-
-        if diffto and 'sitelinks' in diffto:
-            to_nuke = []
-            diffto_sitelinks = diffto['sitelinks']
-
-            for dbname, sitelink in sitelinks.items():
-                if dbname in diffto_sitelinks:
-                    diffto_link = diffto_sitelinks[dbname]
-                    if diffto_link.get('title') == sitelink.get('title'):
-                        # compare badges
-                        tmp_badges = []
-                        diffto_badges = diffto_link.get('badges', [])
-                        badges = sitelink.get('badges', [])
-                        for badge in set(diffto_badges) - set(badges):
-                            tmp_badges.append('')
-                        for badge in set(badges) - set(diffto_badges):
-                            tmp_badges.append(badge)
-
-                        if tmp_badges:
-                            sitelinks[dbname]['badges'] = tmp_badges
-                        else:
-                            to_nuke.append(dbname)
-
-            # find removed sitelinks
-            for dbname in (set(diffto_sitelinks.keys())
-                           - set(sitelinks.keys())):
-                badges = [''] * len(diffto_sitelinks[dbname].get('badges', []))
-                sitelinks[dbname] = {'site': dbname, 'title': ''}
-                if badges:
-                    sitelinks[dbname]['badges'] = badges
-
-            for dbname in to_nuke:
-                del sitelinks[dbname]
-
-        if sitelinks:
-            data['sitelinks'] = sitelinks
-
-        return data
 
     def iterlinks(self, family=None):
         """
@@ -4796,11 +4965,10 @@ class ItemPage(WikibasePage):
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
-        dbname = self.getdbName(site)
-        if dbname not in self.sitelinks:
+        if site not in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
-            return self.sitelinks[dbname].canonical_title()
+            return self.sitelinks[site].canonical_title()
 
     def setSitelink(self, sitelink, **kwargs):
         """
@@ -4828,7 +4996,7 @@ class ItemPage(WikibasePage):
         """
         data = []
         for site in sites:
-            site = self.getdbName(site)
+            site = SiteLinkCollection.getdbName(site)
             data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
@@ -4840,17 +5008,7 @@ class ItemPage(WikibasePage):
         list can either be a Page object, or a dict
         with a value for 'site' and 'title'.
         """
-        data = {}
-        # todo: move to _normalizeData
-        for obj in sitelinks:
-            if isinstance(obj, Page):
-                db_name = self.getdbName(obj.site)
-                data[db_name] = {'site': db_name, 'title': obj.title()}
-            else:
-                # TODO: Do some verification here
-                db_name = obj['site']
-                data[db_name] = obj
-        data = {'sitelinks': data}
+        data = {'sitelinks': sitelinks}
         self.editEntity(data, **kwargs)
 
     def mergeInto(self, item, **kwargs):
@@ -5022,9 +5180,16 @@ class PropertyPage(WikibasePage, Property):
         PropertyPage(DataSite, datatype='url')
     """
 
-    _cache_attrs = WikibasePage._cache_attrs + ('_type',)
+    _cache_attrs = WikibasePage._cache_attrs + (
+        '_type', 'labels', 'descriptions', 'aliases', 'claims')
     entity_type = 'property'
     title_pattern = r'P[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'labels': LanguageDict,
+        'descriptions': LanguageDict,
+        'aliases': AliasesDict,
+        'claims': ClaimCollection,
+    }
 
     def __init__(self, source, title=None, datatype=None):
         """
@@ -5032,7 +5197,7 @@ class PropertyPage(WikibasePage, Property):
 
         @param source: data repository property is on
         @type source: pywikibot.site.DataSite
-        @param title: page name of property, like "P##",
+        @param title: identifier of property, like "P##",
                       "-1" or None for an empty property.
         @type title: str
         @param datatype: Datatype for a new property.
@@ -6606,50 +6771,6 @@ class SiteLink(BaseLink):
             'badges': [badge.title() for badge in self.badges]
         }
         return json
-
-
-class SiteLinkCollection(dict):
-    """A structure holding SiteLinks for a Wikibase item."""
-
-    def __init__(self, repo, *args):
-        """
-        Initializer.
-
-        @param repo: the Wikibase site on which badges are defined
-        @type repo: pywikibot.site.DataSite
-        """
-        super(SiteLinkCollection, self).__init__(*args)
-        self.repo = repo
-
-    def __getitem__(self, key):
-        """
-        Get the SiteLink with the given key.
-
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.page.Site or str
-        @rtype: pywikibot.page.SiteLink
-        """
-        if isinstance(key, pywikibot.site.BaseSite):
-            key = key.dbName()
-        return super(SiteLinkCollection, self).__getitem__(key)
-
-    def __setitem__(self, key, val):
-        """
-        Set the SiteLink for a given key.
-
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @param val: page name as a string or JSON containing SiteLink data
-        @type val: dict or str
-        @rtype: pywikibot.page.SiteLink
-        """
-        if isinstance(val, UnicodeType):
-            val = SiteLink(val, key)
-        else:
-            val = SiteLink.fromJSON(val, self.repo)
-        if isinstance(key, pywikibot.site.BaseSite):
-            key = key.dbName()
-        return super(SiteLinkCollection, self).__setitem__(key, val)
 
 
 # Utility functions for parsing page titles

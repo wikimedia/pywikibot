@@ -15,7 +15,9 @@ from decimal import Decimal
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.page import WikibasePage, ItemPage, PropertyPage, Page
+from pywikibot.page import (
+    WikibasePage, ItemPage, PropertyPage, Page, LanguageDict, AliasesDict,
+)
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
 
@@ -1760,13 +1762,9 @@ class TestLinks(WikidataTestCase):
         self.assertLength(wvlinks, 2)
 
 
-class TestWriteNormalizeLang(TestCase):
+class TestLanguageDict(TestCase):
 
-    """Test cases for routines that normalize languages in a dict.
-
-    Exercises WikibasePage._normalizeLanguages with data that is
-    not normalized and data which is already normalized.
-    """
+    """Test cases covering LanguageDict methods."""
 
     family = 'wikipedia'
     code = 'en'
@@ -1775,29 +1773,170 @@ class TestWriteNormalizeLang(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestWriteNormalizeLang, self).setUp()
+        super(TestLanguageDict, self).setUp()
         self.site = self.get_site()
         self.lang_out = {'en': 'foo'}
 
-    def test_normalize_lang(self):
-        """Test _normalizeLanguages() method."""
-        lang_in = {self.site: 'foo'}
+    def test_init(self):
+        """Test LanguageDict initializer."""
+        ld = LanguageDict()
+        self.assertLength(ld, 0)
+        ld = LanguageDict(self.lang_out)
+        self.assertLength(ld, 1)
 
-        response = WikibasePage._normalizeLanguages(lang_in)
-        self.assertEqual(response, self.lang_out)
+    def test_setitem(self):
+        """Test LanguageDict.__setitem__ metamethod."""
+        ld = LanguageDict(self.lang_out)
+        self.assertIn('en', ld)
+        ld[self.site] = 'bar'
+        self.assertIn('en', ld)
 
-    def test_normalized_lang(self):
-        """Test _normalizeData() method."""
-        response = WikibasePage._normalizeData(
-            copy.deepcopy(self.lang_out))
-        self.assertEqual(response, self.lang_out)
+    def test_getitem(self):
+        """Test LanguageDict.__getitem__ metamethod."""
+        ld = LanguageDict(self.lang_out)
+        self.assertEqual(ld['en'], 'foo')
+        self.assertEqual(ld[self.site], 'foo')
+        self.assertIsNone(ld.get('de'))
+
+    def test_delitem(self):
+        """Test LanguageDict.__delitem__ metamethod."""
+        ld = LanguageDict(self.lang_out)
+        ld.pop(self.site)
+        self.assertNotIn('en', ld)
+        self.assertLength(ld, 0)
+
+    def test_fromJSON(self):
+        """Test LanguageDict.fromJSON method."""
+        ld = LanguageDict.fromJSON({'en': {'language': 'en', 'value': 'foo'}})
+        self.assertIsInstance(ld, LanguageDict)
+        self.assertEqual(ld, LanguageDict(self.lang_out))
+
+    def test_toJSON(self):
+        """Test LanguageDict.toJSON method."""
+        ld = LanguageDict()
+        self.assertEqual(ld.toJSON(), {})
+        ld = LanguageDict(self.lang_out)
+        self.assertEqual(
+            ld.toJSON(), {'en': {'language': 'en', 'value': 'foo'}})
+
+    def test_toJSON_diffto(self):
+        """Test LanguageDict.toJSON method."""
+        ld = LanguageDict({'de': 'foo'})
+        diffto = {
+            'de': {'language': 'de', 'value': 'bar'},
+            'en': {'language': 'en', 'value': 'foo'}}
+        self.assertEqual(
+            ld.toJSON(diffto=diffto),
+            {'de': {'language': 'de', 'value': 'foo'},
+             'en': {'language': 'en', 'value': ''}})
+
+    def test_normalizeData(self):
+        """Test LanguageDict.normalizeData method."""
+        self.assertEqual(
+            LanguageDict.normalizeData(self.lang_out),
+            {'en': {'language': 'en', 'value': 'foo'}})
+
+
+class TestAliasesDict(TestCase):
+
+    """Test cases covering AliasesDict methods."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def setUp(self):
+        """Setup tests."""
+        super(TestAliasesDict, self).setUp()
+        self.site = self.get_site()
+        self.lang_out = {'en': ['foo', 'bar']}
+
+    def test_init(self):
+        """Test AliasesDict initializer."""
+        ad = AliasesDict()
+        self.assertLength(ad, 0)
+        ad = AliasesDict(self.lang_out)
+        self.assertLength(ad, 1)
+
+    def test_setitem(self):
+        """Test AliasesDict.__setitem__ metamethod."""
+        ad = AliasesDict(self.lang_out)
+        self.assertIn('en', ad)
+        ad[self.site] = ['baz']
+        self.assertIn('en', ad)
+
+    def test_getitem(self):
+        """Test AliasesDict.__getitem__ metamethod."""
+        ad = AliasesDict(self.lang_out)
+        self.assertEqual(ad['en'], ['foo', 'bar'])
+        self.assertEqual(ad[self.site], ['foo', 'bar'])
+        self.assertIsNone(ad.get('de'))
+
+    def test_delitem(self):
+        """Test AliasesDict.__delitem__ metamethod."""
+        ad = AliasesDict(self.lang_out)
+        ad.pop(self.site)
+        self.assertNotIn('en', ad)
+        self.assertLength(ad, 0)
+
+    def test_fromJSON(self):
+        """Test AliasesDict.fromJSON method."""
+        ad = AliasesDict.fromJSON({'en': [
+            {'language': 'en', 'value': 'foo'},
+            {'language': 'en', 'value': 'bar'}]})
+        self.assertIsInstance(ad, AliasesDict)
+        self.assertEqual(ad, AliasesDict(self.lang_out))
+
+    def test_toJSON(self):
+        """Test AliasesDict.toJSON method."""
+        ad = AliasesDict()
+        self.assertEqual(ad.toJSON(), {})
+        ad = AliasesDict(self.lang_out)
+        self.assertEqual(ad.toJSON(), {'en': [
+            {'language': 'en', 'value': 'foo'},
+            {'language': 'en', 'value': 'bar'},
+        ]})
+
+    def test_toJSON_diffto(self):
+        """Test AliasesDict.toJSON method."""
+        ad = AliasesDict(self.lang_out)
+        diffto = {
+            'de': [
+                {'language': 'de', 'value': 'foo'},
+                {'language': 'de', 'value': 'bar'},
+            ],
+            'en': [
+                {'language': 'en', 'value': 'foo'},
+                {'language': 'en', 'value': 'baz'},
+            ]}
+        self.assertEqual(
+            ad.toJSON(diffto=diffto),
+            {'de': [{'language': 'de', 'value': 'foo', 'remove': ''},
+                    {'language': 'de', 'value': 'bar', 'remove': ''}],
+             'en': [{'language': 'en', 'value': 'foo'},
+                    {'language': 'en', 'value': 'bar'}]})
+
+    def test_normalizeData(self):
+        """Test AliasesDict.normalizeData method."""
+        data_in = {'en': [
+            {'language': 'en', 'value': 'foo'},
+            'bar',
+            {'language': 'en', 'value': 'baz', 'remove': ''},
+        ]}
+        data_out = {'en': [
+            {'language': 'en', 'value': 'foo'},
+            {'language': 'en', 'value': 'bar'},
+            {'language': 'en', 'value': 'baz', 'remove': ''},
+        ]}
+        self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
 
 
 class TestWriteNormalizeData(TestCase):
 
     """Test cases for routines that normalize data for writing to Wikidata.
 
-    Exercises WikibasePage._normalizeData with data that is not normalized
+    Exercises ItemPage._normalizeData with data that is not normalized
     and data which is already normalized.
     """
 
@@ -1807,29 +1946,31 @@ class TestWriteNormalizeData(TestCase):
         """Setup tests."""
         super(TestWriteNormalizeData, self).setUp()
         self.data_out = {
+            'labels': {'en': {'language': 'en', 'value': 'Foo'}},
+            'descriptions': {'en': {'language': 'en', 'value': 'Desc'}},
             'aliases': {'en': [
                 {'language': 'en', 'value': 'Bah'},
                 {'language': 'en', 'value': 'Bar', 'remove': ''},
             ]},
-            'labels': {'en': {'language': 'en', 'value': 'Foo'}},
         }
 
     def test_normalize_data(self):
         """Test _normalizeData() method."""
         data_in = {
+            'labels': {'en': 'Foo'},
+            'descriptions': {'en': 'Desc'},
             'aliases': {'en': [
                 'Bah',
                 {'language': 'en', 'value': 'Bar', 'remove': ''},
             ]},
-            'labels': {'en': 'Foo'},
         }
 
-        response = WikibasePage._normalizeData(data_in)
+        response = ItemPage._normalizeData(data_in)
         self.assertEqual(response, self.data_out)
 
     def test_normalized_data(self):
         """Test _normalizeData() method for normalized data."""
-        response = WikibasePage._normalizeData(
+        response = ItemPage._normalizeData(
             copy.deepcopy(self.data_out))
         self.assertEqual(response, self.data_out)
 
