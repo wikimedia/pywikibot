@@ -18,6 +18,9 @@ from textwrap import fill
 
 from generate_family_file import _import_with_no_user_config
 
+if sys.version_info[0] == 2:
+    from future_builtins import filter
+
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {'USER INTERFACE SETTINGS',  # uses sys
                      'EXTERNAL EDITOR SETTINGS',  # uses os

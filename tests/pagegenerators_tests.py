@@ -23,7 +23,7 @@ from pywikibot.pagegenerators import (
     CategorizedPageGenerator
 )
 
-from pywikibot.tools import has_module, suppress_warnings
+from pywikibot.tools import has_module, PY2, suppress_warnings
 
 from tests import join_data_path, mock
 from tests.aspects import (
@@ -35,6 +35,9 @@ from tests.aspects import (
     RecentChangesTestCase,
 )
 from tests.thread_tests import GeneratorIntersectTestCase
+
+if PY2:
+    from future_builtins import zip
 
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests

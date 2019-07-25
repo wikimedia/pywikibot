@@ -38,8 +38,8 @@ from pywikibot.tools import (
 if not PY2:
     from html.parser import HTMLParser
 else:
+    from future_builtins import zip
     from HTMLParser import HTMLParser
-    from itertools import izip as zip
 
 try:
     import mwparserfromhell
