@@ -36,7 +36,7 @@ if not python_is_supported():
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient>=0.0.18,!=0.0.23,!=0.0.24'],
+    'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
@@ -51,7 +51,7 @@ extra_deps = {
         ';python_full_version=="2.7.7" or python_full_version=="2.7.8"',
         'pycparser!=2.14',
     ],
-    'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
+    'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
@@ -86,7 +86,7 @@ script_deps = {
         'Pillow;python_version>="3.5"',
     ],
     'states_redirect.py': ['pycountry'],
-    'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
+    'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
 script_deps['data_ingestion.py'] = extra_deps['csv']
