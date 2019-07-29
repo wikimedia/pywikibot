@@ -5911,7 +5911,8 @@ class APISite(BaseSite):
 
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
-                  autoblock=True, noemail=False, reblock=False):
+                  autoblock=True, noemail=False, reblock=False,
+                  allowusertalk=False):
         """
         Block a user for certain amount of time and for a certain reason.
 
@@ -5947,6 +5948,9 @@ class APISite(BaseSite):
         @param reblock: If the user is already blocked, overwrite the existing
             block.
         @type reblock: boolean
+        @param allowusertalk: Whether the user can edit their talk page while
+            blocked.
+        @type allowusertalk: boolean
         @return: The data retrieved from the API request.
         @rtype: dict
         """
@@ -5957,7 +5961,8 @@ class APISite(BaseSite):
                                    expiry=expiry, reason=reason, token=token,
                                    anononly=anononly, nocreate=nocreate,
                                    autoblock=autoblock, noemail=noemail,
-                                   reblock=reblock)
+                                   reblock=reblock,
+                                   allowusertalk=allowusertalk)
 
         data = req.submit()
         return data
