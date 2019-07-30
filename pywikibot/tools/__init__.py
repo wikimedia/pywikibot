@@ -1594,6 +1594,9 @@ def deprecated(*args, **kwargs):
     @kwarg since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
     @type since: str
+    @kwarg future_warning: if True a FutureWarning will be thrown,
+        otherwise it defaults to DeprecationWarning
+    @type future_warning: bool
     """
     def decorator(obj):
         """Outer wrapper.
@@ -1613,7 +1616,9 @@ def deprecated(*args, **kwargs):
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
-            issue_deprecation_warning(name, instead, depth, since=since)
+            issue_deprecation_warning(
+                name, instead, depth, since=since,
+                warning_class=FutureWarning if future_warning else None)
             return obj(*args, **kwargs)
 
         def add_docstring(wrapper):
@@ -1654,6 +1659,7 @@ def deprecated(*args, **kwargs):
         return wrapper
 
     since = kwargs.pop('since', None)
+    future_warning = kwargs.pop('future_warning', False)
     without_parameters = (len(args) == 1 and len(kwargs) == 0
                           and callable(args[0]))
     if 'instead' in kwargs:
@@ -1827,7 +1833,8 @@ def remove_last_args(arg_names):
 
 
 def redirect_func(target, source_module=None, target_module=None,
-                  old_name=None, class_name=None, since=None):
+                  old_name=None, class_name=None, since=None,
+                  future_warning=False):
     """
     Return a function which can be used to redirect to 'target'.
 
@@ -1853,11 +1860,16 @@ def redirect_func(target, source_module=None, target_module=None,
     @param since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
     @type since: str
+    @param future_warning: if True a FutureWarning will be thrown,
+        otherwise it defaults to DeprecationWarning
+    @type future_warning: bool
     @return: A new function which adds a warning prior to each execution.
     @rtype: callable
     """
     def call(*a, **kw):
-        issue_deprecation_warning(old_name, new_name, since=since)
+        issue_deprecation_warning(
+            old_name, new_name, since=since,
+            warning_class=FutureWarning if future_warning else None)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
@@ -1906,7 +1918,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
     def _add_deprecated_attr(self, name, replacement=None,
                              replacement_name=None, warning_message=None,
-                             since=None):
+                             since=None, future_warning=False):
         """
         Add the name to the local deprecated names dict.
 
@@ -1928,6 +1940,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param since: a timestamp string of the date when the method was
             deprecated (form 'YYYYMMDD') or a version string.
         @type since: str
+        @param future_warning: if True a FutureWarning will be thrown,
+            otherwise it defaults to DeprecationWarning
+        @type future_warning: bool
         """
         if '.' in name:
             raise ValueError('Deprecated name "{0}" may not contain '
@@ -1956,7 +1971,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
         if hasattr(self, name):
             # __getattr__ will only be invoked if self.<name> does not exist.
             delattr(self, name)
-        self._deprecated[name] = replacement_name, replacement, warning_message
+        self._deprecated[name] = (
+            replacement_name, replacement, warning_message, future_warning)
 
     def __setattr__(self, attr, value):
         """Set the value of the wrapped module."""
@@ -1966,23 +1982,20 @@ class ModuleDeprecationWrapper(types.ModuleType):
     def __getattr__(self, attr):
         """Return the attribute with a deprecation warning if required."""
         if attr in self._deprecated:
-            warning_message = self._deprecated[attr][2]
-            warn(warning_message.format(self._module.__name__, attr,
-                                        self._deprecated[attr][0]),
-                 DeprecationWarning, 2)
-            if self._deprecated[attr][1]:
-                return self._deprecated[attr][1]
-            elif '.' in self._deprecated[attr][0]:
+            name, repl, message, future = self._deprecated[attr]
+            warning_message = message
+            warn(warning_message.format(self._module.__name__, attr, name),
+                 FutureWarning if future else DeprecationWarning, 2)
+            if repl:
+                return repl
+            elif '.' in name:
                 try:
-                    package_name = self._deprecated[attr][0].split('.', 1)[0]
+                    package_name = name.split('.', 1)[0]
                     module = import_module(package_name)
                     context = {package_name: module}
-                    replacement = eval(self._deprecated[attr][0], context)
+                    replacement = eval(name, context)
                     self._deprecated[attr] = (
-                        self._deprecated[attr][0],
-                        replacement,
-                        self._deprecated[attr][2]
-                    )
+                        name, replacement, message, future)
                     return replacement
                 except Exception:
                     pass
