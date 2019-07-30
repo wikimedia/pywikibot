@@ -23,7 +23,7 @@ else:
     from urllib import urlencode
 
 
-@deprecated('memento_client package', since='20150811')
+@deprecated('memento_client package', since='20150811', future_warning=True)
 def getInternetArchiveURL(url, timestamp=None):
     """Return archived URL by Internet Archive.
 
@@ -63,7 +63,7 @@ def getInternetArchiveURL(url, timestamp=None):
         return None
 
 
-@deprecated('memento_client package', since='20150811')
+@deprecated('memento_client package', since='20150811', future_warning=True)
 def getWebCitationURL(url, timestamp=None):
     """Return archived URL by Web Citation.
 
