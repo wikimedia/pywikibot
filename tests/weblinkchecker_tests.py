@@ -14,7 +14,6 @@ from requests import ConnectionError as RequestsConnectionError
 from pywikibot.tools import PY2
 from scripts import weblinkchecker
 from tests.aspects import unittest, require_modules, TestCase
-from tests import weblib_tests
 
 if not PY2:
     from urllib.parse import urlparse
@@ -40,24 +39,6 @@ class MementoTestCase(TestCase):
                 url, when, self.timegate_uri)
         except (RequestsConnectionError, MementoClientException) as e:
             self.skipTest(e)
-
-
-class WeblibTestMementoInternetArchive(MementoTestCase,
-                                       weblib_tests.TestInternetArchive):
-
-    """Test InternetArchive Memento using old weblib tests."""
-
-    timegate_uri = 'http://web.archive.org/web/'
-    hostname = timegate_uri
-
-
-class WeblibTestMementoWebCite(MementoTestCase, weblib_tests.TestWebCite):
-
-    """Test WebCite Memento using old weblib tests."""
-
-    timegate_uri = 'http://timetravel.mementoweb.org/webcite/timegate/'
-    hostname = ('http://timetravel.mementoweb.org/webcite/'
-                'timemap/json/http://google.com')
 
 
 class TestMementoWebCite(MementoTestCase):

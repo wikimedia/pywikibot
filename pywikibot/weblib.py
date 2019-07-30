@@ -15,15 +15,18 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from pywikibot.comms import http
 from pywikibot import config2
-from pywikibot.tools import deprecated, PY2
+from pywikibot.tools import issue_deprecation_warning, PY2
 
 if not PY2:
     from urllib.parse import urlencode
 else:
     from urllib import urlencode
 
+issue_deprecation_warning(
+    'weblib', 'memento_client package', since='20150811',
+    warning_class=FutureWarning)
 
-@deprecated('memento_client package', since='20150811', future_warning=True)
+
 def getInternetArchiveURL(url, timestamp=None):
     """Return archived URL by Internet Archive.
 
@@ -63,7 +66,6 @@ def getInternetArchiveURL(url, timestamp=None):
         return None
 
 
-@deprecated('memento_client package', since='20150811', future_warning=True)
 def getWebCitationURL(url, timestamp=None):
     """Return archived URL by Web Citation.
 

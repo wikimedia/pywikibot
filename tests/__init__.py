@@ -113,7 +113,6 @@ library_test_modules = [
     'pagegenerators',
     'cosmetic_changes',
     'wikistats',
-    'weblib',
     'i18n',
     'tk',
     'wikibase',
