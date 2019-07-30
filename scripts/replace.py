@@ -169,7 +169,6 @@ from pywikibot.tools.formatter import color_format
 
 if not PY2:
     from queue import Queue
-    long = int
 else:
     from Queue import Queue
 
