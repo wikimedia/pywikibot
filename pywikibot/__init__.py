@@ -74,7 +74,6 @@ from pywikibot.tools.formatter import color_format
 
 if not PY2:
     from queue import Queue
-    long = int
 else:
     from Queue import Queue
 
@@ -507,7 +506,7 @@ class WbTime(_WbRepresentation):
           to minutes.
 
         @param year: The year as a signed integer of between 1 and 16 digits.
-        @type year: long
+        @type year: int
         @param month: Month
         @type month: int
         @param day: Day
@@ -551,7 +550,7 @@ class WbTime(_WbRepresentation):
         if month is None:
             self.precision = self.PRECISION['year']
             month = 1
-        self.year = long(year)
+        self.year = year
         self.month = month
         self.day = day
         self.hour = hour
@@ -614,7 +613,7 @@ class WbTime(_WbRepresentation):
         if not match:
             raise ValueError("Invalid format: '%s'" % datetimestr)
         t = match.groups()
-        return cls(long(t[0]), int(t[1]), int(t[2]),
+        return cls(int(t[0]), int(t[1]), int(t[2]),
                    int(t[3]), int(t[4]), int(t[5]),
                    precision, before, after, timezone, calendarmodel, site)
 

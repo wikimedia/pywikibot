@@ -53,7 +53,6 @@ from pywikibot.tools import (
 from pywikibot.tools.ip import is_IP, ip_regexp
 
 if not PY2:
-    long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 else:
@@ -783,7 +782,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         If the page has only one revision, it shall return -1.
 
-        @rtype: long
+        @rtype: int
 
         @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
@@ -797,7 +796,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         DEPRECATED: Use latest_revision.parent_id instead.
 
-        @rtype: long
+        @rtype: int
 
         @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
@@ -3333,11 +3332,11 @@ class User(Page):
         @param force: if True, forces reloading the data from API
         @type force: bool
 
-        @return: long (MediaWiki's internal timestamp format) or 0
-        @rtype: int or long
+        @return: int (MediaWiki's internal timestamp format) or 0
+        @rtype: int
         """
         if self.registration():
-            return long(self.registration().strftime('%Y%m%d%H%M%S'))
+            return int(self.registration().strftime('%Y%m%d%H%M%S'))
         else:
             return 0
 
@@ -3365,7 +3364,7 @@ class User(Page):
         @param force: if True, forces reloading the data from API
         @type force: bool
 
-        @rtype: int or long
+        @rtype: int
         """
         return self.getprops(force).get('editcount', 0)
 
@@ -4135,7 +4134,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         """
         Get the revision identifier for the most recent revision of the entity.
 
-        @rtype: long
+        @rtype: int
         """
         if not hasattr(self, '_revid'):
             self.get()
@@ -5576,7 +5575,7 @@ class Revision(DotReadableDict):
         @param rollbacktoken: rollback token
         @type rollbacktoken: str
         @param parentid: id of parent Revision (v1.16+)
-        @type parentid: long
+        @type parentid: int
         @param contentmodel: content model label (v1.21+)
         @type contentmodel: str
         @param sha1: sha1 of revision text (v1.19+)
@@ -5602,7 +5601,7 @@ class Revision(DotReadableDict):
         Returns 0 if there is no previous revision
 
         @return: id of parent/previous revision
-        @rtype: int or long
+        @rtype: int
         @raises AssertionError: parent id not supplied to the constructor
         """
         assert self._parent_id is not None, (
