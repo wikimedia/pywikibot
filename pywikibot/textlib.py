@@ -267,7 +267,7 @@ def _create_default_regexes():
         # section headers
         'header': re.compile(
             r'(?:(?<=\n)|\A)(?:<!--[\s\S]*?-->)*'
-            r'=(?:.|<!--[\s\S]*?-->)+='
+            r'=(?:[^\n]|<!--[\s\S]*?-->)+='
             r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
