@@ -126,6 +126,7 @@ class ProofreadPage(pywikibot.Page):
     close_tag = '</noinclude>'
     p_open = re.compile(r'<noinclude>')
     p_close = re.compile(r'(</div>|\n\n\n)?</noinclude>')
+    p_close_no_div = re.compile('</noinclude>')  # V2 page format.
 
     # phetools ocr utility
     _HOCR_CMD = ('https://tools.wmflabs.org/phetools/hocr_cgi.py?'
@@ -461,23 +462,31 @@ class ProofreadPage(pywikibot.Page):
         @raise Error: the page is not formatted according to ProofreadPage
             extension.
         """
+        def _assert_len(len_oq, len_cq, title):
+            if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
+                raise pywikibot.Error('ProofreadPage %s: invalid format'
+                                      % title)
+
         # Property force page text loading.
         if not (hasattr(self, '_text') or self.text):
             self._create_empty_page()
             return
 
+        _title = self.title(as_link=True)
+
         open_queue = list(self.p_open.finditer(self._text))
         close_queue = list(self.p_close.finditer(self._text))
-
-        len_oq = len(open_queue)
-        len_cq = len(close_queue)
-        if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
-            raise pywikibot.Error('ProofreadPage %s: invalid format'
-                                  % self.title(as_link=True))
+        _assert_len(len(open_queue), len(close_queue), _title)
 
         f_open, f_close = open_queue[0], close_queue[0]
         self._full_header = FullHeader(
             self._text[f_open.end():f_close.start()])
+
+        # check version of page format and in case recompute last match,
+        # in order not to include </div>.
+        if not self._full_header._has_div:
+            close_queue = list(self.p_close_no_div.finditer(self._text))
+            _assert_len(len(open_queue), len(close_queue), _title)
 
         l_open, l_close = open_queue[-1], close_queue[-1]
         self._footer = self._text[l_open.end():l_close.start()]
