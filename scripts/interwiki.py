@@ -1355,8 +1355,8 @@ class Subject(interwiki_graph.Subject):
                     # Ignore the interwiki links.
                     iw = ()
                 if self.conf.lacklanguage:
-                    if self.conf.lacklanguage in [link.site.lang
-                                                  for link in iw]:
+                    if self.conf.lacklanguage in (link.site.lang
+                                                  for link in iw):
                         iw = ()
                         self.workonme = False
                 if len(iw) < self.conf.minlinks:

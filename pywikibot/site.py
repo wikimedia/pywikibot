@@ -255,7 +255,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
         @rtype: bool
         """
-        return name in [x.lower() for x in self._distinct()]
+        return name in (x.lower() for x in self._distinct())
 
     def __contains__(self, item):
         """Determine if item is a name of this namespace.
@@ -4382,7 +4382,7 @@ class APISite(BaseSite):
 
     def isBot(self, username):
         """Return True is username is a bot user."""
-        return username in [userdata['name'] for userdata in self.botusers()]
+        return username in (userdata['name'] for userdata in self.botusers())
 
     @deprecated_args(step=None)
     def botusers(self, total=None):
