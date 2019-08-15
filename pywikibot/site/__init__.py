@@ -5421,9 +5421,7 @@ class APISite(BaseSite):
                         captcha = result['edit']['captcha']
                         req['captchaid'] = captcha['id']
 
-                        if captcha['type'] == 'math':
-                            # TODO: Should the input be parsed through eval
-                            # in py3?
+                        if captcha['type'] in ['math', 'simple']:
                             req['captchaword'] = input(captcha['question'])
                             continue
 
