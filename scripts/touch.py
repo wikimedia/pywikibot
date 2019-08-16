@@ -100,7 +100,6 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    gen = None
     options = {}
 
     # Process global args and prepare generator args parser

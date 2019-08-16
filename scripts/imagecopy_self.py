@@ -431,9 +431,6 @@ class imageFetcher(threading.Thread):
         #        "strange" fields
 
         description = ''
-        source = ''
-        date = ''
-        author = ''
         permission = ''
         other_versions = ''
         contents = {}

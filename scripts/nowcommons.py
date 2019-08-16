@@ -229,7 +229,6 @@ class NowCommonsDeleteBot(Bot):
 
     def findFilenameOnCommons(self, localImagePage):
         """Find filename on Commons."""
-        filenameOnCommons = None
         for templateName, params in localImagePage.templatesWithParams():
             if templateName in self.nc_templates:
                 if params == []:

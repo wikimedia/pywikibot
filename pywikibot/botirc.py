@@ -104,7 +104,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         entry = self.api_found.findall(text)
         page = pywikibot.Page(self.site, name)
         try:
-            text = page.get()
+            page.get()
         except pywikibot.NoPage:
             return
         except pywikibot.IsRedirectPage:

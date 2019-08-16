@@ -1176,7 +1176,6 @@ class Subject(interwiki_graph.Subject):
             # Only once!
             self.hintsAsked = True
             if self.conf.untranslated:
-                newhint = None
                 t = self.conf.showtextlink
                 if t:
                     pywikibot.output(self.originPage.get()[:t])

@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -422,7 +422,6 @@ class UploadRobot(BaseBot):
 
         pywikibot.output('Uploading file to {0}...'.format(site))
 
-        success = False
         ignore_warnings = self.ignoreWarning is True or self._handle_warnings
         if ('://' in file_url
                 and 'upload_by_url' not in site.userinfo['rights']):
@@ -441,10 +440,8 @@ class UploadRobot(BaseBot):
                     % site)
             else:
                 pywikibot.error('Upload error: ', exc_info=True)
-            return None
         except Exception:
             pywikibot.error('Upload error: ', exc_info=True)
-            return None
         else:
             if success:
                 # No warning, upload complete.
@@ -453,7 +450,7 @@ class UploadRobot(BaseBot):
                 return filename  # data['filename']
             else:
                 pywikibot.output('Upload aborted.')
-                return None
+        return None
 
     def run(self):
         """Run bot."""

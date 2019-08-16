@@ -540,7 +540,6 @@ class ReferencesRobot(Bot):
                     continue
 
                 ref = RefLink(link, match.group('name'), site=self.site)
-                f = None
 
                 try:
                     f = comms.http.fetch(

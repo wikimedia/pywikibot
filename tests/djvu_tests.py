@@ -41,7 +41,7 @@ class TestDjVuFile(TestCase):
             dp = subprocess.Popen(['djvudump'],
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
-            stdoutdata, stderrdata = dp.communicate()
+            dp.communicate()
         except OSError:
             raise unittest.SkipTest('djvulibre library not installed.')
 

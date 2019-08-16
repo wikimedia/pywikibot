@@ -287,7 +287,7 @@ def getUsage(use):
     result = []
     lang = ''
     project = ''
-    article = ''
+    articles = ''
     usageRe = re.compile(
         r'^(?P<lang>([\w-]+))\.(?P<project>([\w]+))\.org:(?P<articles>\s(.*))')
     matches = usageRe.search(use)
@@ -454,7 +454,6 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    generator = None
     onlyFilter = False
     onlyUncat = False
 

@@ -29,7 +29,7 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -167,11 +167,9 @@ class ImageTransferBot(object):
             if sourceSite.family == self.targetSite.family:
                 description += '\n\n{0}'.format(sourceImagePage)
         except pywikibot.NoPage:
-            description = ''
             pywikibot.output(
                 'Image does not exist or description page is empty.')
         except pywikibot.IsRedirectPage:
-            description = ''
             pywikibot.output('Image description page is redirect.')
         else:
             bot = UploadRobot(url=url, description=description,
@@ -291,8 +289,6 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    gen = None
-
     interwiki = False
     keep_name = False
     targetLang = None
