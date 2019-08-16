@@ -240,7 +240,7 @@ class TestDiscussionPageObject(TestCase):
     """Test DiscussionPage object."""
 
     cached = True
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def testTwoThreadsWithCommentedOutThread(self):
@@ -299,6 +299,67 @@ class TestDiscussionPageObject(TestCase):
         page = archivebot.DiscussionPage(page, archiver)
         page.load_page()
         self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+
+
+class TestPageArchiverObject(TestCase):
+
+    """Test PageArchiver object."""
+
+    cached = True
+    family = 'wikipedia'
+    code = 'test'
+
+    def testLoadConfigInTemplateNamespace(self):
+        """Test loading of config with TEMPLATE_PAGE in Template ns.
+
+        Talk:For-pywikibot-archivebot-01 must have:
+
+         {{Pywikibot_archivebot
+         |archive = Talk:Main_Page/archive
+         |algo = old(30d)
+         }}
+        """
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot-01')
+
+        # TEMPLATE_PAGE assumed in ns=10 if ns is not explicit.
+        tmpl_with_ns = pywikibot.Page(site, 'Template:Pywikibot_archivebot')
+        tmpl_without_ns = pywikibot.Page(site, 'Pywikibot_archivebot', ns=10)
+
+        try:
+            archivebot.PageArchiver(page, tmpl_with_ns, '')
+        except pywikibot.Error as e:
+            self.fail('PageArchiver() raised {}!'.format(e))
+
+        try:
+            archivebot.PageArchiver(page, tmpl_without_ns, '')
+        except pywikibot.Error as e:
+            self.fail('PageArchiver() raised {}!'.format(e))
+
+    def testLoadConfigInOtherNamespace(self):
+        """Test loading of config with TEMPLATE_PAGE not in Template ns.
+
+        Talk:For-pywikibot-archivebot must have:
+
+         {{User:MiszaBot/config
+         |archive = Talk:Main_Page/archive
+         |algo = old(30d)
+         }}
+        """
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot')
+
+        tmpl_with_ns = pywikibot.Page(site, 'User:MiszaBot/config', ns=10)
+        tmpl_without_ns = pywikibot.Page(site, 'MiszaBot/config', ns=10)
+
+        # TEMPLATE_PAGE assumed in ns=10 if ns is not explicit.
+        try:
+            archivebot.PageArchiver(page, tmpl_with_ns, '')
+        except pywikibot.Error as e:
+            self.fail('PageArchiver() raised {}!'.format(e))
+
+        with self.assertRaises(archivebot.MissingConfigError):
+            archivebot.PageArchiver(page, tmpl_without_ns, '')
 
 
 if __name__ == '__main__':  # pragma: no cover
