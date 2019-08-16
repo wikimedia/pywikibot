@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Add allowusertalk to the User.block() options (T229288)
+* botirc module will be removed in next release (T212632)
 * weblib module will be removed in next release (T85001)
 * Bugfixes and improvements
 * Localisation updates
