@@ -172,6 +172,10 @@ class TestProofreadPageValidSite(TestCase):
         'title1': 'User:Popular Science Monthly Volume 1.djvu/12'
     }
 
+    div_in_footer = {
+        'title': 'Page:Pywikibot unlinked test page',
+    }
+
     class_pagetext_fmt = {
         True: ('<div class="pagetext">\n\n\n', '</div>'),
         False: ('', ''),
@@ -231,6 +235,11 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(page.user, self.valid['user'])
         self.assertEqual(page.header, self.valid['header'])
         self.assertEqual(page.footer, self.valid['footer'])
+
+    def test_div_in_footer(self):
+        """Test ProofreadPage page parsing functions."""
+        page = ProofreadPage(self.site, self.div_in_footer['title'])
+        self.assertTrue(page.footer.endswith('</div>'))
 
     def test_decompose_recompose_text(self):
         """Test ProofreadPage page decomposing/composing text."""
