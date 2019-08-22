@@ -1303,7 +1303,6 @@ def must_be(group=None, right=None):
                   keyword argument 'as_group'.
     @type group: str ('user' or 'sysop')
     @param right: The rights the logged in user should have.
-                  Not supported yet and thus ignored.
 
     @return: method decorator
     """
@@ -1314,12 +1313,16 @@ def must_be(group=None, right=None):
                 raise UserRightsError('Site {} has been closed. Only steward '
                                       'can perform requested action.'
                                       .format(self.sitename))
+            if right is not None:
+                if right in self.userinfo['rights']:
+                    return
             if grp == 'user':
                 self.login(False)
             elif grp == 'sysop':
                 self.login(True)
             else:
                 raise Exception('Not implemented')
+
             return fn(self, *args, **kwargs)
 
         if not __debug__:
@@ -5638,7 +5641,7 @@ class APISite(BaseSite):
                         'Revision may not exist or was already undeleted.'
     }  # other errors shouldn't occur because of pre-submission checks
 
-    @must_be(group='sysop')
+    @must_be(group='sysop', right='delete')
     @deprecate_arg('summary', 'reason')
     def deletepage(self, page, reason):
         """Delete page from the wiki. Requires appropriate privilege level.
@@ -5676,7 +5679,7 @@ class APISite(BaseSite):
         finally:
             self.unlock_page(page)
 
-    @must_be(group='sysop')
+    @must_be(group='sysop', right='undelete')
     @deprecate_arg('summary', 'reason')
     def undelete_page(self, page, reason, revisions=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
@@ -5749,7 +5752,7 @@ class APISite(BaseSite):
         # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
 
-    @must_be(group='sysop')
+    @must_be(group='sysop', right='protect')
     @deprecate_arg('summary', 'reason')
     def protect(self, page, protections, reason, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
@@ -5907,7 +5910,7 @@ class APISite(BaseSite):
 
             yield result['patrol']
 
-    @must_be(group='sysop')
+    @must_be(group='sysop', right='block')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False,
                   allowusertalk=False):
@@ -5965,7 +5968,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
-    @must_be(group='sysop')
+    @must_be(group='sysop', right='block')
     def unblockuser(self, user, reason=None):
         """
         Remove the block for the user.
