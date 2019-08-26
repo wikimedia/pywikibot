@@ -6305,8 +6305,10 @@ class APISite(BaseSite):
                                       3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
-            ignore_warnings = lambda warnings: all(  # noqa: E731
-                w.code in ignored_warnings for w in warnings)
+
+            def ignore_warnings(warnings):
+                return all(w.code in ignored_warnings for w in warnings)
+
         ignore_all_warnings = not callable(ignore_warnings) and ignore_warnings
         if text is None:
             text = filepage.text
