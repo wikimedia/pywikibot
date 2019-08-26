@@ -2282,10 +2282,14 @@ def compareLanguages(old, new, insite, summary):
     if not summary and \
        len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
-        fmt = lambda d, site: UnicodeType(d[site])  # noqa: E731
+
+        def fmt(d, site):
+            return UnicodeType(d[site])
     else:
         # Use short format, just the language code
-        fmt = lambda d, site: site.code  # noqa: E731
+
+        def fmt(d, site):
+            return site.code
 
     mods = mcomment = ''
 
