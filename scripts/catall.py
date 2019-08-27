@@ -22,7 +22,7 @@ Options:
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels, 2004
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -60,7 +60,7 @@ q: quit.""")
         elif choice == '??':
             pywikibot.output(pagetext[0:length])
             length = length + 500
-        elif choice == 'xx' and chosen == []:
+        elif choice == 'xx' and not chosen:
             chosen = None
             done = True
         elif choice == 'q':
@@ -107,26 +107,27 @@ def main(*args):
     for p in mysite.allpages(start=start):
         try:
             text = p.get()
+        except pywikibot.IsRedirectPage:
+            pywikibot.output('{} is a redirect'.format(p.title()))
+        else:
+            pywikibot.output('========== {} =========='.format(p.title()))
             cats = p.categories()
+
             if not cats:
-                pywikibot.output('========== {} =========='.format(p.title()))
                 pywikibot.output('No categories')
                 pywikibot.output('-' * 40)
                 newcats = choosecats(text)
-                if newcats != [] and newcats is not None:
+                if newcats:
                     make_categories(p, newcats, mysite)
             elif docorrections:
-                pywikibot.output('========== {} =========='.format(p.title()))
                 for c in cats:
                     pywikibot.output(c.title())
                 pywikibot.output('-' * 40)
                 newcats = choosecats(text)
                 if newcats is None:
                     make_categories(p, [], mysite)
-                elif newcats != []:
+                elif newcats:
                     make_categories(p, newcats, mysite)
-        except pywikibot.IsRedirectPage:
-            pywikibot.output('{} is a redirect'.format(p.title()))
 
 
 if __name__ == '__main__':
