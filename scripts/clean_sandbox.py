@@ -43,7 +43,8 @@ import time
 
 import pywikibot
 
-from pywikibot import i18n, Bot, pagegenerators
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import Bot, ConfigParserBot
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
@@ -131,23 +132,23 @@ docuReplacements = {
 }
 
 
-class SandboxBot(Bot):
+class SandboxBot(Bot, ConfigParserBot):
 
     """Sandbox reset bot."""
 
     availableOptions = {
-        'hours': 1,
+        'hours': 1.0,
         'no_repeat': True,
-        'delay': None,
-        'delay_td': None,
+        'delay': -1,
         'text': '',
         'summary': '',
+        'delay_td': None,  # not a real option but __init__ sets it
     }
 
     def __init__(self, **kwargs):
         """Initializer."""
         super(SandboxBot, self).__init__(**kwargs)
-        if self.getOption('delay') is None:
+        if self.getOption('delay') < 0:
             d = min(15, max(5, int(self.getOption('hours') * 60)))
             self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
         else:
