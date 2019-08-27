@@ -123,7 +123,7 @@ soft404 = re.compile(
     re.IGNORECASE)
 # matches an URL at the index of a website
 dirIndex = re.compile(
-    r'^\w+://[^/]+/((default|index)\.'
+    r'\w+://[^/]+/((default|index)\.'
     r'(asp|aspx|cgi|htm|html|phtml|mpx|mspx|php|shtml|var))?$',
     re.IGNORECASE)
 # Extracts the domain name

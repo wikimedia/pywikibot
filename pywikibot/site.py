@@ -1398,7 +1398,7 @@ class Siteinfo(Container):
     All values of the siteinfo property 'general' are directly available.
     """
 
-    WARNING_REGEX = re.compile(r'^Unrecognized values? for parameter '
+    WARNING_REGEX = re.compile(r'Unrecognized values? for parameter '
                                r'["\']siprop["\']: (.+?)\.?$')
 
     # Until we get formatversion=2, we have to convert empty-string properties
@@ -2942,7 +2942,7 @@ class APISite(BaseSite):
         try:
             versionstring = self.siteinfo.get('generator',
                                               expiry=0 if force else 1)
-            m = re.match(r'^MediaWiki ([0-9]+)\.([0-9]+)(.*)$', versionstring)
+            m = re.match(r'MediaWiki ([0-9]+)\.([0-9]+)(.*)$', versionstring)
             if m:
                 return (int(m.group(1)), int(m.group(2)), m.group(3))
         # May occur if you are not logged in (no API read permissions).

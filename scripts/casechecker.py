@@ -53,7 +53,7 @@ class CaseChecker(object):
     # all letters that may be used as suffixes after roman numbers: "Iый"
     romannumSuffixes = localLowerLtr
     romanNumSfxPtrn = re.compile(
-        '^[' + romanNumChars + ']+[' + localLowerLtr + ']+$')
+        '[{}]+[{}]+$'.format(romanNumChars, localLowerLtr))
 
     whitelists = {
         'ru': 'ВП:КЛ/Проверенные',
