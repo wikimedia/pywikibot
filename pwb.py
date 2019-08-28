@@ -4,10 +4,15 @@
 
 Run scripts using:
 
-    python pwb.py <name_of_script> <options>
+    python pwb.py <pwb options> <name_of_script> <options>
 
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
+
+Currently <pwb options> are global options. This can be used for tests
+to set the default site like (see T216825):
+
+    python pwb.py -lang:de bot_tests -v
 """
 # (C) Pywikibot team, 2012-2019
 #
@@ -115,6 +120,25 @@ def abspath(path):
     return path
 
 
+def handle_args(pwb_py, *args):
+    """Handle args and get filename.
+
+    @return: filename, script args, local args for pwb.py
+    @rtype: tuple
+    """
+    fname = None
+    index = 0
+    for arg in args:
+        if arg.startswith('-'):
+            index += 1
+        else:
+            fname = arg
+            if not fname.endswith('.py'):
+                fname += '.py'
+            break
+    return fname, list(args[index + int(bool(fname)):]), args[:index]
+
+
 # Establish a normalised path for the directory containing pwb.py.
 # Either it is '.' if the user's current working directory is the same,
 # or it is the absolute path for the directory of pwb.py
@@ -132,15 +156,7 @@ except ImportError as e:
                       "Try running 'pip install requests'.".format(e))
 del requests
 
-if len(sys.argv) > 1 and sys.argv[1][0] != '-':
-    filename = sys.argv[1]
-    if not filename.endswith('.py'):
-        filename += '.py'
-else:
-    filename = None
-
-# Skip the filename if one was given
-args = sys.argv[(2 if filename else 1):]
+filename, args, local_args = handle_args(*sys.argv)
 
 # Search for user-config.py before creating one.
 # If successful, user-config.py already exists in one of the candidate
@@ -255,6 +271,14 @@ def main():
     global filename
     if not filename:
         return False
+
+    if local_args:  # don't use sys.argv
+        pwb_args = pwb.handle_args(local_args)
+        if pwb_args:
+            print('ERROR: unknown pwb.py argument{}: {}\n'
+                  .format('' if len(pwb_args) == 1 else 's',
+                          ', '.join(pwb_args)))
+            return False
 
     file_package = None
     argvu = pwb.argvu[1:]
