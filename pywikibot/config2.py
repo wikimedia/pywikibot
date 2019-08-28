@@ -40,6 +40,7 @@ build paths relative to base_dir:
 from __future__ import absolute_import, division, unicode_literals
 
 import collections
+import copy
 import os
 import platform
 import re
@@ -111,7 +112,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {'use_SSL_onlogin', 'use_SSL_always',
                          'available_ssl_project', 'fake_user_agent',
-                         'special_page_limit'}
+                         'special_page_limit', 'sysopnames'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -1033,19 +1034,9 @@ _public_globals = {
     if _key[0] != '_' and _key not in _imports}
 
 # Create an environment for user-config.py which is
-# a shallow copy of the core config settings, so that
+# a deep copy of the core config settings, so that
 # we can detect modified config items easily.
-_exec_globals = {}
-for _key, _val in _public_globals.items():
-    if isinstance(_val, dict):
-        if isinstance(_val, collections.defaultdict):
-            _exec_globals[_key] = collections.defaultdict(dict)
-        else:
-            _exec_globals[_key] = {}
-        if len(_val) > 0:
-            _exec_globals[_key].update(_val)
-    else:
-        _exec_globals[_key] = _val
+_exec_globals = copy.deepcopy(_public_globals)
 
 # Get the user files
 if __no_user_config:
@@ -1126,8 +1117,7 @@ _check_user_config_types(_exec_globals, _public_globals, _imports)
 
 # Copy the user config settings into globals
 _modified = {_key for _key in _public_globals.keys()
-             if _exec_globals[_key] != globals()[_key]
-             or _key in {'usernames', 'sysopnames', 'disambiguation_comment'}}
+             if _exec_globals[_key] != globals()[_key]}
 
 if 'user_agent_format' in _modified:
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
