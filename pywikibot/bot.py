@@ -19,6 +19,12 @@ conjunction. Each bot should subclass at least one of these four classes:
   set the C{site} property and it's deprecated to request it. Instead site of
   the current page should be used. And out of C{run} that sit isn't defined.
 
+* L{ConfigParserBot}: Bot class which supports reading options from a
+  scripts.ini configuration file. That file consists of sections, led by a
+  C{[section]} header and followed by C{option: value} or C{option=value}
+  entries. The section is the script name without .py suffix. All options
+  identified must be predefined in availableOptions dictionary.
+
 * L{Bot}: The previous base class which should be avoided. This class is mainly
   used for bots which work with wikibase or together with an image repository.
 
