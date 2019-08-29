@@ -148,12 +148,6 @@ class TestCaseBase(unittest.TestCase):
         sys.stdout.flush()
         result.addSuccess(self)
 
-    def _addExpectedFailure(self, result, exc_info=None):
-        """Report and ignore."""
-        unittest_print(' expected failure ', end='')
-        sys.stdout.flush()
-        result.addSuccess(self)
-
     def assertMethod(self, method, *args):
         """Generic method assertion."""
         if not method(*args):
