@@ -1756,7 +1756,11 @@ class ConfigParserBot(BaseBot):
 
     def setOptions(self, **kwargs):
         """Read settings from scripts.ini file."""
-        conf = configparser.ConfigParser()
+        if PY2:
+            conf = configparser.ConfigParser()
+        else:
+            conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
+
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
