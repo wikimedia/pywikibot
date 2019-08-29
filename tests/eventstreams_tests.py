@@ -7,9 +7,11 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+import json
+
 from tests import mock
 
-from pywikibot.comms.eventstreams import EventStreams
+from pywikibot.comms.eventstreams import EventStreams, EventSource
 from pywikibot import config
 from pywikibot.family import WikimediaFamily
 
@@ -256,6 +258,53 @@ class TestEventStreamsFilterTests(TestCase):
                     else:
                         result = False
                     self._test_filter(none_type, all_type, any_type, result)
+
+
+class EventStreamsTestClass(EventStreams):
+
+    """Test class of EventStreams."""
+
+    def __iter__(self):
+        """Iterator."""
+        n = 0
+        while self._total is None or n < self._total:
+            if not hasattr(self, 'source'):
+                self.source = EventSource(**self.sse_kwargs)
+            event = next(self.source)
+            if event.event == 'message':
+                if not event.data:
+                    continue
+                n += 1
+                try:
+                    element = json.loads(event.data)
+                except ValueError as e:
+                    self.source.resp.close()  # close SSLSocket
+                    del self.source
+                    raise ValueError(
+                        '{error}\n\nEvent no {number}: '
+                        'Could not load json data from source\n${event}$'
+                        .format(number=n, event=event, error=e))
+                yield element
+        del self.source
+
+
+class TestEventSource(TestCase):
+
+    """Test sseclient.EventSource."""
+
+    net = True
+
+    def test_stream(self):
+        """Verify that the EventSource delivers events without problems.
+
+        As found in sseclient 0.0.24 the EventSource gives randomly a
+        ValueError 'Unterminated string' when json.load is processed
+        if the limit is high enough.
+        """
+        limit = 50
+        self.es = EventStreamsTestClass(streams='recentchange')
+        self.es.set_maximum_items(limit)
+        self.assertLength(list(self.es), limit)
 
 
 if __name__ == '__main__':  # pragma: no cover
