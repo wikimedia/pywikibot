@@ -7,7 +7,7 @@ function/method instead.
 
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,3 +43,6 @@ def GetData(request, site=None, back_response=False):
         res_dummy.__dict__.update({'code': 0, 'msg': ''})
         return res_dummy, result
     return result
+
+
+__all__ = (GetData, )
