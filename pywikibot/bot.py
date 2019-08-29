@@ -1776,12 +1776,16 @@ class ConfigParserBot(BaseBot):
                 if not conf.has_option(section, option):
                     continue
                 # use a convenience parser method, default to get()
-                method = getattr(conf, 'get' + type(value).__name__,
-                                 getattr(conf, 'get'))
+                default = getattr(conf, 'get')
+                value_type = type(value).__name__
+                if value_type == 'bool':
+                    method = getattr(conf, 'getboolean')
+                else:
+                    method = getattr(conf, 'get' + value_type, default)
                 args[option] = method(section, option)
             for opt in set(conf.options(section)) - set(args):
                 pywikibot.warning(
-                    opt + ' is not a valid option. It was ignored.')
+                    '"{}" is not a valid option. It was ignored.'.format(opt))
             args.update(kwargs)
         else:
             args = kwargs
