@@ -207,6 +207,16 @@ class TestEventStreamsFilterTests(TestCase):
         self.es.register_filter(foo=10)
         self.assertFalse(self.es.streamfilter(self.data))
 
+    def test_filter_sequence_false(self):
+        """Test EventStreams filter with assignment of a sequence."""
+        self.es.register_filter(bar=list('baz'))
+        self.assertFalse(self.es.streamfilter(self.data))
+
+    def test_filter_sequence_true(self):
+        """Test EventStreams filter with assignment of a sequence."""
+        self.es.register_filter(bar=('foo', 'bar', 'baz'))
+        self.assertTrue(self.es.streamfilter(self.data))
+
     def test_filter_multiple(self):
         """Test EventStreams filter with multiple arguments."""
         self.es.register_filter(foo=False, bar='baz')
