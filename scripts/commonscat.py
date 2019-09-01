@@ -51,7 +51,7 @@ import re
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import SingleSiteBot, ExistingPageBot, NoRedirectPageBot
 
 from scripts.add_text import add_text
 
@@ -214,7 +214,7 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(SingleSiteBot):
+class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """Commons categorisation bot."""
 
@@ -225,22 +225,23 @@ class CommonscatBot(SingleSiteBot):
         })
         super(CommonscatBot, self).__init__(**kwargs)
 
-    def treat(self, page):
+    def skip_page(self, page):
+        """Skip category redirects or disambigs."""
+        if page.isCategoryRedirect():
+            pywikibot.warning(
+                'Page {page} on {page.site} is a category redirect. '
+                'Skipping.'.format(page=page))
+            return True
+        if page.isDisambig():
+            pywikibot.warning(
+                'Page {page} on {page.site} is a disambiguation. '
+                'Skipping.'.format(page=page))
+            return True
+        return super(CommonscatBot, self).skip_page(page)
+
+    def treat_page(self):
         """Load the given page, do some changes, and save it."""
-        if not page.exists():
-            pywikibot.output('Page {} does not exist. Skipping.'
-                             .format(page.title(as_link=True)))
-        elif page.isRedirectPage():
-            pywikibot.output('Page {} is a redirect. Skipping.'
-                             .format(page.title(as_link=True)))
-        elif page.isCategoryRedirect():
-            pywikibot.output('Page {} is a category redirect. Skipping.'
-                             .format(page.title(as_link=True)))
-        elif page.isDisambig():
-            pywikibot.output('Page {} is a disambiguation. Skipping.'
-                             .format(page.title(as_link=True)))
-        else:
-            self.addCommonscat(page)
+        self.addCommonscat(self.current_page)
 
     def skipPage(self, page):
         """Determine if the page should be skipped."""
@@ -268,7 +269,6 @@ class CommonscatBot(SingleSiteBot):
         category is found add it to the page.
 
         """
-        self.current_page = page
         # Get the right templates for this page
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             page.site.code, commonscatTemplates,
