@@ -63,4 +63,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                      ['en']
                      ),
         'es': ('/uso', '/doc'),
+        'sr': ('/док', ),
     }
