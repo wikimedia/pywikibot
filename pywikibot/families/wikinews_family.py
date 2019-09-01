@@ -35,6 +35,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'no': ('Kategoriomdirigering',),
         'ro': ('Redirect categorie',),
         'ru': ('Category redirect',),
+        'sr': ('Category redirect',),
         'tr': ('Kategori yönlendirme',),
         'zh': ('分类重定向',),
     }
@@ -55,4 +56,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                      ['en', ]
                      ),
         'it': ('/man', ),
+        'sr': ('/док', ),
     }
