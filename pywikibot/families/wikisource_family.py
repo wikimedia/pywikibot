@@ -136,6 +136,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'no': ('/dok', ),
         'ru': ('/Документация', ),
         'sl': ('/dok', ),
+        'sr': ('/док', ),
         'sv': ('/dok', ),
         'uk': ('/документація', ),
     }
