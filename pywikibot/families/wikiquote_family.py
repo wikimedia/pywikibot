@@ -66,6 +66,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'sr': ('/док', ),
     }
 
     def code2encodings(self, code):
