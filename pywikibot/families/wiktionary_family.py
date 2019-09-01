@@ -130,4 +130,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'sr': ('/док', ),
     }
