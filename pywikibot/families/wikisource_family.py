@@ -99,6 +99,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'pl': [104],
         'pt': [102],
         'ro': [102],
+        'sr': [100],
         'sv': [106],
         'tr': [100],
         'vi': [102],
