@@ -1541,7 +1541,7 @@ def main(*args):
                     'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        if arg.startswith(('-sleep', '-time')):
+        elif arg.startswith(('-sleep', '-time')):
             if arg.startswith('-sleep'):
                 length = len('-sleep')
             else:
