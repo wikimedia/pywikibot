@@ -41,12 +41,15 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
-from pywikibot import pagegenerators, Bot
+from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
+from pywikibot import pagegenerators
 
 
-class CreateCategoriesBot(Bot):
+class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
 
     """Category creator bot."""
+
+    summary_key = 'create_categories-create'
 
     def __init__(self, generator, parent, basename, overwrite, **kwargs):
         """Initializer."""
@@ -55,7 +58,6 @@ class CreateCategoriesBot(Bot):
         self.parent = parent
         self.basename = basename
         self.overwrite = overwrite
-        self.comment = 'Creating new category'
 
     def treat(self, page):
         """Create category in commons for that page."""
@@ -67,10 +69,9 @@ class CreateCategoriesBot(Bot):
                    '[[Category:%(title)s]]\n'
                    % {'parent': self.parent, 'title': title})
 
-        pywikibot.output(newpage.title())
-        self.userPut(newpage, '', newtext, summary=self.comment,
-                     ignore_save_related_errors=True,
-                     ignore_server_errors=True)
+        self.current_page = newpage
+        self.current_page.text = ''
+        self.put_current(newtext, ignore_server_errors=True)
 
     def skip_page(self, page):
         """Skip page if it is not overwritten."""
