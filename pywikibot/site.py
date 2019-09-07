@@ -1315,7 +1315,7 @@ def must_be(group=None, right=None):
                                       .format(self.sitename))
             if right is not None:
                 if right in self.userinfo['rights']:
-                    return
+                    return fn(self, *args, **kwargs)
             if grp == 'user':
                 self.login(False)
             elif grp == 'sysop':
