@@ -132,7 +132,7 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot import (
-    comms, i18n, config, pagegenerators, textlib, weblib, config2,
+    comms, i18n, config, pagegenerators, textlib, config2,
 )
 
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
@@ -725,10 +725,6 @@ class History(object):
                             'get_closest_memento_url({0}) failed: {1}'.format(
                                 url, e))
                         archiveURL = None
-                    if archiveURL is None:
-                        archiveURL = weblib.getInternetArchiveURL(url)
-                    if archiveURL is None:
-                        archiveURL = weblib.getWebCitationURL(url)
                     self.log(url, error, page, archiveURL)
             else:
                 self.historyDict[url] = [(page.title(), now, error)]
