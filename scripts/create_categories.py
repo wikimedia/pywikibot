@@ -59,8 +59,9 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         self.basename = basename
         self.overwrite = overwrite
 
-    def treat(self, page):
-        """Create category in commons for that page."""
+    def init_page(self, item):
+        """Create a category to be processed with the given page title."""
+        page = super(CreateCategoriesBot, self).init_page(item)
         title = page.title(with_ns=False)
 
         newpage = pywikibot.Category(pywikibot.Site('commons', 'commons'),
@@ -68,8 +69,13 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         newtext = ('[[Category:%(parent)s|%(title)s]]\n'
                    '[[Category:%(title)s]]\n'
                    % {'parent': self.parent, 'title': title})
+        newpage.text = newtext
+        return newpage
 
-        self.current_page = newpage
+    def treat(self, page):
+        """Create category in commons for that page."""
+        newtext = page.text
+        self.current_page = page
         self.current_page.text = ''
         self.put_current(newtext, ignore_server_errors=True)
 
