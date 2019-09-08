@@ -60,8 +60,8 @@ class LoginManager(object):
 
     """Site login manager."""
 
-    @deprecated_args(username='user', verbose=None)
-    def __init__(self, password=None, sysop=False, site=None, user=None):
+    @deprecated_args(username='user', verbose=None, sysop=False)
+    def __init__(self, password=None, site=None, user=None):
         """
         Initializer.
 
@@ -74,18 +74,12 @@ class LoginManager(object):
         @type user: basestring
         @param password: password to use
         @type password: basestring
-        @param sysop: login as sysop account.
-            The sysop username is loaded from config.sysopnames.
-        @type sysop: bool
 
         @raises NoUsername: No username is configured for the requested site.
         """
         site = self.site = site or pywikibot.Site()
         if not user:
-            if sysop:
-                config_names = config.sysopnames
-            else:
-                config_names = config.usernames
+            config_names = config.usernames
 
             code_to_usr = config_names[site.family.name] or config_names['*']
             try:
@@ -93,13 +87,12 @@ class LoginManager(object):
             except KeyError:
                 raise NoUsername(
                     'ERROR: '
-                    '{account} for {fam_name}:{wiki_code} is undefined.\n'
-                    'If you have a {account} for that site, '
+                    'username for {site.family.name}:{site.code} is undefined.'
+                    '\nIf you have a username for that site, '
                     'please add a line to user-config.py as follows:\n'
-                    "{account}s['{fam_name}']['{wiki_code}'] = 'myUsername'"
-                    .format(
-                        fam_name=site.family.name, wiki_code=site.code,
-                        account='sysopname' if sysop else 'username'))
+                    "usernames['{site.family.name}']['{site.code}'] = "
+                    "'myUsername'"
+                    .format(site=site))
         self.password = password
         self.login_name = self.username = user
         if getattr(config, 'password_file', ''):
@@ -212,7 +205,6 @@ class LoginManager(object):
         Example::
 
          ('my_username', 'my_default_password')
-         ('my_sysop_user', 'my_sysop_password')
          ('wikipedia', 'my_wikipedia_user', 'my_wikipedia_pass')
          ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
          ('my_username', BotPassword(
@@ -364,7 +356,8 @@ class OauthLoginManager(LoginManager):
     # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
     # authentication process
 
-    def __init__(self, password=None, sysop=False, site=None, user=None):
+    @deprecated_args(sysop=False)
+    def __init__(self, password=None, site=None, user=None):
         """
         Initializer.
 
@@ -376,9 +369,6 @@ class OauthLoginManager(LoginManager):
         @type user: basestring
         @param password: consumer secret
         @type password: basestring
-        @param sysop: login as sysop account.
-            The sysop username is loaded from config.sysopnames.
-        @type sysop: bool
 
         @raises NoUsername: No username is configured for the requested site.
         @raises OAuthImpossible: mwoauth isn't installed
@@ -386,7 +376,6 @@ class OauthLoginManager(LoginManager):
         if isinstance(mwoauth, ImportError):
             raise OAuthImpossible('mwoauth is not installed: %s.' % mwoauth)
         assert password is not None and user is not None
-        assert sysop is False
         super(OauthLoginManager, self).__init__(None, False, site, None)
         if self.password:
             pywikibot.warn('Password exists in password file for %s:%s.'
