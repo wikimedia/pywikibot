@@ -30,11 +30,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'en', 'pl', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs', 'pt',
         'www', 'fa', 'gu', 'hu', 'ml', 'sv', 'ko', 'bn', 'sr', 'sa', 'uk',
-        'hy', 'sl', 'te', 'el', 'ro', 'fi', 'ja', 'vi', 'nap', 'az', 'ta',
-        'th', 'ca', 'br', 'nl', 'kn', 'hr', 'la', 'no', 'is', 'eo', 'vec',
-        'tr', 'pms', 'be', 'et', 'da', 'mk', 'id', 'yi', 'bg', 'li', 'as',
-        'mr', 'or', 'gl', 'bs', 'sah', 'lt', 'eu', 'sk', 'pa', 'cy',
-        'zh-min-nan', 'fo',
+        'hy', 'sl', 'te', 'el', 'ro', 'fi', 'ja', 'vi', 'ta', 'az', 'th', 'ca',
+        'br', 'nl', 'kn', 'hr', 'la', 'no', 'is', 'eo', 'vec', 'tr', 'pms',
+        'be', 'et', 'da', 'mk', 'id', 'yi', 'bg', 'li', 'as', 'mr', 'or', 'gl',
+        'bs', 'sah', 'lt', 'pa', 'eu', 'sk', 'nap', 'cy', 'zh-min-nan', 'fo',
     ]
 
     # Sites we want to edit but not count as real languages
