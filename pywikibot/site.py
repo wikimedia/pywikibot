@@ -305,10 +305,11 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Return the name with required colons, depending on the ID."""
         if id == 0:
             return ':'
-        elif id in (6, 14):
+
+        if id in (6, 14):
             return ':' + name + ':'
-        else:
-            return '' + name + ':'
+
+        return name + ':'
 
     def __str__(self):
         """Return the canonical string representation."""
@@ -342,10 +343,14 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Compare whether two namespace objects are equal."""
         if isinstance(other, int):
             return self.id == other
-        elif isinstance(other, Namespace):
+
+        if isinstance(other, Namespace):
             return self.id == other.id
-        elif isinstance(other, UnicodeType):
+
+        if isinstance(other, UnicodeType):
             return other in self
+
+        return False
 
     def __ne__(self, other):
         """Compare whether two namespace objects are not equal."""
@@ -357,11 +362,11 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     def __sub__(self, other):
         """Apply subtraction on the namespace id."""
-        return -(other) + self.id
+        return self.id - other
 
     def __add__(self, other):
         """Apply addition on the namespace id."""
-        return other + self.id
+        return self.id + other
 
     def _cmpkey(self):
         """Return the ID as a comparison key."""
@@ -420,17 +425,16 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
         parts = name.split(':', 4)
         count = len(parts)
-        if count > 3:
+        if count > 3 or (count == 3 and parts[2]):
             return False
-        elif count == 3:
-            if parts[2] != '':
-                return False
 
         # Discard leading colon
-        if count >= 2 and parts[0] == '' and parts[1]:
+        if count >= 2 and not parts[0] and parts[1]:
             return parts[1].strip()
-        elif parts[0]:
+
+        if parts[0]:
             return parts[0].strip()
+
         return False
 
     @classmethod
