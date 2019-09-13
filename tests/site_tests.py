@@ -2715,6 +2715,82 @@ class TestCommonsSite(TestCase):
         self.assertEqual(ll.site.family.name, 'wikipedia')
 
 
+class TestFileArchive(DeprecationTestCase):
+
+    """Test filearchive on Commons."""
+
+    family = 'commons'
+    code = 'commons'
+
+    cached = True
+
+    def test_filearchive(self):
+        """Test filearchive method."""
+        gen = self.site.filearchive(total=10)
+        self.assertNotIn('fafrom', str(gen.request))
+        self.assertNotIn('fato', str(gen.request))
+        fa = list(gen)
+        self.assertLessEqual(len(fa), 10)
+        for item in fa:
+            self.assertIsInstance(item, dict)
+            self.assertIn('id', item)
+            self.assertIn('name', item)
+            self.assertIn('ns', item)
+            self.assertIn('title', item)
+            self.assertIn('timestamp', item)
+            self.assertEqual(item['ns'], 6)
+            self.assertEqual('File:' + item['name'].replace('_', ' '),
+                             item['title'])
+
+    def test_filearchive_limit(self):
+        """Test deprecated limit parameter."""
+        fa = list(self.site.filearchive(limit=10))
+        self.assertOneDeprecation()
+        self.assertLessEqual(len(fa), 10)
+
+    def test_filearchive_prefix(self):
+        """Test prefix parameter."""
+        gen = self.site.filearchive(prefix='py')
+        self.assertIn('faprefix=py', str(gen.request))
+        for item in gen:
+            self.assertTrue(item['name'].startswith('Py'))
+
+    def test_filearchive_prop(self):
+        """Test properties."""
+        gen = self.site.filearchive(prop=['sha1', 'size', 'user'], total=1)
+        self.assertIn('faprop=sha1|size|user', str(gen.request))
+        item = next(iter(gen))
+        self.assertIn('sha1', item)
+        self.assertIn('size', item)
+        self.assertIn('user', item)
+
+    def test_filearchive_reverse(self):
+        """Test reverse parameter."""
+        gen1 = self.site.filearchive(total=1)
+        gen2 = self.site.filearchive(reverse=True, total=1)
+        self.assertNotIn('fadir=', str(gen1.request))
+        self.assertIn('fadir=descending', str(gen2.request))
+        fa1 = next(iter(gen1))
+        fa2 = next(iter(gen2))
+        self.assertLess(fa1['name'], fa2['name'])
+
+    def test_filearchive_start(self):
+        """Test start/end parameters."""
+        gen = self.site.filearchive(start='py', end='wiki', total=1)
+        self.assertIn('fafrom=py', str(gen.request))
+        self.assertIn('fato=wiki', str(gen.request))
+        item = next(iter(gen))
+        self.assertGreaterEqual(item['name'], 'Py')
+
+    def test_filearchive_sha1(self):
+        """Test sha1 parameter."""
+        sha1 = '0d5a00aa774100408e60da09f5fb21f253b366f1'
+        gen = self.site.filearchive(sha1=sha1, prop='sha1', total=1)
+        self.assertIn('fasha1=' + sha1, str(gen.request))
+        item = next(iter(gen))
+        self.assertEqual(item['sha1'], sha1)
+
+
 class TestWiktionarySite(TestCase):
 
     """Test Site Object on English Wiktionary."""
