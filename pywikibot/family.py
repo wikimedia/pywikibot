@@ -1593,6 +1593,20 @@ class FandomFamily(Family):
 
     """Common features of Fandom families."""
 
+    @deprecated('APISite.version()', since='20141225')
+    def version(self, code):
+        """Return the version for this family."""
+        return '1.19.24'
+
+    @classproperty
+    def langs(cls):
+        """Property listing family languages."""
+        return {code: cls.domain for code in cls.codes}
+
+    def protocol(self, code):
+        """Return 'https' as the protocol."""
+        return 'https'
+
     def scriptpath(self, code):
         """Return the script path for this family."""
         return '' if code == 'en' else ('/' + code)
