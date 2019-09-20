@@ -4470,6 +4470,38 @@ class APISite(BaseSite):
             aigen.request['gaisha1base36'] = sha1base36
         return aigen
 
+    @deprecated_args(limit='total')  # ignore falimit setting
+    def filearchive(self, start=None, end=None, reverse=False, total=None,
+                    **kwargs):
+        """Iterate archived files.
+
+        Yields dict of file archive informations.
+
+        @see: U{https://www.mediawiki.org/wiki/API:filearchive}
+
+        @param start: start at this title (name need not exist)
+        @param end: end at this title (name need not exist)
+        @param reverse: if True, iterate in reverse lexigraphic order
+        @param total: maximum number of pages to retrieve in total
+        @keyword prefix: only iterate titles starting with this substring
+        @keyword sha1: only iterate image with this sha1 hash
+        @keyword sha1base36: same as sha1 but in base 36
+        @keyword prop: Image information to get. Default is timestamp
+        """
+        if start and end:
+            self.assert_valid_iter_params(self, 'filearchive', start, end,
+                                          reverse)
+        fagen = self._generator(api.ListGenerator,
+                                type_arg='filearchive',
+                                fafrom=start,
+                                fato=end,
+                                total=total)
+        for k, v in kwargs.items():
+            fagen.request['fa' + k] = v
+        if reverse:
+            fagen.request['fadir'] = 'descending'
+        return fagen
+
     @deprecated_args(step=None)
     def blocks(self, starttime=None, endtime=None, reverse=False,
                blockids=None, users=None, iprange=None, total=None):
