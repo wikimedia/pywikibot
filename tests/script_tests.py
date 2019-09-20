@@ -394,7 +394,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     _expected_failures = {
         'catall',          # stdout user interaction
         'upload',          # raises custom ValueError
-    }.union(failed_dep_script_set)
+    }
 
     _allowed_failures = [
         'disambredir',
