@@ -5015,69 +5015,129 @@ class APISite(BaseSite):
                                                 filters)
         return wlgen
 
-    # TODO: T75370
-    @deprecated_args(step=None, get_text='content')
-    def deletedrevs(self, page, start=None, end=None, reverse=False,
-                    content=False, total=None):
+    @deprecated_args(step=None, get_text='content', page='titles',
+                     limit='total')
+    def deletedrevs(self, titles=None, start=None, end=None, reverse=False,
+                    content=False, total=None, **kwargs):
         """Iterate deleted revisions.
 
         Each value returned by the iterator will be a dict containing the
         'title' and 'ns' keys for a particular Page and a 'revisions' key
         whose value is a list of revisions in the same format as
-        recentchanges (plus a 'content' element if requested). If get_text
-        is true, the toplevel dict will contain a 'token' key as well.
+        recentchanges plus a 'content' element with key '*' if requested
+        when 'content' parameter is set. For older wikis a 'token' key is
+        also given with the content request.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Deletedrevs}
+        @see: U{https://www.mediawiki.org/wiki/API:Deletedrevisions}
 
-        @param page: The page to check for deleted revisions
+        @param titles: The page titles to check for deleted revisions
+        @type titles: str (multiple titles delimited with '|')
+            or pywikibot.Page or typing.Iterable[pywikibot.Page]
+            or typing.Iterable[str]
+        @keyword revids: Get revisions by their ID
+
+        @note either titles or revids must be set but not both
+
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
         @type reverse: bool
-        @param content: If True, retrieve the content of each revision and
-            an undelete token
+        @param content: If True, retrieve the content of each revision
+        @param total: number of revisions to retrieve
+        @keyword user: List revisions by this user
+        @keyword excludeuser: Exclude revisions by this user
+        @keyword tag: Only list revision tagged with this tag
+        @keyword prop: Which properties to get. Defaults are ids, user,
+            comment, flags and timestamp
         """
+        def handle_props(props):
+            """Translate deletedrev props to deletedrevisions props."""
+            if isinstance(props, UnicodeType):
+                props = props.split('|')
+            if self.mw_version >= '1.25':
+                return props
+
+            old_props = []
+            for item in props:
+                if item == 'ids':
+                    old_props += ['revid', 'parentid']
+                elif item == 'flags':
+                    old_props.append('minor')
+                elif item == 'timestamp':
+                    pass
+                else:
+                    old_props.append(item)
+                    if item == 'content' and self.mw_version < '1.24':
+                        old_props.append('token')
+            return old_props
+
         if start and end:
             self.assert_valid_iter_params('deletedrevs', start, end, reverse)
 
         if not self.logged_in():
             self.login()
+
+        err = ('deletedrevs: User:{} not authorized to '
+               .format(self.user()))
         if 'deletedhistory' not in self.userinfo['rights']:
-            try:
-                self.login(True)
-            except NoUsername:
-                pass
-            if 'deletedhistory' not in self.userinfo['rights']:
-                raise Error(
-                    'deletedrevs: '
-                    'User:%s not authorized to access deleted revisions.'
-                    % self.user())
+            raise Error(err + 'access deleted revisions.')
         if content:
             if 'undelete' not in self.userinfo['rights']:
-                try:
-                    self.login(True)
-                except NoUsername:
-                    pass
-                if 'undelete' not in self.userinfo['rights']:
-                    raise Error(
-                        'deletedrevs: '
-                        'User:%s not authorized to view deleted content.'
-                        % self.user())
+                raise Error(err + 'view deleted content.')
 
-        drgen = self._generator(api.ListGenerator, type_arg='deletedrevs',
-                                titles=page.title(with_section=False),
-                                drprop='revid|user|comment|minor',
-                                total=total)
+        revids = kwargs.pop('revids', None)
+        if not (bool(titles) ^ (revids is not None)):
+            raise Error('deletedrevs: either "titles" or "revids" parameter '
+                        'must be given.')
+        if revids and self.mw_version < '1.25':
+            raise NotImplementedError(
+                'deletedrevs: "revid" is not implemented with MediaWiki {}'
+                .format(self.mw_version))
+
+        if self.mw_version >= '1.25':
+            pre = 'drv'
+            type_arg = 'deletedrevisions'
+            generator = api.PropertyGenerator
+        else:
+            pre = 'dr'
+            type_arg = 'deletedrevs'
+            generator = api.ListGenerator
+
+        gen = self._generator(generator, type_arg=type_arg,
+                              titles=titles, revids=revids,
+                              total=total)
+
+        gen.request[pre + 'start'] = start
+        gen.request[pre + 'end'] = end
+
+        # handle properties
+        prop = kwargs.pop('prop',
+                          ['ids', 'user', 'comment', 'flags', 'timestamp'])
         if content:
-            drgen.request['drprop'] = (drgen.request['drprop']
-                                       + ['content', 'token'])
-        if start is not None:
-            drgen.request['drstart'] = start
-        if end is not None:
-            drgen.request['drend'] = end
+            prop.append('content')
+        prop = handle_props(prop)
+        gen.request[pre + 'prop'] = prop
+
+        # handle other parameters like user
+        for k, v in kwargs.items():
+            gen.request[pre + k] = v
+
         if reverse:
-            drgen.request['drdir'] = 'newer'
-        return drgen
+            gen.request[pre + 'dir'] = 'newer'
+
+        if self.mw_version < '1.25':
+            # yield from gen
+            for data in gen:
+                yield data
+        else:
+            # The dict result is different for both generators
+            for data in gen:
+                try:
+                    data['revisions'] = data.pop('deletedrevisions')
+                except KeyError:
+                    pass
+                else:
+                    yield data
 
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
