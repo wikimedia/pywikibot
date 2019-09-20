@@ -158,6 +158,7 @@ if 'PYSETUP_TEST_EXTRAS' in os.environ:
 
 # These extra dependencies are needed other unittest fails to load tests.
 test_deps += extra_deps['csv']
+test_deps += extra_deps['eventstreams']
 test_deps += ['six;python_version>="3"']
 
 
