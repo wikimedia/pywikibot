@@ -196,7 +196,6 @@ class FailingSiteTestCase(SiteDetectionTestCase):
         """
         self.assertNoSite('http://wiki.animutationportal.com/index.php/$1')
 
-    @unittest.expectedFailure
     def test_hackerspaces(self):
         """Test detection of MediaWiki sites for hackerspaces.org."""
         self.assertNoSite('http://hackerspaces.org/wiki/$1')
