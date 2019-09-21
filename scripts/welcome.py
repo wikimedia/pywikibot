@@ -3,9 +3,8 @@
 """
 Script to welcome new users.
 
-This script works out of the box for Wikis that
-have been defined in the script. It is currently used on the Dutch, Norwegian,
-Albanian, Italian Wikipedia, Wikimedia Commons and English Wikiquote.
+This script works out of the box for Wikis that have been
+defined in the script.
 
 Ensure you have community support before running this bot!
 
