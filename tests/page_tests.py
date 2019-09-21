@@ -927,7 +927,9 @@ class TestPageRedirects(TestCase):
         p1 = pywikibot.Page(site, 'User:Legoktm/R1')
         p2 = pywikibot.Page(site, 'User:Legoktm/R2')
         self.assertTrue(p1.isRedirectPage())
-        self.assertEqual(p1.getRedirectTarget(), p2)
+        p3 = p1.getRedirectTarget()
+        self.assertEqual(p3, p2)
+        self.assertIsInstance(p3, pywikibot.User)
 
     def testPageGet(self):
         """Test C{Page.get()} on different types of pages."""

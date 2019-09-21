@@ -3238,7 +3238,6 @@ class APISite(BaseSite):
             # target_title is the ultimate target
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata, ['info'])
-            page._redirtarget = target
         else:
             # Target is an intermediate redirect -> double redirect.
             # Do not bypass double-redirects and return the ultimate target;
@@ -3246,7 +3245,16 @@ class APISite(BaseSite):
             # This handles also redirects to sections, as sametitle()
             # does not ignore sections.
             target = pywikibot.Page(self, target_title)
-            page._redirtarget = target
+
+        # Upcast to proper Page subclass.
+        ns = target.namespace()
+        if ns == 2:
+            target = pywikibot.User(target)
+        elif ns == 6:
+            target = pywikibot.FilePage(target)
+        elif ns == 14:
+            target = pywikibot.Category(target)
+        page._redirtarget = target
 
         return page._redirtarget
 
