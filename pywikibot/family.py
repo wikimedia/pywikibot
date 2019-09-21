@@ -1309,7 +1309,10 @@ class Family(object):
             return None
 
         matched_sites = []
-        for code in chain(self.codes, getattr(self, 'test_codes', ())):
+        for code in chain(self.codes,
+                          getattr(self, 'test_codes', ()),
+                          getattr(self, 'closed_wikis', ()),
+                          ):
             if self._hostname(code)[1] == parsed.netloc:
                 # Use the code and family instead of the url
                 # This is only creating a Site instance if domain matches
