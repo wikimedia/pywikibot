@@ -61,8 +61,9 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
             self.assertIn(lang, self.generator_instance.wikis)
         for i in range(10):
             lang = choice(self.generator_instance.langs)
-            site = Site(url=lang['url'])
-            self.assertEqual(site.lang, lang['prefix'])
+            with self.subTest(lang=lang['prefix']):
+                site = Site(url=lang['url'])
+                self.assertEqual(site.lang, lang['prefix'])
 
 
 if __name__ == '__main__':  # pragma: no cover
