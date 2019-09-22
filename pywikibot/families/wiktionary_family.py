@@ -36,14 +36,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'pt', 'vi', 'sr', 'ja', 'chr', 'th', 'hi', 'ro', 'no', 'id', 'et',
         'ml', 'my', 'uz', 'li', 'cs', 'or', 'te', 'eo', 'fa', 'ar', 'jv', 'az',
         'gl', 'eu', 'oc', 'br', 'uk', 'da', 'lo', 'hr', 'fj', 'tg', 'ky', 'la',
-        'bg', 'sk', 'ast', 'simple', 'ps', 'ur', 'is', 'wa', 'cy', 'vo',
+        'bg', 'sk', 'simple', 'ast', 'is', 'ps', 'ur', 'wa', 'cy', 'vo',
         'zh-min-nan', 'af', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'co', 'ka', 'mn', 'pnb', 'nds', 'sl', 'lb', 'bs', 'nah',
         'sa', 'kk', 'tk', 'sm', 'km', 'mk', 'hsb', 'ms', 'be', 'vec', 'yue',
         'ga', 'an', 'wo', 'ang', 'tt', 'mt', 'sd', 'gn', 'mr', 'ie', 'so',
         'gd', 'csb', 'ug', 'ia', 'st', 'fo', 'roa-rup', 'si', 'hif', 'kl',
-        'mi', 'ay', 'jbo', 'ln', 'su', 'zu', 'na', 'gu', 'gv', 'kw', 'rw',
-        'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am', 'dv', 'tpi', 'yi',
+        'mi', 'ay', 'jbo', 'su', 'ln', 'zu', 'na', 'gu', 'gv', 'kw', 'rw',
+        'ts', 'ne', 'yi', 'om', 'qu', 'ss', 'ha', 'iu', 'am', 'dv', 'tpi',
         'ti', 'sg', 'tn', 'ks',
     ]
 
