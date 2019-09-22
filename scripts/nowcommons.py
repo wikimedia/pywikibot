@@ -158,6 +158,10 @@ nowCommons = {
         'Перенесено на Викисклад',
         'На Викискладе',
     ],
+    'sr': [
+        'NowCommons',
+        'На Остави',
+    ],
     'zh': [
         'NowCommons',
         'Nowcommons',
