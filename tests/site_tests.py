@@ -1065,6 +1065,26 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 'indexpageids': [True], 'continue': [True]})
         self.assertLessEqual(len(tuple(upgen)), 3)
 
+    def test_assert_valid_iter_params(self):
+        """Test site.assert_valid_iter_params method."""
+        func = self.site.assert_valid_iter_params
+
+        # reverse=False, is_ts=False
+        self.assertIsNone(func('m', 1, 2, False, False))
+        self.assertRaises(AssertionError, func, 'm', 2, 1, False, False)
+
+        # reverse=False, is_ts=True
+        self.assertIsNone(func('m', 2, 1, False, True))
+        self.assertRaises(AssertionError, func, 'm', 1, 2, False, True)
+
+        # reverse=True, is_ts=False
+        self.assertIsNone(func('m', 2, 1, True, False))
+        self.assertRaises(AssertionError, func, 'm', 1, 2, True, False)
+
+        # reverse=True, is_ts=True
+        self.assertIsNone(func('m', 1, 2, True, True))
+        self.assertRaises(AssertionError, func, 'm', 2, 1, True, True)
+
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):
     """Test cases for Site methods with users."""
