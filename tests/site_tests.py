@@ -3255,7 +3255,6 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
-    @allowed_failure
     def test_preload_templates_and_langlinks(self):
         """Test preloading templates and langlinks works."""
         mysite = self.get_site()
@@ -3263,15 +3262,23 @@ class TestPagePreloading(DefaultSiteTestCase):
         count = 0
         # Use backlinks, as any backlink has at least one link
         links = mysite.pagebacklinks(mainpage, total=10)
+        # Screen pages before test;
+        # it is not guaranteed that all pages will have both.
+        links = [l for l in links if (l.langlinks() and l.templates())]
+        #  Skip test if no valid pages are found.
+        if not links:
+            self.SkipTest('No valid pages found to carry out test.')
+
         for page in mysite.preloadpages(links, langlinks=True, templates=True):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertLength(page._revisions, 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
-                self.assertTrue(hasattr(page, '_templates'))
-                self.assertTrue(hasattr(page, '_langlinks'))
+            with self.subTest(page=page):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertIsInstance(page.exists(), bool)
+                if page.exists():
+                    self.assertLength(page._revisions, 1)
+                    self.assertIsNotNone(page._revisions[page._revid].text)
+                    self.assertFalse(hasattr(page, '_pageprops'))
+                    self.assertTrue(hasattr(page, '_templates'))
+                    self.assertTrue(hasattr(page, '_langlinks'))
             count += 1
             if count >= 6:
                 break
