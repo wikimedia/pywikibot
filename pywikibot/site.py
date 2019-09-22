@@ -21,6 +21,7 @@ import json
 import mimetypes
 import os
 import re
+from textwrap import fill
 import threading
 import time
 import uuid
@@ -2270,16 +2271,33 @@ class APISite(BaseSite):
             'articlepath must end with /$1'
         return self.siteinfo['general']['articlepath'][:-2]
 
-    def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
-        """Validate iterating API parameters."""
-        if reverse:
-            if end < start:
-                raise Error(msg_prefix
-                            + ': end must be later than start'
-                              ' with reverse=True')
-        elif start < end:
-            raise Error(msg_prefix
-                        + ': start must be later than end with reverse=False')
+    def assert_valid_iter_params(self, msg_prefix, start, end, reverse,
+                                 is_ts=True):
+        """Validate iterating API parameters.
+
+        @param msg_prefix: The calling method name
+        @type msg_prefix: str
+        @param start: The start value to compare
+        @param end: The end value to compare
+        @param reverse: The reverse option
+        @type reverse: bool
+        @param is_ts: When comparing timestamps (with is_ts=True) the start
+            is usually greater than end. Comparing titles this is vice versa.
+        type is_ts: bool
+        @raises AssertionError: start/end values are in wrong order
+        """
+        if reverse ^ is_ts:
+            low, high = end, start
+            order = 'follow'
+        else:
+            low, high = start, end
+            order = 'precede'
+        msg = ('{method}: "start" must {order} "end" '
+               'with reverse={reverse} and is_ts={is_ts} '
+               'but "start" is "{start}" and "end" is "{end}".')
+        assert low < high, fill(msg.format(method=msg_prefix, order=order,
+                                           start=start, end=end,
+                                           reverse=reverse, is_ts=is_ts))
 
     def has_right(self, right, sysop=False):
         """Return true if and only if the user has a specific right.
@@ -4478,6 +4496,7 @@ class APISite(BaseSite):
             aigen.request['gaisha1base36'] = sha1base36
         return aigen
 
+    @need_version('1.17')
     @deprecated_args(limit='total')  # ignore falimit setting
     def filearchive(self, start=None, end=None, reverse=False, total=None,
                     **kwargs):
@@ -4497,8 +4516,8 @@ class APISite(BaseSite):
         @keyword prop: Image information to get. Default is timestamp
         """
         if start and end:
-            self.assert_valid_iter_params(self, 'filearchive', start, end,
-                                          reverse)
+            self.assert_valid_iter_params(
+                'filearchive', start, end, reverse, is_ts=False)
         fagen = self._generator(api.ListGenerator,
                                 type_arg='filearchive',
                                 fafrom=start,
