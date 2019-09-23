@@ -943,13 +943,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
             for prop in props:
                 self.assertIn(prop, block)
         # starttime earlier than endtime
-        self.assertRaises(pywikibot.Error, mysite.blocks, total=5,
+        self.assertRaises(AssertionError, mysite.blocks, total=5,
                           starttime=pywikibot.Timestamp.fromISOformat(
                               '2008-08-03T00:00:01Z'),
                           endtime=pywikibot.Timestamp.fromISOformat(
                               '2008-08-03T23:59:59Z'))
         # reverse: endtime earlier than starttime
-        self.assertRaises(pywikibot.Error, mysite.blocks,
+        self.assertRaises(AssertionError, mysite.blocks,
                           starttime=pywikibot.Timestamp.fromISOformat(
                               '2008-08-03T23:59:59Z'),
                           endtime=pywikibot.Timestamp.fromISOformat(
@@ -1335,13 +1335,13 @@ class TestLogEvents(DefaultSiteTestCase):
                 '2008-02-03T00:00:01Z' <= str(entry.timestamp())
                 <= '2008-02-03T23:59:59Z')
         # starttime earlier than endtime
-        self.assertRaises(pywikibot.Error, mysite.logevents,
+        self.assertRaises(AssertionError, mysite.logevents,
                           start=pywikibot.Timestamp.fromISOformat(
                               '2008-02-03T00:00:01Z'),
                           end=pywikibot.Timestamp.fromISOformat(
                               '2008-02-03T23:59:59Z'), total=5)
         # reverse: endtime earlier than starttime
-        self.assertRaises(pywikibot.Error, mysite.logevents,
+        self.assertRaises(AssertionError, mysite.logevents,
                           start=pywikibot.Timestamp.fromISOformat(
                               '2008-02-03T23:59:59Z'),
                           end=pywikibot.Timestamp.fromISOformat(
@@ -1465,11 +1465,11 @@ class TestRecentChanges(DefaultSiteTestCase):
                 '2008-10-05T06:00:01Z' <= change['timestamp']
                 <= '2008-10-05T23:59:59Z')
         # start earlier than end
-        self.assertRaises(pywikibot.Error, mysite.recentchanges,
+        self.assertRaises(AssertionError, mysite.recentchanges,
                           start='2008-02-03T00:00:01Z',
                           end='2008-02-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        self.assertRaises(pywikibot.Error, mysite.recentchanges,
+        self.assertRaises(AssertionError, mysite.recentchanges,
                           start=pywikibot.Timestamp.fromISOformat(
                               '2008-02-03T23:59:59Z'),
                           end=pywikibot.Timestamp.fromISOformat(
@@ -1777,12 +1777,12 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         """Test the site.usercontribs() method with invalid parameters."""
         mysite = self.get_site()
         # start earlier than end
-        self.assertRaises(pywikibot.Error, mysite.usercontribs,
+        self.assertRaises(AssertionError, mysite.usercontribs,
                           userprefix='Jim',
                           start='2008-10-03T00:00:01Z',
                           end='2008-10-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        self.assertRaises(pywikibot.Error, mysite.usercontribs,
+        self.assertRaises(AssertionError, mysite.usercontribs,
                           userprefix='Jim',
                           start='2008-10-03T23:59:59Z',
                           end='2008-10-03T00:00:01Z', reverse=True, total=5)
@@ -1832,11 +1832,11 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
                 '2008-10-15T06:00:01Z' <= rev['timestamp']
                 <= '2008-10-15T23:59:59Z')
         # start earlier than end
-        self.assertRaises(pywikibot.Error, mysite.watchlist_revs,
+        self.assertRaises(AssertionError, mysite.watchlist_revs,
                           start='2008-09-03T00:00:01Z',
                           end='2008-09-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        self.assertRaises(pywikibot.Error, mysite.watchlist_revs,
+        self.assertRaises(AssertionError, mysite.watchlist_revs,
                           start='2008-09-03T23:59:59Z',
                           end='2008-09-03T00:00:01Z', reverse=True, total=5)
         for rev in mysite.watchlist_revs(namespaces=[6, 7], total=5):
@@ -1937,11 +1937,11 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                                         '2008-10-15T06:00:01Z')
 
         # start earlier than end
-        self.assertRaises(pywikibot.Error, mysite.deletedrevs,
+        self.assertRaises(AssertionError, mysite.deletedrevs,
                           page=mainpage, start='2008-09-03T00:00:01Z',
                           end='2008-09-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        self.assertRaises(pywikibot.Error, mysite.deletedrevs,
+        self.assertRaises(AssertionError, mysite.deletedrevs,
                           page=mainpage, start='2008-09-03T23:59:59Z',
                           end='2008-09-03T00:00:01Z', reverse=True,
                           total=5)
@@ -2021,10 +2021,10 @@ class TestSiteSysopWrite(TestCase):
         """Test that site.protect() throws an exception for invalid args."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
-        self.assertRaises(pywikibot.Error, site.protect,
+        self.assertRaises(AssertionError, site.protect,
                           protections={'anInvalidValue': 'sysop'},
                           page=p1, reason='Pywikibot unit test')
-        self.assertRaises(pywikibot.Error, site.protect,
+        self.assertRaises(AssertionError, site.protect,
                           protections={'edit': 'anInvalidValue'},
                           page=p1, reason='Pywikibot unit test')
 
