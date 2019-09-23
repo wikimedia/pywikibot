@@ -5017,7 +5017,7 @@ class APISite(BaseSite):
 
     # TODO: T75370
     @deprecated_args(step=None, get_text='content')
-    def deletedrevs(self, page, start=None, end=None, reverse=None,
+    def deletedrevs(self, page, start=None, end=None, reverse=False,
                     content=False, total=None):
         """Iterate deleted revisions.
 
@@ -5033,6 +5033,7 @@ class APISite(BaseSite):
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
+        @type reverse: bool
         @param content: If True, retrieve the content of each revision and
             an undelete token
         """
