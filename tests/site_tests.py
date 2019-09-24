@@ -3318,7 +3318,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         links = [l for l in links if (l.langlinks() and l.templates())]
         #  Skip test if no valid pages are found.
         if not links:
-            self.SkipTest('No valid pages found to carry out test.')
+            self.skipTest('No valid pages found to carry out test.')
 
         for page in mysite.preloadpages(links, langlinks=True, templates=True):
             with self.subTest(page=page):
