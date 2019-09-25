@@ -4562,16 +4562,8 @@ class APISite(BaseSite):
         @type total: int
         """
         if starttime and endtime:
-            if reverse:
-                if starttime > endtime:
-                    raise Error(
-                        'blocks: '
-                        'starttime must be before endtime with reverse=True')
-            else:
-                if endtime > starttime:
-                    raise Error(
-                        'blocks: '
-                        'endtime must be before starttime with reverse=False')
+            self.assert_valid_iter_params('blocks', starttime, endtime,
+                                          reverse)
         bkgen = self._generator(api.ListGenerator, type_arg='blocks',
                                 total=total)
         bkgen.request['bkprop'] = ['id', 'user', 'by', 'timestamp', 'expiry',

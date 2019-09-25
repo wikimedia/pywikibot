@@ -888,76 +888,77 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test the site.blocks() method."""
         mysite = self.get_site()
         props = ('id', 'by', 'timestamp', 'expiry', 'reason')
-        bl = list(mysite.blocks(total=10))
-        self.assertLessEqual(len(bl), 10)
-        for block in bl:
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
-        # timestamps should be in descending order
-        timestamps = [block['timestamp'] for block in bl]
-        for t in range(1, len(timestamps)):
-            self.assertLessEqual(timestamps[t], timestamps[t - 1])
 
-        b2 = list(mysite.blocks(total=10, reverse=True))
-        self.assertLessEqual(len(b2), 10)
-        for block in b2:
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
-        # timestamps should be in ascending order
-        timestamps = [block['timestamp'] for block in b2]
-        for t in range(1, len(timestamps)):
-            self.assertGreaterEqual(timestamps[t], timestamps[t - 1])
+        with self.subTest(total=10, reverse=False):
+            bl = list(mysite.blocks(total=10))
+            self.assertLessEqual(len(bl), 10)
+            for block in bl:
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
 
-        for block in mysite.blocks(
-                starttime=pywikibot.Timestamp.fromISOformat(
-                    '2008-07-01T00:00:01Z'),
-                total=5):
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
-        for block in mysite.blocks(
-                endtime=pywikibot.Timestamp.fromISOformat(
-                    '2008-07-31T23:59:59Z'),
-                total=5):
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
-        for block in mysite.blocks(
-                starttime=pywikibot.Timestamp.fromISOformat(
-                    '2008-08-02T00:00:01Z'),
-                endtime=pywikibot.Timestamp.fromISOformat(
-                    '2008-08-02T23:59:59Z'),
-                reverse=True, total=5):
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
-        for block in mysite.blocks(
-                starttime=pywikibot.Timestamp.fromISOformat(
-                    '2008-08-03T23:59:59Z'),
-                endtime=pywikibot.Timestamp.fromISOformat(
-                    '2008-08-03T00:00:01Z'),
-                total=5):
-            self.assertIsInstance(block, dict)
-            for prop in props:
-                self.assertIn(prop, block)
+            # timestamps should be in descending order
+            timestamps = [block['timestamp'] for block in bl]
+            for t in range(1, len(timestamps)):
+                self.assertLessEqual(timestamps[t], timestamps[t - 1])
+
+        with self.subTest(total=10, reverse=True):
+            b2 = list(mysite.blocks(total=10, reverse=True))
+            self.assertLessEqual(len(b2), 10)
+
+            for block in b2:
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
+
+            # timestamps should be in ascending order
+            timestamps = [block['timestamp'] for block in b2]
+            for t in range(1, len(timestamps)):
+                self.assertGreaterEqual(timestamps[t], timestamps[t - 1])
+
+        ip = '80.100.22.71'
+        with self.subTest(users=ip):
+            for block in mysite.blocks(users=ip, total=5):
+                self.assertIsInstance(block, dict)
+                self.assertEqual(block['user'], ip)
+
+        low = pywikibot.Timestamp.fromISOformat('2008-08-03T00:00:01Z')
+        high = pywikibot.Timestamp.fromISOformat('2008-08-03T23:59:59Z')
+
+        with self.subTest(starttime=low):
+            for block in mysite.blocks(starttime=low, total=5):
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
+
+        with self.subTest(endtime=high):
+            for block in mysite.blocks(endtime=high, total=5):
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
+
+        with self.subTest(starttime=high, endtime=low, reverse=False):
+            for block in mysite.blocks(starttime=high, endtime=low, total=5):
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
+
+        with self.subTest(starttime=low, endtime=high, reverse=True):
+            for block in mysite.blocks(starttime=low, endtime=high,
+                                       reverse=True, total=5):
+                self.assertIsInstance(block, dict)
+                for prop in props:
+                    self.assertIn(prop, block)
+
         # starttime earlier than endtime
-        self.assertRaises(AssertionError, mysite.blocks, total=5,
-                          starttime=pywikibot.Timestamp.fromISOformat(
-                              '2008-08-03T00:00:01Z'),
-                          endtime=pywikibot.Timestamp.fromISOformat(
-                              '2008-08-03T23:59:59Z'))
+        with self.subTest(starttime=low, endtime=high, reverse=False):
+            self.assertRaises(AssertionError, mysite.blocks, total=5,
+                              starttime=low, endtime=high)
+
         # reverse: endtime earlier than starttime
-        self.assertRaises(AssertionError, mysite.blocks,
-                          starttime=pywikibot.Timestamp.fromISOformat(
-                              '2008-08-03T23:59:59Z'),
-                          endtime=pywikibot.Timestamp.fromISOformat(
-                              '2008-08-03T00:00:01Z'),
-                          reverse=True, total=5)
-        for block in mysite.blocks(users='80.100.22.71', total=5):
-            self.assertIsInstance(block, dict)
-            self.assertEqual(block['user'], '80.100.22.71')
+        with self.subTest(starttime=high, endtime=low, reverse=True):
+            self.assertRaises(AssertionError, mysite.blocks, total=5,
+                              starttime=high, endtime=low, reverse=True)
 
     def test_exturl_usage(self):
         """Test the site.exturlusage() method."""
