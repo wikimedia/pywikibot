@@ -14,7 +14,9 @@ import pywikibot
 
 from pywikibot.data import api
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
+from pywikibot.tools import has_module
 
+from tests import unittest_print
 from tests.aspects import unittest, require_modules, TestCase
 from tests.basepage_tests import (
     BasePageMethodsTestBase,
@@ -330,8 +332,24 @@ class TestPageQuality(TestCase):
         self.assertEqual(page.quality_level, 0)
 
 
-@require_modules('bs4')
-class TestPageOCR(TestCase):
+class BS4TestCase(TestCase):
+
+    """Run tests which needs bs4 beeing installed."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Check whether bs4 module is installed already."""
+        if not has_module('bs4'):
+            unittest_print(
+                'all tests ({module}.{name})\n{doc} ... '
+                .format(module=__name__, doc=cls.__doc__, name=cls.__name__),
+                end='')
+            # skipTest cannot be used with Python 2 for setUpClass
+            raise unittest.SkipTest('bs4 not installed')
+        super(BS4TestCase, cls).setUpClass()
+
+
+class TestPageOCR(BS4TestCase):
 
     """Test page ocr functions."""
 
@@ -408,8 +426,7 @@ class TestPageOCR(TestCase):
             self.assertGreater(s.ratio(), 0.9)
 
 
-@require_modules('bs4')
-class TestProofreadPageIndexProperty(TestCase):
+class TestProofreadPageIndexProperty(BS4TestCase):
 
     """Test ProofreadPage index property."""
 
@@ -467,15 +484,7 @@ class TestProofreadPageIndexProperty(TestCase):
         self.assertEqual(page._index, (None, []))
 
 
-@require_modules('bs4')
-class IndexPageTestCase(TestCase):
-
-    """Run tests related to IndexPage ProofreadPage extension."""
-
-    pass
-
-
-class TestIndexPageInvalidSite(IndexPageTestCase):
+class TestIndexPageInvalidSite(BS4TestCase):
 
     """Test IndexPage class."""
 
@@ -490,7 +499,7 @@ class TestIndexPageInvalidSite(IndexPageTestCase):
                           IndexPage, self.site, 'title')
 
 
-class TestIndexPageValidSite(IndexPageTestCase):
+class TestIndexPageValidSite(BS4TestCase):
 
     """Test IndexPage class."""
 
@@ -535,8 +544,7 @@ class TestIndexPageValidSite(IndexPageTestCase):
         self.assertEqual(page.namespace(), source.namespace)
 
 
-@require_modules('bs4')
-class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
+class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
 
     """Test behavior of ProofreadPage methods inherited from BasePage."""
 
@@ -555,7 +563,7 @@ class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
         self._test_return_datatypes()
 
 
-class TestLoadRevisionsCachingIndexPage(IndexPageTestCase,
+class TestLoadRevisionsCachingIndexPage(BS4TestCase,
                                         BasePageLoadRevisionsCachingTestBase):
 
     """Test site.loadrevisions() caching."""
@@ -575,7 +583,7 @@ class TestLoadRevisionsCachingIndexPage(IndexPageTestCase,
 
 
 @unittest.skip('T193637 and T114318')
-class TestIndexPageMappings(IndexPageTestCase):
+class TestIndexPageMappings(BS4TestCase):
 
     """Test IndexPage class."""
 
@@ -739,7 +747,7 @@ class TestIndexPageMappings(IndexPageTestCase):
         self.assertEqual(list(gen), [])
 
 
-class TestIndexPageMappingsRedlinks(IndexPageTestCase):
+class TestIndexPageMappingsRedlinks(BS4TestCase):
 
     """Test IndexPage mappings with redlinks."""
 
@@ -783,7 +791,7 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
         self.assertEqual(list(gen), self.pages)
 
 
-class TestIndexPageHasValidContent(IndexPageTestCase):
+class TestIndexPageHasValidContent(BS4TestCase):
 
     """Unit tests for has_valid_content()."""
 
