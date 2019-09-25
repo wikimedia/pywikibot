@@ -2108,16 +2108,19 @@ class TestUserList(DefaultSiteTestCase):
 
     def test_users(self):
         """Test the site.users() method with preset usernames."""
-        mysite = self.site
+        user_list = ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling']
+        missing = ['A username that should not exist 1A53F6E375B5']
+        all_users = user_list + missing
         cnt = 0
-        for user in mysite.users(
-                ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling']):
+        for user in self.site.users(all_users):
             self.assertIsInstance(user, dict)
-            self.assertTrue(user['name']
-                            in ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling'])
+            self.assertIn(user['name'], all_users)
+            if user['name'] == missing[0]:
+                self.assertIn('missing', user)
+            else:
+                self.assertNotIn('missing', user)
             cnt += 1
-        if not cnt:
-            self.skipTest('Test usernames not found')
+        self.assertEqual(cnt, len(all_users), 'Some test usernames not found')
 
 
 class PatrolTestCase(TokenTestBase, TestCase):
