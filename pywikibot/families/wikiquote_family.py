@@ -56,8 +56,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'fr', 'gl', 'gu', 'he', 'hi', 'hu', 'hy', 'id', 'is',
         'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
         'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru',
-        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr',
-        'uk', 'ur', 'uz', 'vi', 'wo', 'zh',
+        'sa', 'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta',
+        'te', 'th', 'tr', 'uk', 'ur', 'uz', 'vi', 'wo', 'zh',
     ]
 
     # Subpages for documentation.
