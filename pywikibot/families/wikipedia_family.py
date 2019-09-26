@@ -57,8 +57,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'roa-rup', 'lbe', 'bi', 'ty', 'sat', 'mdf', 'kg', 'tcy', 'srn', 'inh',
         'xh', 'atj', 'ltg', 'chr', 'sm', 'pih', 'om', 'tn', 'ak', 'cu', 'ts',
         'tw', 'rmy', 'bm', 'st', 'chy', 'rn', 'got', 'tum', 'ny', 'ss', 'ch',
-        'pnt', 'fj', 'iu', 'ady', 've', 'ee', 'ks', 'ik', 'sg', 'ff', 'dz',
-        'ti', 'din', 'cr',
+        'pnt', 'fj', 'iu', 'ady', 've', 'ee', 'nqo', 'ks', 'ik', 'sg', 'ff',
+        'dz', 'ti', 'din', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
