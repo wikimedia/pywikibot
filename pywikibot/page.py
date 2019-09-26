@@ -2480,6 +2480,12 @@ class FilePage(Page):
 
     def _load_file_revisions(self, imageinfo):
         for file_rev in imageinfo:
+            # filemissing in API response indicates most fields are missing
+            # see https://gerrit.wikimedia.org/r/#/c/mediawiki/core/+/533482/
+            if 'filemissing' in file_rev:
+                pywikibot.warning("File '%s' contains missing revisions"
+                                  % self.title())
+                continue
             file_revision = FileInfo(file_rev)
             self._file_revisions[file_revision.timestamp] = file_revision
 
