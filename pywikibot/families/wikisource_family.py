@@ -97,6 +97,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'it': [102],
         'ko': [100],
         'la': [102],
+        'nap': [102],
         'nl': [102],
         'no': [102],
         'pl': [104],
