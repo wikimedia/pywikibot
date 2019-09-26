@@ -32,5 +32,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'el', 'en', 'es', 'fa', 'hi', 'ru',
+        'bn', 'el', 'en', 'es', 'fa', 'fi', 'hi', 'ps', 'ru',
     ]
