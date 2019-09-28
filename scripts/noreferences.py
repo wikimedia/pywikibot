@@ -94,10 +94,6 @@ placeBeforeSections = {
         'See also',
         'Notes'
     ],
-    'ru': [
-        'Ссылки',
-        'Литература',
-    ],
     'eo': [
         'Eksteraj ligiloj',
         'Ekstera ligilo',
@@ -192,6 +188,10 @@ placeBeforeSections = {
         'Veja também',
         'Ver também',
         'Notas',
+    ],
+    'ru': [
+        'Ссылки',
+        'Литература',
     ],
     'sk': [
         'Pozri aj',
