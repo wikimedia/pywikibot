@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Implement deletedrevisions api call (T75370)
+* assert_valid_iter_params may raise AssertionError instead of pywikibot.Error (T233582)
+* Upcast getRedirectTarget result and return the appropriate page subclass (T233392)
+* Add ListGenerator for API:filearchive to site module (T230196)
+* Deprecate the ability to login with a secondary sysop account (T71283)
 * Enable global args with pwb.py wrapper script (T216825)
 * Add a new ConfigParserBot class to set options from the scripts.ini file (T223778)
 * Check a user's rights rather than group memberships; 'sysopnames' will be deprecated (T229293, T189126, T122705, T119335, T75545)
