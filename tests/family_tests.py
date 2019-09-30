@@ -11,7 +11,7 @@ import pywikibot.site
 
 from pywikibot.exceptions import UnknownFamily
 from pywikibot.family import Family, SingleSiteFamily
-from pywikibot.tools import StringTypes as basestring
+from pywikibot.tools import StringTypes as basestring, suppress_warnings
 
 from tests.aspects import (
     unittest,
@@ -50,8 +50,12 @@ class TestFamily(TestCase):
                 if domain.split(':', 1)[0] != 'localhost':
                     self.assertIn('.', domain)
             self.assertEqual(f.name, name)
-            self.assertIsInstance(f.languages_by_size, list)
-            self.assertGreaterEqual(set(f.langs), set(f.languages_by_size))
+
+            with suppress_warnings(
+                    'wowwiki_family.Family.languages_by_size is deprecated'):
+                self.assertIsInstance(f.languages_by_size, list)
+                self.assertGreaterEqual(set(f.langs), set(f.languages_by_size))
+
             if isinstance(f, SingleSiteFamily):
                 self.assertIsNotNone(f.code)
                 self.assertIsNotNone(f.domain)
