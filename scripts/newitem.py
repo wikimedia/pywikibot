@@ -5,7 +5,7 @@ This script creates new items on Wikidata based on certain criteria.
 
 * When was the (Wikipedia) page created?
 * When was the last edit on the page?
-* Does the page contain interwiki's?
+* Does the page contain interwikis?
 
 This script understands various command-line arguments:
 
@@ -16,7 +16,7 @@ This script understands various command-line arguments:
                   created.
 
 -touch            Do a null edit on every page which has a wikibase item.
-                  Be careful, this option can trigger edit rates or captachas
+                  Be careful, this option can trigger edit rates or captchas
                   if your account is not autoconfirmed.
 
 """
@@ -164,7 +164,7 @@ def main(*args):
             'not in the autoconfirmed group on {}. Script '
             'will not touch pages linked to newly created '
             'items to avoid triggering edit rates or '
-            'captachas. Use -touch param to force this.'
+            'captchas. Use -touch param to force this.'
             .format(user.username, bot.site.sitename)))
         bot.options['touch'] = False
     bot.run()
