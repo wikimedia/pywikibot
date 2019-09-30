@@ -22,8 +22,8 @@ You can use any typical pagegenerator to provide with a list of pages:
         -namespace:0 -transcludes:Infobox_stazione_ferroviaria
 
 You can also run over a set of items on the repo without coordinates and
-try to import them from any connected page. To do this, you need to
-explicitly provide the repo as the site using -lang a -family arguments.
+try to import them from any connected page. To do this, you have to
+explicitly provide the repo as the site using -lang and -family arguments.
 Example:
 
     python pwb.py coordinate_import -lang:wikidata -family:wikidata \
