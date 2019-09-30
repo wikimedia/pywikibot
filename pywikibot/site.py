@@ -2283,7 +2283,7 @@ class APISite(BaseSite):
         @type reverse: bool
         @param is_ts: When comparing timestamps (with is_ts=True) the start
             is usually greater than end. Comparing titles this is vice versa.
-        type is_ts: bool
+        @type is_ts: bool
         @raises AssertionError: start/end values are in wrong order
         """
         if reverse ^ is_ts:
