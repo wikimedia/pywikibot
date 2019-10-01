@@ -45,8 +45,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
         'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he',
-        'ja', 'ko', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr',
-        'uk', 'zh',
+        'ja', 'ko', 'li', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta',
+        'tr', 'uk', 'zh',
     ]
 
     # Subpages for documentation.
