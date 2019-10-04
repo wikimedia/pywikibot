@@ -355,6 +355,7 @@ import re
 import shelve
 import socket
 import sys
+from textwrap import fill
 
 import pywikibot
 
@@ -1166,33 +1167,35 @@ class Subject(interwiki_graph.Subject):
 
     def askForHints(self, counter):
         """Ask for hints to other sites."""
-        if not self.workonme:
-            # Do not ask hints for pages that we don't work on anyway
+        if not self.workonme:  # we don't work on it anyway
             return
-        if (self.untranslated or self.conf.askhints) and not self.hintsAsked \
-           and self.originPage and self.originPage.exists() \
-           and not self.originPage.isRedirectPage() and \
-           not self.originPage.isCategoryRedirect():
-            # Only once!
+
+        if ((self.untranslated or self.conf.askhints)
+            and not self.hintsAsked
+            and self.originPage
+            and self.originPage.exists()
+            and not self.originPage.isRedirectPage()
+                and not self.originPage.isCategoryRedirect()):
+
             self.hintsAsked = True
             if self.conf.untranslated:
                 t = self.conf.showtextlink
                 if t:
                     pywikibot.output(self.originPage.get()[:t])
-                # loop
+
                 while True:
                     newhint = pywikibot.input(
                         'Give a hint (? to see pagetext):')
+                    if not newhint:
+                        break
                     if newhint == '?':
                         t += self.conf.showtextlinkadd
                         pywikibot.output(self.originPage.get()[:t])
-                    elif newhint and ':' not in newhint:
-                        pywikibot.output(
+                    elif ':' not in newhint:
+                        pywikibot.output(fill(
                             'Please enter a hint in the format '
                             'language:pagename or type nothing if you do not '
-                            'have a hint.')
-                    elif not newhint:
-                        break
+                            'have a hint.'))
                     else:
                         links = titletranslate.translate(
                             self.originPage,
