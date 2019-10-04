@@ -9,7 +9,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import codecs
-import itertools
+from itertools import chain, combinations
 import os
 import re
 from string import ascii_letters
@@ -547,7 +547,7 @@ class CaseChecker(object):
         else:
 
             # Replace all unambiguous bad words
-            for k, v in mapLat.items() + mapLcl.items():
+            for k, v in dict(chain(mapLat.items(), mapLcl.items())).items():
                 if k not in ambigBadWords:
                     title = title.replace(k, v)
             if len(ambigBadWords) == 0:
@@ -561,8 +561,7 @@ class CaseChecker(object):
                 # latin character.
                 for itemCntToPick in range(len(ambigBadWords) + 1):
                     title2 = title
-                    for uc in itertools.combinations(list(ambigBadWords),
-                                                     itemCntToPick):
+                    for uc in combinations(list(ambigBadWords), itemCntToPick):
                         wordsToLat = ambigBadWords.copy()
                         for bw in uc:
                             title2 = title2.replace(bw, mapLcl[bw])
