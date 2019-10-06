@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -974,19 +974,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
 
-    def test_lock_page(self):
-        """Test the site.lock_page() and site.unlock_page() method."""
-        site = self.get_site()
-        p1 = pywikibot.Page(site, 'Foo')
-
-        site.lock_page(page=p1, block=True)
-        self.assertRaises(pywikibot.site.PageInUse, site.lock_page, page=p1,
-                          block=False)
-        site.unlock_page(page=p1)
-        # verify it's unlocked
-        site.lock_page(page=p1, block=False)
-        site.unlock_page(page=p1)
-
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
         if self.site.mw_version < '1.15':
@@ -1089,7 +1076,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertRaises(AssertionError, func, 'm', 2, 1, True, True)
 
 
-class TestThreadsLockingPage(DefaultSiteTestCase):
+class TestLockingPage(DefaultSiteTestCase):
     """Test cases for lock/unlock a page within threads."""
 
     cached = True
@@ -1102,8 +1089,8 @@ class TestThreadsLockingPage(DefaultSiteTestCase):
         time.sleep(wait)
         page.site.unlock_page(page=page)
 
-    def test_lock_page(self):
-        """Test the site.lock_page() and site.unlock_page() method."""
+    def test_threads_locking_page(self):
+        """Test lock_page and unlock_page methods for multiple threads."""
         # Start few threads
         threads = []
         for i in range(5):
@@ -1120,6 +1107,19 @@ class TestThreadsLockingPage(DefaultSiteTestCase):
                 # In that case is_alive() is True
                 self.assertFalse(thread.is_alive(),
                                  'test page is still locked')
+
+    def test_lock_page(self):
+        """Test the site.lock_page() and site.unlock_page() method."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'Foo')
+
+        site.lock_page(page=p1, block=True)
+        self.assertRaises(pywikibot.site.PageInUse, site.lock_page, page=p1,
+                          block=False)
+        site.unlock_page(page=p1)
+        # verify it's unlocked
+        site.lock_page(page=p1, block=False)
+        site.unlock_page(page=p1)
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):

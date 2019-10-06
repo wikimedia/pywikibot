@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -780,7 +780,7 @@ class BaseSite(ComparableMixin):
             self.code in self.family.use_hard_category_redirects)
 
         # following are for use with lock_page and unlock_page methods
-        self._pagemutex = threading.Lock()
+        self._pagemutex = threading.Condition()
         self._locked_pages = set()
 
     @deprecated(since='20141225')
@@ -880,7 +880,7 @@ class BaseSite(ComparableMixin):
     def __setstate__(self, attrs):
         """Restore things removed in __getstate__."""
         self.__dict__.update(attrs)
-        self._pagemutex = threading.Lock()
+        self._pagemutex = threading.Condition()
 
     def user(self):
         """Return the currently-logged in bot username, or None."""
@@ -1065,29 +1065,12 @@ class BaseSite(ComparableMixin):
 
         """
         title = page.title(with_section=False)
-
-        self._pagemutex.acquire()
-        try:
+        with self._pagemutex:
             while title in self._locked_pages:
                 if not block:
                     raise PageInUse(title)
-
-                # The mutex must be released so that page can be unlocked
-                self._pagemutex.release()
-                time.sleep(.25)
-                self._pagemutex.acquire()
-
+                self._pagemutex.wait()
             self._locked_pages.add(title)
-        finally:
-            # time.sleep may raise an exception from signal handler (eg:
-            # KeyboardInterrupt) while the lock is released, and there is no
-            # reason to acquire the lock again given that our caller will
-            # receive the exception. The state of the lock is therefore
-            # undefined at the point of this finally block.
-            try:
-                self._pagemutex.release()
-            except RuntimeError:
-                pass
 
     def unlock_page(self, page):
         """
@@ -1097,11 +1080,9 @@ class BaseSite(ComparableMixin):
         @type page: pywikibot.Page
 
         """
-        self._pagemutex.acquire()
-        try:
+        with self._pagemutex:
             self._locked_pages.discard(page.title(with_section=False))
-        finally:
-            self._pagemutex.release()
+            self._pagemutex.notify_all()
 
     def disambcategory(self):
         """Return Category in which disambig pages are listed."""
