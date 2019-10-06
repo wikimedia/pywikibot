@@ -1170,43 +1170,45 @@ class Subject(interwiki_graph.Subject):
         if not self.workonme:  # we don't work on it anyway
             return
 
-        if ((self.untranslated or self.conf.askhints)
+        if not (
+            (self.untranslated or self.conf.askhints)
             and not self.hintsAsked
             and self.originPage
             and self.originPage.exists()
             and not self.originPage.isRedirectPage()
                 and not self.originPage.isCategoryRedirect()):
+            return
 
-            self.hintsAsked = True
-            if not self.conf.untranslated:
-                return
+        self.hintsAsked = True
+        if not self.conf.untranslated:
+            return
 
-            t = self.conf.showtextlink
-            if t:
+        t = self.conf.showtextlink
+        if t:
+            pywikibot.output(self.originPage.get()[:t])
+
+        while True:
+            newhint = pywikibot.input('Give a hint (? to see pagetext):')
+            if not newhint:
+                break
+            if newhint == '?':
+                t += self.conf.showtextlinkadd
                 pywikibot.output(self.originPage.get()[:t])
-
-            while True:
-                newhint = pywikibot.input('Give a hint (? to see pagetext):')
-                if not newhint:
-                    break
-                if newhint == '?':
-                    t += self.conf.showtextlinkadd
-                    pywikibot.output(self.originPage.get()[:t])
-                elif ':' not in newhint:
-                    pywikibot.output(fill(
-                        'Please enter a hint in the format language:pagename '
-                        'or type nothing if you do not have a hint.'))
-                else:
-                    links = titletranslate.translate(
-                        self.originPage,
-                        hints=[newhint],
-                        auto=self.conf.auto,
-                        removebrackets=self.conf.hintnobracket)
-                    for link in links:
-                        page = pywikibot.Page(link)
-                        self.addIfNew(page, counter, None)
-                        if self.conf.hintsareright:
-                            self.hintedsites.add(page.site)
+            elif ':' not in newhint:
+                pywikibot.output(fill(
+                    'Please enter a hint in the format language:pagename '
+                    'or type nothing if you do not have a hint.'))
+            else:
+                links = titletranslate.translate(
+                    self.originPage,
+                    hints=[newhint],
+                    auto=self.conf.auto,
+                    removebrackets=self.conf.hintnobracket)
+                for link in links:
+                    page = pywikibot.Page(link)
+                    self.addIfNew(page, counter, None)
+                    if self.conf.hintsareright:
+                        self.hintedsites.add(page.site)
 
     def batchLoaded(self, counter):
         """
