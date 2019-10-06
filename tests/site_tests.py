@@ -9,14 +9,17 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 import pickle
+import random
 import re
 import sys
+import time
 
 try:
     from collections.abc import Iterable, Mapping
 except ImportError:  # Python 2.7
     from collections import Iterable, Mapping
 from datetime import datetime
+import threading
 
 import pywikibot
 
@@ -1085,6 +1088,40 @@ class TestSiteGenerators(DefaultSiteTestCase):
         # reverse=True, is_ts=True
         self.assertIsNone(func('m', 1, 2, True, True))
         self.assertRaises(AssertionError, func, 'm', 2, 1, True, True)
+
+
+class TestThreadsLockingPage(DefaultSiteTestCase):
+    """Test cases for lock/unlock a page within threads."""
+
+    cached = True
+
+    def worker(self):
+        """Lock a page, wait few seconds and unlock the page."""
+        page = pywikibot.Page(self.site, 'Foo')
+        page.site.lock_page(page=page, block=True)
+        wait = random.randint(1, 25) / 10
+        time.sleep(wait)
+        page.site.unlock_page(page=page)
+
+    def test_lock_page(self):
+        """Test the site.lock_page() and site.unlock_page() method."""
+        # Start few threads
+        for i in range(5):
+            thread = threading.Thread(target=self.worker)
+            thread.setDaemon(True)
+            thread.start()
+
+        current_thread = threading.currentThread()
+        for thread in threading.enumerate():
+            if thread is current_thread:
+                continue
+            thread.join(15)  # maximum wait time for all threads
+
+            with self.subTest(name=thread.getName()):
+                # Check whether a timeout happened.
+                # In that case is_alive() is True
+                self.assertFalse(thread.is_alive(),
+                                 'test page is still locked')
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):
