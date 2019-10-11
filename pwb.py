@@ -200,8 +200,9 @@ def find_alternates(filename, script_paths):
           file=sys.stderr)
 
     scripts = {}
-    for file_package in script_paths:
-        path = file_package.split('.')
+
+    script_paths = [['.']] + script_paths  # add current directory
+    for path in script_paths:
         for script_name in os.listdir(os.path.join(*path)):
             # remove .py for better matching
             name, _, suffix = script_name.rpartition('.')
@@ -255,14 +256,17 @@ def find_filename(filename):
                  'found: {0}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
+    path_list = []
     for file_package in script_paths:
-        paths = file_package.split('.') + [filename]
+        package = file_package.split('.')
+        paths = package + [filename]
         testpath = os.path.join(_pwb_dir, *paths)
         if os.path.exists(testpath):
             filename = testpath
             break
+        path_list.append(package)
     else:
-        filename = find_alternates(filename, script_paths)
+        filename = find_alternates(filename, path_list)
     return filename
 
 
