@@ -72,7 +72,7 @@ class TestCategoryObject(TestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
         p1 = pywikibot.Page(site, 'Category:Wikipedia disclaimers')
-        p2 = pywikibot.Page(site, 'Wikipedia:Terms of use')
+        p2 = pywikibot.Page(site, 'Wikipedia:Privacy policy')
         p3 = pywikibot.Page(site, 'Wikipedia:Risk disclaimer')
 
         members = list(cat.members())
@@ -122,7 +122,7 @@ class TestCategoryObject(TestCase):
         """Test the articles method."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
-        p1 = pywikibot.Page(site, 'Wikipedia:Terms of use')
+        p1 = pywikibot.Page(site, 'Wikipedia:Privacy policy')
         p2 = pywikibot.Page(site, 'Wikipedia:Risk disclaimer')
 
         articles = list(cat.articles())
