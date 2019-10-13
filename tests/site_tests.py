@@ -1106,15 +1106,14 @@ class TestThreadsLockingPage(DefaultSiteTestCase):
     def test_lock_page(self):
         """Test the site.lock_page() and site.unlock_page() method."""
         # Start few threads
+        threads = []
         for i in range(5):
             thread = threading.Thread(target=self.worker)
             thread.setDaemon(True)
             thread.start()
+            threads.append(thread)
 
-        current_thread = threading.currentThread()
-        for thread in threading.enumerate():
-            if thread is current_thread:
-                continue
+        for thread in threads:
             thread.join(15)  # maximum wait time for all threads
 
             with self.subTest(name=thread.getName()):
