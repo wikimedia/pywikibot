@@ -60,7 +60,7 @@ class LoginManager(object):
 
     """Site login manager."""
 
-    @deprecated_args(username='user', verbose=None, sysop=False)
+    @deprecated_args(username='user', verbose=None, sysop=None)
     def __init__(self, password=None, site=None, user=None):
         """
         Initializer.
@@ -356,7 +356,7 @@ class OauthLoginManager(LoginManager):
     # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
     # authentication process
 
-    @deprecated_args(sysop=False)
+    @deprecated_args(sysop=None)
     def __init__(self, password=None, site=None, user=None):
         """
         Initializer.
