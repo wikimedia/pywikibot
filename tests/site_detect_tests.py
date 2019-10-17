@@ -10,10 +10,18 @@ from __future__ import absolute_import, division, unicode_literals
 
 from requests.exceptions import ConnectionError, Timeout
 
+import pywikibot
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
+from pywikibot.tools import PY2
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, PatchingTestCase
+from tests.utils import DrySite
+
+if not PY2:
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 
 class SiteDetectionTestCase(TestCase):
@@ -265,6 +273,103 @@ class OtherSiteTestCase(SiteDetectionTestCase):
         http://musicbrainz.org/doc/api.php.
         """
         self.assertNoSite('http://musicbrainz.org/doc/$1')
+
+
+class PrivateWikiTestCase(PatchingTestCase):
+
+    """Test generate_family_file works for private wikis."""
+
+    net = False
+
+    SCHEME = 'https'
+    NETLOC = 'privatewiki.example.com'
+    WEBPATH = '/wiki/'
+    SCRIPTPATH = '/w'
+    APIPATH = SCRIPTPATH + '/api.php'
+    USERNAME = 'Private Wiki User'
+    VERSION = '1.33.0'
+    LANG = 'ike-cans'
+
+    _server = SCHEME + '://' + NETLOC
+    _weburl = _server + WEBPATH
+    _apiurl = _server + APIPATH
+    _generator = 'MediaWiki ' + VERSION
+
+    _responses = {
+        # site_detect.MWSite.__init__ first fetches whatever is at
+        # the user-supplied URL. We need to return enough data for
+        # site_detect.WikiHTMLPageParser to determine the server
+        # version and the API URL.
+        WEBPATH: ''.join((
+            '<meta name="generator" content="', _generator,
+            '"/>\n<link rel="EditURI" type="application/rsd+xml" '
+            'href="', _apiurl, '?action=rsd"/>')),
+        APIPATH: '{"error":{"code":"readapidenied"}}',
+    }
+
+    _siteinfo = {
+        'generator': _generator,
+        'server': _server,
+        'scriptpath': SCRIPTPATH,
+        'articlepath': WEBPATH.rstrip('/') + '/$1',
+        'lang': LANG,
+    }
+
+    @PatchingTestCase.patched(pywikibot.site_detect, 'fetch')
+    def fetch(self, url, *args, **kwargs):
+        """Patched version of pywikibot.site_detect.fetch."""
+        parsed_url = urlparse(url)
+        self.assertEqual(parsed_url.scheme, self.SCHEME)
+        self.assertEqual(parsed_url.netloc, self.NETLOC)
+        self.assertIn(parsed_url.path, self._responses)
+
+        return type(str('Response'),
+                    (object,),
+                    {'status': 200,
+                     'text': self._responses[parsed_url.path],
+                     'data': type(str('ResponseData'),
+                                  (object,),
+                                  {'url': url})})
+
+    @PatchingTestCase.patched(pywikibot, 'input')
+    def input(self, question, *args, **kwargs):
+        """Patched version of pywikibot.input."""
+        self.assertTrue(question.endswith('username?'))
+        return self.USERNAME
+
+    @PatchingTestCase.patched(pywikibot, 'Site')
+    def Site(self, code=None, fam=None, user=None, *args, **kwargs):
+        """Patched version of pywikibot.Site."""
+        self.assertEqual(code, fam.code)
+        self.assertEqual(fam.domain, self.NETLOC)
+        self.assertEqual(user, self.USERNAME)
+        if not args and 'sysop' not in kwargs:
+            kwargs['sysop'] = None
+        site = DrySite(code, fam, user, *args, **kwargs)
+        site._siteinfo._cache.update(
+            (key, (value, True))
+            for key, value in self._siteinfo.items())
+        return site
+
+    def test_T235768_failure(self):
+        """Test generate_family_file works for private wikis.
+
+        generate_family_file.FamilyFileGenerator.run() does:
+          w = self.Wiki(self.base_url)
+          self.wikis[w.lang] = w
+
+        where self.Wiki is pywikibot.site_detect.MWSite.__init__.
+        That calls MWSite._parse_post_117() which sets lang, but
+        that call's wrapped to log exceptions and then continue
+        past them.  In T235768, the code that handles private
+        wikis raises an exception that's consumed in that way.
+        The value returned to FamilyFileGenerator.run() does not
+        have lang set, causing generate_family_file to bomb.
+        """
+        site = MWSite(self._weburl)
+        self.assertIsInstance(site, MWSite)
+        self.assertTrue(hasattr(site, 'lang'))
+        self.assertEqual(site.lang, self.LANG)
 
 
 if __name__ == '__main__':  # pragma: no cover
