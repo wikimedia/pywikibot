@@ -214,6 +214,7 @@ logbook = {
     'ja': '利用者:Alexbot/Welcomebotログ',
     'nl': 'Project:Logboek welkom',
     'no': 'Project:Velkomstlogg',
+    'sd': 'Project:ڀليڪار دوڳي',
     'sq': 'Project:Tung log',
     'ur': 'Project:نوشتہ خوش آمدید',
     'zh': 'User:Welcomebot/欢迎日志',
