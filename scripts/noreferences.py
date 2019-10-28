@@ -193,6 +193,11 @@ placeBeforeSections = {
         'Ссылки',
         'Литература',
     ],
+    'sd': [
+        'وڌيڪ ڏسو',
+        'حوالا',
+        'خارجي ڳنڌڻا',
+    ],
     'sk': [
         'Pozri aj',
     ],
@@ -354,6 +359,9 @@ referencesSections = {
         'pt': [
             'Referências',
         ],
+        'sd': [
+            'حوالا',
+        ],
         'sk': [
             'Referencie',
         ],
@@ -430,6 +438,8 @@ referencesTemplates = {
         'ru': ['Reflist', 'Ref-list', 'Refs', 'Sources',
                'Примечания', 'Список примечаний',
                'Сноска', 'Сноски'],
+        'sd': ['Reflist', 'Refs', 'Reference',
+               'حوالا'],
         'sr': ['Reflist', 'Референце', 'Извори', 'Рефлист'],
         'szl': ['Przipisy', 'Připisy'],
         'th': ['รายการอ้างอิง'],
@@ -455,6 +465,7 @@ referencesSubstitute = {
         'hu': '{{Források}}',
         'pl': '{{Przypisy}}',
         'ru': '{{примечания}}',
+        'sd': '{{حوالا}}',
         'sr': '{{reflist}}',
         'szl': '{{Przipisy}}',
         'th': '{{รายการอ้างอิง}}',
