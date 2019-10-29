@@ -1200,8 +1200,8 @@ class BaseSite(ComparableMixin):
             return True
         # Replace underscores with spaces and multiple combinations of them
         # with only one space
-        title1 = re.sub(r'[_ ]+', ' ', title1)
-        title2 = re.sub(r'[_ ]+', ' ', title2)
+        title1 = re.sub(r'[_\- ]+', ' ', title1)
+        title2 = re.sub(r'[_\- ]+', ' ', title2)
         if title1 == title2:
             return True
         default_ns = self.namespaces[0]
