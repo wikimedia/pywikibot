@@ -12,6 +12,7 @@ from random import choice
 from pywikibot import Site
 
 from tests.aspects import unittest, DefaultSiteTestCase
+from tests.utils import allowed_failure
 
 import generate_family_file
 
@@ -52,7 +53,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
-    @unittest.expectedFailure  # T194138
+    @allowed_failure  # T194138
     def test_attributes_after_run(self):
         """Test FamilyFileGenerator attributes after run()."""
         self.generator_instance.run()
@@ -61,9 +62,8 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
             self.assertIn(lang, self.generator_instance.wikis)
         for i in range(10):
             lang = choice(self.generator_instance.langs)
-            with self.subTest(lang=lang['prefix']):
-                site = Site(url=lang['url'])
-                self.assertEqual(site.lang, lang['prefix'])
+            site = Site(url=lang['url'])
+            self.assertEqual(site.lang, lang['prefix'])
 
 
 if __name__ == '__main__':  # pragma: no cover
