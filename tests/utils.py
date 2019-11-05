@@ -7,6 +7,7 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from functools import wraps
 import inspect
 import json
 import os
@@ -84,6 +85,7 @@ def allowed_failure(func):
     This decorator runs the test and, if it is a failure, reports the result
     and considers it a skipped test.
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
@@ -98,7 +100,6 @@ def allowed_failure(func):
         except Exception:
             pywikibot.exception(tb=True)
             raise unittest.SkipTest('Test is allowed to fail.')
-    wrapper.__name__ = func.__name__
 
     if PY2:
         return unittest.expectedFailure(func)
