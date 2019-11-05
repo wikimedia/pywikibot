@@ -7,7 +7,6 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import os
 import pickle
 import random
 import re
@@ -46,7 +45,7 @@ from tests.aspects import (
     AlteredDefaultSiteTestCase,
 )
 from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
-from tests.utils import allowed_failure, allowed_failure_if, entered_loop
+from tests.utils import entered_loop
 
 if not PY2:
     long = int  # Must be global: T159700
@@ -1264,7 +1263,6 @@ class TestImageUsage(DefaultSiteTestCase):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertIn(imagepage, list(using.imagelinks()))
 
-    @allowed_failure_if(os.environ.get('TRAVIS', 'false') == 'true')
     def test_image_usage_in_redirects(self):
         """Test the site.imageusage() method on redirects only."""
         mysite = self.get_site()
@@ -3263,7 +3261,6 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count > 5:
                 break
 
-    @allowed_failure
     def test_preload_langlinks_normal(self):
         """Test preloading continuation works."""
         # FIXME: test fails
@@ -3302,28 +3299,6 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertRegex(
                 output_mock.call_args[0][0], r'Retrieving \d pages from ')
 
-    def _test_preload_langlinks_long(self):
-        """Test preloading continuation works."""
-        # FIXME: test fails. It is disabled as it takes more
-        # than 10 minutes on travis for English Wikipedia
-        mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        count = 0
-        links = mainpage.backlinks(total=100)
-        for page in mysite.preloadpages(links, groupsize=50,
-                                        langlinks=True):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertLength(page._revisions, 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
-                self.assertTrue(hasattr(page, '_langlinks'))
-            count += 1
-
-        self.assertLength(links, count)
-
-    @allowed_failure
     def test_preload_templates(self):
         """Test preloading templates works."""
         mysite = self.get_site()
@@ -3343,6 +3318,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
+    @unittest.expectedFailure
     def test_preload_templates_and_langlinks(self):
         """Test preloading templates and langlinks works."""
         mysite = self.get_site()
