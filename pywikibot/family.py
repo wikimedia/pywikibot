@@ -986,7 +986,7 @@ class Family(object):
         @param fam: family name (if omitted, uses the configured default)
         @type fam: str
         @return: a Family instance configured for the named family.
-        @raises UnknownFamily: family not known
+        @raises pywikibot.exceptions.UnknownFamily: family not known
         """
         if fam is None:
             fam = config.family

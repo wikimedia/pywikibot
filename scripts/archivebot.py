@@ -280,7 +280,7 @@ def template_title_regex(tpl_page):
     case-insensitivity depending on the namespace.
 
     @param tpl_page: The template page
-    @type tpl_page: Page
+    @type tpl_page: pywikibot.page.Page
     """
     ns = tpl_page.site.namespaces[tpl_page.namespace()]
     marker = '?' if ns.id == 10 else ''

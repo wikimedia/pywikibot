@@ -67,7 +67,7 @@ class Subject(object):
         """Initializer.
 
         @param originPage: the page on the 'origin' wiki
-        @type originPage: Page
+        @type originPage: pywikibot.page.Page
         """
         # Remember the "origin page"
         self._origin = origin
@@ -131,7 +131,7 @@ class GraphDrawer(object):
         """Initializer.
 
         @param subject: page data to graph
-        @type subject: Subject
+        @type subject: pywikibot.interwiki_graph.Subject
 
         @raises GraphImpossible: pydot is not installed
         """
@@ -255,7 +255,7 @@ def getFilename(page, extension=None):
     Create a filename that is unique for the page.
 
     @param page: page used to create the new filename
-    @type page: Page
+    @type page: pywikibot.page.Page
     @param extension: file extension
     @type extension: str
     @return: filename of <family>-<lang>-<page>.<ext>

@@ -130,7 +130,7 @@ def findDuplicateImages(photo, site=None):
     @type photo: io.BytesIO
     @param site: Site to search for duplicates.
         Defaults to using Wikimedia Commons if not supplied.
-    @type site: APISite or None
+    @type site: pywikibot.site.APISite or None
     """
     if not site:
         site = pywikibot.Site('commons', 'commons')

@@ -737,7 +737,7 @@ class checkImagesBot(object):
         @param listGiven: a list of tuples which hold seconds and FilePage
         @type listGiven: list
         @return: the most used or oldest image
-        @rtype: FilePage
+        @rtype: pywikibot.page.FilePage
         """
         # find the most used image
         inx_found = None  # index of found image

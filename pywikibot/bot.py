@@ -726,12 +726,12 @@ class InteractiveReplace(object):
 
         @param old_link: The old link which is searched. The label and section
             are ignored.
-        @type old_link: Link or Page
+        @type old_link: pywikibot.page.Link or pywikibot.page.Page
         @param new_link: The new link with which it should be replaced.
             Depending on the replacement mode it'll use this link's label and
             section. If False it'll unlink all and the attributes beginning
             with allow_replace are ignored.
-        @type new_link: Link or Page or False
+        @type new_link: pywikibot.page.Link or pywikibot.page.Page or False
         @param default: The default answer as the shortcut
         @type default: None or str
         @param automatic_quit: Add an option to quit and raise a
@@ -1181,7 +1181,8 @@ class OptionHandler(object):
         Get the current value of an option.
 
         @param option: key defined in OptionHandler.availableOptions
-        @raise Error: No valid option is given with option parameter
+        @raise pywikibot.exceptions.Error: No valid option is given with
+            option parameter
         """
         try:
             return self.options.get(option, self.availableOptions[option])
@@ -2028,7 +2029,7 @@ class WikidataBot(Bot, ExistingPageBot):
         Edit entity with data provided, with user confirmation as required.
 
         @param item: page to be edited
-        @type item: ItemPage
+        @type item: pywikibot.page.ItemPage
         @param data: data to be saved, or None if the diff should be created
           automatically
         @param ignore_save_related_errors: Ignore save related errors and

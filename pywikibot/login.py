@@ -75,7 +75,8 @@ class LoginManager(object):
         @param password: password to use
         @type password: basestring
 
-        @raises NoUsername: No username is configured for the requested site.
+        @raises pywikibot.exceptions.NoUsername: No username is configured
+            for the requested site.
         """
         site = self.site = site or pywikibot.Site()
         if not user:
@@ -104,7 +105,8 @@ class LoginManager(object):
 
         @see: U{https://www.mediawiki.org/wiki/API:Users}
 
-        @raises NoUsername: Username doesn't exist in user list.
+        @raises pywikibot.exceptions.NoUsername: Username doesn't exist in
+            user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
         main_username = self.username
@@ -275,7 +277,8 @@ class LoginManager(object):
                            using unified login
         @type autocreate: bool
 
-        @raises NoUsername: Username is not recognised by the site.
+        @raises pywikibot.exceptions.NoUsername: Username is not recognised by
+            the site.
         """
         if not self.password:
             # First check that the username exists,
@@ -371,7 +374,8 @@ class OauthLoginManager(LoginManager):
         @param password: consumer secret
         @type password: basestring
 
-        @raises NoUsername: No username is configured for the requested site.
+        @raises pywikibot.exceptions.NoUsername: No username is configured
+            for the requested site.
         @raises OAuthImpossible: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):

@@ -53,7 +53,7 @@ class Photo(pywikibot.FilePage):
             from the title & template
         @type metadata: dict
         @param site: target site
-        @type site: APISite
+        @type site: pywikibot.site.APISite
 
         """
         self.URL = URL
@@ -161,7 +161,8 @@ class DataIngestionBot(pywikibot.Bot):
             Use None to determine the site from the pages treated.
             Defaults to 'deprecated_default_commons' to use Wikimedia Commons
             for backwards compatibility reasons. Deprecated.
-        @type site: APISite, 'deprecated_default_commons' or None
+        @type site: pywikibot.site.APISite, 'deprecated_default_commons' or
+            None
         """
         if site == 'deprecated_default_commons':
             warn("site='deprecated_default_commons' is deprecated; "

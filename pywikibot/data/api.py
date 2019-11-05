@@ -873,7 +873,7 @@ class OptionSet(MutableMapping):
         If a site is given, the module and param must be given too.
 
         @param site: The associated site
-        @type site: APISite
+        @type site: piwikibot.site.APISite
         @param module: The module name which is used by paraminfo. (Ignored
             when site is None)
         @type module: str
@@ -898,7 +898,7 @@ class OptionSet(MutableMapping):
         unless there had been invalid names and a KeyError was thrown.
 
         @param site: The associated site
-        @type site: APISite
+        @type site: pywikibot.site.APISite
         @param module: The module name which is used by paraminfo.
         @type module: str
         @param param: The parameter name inside the module. That parameter must
@@ -3293,7 +3293,7 @@ def update_page(page, pagedict, props=[]):
     """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
-    @type page: Page
+    @type page: pywikibot.page.Page
     @param pagedict: the contents of a "page" element of a query response
     @type pagedict: dict
     @param props: the property names which resulted in pagedict. If a missing
@@ -3301,8 +3301,9 @@ def update_page(page, pagedict, props=[]):
         property which would make the value present must be in the props
         parameter.
     @type props: iterable of string
-    @raises InvalidTitle: Page title is invalid
-    @raises UnsupportedPage: Page with namespace < 0 is not supported yet
+    @raises pywikibot.exceptions.InvalidTitle: Page title is invalid
+    @raises pywikibot.exceptions.UnsupportedPage: Page with namespace < 0
+        is not supported yet
     """
     _update_pageid(page, pagedict)
     _update_contentmodel(page, pagedict)

@@ -38,7 +38,7 @@ class FlowPage(BasePage):
         """Initializer.
 
         @param source: A Flow-enabled site or a Link or Page on such a site
-        @type source: Site, Link, or Page
+        @type source: Site, pywikibot.page.Link, or pywikibot.page.Page
         @param title: normalized title of the page
         @type title: str
 

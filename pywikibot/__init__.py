@@ -1166,7 +1166,7 @@ def _code_fam_from_url(url):
     Site helper method.
     @param url: The site URL to get code and family
     @type url: str
-    @raises SiteDefinitionError: Unknown URL
+    @raises pywikibot.exceptions.SiteDefinitionError: Unknown URL
     """
     if url not in _url_cache:
         matched_sites = []
@@ -1202,7 +1202,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @param code: language code (override config.mylang)
     @type code: str
     @param fam: family name or object (override config.family)
-    @type fam: str or Family
+    @type fam: str or pywikibot.family.Family
     @param user: bot user name to use on this site (override config.usernames)
     @type user: str
     @param sysop: sysop user to use on this site (override config.sysopnames)
@@ -1216,7 +1216,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @rtype: pywikibot.site.APISite
     @raises ValueError: URL and pair of code and family given
     @raises ValueError: Invalid interface name
-    @raises SiteDefinitionError: Unknown URL
+    @raises pywikibot.exceptions.SiteDefinitionError: Unknown URL
     """
     _logger = 'wiki'
 

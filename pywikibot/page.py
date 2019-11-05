@@ -184,7 +184,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             wikitext, URLs, or another non-normalized source.
 
         @param source: the source of the page
-        @type source: BaseLink (or subclass), Page (or subclass), or Site
+        @type source: pywikibot.page.BaseLink (or subclass),
+            pywikibot.page.Page (or subclass), or pywikibot.page.Site
         @param title: normalized title of the page; required if source is a
             Site, ignored otherwise
         @type title: str
@@ -468,12 +469,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         retrieved yet, or if force is True. This can raise the following
         exceptions that should be caught by the calling code:
 
-        @exception NoPage:         The page does not exist
-        @exception IsRedirectPage: The page is a redirect. The argument of the
-                                   exception is the title of the page it
-                                   redirects to.
-        @exception SectionError:   The section does not exist on a page with
-                                   a # link
+        @exception pywikibot.exceptions.NoPage: The page does not exist
+        @exception pywikibot.exceptions.IsRedirectPage: The page is a redirect.
+            The argument of the exception is the title of the page it
+            redirects to.
+        @exception pywikibot.exceptions.SectionError: The section does not
+            exist on a page with a # link
 
         @param force:           reload all page attributes, including errors.
         @param get_redirect:    return the redirect text, do not follow the
@@ -883,7 +884,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         If this is a category redirect, return the target category title.
 
-        @rtype: Category
+        @rtype: pywikibot.page.Category
         """
         if self.isCategoryRedirect():
             return Category(Link(self._catredirect, self.site))
@@ -1561,7 +1562,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Convenience function to get the Wikibase item of a page.
 
-        @rtype: ItemPage
+        @rtype: pywikibot.page.ItemPage
         """
         return ItemPage.fromPage(self)
 
@@ -1676,7 +1677,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Uses the MediaWiki extension PageImages.
 
         @return: A FilePage object
-        @rtype: FilePage
+        @rtype: pywikibot.page.FilePage
         """
         if not hasattr(self, '_pageimage'):
             self._pageimage = None
@@ -1705,8 +1706,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         If this page was not moved, it will raise a NoPage exception.
         This method also works if the source was already deleted.
 
-        @rtype: pywikibot.Page
-        @raises NoPage: this page was not moved
+        @rtype: pywikibot.page.Page
+        @raises pywikibot.exceptions.NoPage: this page was not moved
         """
         try:
             return self.moved_target()
@@ -1720,8 +1721,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         If this page was not moved, it will raise a NoMoveTarget exception.
         This method also works if the source was already deleted.
 
-        @rtype: pywikibot.Page
-        @raises NoMoveTarget: this page was not moved
+        @rtype: pywikibot.page.Page
+        @raises pywikibot.exceptions.NoMoveTarget: this page was not moved
         """
         gen = iter(self.site.logevents(logtype='move', page=self, total=1))
         try:
@@ -2137,9 +2138,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Remove page from oldCat and add it to newCat.
 
         @param old_cat: category to be removed
-        @type old_cat: Category
+        @type old_cat: pywikibot.page.Category
         @param new_cat: category to be added, if any
-        @type new_cat: Category or None
+        @type new_cat: pywikibot.page.Category or None
 
         @param summary: string to use as an edit summary
 
@@ -2359,7 +2360,7 @@ class Page(BasePage):
         @return: a list of tuples with one tuple for each template invocation
             in the page, with the template Page as the first entry and a list
             of parameters as the second entry.
-        @rtype: list of (Page, list)
+        @rtype: list of (pywikibot.page.Page, list)
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
@@ -3037,7 +3038,7 @@ class Category(Page):
         Copy text of category page to a new page. Does not move contents.
 
         @param cat: New category title (without namespace) or Category object
-        @type cat: str or Category
+        @type cat: str or pywikibot.page.Category
         @param message: message to use for category creation message
             If two %s are provided in message, will be replaced
             by (self.title, authorsList)
@@ -3814,7 +3815,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         initialisation logic.
 
         @param site: Wikibase data site
-        @type site: DataSite
+        @type site: pywikibot.site.DataSite
         @param title: normalized title of the page
         @type title: str
         @kwarg ns: namespace
@@ -4311,7 +4312,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         Add a claim to the entity.
 
         @param claim: The claim to add
-        @type claim: Claim
+        @type claim: pywikibot.page.Claim
         @param bot: Whether to flag as bot (if possible)
         @type bot: bool
         @keyword asynchronous: if True, launch a separate thread to add claim
@@ -4504,14 +4505,16 @@ class ItemPage(WikibasePage):
         Get the ItemPage for a Page that links to it.
 
         @param page: Page to look for corresponding data item
-        @type page: pywikibot.Page
+        @type page: pywikibot.page.Page
         @param lazy_load: Do not raise NoPage if either page or corresponding
                           ItemPage does not exist.
         @type lazy_load: bool
-        @rtype: ItemPage
+        @rtype: pywikibot.page.ItemPage
 
-        @raise NoPage: There is no corresponding ItemPage for the page
-        @raise WikiBaseError: The site of the page has no data repository.
+        @raise pywikibot.exceptions.NoPage: There is no corresponding
+            ItemPage for the page
+        @raise pywikibot.exceptions.WikiBaseError: The site of the page
+            has no data repository.
         """
         if hasattr(page, '_item'):
             return page._item
@@ -4549,11 +4552,11 @@ class ItemPage(WikibasePage):
         @type uri: basestring
         @param lazy_load: Do not raise NoPage if ItemPage does not exist.
         @type lazy_load: bool
-        @rtype: ItemPage
+        @rtype: pywikibot.page.ItemPage
 
         @raise TypeError: Site is not a valid DataSite.
         @raise ValueError: Site does not match the base of the provided uri.
-        @raise NoPage: Uri points to non-existent item.
+        @raise pywikibot.exceptions.NoPage: Uri points to non-existent item.
         """
         if not isinstance(site, DataSite):
             raise TypeError('{0} is not a data repository.'.format(site))
@@ -4761,7 +4764,7 @@ class ItemPage(WikibasePage):
         Merge the item into another item.
 
         @param item: The item to merge into
-        @type item: ItemPage
+        @type item: pywikibot.page.ItemPage
         """
         data = self.repo.mergeItems(from_item=self, to_item=item, **kwargs)
         if not data.get('success', 0):
@@ -4780,7 +4783,7 @@ class ItemPage(WikibasePage):
         You need to define an extra argument to make this work, like save=True
 
         @param target_page: target of the redirect, this argument is required.
-        @type target_page: ItemPage or string
+        @type target_page: pywikibot.page.ItemPage or string
         @param force: if true, it sets the redirect target even the page
             is not redirect.
         @type force: bool
@@ -4985,7 +4988,7 @@ class PropertyPage(WikibasePage, Property):
         """
         Helper function to create a new claim object for this property.
 
-        @rtype: Claim
+        @rtype: pywikibot.page.Claim
         """
         # todo: raise when self.id is -1
         return Claim(self.site, self.getID(), datatype=self.type,
@@ -5099,7 +5102,7 @@ class Claim(Property):
         """
         Create an independent copy of this object.
 
-        @rtype: Claim
+        @rtype: pywikibot.page.Claim
         """
         is_qualifier = self.isQualifier
         is_reference = self.isReference
@@ -5121,7 +5124,7 @@ class Claim(Property):
         @param data: JSON containing claim data
         @type data: dict
 
-        @rtype: Claim
+        @rtype: pywikibot.page.Claim
         """
         claim = cls(site, data['mainsnak']['property'],
                     datatype=data['mainsnak'].get('datatype', None))
@@ -5191,7 +5194,7 @@ class Claim(Property):
         differently like references, but I'm not
         sure if this even requires it's own function.
 
-        @rtype: Claim
+        @rtype: pywikibot.page.Claim
         """
         claim = cls.fromJSON(site, {'mainsnak': data,
                                     'hash': data.get('hash')})
@@ -5404,7 +5407,7 @@ class Claim(Property):
         """Add the given qualifier.
 
         @param qualifier: the qualifier to add
-        @type qualifier: Claim
+        @type qualifier: pywikibot.page.Claim
         """
         if qualifier.on_item is not None:
             raise ValueError(
@@ -5423,7 +5426,7 @@ class Claim(Property):
         Remove the qualifier. Call removeQualifiers().
 
         @param qualifier: the qualifier to remove
-        @type qualifier: Claim
+        @type qualifier: pywikibot.page.Claim
         """
         self.removeQualifiers([qualifier], **kwargs)
 
@@ -5894,10 +5897,10 @@ class BaseLink(UnicodeMixin, ComparableMixin):
         """
         Create a BaseLink to a Page.
 
-        @param page: target Page
-        @type page: Page
+        @param page: target pywikibot.page.Page
+        @type page: pywikibot.page.Page
 
-        @rtype: BaseLink
+        @rtype: pywikibot.page.BaseLink
         """
         title = page.title(with_ns=False,
                            allow_interwiki=False,
@@ -6259,11 +6262,11 @@ class Link(BaseLink):
         Create a Link to a Page.
 
         @param page: target Page
-        @type page: Page
+        @type page: pywikibot.page.Page
         @param source: Link from site source
         @param source: Site
 
-        @rtype: Link
+        @rtype: pywikibot.page.Link
         """
         base_link = BaseLink.fromPage(page)
         link = cls.__new__(cls)
@@ -6291,7 +6294,7 @@ class Link(BaseLink):
         @param source: Link from site source
         @param source: Site
 
-        @rtype: Link
+        @rtype: pywikibot.page.Link
         """
         link = cls.__new__(cls)
         if source.family.interwiki_forward:
@@ -6434,7 +6437,7 @@ class SiteLink(BaseLink):
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
 
-        @rtype: SiteLink
+        @rtype: pywikibot.page.SiteLink
         """
         sl = cls(data['title'], data['site'])
         repo = site or sl.site.data_repository()
@@ -6475,8 +6478,8 @@ class SiteLinkCollection(dict):
         Get the SiteLink with the given key.
 
         @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @rtype: SiteLink
+        @type key: pywikibot.page.Site or str
+        @rtype: pywikibot.page.SiteLink
         """
         if isinstance(key, pywikibot.site.BaseSite):
             key = key.dbName()
@@ -6490,7 +6493,7 @@ class SiteLinkCollection(dict):
         @type key: pywikibot.Site or str
         @param val: page name as a string or JSON containing SiteLink data
         @type val: dict or str
-        @rtype: SiteLink
+        @rtype: pywikibot.page.SiteLink
         """
         if isinstance(val, UnicodeType):
             val = SiteLink(val, key)
