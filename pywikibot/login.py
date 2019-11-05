@@ -173,9 +173,10 @@ class LoginManager(object):
         """
         Store cookie data.
 
-        The argument data is the raw data, as returned by getCookie().
+        @param data: The raw data as returned by getCookie()
+        @type data: str
 
-        Returns nothing.
+        @return: None
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')

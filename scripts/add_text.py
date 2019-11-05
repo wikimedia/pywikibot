@@ -76,7 +76,19 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 def get_text(page, old, create):
-    """Get the old text."""
+    """
+    Get text on page. If old is not None, return old.
+
+    @param page: The page to get text from
+    @type page: pywikibot.page.BasePage
+    @param old: If not None, this parameter is returned instead
+        of fetching text from the page
+    @type old: str
+    @param create: Create the page if it doesn't exist
+    @type create: bool
+    @return: The page's text or old parameter if not None
+    @rtype: str
+    """
     if old is None:
         try:
             text = page.get()
@@ -98,7 +110,23 @@ def get_text(page, old, create):
 
 
 def put_text(page, new, summary, count, asynchronous=False):
-    """Save the new text."""
+    """
+    Save the new text.
+
+    @param page: The page to update and save
+    @type page: pywikibot.page.BasePage
+    @param new: The new text for the page
+    @type new: str
+    @param summary: Summary of page changes.
+    @type summary: str
+    @param count: Maximum num attempts to reach the server
+    @type count: int
+    @param asynchronous: Save the page asynchronously
+    @type asynchronous: bool
+    @return: True if successful, False if unsuccessful, None if
+        waiting for server
+    @rtype: bool / None
+    """
     page.text = new
     try:
         page.save(summary=summary, asynchronous=asynchronous,
@@ -132,7 +160,34 @@ def add_text(page, addText, summary=None, regexSkip=None,
     """
     Add text to a page.
 
-    @rtype: tuple of (text, newtext, always)
+    @param page: The page to add text to
+    @type page: pywikibot.page.BasePage
+    @param addText: Text to add
+    @type addText: str
+    @param summary: Summary of changes. If None, beginning of addText is used.
+    @type summary: str
+    @param regexSkip: Abort if text on page matches
+    @type regexSkip: str
+    @param regexSkipUrl: Abort if full url matches
+    @type regexSkipUrl: str
+    @param always: Always add text without user confirmation
+    @type always: bool
+    @param up: If True, add text to top of page, else add at bottom.
+    @type up: bool
+    @param putText: If True, save changes to the page, else return
+        (text, newtext, always)
+    @type putText: bool
+    @param oldTextGiven: If None fetch page text, else use this text
+    @type oldTextGiven: str
+    @param reorderEnabled: If True place text above categories and
+        interwiki, else place at page bottom. No effect if up = False.
+    @type reorderEnabled: bool
+    @param create: Create page if it does not exist
+    @type create: bool
+    @return: If putText=True: (success, success, always)
+        else: (text, newtext, always)
+    @rtype: Tuple of (bool, bool, bool) or (str, str, bool)
+        depending on value of putText parameter
     """
     site = page.site
     if not summary:
