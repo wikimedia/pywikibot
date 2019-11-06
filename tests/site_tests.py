@@ -3263,21 +3263,19 @@ class TestPagePreloading(DefaultSiteTestCase):
 
     def test_preload_langlinks_normal(self):
         """Test preloading continuation works."""
-        # FIXME: test fails
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        count = 0
-        links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, groupsize=5, langlinks=True):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertLength(page._revisions, 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
-                self.assertTrue(hasattr(page, '_langlinks'))
-            count += 1
-            if count >= 6:
+        links = mysite.pagelinks(self.get_mainpage(), total=10)
+        gen = mysite.preloadpages(links, groupsize=5, langlinks=True)
+        for count, page in enumerate(gen):
+            with self.subTest(page=page.title()):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertIsInstance(page.exists(), bool)
+                if page.exists():
+                    self.assertLength(page._revisions, 1)
+                    self.assertIsNotNone(page._revisions[page._revid].text)
+                    self.assertFalse(hasattr(page, '_pageprops'))
+                    self.assertTrue(hasattr(page, '_langlinks'))
+            if count >= 5:
                 break
 
     @patch.object(pywikibot, 'output')
@@ -3302,20 +3300,19 @@ class TestPagePreloading(DefaultSiteTestCase):
     def test_preload_templates(self):
         """Test preloading templates works."""
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        count = 0
         # Use backlinks, as any backlink has at least one link
-        links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, templates=True):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertLength(page._revisions, 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
-                self.assertTrue(hasattr(page, '_templates'))
-            count += 1
-            if count >= 6:
+        links = mysite.pagelinks(self.get_mainpage(), total=10)
+        gen = mysite.preloadpages(links, templates=True)
+        for count, page in enumerate(gen):
+            with self.subTest(page=page.title()):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertIsInstance(page.exists(), bool)
+                if page.exists():
+                    self.assertLength(page._revisions, 1)
+                    self.assertIsNotNone(page._revisions[page._revid].text)
+                    self.assertFalse(hasattr(page, '_pageprops'))
+                    self.assertTrue(hasattr(page, '_templates'))
+            if count >= 5:
                 break
 
     @unittest.expectedFailure
