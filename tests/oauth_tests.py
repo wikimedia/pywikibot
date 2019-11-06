@@ -59,8 +59,9 @@ class TestOauthLoginManger(DefaultOAuthSiteTestCase):
     """Test OAuth login manager."""
 
     def _get_login_manager(self):
-        login_manager = OauthLoginManager(self.consumer_token[1], False,
-                                          self.site, self.consumer_token[0])
+        login_manager = OauthLoginManager(password=self.consumer_token[1],
+                                          site=self.site,
+                                          user=self.consumer_token[0])
         # Set access token directly, discard user interaction token fetching
         login_manager._access_token = self.access_token
         return login_manager
