@@ -2108,8 +2108,7 @@ class APISite(BaseSite):
                                              right=self._username[sysop]))
             else:
                 raise NoUsername('Logging in on %s via OAuth failed' % self)
-        login_manager = api.LoginManager(
-            site=self, sysop=sysop, user=self._username[sysop])
+        login_manager = api.LoginManager(site=self, user=self._username[sysop])
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username[sysop] = login_manager.username
             self.getuserinfo(force=True)
