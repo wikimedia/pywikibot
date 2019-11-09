@@ -7637,6 +7637,146 @@ class DataSite(APISite):
                               total=total, parameters=parameters)
         return gen
 
+    def _wbset_action(self, itemdef, action, action_data, **kwargs):
+        """
+        Execute wbset{action}' on a Wikibase item.
+
+        Supported actions are:
+            wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
+
+        @param itemdef: Item to modify or create
+        @type itemdef: str, WikibasePage or Page coonected to such item
+        @param action: wbset{action] to perform:
+            'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
+        @type action: str
+        @param data: data to be used in API request, see API help
+        @type data: SiteLink or dict
+            wbsetaliases:
+                dict shall have the following structure:
+                {'language': value (str),
+                 'add': list of language codes (str),
+                 'remove': list of language codes (str),
+                 'set' list of language codes (str)
+                  }
+                'add' and 'remove' are alternative to 'set'
+            wbsetdescription and wbsetlabel:
+                dict shall have keys 'language', 'value'
+            wbsetsitelink:
+                dict shall have keys 'linksite', 'linktitle' and
+                optionally 'badges'
+        @kwargs bot: Whether to mark the edit as a bot edit, default is False
+        @type bot: bool
+        @return: query result
+        @rtype: dict
+        @raises AssertionError, TypeError
+        """
+        def format_sitelink(sitelink):
+            """Convert SiteLink to a dict accepted by wbsetsitelink API."""
+            if isinstance(sitelink, pywikibot.page.SiteLink):
+                _dict = {
+                    'linksite': sitelink._sitekey,
+                    'linktitle': sitelink._rawtitle,
+                    'badges': '|'.join([b.title() for b in sitelink.badges]),
+                }
+            else:
+                _dict = sitelink
+
+            return _dict
+
+        def prepare_data(action, data):
+            """Prepare data as expected by API."""
+            if action == 'wbsetaliases':
+                res = data
+                keys = set(res)
+                assert keys < {'language', 'add', 'remove', 'set'}
+                assert keys & {'add', 'set'} == {}
+                assert keys & {'remove', 'set'} == {}
+            elif action in ('wbsetlabel', 'wbsetdescription'):
+                res = data
+                keys = set(res)
+                assert keys == {'language', 'value'}
+            elif action == 'wbsetsitelink':
+                res = format_sitelink(data)
+                keys = set(res)
+                assert keys >= {'linksite'}
+                assert keys <= {'linksite', 'linktitle', 'badges'}
+            else:
+                raise ValueError('Something has gone wrong ...')
+
+            return res
+
+        # Supported actions
+        assert action in ('wbsetaliases', 'wbsetdescription',
+                          'wbsetlabel', 'wbsetsitelink'), \
+            'action {} not supported.'.format(action)
+
+        # prefer ID over (site, title)
+        if isinstance(itemdef, str):
+            itemdef = pywikibot.ItemPage(self, itemdef)
+        elif isinstance(itemdef, pywikibot.Page):
+            try:
+                itemdef = itemdef.data_item()
+            except pywikibot.NoPage:
+                itemdef = pywikibot.ItemPage(self)
+        if not isinstance(itemdef, pywikibot.page.WikibasePage):
+            raise TypeError('itemdef shall be str, WikibasePage or Page')
+
+        params = itemdef._defined_by(singular=True)
+        # TODO: support 'new'
+        baserevid = kwargs.pop('baserevid', 0) or itemdef.latest_revision_id
+        params.update(
+            {'id': itemdef.id,
+             'baserevid': baserevid,
+             'action': action,
+             'token': self.tokens['edit'],
+             'bot': kwargs.pop('bot', False),
+             })
+        params.update(prepare_data(action, action_data))
+
+        for arg in kwargs:
+            if arg in ['summary']:
+                params[arg] = kwargs[arg]
+            else:
+                warn('Unknown parameter {} for action  {}, ignored'
+                     .format(arg, action), UserWarning, 2)
+
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
+    def wbsetaliases(self, itemdef, aliases, **kwargs):
+        """
+        Set aliases for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetaliases', aliases, **kwargs)
+
+    def wbsetdescription(self, itemdef, description, **kwargs):
+        """
+        Set description for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetdescription', description,
+                                  **kwargs)
+
+    def wbsetlabel(self, itemdef, label, **kwargs):
+        """
+        Set label for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetlabel', label, **kwargs)
+
+    def wbsetsitelink(self, itemdef, sitelink, **kwargs):
+        """
+        Set, remove or modify a sitelink on a Wikibase item.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)
+
 
 wrapper = ModuleDeprecationWrapper(__name__)
 # Note: use LoginStatus instead of _LoginStatus
