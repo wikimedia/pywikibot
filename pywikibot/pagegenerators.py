@@ -2953,6 +2953,8 @@ def WikidataSPARQLPageGenerator(query, site=None,
     @param query: the SPARQL query string.
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
+    @param item_name: name of the item in the SPARQL query
+    @type item_name: str
     @param endpoint: SPARQL endpoint URL
     @type endpoint: str
     @param entity_url: URL prefix for any entities returned in a query.
