@@ -15,7 +15,6 @@ from requests import RequestException
 import pywikibot
 
 from pywikibot.comms.http import fetch
-from pywikibot import config
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion, PY2
 
@@ -177,13 +176,11 @@ class MWSite(object):
             username = pywikibot.input(
                 'Private wiki detected. Login is required.\n'
                 'Please enter your username?')
-            config.usernames['temporary_family'] = {'temporary_code': username}
             # Setup a dummy family so that we can create a site object
-            fam = pywikibot.Family()
-            fam.name = 'temporary_family'
-            fam.scriptpath = lambda code: self.api[:-8]  # without /api.php
-            fam.langs = {'temporary_code': self.server}
-            site = pywikibot.Site('temporary_code', fam)
+            fam = pywikibot.family.AutoFamily(
+                'temporary_family',
+                self.api[:-8])
+            site = pywikibot.Site(fam.code, fam, username)
             site.version = lambda: str(self.version)
             # Now the site object is able to login
             info = site.siteinfo
