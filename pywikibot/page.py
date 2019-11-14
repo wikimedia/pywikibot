@@ -5038,7 +5038,7 @@ class Claim(Property):
 
     @deprecated_args(isReference='is_reference', isQualifier='is_qualifier')
     def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
-                 is_qualifier=False, **kwargs):
+                 is_qualifier=False, rank='normal', **kwargs):
         """
         Initializer.
 
@@ -5051,10 +5051,12 @@ class Claim(Property):
         @param hash: hash identifier for references
         @param is_reference: whether specified claim is a reference
         @param is_qualifier: whether specified claim is a qualifier
+        @param rank: rank for claim
         """
         Property.__init__(self, site, pid, **kwargs)
         self.snak = snak
         self.hash = hash
+        self.rank = rank
         self.isReference = is_reference
         self.isQualifier = is_qualifier
         if self.isQualifier and self.isReference:
@@ -5063,7 +5065,6 @@ class Claim(Property):
         self.qualifiers = OrderedDict()
         self.target = None
         self.snaktype = 'value'
-        self.rank = 'normal'
         self.on_item = None  # The item it's on
 
     def __repr__(self):
