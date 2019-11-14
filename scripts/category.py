@@ -651,7 +651,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.move_comment = move_comment if move_comment else self.comment
 
     def run(self):
-        """The main bot function that does all the work.
+        """
+        The main bot function that does all the work.
 
         For readability it is split into several helper functions:
         - _movecat()
@@ -718,6 +719,12 @@ class CategoryMoveRobot(CategoryPreprocess):
 
         Do not use this function from outside the class. Automatically marks
         the pages if they can't be removed due to missing permissions.
+
+        @param moved_page: Category page to delete
+        @param moved_talk: Talk page to delete
+        @type moved_page: pywikibot.page.BasePage
+        @type moved_talk: pywikibot.page.BasePage
+
         """
         if moved_page and self.oldcat.exists():
             self.oldcat.delete(self.deletion_comment, not self.batch,
@@ -755,7 +762,19 @@ class CategoryMoveRobot(CategoryPreprocess):
 
     @staticmethod
     def check_move(name, old_page, new_page):
-        """Return if the old page can be safely moved to the new page."""
+        """Return if the old page can be safely moved to the new page.
+
+        @param name: Title of the new page
+        @type name: str
+        @param old_page: Page to be moved
+        @type old_page: pywikibot.page.BasePage
+        @param new_page: Page to be moved to
+        @type new_page: pywikibot.page.BasePage
+        @return: True if possible to move page, False if not page move
+            not possible
+        @rtype: bool
+
+        """
         move_possible = True
         if new_page and new_page.exists():
             pywikibot.warning("The {0} target '{1}' already exists."
