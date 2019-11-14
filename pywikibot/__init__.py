@@ -1372,7 +1372,9 @@ def _flush(stop=True):
             '{lightblue}Waiting for {num} pages to be put. '
             'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
-    while _putthread.is_alive() and page_put_queue.qsize() > 0:
+    while (_putthread.is_alive()
+           and (page_put_queue.qsize() > 0
+                or page_put_queue_busy.qsize() > 0)):
         try:
             _putthread.join(1)
         except KeyboardInterrupt:
@@ -1398,10 +1400,12 @@ def async_manager():
     """Daemon; take requests from the queue and execute them in background."""
     while True:
         (request, args, kwargs) = page_put_queue.get()
+        page_put_queue_busy.put(None)
         if request is None:
             break
         request(*args, **kwargs)
         page_put_queue.task_done()
+        page_put_queue_busy.get()
 
 
 def async_request(request, *args, **kwargs):
@@ -1420,6 +1424,8 @@ def async_request(request, *args, **kwargs):
 
 # queue to hold pending requests
 page_put_queue = Queue(config.max_queue_size)
+# queue to signal that async_manager is working on a request. See T147178.
+page_put_queue_busy = Queue(config.max_queue_size)
 # set up the background thread
 _putthread = threading.Thread(target=async_manager)
 # identification for debugging purposes
