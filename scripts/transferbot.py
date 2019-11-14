@@ -13,7 +13,7 @@ The following parameters are supported:
 
 -prefix:          Page prefix on the new site.
 
--overwrite:       Existing pages are skipped by default. Use his option to
+-overwrite:       Existing pages are skipped by default. Use this option to
                   overwrite pages.
 
 Internal links are *not* repaired!
