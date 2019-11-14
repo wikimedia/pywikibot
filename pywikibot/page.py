@@ -5704,7 +5704,7 @@ class FileInfo(DotReadableDict):
         return self.__dict__ == other.__dict__
 
 
-class BaseLink(ComparableMixin):
+class BaseLink(UnicodeMixin, ComparableMixin):
 
     """
     A MediaWiki link (local or interwiki).
@@ -5865,19 +5865,6 @@ class BaseLink(ComparableMixin):
             # code is the same as the family name
             return '[[%s:%s]]' % (self.site.code, title)
         return '[[%s:%s:%s]]' % (self.site.family.name, self.site.code, title)
-
-    if not PY2:
-        def __str__(self):
-            """Return a string representation."""
-            return self.__unicode__()
-    else:  # PY2
-        def __str__(self):
-            """Return a string representation."""
-            return self.__bytes__()
-
-    def __bytes__(self):
-        """Return a byte representation."""
-        return self.astext().encode('ascii', 'backslashreplace')
 
     def _cmpkey(self):
         """
