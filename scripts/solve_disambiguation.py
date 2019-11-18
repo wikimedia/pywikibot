@@ -410,12 +410,9 @@ class ReferringPageGeneratorWithIgnore(object):
     def __iter__(self):
         """Yield pages."""
         # TODO: start yielding before all referring pages have been found
-        refs = [
-            page for page in self.disambPage.getReferences(
-                with_template_inclusion=False,
-                namespaces=0 if self.main_only else None
-            )
-        ]
+        refs = list(self.disambPage.getReferences(
+            with_template_inclusion=False,
+            namespaces=0 if self.main_only else None))
         pywikibot.output('Found {0} references.'.format(len(refs)))
         # Remove ignorables
         if self.disambPage.site.family.name in ignore_title and \

@@ -465,7 +465,7 @@ class UI(object):
             return [s.decode(self.encoding) for s in self.argv]
         # in python 3, self.argv is unicode and thus cannot be decoded
         except AttributeError:
-            return [s for s in self.argv]
+            return list(self.argv)
 
 
 class TerminalHandler(logging.Handler):

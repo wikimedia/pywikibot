@@ -153,9 +153,7 @@ class WikiStats(object):
             f = BytesIO(data)
 
         reader = csv.DictReader(f)
-
-        data = [site for site in reader]
-
+        data = list(reader)
         self._data['csv'][table] = data
 
         return data

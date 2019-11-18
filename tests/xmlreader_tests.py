@@ -21,9 +21,8 @@ class XmlReaderTestCase(TestCase):
 
     def _get_entries(self, filename, **kwargs):
         """Get all entries via XmlDump."""
-        entries = [r for r in
-                   xmlreader.XmlDump(join_xml_data_path(filename),
-                                     **kwargs).parse()]
+        entries = list(xmlreader.XmlDump(join_xml_data_path(filename),
+                                         **kwargs).parse())
         return entries
 
 
@@ -55,9 +54,8 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
     def test_XmlDumpRedirect(self):
         """Test XmlDump correctly parsing whether a page is a redirect."""
         self._get_entries('article-pyrus.xml', allrevisions=True)
-        pages = [r for r in
-                 xmlreader.XmlDump(
-                     join_xml_data_path('article-pyrus.xml')).parse()]
+        pages = list(xmlreader.XmlDump(
+            join_xml_data_path('article-pyrus.xml')).parse())
         self.assertTrue(pages[0].isredirect)
 
     def _compare(self, previous, variant, all_revisions):

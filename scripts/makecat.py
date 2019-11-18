@@ -111,9 +111,8 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
             except pywikibot.IsRedirectPage:
                 cl = True
             else:
-                cats = [x for x in pl.categories()]
+                cats = list(pl.categories())
                 if workingcat not in cats:
-                    cats = [x for x in pl.categories()]
                     for c in cats:
                         if c in parentcats:
                             if self.removeparent:

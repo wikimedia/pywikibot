@@ -206,7 +206,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                 namespaces = self.getOption('orphansonly')
                 ns_with_ref = self.current_page.namespaces_with_ref_to_page(
                     namespaces)
-                ns_with_ref = sorted(list(ns_with_ref))
+                ns_with_ref = sorted(ns_with_ref)
                 if ns_with_ref:
                     ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
                     pywikibot.output(

@@ -744,7 +744,7 @@ class checkImagesBot(object):
         max_usage = 0  # hold max amount of using pages
         for num, element in enumerate(listGiven):
             image = element[1]
-            image_used = len([page for page in image.usingPages()])
+            image_used = len(list(image.usingPages()))
             if image_used > max_usage:
                 max_usage = image_used
                 inx_found = num

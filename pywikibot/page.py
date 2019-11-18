@@ -3207,12 +3207,12 @@ class Category(Page):
     @deprecated('list(Category.subcategories(...))', since='20090307')
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))."""
-        return sorted(list(set(self.subcategories(recurse))))
+        return sorted(set(self.subcategories(recurse)))
 
     @deprecated('list(Category.articles(...))', since='20090307')
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))."""
-        return sorted(list(set(self.articles(recurse))))
+        return sorted(set(self.articles(recurse)))
 
     @deprecated('Category.categories()', since='20090307')
     def supercategories(self):
@@ -3222,7 +3222,7 @@ class Category(Page):
     @deprecated('list(Category.categories(...))', since='20090307')
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))."""
-        return sorted(list(set(self.categories())))
+        return sorted(set(self.categories()))
 
 
 class User(Page):

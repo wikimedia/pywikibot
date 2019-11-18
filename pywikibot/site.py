@@ -6208,8 +6208,7 @@ class APISite(BaseSite):
         @return: True if API returned expected response; False otherwise
         @rtype: bool
         """
-        req = self._simple_request(action='purge',
-                                   titles=[page for page in set(pages)])
+        req = self._simple_request(action='purge', titles=list(set(pages)))
         if converttitles:
             req['converttitles'] = True
         if redirects:
