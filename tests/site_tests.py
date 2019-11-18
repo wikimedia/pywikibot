@@ -2435,22 +2435,22 @@ class TestSiteAPILimits(TestCase):
 
         gen = mysite.pagecategories(mypage, total=12)
         gen.set_query_increment = 5
-        cats = [c for c in gen]
+        cats = list(gen)
         self.assertLength(cats, 12)
 
         gen = mysite.categorymembers(mycat, total=12)
         gen.set_query_increment = 5
-        cat_members = [cm for cm in gen]
+        cat_members = list(gen)
         self.assertLength(cat_members, 12)
 
         gen = mysite.pageimages(mypage, total=5)
         gen.set_query_increment = 3
-        images = [im for im in gen]
+        images = list(gen)
         self.assertLength(images, 5)
 
         gen = mysite.pagetemplates(mypage, total=5)
         gen.set_query_increment = 3
-        templates = [tl for tl in gen]
+        templates = list(gen)
         self.assertLength(templates, 5)
 
         mysite.loadrevisions(mypage, step=5, total=12)

@@ -2176,7 +2176,7 @@ class CachedRequest(Request):
                 max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
             user_key = repr(user_key)
 
-        request_key = repr(sorted(list(self._encoded_items().items())))
+        request_key = repr(sorted(self._encoded_items().items()))
         return repr(self.site) + user_key + request_key
 
     def _create_file_name(self):
