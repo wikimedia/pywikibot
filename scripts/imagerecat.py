@@ -19,19 +19,10 @@ The following command line parameters are supported:
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import socket
-import xml.etree.ElementTree
-
 import pywikibot
 
 from pywikibot import pagegenerators, textlib
-from pywikibot.comms.http import fetch
-from pywikibot.tools import deprecated, PY2
-
-if not PY2:
-    from urllib.parse import urlencode
-else:
-    from urllib import urlencode
+from pywikibot.tools import deprecated
 
 
 category_blacklist = []
@@ -89,87 +80,6 @@ def getCurrentCats(imagepage):
     for cat in imagepage.categories():
         result.append(cat.title(with_ns=False))
     return list(set(result))
-
-
-def getOpenStreetMapCats(latitude, longitude):
-    """Get a list of location categories based on the OSM nomatim tool."""
-    result = []
-    location_list = getOpenStreetMap(latitude, longitude)
-    for i, location in enumerate(location_list):
-        pywikibot.log('Working on {!r}'.format(location))
-        if i <= len(location_list) - 3:
-            category = getCategoryByName(name=location,
-                                         parent=location_list[i + 1],
-                                         grandparent=location_list[i + 2])
-        elif i == len(location_list) - 2:
-            category = getCategoryByName(name=location,
-                                         parent=location_list[i + 1])
-        else:
-            category = getCategoryByName(name=location_list[i])
-        if category and not category == '':
-            result.append(category)
-    return result
-
-
-def getOpenStreetMap(latitude, longitude):
-    """
-    Get the result from https://nominatim.openstreetmap.org/reverse .
-
-    @rtype: list of tuples
-    """
-    result = []
-    gotInfo = False
-    parameters = urlencode({'lat': latitude, 'lon': longitude,
-                            'accept-language': 'en'})
-    while not gotInfo:
-        try:
-            page = fetch(
-                'https://nominatim.openstreetmap.org/reverse?format=xml&{}'
-                .format(parameters))
-            et = xml.etree.ElementTree.fromstring(page.text)
-            gotInfo = True
-        except IOError:
-            pywikibot.output("Got an IOError, let's try again")
-            pywikibot.sleep(30)
-        except socket.timeout:
-            pywikibot.output("Got a timeout, let's try again")
-            pywikibot.sleep(30)
-    validParts = ['hamlet', 'village', 'city', 'county', 'country']
-    invalidParts = ['path', 'road', 'suburb', 'state', 'country_code']
-    addressparts = et.find('addressparts')
-
-    for addresspart in addressparts.getchildren():
-        if addresspart.tag in validParts:
-            result.append(addresspart.text)
-        elif addresspart.tag in invalidParts:
-            pywikibot.output('Dropping {}, {}'
-                             .format(addresspart.tag, addresspart.text))
-        else:
-            pywikibot.warning('{}, {} is not in addressparts lists'
-                              .format(addresspart.tag, addresspart.text))
-    return result
-
-
-def getCategoryByName(name, parent='', grandparent=''):
-    """Get category by name."""
-    if not parent == '':
-        workname = name.strip() + ',_' + parent.strip()
-        workcat = pywikibot.Category(pywikibot.Site('commons', 'commons'),
-                                     workname)
-        if workcat.exists():
-            return workname
-    if not grandparent == '':
-        workname = name.strip() + ',_' + grandparent.strip()
-        workcat = pywikibot.Category(pywikibot.Site('commons', 'commons'),
-                                     workname)
-        if workcat.exists():
-            return workname
-    workname = name.strip()
-    workcat = pywikibot.Category(pywikibot.Site('commons', 'commons'),
-                                 workname)
-    if workcat.exists():
-        return workname
-    return ''
 
 
 def applyAllFilters(categories):
