@@ -4165,7 +4165,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         @return: the altered dict from parameter data.
         @rtype: dict
         """
-        for key in data:
+        for key in list(data):
             if isinstance(key, pywikibot.site.BaseSite):
                 data[key.lang] = data[key]
                 del data[key]
