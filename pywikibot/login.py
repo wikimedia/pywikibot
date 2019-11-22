@@ -377,7 +377,8 @@ class OauthLoginManager(LoginManager):
         if isinstance(mwoauth, ImportError):
             raise OAuthImpossible('mwoauth is not installed: %s.' % mwoauth)
         assert password is not None and user is not None
-        super(OauthLoginManager, self).__init__(None, False, site, None)
+        super(OauthLoginManager, self).__init__(password=None, site=site,
+                                                user=None)
         if self.password:
             pywikibot.warn('Password exists in password file for %s:%s.'
                            'Password is unnecessary and should be removed '
