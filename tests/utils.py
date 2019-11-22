@@ -38,7 +38,6 @@ from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.site import Namespace
 from pywikibot.tools import (
-    deprecated,
     PY2, PYTHON_VERSION,
     UnicodeType as unicode,
 )
@@ -73,32 +72,33 @@ def expected_failure_if(expect):
         return lambda orig: orig
 
 
-@deprecated('unittest.expectedFailure', since='20190512')
 def allowed_failure(func):
     """
     Unit test decorator to allow failure.
 
-    Test runners each have different interpretations of what should be
-    the result of an @expectedFailure test if it succeeds. Some consider
-    it to be a pass; others a failure.
+    This decorator runs the test and, if it is an Assertion failure,
+    reports the result and considers it a skipped test. This is a
+    similar behaviour like expectedFailure in Python 2. Passing a test
+    will not count as failure (unexpected success) which Python 3 does.
 
-    This decorator runs the test and, if it is a failure, reports the result
-    and considers it a skipped test.
+    This decorator should be used if a test passes or fails due to
+    random test parameters. If tests fails deterministic expectedFailure
+    decorator should be used instead.
+
+    @note: This decorator does not support subTest content manager.
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except AssertionError:
+            pywikibot.exception(tb=False)
             tb = traceback.extract_tb(sys.exc_info()[2])
             for depth, line in enumerate(tb):
                 if re.match('assert[A-Z]', line[2]):
                     break
             tb = traceback.format_list(tb[:depth])
             pywikibot.error('\n' + ''.join(tb)[:-1])  # remove \n at the end
-            raise unittest.SkipTest('Test is allowed to fail.')
-        except Exception:
-            pywikibot.exception(tb=True)
             raise unittest.SkipTest('Test is allowed to fail.')
 
     if PY2:
@@ -107,11 +107,13 @@ def allowed_failure(func):
         return wrapper
 
 
-@deprecated('expected_failure_if', since='20190512')
 def allowed_failure_if(expect):
     """
     Unit test decorator to allow failure under conditions.
 
+    See allowed_failure method for more details.
+
+    @note: This decorator does not support subTest content manager.
     @param expect: Flag to check if failure is allowed
     @type expect: bool
     """
