@@ -206,7 +206,7 @@ moveToCommonsTemplate = {
     'pl': ['Do Commons', 'NaCommons', 'Na Commons'],
     'ru': ['На Викисклад'],
     'sl': ['Skopiraj v Zbirko'],
-    'sr': ['За оставу'],
+    'sr': ['За оставу', 'Пребацити на оставу'],
     'sv': ['Till Commons'],
     'zh': ['Copy to Wikimedia Commons'],
 }
