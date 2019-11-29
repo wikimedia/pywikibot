@@ -20,7 +20,7 @@
 
 # mandatory; see README.conversion.txt
 requests>=2.20.0
-
+enum34
 # requests security extra
 requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
 

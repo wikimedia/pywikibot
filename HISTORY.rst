@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* enum34 package is mandatory for Python 2.7
 * Implement deletedrevisions api call (T75370)
 * assert_valid_iter_params may raise AssertionError instead of pywikibot.Error (T233582)
 * Upcast getRedirectTarget result and return the appropriate page subclass (T233392)
