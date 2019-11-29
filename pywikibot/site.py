@@ -781,7 +781,7 @@ class BaseSite(ComparableMixin):
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
-        self._locked_pages = []
+        self._locked_pages = set()
 
     @deprecated(since='20141225')
     def has_api(self):
@@ -1077,7 +1077,7 @@ class BaseSite(ComparableMixin):
                 time.sleep(.25)
                 self._pagemutex.acquire()
 
-            self._locked_pages.append(title)
+            self._locked_pages.add(title)
         finally:
             # time.sleep may raise an exception from signal handler (eg:
             # KeyboardInterrupt) while the lock is released, and there is no
@@ -1099,7 +1099,7 @@ class BaseSite(ComparableMixin):
         """
         self._pagemutex.acquire()
         try:
-            self._locked_pages.remove(page.title(with_section=False))
+            self._locked_pages.discard(page.title(with_section=False))
         finally:
             self._pagemutex.release()
 
