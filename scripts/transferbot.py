@@ -16,6 +16,9 @@ The following parameters are supported:
 -overwrite:       Existing pages are skipped by default. Use this option to
                   overwrite pages.
 
+-target           Use page generator of the target site
+
+
 Internal links are *not* repaired!
 
 Pages to work on can be specified using any of:
@@ -36,6 +39,10 @@ Arabic Wiktionary:
 
     python pwb.py transferbot -family:wikipedia -lang:en \
         -tofamily:wiktionary -tolang:ar -page:"Template:Query service"
+
+Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
+    python pwb.py transferbot -family:wikipedia -lang:en \
+        -tolang:de -wantedtemplates:10 -target
 
 """
 #
@@ -69,14 +76,10 @@ def main(*args):
     tofamily = fromsite.family.name
     prefix = ''
     overwrite = False
+    target = False
     gen_args = []
 
-    gen_factory = pagegenerators.GeneratorFactory()
-
     for arg in local_args:
-        if gen_factory.handleArg(arg):
-            gen_args.append(arg)
-            continue
         if arg.startswith('-tofamily'):
             tofamily = arg[len('-tofamily:'):]
         elif arg.startswith('-tolang'):
@@ -85,34 +88,53 @@ def main(*args):
             prefix = arg[len('-prefix:'):]
         elif arg == '-overwrite':
             overwrite = True
-
-    gen = gen_factory.getCombinedGenerator()
+        elif arg == '-target':
+            target = True
+        else:
+            gen_args.append(arg)
 
     tosite = pywikibot.Site(tolang, tofamily)
     additional_text = ('Target site not different from source site.'
                        if fromsite == tosite else '')
 
+    gen_factory = pagegenerators.GeneratorFactory(site=tosite if target
+                                                  else fromsite)
+    unknown_args = [arg for arg in gen_args if not gen_factory.handleArg(arg)]
+
+    if unknown_args:
+        for item in unknown_args:
+            gen_args.remove(item)
+
+    gen = gen_factory.getCombinedGenerator()
+
+    suggest_help(missing_generator=not gen,
+                 additional_text=additional_text,
+                 unknown_parameters=unknown_args)
     if additional_text or not gen:
-        suggest_help(missing_generator=not gen,
-                     additional_text=additional_text)
         return
 
     gen_args = ' '.join(gen_args)
     pywikibot.output("""
     Page transfer configuration
     ---------------------------
-    Source: %(fromsite)r
-    Target: %(tosite)r
+    Source: {fromsite}
+    Target: {tosite}
 
-    Generator of pages to transfer: %(gen_args)s
-
-    Prefix for transferred pages: %(prefix)s
-    """ % {'fromsite': fromsite, 'tosite': tosite,
-           'gen_args': gen_args, 'prefix': prefix if prefix else '(none)'})
+    Generator of pages to transfer: {gen_args}
+    {target}
+    Prefix for transferred pages: {prefix}
+    """.format(fromsite=fromsite, tosite=tosite, gen_args=gen_args,
+               prefix=prefix if prefix else '(none)',
+               target='from target site\n' if target else ''))
 
     for page in gen:
-        target_title = (prefix + page.namespace().canonical_prefix()
-                        + page.title(with_ns=False))
+        title = page.namespace().canonical_prefix() + page.title(with_ns=False)
+        if target:
+            # page is at target site, fetch it from source
+            target_title = prefix + page.title()
+            page = pywikibot.Page(fromsite, title)
+        else:
+            target_title = (prefix + title)
         targetpage = pywikibot.Page(tosite, target_title)
         edithistpage = pywikibot.Page(tosite, target_title + '/edithistory')
 
