@@ -22,7 +22,6 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 
 from pywikibot import pagegenerators, textlib
-from pywikibot.tools import deprecated
 
 
 category_blacklist = []
@@ -131,9 +130,7 @@ def filterCountries(categories):
 
     First make a list of any ...by country categories and try to find some
     countries. If a by country category has a subcategoy containing one of the
-    countries found, add it. The ...by country categories remain in the set and
-    should be filtered out by filterParents.
-
+    countries found, add it. The ...by country categories remain in the set.
     """
     result = categories
     listByCountry = []
@@ -157,18 +154,6 @@ def filterCountries(categories):
                     if subcategory.title(with_ns=False).endswith(country):
                         result.append(subcategory.title(with_ns=False))
     return list(set(result))
-
-
-@deprecated(since='20180120')
-def filterParents(categories):
-    """
-    Remove all parent categories from the set to prevent overcategorization.
-
-    DEPRECATED: Toolserver script isn't available anymore (T78462).
-    This method is kept for compatibility and may be restored sometime by a new
-    implementation.
-    """
-    return categories
 
 
 def saveImagePage(imagepage, newcats):
