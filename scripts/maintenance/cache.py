@@ -204,8 +204,7 @@ class CacheEntry(api.CachedRequest):
             raise ParseError('No Site')
         self.site = eval(site)
         if login_status:
-            self.site._loginstatus = eval('LoginStatus.%s'
-                                          % login_status[12:-1])
+            self.site._loginstatus = eval(login_status)
         if username:
             self.site._username = [username, username]
         if not params:
