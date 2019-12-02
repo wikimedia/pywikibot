@@ -92,10 +92,6 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for bluwiki.com."""
         self.assertSite('http://bluwiki.com/go/$1')
 
-    def test_kino_skirpov(self):
-        """Test detection of MediaWiki sites for kino.skripov.com."""
-        self.assertSite('http://kino.skripov.com/index.php/$1')
-
 
 class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
 
