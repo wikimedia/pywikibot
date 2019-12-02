@@ -1167,16 +1167,13 @@ class Subject(interwiki_graph.Subject):
 
     def askForHints(self, counter):
         """Ask for hints to other sites."""
-        if not self.workonme:  # we don't work on it anyway
-            return
-
-        if not (
-            (self.untranslated or self.conf.askhints)
-            and not self.hintsAsked
-            and self.originPage
-            and self.originPage.exists()
-            and not self.originPage.isRedirectPage()
-                and not self.originPage.isCategoryRedirect()):
+        if (not self.workonme  # we don't work on it anyway
+            or not self.untranslated and not self.conf.askhints
+            or self.hintsAsked
+            or not self.originPage
+            or not self.originPage.exists()
+            or self.originPage.isRedirectPage()
+                or self.originPage.isCategoryRedirect()):
             return
 
         self.hintsAsked = True
@@ -1189,8 +1186,10 @@ class Subject(interwiki_graph.Subject):
 
         while True:
             newhint = pywikibot.input('Give a hint (? to see pagetext):')
+
             if not newhint:
                 break
+
             if newhint == '?':
                 t += self.conf.showtextlinkadd
                 pywikibot.output(self.originPage.get()[:t])
