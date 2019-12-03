@@ -359,6 +359,6 @@ def setup(app):
 
 pywikibot_env()
 
-autodoc_default_flags = [
-    'special-members',
-]
+autodoc_default_options = {
+    'special-members': True,
+}
