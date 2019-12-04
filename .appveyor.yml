@@ -21,18 +21,14 @@ environment:
       PYTHON_VERSION: "2.7.4"
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python341-x64"
-      PYTHON_VERSION: "3.4.1"
+    - PYTHON: "C:\\Python350-x64"
+      PYTHON_VERSION: "3.5.0"
       PYTHON_ARCH: "64"
 
     # Appveyor pre-installs these versions onto build machines
 
     - PYTHON: "C:\\Python27"
       PYTHON_VERSION: "2.7.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.x"
       PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python35"
@@ -53,10 +49,6 @@ environment:
 
     - PYTHON: "C:\\Python27-x64"
       PYTHON_VERSION: "2.7.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4.x"
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python35-x64"
