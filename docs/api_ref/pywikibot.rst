@@ -36,14 +36,6 @@ pywikibot.bot\_choice module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.botirc module
------------------------
-
-.. automodule:: pywikibot.botirc
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pywikibot.config2 module
 ------------------------
 
@@ -256,14 +248,6 @@ pywikibot.version module
 ------------------------
 
 .. automodule:: pywikibot.version
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pywikibot.weblib module
------------------------
-
-.. automodule:: pywikibot.weblib
     :members:
     :undoc-members:
     :show-inheritance:
