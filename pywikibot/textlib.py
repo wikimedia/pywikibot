@@ -1394,10 +1394,12 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
         title = '[%s%s]' % (title[0].upper(), title[0].lower()) + title[1:]
     # spaces and underscores in page titles are interchangeable and collapsible
     title = title.replace(r'\ ', '[ _]+').replace(r'\_', '[ _]+')
-    categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])'
+    categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s[\s\u200e\u200f]*'
+                           r'((?:\|[^]]+)?\]\])'
                            % (catNamespace, title), re.I)
     categoryRN = re.compile(
-        r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])[^\S\n]*\n'
+        r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s[\s\u200e\u200f]*'
+        r'((?:\|[^]]+)?\]\])[^\S\n]*\n'
         % (catNamespace, title), re.I | re.M)
     exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
     if newcat is None:
