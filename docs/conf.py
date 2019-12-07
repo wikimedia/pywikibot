@@ -360,5 +360,8 @@ def setup(app):
 pywikibot_env()
 
 autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
     'special-members': True,
+    'show-inheritance': True,
 }
