@@ -179,8 +179,8 @@ class TestHttpStatus(HttpbinTestCase):
         'enwp': {
             'hostname': 'en.wikipedia.org',
         },
-        'gandi': {
-            'hostname': 'www.gandi.eu',
+        'wikia': {
+            'hostname': 'en.wikia.com',
         },
     }
 
@@ -216,10 +216,10 @@ class TestHttpStatus(HttpbinTestCase):
         self.assertIn('//en.wikipedia.org/wiki/Main_Page',
                       r.data.url)
 
-        r = http.fetch(uri='http://www.gandi.eu')
+        r = http.fetch(uri='http://en.wikia.com')
         self.assertEqual(r.status, 200)
         self.assertEqual(r.data.url,
-                         'https://www.gandi.net/en')
+                         'https://www.fandom.com/explore')
 
 
 class UserAgentTestCase(TestCase):
