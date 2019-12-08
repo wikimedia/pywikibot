@@ -325,23 +325,31 @@ class TestSiteObject(DefaultSiteTestCase):
         mysite = self.get_site()
         ns = mysite.namespaces
         self.assertIsInstance(ns, Mapping)
-        self.assertTrue(all(x in ns for x in range(0, 16)))
         # built-in namespaces always present
         self.assertIsInstance(mysite.ns_normalize('project'), str)
-        self.assertTrue(all(isinstance(key, int)
-                            for key in ns))
-        self.assertTrue(all(isinstance(val, Iterable)
-                            for val in ns.values()))
-        self.assertTrue(all(isinstance(name, str)
-                            for val in ns.values()
-                            for name in val))
-        self.assertTrue(all(isinstance(mysite.namespace(key), str)
-                            for key in ns))
-        self.assertTrue(all(isinstance(mysite.namespace(key, True), Iterable)
-                            for key in ns))
-        self.assertTrue(all(isinstance(item, str)
-                            for key in ns
-                            for item in mysite.namespace(key, True)))
+
+        for ns_id in range(-2, 16):
+            with self.subTest(namespace_id=ns_id):
+                self.assertIn(ns_id, ns)
+
+        for key in ns:
+            all_ns = mysite.namespace(key, True)
+            with self.subTest(namespace=key):
+                self.assertIsInstance(key, int)
+                self.assertIsInstance(mysite.namespace(key), str)
+                self.assertNotIsInstance(all_ns, str)
+                self.assertIsInstance(all_ns, Iterable)
+
+            for item in all_ns:
+                with self.subTest(namespace=key, item=item):
+                    self.assertIsInstance(item, str)
+
+        for val in ns.values():
+            with self.subTest(value=val):
+                self.assertIsInstance(val, Iterable)
+            for name in val:
+                with self.subTest(value=val, name=name):
+                    self.assertIsInstance(name, str)
 
     def test_user_attributes_return_types(self):
         """Test returned types of user attributes."""
