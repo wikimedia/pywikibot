@@ -363,7 +363,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIn(item, langs)
             self.assertIsNone(self.site.namespaces.lookup_name(item))
 
-    def test_mamespace_methods(self):
+    def test_namespace_methods(self):
         """Test cases for methods manipulating namespace names."""
         mysite = self.get_site()
         ns = mysite.namespaces
