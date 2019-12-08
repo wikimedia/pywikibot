@@ -3265,7 +3265,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 break
 
     def test_preload_langlinks_normal(self):
-        """Test preloading continuation works."""
+        """Test preloading langlinks works."""
         mysite = self.get_site()
         links = mysite.pagelinks(self.get_mainpage(), total=10)
         gen = mysite.preloadpages(links, groupsize=5, langlinks=True)
@@ -3318,22 +3318,14 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 5:
                 break
 
-    @unittest.expectedFailure
     def test_preload_templates_and_langlinks(self):
         """Test preloading templates and langlinks works."""
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        count = 0
         # Use backlinks, as any backlink has at least one link
-        links = mysite.pagebacklinks(mainpage, total=10)
-        # Screen pages before test;
-        # it is not guaranteed that all pages will have both.
-        links = [l for l in links if (l.langlinks() and l.templates())]
-        #  Skip test if no valid pages are found.
-        if not links:
-            self.skipTest('No valid pages found to carry out test.')
-
-        for page in mysite.preloadpages(links, langlinks=True, templates=True):
+        links = mysite.pagebacklinks(self.get_mainpage(), total=10)
+        for count, page in enumerate(mysite.preloadpages(links,
+                                                         langlinks=True,
+                                                         templates=True)):
             with self.subTest(page=page):
                 self.assertIsInstance(page, pywikibot.Page)
                 self.assertIsInstance(page.exists(), bool)
@@ -3343,8 +3335,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                     self.assertFalse(hasattr(page, '_pageprops'))
                     self.assertTrue(hasattr(page, '_templates'))
                     self.assertTrue(hasattr(page, '_langlinks'))
-            count += 1
-            if count >= 6:
+            if count >= 5:
                 break
 
 
