@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from distutils.version import StrictVersion
 
-from pywikibot.tools import ip, PY2
+from pywikibot.tools import ip, PY2, PYTHON_VERSION
 
 from tests import unittest_print
 from tests.aspects import unittest, TestCase, DeprecationTestCase
@@ -214,12 +214,6 @@ class TestIPBase(TestCase):
         self.ipv6test(False, '1.2.3.4::')
 
         # Testing IPv4 addresses represented as dotted-quads
-        # Leading zero's in IPv4 addresses not allowed: some systems treat the
-        # leading "0" in ".086" as the start of an octal number
-        # Update: The BNF in RFC-3986 explicitly defines the dec-octet
-        # (for IPv4 addresses) not to have a leading zero
-        self.ipv6test(False, 'fe80:0000:0000:0000:0204:61ff:254.157.241.086')
-        # but this is OK, since there's a single digit
         self.ipv6test(True, '::ffff:192.0.2.128')
         self.ipv6test(False, 'XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:1.2.3.4')
         self.ipv6test(False, '1111:2222:3333:4444:5555:6666:256.256.256.256')
@@ -654,6 +648,16 @@ class TestIPBase(TestCase):
         # extra 0 not allowed!
         self.ipv6test(False, '2001:0000:1234:0000:00001:C1C0:ABCD:0876')
 
+    def _test_T240060_failures(self):
+        """Test known deviated behaviour in Python 3.8."""
+        # Testing IPv4 addresses represented as dotted-quads
+        # Leading zero's in IPv4 addresses not allowed: some systems treat the
+        # leading "0" in ".086" as the start of an octal number
+        # Update: The BNF in RFC-3986 explicitly defines the dec-octet
+        # (for IPv4 addresses) not to have a leading zero
+        self.ipv6test(PYTHON_VERSION >= (3, 8),
+                      'fe80:0000:0000:0000:0204:61ff:254.157.241.086')
+
 
 class IPRegexTestCase(TestIPBase, DeprecationTestCase):
 
@@ -701,6 +705,10 @@ class IPAddressModuleTestCase(TestIPBase):
     def test_T105443_failures(self):
         """Test known bugs in the ipaddr module."""
         self._test_T105443_failures()
+
+    def test_T240060_failures(self):
+        """Test known bugs in the ipaddr module."""
+        self._test_T240060_failures()
 
 
 if __name__ == '__main__':  # pragma: no cover
