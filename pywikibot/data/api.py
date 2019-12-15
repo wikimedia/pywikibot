@@ -3333,9 +3333,13 @@ def update_page(page, pagedict, props=[]):
 
     if 'templates' in pagedict:
         _update_templates(page, pagedict['templates'])
+    elif 'templates' in props:
+        page._templates = []
 
     if 'langlinks' in pagedict:
         _update_langlinks(page, pagedict['langlinks'])
+    elif 'langlinks' in props:
+        page._langlinks = []
 
     if 'coordinates' in pagedict:
         _update_coordinates(page, pagedict['coordinates'])
