@@ -358,10 +358,10 @@ def getPhotos(flickr, user_id='', group_id='', photoset_id='',
         pages = photos.find('photos').attrib['pages']
 
         def gen(i):
-            return flickr.groups_pools_getPhotos(
+            return list(flickr.groups_pools_getPhotos(
                 group_id=group_id, user_id=user_id, tags=tags,
                 per_page='100', page=i
-            ).find('photos').getchildren()
+            ).find('photos'))
     # https://www.flickr.com/services/api/flickr.photosets.getPhotos.html
     # Get the photos in a photoset
     elif photoset_id:
@@ -370,9 +370,9 @@ def getPhotos(flickr, user_id='', group_id='', photoset_id='',
         pages = photos.find('photoset').attrib['pages']
 
         def gen(i):
-            return flickr.photosets_getPhotos(
+            return list(flickr.photosets_getPhotos(
                 photoset_id=photoset_id, per_page='100', page=i
-            ).find('photoset').getchildren()
+            ).find('photoset'))
     # https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
     # Get the (public) photos uploaded by a user
     elif user_id:
@@ -381,9 +381,9 @@ def getPhotos(flickr, user_id='', group_id='', photoset_id='',
         pages = photos.find('photos').attrib['pages']
 
         def gen(i):
-            return flickr.people_getPublicPhotos(
+            return list(flickr.people_getPublicPhotos(
                 user_id=user_id, per_page='100', page=i
-            ).find('photos').getchildren()
+            ).find('photos'))
     for i in range(1, int(pages) + 1):
         gotPhotos = False
         while not gotPhotos:
