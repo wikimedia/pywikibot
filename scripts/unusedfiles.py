@@ -25,6 +25,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.flow import Board
 from pywikibot.tools import issue_deprecation_warning
 
 template_to_the_image = {
@@ -35,10 +36,10 @@ template_to_the_image = {
     'ur': '{{غیر مستعمل تصاویر}}',
 }
 
-# This template message should use subst:
 template_to_the_user = {
-    'fa': '\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
-    'ur': '\n\n{{جا:اطلاع برائے غیر مستعمل تصاویر}}--~~~~',
+    'fa': '{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
+    'ur': '{{جا:اطلاع برائے غیر مستعمل تصاویر}}',
+    'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
 }
 
 
@@ -81,8 +82,12 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
             uploader = image.get_file_history().pop(0)['user']
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
-            msg2uploader = self.template_user % {'title': image.title()}
-            self.append_text(usertalkpage, msg2uploader)
+            template2uploader = self.template_user % {'title': image.title()}
+            msg2uploader = self.site.expand_text(template2uploader)
+            if usertalkpage.is_flow_page():
+                self.post_to_flow_board(usertalkpage, msg2uploader)
+            else:
+                self.append_text(usertalkpage, '\n\n' + msg2uploader + ' ~~~~')
 
     def append_text(self, page, apptext):
         """Append apptext to the page."""
@@ -99,6 +104,14 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         text += apptext
         self.current_page = page
         self.put_current(text)
+
+    def post_to_flow_board(self, page, post):
+        """Post message as a Flow topic."""
+        board = Board(page)
+        header, rest = post.split('\n', 1)
+        title = header.strip('=')
+        content = rest.lstrip()
+        board.new_topic(title, content)
 
 
 def main(*args):
