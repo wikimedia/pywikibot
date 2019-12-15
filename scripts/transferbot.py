@@ -47,7 +47,7 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -101,16 +101,12 @@ def main(*args):
                                                   else fromsite)
     unknown_args = [arg for arg in gen_args if not gen_factory.handleArg(arg)]
 
-    if unknown_args:
-        for item in unknown_args:
-            gen_args.remove(item)
-
     gen = gen_factory.getCombinedGenerator()
 
     suggest_help(missing_generator=not gen,
                  additional_text=additional_text,
                  unknown_parameters=unknown_args)
-    if additional_text or not gen:
+    if additional_text or not gen or unknown_args:
         return
 
     gen_args = ' '.join(gen_args)
