@@ -4,7 +4,19 @@ Release history
 Current release
 ---------------
 
-* enum34 package is mandatory for Python 2.7
+* replaceCategoryInPlace: Allow LRM and RLM at the end of the old_cat title (T240084)
+* Support for Python 3.4 will be dropped (T239542)
+* Derive LoginStatus from IntEnum (T213287, T239533)
+* enum34 package is mandatory for Python 2.7 (T213287)
+* call LoginManager with keyword arguments (T237501)
+* Enable Pywikibot for Python 3.8 (T238637)
+* Derive BaseLink from tools.UnicodeMixin (T223894)
+* Make _flush aware of _putthread ongoing tasks (T147178)
+* Add family file for foundation wiki (T237888)
+* Fix generate_family_file.py for private wikis (T235768)
+* Add rank parameter to Claim initializer
+* Add current directory for similar script search (T217195)
+* Release BaseSite.lock_page mutex during sleep
 * Implement deletedrevisions api call (T75370)
 * assert_valid_iter_params may raise AssertionError instead of pywikibot.Error (T233582)
 * Upcast getRedirectTarget result and return the appropriate page subclass (T233392)
