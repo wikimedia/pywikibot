@@ -148,14 +148,14 @@ def filterCountries(categories):
             for country in countries:
                 if country in cat:
                     listCountries.append(country)
-    if len(listByCountry) > 0:
-        for bc in listByCountry:
-            category = pywikibot.Category(
-                pywikibot.Site('commons', 'commons'), 'Category:' + bc)
-            for subcategory in category.subcategories():
-                for country in listCountries:
-                    if subcategory.title(with_ns=False).endswith(country):
-                        result.append(subcategory.title(with_ns=False))
+
+    country_tuple = tuple(listCountries)
+    for bc in listByCountry:
+        category = pywikibot.Category(
+            pywikibot.Site('commons', 'commons'), 'Category:' + bc)
+        for subcategory in category.subcategories():
+            if subcategory.title(with_ns=False).endswith(country_tuple):
+                result.append(subcategory.title(with_ns=False))
     return list(set(result))
 
 
