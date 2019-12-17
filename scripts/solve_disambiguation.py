@@ -80,7 +80,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1241,29 +1241,30 @@ def main(*args):
     generator_factory = pagegenerators.GeneratorFactory(
         positional_arg_name='page')
 
-    for arg in local_args:
-        if arg.startswith('-primary:'):
+    for argument in local_args:
+        arg, _, value = argument.partition(':')
+        if arg == '-primary':
             primary = True
-            getAlternatives = False
-            alternatives.append(arg[9:])
-        elif arg == '-primary':
-            primary = True
-        elif arg.startswith('-always:'):
-            always = arg[8:]
-        elif arg.startswith('-pos:'):
-            if arg[5] != ':':
+            if value:
+                getAlternatives = False
+                alternatives.append(value)
+        elif arg == '-always':
+            always = value
+        elif arg == '-pos':
+            if not value:
+                pass
+            elif value.startswith(':'):
+                alternatives.append(value)
+            else:
                 mysite = pywikibot.Site()
-                page = pywikibot.Page(pywikibot.Link(arg[5:], mysite))
+                page = pywikibot.Page(pywikibot.Link(value, mysite))
                 if page.exists():
                     alternatives.append(page.title())
-                else:
-                    if pywikibot.input_yn(
-                            'Possibility {0} does not actually exist. Use it '
-                            'anyway?'.format(page.title()),
-                            default=False, automatic_quit=False):
-                        alternatives.append(page.title())
-            else:
-                alternatives.append(arg[5:])
+                elif pywikibot.input_yn(
+                    'Possibility {0} does not actually exist. Use it anyway?'
+                    .format(page.title()),
+                        default=False, automatic_quit=False):
+                    alternatives.append(page.title())
         elif arg == '-just':
             getAlternatives = False
         elif arg == '-dnskip':
@@ -1272,19 +1273,19 @@ def main(*args):
             main_only = True
         elif arg == '-first':
             first_only = True
-        elif arg.startswith('-min:'):
-            minimum = int(arg[5:])
-        elif arg.startswith('-start'):
+        elif arg == '-min':
+            minimum = int(value)
+        elif arg == '-start':
             try:
                 generator = pagegenerators.CategorizedPageGenerator(
                     pywikibot.Site().disambcategory(),
-                    start=arg[7:], namespaces=[0])
+                    start=value, namespaces=[0])
             except pywikibot.NoPage:
                 pywikibot.output(
                     'Disambiguation category for your wiki is not known.')
                 raise
         else:
-            generator_factory.handleArg(arg)
+            generator_factory.handleArg(argument)
 
     site = pywikibot.Site()
 
