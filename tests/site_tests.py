@@ -2146,15 +2146,14 @@ class TestUserList(DefaultSiteTestCase):
         user_list = ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling']
         missing = ['A username that should not exist 1A53F6E375B5']
         all_users = user_list + missing
-        cnt = 0
-        for user in self.site.users(all_users):
-            self.assertIsInstance(user, dict)
-            self.assertIn(user['name'], all_users)
-            if user['name'] == missing[0]:
-                self.assertIn('missing', user)
-            else:
-                self.assertNotIn('missing', user)
-            cnt += 1
+        for cnt, user in enumerate(self.site.users(all_users), start=1):
+            with self.subTest(user=user['name']):
+                self.assertIsInstance(user, dict)
+                self.assertIn(user['name'], all_users)
+                if user['name'] == missing[0]:
+                    self.assertIn('missing', user)
+                elif self.site.family.name == 'wikipedia':
+                    self.assertNotIn('missing', user)
         self.assertEqual(cnt, len(all_users), 'Some test usernames not found')
 
 
