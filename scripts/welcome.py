@@ -557,7 +557,7 @@ class WelcomeBot(SingleSiteBot):
                                  .format(self.site))
                 list_loaded = load_word_function(badword_page.get())
             else:
-                showStatus(4)
+                self.show_status(4)
                 pywikibot.output("The bad word page doesn't exist!")
             self._blacklist = elenco + elenco_others + list_loaded
             del elenco, elenco_others, list_loaded
@@ -574,10 +574,10 @@ class WelcomeBot(SingleSiteBot):
                                      .format(self.site))
                     list_white = load_word_function(whitelist_page.get())
                 else:
-                    showStatus(4)
+                    self.show_status(4)
                     pywikibot.output("The whitelist's page doesn't exist!")
             else:
-                showStatus(4)
+                self.show_status(4)
                 pywikibot.warning("The whitelist hasn't been set!")
 
             # Join the whitelist words.
@@ -614,7 +614,7 @@ class WelcomeBot(SingleSiteBot):
                 answer = 'y'
 
             if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
-                showStatus()
+                self.show_status()
                 pywikibot.output(
                     '{} is possibly an unwanted username. It will be reported.'
                     .format(name))
@@ -656,7 +656,7 @@ class WelcomeBot(SingleSiteBot):
             if rep_text != '':
                 rep_page.put(text_get + rep_text, summary=com, force=True,
                              minor=True)
-                showStatus(5)
+                self.show_status(5)
                 pywikibot.output('Reported')
             self.BAQueue = []
 
@@ -677,7 +677,7 @@ class WelcomeBot(SingleSiteBot):
             text = log_page.get()
         else:
             # make new log page
-            showStatus()
+            self.show_status()
             pywikibot.output(
                 'Log page is not exist, getting information for page creation')
             text = i18n.translate(self.site, logpage_header,
@@ -735,7 +735,7 @@ class WelcomeBot(SingleSiteBot):
         if not globalvar.signFileName:
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
-                showStatus(4)
+                self.show_status(4)
                 pywikibot.output(
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
@@ -770,25 +770,25 @@ class WelcomeBot(SingleSiteBot):
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped."""
         if user.isBlocked():
-            showStatus(3)
+            self.show_status(3)
             pywikibot.output('{} has been blocked!'.format(user.username))
 
         elif 'bot' in user.groups():
-            showStatus(3)
+            self.show_status(3)
             pywikibot.output('{} is a bot!'.format(user.username))
 
         elif 'bot' in user.username.lower():
-            showStatus(3)
+            self.show_status(3)
             pywikibot.output('{} might be a global bot!'
                              .format(user.username))
 
         elif user.editCount() < globalvar.attachEditCount:
             if not user.editCount() == 0:
-                showStatus(1)
+                self.show_status(1)
                 pywikibot.output('{0} has only {1} contributions.'
                                  .format(user.username, user.editCount()))
             elif not globalvar.quiet:
-                showStatus(1)
+                self.show_status(1)
                 pywikibot.output('{} has no contributions.'
                                  .format(user.username))
         else:
@@ -804,12 +804,12 @@ class WelcomeBot(SingleSiteBot):
                 if self.skip_page(user):
                     continue
 
-                showStatus(2)
+                self.show_status(2)
                 pywikibot.output('{} has enough edits to be welcomed.'
                                  .format(user.username))
                 ustp = user.getUserTalkPage()
                 if ustp.exists():
-                    showStatus(3)
+                    self.show_status(3)
                     pywikibot.output('{} has been already welcomed.'
                                      .format(user.username))
                     continue
@@ -838,7 +838,7 @@ class WelcomeBot(SingleSiteBot):
                     # append welcomed, welcome_count++
                     ustp.put(welcome_text, welcome_comment, minor=False)
                 except pywikibot.EditConflict:
-                    showStatus(4)
+                    self.show_status(4)
                     pywikibot.output(
                         'An edit conflict has occurred, skipping this user.')
                 else:
@@ -846,7 +846,7 @@ class WelcomeBot(SingleSiteBot):
 
                 welcomed_count = len(self.welcomed_users)
                 if globalvar.makeWelcomeLog:
-                    showStatus(5)
+                    self.show_status(5)
                     if welcomed_count == 0:
                         count = 'No users have'
                     elif welcomed_count == 1:
@@ -861,7 +861,7 @@ class WelcomeBot(SingleSiteBot):
                             welcomed_count = 0
 
             if globalvar.makeWelcomeLog and welcomed_count > 0:
-                showStatus()
+                self.show_status()
                 if welcomed_count == 1:
                     pywikibot.output('Putting the log of the latest user...')
                 else:
@@ -872,12 +872,12 @@ class WelcomeBot(SingleSiteBot):
                     continue
                 self.welcomed_users = []
             if hasattr(self, '_BAQueue'):
-                showStatus()
+                self.show_status()
                 pywikibot.output('Putting bad name to report page...')
                 self.reportBadAccount(None, final=True)
             try:
                 if globalvar.recursive:
-                    showStatus()
+                    self.show_status()
                     if locale.getlocale()[1]:
                         strfstr = time.strftime(
                             '%d %b %Y %H:%M:%S (UTC)', time.gmtime())
@@ -895,11 +895,12 @@ class WelcomeBot(SingleSiteBot):
             except KeyboardInterrupt:
                 break
 
-
-def showStatus(n=0) -> None:
-    """Output colorized status."""
-    pywikibot.output(color_format('{color}[{0:5}]{default} ',
-                                  _MSGS[n], color=_COLORS[n]), newline=False)
+    @staticmethod
+    def show_status(n=0):
+        """Output colorized status."""
+        pywikibot.output(color_format('{color}[{0:5}]{default} ',
+                                      _MSGS[n], color=_COLORS[n]),
+                         newline=False)
 
 
 def load_word_function(raw) -> List[str]:
@@ -1022,7 +1023,7 @@ def main(*args) -> None:
         bot.run()
     except KeyboardInterrupt:
         if bot.welcomed_users:
-            showStatus()
+            bot.show_status()
             pywikibot.output('Put welcomed users before quit...')
             bot.makelogpage(bot.welcomed_users)
         pywikibot.output('\nQuitting...')
