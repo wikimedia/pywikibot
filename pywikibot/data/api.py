@@ -1612,7 +1612,7 @@ class Request(MutableMapping):
             'edit-already-exists',
             'actionthrottledtext',  # T192912
         )
-        messages = error.pop('messages', None)
+        messages = error.get('messages')
         message = None
         # bug T68619; after Wikibase breaking change 1ca9cee change we have a
         # list of messages
