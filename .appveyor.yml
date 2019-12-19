@@ -15,15 +15,16 @@ environment:
 
   matrix:
 
-    # Test the lowest supported release of each major Python version.
+    # Test the lowest supported release of each major Python version
 
     - PYTHON: "C:\\Python274-x64"
       PYTHON_VERSION: "2.7.4"
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python351-x64"
-      PYTHON_VERSION: "3.5.1"
-      PYTHON_ARCH: "64"
+    # Python 3.5 is only available in its last release, not any earlier, see T241124
+    #- PYTHON: "C:\\Python350-x64"
+    #  PYTHON_VERSION: "3.5.0"
+    #  PYTHON_ARCH: "64"
 
     # Appveyor pre-installs these versions onto build machines
 
