@@ -58,35 +58,54 @@ class TextEditor(ScrolledText):
 
         Get default settings from user's IDLE configuration.
         """
-        currentTheme = idleConf.CurrentTheme()
-        textcf = {
-            'padx': 5,
-            'wrap': 'word',
-            'undo': 'True',
-            'foreground': idleConf.GetHighlight(
-                currentTheme, 'normal', fgBg='fg'),
-            'background': idleConf.GetHighlight(
-                currentTheme, 'normal', fgBg='bg'),
-            'highlightcolor': idleConf.GetHighlight(
-                currentTheme, 'hilite', fgBg='fg'),
-            'highlightbackground': idleConf.GetHighlight(
-                currentTheme, 'hilite', fgBg='bg'),
-            'insertbackground': idleConf.GetHighlight(
-                currentTheme, 'cursor', fgBg='fg'),
-            'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
-            'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
-        }
-        fontWeight = 'normal'
+        textcf = self._initialize_config(idleConf.CurrentTheme())
+
         if idleConf.GetOption('main', 'EditorWindow', 'font-bold',
                               type='bool'):
-            fontWeight = 'bold'
-        textcf['font'] = (idleConf.GetOption('main', 'EditorWindow', 'font'),
-                          idleConf.GetOption('main', 'EditorWindow',
-                                             'font-size'),
-                          fontWeight)
+            font_weight = 'bold'
+        else:
+            font_weight = 'normal'
+        textcf['font'] = (
+            idleConf.GetOption('main', 'EditorWindow', 'font'),
+            idleConf.GetOption('main', 'EditorWindow', 'font-size'),
+            font_weight)
+
         # override defaults with any user-specified settings
         textcf.update(kwargs)
         ScrolledText.__init__(self, master, **textcf)
+
+    def _initialize_config(self, Theme):
+        """Fix idleConf.GetHighlight method for different Python releases."""
+        config = {
+            'padx': 5,
+            'wrap': 'word',
+            'undo': 'True',
+            'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
+            'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
+        }
+        if PYTHON_VERSION >= (3, 7, 4):  # T241216
+            config['foreground'] = idleConf.GetHighlight(
+                Theme, 'normal')['foreground']
+            config['background'] = idleConf.GetHighlight(
+                Theme, 'normal')['background']
+            config['highlightcolor'] = idleConf.GetHighlight(
+                Theme, 'hilite')['foreground']
+            config['highlightbackground'] = idleConf.GetHighlight(
+                Theme, 'hilite')['background']
+            config['insertbackground'] = idleConf.GetHighlight(
+                Theme, 'cursor')['foreground']
+        else:
+            config['foreground'] = idleConf.GetHighlight(
+                Theme, 'normal', fgBg='fg')
+            config['background'] = idleConf.GetHighlight(
+                Theme, 'normal', fgBg='bg')
+            config['highlightcolor'] = idleConf.GetHighlight(
+                Theme, 'hilite', fgBg='fg')
+            config['highlightbackground'] = idleConf.GetHighlight(
+                Theme, 'hilite', fgBg='bg')
+            config['insertbackground'] = idleConf.GetHighlight(
+                Theme, 'cursor', fgBg='fg')
+        return config
 
     def add_bindings(self):
         """Assign key and events bindings to methods."""
