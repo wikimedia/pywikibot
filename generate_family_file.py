@@ -215,7 +215,8 @@ def _import_with_no_user_config(*import_args):
     return result
 
 
-if __name__ == '__main__':
+def main():
+    """Process command line arguments and generate a family file."""
     if len(sys.argv) != 3:
         print("""
 Usage: {module} <url> <short name>
@@ -225,3 +226,7 @@ This will create the file mywiki_family.py in pywikibot{sep}families"""
                       sep=os.sep))
 
     FamilyFileGenerator(*sys.argv[1:]).run()
+
+
+if __name__ == '__main__':
+    main()
