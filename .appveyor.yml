@@ -21,10 +21,9 @@ environment:
       PYTHON_VERSION: "2.7.4"
       PYTHON_ARCH: "64"
 
-    # Python 3.5 is only available in its last release, not any earlier, see T241124
-    #- PYTHON: "C:\\Python350-x64"
-    #  PYTHON_VERSION: "3.5.0"
-    #  PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Python350-x64"
+      PYTHON_VERSION: "3.5.0"
+      PYTHON_ARCH: "64"
 
     # Appveyor pre-installs these versions onto build machines
 
@@ -84,7 +83,18 @@ install:
   - ps: $run | Out-File -Encoding ascii -FilePath appveyor\run_with_env.cmd
 
   # This is needed for Python versions not installed on Appveyor build machines
-  - ps: if (-not(Test-Path($env:PYTHON))) { iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1') }
+  - ps: |
+      if (-not(Test-Path($env:PYTHON))) {
+        if ($env:PYTHON_VERSION -eq "2.7.4") {
+          iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1')
+        } else {
+          $logPath = "C:\Python350-x64.log"
+          if (-not(Test-Path -Path $logPath -PathType leaf)) { ni $logPath -type file }
+          $exePath = "$env:TEMP\python-3.5.0-amd64.exe"
+          (New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.5.0/python-3.5.0-amd64.exe', $exePath)
+          cmd /c start /wait $exePath /quiet TargetDir=C:\Python350-x64 Shortcuts=0 Include_launcher=0 InstallLauncherAllUsers=0
+        }
+      }
   - pip install virtualenv
   - virtualenv env
   - env\Scripts\activate.bat
