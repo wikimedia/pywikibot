@@ -188,7 +188,7 @@ class Family(family.Family):  # noqa: D101
             %(code_path_pairs)s
         }[code]
 
-    @deprecated('APISite.version()')
+    @deprecated('APISite.version()', since='20141225')
     def version(self, code):
         return {
             %(code_version_pairs)s
