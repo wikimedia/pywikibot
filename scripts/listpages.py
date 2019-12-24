@@ -153,7 +153,7 @@ class Formatter(object):
             except pywikibot.Error:
                 self.trs_title = '{0}:{1}'.format(default, page._link.title)
 
-    def output(self, num=None, fmt=1):
+    def output(self, num=None, fmt='1'):
         """Output formatted string."""
         fmt = self.fmt_options.get(fmt, fmt)
         # If selected format requires trs_title, outputlang must be set.
