@@ -200,7 +200,8 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    site = pywikibot.Site('commons', 'commons')
+    genFactory = pagegenerators.GeneratorFactory(site=site)
 
     for arg in local_args:
         if arg == '-onlyuncat':
@@ -210,10 +211,8 @@ def main(*args):
 
     generator = genFactory.getCombinedGenerator()
     if not generator:
-        site = pywikibot.Site('commons', 'commons')
         generator = pagegenerators.CategorizedPageGenerator(
-            pywikibot.Category(site, 'Category:Media needing categories'),
-            recurse=True)
+            pywikibot.Category(site, 'Media needing categories'), recurse=True)
 
     initLists()
     categorizeImages(generator, onlyUncat)
