@@ -3183,6 +3183,20 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 5:
                 break
 
+    def test_preload_categories(self):
+        """Test preloading categories works."""
+        mysite = self.get_site()
+        cats = mysite.randompages(total=10, namespaces=14)
+        gen = mysite.preloadpages(cats, categories=True)
+        for count, page in enumerate(gen):
+            with self.subTest(page=page.title()):
+                self.assertTrue(hasattr(page, '_categories'))
+                # content=True will bypass cache
+                self.assertEqual(page._categories,
+                                 set(page.categories(content=True)))
+            if count >= 5:
+                break
+
     def test_preload_content(self):
         """Test preloading templates and langlinks works."""
         mysite = self.get_site()
