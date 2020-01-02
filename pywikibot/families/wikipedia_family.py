@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,30 +34,30 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'vi', 'ja', 'zh', 'ar', 'pt', 'uk', 'fa', 'ca', 'sr', 'no', 'id', 'ko',
         'fi', 'hu', 'sh', 'cs', 'ro', 'eu', 'tr', 'ms', 'eo', 'hy', 'bg', 'da',
         'he', 'ce', 'zh-min-nan', 'sk', 'kk', 'min', 'hr', 'et', 'lt', 'be',
-        'el', 'sl', 'gl', 'az', 'azb', 'simple', 'nn', 'ur', 'hi', 'th', 'ka',
+        'el', 'sl', 'gl', 'az', 'simple', 'azb', 'nn', 'ur', 'hi', 'th', 'ka',
         'uz', 'la', 'ta', 'vo', 'cy', 'mk', 'tg', 'ast', 'lv', 'mg', 'tt',
-        'af', 'oc', 'bs', 'ky', 'bn', 'sq', 'tl', 'zh-yue', 'new', 'te',
+        'af', 'oc', 'bs', 'ky', 'bn', 'sq', 'zh-yue', 'tl', 'new', 'te',
         'be-tarask', 'br', 'ml', 'pms', 'su', 'nds', 'lb', 'ht', 'jv', 'sco',
-        'mr', 'sw', 'ga', 'szl', 'pnb', 'ba', 'is', 'my', 'fy', 'cv', 'lmo',
-        'an', 'ne', 'pa', 'yo', 'bar', 'io', 'gu', 'arz', 'als', 'ku', 'scn',
-        'kn', 'bpy', 'ckb', 'wuu', 'ia', 'qu', 'mn', 'bat-smg', 'si', 'wa',
+        'mr', 'sw', 'pnb', 'ga', 'szl', 'ba', 'is', 'my', 'fy', 'cv', 'arz',
+        'lmo', 'an', 'ne', 'pa', 'yo', 'bar', 'io', 'gu', 'als', 'ku', 'scn',
+        'kn', 'ckb', 'bpy', 'wuu', 'ia', 'qu', 'mn', 'bat-smg', 'si', 'wa',
         'cdo', 'or', 'gd', 'yi', 'am', 'nap', 'bug', 'ilo', 'mai', 'hsb',
-        'xmf', 'map-bms', 'fo', 'mzn', 'diq', 'li', 'sd', 'vec', 'eml', 'sah',
-        'os', 'sa', 'ps', 'nv', 'ace', 'mrj', 'mhr', 'zh-classical', 'hif',
-        'frr', 'bcl', 'roa-tara', 'hak', 'pam', 'nso', 'km', 'hyw', 'se',
-        'rue', 'mi', 'vls', 'bh', 'nah', 'nds-nl', 'crh', 'gan', 'vep', 'sc',
-        'as', 'shn', 'ab', 'glk', 'bo', 'myv', 'co', 'so', 'tk', 'fiu-vro',
-        'lrc', 'kv', 'csb', 'gv', 'sn', 'udm', 'zea', 'ay', 'ie', 'pcd', 'kab',
-        'nrm', 'ug', 'ha', 'lez', 'stq', 'kw', 'mwl', 'haw', 'gn', 'gom', 'rm',
-        'lij', 'lfn', 'lad', 'lo', 'frp', 'koi', 'mt', 'fur', 'dsb', 'dty',
-        'ang', 'ext', 'olo', 'ln', 'cbk-zam', 'dv', 'bjn', 'ksh', 'gag', 'pfl',
-        'pi', 'pag', 'gor', 'av', 'bxr', 'xal', 'krc', 'sat', 'za', 'pap',
-        'tyv', 'kaa', 'pdc', 'rw', 'to', 'kl', 'nov', 'jam', 'arc', 'kbp',
-        'kbd', 'tpi', 'tet', 'ig', 'ki', 'zu', 'wo', 'na', 'jbo', 'tcy',
-        'roa-rup', 'lbe', 'bi', 'szy', 'ty', 'mdf', 'kg', 'lg', 'inh', 'srn',
+        'xmf', 'map-bms', 'fo', 'mzn', 'diq', 'sd', 'li', 'vec', 'eml', 'sah',
+        'os', 'sa', 'ps', 'nv', 'ace', 'mrj', 'mhr', 'zh-classical', 'frr',
+        'hif', 'bcl', 'roa-tara', 'hak', 'pam', 'nso', 'km', 'hyw', 'se',
+        'rue', 'mi', 'vls', 'bh', 'nah', 'nds-nl', 'crh', 'gan', 'vep', 'shn',
+        'sc', 'as', 'ab', 'glk', 'bo', 'myv', 'co', 'so', 'tk', 'fiu-vro',
+        'lrc', 'kv', 'csb', 'gv', 'sn', 'udm', 'zea', 'ie', 'ay', 'pcd', 'kab',
+        'ha', 'nrm', 'ug', 'lez', 'stq', 'kw', 'mwl', 'haw', 'gn', 'gom',
+        'lij', 'rm', 'lfn', 'lad', 'lo', 'frp', 'koi', 'mt', 'fur', 'dsb',
+        'dty', 'olo', 'ext', 'ang', 'ln', 'cbk-zam', 'dv', 'bjn', 'ksh', 'gag',
+        'pfl', 'pi', 'pag', 'gor', 'av', 'bxr', 'sat', 'xal', 'krc', 'za',
+        'tyv', 'pap', 'kaa', 'pdc', 'rw', 'to', 'kl', 'nov', 'jam', 'arc',
+        'kbp', 'tpi', 'kbd', 'szy', 'tet', 'ig', 'zu', 'ki', 'wo', 'na', 'jbo',
+        'tcy', 'roa-rup', 'bi', 'lbe', 'ty', 'mdf', 'kg', 'lg', 'inh', 'srn',
         'atj', 'xh', 'ban', 'ltg', 'chr', 'got', 'sm', 'pih', 'om', 'ak', 'tn',
-        'tw', 'cu', 'ts', 'rmy', 'bm', 'st', 'chy', 'rn', 'tum', 'ny', 'fj',
-        'ch', 'ss', 'nqo', 'gcr', 'pnt', 'ady', 'iu', 'mnw', 've', 'ee', 'ks',
+        'tw', 'cu', 'ts', 'rmy', 'bm', 'st', 'fj', 'chy', 'rn', 'tum', 'ny',
+        'ch', 'nqo', 'ss', 'gcr', 'pnt', 'ady', 'iu', 'mnw', 've', 'ee', 'ks',
         'ik', 'sg', 'ff', 'dz', 'ti', 'din', 'cr',
     ]
 

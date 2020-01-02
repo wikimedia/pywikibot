@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,19 +31,19 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'en', 'mg', 'fr', 'ru', 'sh', 'es', 'de', 'zh', 'ku', 'nl', 'sv', 'pl',
-        'lt', 'el', 'it', 'ca', 'fi', 'hu', 'ta', 'tr', 'hy', 'io', 'ko', 'kn',
+        'en', 'mg', 'fr', 'ru', 'sh', 'es', 'de', 'zh', 'ku', 'nl', 'sv', 'el',
+        'pl', 'lt', 'it', 'ca', 'fi', 'hu', 'ta', 'tr', 'hy', 'io', 'ko', 'kn',
         'pt', 'vi', 'ja', 'sr', 'chr', 'th', 'hi', 'ro', 'no', 'et', 'id',
         'ml', 'my', 'uz', 'cs', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'jv', 'az',
         'gl', 'eu', 'oc', 'br', 'uk', 'da', 'lo', 'hr', 'fj', 'tg', 'ky', 'la',
-        'simple', 'bg', 'is', 'sk', 'ast', 'ps', 'ur', 'wa', 'cy', 'vo',
+        'simple', 'is', 'bg', 'sk', 'ast', 'ps', 'ur', 'wa', 'cy', 'vo',
         'zh-min-nan', 'af', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'nds', 'lb', 'sl', 'bs', 'nah',
-        'sa', 'kk', 'tk', 'vec', 'sm', 'km', 'mk', 'ms', 'hsb', 'be', 'yue',
+        'sa', 'kk', 'tk', 'vec', 'sm', 'km', 'ms', 'mk', 'hsb', 'be', 'yue',
         'ga', 'an', 'wo', 'ang', 'tt', 'shy', 'mt', 'sd', 'gn', 'mr', 'ie',
         'so', 'csb', 'ug', 'gd', 'ia', 'st', 'fo', 'roa-rup', 'si', 'hif',
         'kl', 'mi', 'ay', 'su', 'jbo', 'zu', 'ln', 'yi', 'na', 'gu', 'gv',
-        'kw', 'rw', 'ts', 'ne', 'min', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
+        'kw', 'min', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
         'tpi', 'dv', 'ti', 'sg', 'tn', 'ks',
     ]
 
