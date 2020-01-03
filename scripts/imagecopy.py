@@ -526,60 +526,62 @@ def main(*args):
         if not page.exists() or page.namespace() != 6 or page.isRedirectPage():
             continue
 
-        skip = False
         imagepage = pywikibot.FilePage(page.site, page.title())
 
         # First do autoskip.
         if doiskip(imagepage.get()):
             pywikibot.output('Skipping ' + page.title())
-            skip = True
+            continue
+
+        # The first upload is last in the list.
+        try:
+            username = imagepage.latest_file_info.user
+        except NotImplementedError:
+            # No API, using the page file instead
+            (datetime, username, resolution, size,
+             comment) = imagepage.get_file_history().pop()
+
+        skip = False
+        if always:
+            newname = imagepage.title(with_ns=False)
+            CommonsPage = pywikibot.Page(pywikibot.Site('commons',
+                                                        'commons'),
+                                         'File:' + newname)
+            if CommonsPage.exists():
+                continue
         else:
-            # The first upload is last in the list.
-            try:
-                username = imagepage.latest_file_info.user
-            except NotImplementedError:
-                # No API, using the page file instead
-                (datetime, username, resolution, size,
-                 comment) = imagepage.get_file_history().pop()
-            if always:
-                newname = imagepage.title(with_ns=False)
-                CommonsPage = pywikibot.Page(pywikibot.Site('commons',
-                                                            'commons'),
-                                             'File:' + newname)
-                if CommonsPage.exists():
-                    skip = True
-            else:
-                while True:
-                    # Do TkdialogIC to accept/reject and change the name
-                    newname, skip = TkdialogIC(
-                        imagepage.title(with_ns=False),
-                        imagepage.get(), username,
-                        imagepage.permalink(with_protocol=True),
-                        imagepage.templates()).getnewname()
+            while True:
+                # Do TkdialogIC to accept/reject and change the name
+                newname, skip = TkdialogIC(
+                    imagepage.title(with_ns=False),
+                    imagepage.get(), username,
+                    imagepage.permalink(with_protocol=True),
+                    imagepage.templates()).getnewname()
 
-                    if skip:
-                        pywikibot.output('Skipping this image')
-                        break
+                if skip:
+                    pywikibot.output('Skipping this image')
+                    break
 
-                    # Did we enter a new name?
-                    if len(newname) == 0:
-                        # Take the old name
-                        newname = imagepage.title(with_ns=False)
-                    else:
-                        newname = newname.decode('utf-8')
+                # Did we enter a new name?
+                if not newname:
+                    # Take the old name
+                    newname = imagepage.title(with_ns=False)
+                else:
+                    newname = newname.decode('utf-8')
 
-                    # Check if the image already exists
-                    CommonsPage = pywikibot.Page(
-                        imagepage.site.image_repository(),
-                        'File:' + newname)
-                    if not CommonsPage.exists():
-                        break
-                    else:
-                        pywikibot.output(
-                            'Image already exists, pick another name or '
-                            'skip this image')
-                    # We don't overwrite images, pick another name, go to
-                    # the start of the loop
+                # Check if the image already exists
+                CommonsPage = pywikibot.Page(
+                    imagepage.site.image_repository(),
+                    'File:' + newname)
+
+                if not CommonsPage.exists():
+                    break
+
+                pywikibot.output(
+                    'Image already exists, pick another name or '
+                    'skip this image')
+                # We don't overwrite images, pick another name, go to
+                # the start of the loop
 
         if not skip:
             imageTransfer(imagepage, newname, category,
