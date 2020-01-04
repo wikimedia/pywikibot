@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1489,21 +1489,15 @@ class Siteinfo(Container):
         if prop in Siteinfo.BOOLEAN_PROPS.keys():
             # siprop=namespaces and
             # magicwords has properties per item in result
-            if prop == 'namespaces' or prop == 'magicwords':
+            if prop in ('namespaces', 'magicwords'):
                 for index, value in enumerate(data):
                     # namespaces uses a dict, while magicwords uses a list
                     key = index if type(data) is list else value
                     for p in Siteinfo.BOOLEAN_PROPS[prop]:
-                        if p in data[key]:
-                            data[key][p] = True
-                        else:
-                            data[key][p] = False
+                        data[key][p] = p in data[key]
             else:
                 for p in Siteinfo.BOOLEAN_PROPS[prop]:
-                    if p in data:
-                        data[p] = True
-                    else:
-                        data[p] = False
+                    data[p] = p in data
 
     def _get_siteinfo(self, prop, expiry):
         """
