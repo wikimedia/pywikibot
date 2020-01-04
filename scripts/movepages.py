@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -194,6 +194,8 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
+        if genFactory.handleArg(arg):
+            continue
         if arg == '-pairs' or arg.startswith('-pairs:'):
             issue_deprecation_warning(
                 '-pairs',
@@ -243,8 +245,6 @@ def main(*args):
                 options['summary'] = pywikibot.input('Enter the summary:')
             else:
                 options['summary'] = arg[9:]
-        else:
-            genFactory.handleArg(arg)
 
     if oldName:
         pywikibot.warning('-from:{0} without -to:'.format(oldName))
