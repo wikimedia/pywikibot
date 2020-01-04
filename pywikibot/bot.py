@@ -54,7 +54,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -134,6 +134,8 @@ from pywikibot.tools._logging import (
 )
 from pywikibot.tools.formatter import color_format
 
+if PY2:
+    from future_builtins import zip
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'

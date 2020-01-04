@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,6 +36,7 @@ from tests.utils import FakeLoginManager, PatchedHttp
 if not PY2:
     from urllib.parse import unquote_to_bytes
 else:
+    from future_builtins import zip
     from urllib import unquote_plus as unquote_to_bytes
 
 
