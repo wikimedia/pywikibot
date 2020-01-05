@@ -33,10 +33,9 @@ except ImportError as e:
 from pywikibot import config, debug, Timestamp, Site, warning
 from pywikibot.tools import deprecated_args, StringTypes
 
-# requests >= 2.9 is required for eventstreams (T184713)
-if LooseVersion(requests.__version__) < LooseVersion('2.9'):
+if LooseVersion(requests.__version__) < LooseVersion('2.20.1'):
     raise ImportError(
-        'requests >= 2.9 is required for EventStreams;\n'
+        'requests >= 2.20.1 is required for EventStreams;\n'
         "install it with 'pip install \"requests>=2.20.1\"'\n")
 
 
