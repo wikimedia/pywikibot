@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,6 +23,9 @@ from pywikibot.bot_choice import (
 )
 from pywikibot.tools import deprecated, PY2
 from pywikibot.userinterfaces import transliteration
+
+if PY2:
+    from future_builtins import zip
 
 transliterator = transliteration.transliterator(config.console_encoding)
 

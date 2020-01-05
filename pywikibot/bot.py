@@ -134,6 +134,8 @@ from pywikibot.tools._logging import (
 )
 from pywikibot.tools.formatter import color_format
 
+if PY2:
+    from future_builtins import zip
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
