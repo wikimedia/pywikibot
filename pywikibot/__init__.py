@@ -15,6 +15,7 @@ import datetime
 from decimal import Decimal
 import math
 import re
+import sys
 import threading
 import time
 
@@ -65,7 +66,7 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PY2,
+    PY2, PYTHON_VERSION,
     UnicodeMixin,
     UnicodeType
 )
@@ -115,12 +116,14 @@ if PY2:
     # T111615: Python 2 requires __all__ is bytes
     globals()['__all__'] = tuple(bytes(item) for item in __all__)
 
-    import sys
+if PY2 or PYTHON_VERSION < (3, 5, 0):
     warn("""
+
 Python {version} will be dropped soon.
 It is recommended to use Python 3.5 or above.
-See T213287 for further information.
-""".format(version=sys.version.split(None, 1)[0]),
+See {what} for further information.
+""".format(version=sys.version.split(None, 1)[0],
+           what='T213287' if PY2 else 'T239542'),
          FutureWarning)  # probably adjust the line no in utils.execute()
 
 for _name in textlib_methods:
