@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,7 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PY2, PYTHON_VERSION,
+    PY2,
     UnicodeMixin,
     UnicodeType
 )
@@ -117,12 +117,11 @@ if PY2:
 
     import sys
     warn("""
-Python {version} will be dropped {when}.
+Python {version} will be dropped soon.
 It is recommended to use Python 3.5 or above.
 See T213287 for further information.
-""".format(version=sys.version.split(None, 1)[0],
-           when='soon' if PYTHON_VERSION < (2, 7, 9) else 'in 2020'),
-         FutureWarning)
+""".format(version=sys.version.split(None, 1)[0]),
+         FutureWarning)  # probably adjust the line no in utils.execute()
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
