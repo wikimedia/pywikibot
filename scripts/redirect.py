@@ -464,10 +464,10 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         assert page.site == self.site, (
             'target page is on different site {0}'.format(page.site))
         reason = i18n.twtranslate(self.site, summary_key)
-        if page.site.logged_in(sysop=True):
+        if 'delete' in page.site.userinfo['rights']:
             page.delete(reason, prompt=False)
         elif self.sdtemplate:
-            pywikibot.output('No sysop in user-config.py, '
+            pywikibot.output('User does not have delete right, '
                              'put page to speedy deletion.')
             try:
                 content = page.get(get_redirect=True)
