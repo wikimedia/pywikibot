@@ -4,6 +4,13 @@ Release history
 Current release
 ---------------
 
+* Rewrite site.log_page/site.unlock_page implementation
+* Require requests 2.20.1 (T241934)
+* Make bot.suggest_help a function
+* Fix gui settings for Python 3.7.4+ (T241216)
+* Better api error message handling (T235500)
+* Ensure that required props exists as Page attribute (T237497)
+* Refactor data loading for WikibaseEntities (T233406)
 * replaceCategoryInPlace: Allow LRM and RLM at the end of the old_cat title (T240084)
 * Support for Python 3.4 will be dropped (T239542)
 * Derive LoginStatus from IntEnum (T213287, T239533)
