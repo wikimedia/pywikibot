@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Installer script for Pywikibot 3.0 framework."""
+"""Installer script for Pywikibot framework."""
 #
 # (C) Pywikibot team, 2009-2020
 #
@@ -165,13 +165,20 @@ test_deps += ['six;python_version>="3"']
 
 
 def get_version(name):
-    """Get a valid pywikibot module version string."""
+    """Get a valid pywikibot module version string.
+
+    Either create a timebased version number for the package
+    or read the version number from the package.
+
+    @return: pywikibot module version string
+    @rtype: str
+    """
     version = '3.0'
     try:
         import subprocess
         date = subprocess.check_output(
             ['git', 'log', '-1', '--format=%ci']).strip()
-        date = date.decode().split(' ')[0].replace('-', '')
+        date = date.decode().split(' ', 1)[0].replace('-', '')
         version += '.' + date
         if 'sdist' not in sys.argv:
             version += '.dev0'
