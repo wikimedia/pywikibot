@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2019
+# (C) Pywikibot team, 2009-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -164,7 +164,7 @@ test_deps += extra_deps['eventstreams']
 test_deps += ['six;python_version>="3"']
 
 
-def get_version():
+def get_version(name):
     """Get a valid pywikibot module version string."""
     version = '3.0'
     try:
@@ -177,7 +177,12 @@ def get_version():
             version += '.dev0'
     except Exception as e:
         print(e)
-        version += '.dev0'
+        from pkg_resources import get_distribution, DistributionNotFound
+        try:
+            version = get_distribution(name).version
+        except DistributionNotFound as e:
+            print(e)
+            version += '.dev0'
     return version
 
 
@@ -205,7 +210,7 @@ def read_desc(filename):
 name = 'pywikibot'
 setup(
     name=name,
-    version=get_version(),
+    version=get_version(name),
     description='Python MediaWiki Bot Framework',
     long_description=read_desc('README.rst'),
     keywords=['API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
