@@ -33,7 +33,7 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                        |
     +---------------------------+------------------------------------------------------+
-    | setup.py                  | Installer script for Pywikibot 3.0 framework         |
+    | setup.py                  | Installer script for Pywikibot framework             |
     +---------------------------+------------------------------------------------------+
     | tox.ini                   | Tests config file                                    |
     +---------------------------+------------------------------------------------------+
