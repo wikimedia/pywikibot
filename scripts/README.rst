@@ -13,7 +13,7 @@ To get started on proper usage of the bot framework, please refer to:
     `Manual:Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
 
 NOTE : Script names with # at start are not yet present in Core rather are
-       expected to be merged based on reviews and need from Compat version.
+       expected to be merged based on reviews and need from compat version.
 
 The contents of the package
 ---------------------------
@@ -263,8 +263,6 @@ The contents of the package
     | archive                | Scripts no longer maintained.                           |
     +========================+=========================================================+
     | featured.py            | A robot to check feature articles.                      |
-    +------------------------+---------------------------------------------------------+
-    | script_wui.py          | Run scripts as sub-bot                                  |
     +------------------------+---------------------------------------------------------+
 
 

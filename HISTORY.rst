@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* botirc module has been removed (T212632)
 * Bugfixes and improvements
 * Localisation updates
 

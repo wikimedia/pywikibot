@@ -16,9 +16,6 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |
     +----------------------------+------------------------------------------------------+
-    | botirc.py                  | Deprecated user-interface related functions for      |
-    |                            | building irc bot                                     |
-    +----------------------------+------------------------------------------------------+
     | config2.py                 | Module to define and load pywikibot configuration    |
     +----------------------------+------------------------------------------------------+
     | cosmetic_changes.py        | Slight modifications to a wiki page's source code    |
