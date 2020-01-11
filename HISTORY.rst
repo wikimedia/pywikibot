@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20200111
+------------
+
 * Fix broken get_version() in setup.py (T198374)
 * Rewrite site.log_page/site.unlock_page implementation
 * Require requests 2.20.1 (T241934)
