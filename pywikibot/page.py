@@ -3033,91 +3033,6 @@ class Category(Page):
         """
         return 'hiddencat' in self.properties()
 
-    def copyTo(self, cat, message):
-        """
-        Copy text of category page to a new page. Does not move contents.
-
-        @param cat: New category title (without namespace) or Category object
-        @type cat: str or pywikibot.page.Category
-        @param message: message to use for category creation message
-            If two %s are provided in message, will be replaced
-            by (self.title, authorsList)
-        @type message: str
-        @return: True if copying was successful, False if target page
-            already existed.
-        @rtype: bool
-        """
-        # This seems far too specialized to be in the top-level framework
-        # move to category.py? (Although it doesn't seem to be used there,
-        # either)
-        if not isinstance(cat, Category):
-            target_cat = Category(self.site, 'Category:' + cat)
-        else:
-            target_cat = cat
-        if target_cat.exists():
-            pywikibot.warning(
-                'Target page %s already exists!' % target_cat.title())
-            return False
-        else:
-            pywikibot.output('Moving text from %s to %s.'
-                             % (self.title(), target_cat.title()))
-            authors = ', '.join(self.contributingUsers())
-            try:
-                creation_summary = message % (self.title(), authors)
-            except TypeError:
-                creation_summary = message
-            target_cat.put(self.get(), creation_summary)
-            return True
-
-    @deprecated_args(cfdTemplates='cfd_templates')
-    def copyAndKeep(self, catname, cfd_templates, message):
-        """
-        Copy partial category page text (not contents) to a new title.
-
-        Like copyTo above, except this removes a list of templates (like
-        deletion templates) that appear in the old category text. It also
-        removes all text between the two HTML comments BEGIN CFD TEMPLATE
-        and END CFD TEMPLATE. (This is to deal with CFD templates that are
-        substituted.)
-
-        Returns true if copying was successful, false if target page already
-        existed.
-
-        @param catname: New category title (without namespace)
-        @param cfd_templates: A list (or iterator) of templates to be removed
-            from the page text
-        @return: True if copying was successful, False if target page
-            already existed.
-        @rtype: bool
-        """
-        # I don't see why we need this as part of the framework either
-        # move to scripts/category.py?
-        target_cat = Category(self.site, 'Category:' + catname)
-        if target_cat.exists():
-            pywikibot.warning('Target page %s already exists!'
-                              % target_cat.title())
-            return False
-
-        pywikibot.output(
-            'Moving text from {} to {}.'
-            .format(self.title(), target_cat.title()))
-        authors = ', '.join(self.contributingUsers())
-        creation_summary = message % (self.title(), authors)
-        newtext = self.get()
-        for regex_name in cfd_templates:
-            matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
-            newtext = matchcfd.sub('', newtext)
-        matchcomment = re.compile(
-            r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',
-            re.IGNORECASE | re.MULTILINE | re.DOTALL)
-        newtext = matchcomment.sub('', newtext)
-        pos = 0
-        while (newtext[pos:pos + 1] == '\n'):
-            pos = pos + 1
-        newtext = newtext[pos:]
-        target_cat.put(newtext, creation_summary)
-        return True
-
     @property
     def categoryinfo(self):
         """
@@ -3224,6 +3139,93 @@ class Category(Page):
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))."""
         return sorted(set(self.categories()))
+
+    @deprecated(since='20200111', future_warning=True)
+    def copyTo(self, cat, message):
+        """
+        Copy text of category page to a new page. Does not move contents.
+
+        @param cat: New category title (without namespace) or Category object
+        @type cat: str or pywikibot.page.Category
+        @param message: message to use for category creation message
+            If two %s are provided in message, will be replaced
+            by (self.title, authorsList)
+        @type message: str
+        @return: True if copying was successful, False if target page
+            already existed.
+        @rtype: bool
+        """
+        # This seems far too specialized to be in the top-level framework
+        # move to category.py? (Although it doesn't seem to be used there,
+        # either)
+        if not isinstance(cat, Category):
+            target_cat = Category(self.site, 'Category:' + cat)
+        else:
+            target_cat = cat
+        if target_cat.exists():
+            pywikibot.warning(
+                'Target page %s already exists!' % target_cat.title())
+            return False
+        else:
+            pywikibot.output('Moving text from %s to %s.'
+                             % (self.title(), target_cat.title()))
+            authors = ', '.join(self.contributingUsers())
+            try:
+                creation_summary = message % (self.title(), authors)
+            except TypeError:
+                creation_summary = message
+            target_cat.put(self.get(), creation_summary)
+            return True
+
+    @deprecated(since='20200111', future_warning=True)
+    @deprecated_args(cfdTemplates='cfd_templates')
+    def copyAndKeep(self, catname, cfd_templates, message):
+        """
+        Copy partial category page text (not contents) to a new title.
+
+        Like copyTo above, except this removes a list of templates (like
+        deletion templates) that appear in the old category text. It also
+        removes all text between the two HTML comments BEGIN CFD TEMPLATE
+        and END CFD TEMPLATE. (This is to deal with CFD templates that are
+        substituted.)
+
+        Returns true if copying was successful, false if target page already
+        existed.
+
+        @param catname: New category title (without namespace)
+        @param cfd_templates: A list (or iterator) of templates to be removed
+            from the page text
+        @return: True if copying was successful, False if target page
+            already existed.
+        @rtype: bool
+        """
+        # I don't see why we need this as part of the framework either
+        # move to scripts/category.py?
+        target_cat = Category(self.site, 'Category:' + catname)
+        if target_cat.exists():
+            pywikibot.warning('Target page %s already exists!'
+                              % target_cat.title())
+            return False
+
+        pywikibot.output(
+            'Moving text from {} to {}.'
+            .format(self.title(), target_cat.title()))
+        authors = ', '.join(self.contributingUsers())
+        creation_summary = message % (self.title(), authors)
+        newtext = self.get()
+        for regex_name in cfd_templates:
+            matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
+            newtext = matchcfd.sub('', newtext)
+        matchcomment = re.compile(
+            r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',
+            re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        newtext = matchcomment.sub('', newtext)
+        pos = 0
+        while (newtext[pos:pos + 1] == '\n'):
+            pos = pos + 1
+        newtext = newtext[pos:]
+        target_cat.put(newtext, creation_summary)
+        return True
 
 
 class User(Page):
