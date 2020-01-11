@@ -5,6 +5,7 @@ Current release
 ---------------
 
 * Category.copyTo and Category.copyAndKeep will be removed in the next release
+* weblib module has been removed (T85001)
 * botirc module has been removed (T212632)
 * Bugfixes and improvements
 * Localisation updates

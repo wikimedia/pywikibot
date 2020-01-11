@@ -78,9 +78,6 @@ The contents of the package
     | version.py                 | Module to determine the pywikibot version (tag,      |
     |                            | revision and date)                                   |
     +----------------------------+------------------------------------------------------+
-    | weblib.py                  | Functions for manipulating external links or         |
-    |                            | querying third-party sites                           |
-    +----------------------------+------------------------------------------------------+
     | xmlreader.py               | Reading and parsing XML dump files.                  |
     +----------------------------+------------------------------------------------------+
 

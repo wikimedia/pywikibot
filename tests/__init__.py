@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,9 +155,6 @@ if not i18n.messages_available():
 disabled_tests = {
     'textlib': [
         'test_interwiki_format',  # example; very slow test
-    ],
-    'weblib': [
-        'testWebCiteOlder',  # fails. T110640
     ],
 }
 
