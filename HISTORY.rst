@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Fix broken get_version() in setup.py (T198374)
 * Rewrite site.log_page/site.unlock_page implementation
 * Require requests 2.20.1 (T241934)
 * Make bot.suggest_help a function
