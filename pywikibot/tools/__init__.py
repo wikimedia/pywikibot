@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import collections
+from distutils.version import LooseVersion
 import gzip
 import hashlib
 from importlib import import_module
@@ -372,14 +373,26 @@ class NotImplementedClass(object):
             '%s: %s' % (self.__class__.__name__, self.__doc__))
 
 
-def has_module(module):
+def has_module(module, version=None):
     """Check whether a module can be imported."""
     try:
-        import_module(module)
+        m = import_module(module)
     except ImportError:
-        return False
+        pass
     else:
-        return True
+        if version is None:
+            return True
+        try:
+            module_version = LooseVersion(m.__version__)
+        except AttributeError:
+            pass
+        else:
+            if module_version >= LooseVersion(version):
+                return True
+            else:
+                warn('Module version {} is lower than requested version {}'
+                     .format(module_version, version), ImportWarning)
+    return False
 
 
 def empty_iterator():
