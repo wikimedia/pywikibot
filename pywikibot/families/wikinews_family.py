@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
