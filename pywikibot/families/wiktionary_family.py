@@ -39,11 +39,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'simple', 'is', 'bg', 'sk', 'ast', 'ps', 'ur', 'wa', 'cy', 'vo',
         'zh-min-nan', 'af', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'nds', 'lb', 'sl', 'bs', 'nah',
-        'sa', 'kk', 'tk', 'vec', 'sm', 'km', 'ms', 'mk', 'hsb', 'be', 'yue',
+        'sa', 'kk', 'tk', 'vec', 'ms', 'sm', 'km', 'mk', 'hsb', 'be', 'yue',
         'ga', 'an', 'wo', 'ang', 'tt', 'shy', 'mt', 'sd', 'gn', 'mr', 'ie',
-        'so', 'csb', 'ug', 'gd', 'ia', 'st', 'fo', 'roa-rup', 'si', 'hif',
-        'kl', 'mi', 'ay', 'su', 'jbo', 'zu', 'ln', 'yi', 'na', 'gu', 'gv',
-        'kw', 'min', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
+        'so', 'gd', 'csb', 'ug', 'ia', 'st', 'fo', 'roa-rup', 'si', 'hif',
+        'kl', 'mi', 'ay', 'su', 'jbo', 'zu', 'ln', 'yi', 'min', 'na', 'gu',
+        'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
         'tpi', 'dv', 'ti', 'sg', 'tn', 'ks',
     ]
 
