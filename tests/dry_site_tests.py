@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,26 +32,23 @@ class TestDrySite(DefaultDrySiteTestCase):
         x = self.get_site()
 
         x._userinfo = {'name': None, 'groups': []}
-        x._username = ['normal_user', 'sysop_user']
+        x._username = 'user'
 
-        self.assertFalse(x.logged_in(True))
-        self.assertFalse(x.logged_in(False))
+        self.assertFalse(x.logged_in())
 
-        x._userinfo['name'] = 'normal_user'
-        self.assertFalse(x.logged_in(True))
-        self.assertTrue(x.logged_in(False))
+        x._userinfo['name'] = 'user'
+        self.assertTrue(x.logged_in())
 
-        x._userinfo['name'] = 'sysop_user'
+        x._userinfo['name'] = 'user'
         x._userinfo['groups'] = ['sysop']
-        self.assertTrue(x.logged_in(True))
-        self.assertFalse(x.logged_in(False))
+        self.assertTrue(x.logged_in())
 
     def test_user_agent(self):
         """Test different variants of user agents."""
         x = self.get_site()
 
         x._userinfo = {'name': 'foo'}
-        x._username = ('foo', None)
+        x._username = 'foo'
 
         self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          user_agent(x, format_string='{pwb}'))
@@ -67,12 +64,12 @@ class TestDrySite(DefaultDrySiteTestCase):
                          user_agent(x, format_string='{username}'))
 
         x._userinfo = {'name': '!'}
-        x._username = ('!', None)
+        x._username = '!'
 
         self.assertEqual('!', user_agent(x, format_string='{username}'))
 
         x._userinfo = {'name': 'foo bar'}
-        x._username = ('foo bar', None)
+        x._username = 'foo bar'
 
         self.assertEqual('foo_bar', user_agent(x, format_string='{username}'))
 
@@ -86,13 +83,13 @@ class TestDrySite(DefaultDrySiteTestCase):
                          user_agent(x, format_string=old_config))
 
         x._userinfo = {'name': '⁂'}
-        x._username = ('⁂', None)
+        x._username = '⁂'
 
         self.assertEqual('%E2%81%82',
                          user_agent(x, format_string='{username}'))
 
         x._userinfo = {'name': '127.0.0.1'}
-        x._username = (None, None)
+        x._username = None
 
         self.assertEqual('Foo', user_agent(x, format_string='Foo {username}'))
         self.assertEqual('Foo (' + x.family.name + ':' + x.code + ')',

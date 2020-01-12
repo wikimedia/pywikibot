@@ -65,7 +65,7 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -206,7 +206,7 @@ class CacheEntry(api.CachedRequest):
         if login_status:
             self.site._loginstatus = eval(login_status)
         if username:
-            self.site._username = [username, username]
+            self.site._username = username
         if not params:
             raise ParseError('No request params')
         self._params = {}

@@ -1018,7 +1018,7 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         self, error, warning, exception, output
     ):
         """Test the query with a username which does not exist."""
-        self.site._username = ['Not registered username', None]
+        self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
@@ -1047,7 +1047,7 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
     @patch.object(pywikibot.config, 'usernames', defaultdict(dict))
     def test_access_denied_no_username(self, exception, warning):
         """Test the query without a username."""
-        self.site._username = [None, None]
+        self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965

@@ -428,7 +428,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
 
     """Site interface to prevent sites being loaded."""
 
-    def __init__(self, code, fam=None, user=None, sysop=None):
+    def __init__(self, code, fam=None, user=None):
         """Initializer."""
         raise pywikibot.SiteDefinitionError(
             'Loading site {}:{} during dry test not permitted'
@@ -639,7 +639,7 @@ class RequireUserMixin(TestCaseBase):
     @classmethod
     def require_site_user(cls, family, code, sysop=False):
         """Check the user config has a valid login to the site."""
-        if not cls.has_site_user(family, code, sysop=sysop):
+        if not cls.has_site_user(family, code):
             raise unittest.SkipTest(
                 '{}: No {}username for {}:{}'
                 .format(cls.__name__,
@@ -673,14 +673,14 @@ class RequireUserMixin(TestCaseBase):
                         site, site.siteinfo.get('readonlyreason', '')))
 
             try:
-                site.login(sysop)
+                site.login()
             except NoUsername:
                 pass
 
             if not site.user():
                 raise unittest.SkipTest(
-                    '{}: Not able to login to {} as {}'
-                    .format(cls.__name__, 'sysop' if sysop else 'bot', site))
+                    '{}: Not able to login to {}'
+                    .format(cls.__name__, site))
 
     def setUp(self):
         """
@@ -698,8 +698,6 @@ class RequireUserMixin(TestCaseBase):
 
     def _reset_login(self):
         """Login to all sites."""
-        sysop = hasattr(self, 'sysop') and self.sysop
-
         # There may be many sites, and setUp doesn't know
         # which site is to be tested; ensure they are all
         # logged in.
@@ -709,8 +707,8 @@ class RequireUserMixin(TestCaseBase):
             if hasattr(self, 'oauth') and self.oauth:
                 continue
 
-            if not site.logged_in(sysop):
-                site.login(sysop)
+            if not site.logged_in():
+                site.login()
             assert(site.user())
 
     def get_userpage(self, site=None):
@@ -1036,7 +1034,7 @@ class TestCase(TestTimerMixin, TestCaseBase):
         return cls.sites[name]['site']
 
     @classmethod
-    def has_site_user(cls, family, code, sysop=False):
+    def has_site_user(cls, family, code):
         """Check the user config has a user for the site."""
         if not family:
             raise Exception('no family defined for {}'.format(cls.__name__))
@@ -1044,7 +1042,7 @@ class TestCase(TestTimerMixin, TestCaseBase):
             raise Exception('no site code defined for {}'
                             .format(cls.__name__))
 
-        usernames = config.sysopnames if sysop else config.usernames
+        usernames = config.usernames
 
         return (code in usernames[family] or '*' in usernames[family]
                 or code in usernames['*'] or '*' in usernames['*'])
