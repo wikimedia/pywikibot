@@ -18,7 +18,7 @@ Command line options:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,11 +27,8 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 
 import pywikibot
-
 from pywikibot import config
-
 from pywikibot.data.api import CachedRequest
-
 from scripts.maintenance.cache import CacheEntry
 
 
@@ -49,13 +46,13 @@ def isWatched(pageName, site=None):
     return pageName in watchlist
 
 
-def refresh(site, sysop=False):
+def refresh(site):
     """Fetch the watchlist."""
     pywikibot.output('Retrieving watchlist for {0}.'.format(str(site)))
-    return list(site.watched_pages(sysop=sysop, force=True))
+    return list(site.watched_pages(force=True))
 
 
-def refresh_all(sysop=False):
+def refresh_all():
     """Reload watchlists for all wikis where a watchlist is already present."""
     cache_path = CachedRequest._get_cache_dir()
     files = os.listdir(cache_path)
@@ -66,22 +63,18 @@ def refresh_all(sysop=False):
         entry.parse_key()
         entry._rebuild()
         if entry.site not in seen and 'watchlistraw' in entry._data:
-            refresh(entry.site, sysop)
+            refresh(entry.site)
             seen.add(entry.site)
 
 
-def refresh_new(sysop=False):
+def refresh_new():
     """Load watchlists of all wikis for accounts set in user-config.py."""
     pywikibot.output(
         'Downloading all watchlists for your accounts in user-config.py')
     for family in config.usernames:
         for lang in config.usernames[family]:
             site = pywikibot.Site(lang, family)
-            refresh(site, sysop=sysop)
-    for family in config.sysopnames:
-        for lang in config.sysopnames[family]:
-            site = pywikibot.Site(lang, family)
-            refresh(site, sysop=sysop)
+            refresh(site)
 
 
 def main(*args):
@@ -93,23 +86,20 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    all = False
-    new = False
-    sysop = False
+    opt_all = False
+    opt_new = False
     for arg in pywikibot.handle_args(args):
         if arg in ('-all', '-update'):
-            all = True
+            opt_all = True
         elif arg == '-new':
-            new = True
-        elif arg == '-sysop':
-            sysop = True
-    if all:
-        refresh_all(sysop=sysop)
-    elif new:
-        refresh_new(sysop=sysop)
+            opt_new = True
+    if opt_all:
+        refresh_all()
+    elif opt_new:
+        refresh_new()
     else:
         site = pywikibot.Site()
-        watchlist = refresh(site, sysop=sysop)
+        watchlist = refresh(site)
         pywikibot.output('{} pages in the watchlist.'.format(len(watchlist)))
         for page in watchlist:
             try:
