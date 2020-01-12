@@ -85,11 +85,14 @@ script_deps = {
         'Pillow<6.0.0;python_version=="3.4"',
         'Pillow;python_version>="3.5"',
     ],
+    'patrol.py': ['mwparserfromhell>=0.3.3'],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
-    'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
 script_deps['data_ingestion.py'] = extra_deps['csv']
+script_deps['imageharvest.py'] = extra_deps['html']
+script_deps['isbn.py'] = extra_deps['isbn']
+script_deps['match_images.py'] = script_deps['flickrripper.py']
 
 extra_deps.update(script_deps)
 
