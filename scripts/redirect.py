@@ -72,8 +72,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2004-2019
+# (C) xqt, 2009-2020
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -427,7 +427,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         @return: A valid speedy deletion template.
         @rtype: str or None
         """
-        if self.getOption('delete') and not self.site.logged_in(sysop=True):
+        if self.getOption('delete') \
+           and 'delete' not in self.site.userinfo['rights']:
             sd = self.getOption('sdtemplate')
             if not sd and i18n.twhas_key(self.site,
                                          'redirect-broken-redirect-template'):

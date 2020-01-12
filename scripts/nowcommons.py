@@ -10,7 +10,7 @@ Files are downloaded and compared. If the files match, it can be deleted on
 the source wiki. If multiple versions of the file exist, the script will not
 delete. If the SHA1 comparison is not equal, the script will not delete.
 
-A sysop account on the local wiki is required if you want all features of
+A sysop rights on the local wiki is required if you want all features of
 this script to work properly.
 
 This script understands various command-line arguments:
@@ -31,7 +31,7 @@ This script understands various command-line arguments:
                     file, including where it is used as a template parameter
                     or in galleries. However, it can also make more mistakes.
 
-    -replaceonly    Use this if you do not have a local sysop account, but do
+    -replaceonly    Use this if you do not have a local sysop rights, but do
                     wish to replace links from the NowCommons template.
 
 Example
@@ -49,8 +49,8 @@ Please fix these if you are capable and motivated:
 #
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2019
-# (C) Pywikibot team, 2006-2019
+# (C) xqt, 2010-2020
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
