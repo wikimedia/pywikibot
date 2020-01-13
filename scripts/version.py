@@ -3,8 +3,8 @@
 """Script to determine the Pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
-# (C) xqt, 2010-2018
-# (C) Pywikibot team, 2007-2018
+# (C) xqt, 2010-2020
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,17 +76,11 @@ def main(*args):
     check_environ('PYWIKIBOT_NO_USER_CONFIG')
     pywikibot.output('Config base dir: ' + pywikibot.config2.base_dir)
     for family, usernames in pywikibot.config2.usernames.items():
-        if usernames:
-            pywikibot.output('Usernames for family "{0}":'.format(family))
-            for lang, username in usernames.items():
-                sysop_name = pywikibot.config2.sysopnames.get(family,
-                                                              {}).get(lang)
-                if not sysop_name:
-                    sysop_name = 'no sysop configured'
-                elif sysop_name == username:
-                    sysop_name = 'also sysop'
-                pywikibot.output('\t{0}: {1} ({2})'.format(lang, username,
-                                                           sysop_name))
+        if not usernames:
+            continue
+        pywikibot.output('Usernames for family "{0}":'.format(family))
+        for lang, username in usernames.items():
+            pywikibot.output('\t{0}: {1}'.format(lang, username))
 
 
 if __name__ == '__main__':
