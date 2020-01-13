@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -137,18 +137,7 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-# If you have a sysop account on some wikis, this will be used to delete pages
-# or to edit locked pages if you add such lines to your
-# user-config.py:
-#
-# sysopnames['wikipedia']['de'] = 'myGermanUsername'
-# sysopnames['wiktionary']['en'] = 'myEnglishUsername'
-#
-# If you have a unique syop account for all languages of a family,
-# you can use '*'
-# sysopnames['myownwiki']['*'] = 'mySingleUsername'
 usernames = collections.defaultdict(dict)
-sysopnames = collections.defaultdict(dict)
 disambiguation_comment = collections.defaultdict(dict)
 
 # User agent format.
@@ -410,7 +399,6 @@ def register_family_file(family_name, file_path):
     family.AutoFamily function is used when the url is given.
     """
     usernames[family_name] = {}
-    sysopnames[family_name] = {}
     disambiguation_comment[family_name] = {}
     family_files[family_name] = file_path
 
@@ -931,6 +919,7 @@ panoramio = {
 }
 
 special_page_limit = 500
+sysopnames = collections.defaultdict(dict)
 
 # #############################################
 
