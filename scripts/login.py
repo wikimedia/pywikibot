@@ -33,11 +33,9 @@ The following parameters are supported:
                 where others have either physical or remote access.
                 Use -pass instead.
 
-   -sysop       Log in with your sysop account.
-
    -oauth       Generate OAuth authentication information.
                 NOTE: Need to copy OAuth tokens to your user-config.py
-                manually. -logout, -pass, -force, -pass:XXXX and -sysop are not
+                manually. -logout, -pass, -force and -pass:XXXX are not
                 compatible with -oauth.
 
    -autocreate  Auto-create an account using unified login when necessary.
@@ -56,7 +54,7 @@ subdirectory.
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -100,7 +98,7 @@ def _oauth_login(site):
         pywikibot.output('Logged in on %(site)s as %(username)s'
                          'via OAuth consumer %(consumer)s'
                          % {'site': site,
-                            'username': site.username(sysop=False),
+                            'username': site.username(),
                             'consumer': consumer_key})
         pywikibot.output('NOTE: To use OAuth, you need to copy the '
                          'following line to your user-config.py:')
@@ -119,7 +117,6 @@ def main(*args):
     @type args: str
     """
     password = None
-    sysop = False
     logall = False
     logout = False
     oauth = False
@@ -133,8 +130,6 @@ def main(*args):
                     password=True)
             else:
                 password = arg[6:]
-        elif arg == '-sysop':
-            sysop = True
         elif arg == '-all':
             logall = True
         elif arg == '-force':
@@ -159,10 +154,7 @@ def main(*args):
                           'https://phabricator.wikimedia.org/T102477')
 
     if logall:
-        if sysop and not oauth:
-            namedict = config.sysopnames
-        else:
-            namedict = config.usernames
+        namedict = config.usernames
     else:
         site = pywikibot.Site()
         namedict = {site.family.name: {site.code: None}}
@@ -176,7 +168,7 @@ def main(*args):
                 if logout:
                     site.logout()
                 else:
-                    site.login(sysop, autocreate=autocreate)
+                    site.login(autocreate=autocreate)
                 user = site.user()
                 if user:
                     pywikibot.output(
