@@ -783,7 +783,7 @@ class BaseSite(ComparableMixin):
         self._pagemutex = threading.Condition()
         self._locked_pages = set()
 
-    @deprecated(since='20141225')
+    @deprecated(since='20141225', future_warning=True)
     def has_api(self):
         """Return whether this site has an API."""
         return False
@@ -1883,7 +1883,7 @@ class APISite(BaseSite):
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of %s.' % dbname)
 
-    @deprecated(since='20141225')
+    @deprecated(since='20141225', future_warning=True)
     def has_api(self):
         """Return whether this site has an API."""
         return True
