@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 from pywikibot.tools import deprecated
-from pywikibot.site import must_be, need_version
+from pywikibot.site import must_be, need_right, need_version
 from pywikibot.comms.http import user_agent
 from pywikibot.exceptions import UserRightsError
 
@@ -136,26 +136,37 @@ class TestMustBe(DebugOnlyTestCase):
         self.family.name = 'test'
         self.sitename = self.family.name + ':' + self.code
         self._logged_in_as = None
+        self._userinfo = []
         self.obsolete = False
         super(TestMustBe, self).setUp()
         self.version = lambda: '1.14'  # lowest supported release
 
-    def login(self, sysop):
-        """Fake the log in and just store who logged in."""
-        self._logged_in_as = 'sysop' if sysop else 'user'
+    def login(self, group):
+        """Fake the log in as required user group."""
+        self._logged_in_as = group
+        self._userinfo = [group]
+
+    def user(self):
+        """Fake the logged in user."""
+        return self._logged_in_as
 
     def has_group(self, group):
         """Fake the groups user belongs to."""
-        return False
+        return group in self._userinfo
 
     def testMockInTest(self):
         """Test that setUp and login work."""
         self.assertIsNone(self._logged_in_as)
-        self.login(True)
-        self.assertEqual(self._logged_in_as, 'sysop')
+        self.login('user')
+        self.assertEqual(self._logged_in_as, 'user')
 
     # Test that setUp is actually called between each test
     testMockInTestReset = testMockInTest  # noqa: N815
+
+    @must_be('steward')
+    def call_this_steward_req_function(self, *args, **kwargs):
+        """Require a sysop to function."""
+        return args, kwargs
 
     @must_be('sysop')
     def call_this_sysop_req_function(self, *args, **kwargs):
@@ -167,40 +178,122 @@ class TestMustBe(DebugOnlyTestCase):
         """Require a user to function."""
         return args, kwargs
 
+    def testMustBeSteward(self):
+        """Test a function which requires a sysop."""
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        self.login('steward')
+        retval = self.call_this_steward_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+
     def testMustBeSysop(self):
         """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
+        self.login('sysop')
         retval = self.call_this_sysop_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertEqual(self._logged_in_as, 'sysop')
+        self.assertRaises(UserRightsError, self.call_this_steward_req_function,
+                          args, kwargs)
 
     def testMustBeUser(self):
         """Test a function which requires a user."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
+        self.login('user')
         retval = self.call_this_user_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertEqual(self._logged_in_as, 'user')
+        self.assertRaises(UserRightsError, self.call_this_sysop_req_function,
+                          args, kwargs)
 
     def testOverrideUserType(self):
         """Test overriding the required group."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
+        self.login('sysop')
         retval = self.call_this_user_req_function(
             *args, as_group='sysop', **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertEqual(self._logged_in_as, 'sysop')
 
     def testObsoleteSite(self):
         """Test when the site is obsolete and shouldn't be edited."""
         self.obsolete = True
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
+        self.login('steward')
+        retval = self.call_this_user_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+        self.login('user')
         self.assertRaises(UserRightsError, self.call_this_user_req_function,
+                          args, kwargs)
+
+
+class TestNeedRight(DebugOnlyTestCase):
+
+    """Test cases for the must_be decorator."""
+
+    net = False
+
+    # Implemented without setUpClass(cls) and global variables as objects
+    # were not completely disposed and recreated but retained 'memory'
+    def setUp(self):
+        """Creating fake variables to appear as a site."""
+        self.code = 'test'
+        self.family = lambda: None
+        self.family.name = 'test'
+        self.sitename = self.family.name + ':' + self.code
+        self._logged_in_as = None
+        self._userinfo = []
+        self.obsolete = False
+        super(TestNeedRight, self).setUp()
+        self.version = lambda: '1.14'  # lowest supported release
+
+    def login(self, group, right):
+        """Fake the log in as required user group."""
+        self._logged_in_as = group
+        self._userinfo = [right]
+
+    def user(self):
+        """Fake the logged in user."""
+        return self._logged_in_as
+
+    def has_right(self, right):
+        """Fake the groups user belongs to."""
+        return right in self._userinfo
+
+    @need_right('edit')
+    def call_this_edit_req_function(self, *args, **kwargs):
+        """Require a sysop to function."""
+        return args, kwargs
+
+    @need_right('move')
+    def call_this_move_req_function(self, *args, **kwargs):
+        """Require a sysop to function."""
+        return args, kwargs
+
+    def testNeedRightEdit(self):
+        """Test a function which requires a sysop."""
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        self.login('user', 'edit')
+        retval = self.call_this_edit_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+
+    def testNeedRightMove(self):
+        """Test a function which requires a sysop."""
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        self.login('user', 'move')
+        retval = self.call_this_move_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+        self.assertRaises(UserRightsError, self.call_this_edit_req_function,
                           args, kwargs)
 
 

@@ -1285,33 +1285,31 @@ class BaseSite(ComparableMixin):
         return self.getUrl(address, data=data)
 
 
-def must_be(group=None, right=None):
+@deprecated_args(right=None)
+def must_be(group=None):
     """Decorator to require a certain user status when method is called.
 
-    @param group: The group the logged in user should belong to
-                  this parameter can be overridden by
+    @param group: The group the logged in user should belong to.
+                  This parameter can be overridden by
                   keyword argument 'as_group'.
-    @type group: str ('user' or 'sysop')
-    @param right: The rights the logged in user should have.
-
+    @type group: str
     @return: method decorator
+    @raises UserRightsError: user is not part of the required user group.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
             grp = kwargs.pop('as_group', group)
-            if self.obsolete and not self.has_group('steward'):
-                raise UserRightsError('Site {} has been closed. Only steward '
-                                      'can perform requested action.'
-                                      .format(self.sitename))
-            if right is not None:
-                if self.has_right(right):
-                    return fn(self, *args, **kwargs)
-            if grp == 'user':
-                self.login(False)
-            elif grp == 'sysop':
-                self.login(True)
-            else:
-                raise Exception('Not implemented')
+            if self.obsolete:
+                if not self.has_group('steward'):
+                    raise UserRightsError(
+                        'Site {} has been closed. Only steward '
+                        'can perform requested action.'
+                        .format(self.sitename))
+
+            elif not self.has_group(grp):
+                raise UserRightsError('User "{}" is not part of the required '
+                                      'user group "{}"'
+                                      .format(self.user(), grp))
 
             return fn(self, *args, **kwargs)
 
@@ -1319,7 +1317,38 @@ def must_be(group=None, right=None):
             return fn
 
         manage_wrapping(callee, fn)
+        return callee
 
+    return decorator
+
+
+def need_right(right=None):
+    """Decorator to require a certain user right when method is called.
+
+    @param right: The right the logged in user should have.
+    @type right: str
+    @return: method decorator
+    @raises UserRightsError: user has insufficient rights.
+    """
+    def decorator(fn):
+        def callee(self, *args, **kwargs):
+            if self.obsolete:
+                if not self.has_group('steward'):
+                    raise UserRightsError(
+                        'Site {} has been closed. Only steward '
+                        'can perform requested action.'
+                        .format(self.sitename))
+
+            elif right is not None and not self.has_right(right):
+                raise UserRightsError('User "{}" does not have required '
+                                      'user right "{}"'
+                                      .format(self.user, right))
+            return fn(self, *args, **kwargs)
+
+        if not __debug__:
+            return fn
+
+        manage_wrapping(callee, fn)
         return callee
 
     return decorator
@@ -2271,13 +2300,11 @@ class APISite(BaseSite):
     def has_right(self, right):
         """Return true if and only if the user has a specific right.
 
-        Possible values of 'right' may vary depending on wiki settings,
-        but will usually include:
-
-        * Actions: edit, move, delete, protect, upload
-        * User levels: autoconfirmed, sysop, bot
-
+        Possible values of 'right' may vary depending on wiki settings.
         U{https://www.mediawiki.org/wiki/API:Userinfo}
+
+        @param right: a specific right to be validated
+        @type right: str
         """
         return right.lower() in self._userinfo['rights']
 
@@ -5210,7 +5237,7 @@ class APISite(BaseSite):
     }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
-    @must_be(group='user')
+    @need_right('edit')
     def editpage(self, page, summary=None, minor=True, notminor=False,
                  bot=True, recreate=True, createonly=False, nocreate=False,
                  watch=None, **kwargs):
@@ -5430,7 +5457,7 @@ class APISite(BaseSite):
             'destination revisions of {dest}'
     }
 
-    @must_be(group='sysop', right='mergehistory')
+    @need_right('mergehistory')
     def merge_history(self, source, dest, timestamp=None, reason=None):
         """Merge revisions from one page into another.
 
@@ -5549,7 +5576,7 @@ class APISite(BaseSite):
             '[[%(oldtitle)s]]',
     }
 
-    @must_be(group='user')
+    @need_right('move')
     def movepage(self, page, newtitle, summary, movetalk=True,
                  noredirect=False):
         """Move a Page to a new title.
@@ -5652,7 +5679,7 @@ class APISite(BaseSite):
             'Page [[%(title)s]] already rolled back; action aborted.',
     }  # other errors shouldn't arise because we check for those errors
 
-    @must_be('user')
+    @need_right('rollback')
     def rollbackpage(self, page, **kwargs):
         """Roll back page to version before last user's edits.
 
@@ -5717,7 +5744,7 @@ class APISite(BaseSite):
                         'Revision may not exist or was already undeleted.'
     }  # other errors shouldn't occur because of pre-submission checks
 
-    @must_be(group='sysop', right='delete')
+    @need_right('delete')
     @deprecate_arg('summary', 'reason')
     def deletepage(self, page, reason):
         """Delete page from the wiki. Requires appropriate privilege level.
@@ -5755,7 +5782,7 @@ class APISite(BaseSite):
         finally:
             self.unlock_page(page)
 
-    @must_be(group='sysop', right='undelete')
+    @need_right('undelete')
     @deprecate_arg('summary', 'reason')
     def undelete_page(self, page, reason, revisions=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
@@ -5828,7 +5855,7 @@ class APISite(BaseSite):
         # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
 
-    @must_be(group='sysop', right='protect')
+    @need_right('protect')
     @deprecate_arg('summary', 'reason')
     def protect(self, page, protections, reason, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
@@ -5897,7 +5924,7 @@ class APISite(BaseSite):
             "The revision %(revid)s can't be patrolled as it's too old."
     }
 
-    @must_be(group='user')
+    @need_right('patrol')
     @deprecated_args(token=None)
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
@@ -5986,7 +6013,7 @@ class APISite(BaseSite):
 
             yield result['patrol']
 
-    @must_be(group='sysop', right='block')
+    @need_right('block')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False,
                   allowusertalk=False):
@@ -6044,7 +6071,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
-    @must_be(group='sysop', right='block')
+    @need_right('unblock')
     def unblockuser(self, user, reason=None):
         """
         Remove the block for the user.
@@ -6064,7 +6091,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('editmywatchlist')
     def watch(self, pages, unwatch=False):
         """Add or remove pages from watchlist.
 
@@ -6104,7 +6131,7 @@ class APISite(BaseSite):
                 return False
         return True
 
-    @must_be(group='user')
+    @need_right('editmywatchlist')
     @deprecated('Site().watch', since='20160102')
     def watchpage(self, page, unwatch=False):
         """
@@ -6131,7 +6158,7 @@ class APISite(BaseSite):
             return False
         return ('unwatched' if unwatch else 'watched') in result['watch']
 
-    @must_be(group='user')
+    @need_right('purge')
     def purgepages(
         self, pages, forcelinkupdate=False, forcerecursivelinkupdate=False,
         converttitles=False, redirects=False
@@ -6211,7 +6238,7 @@ class APISite(BaseSite):
         """
         return self._get_titles_with_hash(hash_found)
 
-    @must_be(group='user')
+    @need_right('edit')
     def is_uploaddisabled(self):
         """Return True if upload is disabled on site.
 
@@ -7269,7 +7296,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def create_new_topic(self, page, title, content, format):
         """
@@ -7294,7 +7321,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['new-topic']['committed']['topiclist']
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def reply_to_post(self, page, reply_to_uuid, content, format):
         """Reply to a post on a Flow topic.
@@ -7318,7 +7345,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['reply']['committed']['topic']
 
-    @must_be('user', 'flow-lock')
+    @need_right('flow-lock')
     @need_extension('Flow')
     def lock_topic(self, page, lock, reason):
         """
@@ -7342,7 +7369,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['lock-topic']['committed']['topic']
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def moderate_topic(self, page, state, reason):
         """
@@ -7365,7 +7392,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['moderate-topic']['committed']['topic']
 
-    @must_be('user', 'flow-delete')
+    @need_right('flow-delete')
     @need_extension('Flow')
     def delete_topic(self, page, reason):
         """
@@ -7380,7 +7407,7 @@ class APISite(BaseSite):
         """
         return self.moderate_topic(page, 'delete', reason)
 
-    @must_be('user', 'flow-hide')
+    @need_right('flow-hide')
     @need_extension('Flow')
     def hide_topic(self, page, reason):
         """
@@ -7395,7 +7422,7 @@ class APISite(BaseSite):
         """
         return self.moderate_topic(page, 'hide', reason)
 
-    @must_be('user', 'flow-suppress')
+    @need_right('flow-suppress')
     @need_extension('Flow')
     def suppress_topic(self, page, reason):
         """
@@ -7410,7 +7437,7 @@ class APISite(BaseSite):
         """
         return self.moderate_topic(page, 'suppress', reason)
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def restore_topic(self, page, reason):
         """
@@ -7425,7 +7452,7 @@ class APISite(BaseSite):
         """
         return self.moderate_topic(page, 'restore', reason)
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def moderate_post(self, post, state, reason):
         """
@@ -7450,7 +7477,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['moderate-post']['committed']['topic']
 
-    @must_be('user', 'flow-delete')
+    @need_right('flow-delete')
     @need_extension('Flow')
     def delete_post(self, post, reason):
         """
@@ -7465,7 +7492,7 @@ class APISite(BaseSite):
         """
         return self.moderate_post(post, 'delete', reason)
 
-    @must_be('user', 'flow-hide')
+    @need_right('flow-hide')
     @need_extension('Flow')
     def hide_post(self, post, reason):
         """
@@ -7480,7 +7507,7 @@ class APISite(BaseSite):
         """
         return self.moderate_post(post, 'hide', reason)
 
-    @must_be('user', 'flow-suppress')
+    @need_right('flow-suppress')
     @need_extension('Flow')
     def suppress_post(self, post, reason):
         """
@@ -7495,7 +7522,7 @@ class APISite(BaseSite):
         """
         return self.moderate_post(post, 'suppress', reason)
 
-    @must_be('user')
+    @need_right('edit')
     @need_extension('Flow')
     def restore_post(self, post, reason):
         """
@@ -7956,7 +7983,7 @@ class DataSite(APISite):
         return dtype
 
     @deprecated_args(identification='entity')
-    @must_be(group='user')
+    @need_right('edit')
     def editEntity(self, entity, data, bot=True, **kwargs):
         """
         Edit entity.
@@ -8010,7 +8037,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def addClaim(self, entity, claim, bot=True, summary=None):
         """
         Add a claim.
@@ -8041,7 +8068,7 @@ class DataSite(APISite):
             entity.claims[claim.getID()] = [claim]
         entity.latest_revision_id = data['pageinfo']['lastrevid']
 
-    @must_be(group='user')
+    @need_right('edit')
     def changeClaimTarget(self, claim, snaktype='value',
                           bot=True, summary=None):
         """
@@ -8073,7 +8100,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def save_claim(self, claim, summary=None, bot=True):
         """
         Save the whole claim to the wikibase site.
@@ -8103,7 +8130,7 @@ class DataSite(APISite):
         claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def editSource(self, claim, source, new=False,
                    bot=True, summary=None, baserevid=None):
         """
@@ -8158,7 +8185,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def editQualifier(self, claim, qualifier, new=False, bot=True,
                       summary=None, baserevid=None):
         """
@@ -8196,7 +8223,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def removeClaims(self, claims, bot=True, summary=None, baserevid=None):
         """
         Remove claims.
@@ -8230,7 +8257,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def removeSources(self, claim, sources,
                       bot=True, summary=None, baserevid=None):
         """
@@ -8261,7 +8288,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def remove_qualifiers(self, claim, qualifiers,
                           bot=True, summary=None, baserevid=None):
         """
@@ -8293,7 +8320,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def linkTitles(self, page1, page2, bot=True):
         """
         Link two pages together.
@@ -8321,7 +8348,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('item-merge')
     @deprecated_args(ignoreconflicts='ignore_conflicts', fromItem='from_item',
                      toItem='to_item')
     def mergeItems(self, from_item, to_item, ignore_conflicts=None,
@@ -8358,7 +8385,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('item-redirect')
     def set_redirect_target(self, from_item, to_item, bot=True):
         """
         Make a redirect to another item.
@@ -8381,7 +8408,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
-    @must_be(group='user')
+    @need_right('edit')
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
         Create a new Wikibase item for a provided page.
