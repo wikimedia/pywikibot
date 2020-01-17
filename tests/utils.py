@@ -253,7 +253,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                         skip_frames -= 1
 
             # Ignore socket IO warnings (T183696, T184996)
-            if (PYTHON_VERSION >= (3, 2)
+            if (not PY2
                     and issubclass(warn_msg.category, ResourceWarning)
                     and str(warn_msg.message).startswith(
                         ('unclosed <ssl.SSLSocket',
