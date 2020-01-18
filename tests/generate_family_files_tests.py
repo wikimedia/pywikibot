@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test generate_family_files script."""
 #
-# (C) Pywikibot team, 2018-2019
+# (C) Pywikibot team, 2018-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,17 +38,19 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
     """Test generate_family_file functionality."""
 
+    familyname = 'testgff'
+
     def setUp(self):
         """Set up tests class."""
         super(TestGenerateFamilyFiles, self).setUp()
         self.generator_instance = FamilyTestGenerator(
-            url=self.site.base_url(''), name='gff-test', dointerwiki='y')
+            url=self.site.base_url(''), name=self.familyname, dointerwiki='y')
 
     def test_initial_attributes(self):
         """Test initial FamilyFileGenerator attributes."""
         self.assertEqual(self.generator_instance.base_url,
                          self.site.base_url(''))
-        self.assertEqual(self.generator_instance.name, 'gff-test')
+        self.assertEqual(self.generator_instance.name, self.familyname)
         self.assertEqual(self.generator_instance.dointerwiki, 'y')
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
