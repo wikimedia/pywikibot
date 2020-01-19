@@ -68,7 +68,7 @@ environment:
       PYTHON_ARCH: "64"
 
 matrix:
-  fast_finish: true
+  fast_finish: false
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
