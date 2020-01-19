@@ -39,7 +39,7 @@ pydot >= 1.2
 unicodecsv ; python_version < '3'
 
 # cosmetic_changes and scripts/isbn
-python-stdnum
+python-stdnum >= 1.13
 
 # GUI
 Pillow < 7.0.0 ; python_version < '3'

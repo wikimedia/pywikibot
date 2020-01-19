@@ -37,7 +37,7 @@ if not python_is_supported():
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum'],
+    'isbn': ['python-stdnum>=1.13'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
