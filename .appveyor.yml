@@ -108,7 +108,7 @@ test_script:
   - set PYTHONIOENCODING=utf8
 
   - "mkdir %PYWIKIBOT_DIR%"
-  - "python -Werror::UserWarning -m generate_user_files -dir:%PYWIKIBOT_DIR% -family:wikipedia -lang:en -v -debug"
+  - "python -Wd::UserWarning -m generate_user_files -dir:%PYWIKIBOT_DIR% -family:wikipedia -lang:en -v -debug"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
 
   - set PYSETUP_TEST_NO_UI=1
