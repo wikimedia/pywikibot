@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Refactor Wikibase entity namespace handling (T160395)
+* Site.has_api method will be removed in next release
 * Category.copyTo and Category.copyAndKeep will be removed in the next release
 * weblib module has been removed (T85001)
 * botirc module has been removed (T212632)
