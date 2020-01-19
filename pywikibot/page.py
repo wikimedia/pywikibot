@@ -4154,7 +4154,8 @@ class WikibasePage(BasePage, WikibaseEntity):
                             or claim not in diffto_claims[prop]):
                         temp[prop].append(claim)
 
-                    claim_ids.add(claim['id'])
+                    if 'id' in claim:
+                        claim_ids.add(claim['id'])
 
             for prop, prop_claims in diffto_claims.items():
                 for claim in prop_claims:

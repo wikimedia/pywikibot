@@ -284,7 +284,6 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase,
         main('-page:' + self.test_page_qid, '-always', '-format')
         self.assertEqual(self.setTarget_value, '0-9752298-0-X')
 
-    @unittest.expectedFailure  # See T174870
     def test_isbn_to13(self):
         """Test to13 using the bot and wikibase."""
         main('-page:' + self.test_page_qid, '-always', '-to13')
