@@ -56,8 +56,7 @@ flickrapi
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3
 
-# The mysql generator in pagegenerators depends on either PyMySQL or MySQLdb
-# pywikibot prefers PyMySQL over MySQLdb (Python 2 only)
+# The mysql generator in pagegenerators depends on PyMySQL
 PyMySQL
 
 # core HTML comparison parser in diff module
