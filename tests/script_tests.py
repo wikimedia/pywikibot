@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,18 +20,15 @@ from tests.utils import execute_pwb, add_metaclass
 scripts_path = join_root_path('scripts')
 
 # These dependencies are not always the package name which is in setup.py.
-# e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,
-# and setup.py requests that 'Pillow' is installed to provide 'PIL.ImageTk'.
-# Here, it doesn't matter which pypi package was requested and installed.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
-    'flickrripper': ['flickrapi', 'Pillow'],
+    'flickrripper': ['flickrapi', 'PIL'],
     'imageharvest': ['bs4'],
     'isbn': ['python-stdnum'],
-    'match_images': ['PIL.ImageTk'],
+    'match_images': ['PIL.Image'],
     'states_redirect': ['pycountry'],
-    'patrol': ['mwparserfromhell>=0.3.3'],
-    'weblinkchecker': ['memento_client>=0.5.1,!=0.6.0'],
+    'patrol': ['mwparserfromhell'],
+    'weblinkchecker': ['memento_client'],
 }
 
 if PY2:
