@@ -4,6 +4,9 @@ Release history
 Current release
 ---------------
 
+* ipaddress module is required for Python 2 (T243171)
+* tools.ip will be dropped in favour of tools.is_IP (T243171)
+* tools.ip_regexp is deprecatd for 5 years and will be removed with next release
 * backports.py will be removed with next release (T244664)
 * stdnum package is required for ISBN scripts and cosmetic_changes (T132919, T144288, T241141)
 * preload urllib.quote() with Python 2 (T243710, T222623)

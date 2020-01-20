@@ -42,11 +42,16 @@ if not PY2:
     import queue
     StringTypes = (str, bytes)
     UnicodeType = str
+    from ipaddress import ip_address
 else:
     from itertools import izip_longest as zip_longest
     import Queue as queue  # noqa: N813
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
+    try:
+        from ipaddress import ip_address
+    except ImportError:
+        ip_address = None
 
 try:
     import bz2
@@ -373,6 +378,33 @@ class NotImplementedClass(object):
             '%s: %s' % (self.__class__.__name__, self.__doc__))
 
 
+def is_IP(IP):  # noqa N802, N803
+    """Verify the IP address provided is valid.
+
+    No logging is performed. Use ip_address instead to catch errors.
+
+    @param IP: IP address
+    @type IP: str
+    @rtype: bool
+    """
+    method = ip_address
+    if not ip_address:  # Python 2 needs ipaddress to be installed
+        issue_deprecation_warning(
+            'ipaddr module or tools.ip.ip_regexp', 'ipaddress module',
+            warning_class=FutureWarning, since='20200120')
+        from pywikibot.tools import ip
+        with suppress_warnings('pywikibot.tools.ip.is_IP is deprecated'):
+            method = ip.is_IP
+
+    try:
+        method(IP)
+    except ValueError:
+        pass
+    else:
+        return True
+    return False
+
+
 def has_module(module, version=None):
     """Check whether a module can be imported."""
     try:
@@ -685,7 +717,8 @@ class DeprecatedRegex(LazyRegex):
     def __getattr__(self, attr):
         """Issue deprecation warning."""
         issue_deprecation_warning(
-            self._name, self._instead, since=self._since)
+            self._name, self._instead, warning_class=FutureWarning,
+            since=self._since)
         return super(DeprecatedRegex, self).__getattr__(attr)
 
 

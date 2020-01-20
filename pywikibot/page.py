@@ -50,7 +50,8 @@ from pywikibot.tools import (
     first_upper, redirect_func, remove_last_args, UnicodeType,
     StringTypes
 )
-from pywikibot.tools.ip import is_IP, ip_regexp
+from pywikibot.tools.ip import ip_regexp  # deprecated
+from pywikibot.tools import is_IP
 
 if not PY2:
     from html import entities as htmlentitydefs

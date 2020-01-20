@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """IP address tools module."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,8 @@ import re
 from distutils.version import StrictVersion
 from warnings import warn
 
-from pywikibot.tools import DeprecatedRegex, PY2, UnicodeType
+from pywikibot.tools import (DeprecatedRegex, PY2, UnicodeType,
+                             ModuleDeprecationWrapper)
 
 _ipaddress_e = _ipaddr_e = _ipaddr_version = None
 
@@ -87,7 +88,7 @@ ip_regexp = DeprecatedRegex(
     r'(([\dA-F]{1,4}(\4|:\b|$)|\2){2}|'
     r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z',
     re.IGNORECASE,
-    'page.ip_regexp', 'tools.ip.is_IP', since='20150212')
+    'page.ip_regexp', 'tools.is_IP', since='20150212')
 
 
 def is_IP(IP):
@@ -105,3 +106,10 @@ def is_IP(IP):
         return True
     except ValueError:
         return False
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('is_IP',
+                             replacement_name='tools.is_IP',
+                             future_warning=True,
+                             since='20200120')

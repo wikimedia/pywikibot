@@ -248,11 +248,10 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
                                Request, site=site,
                                parameters={'action': 'edit'})
 
-        # Explicitly using str as the test expects it to be str (without the
-        # u-prefix) in Python 2 and this module is using unicode_literals
-        site._userinfo = {'name': str('1.2.3.4'), 'groups': []}
+        site._userinfo = {'name': '1.2.3.4', 'groups': []}
 
-        self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
+        # unicode string with "u" is returned with Python 2
+        self.assertRaisesRegex(pywikibot.Error, " as IP u?'1.2.3.4'",
                                Request, site=site,
                                parameters={'action': 'edit'})
 

@@ -38,7 +38,7 @@ from pywikibot.exceptions import (
     Error, TimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.tools import (
-    deprecated, itergroup, ip, PY2, PYTHON_VERSION,
+    deprecated, itergroup, is_IP, PY2, PYTHON_VERSION,
     getargspec, UnicodeType, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
@@ -1253,7 +1253,7 @@ class Request(MutableMapping):
                 raise Error('API write action attempted without userinfo')
             assert('name' in self.site._userinfo)
 
-            if ip.is_IP(self.site._userinfo['name']):
+            if is_IP(self.site._userinfo['name']):
                 raise Error('API write action attempted as IP %r'
                             % self.site._userinfo['name'])
 

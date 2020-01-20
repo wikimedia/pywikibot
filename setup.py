@@ -97,18 +97,11 @@ script_deps['data_ingestion.py'] = extra_deps['csv']
 extra_deps.update(script_deps)
 
 # ------- setup install_requires ------- #
+# packages which are mandatory
 dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
                 'requests>=2.20.1; python_version != "3.4"',
-                'enum34>=1.1.6; python_version < "3"']
-# tools.ip does not have a hard dependency on an IP address module,
-# as it falls back to using regexes if one is not available.
-# The functional backport of py3 ipaddress is acceptable:
-# https://pypi.org/project/ipaddress
-# However the Debian package python-ipaddr is also supported:
-# https://pypi.org/project/ipaddr
-# Other backports are likely broken.
-# ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
-dependencies.append('ipaddr>=2.1.10;python_version<"3"')
+                'enum34>=1.1.6; python_version < "3"',
+                'ipaddress>=1.0.23; python_version < "3"']
 
 # version.package_version() uses pathlib which is a python 3 library.
 # pathlib2 is required for python 2.7

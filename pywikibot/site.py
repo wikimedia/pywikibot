@@ -83,7 +83,7 @@ from pywikibot.tools import (
     filter_unique,
     UnicodeType
 )
-from pywikibot.tools.ip import is_IP
+from pywikibot.tools import is_IP
 
 if not PY2:
     from itertools import zip_longest

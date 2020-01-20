@@ -18,14 +18,13 @@
 #     or
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
-# mandatory; see README.conversion.txt
+# mandatory; see README-conversion.txt
 requests>=2.20.1,<2.22.0; python_version == '3.4'
 requests>=2.20.1; python_version != '3.4'
 enum34>=1.1.6; python_version < '3'
+ipaddress>=1.0.23 ; python_version < '3'
 # requests security extra
 requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
-
-ipaddr>=2.1.10 ; python_version < '3'
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information

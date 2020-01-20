@@ -7,16 +7,14 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
 
-from distutils.version import StrictVersion
-
-from pywikibot.tools import ip, PY2, PYTHON_VERSION
+from pywikibot.tools import is_IP, PY2, PYTHON_VERSION
 
 from tests import unittest_print
-from tests.aspects import unittest, TestCase, DeprecationTestCase
+from tests.aspects import unittest, TestCase
 from tests.utils import expected_failure_if
 
 
-class TestIPBase(TestCase):
+class IPAddressModuleTestCase(TestCase):
 
     """Unit test class base for IP matching."""
 
@@ -25,11 +23,11 @@ class TestIPBase(TestCase):
     def setUp(self):
         """Set up test."""
         self.total = 0
-        super(TestIPBase, self).setUp()
+        super(IPAddressModuleTestCase, self).setUp()
 
     def tearDown(self):
         """Tear down test."""
-        super(TestIPBase, self).tearDown()
+        super(IPAddressModuleTestCase, self).tearDown()
         unittest_print('{} subtests done'.format(self.total))
 
     def ipv6test(self, result, ip_address):
@@ -38,13 +36,10 @@ class TestIPBase(TestCase):
         with self.subTest(ip_address=ip_address):
             msg = '"{}" match should be {} - not OK'.format(
                 ip_address, result) if PY2 else None
-            if result:
-                self.assertTrue(self._do_ip_test(ip_address), msg)
-            else:
-                self.assertFalse(self._do_ip_test(ip_address), msg)
+            self.assertEqual(result, is_IP(ip_address), msg)
 
-    def _run_tests(self):
-        """Test various IP."""
+    def test_ipaddress_module(self):
+        """Test ipaddress module."""
         # test from http://download.dartware.com/thirdparty/test-ipv6-regex.pl
         self.ipv6test(False, '')  # empty string
         self.ipv6test(True, '::1')  # loopback, compressed, non-routable
@@ -635,80 +630,31 @@ class TestIPBase(TestCase):
         self.ipv6test(True, 'a:b:c:d:e:f:0::')
         self.ipv6test(False, "':10.0.0.1")
 
-    def _test_T76286_failures(self):
+        # Known bugs with ipaddr v2.1.10 but works with ipaddress
+        self.ipv6test(False, '02001:0000:1234:0000:0000:C1C0:ABCD:0876')
+        self.ipv6test(False, '2001:0000:1234:0000:00001:C1C0:ABCD:0876')
+
+    @unittest.expectedFailure
+    def test_T76286a_failures(self):
         """Test known bugs in the ipaddress module."""
         # The following fail with the ipaddress module. See T76286
         self.ipv6test(False, '1111:2222:3333:4444:5555:6666:00.00.00.00')
+
+    @unittest.expectedFailure
+    def test_T76286b_failures(self):
+        """Test known bugs in the ipaddress module."""
         self.ipv6test(False, '1111:2222:3333:4444:5555:6666:000.000.000.000')
 
-    def _test_T105443_failures(self):
-        """Test known bugs with ipaddr v2.1.10."""
-        # extra 0 not allowed!
-        self.ipv6test(False, '02001:0000:1234:0000:0000:C1C0:ABCD:0876')
-        # extra 0 not allowed!
-        self.ipv6test(False, '2001:0000:1234:0000:00001:C1C0:ABCD:0876')
-
-    def _test_T240060_failures(self):
+    @expected_failure_if(PYTHON_VERSION >= (3, 8))
+    def test_T240060_failures(self):
         """Test known deviated behaviour in Python 3.8."""
         # Testing IPv4 addresses represented as dotted-quads
         # Leading zero's in IPv4 addresses not allowed: some systems treat the
         # leading "0" in ".086" as the start of an octal number
         # Update: The BNF in RFC-3986 explicitly defines the dec-octet
         # (for IPv4 addresses) not to have a leading zero
-        self.ipv6test(PYTHON_VERSION >= (3, 8),
+        self.ipv6test(False,
                       'fe80:0000:0000:0000:0204:61ff:254.157.241.086')
-
-
-class IPRegexTestCase(TestIPBase, DeprecationTestCase):
-
-    """Test IP regex."""
-
-    def _do_ip_test(self, address):
-        return bool(ip.ip_regexp.match(address))
-
-    def test_regex(self):
-        """Test IP regex."""
-        self._run_tests()
-        self._test_T76286_failures()
-        self._test_T105443_failures()
-        self.assertDeprecationParts('page.ip_regexp', 'tools.ip.is_IP')
-        self.assertLength(self.deprecation_messages, self.total)
-
-
-class IPAddressModuleTestCase(TestIPBase):
-
-    """Test ipaddress module."""
-
-    def _do_ip_test(self, address):
-        return ip.is_IP(address)
-
-    @classmethod
-    def setUpClass(cls):
-        """Check ipaddress module is available."""
-        if ip.ip_address.__name__ == 'ip_address_fake':
-            raise unittest.SkipTest('module ipaddress not available')
-
-        super(IPAddressModuleTestCase, cls).setUpClass()
-
-    def test_ipaddress_module(self):
-        """Test ipaddress module."""
-        self._run_tests()
-
-    @expected_failure_if(ip.ip_address.__module__ == 'ipaddress'
-                         or ip.ip_address.__name__ == 'ip_address_patched')
-    def test_T76286_failures(self):
-        """Test known bugs in the ipaddress module."""
-        self._test_T76286_failures()
-
-    @expected_failure_if(ip.ip_address.__module__ == 'ipaddr'
-                         and ip._ipaddr_version == StrictVersion('2.1.10'))
-    def test_T105443_failures(self):
-        """Test known bugs in the ipaddr module."""
-        self._test_T105443_failures()
-
-    def test_T240060_failures(self):
-        """Test known bugs in the ipaddr module."""
-        self._test_T240060_failures()
 
 
 if __name__ == '__main__':  # pragma: no cover
