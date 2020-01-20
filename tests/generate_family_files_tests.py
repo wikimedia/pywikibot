@@ -10,11 +10,16 @@ from __future__ import absolute_import, division, unicode_literals
 from random import choice
 
 from pywikibot import Site
+from pywikibot.tools import PY2
 
 from tests.aspects import unittest, DefaultSiteTestCase
-from tests.utils import allowed_failure
 
 import generate_family_file
+
+if not PY2:
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 
 class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
@@ -22,10 +27,19 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
     """Family file test creator."""
 
     def getapis(self):
-        """Only load additional two additional wikis randomly."""
+        """Only load additional ten additional different wikis randomly."""
         save = self.langs
-        self.langs = [choice(save), choice(save)]
-        self.prefixes = [item['prefix'] for item in self.langs]
+        seen = set()
+        self.langs = []
+
+        while len(seen) < 10:
+            new = choice(save)
+            key = new['prefix']
+            if key not in seen:
+                seen.add(key)
+                self.langs.append(new)
+
+        self.prefixes = list(seen)
         super(FamilyTestGenerator, self).getapis()
         self.langs = save
 
@@ -55,17 +69,46 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
-    @allowed_failure  # T194138
     def test_attributes_after_run(self):
         """Test FamilyFileGenerator attributes after run()."""
-        self.generator_instance.run()
-        langs = [self.site.lang] + self.generator_instance.prefixes
-        for lang in langs:
-            self.assertIn(lang, self.generator_instance.wikis)
-        for i in range(10):
-            lang = choice(self.generator_instance.langs)
-            site = Site(url=lang['url'])
-            self.assertEqual(site.lang, lang['prefix'])
+        gen = self.generator_instance
+        gen.run()
+
+        with self.subTest(test='Test whether default is loaded'):
+            self.assertIn(self.site.lang, gen.wikis)
+
+        with self.subTest(test='Test element counts'):
+            if self.site.lang not in gen.prefixes:
+                gen.prefixes += [self.site.lang]
+            self.assertCountEqual(gen.prefixes, gen.wikis)
+
+        # test creating Site from url
+        # only test Sites for downloaded wikis (T241413)
+        for language in filter(lambda x: x['prefix'] in gen.wikis, gen.langs):
+            lang = language['prefix']
+            url = language['url']
+            wiki = gen.wikis[lang]
+            lang_parse = urlparse(url)
+            wiki_parse = urlparse(wiki.server)
+
+            with self.subTest(url=url):
+                if lang_parse.netloc != wiki_parse.netloc:
+                    # skip redirected url (T241413)
+                    self.skipTest(
+                        '{} is redirected to {}'
+                        .format(lang_parse.netloc, wiki_parse.netloc))
+
+                site = Site(url=url)
+
+                try:  # T194138 to be solved
+                    self.assertEqual(site.lang, lang,
+                                     'url has lang "{lang}" '
+                                     'but Site {site} has lang "{site.lang}"'
+                                     .format(site=site, lang=lang))
+                except AssertionError:
+                    self.skipTest('KNOWN BUG: url has lang "{lang}" '
+                                  'but Site {site} has lang "{site.lang}"'
+                                  .format(site=site, lang=lang))
 
 
 if __name__ == '__main__':  # pragma: no cover
