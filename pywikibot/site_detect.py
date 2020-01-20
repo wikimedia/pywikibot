@@ -154,8 +154,8 @@ class MWSite(object):
 
                 self.version = list(filter(
                     lambda x: x.startswith('MediaWiki'),
-                    [l.strip()
-                     for l in d['error']['*'].split('\n')]))[0].split()[1]
+                    (l.strip()
+                     for l in d['error']['*'].split('\n'))))[0].split()[1]
             except Exception:
                 pass
             else:
