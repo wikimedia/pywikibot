@@ -1533,11 +1533,6 @@ class IsbnBot(Bot):
             pywikibot.output('Page {0} is a redirect; skipping.'
                              .format(page.title(as_link=True)))
 
-    def run(self):
-        """Run the bot."""
-        for page in self.generator:
-            self.treat(page)
-
 
 class IsbnWikibaseBot(WikidataBot):
 
