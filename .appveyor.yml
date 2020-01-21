@@ -1,7 +1,7 @@
 clone_depth: 50
 environment:
 
-  APPVEYOR_PYTHON_URL: "https://raw.githubusercontent.com/ogrisel/python-appveyor-demo/master/appveyor/"
+  APPVEYOR_PYTHON_URL: "https://raw.githubusercontent.com/dvorapa/python-appveyor-demo/master/appveyor/"
 
   # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
   # /E:ON and /V:ON options are not enabled in the batch script interpreter
@@ -85,15 +85,7 @@ install:
   # This is needed for Python versions not installed on Appveyor build machines
   - ps: |
       if (-not(Test-Path($env:PYTHON))) {
-        if ($env:PYTHON_VERSION -eq "2.7.4") {
-          iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1')
-        } else {
-          $logPath = "C:\Python350-x64.log"
-          if (-not(Test-Path -Path $logPath -PathType leaf)) { ni $logPath -type file }
-          $exePath = "$env:TEMP\python-3.5.0-amd64.exe"
-          (New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.5.0/python-3.5.0-amd64.exe', $exePath)
-          cmd /c start /wait $exePath /quiet TargetDir=C:\Python350-x64 Shortcuts=0 Include_launcher=0 InstallLauncherAllUsers=0
-        }
+        iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1')
       }
   - pip install virtualenv
   - virtualenv env
