@@ -511,11 +511,11 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_dependencies=('flickrapi',))
 
     elif not config.flickr['api_key']:
-        additional_message = (
+        additional_text = (
             'Flickr api key not found! Get yourself an api key\n'
             'Any flickr user can get a key at\n'
             'https://www.flickr.com/services/api/keys/apply/')
-        pywikibot.bot.suggest_help(additional_message=additional_message)
+        pywikibot.bot.suggest_help(additional_text=additional_text)
 
     elif user_id or group_id or photoset_id:
         if 'api_secret' in config.flickr and config.flickr['api_secret']:
