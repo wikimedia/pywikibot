@@ -24,7 +24,7 @@ scripts_path = join_root_path('scripts')
 script_deps = {
     'flickrripper': ['flickrapi', 'PIL'],
     'imageharvest': ['bs4'],
-    'isbn': ['python-stdnum'],
+    'isbn': ['stdnum'],
     'match_images': ['PIL.Image'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
