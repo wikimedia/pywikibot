@@ -7,14 +7,11 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from functools import wraps
 import inspect
 import json
 import os
-import re
 from subprocess import PIPE, Popen
 import sys
-import traceback
 import warnings
 
 try:
@@ -68,57 +65,6 @@ def expected_failure_if(expect):
     """
     if expect:
         return unittest.expectedFailure
-    else:
-        return lambda orig: orig
-
-
-def allowed_failure(func):
-    """
-    Unit test decorator to allow failure.
-
-    This decorator runs the test and, if it is an Assertion failure,
-    reports the result and considers it a skipped test. This is a
-    similar behaviour like expectedFailure in Python 2. Passing a test
-    will not count as failure (unexpected success) which Python 3 does.
-
-    This decorator should be used if a test passes or fails due to
-    random test parameters. If tests fails deterministic expectedFailure
-    decorator should be used instead.
-
-    @note: This decorator does not support subTest content manager.
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except AssertionError:
-            pywikibot.exception(tb=False)
-            tb = traceback.extract_tb(sys.exc_info()[2])
-            for depth, line in enumerate(tb):
-                if re.match('assert[A-Z]', line[2]):
-                    break
-            tb = traceback.format_list(tb[:depth])
-            pywikibot.error('\n' + ''.join(tb)[:-1])  # remove \n at the end
-            raise unittest.SkipTest('Test is allowed to fail.')
-
-    if PY2:
-        return unittest.expectedFailure(func)
-    else:
-        return wrapper
-
-
-def allowed_failure_if(expect):
-    """
-    Unit test decorator to allow failure under conditions.
-
-    See allowed_failure method for more details.
-
-    @note: This decorator does not support subTest content manager.
-    @param expect: Flag to check if failure is allowed
-    @type expect: bool
-    """
-    if expect:
-        return allowed_failure
     else:
         return lambda orig: orig
 
