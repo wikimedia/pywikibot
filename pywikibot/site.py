@@ -2648,8 +2648,7 @@ class APISite(BaseSite):
                 custom_name = nsdata.pop('*')
                 canonical_name = nsdata.pop('canonical')
 
-            if 'content' not in nsdata:  # mw < 1.16
-                nsdata['content'] = ns == 0
+            nsdata.setdefault('content', ns == 0)  # mw < 1.16
 
             default_case = Namespace.default_case(ns)
             if 'case' not in nsdata:
@@ -6588,8 +6587,7 @@ class APISite(BaseSite):
                                 else:
                                     return False
                             result = data
-                            if 'offset' not in result:
-                                result['offset'] = 0
+                            result.setdefault('offset', 0)
                             break
                         throttle = False
                         if 'offset' in data:
@@ -6653,8 +6651,7 @@ class APISite(BaseSite):
                 _file_key = None
                 pywikibot.warning('No filekey defined.')
             if not report_success:
-                if 'offset' not in result:
-                    result['offset'] = True
+                result.setdefault('offset', True)
                 if ignore_warnings(create_warnings_list(result)):
                     return self.upload(
                         filepage, source_filename, source_url, comment, text,

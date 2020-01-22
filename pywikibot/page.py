@@ -5277,8 +5277,7 @@ class Claim(Property):
                             assert source.isReference is True
                             src_data = source.toJSON()
                             if 'hash' in src_data:
-                                if 'hash' not in reference:
-                                    reference['hash'] = src_data['hash']
+                                reference.setdefault('hash', src_data['hash'])
                                 del src_data['hash']
                             reference['snaks'][prop].append(src_data)
                     data['references'].append(reference)

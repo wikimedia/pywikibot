@@ -515,8 +515,7 @@ class TerminalHandler(logging.Handler):
             if 'message' in record.__dict__:
                 return
 
-            if 'newline' not in record.__dict__:
-                record.__dict__['newline'] = '\n'
+            record.__dict__.setdefault('newline', '\n')
 
         text = self.format(record)
         return self.UI.output(text, targetStream=self.stream)
