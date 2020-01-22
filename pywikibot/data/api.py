@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1350,8 +1350,7 @@ class Request(MutableMapping):
             cls._warn_kwargs()
         else:
             kwargs = dict(kwargs)
-            if 'parameters' not in kwargs:
-                kwargs['parameters'] = {}
+            kwargs.setdefault('parameters', {})
         return kwargs
 
     def _format_value(self, value):
