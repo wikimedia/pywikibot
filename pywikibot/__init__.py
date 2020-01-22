@@ -1194,6 +1194,7 @@ def _code_fam_from_url(url):
     return _url_cache[url]
 
 
+@_deprecate_arg('sysop', None)
 def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     """A factory method to obtain a Site object.
 
@@ -1208,8 +1209,6 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @type fam: str or pywikibot.family.Family
     @param user: bot user name to use on this site (override config.usernames)
     @type user: str
-    @param sysop: sysop user to use on this site (override config.sysopnames)
-    @type sysop: str
     @param interface: site class or name of class in pywikibot.site
         (override config.site_interface)
     @type interface: subclass of L{pywikibot.site.BaseSite} or string
@@ -1247,10 +1246,6 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     code_to_user.update(config.usernames[family_name])
     user = user or code_to_user.get(code) or code_to_user.get('*')
 
-    code_to_sysop = config.sysopnames['*'].copy()
-    code_to_sysop.update(config.sysopnames[family_name])
-    sysop = sysop or code_to_sysop.get(code) or code_to_sysop.get('*')
-
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
         if PY2:  # Must not be unicode in Python 2
@@ -1268,7 +1263,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     user = normalize_username(user)
     key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], interface):
-        _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)
+        _sites[key] = interface(code=code, fam=fam, user=user, sysop=None)
         debug("Instantiated %s object '%s'"
               % (interface.__name__, _sites[key]), _logger)
 

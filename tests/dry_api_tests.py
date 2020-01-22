@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -260,7 +260,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         """Test Request object when username is not correct."""
         site = self.get_site()
         site._userinfo = {'name': 'other_username', 'groups': []}
-        site._username[0] = 'myusername'
+        site._username = 'myusername'
         # Ignore warning: API write action by unexpected username commenced.
         with patch('pywikibot.warning'):
             Request(site=site, parameters={'action': 'edit'})
@@ -269,7 +269,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         """Test Request object when username is correct."""
         site = self.get_site()
         site._userinfo = {'name': 'myusername', 'groups': []}
-        site._username[0] = 'myusername'
+        site._username = 'myusername'
 
         Request(site=site, parameters={'action': 'edit'})
 
@@ -310,7 +310,7 @@ class MimeTests(DefaultDrySiteTestCase):
         """Test Request object prepared to upload."""
         # fake write test needs the config username
         site = self.get_site()
-        site._username[0] = 'myusername'
+        site._username = 'myusername'
         site._userinfo = {'name': 'myusername', 'groups': []}
         parameters = {'action': 'upload', 'file': 'MP_sounds.png',
                       'filename': join_images_path('MP_sounds.png')}

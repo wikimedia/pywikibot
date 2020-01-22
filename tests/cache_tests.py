@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,9 +25,9 @@ class RequestCacheTests(TestCase):
         """Assert validity of the cache entry."""
         self.assertIsInstance(entry.site, BaseSite)
         self.assertIsInstance(entry.site._loginstatus, int)
-        self.assertIsInstance(entry.site._username, list)
+        self.assertNotIsInstance(entry.site._username, list)
         if entry.site._loginstatus >= 1:
-            self.assertIsNotNone(entry.site._username[0])
+            self.assertIsNotNone(entry.site._username)
         self.assertIsInstance(entry._params, dict)
         self.assertIsNotNone(entry._params)
         # TODO: more tests on entry._params, and possibly fixes needed
