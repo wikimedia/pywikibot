@@ -7,7 +7,7 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from random import choice
+from random import sample
 
 from pywikibot import Site
 from pywikibot.tools import PY2
@@ -29,17 +29,8 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
     def getapis(self):
         """Only load additional ten additional different wikis randomly."""
         save = self.langs
-        seen = set()
-        self.langs = []
-
-        while len(seen) < 10:
-            new = choice(save)
-            key = new['prefix']
-            if key not in seen:
-                seen.add(key)
-                self.langs.append(new)
-
-        self.prefixes = list(seen)
+        self.langs = sample(save, 10)
+        self.prefixes = [item['prefix'] for item in self.langs]
         super(FamilyTestGenerator, self).getapis()
         self.langs = save
 
