@@ -749,7 +749,6 @@ class TestArgSpec(DeprecationTestCase):
         return tools.getargspec(method)
 
 
-@unittest.skipIf(tools.PYTHON_VERSION >= (3, 6), 'removed in Python 3.6')
 class TestPythonArgSpec(TestArgSpec):
 
     """Test the same tests using Python's implementation."""
@@ -759,7 +758,7 @@ class TestPythonArgSpec(TestArgSpec):
     def getargspec(self, method):
         """Call inspect's getargspec function."""
         with warnings.catch_warnings():
-            if tools.PYTHON_VERSION >= (3, 5):
+            if not tools.PY2:
                 warnings.simplefilter('ignore', DeprecationWarning)
             return inspect.getargspec(method)
 
