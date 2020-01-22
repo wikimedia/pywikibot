@@ -420,13 +420,9 @@ def writelogheader():
     log('PACKAGES:')
     for name in sorted(packages.keys()):
         info = packages[name]
-        if 'path' not in info:
-            if 'type' in info:
-                info['path'] = '[' + info['type'] + ']'
-            else:
-                info['path'] = '[path unknown]'
-        if 'ver' not in info:
-            info['ver'] = '??'
+        info.setdefault('path',
+                        '[{}]'.format(info.get('type', 'path unknown')))
+        info.setdefault('ver', '??')
         if 'err' in info:
             log('  %(name)s: %(err)s' % info)
         else:
@@ -1514,12 +1510,10 @@ class BaseBot(OptionHandler):
                         # Python 2 does not clear the exception and it may seem
                         # that the generator stopped due to an exception
                         sys.exc_clear()
+                    self._skip_counter += 1
                     continue
                 else:
-                    if initialized_page is None:
-                        page = item
-                    else:
-                        page = initialized_page
+                    page = initialized_page or item
 
                 assert isinstance(page, pywikibot.page.BasePage), (
                     '"page" is not a pywikibot.page.BasePage object but {}.'
