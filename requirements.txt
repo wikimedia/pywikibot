@@ -42,9 +42,9 @@ unicodecsv ; python_version < '3'
 python-stdnum >= 1.13
 
 # GUI
-Pillow < 7.0.0 ; python_version < '3'
+Pillow < 7.0.0, >= 6.2.0 ; python_version < '3'
 Pillow < 6.0.0 ; python_version == '3.4'
-Pillow ; python_version >= '3.5'
+Pillow >= 6.2.1 ; python_version >= '3.5'
 
 # core pagegenerators
 google >= 1.7
