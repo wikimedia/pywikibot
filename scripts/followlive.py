@@ -15,7 +15,7 @@ The following parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -390,7 +390,7 @@ class CleaningBot(SingleSiteBot, CurrentPageBot):
 
 b) blank page
 e) edit page
-d) delete page (need sysop right)
+d) delete page (needs deletion right)
 q) quit cleaningbot
 Enter) OK
 What is it? """
