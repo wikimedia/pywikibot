@@ -70,7 +70,9 @@ tox
 Specific tests
 --------------
 
-Individual test components can be run using unittest, nosetests, or pwb
+Individual test components can be run using unittest, nosetests, or pwb.
+With -lang and -family options pwb can be used to specify a site.
+
 
 unittest
 ~~~~~~~~
@@ -104,6 +106,7 @@ pwb
     python pwb.py tests/api_tests -v
     python pwb.py tests/site_tests -v
     python pwb.py tests/api_tests -v TestParamInfo.test_init
+    python pwb.py -lang:de -family:wikipedia tests/page_tests -v TestPageObject
 
 env
 ~~~
@@ -123,10 +126,10 @@ When changes are merged into the main repository, they are replicated to
 https://github.com/wikimedia/pywikibot , and travis tests are run and
 published at https://travis-ci.org/wikimedia/pywikibot/builds .  These tests
 use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
-securely stored in .travis.yml . See section env:global:secure.
+securely stored in .travis.yml file. See section env:global:secure.
 
 Anyone can run these tests on travis-ci.org using their own github account, with
-code changes that have not been merged into the main repository.  To do this:
+code changes that have not been merged into the main repository. To do this:
 
 1. create a github and travis-ci account
 2. fork the main github repository https://github.com/wikimedia/pywikibot
@@ -135,7 +138,7 @@ code changes that have not been merged into the main repository.  To do this:
 5. watch the build at https://travis-ci.org/<username>/pywikibot/builds
 
 Only travis-ci builds from the main repository can access the password for the
-Wikimedia account 'Pywikibot-test'.  All tests which require a logged in user
+Wikimedia account 'Pywikibot-test'. All tests which require a logged in user
 are skipped if the travis-ci build environment does not have a password.
 
 To enable 'user' tests on travis-ci builds for a different repository, add
@@ -166,7 +169,7 @@ Appveyor CI
 
 After changes are published into a github repository, tests may be run on
 a Microsoft Windows box provided by ci.appveyor.com according to the
-configuration in .appveyor.yml .  To do this:
+configuration in .appveyor.yml file. To do this:
 
 1. create a github and appveyor account
 2. fork the main github repository
@@ -207,7 +210,7 @@ Environment variables
 =====================
 
 There are a set of 'edit failure' tests, which attempt to write to the wikis
-and **should** fail.  If there is a bug in pywikibot or MediaWiki, these
+and **should** fail. If there is a bug in pywikibot or MediaWiki, these
 tests **may** actually perform a write operation.
 
 These 'edit failure' tests are disabled by default. On Travis they are enabled
