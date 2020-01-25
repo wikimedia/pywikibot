@@ -690,6 +690,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 class DataBodyParameterTestCase(HttpbinTestCase):
     """Test data and body params of fetch/request methods are equivalent."""
 
+    maxDiff = None
+
     def test_fetch(self):
         """Test that using the data and body params produce same results."""
         r_data = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
