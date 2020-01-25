@@ -13,7 +13,10 @@ __all__ = (
     'mock', 'Mock', 'MagicMock', 'patch')
 
 import functools
+from itertools import chain
 import os
+import unittest
+from unittest.util import safe_repr
 import warnings
 
 # Verify that the unit tests have a base working environment:
@@ -21,14 +24,11 @@ import warnings
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests
-import unittest
-from unittest.util import safe_repr
 
 from pywikibot import config
 import pywikibot.data.api
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
-from pywikibot import i18n
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -71,86 +71,103 @@ join_html_data_path = create_path_func(join_data_path, 'html')
 # Find the root directory of the checkout
 _pwb_py = join_root_path('pwb.py')
 
-library_test_modules = [
-    'python',
-    'plural',
-    'deprecation',
-    'ui',
-    'ui_options',
-    'thread',
-    'tests',
+library_test_modules = {
+    'api',
+    'basepage',
+    'bot',
+    'category',
+    'cosmetic_changes',
     'date',
-    'timestamp',
-    'mediawikiversion',
-    'tools',
-    'tools_chars',
-    'tools_ip',
-    'xmlreader',
-    'textlib',
+    'deprecation',
     'diff',
-    'http',
-    'namespace',
+    'djvu',
     'dry_api',
     'dry_site',
-    'api',
-    'exceptions',
-    'oauth',
-    'family',
-    'site',
-    'link',
-    'interwiki_link',
-    'interwiki_graph',
-    'basepage',
-    'page',
-    'category',
-    'file',
-    'djvu',
-    'proofreadpage',
-    'edit_failure',
+    'echo',
     'edit',
-    'logentry',
-    'timestripper',
-    'pagegenerators',
-    'cosmetic_changes',
-    'wikistats',
-    'i18n',
-    'tk',
-    'wikibase',
-    'wikibase_edit',
+    'edit_failure',
+    'eventstreams',
+    'exceptions',
+    'family',
+    'file',
+    'fixes',
     'flow',
     'flow_edit',
-    'upload',
+    'flow_thanks',
+    'http',
+    'i18n',
+    'interwiki_graph',
+    'interwiki_link',
+    'link',
+    'logentry',
+    'login',
+    'mediawikiversion',
+    'namespace',
+    'oauth',
+    'page',
+    'pagegenerators',
+    'paraminfo',
+    'plural',
+    'proofreadpage',
+    'python',
+    'site',
     'site_detect',
-    'bot',
-]
+    'sparql',
+    'tests',
+    'textlib',
+    'thanks',
+    'thread',
+    'timestamp',
+    'timestripper',
+    'tk',
+    'tools',
+    'tools_chars',
+    'tools_formatter',
+    'tools_ip',
+    'ui',
+    'ui_options',
+    'upload',
+    'uploadbot',
+    'user',
+    'wikibase',
+    'wikibase_edit',
+    'wikistats',
+    'xmlreader'
+}
 
-script_test_modules = [
-    'pwb',
-    'script',
-    'l10n',
+script_test_modules = {
     'add_text',
     'archivebot',
+    'cache',
     'category_bot',
     'checkimages',
+    'compat2core',
     'data_ingestion',
     'deletionbot',
     'disambredir',
+    'fixing_redirects',
+    'generate_family_files',
+    'generate_user_files',
+    'imagecopy',
+    'interwikidata',
     'isbn',
-    'protectbot',
-    'reflinks',
-    'template_bot',
-    'replacebot',
-    'uploadbot',
-    'weblinkchecker',
-    'cache',
-]
-
-disabled_test_modules = [
-    'tests',  # tests of the tests package
     'l10n',
-]
-if not i18n.messages_available():
-    disabled_test_modules.append('l10n')
+    'patrolbot',
+    'protectbot',
+    'pwb',
+    'redirect_bot',
+    'reflinks',
+    'replacebot',
+    'script',
+    'template_bot',
+    'uploadscript',
+    'weblinkchecker'
+}
+
+disabled_test_modules = {
+    'tests',  # tests of the tests package
+    'l10n',  # pywikibot-i18n repository runs it
+}
 
 disabled_tests = {
     'textlib': [
@@ -162,25 +179,21 @@ disabled_tests = {
 def _unknown_test_modules():
     """List tests which are to be executed."""
     dir_list = os.listdir(join_tests_path())
-    all_test_list = [name[0:-9] for name in dir_list  # strip '_tests.py'
-                     if name.endswith('_tests.py')
-                     and not name.startswith('_')]   # skip __init__.py and _*
+    all_test_set = {name[0:-9] for name in dir_list  # strip '_tests.py'
+                    if name.endswith('_tests.py')
+                    and not name.startswith('_')}  # skip __init__.py and _*
 
-    unknown_test_modules = [name
-                            for name in all_test_list
-                            if name not in library_test_modules
-                            and name not in script_test_modules]
-
-    return unknown_test_modules
+    return all_test_set - library_test_modules - script_test_modules
 
 
-extra_test_modules = sorted(_unknown_test_modules())
-
-test_modules = library_test_modules + extra_test_modules + script_test_modules
+extra_test_modules = _unknown_test_modules()
 
 if 'PYWIKIBOT_TEST_MODULES' in os.environ:
     _enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
-    disabled_test_modules = set(test_modules) - set(_enabled_test_modules)
+    disabled_test_modules = (library_test_modules
+                             | extra_test_modules
+                             | script_test_modules
+                             - set(_enabled_test_modules))
 
 
 def unittest_print(*args, **kwargs):
@@ -211,9 +224,11 @@ def collector(loader=unittest.loader.defaultTestLoader):
             'Skipping tests (to run: python -m unittest ...):\n  {!r}'
             .format(disabled_tests))
 
-    modules = [module
-               for module in test_modules
-               if module not in disabled_test_modules]
+    modules = (module
+               for module in chain(library_test_modules,
+                                   extra_test_modules,
+                                   script_test_modules)
+               if module not in disabled_test_modules)
 
     test_list = []
 
