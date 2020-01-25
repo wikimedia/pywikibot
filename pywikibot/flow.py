@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,9 +65,9 @@ class FlowPage(BasePage):
             self._load_uuid()
         return self._uuid
 
-    def get(self, force=False, get_redirect=False, sysop=False):
+    def get(self, force=False, get_redirect=False):
         """Get the page's content."""
-        if get_redirect or force or sysop:
+        if get_redirect or force:
             raise NotImplementedError
 
         # TODO: Return more useful data
@@ -434,22 +434,16 @@ class Post(object):
                                  self._current_revision['creator']['name'])
         return self._creator
 
-    def get(self, format='wikitext', force=False, sysop=False):
+    def get(self, format='wikitext', force=False):
         """Return the contents of the post in the given format.
 
         @param force: Whether to reload from the API instead of using the cache
         @type force: bool
-        @param sysop: Whether to load using sysop rights. Implies force.
-        @type sysop: bool
         @param format: Content format to return contents in
         @type format: str
         @return: The contents of the post in the given content format
         @rtype: str
-        @raises NotImplementedError: use of 'sysop'
         """
-        if sysop:
-            raise NotImplementedError
-
         if format not in self._content or force:
             self._load(format)
         return self._content[format]
