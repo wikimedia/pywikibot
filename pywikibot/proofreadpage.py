@@ -599,17 +599,14 @@ class ProofreadPage(pywikibot.Page):
                 (self._OCR_METHODS, ocr_tool))
 
         # wrong link fail with Exceptions
-        retry = 0
-        while retry < 5:
+        for retry in range(5, 30, 5):
             pywikibot.debug('{0}: get URI {1!r}'.format(ocr_tool, cmd_uri),
                             _logger)
             try:
                 response = http.fetch(cmd_uri)
             except requests.exceptions.ReadTimeout as e:
-                retry += 1
+                timeout = e
                 pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
-                pywikibot.warning('retrying in %s seconds ...' % (retry * 5))
-                time.sleep(retry * 5)
             except Exception as e:
                 pywikibot.error('"%s": %s' % (cmd_uri, e))
                 return (True, e)
@@ -617,6 +614,11 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.debug('{0}: {1}'.format(ocr_tool, response.text),
                                 _logger)
                 break
+
+            pywikibot.warning('retrying in {} seconds ...'.format(retry))
+            time.sleep(retry)
+        else:
+            return True, timeout
 
         if 400 <= response.status < 600:
             return (True, 'Http response status {0}'.format(response.status))
