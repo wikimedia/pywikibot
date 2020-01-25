@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,7 +24,6 @@ from tests.aspects import (
     unittest, TestCase,
     WikidataTestCase,
     DeprecationTestCase,
-    DefaultWikibaseClientTestCase,
 )
 
 from tests.basepage_tests import (
@@ -1715,42 +1714,6 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
         """Test Page methods inherited from superclass BasePage with Q60."""
         self._test_invoke()
         self._test_no_wikitext()
-
-
-class TestDryPageGetNotImplemented(DefaultWikibaseClientTestCase,
-                                   DeprecationTestCase):
-
-    """Test not implement get arguments of WikibasePage classes."""
-
-    dry = True
-
-    def test_base_get_args(self):
-        """Test WikibasePage.get() with sysop argument."""
-        item = WikibasePage(self.repo, 'Q1')
-        # avoid loading anything
-        item._content = {}
-        with self.assertRaises(NotImplementedError):
-            item.get(force=True, sysop=True)
-        with self.assertRaises(NotImplementedError):
-            item.get(force=False, sysop=True)
-        with self.assertRaises(NotImplementedError):
-            item.get(force=False, sysop=False)
-        with self.assertRaises(NotImplementedError):
-            item.get(sysop=True)
-
-    def test_item_get_args(self):
-        """Test ItemPage.get() with sysop argument."""
-        item = ItemPage(self.repo, 'Q1')
-        item._content = {}
-        with self.assertRaises(NotImplementedError):
-            item.get(sysop=True)
-
-    def test_property_get_args(self):
-        """Test PropertyPage.get() with sysop argument."""
-        pp = PropertyPage(self.repo, 'P1')
-        pp._content = {}
-        with self.assertRaises(NotImplementedError):
-            pp.get(sysop=True)
 
 
 class TestLinks(WikidataTestCase):

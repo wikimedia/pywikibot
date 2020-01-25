@@ -12,7 +12,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -458,10 +458,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if title of this Page is in the autoFormat dict."""
         return self.autoFormat()[0] is not None
 
+    @remove_last_args(['sysop'])
     @deprecated_args(throttle=None,
                      change_edit_time=None,
                      expandtemplates=None)
-    def get(self, force=False, get_redirect=False, sysop=False):
+    def get(self, force=False, get_redirect=False):
         """
         Return the wiki-text of the page.
 
@@ -479,15 +480,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param force:           reload all page attributes, including errors.
         @param get_redirect:    return the redirect text, do not follow the
                                 redirect, do not raise an exception.
-        @param sysop:           if the user has a sysop account, use it to
-                                retrieve this page
-
         @rtype: str
         """
         if force:
             del self.latest_revision_id
         try:
-            self._getInternals(sysop)
+            self._getInternals()
         except pywikibot.IsRedirectPage:
             if not get_redirect:
                 raise
@@ -502,7 +500,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return None
 
-    def _getInternals(self, sysop):
+    def _getInternals(self):
         """
         Helper function for get().
 
@@ -517,7 +515,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # If not already stored, fetch revision
         if self._latest_cached_revision() is None:
             try:
-                self.site.loadrevisions(self, content=True, sysop=sysop)
+                self.site.loadrevisions(self, content=True)
             except (pywikibot.NoPage, pywikibot.SectionError) as e:
                 self._getexception = e
                 raise
@@ -527,9 +525,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self._getexception = pywikibot.IsRedirectPage(self)
             raise self._getexception
 
+    @remove_last_args(['sysop'])
     @deprecated_args(throttle=None, change_edit_time=None)
-    def getOldVersion(self, oldid, force=False, get_redirect=False,
-                      sysop=False):
+    def getOldVersion(self, oldid, force=False, get_redirect=False):
         """
         Return text of an old revision of this page; same options as get().
 
@@ -540,8 +538,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 or self._revisions[oldid].text is None:
             self.site.loadrevisions(self,
                                     content=True,
-                                    revids=oldid,
-                                    sysop=sysop)
+                                    revids=oldid)
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
@@ -1881,15 +1878,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated_args(
         throttle=None, deleteAndMove='noredirect', movetalkpage='movetalk')
     @remove_last_args(['safe'])
-    def move(self, newtitle, reason=None, movetalk=True, sysop=False,
-             noredirect=False):
+    def move(self, newtitle, reason=None, movetalk=True, noredirect=False):
         """
         Move this page to a new title.
 
         @param newtitle: The new page title.
         @param reason: The edit summary for the move.
         @param movetalk: If true, move this page's talk page (if it exists)
-        @param sysop: Try to move using sysop account, if available
         @param noredirect: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
         """
@@ -1897,7 +1892,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
             pywikibot.output('Moving %s to [[%s]].'
                              % (self.title(as_link=True), newtitle))
             reason = pywikibot.input('Please enter a reason for the move:')
-        # TODO: implement "sysop" parameter
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,
                                   noredirect=noredirect)
