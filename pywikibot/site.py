@@ -7685,7 +7685,8 @@ class DataSite(APISite):
         """
         Return a new instance for given entity id.
 
-        @raises NoWikibaseEntity: there is no entity with the id
+        @raises pywikibot.exceptions.NoWikibaseEntity: there is no entity
+            with the id
         @return: a WikibaseEntity subclass
         @rtype: WikibaseEntity
         """
