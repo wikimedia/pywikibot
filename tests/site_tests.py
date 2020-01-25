@@ -1323,10 +1323,19 @@ class TestLogEvents(DefaultSiteTestCase):
         self.assertLessEqual(len(le), 10)
         self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
                             for entry in le))
-        for typ in ('block', 'protect', 'rights', 'delete', 'upload',
-                    'move', 'import', 'patrol', 'merge'):
-            for entry in mysite.logevents(logtype=typ, total=3):
-                self.assertEqual(entry.type(), typ)
+
+        for logtype in mysite.logtypes:
+            with self.subTest(logtype=logtype):
+                gen = iter(mysite.logevents(logtype=logtype, total=3))
+                while True:
+                    try:
+                        entry = next(gen)
+                    except StopIteration:
+                        break
+                    except HiddenKeyError as e:  # T216876
+                        self.skipTest(e)
+                    else:
+                        self.assertEqual(entry.type(), logtype)
 
     def test_logevents_mainpage(self):
         """Test logevents method on the main page."""
