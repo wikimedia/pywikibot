@@ -451,16 +451,17 @@ class TestPageObject(DefaultSiteTestCase):
         # we only check that the returned objects are of correct type.
         self.assertIsInstance(mainpage.get(), unicode)
         with suppress_warnings(
-                'pywikibot.page.BasePage.latestRevision is deprecated; '
-                'use latest_revision_id instead.'):
+                r'pywikibot\.page\.BasePage\.latestRevision '
+                r'is deprecated[\s\w]+; '
+                r'use latest_revision_id instead\.'):
             self.assertIsInstance(mainpage.latestRevision(), int)
         self.assertIsInstance(mainpage.userName(), unicode)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         with suppress_warnings(
-                'pywikibot.page.BasePage.isEmpty is deprecated; '
-                'use interwiki.page_empty_check(page) instead.'):
+                r'pywikibot\.page\.BasePage\.isEmpty is deprecated[\s\w]+; '
+                r'use interwiki\.page_empty_check\(page\) instead\.'):
             self.assertIsInstance(mainpage.isEmpty(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.canBeEdited(), bool)
