@@ -102,8 +102,8 @@ class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
         self.assertSite('https://wiki.gentoo.org/wiki/$1')
 
     def test_arabeyes(self):
-        """Test detection of MediaWiki sites for wiki.arabeyes.org."""
-        self.assertSite('http://wiki.arabeyes.org/$1')
+        """Test detection of MediaWiki sites for www.arabeyes.org."""
+        self.assertSite('https://www.arabeyes.org/$1')
 
     def test_tfwiki(self):
         """Test detection of MediaWiki sites for tfwiki.net."""
