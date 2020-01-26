@@ -97,7 +97,8 @@ script_deps['data_ingestion.py'] = extra_deps['csv']
 extra_deps.update(script_deps)
 
 # ------- setup install_requires ------- #
-dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
+dependencies = ['urllib3!=1.25.8; python_version < "3"',
+                'requests>=2.20.1,<2.22.0; python_version == "3.4"',
                 'requests>=2.20.1; python_version != "3.4"',
                 'enum34>=1.1.6; python_version < "3"']
 # tools.ip does not have a hard dependency on an IP address module,
