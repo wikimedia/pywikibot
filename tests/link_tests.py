@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,27 +71,34 @@ class TestLink(DefaultDrySiteTestCase):
 
     def test_valid(self):
         """Test that valid titles are correctly normalized."""
-        site = self.get_site()
         title_tests = ['Sandbox', 'A "B"', "A 'B'", '.com', '~', '"', "'",
                        'Foo/.../Sandbox', 'Sandbox/...', 'A~~', 'X' * 252]
+
+        extended_title_tests = [
+            ('Talk:Sandbox', 'Sandbox'),
+            ('Talk:Foo:Sandbox', 'Foo:Sandbox'),
+            ('File:Example.svg', 'Example.svg'),
+            ('File_talk:Example.svg', 'Example.svg'),
+            (':A', 'A'),
+            # Length is 256 total, but only title part matters
+            ('Category:' + 'X' * 248, 'X' * 248),
+            ('A%20B', 'A B'),
+            ('A &eacute; B', 'A é B'),
+            ('A &#233; B', 'A é B'),
+            ('A &#x00E9; B', 'A é B'),
+            ('A &nbsp; B', 'A B'),
+            ('A &#160; B', 'A B'),
+        ]
+
+        site = self.get_site()
+
         for title in title_tests:
             with self.subTest(title=title):
                 self.assertEqual(Link(title, site).title, title)
 
-        self.assertEqual(Link('Talk:Sandbox', site).title, 'Sandbox')
-        self.assertEqual(Link('Talk:Foo:Sandbox', site).title, 'Foo:Sandbox')
-        self.assertEqual(Link('File:Example.svg', site).title, 'Example.svg')
-        self.assertEqual(Link('File_talk:Example.svg', site).title,
-                         'Example.svg')
-        self.assertEqual(Link(':A', site).title, 'A')
-        # Length is 256 total, but only title part matters
-        self.assertEqual(Link('Category:' + 'X' * 248, site).title, 'X' * 248)
-        self.assertEqual(Link('A%20B', site).title, 'A B')
-        self.assertEqual(Link('A &eacute; B', site).title, 'A é B')
-        self.assertEqual(Link('A &#233; B', site).title, 'A é B')
-        self.assertEqual(Link('A &#x00E9; B', site).title, 'A é B')
-        self.assertEqual(Link('A &nbsp; B', site).title, 'A B')
-        self.assertEqual(Link('A &#160; B', site).title, 'A B')
+        for link, title in extended_title_tests:
+            with self.subTest(link=link, title=title):
+                self.assertEqual(Link(link, site).title, title)
 
         anchor_link = Link('A | B', site)
         self.assertEqual(anchor_link.title, 'A')
