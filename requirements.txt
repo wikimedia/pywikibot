@@ -19,6 +19,7 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README.conversion.txt
+urllib3!=1.25.8; python_version < '3'
 requests>=2.20.1,<2.22.0; python_version == '3.4'
 requests>=2.20.1; python_version != '3.4'
 enum34>=1.1.6; python_version < '3'
