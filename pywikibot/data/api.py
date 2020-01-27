@@ -1969,7 +1969,7 @@ class Request(MutableMapping):
         """
         self._add_defaults()
         use_get = self._use_get()
-
+        retries = 0
         while True:
             paramstring = self._http_param_string()
 
@@ -2021,11 +2021,13 @@ class Request(MutableMapping):
                 continue
 
             if code == 'maxlag':
-                lag = lagpattern.search(info)
+                retries += 1
+                if retries > max(5, pywikibot.config.max_retries):
+                    break
                 pywikibot.log('Pausing due to database lag: ' + info)
-                if lag:
-                    lag = lag.group('lag')
-                self.site.throttle.lag(int(lag or 0))
+                lag = lagpattern.search(info)
+                lag = int(lag.group('lag')) if lag else 0
+                self.site.throttle.lag(lag * retries)
                 continue
 
             elif code == 'help' and self.action == 'help':
@@ -2083,6 +2085,9 @@ class Request(MutableMapping):
                 raise APIError(**result['error'])
             except TypeError:
                 raise RuntimeError(result)
+
+        raise TimeoutError(
+            'Maximum retries attempted due to maxlag without success.')
 
     def wait(self):
         """Determine how long to wait after a failed request."""
