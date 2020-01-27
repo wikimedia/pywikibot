@@ -1508,17 +1508,15 @@ class Request(MutableMapping):
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'.
             if ('continue' not in self._params
-                and 'rawcontinue' not in self._params
                     and self.site.mw_version >= '1.25wmf5'):
-                self._params['rawcontinue'] = ['']
+                self._params.setdefault('rawcontinue', [''])
         elif self.action == 'help' and self.site.mw_version > '1.24':
             self._params['wrap'] = ['']
 
-        if 'maxlag' not in self._params and config.maxlag:
-            self._params['maxlag'] = [str(config.maxlag)]
-        if 'format' not in self._params:
-            self._params['format'] = ['json']
-        elif self._params['format'] != ['json']:
+        if config.maxlag:
+            self._params.setdefault('maxlag', str(config.maxlag))
+        self._params.setdefault('format', ['json'])
+        if self._params['format'] != ['json']:
             raise TypeError("Query format '%s' cannot be parsed."
                             % self._params['format'])
 
