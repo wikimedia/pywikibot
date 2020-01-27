@@ -89,6 +89,12 @@ else:
     from urllib import urlencode, unquote
     from email.mime.multipart import MIMEMultipart
 
+    # Bug: T243710 (Python 2)
+    # see https://github.com/jxtech/wechatpy/issues/375
+    from urllib import quote
+    quote(b'non-empty-string', safe=b'')
+
+
 _logger = 'data.api'
 
 lagpattern = re.compile(
