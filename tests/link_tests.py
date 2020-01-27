@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -103,18 +103,6 @@ class TestLink(DefaultDrySiteTestCase):
 
     def test_invalid(self):
         """Test that invalid titles raise InvalidTitle exception."""
-        exception_message_regex = (
-            r'^The link does not contain a page title$'
-        )
-
-        texts_to_test = ['', ':', '__  __', '  __  ']
-
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    exception_message_regex):
-                Link(text, self.get_site()).parse()
-
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
             exc_regex = (
@@ -122,82 +110,70 @@ class TestLink(DefaultDrySiteTestCase):
                 .format(re.escape(text), re.escape(text[2])))
             return exc_regex
 
-        texts_to_test = ['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B']
-
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    generate_contains_illegal_chars_exc_regex(text)):
-                Link(text, self.get_site()).parse()
-
-        # URL encoding
-        # %XX is understood by wikimedia but not %XXXX
-        with self.assertRaisesRegex(
-                InvalidTitle,
-                r'^(u|)\'A%23B\' contains illegal char\(s\) (u|)\'%23\'$'):
-            Link('A%2523B', self.get_site()).parse()
-
-        # A link is invalid if their (non-)talk page would be in another
-        # namespace than the link's "other" namespace
-        with self.assertRaisesRegex(
-                InvalidTitle,
-                (r'The \(non-\)talk page of (u|)\'Talk:File:Example.svg\''
-                 r' is a valid title in another namespace.')):
-            Link('Talk:File:Example.svg', self.get_site()).parse()
-
         # Directory navigation
         def generate_contains_dot_combinations_exc_regex(text):
             exc_regex = (r'^\(contains \. / combinations\): (u|)\'{}\'$'
                          .format(re.escape(text)))
             return exc_regex
 
-        texts_to_test = ['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',
-                         'Foo/../Sandbox', 'Sandbox/.', 'Sandbox/..']
-
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    generate_contains_dot_combinations_exc_regex(text)):
-                Link(text, self.get_site()).parse()
-
         # Tilde
         def generate_contains_tilde_exc_regex(text):
             exc_regex = r'^\(contains ~~~\): (u|)\'%s\'$' % re.escape(text)
             return exc_regex
-
-        texts_to_test = ['A ~~~ Name', 'A ~~~~ Signature', 'A ~~~~~ Timestamp']
-
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    generate_contains_tilde_exc_regex(text)):
-                Link(text, self.get_site()).parse()
 
         # Overlength
         def generate_overlength_exc_regex(text):
             exc_regex = r'^\(over 255 bytes\): (u|)\'%s\'$' % re.escape(text)
             return exc_regex
 
-        texts_to_test = [('x' * 256), ('Invalid:' + 'X' * 248)]
-
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    generate_overlength_exc_regex(text)):
-                Link(text, self.get_site()).parse()
-
         # Namespace prefix without actual title
         def generate_has_no_title_exc_regex(text):
-            exc_regex = r'^(u|)\'{}\' has no title\.$'.format(re.escape(text))
+            exc_regex = r'^(u|)\'{}\' has no title\.$'.format(
+                re.escape(text.strip()))
             return exc_regex
 
-        texts_to_test = ['Talk:', 'Category: ', 'Category: #bar']
+        title_tests = [
+            # Empty title
+            (['', ':', '__  __', '  __  '],
+             r'^The link does not contain a page title$'),
 
-        for text in texts_to_test:
-            with self.assertRaisesRegex(
-                    InvalidTitle,
-                    generate_has_no_title_exc_regex(text.strip())):
-                Link(text, self.get_site()).parse()
+            (['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B'],
+             generate_contains_illegal_chars_exc_regex),
+
+            # URL encoding
+            # %XX is understood by wikimedia but not %XXXX
+            (['A%2523B'],
+             r'^(u|)\'A%23B\' contains illegal char\(s\) (u|)\'%23\'$'),
+
+            # A link is invalid if their (non-)talk page would be in another
+            # namespace than the link's "other" namespace
+            (['Talk:File:Example.svg'],
+             r'The \(non-\)talk page of (u|)\'Talk:File:Example.svg\''
+             r' is a valid title in another namespace.'),
+
+            (['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',
+              'Foo/../Sandbox', 'Sandbox/.', 'Sandbox/..'],
+             generate_contains_dot_combinations_exc_regex),
+
+            (['A ~~~ Name', 'A ~~~~ Signature', 'A ~~~~~ Timestamp'],
+             generate_contains_tilde_exc_regex),
+
+            ([('x' * 256), ('Invalid:' + 'X' * 248)],
+             generate_overlength_exc_regex),
+
+            (['Talk:', 'Category: ', 'Category: #bar'],
+             generate_has_no_title_exc_regex),
+        ]
+
+        for texts_to_test, exception_regex in title_tests:
+            for text in texts_to_test:
+                with self.subTest(title=text):
+                    if callable(exception_regex):
+                        regex = exception_regex(text)
+                    else:
+                        regex = exception_regex
+                    with self.assertRaisesRegex(InvalidTitle, regex):
+                        Link(text, self.get_site()).parse()
 
     def test_relative(self):
         """Test that relative links are handled properly."""
