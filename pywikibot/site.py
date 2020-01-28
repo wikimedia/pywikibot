@@ -126,7 +126,6 @@ class LoginStatus(IntEnum):
     IN_PROGRESS = -2
     NOT_LOGGED_IN = -1
     AS_USER = 0
-    AS_SYSOP = 1
 
     def __repr__(self):
         """Return internal representation."""
