@@ -4,6 +4,10 @@ Release history
 Current release
 ---------------
 
+* preload urllib.quote() with Python 2 (T243710, T222623)
+* Drop isbn_hyphenate package due to outdated data (T243157)
+* Fix UnboundLocalError in ProofreadPage._ocr_callback (T243644)
+* Deprecate/remove sysop parameter in several methods and functions
 * Refactor Wikibase entity namespace handling (T160395)
 * Site.has_api method will be removed in next release
 * Category.copyTo and Category.copyAndKeep will be removed in the next release
