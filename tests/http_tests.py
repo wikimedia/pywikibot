@@ -694,13 +694,21 @@ class DataBodyParameterTestCase(HttpbinTestCase):
 
     def test_fetch(self):
         """Test that using the data and body params produce same results."""
-        r_data = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
-                            data={'fish&chips': 'delicious'})
-        r_body = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
-                            body={'fish&chips': 'delicious'})
+        r_data_request = http.fetch(uri=self.get_httpbin_url('/post'),
+                                    method='POST',
+                                    data={'fish&chips': 'delicious'})
+        r_body_request = http.fetch(uri=self.get_httpbin_url('/post'),
+                                    method='POST',
+                                    body={'fish&chips': 'delicious'})
 
-        self.assertDictEqual(json.loads(r_data.text),
-                             json.loads(r_body.text))
+        r_data = json.loads(r_data_request.text)
+        r_body = json.loads(r_body_request.text)
+
+        # remove X-Amzn-Trace-Id if present (T243662)
+        r_data['headers'].pop('X-Amzn-Trace-Id', None)
+        r_body['headers'].pop('X-Amzn-Trace-Id', None)
+
+        self.assertDictEqual(r_data, r_body)
 
 
 if __name__ == '__main__':  # pragma: no cover
