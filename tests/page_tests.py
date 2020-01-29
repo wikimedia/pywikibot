@@ -997,7 +997,7 @@ class TestPageDelete(TestCase):
 
     """Test page delete / undelete actions."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True
@@ -1034,7 +1034,7 @@ class TestApplicablePageProtections(TestCase):
 
     """Test applicable restriction types."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_applicable_protections(self):
@@ -1066,7 +1066,7 @@ class TestPageProtect(TestCase):
 
     """Test page protect / unprotect actions."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True
@@ -1157,7 +1157,7 @@ class HtmlEntity(TestCase):
 class TestPermalink(DefaultSiteTestCase):
     """Test that permalink links are correct."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_permalink(self):
@@ -1181,7 +1181,7 @@ class TestPermalink(DefaultSiteTestCase):
 class TestShortLink(DefaultSiteTestCase):
     """Test that short link management is correct."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_create_short_link(self):

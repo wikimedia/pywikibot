@@ -158,7 +158,7 @@ class TestFlowFactoryErrors(TestCase):
 
     """Test errors associated with class methods generating Flow objects."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     cached = True
@@ -218,7 +218,7 @@ class TestFlowFactoryErrors(TestCase):
 class TestFlowTopic(TestCase):
     """Test Topic functions."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_topic(self):

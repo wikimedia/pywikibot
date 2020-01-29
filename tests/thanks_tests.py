@@ -20,7 +20,7 @@ class TestThankRevision(TestCase):
 
     """Test thanks for revisions."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True
@@ -80,7 +80,7 @@ class TestThankRevisionErrors(TestCase):
 
     """Test errors when thanking revisions."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = -1

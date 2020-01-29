@@ -20,7 +20,7 @@ class TestThankFlowPost(TestCase):
 
     """Test thanks for Flow posts."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True

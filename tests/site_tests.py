@@ -2026,7 +2026,7 @@ class TestSiteSysopWrite(TestCase):
 
     """Test site sysop methods that require writing."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True
@@ -2170,7 +2170,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
     """Test patrol method."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True

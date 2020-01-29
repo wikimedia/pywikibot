@@ -24,7 +24,7 @@ class TestGeneralWrite(TestCase):
 
     """Run general write tests."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -74,7 +74,7 @@ class TestGeneralWrite(TestCase):
 class TestSiteMergeHistory(TestCase):
     """Test history merge action."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     write = True

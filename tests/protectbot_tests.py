@@ -19,7 +19,7 @@ class TestProtectionBot(ScriptMainTestCase):
 
     """Test ProtectionBot protect/unprotect capabilities."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     sysop = True

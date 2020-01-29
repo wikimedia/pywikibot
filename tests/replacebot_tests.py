@@ -31,7 +31,7 @@ class TestReplacementsMain(TWNBotTestCase):
         'Press Enter to use this automatic message, or enter a '
         'description of the\nchanges your bot will make:')
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
     cached = False
 

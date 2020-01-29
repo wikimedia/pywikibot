@@ -335,7 +335,7 @@ class SubpageFilterGeneratorTestCase(TestCase):
 
     """Test SubpageFilterGenerator."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_subpage_filter(self):
@@ -362,7 +362,7 @@ class PetScanPageGeneratorTestCase(TestCase):
 
     """Test PetScanPageGenerator."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_petscan(self):

@@ -19,7 +19,7 @@ class TestFlowCreateTopic(TestCase):
 
     """Test the creation of Flow topics."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -42,7 +42,7 @@ class TestFlowReply(TestCase):
 
     """Test replying to existing posts."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -159,7 +159,7 @@ class TestFlowLockTopic(TestCase):
 
     """Locking and unlocking topics."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -184,7 +184,7 @@ class TestFlowHide(TestCase):
 
     """Hiding topics and posts."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -224,7 +224,7 @@ class TestFlowDelete(TestCase):
 
     """Deleting topics and posts."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -265,7 +265,7 @@ class TestFlowSuppress(TestCase):
 
     """Suppressing topics and posts."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -306,7 +306,7 @@ class TestFlowEditFailure(TestCase):
 
     """Flow-related edit failure tests."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True

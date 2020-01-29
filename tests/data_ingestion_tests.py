@@ -118,7 +118,7 @@ class TestDataIngestionBot(ScriptMainTestCase):
 
     """Test TestDataIngestionBot class."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     def test_existing_file(self):

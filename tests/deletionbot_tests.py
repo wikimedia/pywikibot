@@ -19,7 +19,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
 
     """Test deletionbot script."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     sysop = True
@@ -52,7 +52,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
 
     """Test deletionbot as a user (not sysop)."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     user = True
@@ -80,7 +80,7 @@ class TestDeletionBot(ScriptMainTestCase):
 
     """Test deletionbot with patching to make it non-write."""
 
-    family = 'test'
+    family = 'wikipedia'
     code = 'test'
 
     cached = True
