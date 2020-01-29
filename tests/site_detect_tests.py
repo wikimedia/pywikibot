@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -339,8 +339,6 @@ class PrivateWikiTestCase(PatchingTestCase):
         self.assertEqual(code, fam.code)
         self.assertEqual(fam.domain, self.NETLOC)
         self.assertEqual(user, self.USERNAME)
-        if not args and 'sysop' not in kwargs:
-            kwargs['sysop'] = None
         site = DrySite(code, fam, user, *args, **kwargs)
         site._siteinfo._cache.update(
             (key, (value, True))

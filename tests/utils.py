@@ -365,7 +365,7 @@ class DrySite(pywikibot.site.APISite):
 
     _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
 
-    def __init__(self, code, fam, user, sysop):
+    def __init__(self, code, fam, user):
         """Initializer."""
         super(DrySite, self).__init__(code, fam, user)
         self._userinfo = pywikibot.tools.EMPTY_DEFAULT

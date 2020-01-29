@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -178,7 +178,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(kwargs, {})
         self.assertEqual(code, self.current_code)
         self.assertEqual(fam, self.current_family)
-        site = DrySite(code, fam, None, None)
+        site = DrySite(code, fam, None)
         site._siteinfo._cache['general'] = ({'articlepath': self.article_path},
                                             True)
         return site
