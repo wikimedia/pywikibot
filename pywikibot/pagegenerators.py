@@ -3062,7 +3062,8 @@ class PetScanPageGenerator(object):
         }
 
         # test wikipedia
-        if self.site.code == 'test' and self.site.family == 'test':
+        if (self.site.code == 'test'
+                and self.site.family in ['test', 'wikipedia']):
             query['language'] = 'test'
             query['project'] = 'wikipedia'
 
