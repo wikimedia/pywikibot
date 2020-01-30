@@ -1263,7 +1263,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     user = normalize_username(user)
     key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], interface):
-        _sites[key] = interface(code=code, fam=fam, user=user, sysop=None)
+        _sites[key] = interface(code=code, fam=fam, user=user)
         debug("Instantiated %s object '%s'"
               % (interface.__name__, _sites[key]), _logger)
 
