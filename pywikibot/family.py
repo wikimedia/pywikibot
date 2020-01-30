@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1217,18 +1217,6 @@ class Family(object):
         """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
         return '/wiki/'
 
-    def rcstream_host(self, code):
-        """Hostname for RCStream."""
-        raise NotImplementedError('This family does not support RCStream')
-
-    def rcstream_path(self, code):
-        """Return path for RCStream."""
-        raise NotImplementedError('This family does not support RCStream')
-
-    def rcstream_port(self, code):
-        """Return port for RCStream."""
-        raise NotImplementedError('This family does not support RCStream')
-
     def eventstreams_host(self, code):
         """Hostname for EventStreams."""
         raise NotImplementedError('This family does not support EventStreams')
@@ -1740,11 +1728,6 @@ class WikimediaFamily(Family):
     def protocol(self, code):
         """Return 'https' as the protocol."""
         return 'https'
-
-    @deprecated('eventstreams_host', since='20170713')
-    def rcstream_host(self, code):
-        """DEPRECATED: use eventstreams_host instead."""
-        return self.eventstreams_host(code)
 
     def eventstreams_host(self, code):
         """Return 'https://stream.wikimedia.org' as the stream hostname."""
