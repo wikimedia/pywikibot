@@ -90,7 +90,7 @@ class TestReplacementsMain(TWNBotTestCase):
         """Run the L{replace.main} with the given args and summary and page."""
         # -page to not have an empty generator
         # -lang and -family as it will use Site() otherwise
-        return replace.main(*(args + ('-lang:test', '-family:test',
+        return replace.main(*(args + ('-lang:test', '-family:wikipedia',
                                       '-page:TEST')))
 
     def test_invalid_replacements(self):
