@@ -80,8 +80,7 @@ def _get_consumer_token(site):
 
 def _oauth_login(site):
     consumer_key, consumer_secret = _get_consumer_token(site)
-    login_manager = OauthLoginManager(consumer_secret, False, site,
-                                      consumer_key)
+    login_manager = OauthLoginManager(consumer_secret, site, consumer_key)
     login_manager.login()
     identity = login_manager.identity
     if identity is None:

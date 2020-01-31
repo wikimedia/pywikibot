@@ -79,7 +79,7 @@ class TestOauthLoginManger(DefaultOAuthSiteTestCase):
         self.assertIsNotNone(login_manager.access_token)
         self.assertIsInstance(login_manager.identity, dict)
         self.assertEqual(login_manager.identity['username'],
-                         self.site.username(sysop=False))
+                         self.site.username())
 
 
 if __name__ == '__main__':  # pragma: no cover
