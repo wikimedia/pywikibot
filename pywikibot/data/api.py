@@ -35,7 +35,7 @@ from pywikibot import config, login
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
-    Error, TimeoutError, InvalidTitle, UnsupportedPage
+    Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.tools import (
     deprecated, itergroup, PY2, PYTHON_VERSION,
@@ -2097,8 +2097,12 @@ class Request(MutableMapping):
             except TypeError:
                 raise RuntimeError(result)
 
-        raise TimeoutError(
-            'Maximum retries attempted due to maxlag without success.')
+        msg = 'Maximum retries attempted due to maxlag without success.'
+        if os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1':
+            import unittest
+            raise unittest.SkipTest(msg)
+
+        raise MaxlagTimeoutError(msg)
 
     def wait(self):
         """Determine how long to wait after a failed request."""

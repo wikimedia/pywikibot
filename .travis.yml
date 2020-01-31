@@ -121,6 +121,7 @@ env:
   global:
     - TEST_TIMEOUT=300
     - PYWIKIBOT_NO_L10N_TESTS=1
+    - PYWIKIBOT_TESTS_RUNNING=1
 
   matrix:
     - LANGUAGE=en FAMILY=wikipedia PYWIKIBOT_TEST_PROD_ONLY=1

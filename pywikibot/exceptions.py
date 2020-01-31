@@ -602,6 +602,13 @@ class TimeoutError(Error):
     pass
 
 
+class MaxlagTimeoutError(TimeoutError):
+
+    """Request failed with a maxlag timeout error."""
+
+    pass
+
+
 @__deprecated(since='20141214')
 class DeprecatedPageNotFoundError(Error):
 

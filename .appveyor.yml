@@ -13,6 +13,7 @@ environment:
 
   PYSETUP_TEST_EXTRAS: "1"
   PYSETUP_TEST_NO_UI: "1"
+  PYWIKIBOT_TESTS_RUNNING: "1"
 
   matrix:
 
