@@ -62,6 +62,7 @@ from pywikibot.tools import (
     classproperty,
     deprecated as __deprecated,
     deprecate_arg as _deprecate_arg,
+    issue_deprecation_warning,
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
@@ -1222,6 +1223,10 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     """
     _logger = 'wiki'
 
+    if sysop is not None:
+        issue_deprecation_warning('positional argument of "sysop"', depth=3,
+                                  warning_class=DeprecationWarning,
+                                  since='20190907')
     if url:
         # Either code and fam or only url
         if code or fam:
