@@ -108,7 +108,7 @@ script:
         python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -rsxX" ;
       fi
     else
-      coverage run setup.py test ;
+      coverage run -m unittest -vv ;
     fi
 
 after_success:
