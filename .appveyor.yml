@@ -106,7 +106,7 @@ test_script:
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
 
   - set PYSETUP_TEST_NO_UI=1
-  - "%CMD_IN_ENV% coverage run setup.py test"
+  - "%CMD_IN_ENV% coverage run -m unittest -vv"
 
 on_finish:
   - codecov
