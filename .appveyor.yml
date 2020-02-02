@@ -111,7 +111,7 @@ test_script:
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''wikidata''][''test''] = ''$env:PYWIKIBOT_USERNAME'';')"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''commons''][''commons''] = ''$env:PYWIKIBOT_USERNAME'';')"
 
-  - "%CMD_IN_ENV% coverage run setup.py test"
+  - "%CMD_IN_ENV% coverage run -m unittest discover -vv -p \"*_tests.py\""
 
 on_finish:
   - codecov
