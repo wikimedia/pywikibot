@@ -28,6 +28,10 @@ setup.py
 
 ::
 
+    python setup.py test
+
+::
+
     python setup.py nosetests --tests tests
 
 ::
@@ -109,7 +113,7 @@ env
 
 ::
 
-    PYWIKIBOT_TEST_MODULES=api,site python -m unittest -vv
+    PYWIKIBOT_TEST_MODULES=api,site python setup.py test
 
 
 Travis CI
@@ -195,7 +199,7 @@ CircleCI Ubuntu servers.
 5. push changes into the forked git repository
 6. watch the build at https://circleci.com/gh/<username>/pywikibot
 
-PYWIKIBOT_NO_USER_CONFIG=2 is needed because 'python -m unittest -vv' is run.
+PYWIKIBOT_NO_USER_CONFIG=2 is needed because 'python setup.py test' is run.
 
 TOXENV=py27,py34 is a workaround because CircleCI runs 'tox',
 but there is a bug in the CircleCI default 'py26' implementation.
