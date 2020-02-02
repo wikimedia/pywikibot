@@ -48,6 +48,8 @@ from pywikibot.bot import Bot, ConfigParserBot
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
+    'meta': '{{Meta:Sandbox/Please do not edit this line}}'
+            '<!--Please edit below this line.-->',
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
             '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
