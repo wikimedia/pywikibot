@@ -373,9 +373,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = quote_from_bytes(encoded_title, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
-            # systems.
+            # systems, but still are valid in MediaWiki titles:
+            # Unix: /
+            # MediaWiki: /:\
+            # Windows: /:\"?*
             # Spaces are possible on most systems, but are bad for URLs.
-            for forbidden in ':*?/\\ ':
+            for forbidden in ':*?/\\" ':
                 title = title.replace(forbidden, '_')
         return title
 
