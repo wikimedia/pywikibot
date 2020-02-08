@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -423,8 +423,7 @@ class UploadRobot(BaseBot):
         pywikibot.output('Uploading file to {0}...'.format(site))
 
         ignore_warnings = self.ignoreWarning is True or self._handle_warnings
-        if ('://' in file_url
-                and 'upload_by_url' not in site.userinfo['rights']):
+        if '://' in file_url and not site.has_right('upload_by_url'):
             file_url = self.read_file_content(file_url)
 
         try:
@@ -462,7 +461,7 @@ class UploadRobot(BaseBot):
             return
 
         # early check that user has proper rights to upload
-        if 'upload' not in self.targetSite.userinfo['rights']:
+        if not self.targetSite.has_right('upload'):
             pywikibot.error(
                 "User '%s' does not have upload rights on site %s."
                 % (self.targetSite.user(), self.targetSite))

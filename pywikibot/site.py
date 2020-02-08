@@ -1304,7 +1304,7 @@ def must_be(group=None, right=None):
                                       'can perform requested action.'
                                       .format(self.sitename))
             if right is not None:
-                if right in self.userinfo['rights']:
+                if self.has_right(right):
                     return fn(self, *args, **kwargs)
             if grp == 'user':
                 self.login(False)
@@ -5034,10 +5034,10 @@ class APISite(BaseSite):
 
         err = ('deletedrevs: User:{} not authorized to '
                .format(self.user()))
-        if 'deletedhistory' not in self.userinfo['rights']:
+        if not self.has_right('deletedhistory'):
             raise Error(err + 'access deleted revisions.')
         if content:
-            if 'undelete' not in self.userinfo['rights']:
+            if not self.has_right('undelete'):
                 raise Error(err + 'view deleted content.')
 
         revids = kwargs.pop('revids', None)
@@ -5291,7 +5291,7 @@ class APISite(BaseSite):
 
         token = self.tokens['edit']
         if bot is None:
-            bot = ('bot' in self.userinfo['rights'])
+            bot = self.has_right('bot')
         params = dict(action='edit', title=page,
                       text=text, token=token, summary=summary, bot=bot,
                       recreate=recreate, createonly=createonly,
@@ -6354,7 +6354,7 @@ class APISite(BaseSite):
         # An offset != 0 doesn't make sense without a file key
         assert(_offset == 0 or _file_key is not None)
         # check for required user right
-        if 'upload' not in self.userinfo['rights']:
+        if not self.has_right('upload'):
             raise Error(
                 "User '%s' does not have upload rights on site %s."
                 % (self.user(), self))
@@ -6592,7 +6592,7 @@ class APISite(BaseSite):
                         }
         else:
             # upload by URL
-            if 'upload_by_url' not in self.userinfo['rights']:
+            if not self.has_right('upload_by_url'):
                 raise Error(
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
