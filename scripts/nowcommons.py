@@ -234,31 +234,33 @@ class NowCommonsDeleteBot(Bot):
     def findFilenameOnCommons(self, localImagePage):
         """Find filename on Commons."""
         for templateName, params in localImagePage.templatesWithParams():
-            if templateName in self.nc_templates:
-                if params == []:
+            if templateName not in self.nc_templates:
+                continue
+
+            if not params:
+                filenameOnCommons = localImagePage.title(with_ns=False)
+            elif self.site.lang in namespaceInTemplate:
+                skip = False
+                filenameOnCommons = None
+                for par in params:
+                    val = par.split('=')
+                    if len(val) == 1 and not skip:
+                        filenameOnCommons = par[par.index(':') + 1:]
+                        break
+                    if val[0].strip() == '1':
+                        filenameOnCommons = \
+                            val[1].strip()[val[1].strip().index(':') + 1:]
+                        break
+                    skip = True
+                if not filenameOnCommons:
                     filenameOnCommons = localImagePage.title(with_ns=False)
-                elif self.site.lang in namespaceInTemplate:
-                    skip = False
-                    filenameOnCommons = None
-                    for par in params:
-                        val = par.split('=')
-                        if len(val) == 1 and not skip:
-                            filenameOnCommons = par[par.index(':') + 1:]
-                            break
-                        if val[0].strip() == '1':
-                            filenameOnCommons = \
-                                val[1].strip()[val[1].strip().index(':') + 1:]
-                            break
-                        skip = True
-                    if not filenameOnCommons:
-                        filenameOnCommons = localImagePage.title(with_ns=False)
+            else:
+                val = params[0].split('=')
+                if len(val) == 1:
+                    filenameOnCommons = params[0].strip()
                 else:
-                    val = params[0].split('=')
-                    if len(val) == 1:
-                        filenameOnCommons = params[0].strip()
-                    else:
-                        filenameOnCommons = val[1].strip()
-                return filenameOnCommons
+                    filenameOnCommons = val[1].strip()
+            return filenameOnCommons
 
     def run(self):
         """Run the bot."""
