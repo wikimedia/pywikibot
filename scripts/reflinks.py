@@ -39,7 +39,7 @@ The following generators and filters are supported:
 &params;
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -515,7 +515,7 @@ class ReferencesRobot(Bot):
             try:
                 # Load the page's text from the wiki
                 new_text = page.get()
-                if not page.canBeEdited():
+                if not page.has_permission():
                     pywikibot.output("You can't edit page "
                                      + page.title(as_link=True))
                     continue

@@ -3115,23 +3115,35 @@ class APISite(BaseSite):
             self.loadpageinfo(page)
         return page._protection
 
-    def page_can_be_edited(self, page):
-        """
-        Determine if the page can be edited.
+    def page_can_be_edited(self, page, action='edit'):
+        """Determine if the page can be modified.
 
-        Return True if and only if:
-          - page is unprotected, and bot has an account for this site, or
-          - page is protected, and bot has a sysop account for this site.
+        Return True if the bot has the permission of needed restriction level
+        for the given action type.
 
+        @param page: a pywikibot.Page object
+        @type param: pywikibot.Page
+        @param action: a valid restriction type like 'edit', 'move'
+        @type action: str
         @rtype: bool
+
+        @raises ValueError: invalid action parameter
         """
-        rest = self.page_restrictions(page)
-        sysop_protected = 'edit' in rest and rest['edit'][0] == 'sysop'
-        try:
-            api.LoginManager(site=self, sysop=sysop_protected)
-        except NoUsername:
-            return False
-        return True
+        if action not in self.siteinfo['restrictions']['types']:
+            raise ValueError('{}.page_can_be_edited(): Invalid value "{}" for '
+                             '"action" parameter'
+                             .format(self.__class__.__name__, action))
+        prot_rights = {
+            '': action,
+            'autoconfirmed': 'editsemiprotected',
+            'sysop': 'editprotected',
+            'steward': 'editprotected'
+        }
+        restriction = self.page_restrictions(page).get(action, ('', None))[0]
+        user_rights = self.userinfo['rights']
+        if prot_rights.get(restriction, restriction) in user_rights:
+            return True
+        return False
 
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
@@ -7579,16 +7591,6 @@ class ClosedSite(APISite):
                                 'upload': ('steward', 'infinity'),
                                 'create': ('steward', 'infinity')}
         return page._protection
-
-    def page_can_be_edited(self, page):
-        """Determine if the page can be edited."""
-        rest = self.page_restrictions(page)
-        sysop_protected = 'edit' in rest and rest['edit'][0] == 'steward'
-        try:
-            api.LoginManager(site=self, sysop=sysop_protected)
-        except NoUsername:
-            return False
-        return True
 
     def recentchanges(self, **kwargs):
         """An error instead of pointless API call."""

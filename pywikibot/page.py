@@ -1141,17 +1141,24 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 p_types.remove('upload')
             return p_types
 
-    def canBeEdited(self):
-        """
-        Determine whether the page may be edited.
+    def has_permission(self, action='edit'):
+        """Determine whetherthe page can be modified.
 
-        This returns True if and only if:
-          - page is unprotected, and bot has an account for this site, or
-          - page is protected, and bot has a sysop account for this site.
+        Return True if the bot has the permission of needed restriction level
+        for the given action type.
 
+        @param action: a valid restriction type like 'edit', 'move'
+        @type action: str
         @rtype: bool
+
+        @raises ValueError: invalid action parameter
         """
-        return self.site.page_can_be_edited(self)
+        return self.site.page_can_be_edited(self, action)
+
+    @deprecated("Page.has_permission('edit')", since='20200208')
+    def canBeEdited(self):
+        """DEPRECATED. Determine whether the page may be edited."""
+        return self.has_permission()
 
     def botMayEdit(self):
         """
@@ -2163,7 +2170,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if cat not in cats:
                 cats.append(cat)
 
-        if not self.canBeEdited():
+        if not self.has_permission():
             pywikibot.output("Can't edit %s, skipping it..."
                              % self.title(as_link=True))
             return False

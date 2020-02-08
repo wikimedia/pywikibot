@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -308,7 +308,7 @@ class UploadRobot(BaseBot):
                     pywikibot.output(
                         'File exists and you asked to abort. Skipping.')
                     return None
-                if potential_file_page.canBeEdited():
+                if potential_file_page.has_permission():
                     if overwrite is None:
                         overwrite = not pywikibot.input_yn(
                             'File with name %s already exists. '
