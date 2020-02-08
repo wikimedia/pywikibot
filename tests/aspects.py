@@ -7,7 +7,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -794,11 +794,11 @@ class MetaTestCaseClass(type):
         else:
             hostnames = []
 
-        if 'net' in dct and dct['net'] is False:
+        if dct.get('net') is False:
             dct['site'] = False
 
-        if 'sites' in dct and 'site' not in dct:
-            dct['site'] = True
+        if 'sites' in dct:
+            dct.setdefault('site', True)
 
         # If either are specified, assume both should be specified
         if 'family' in dct or 'code' in dct:
@@ -816,13 +816,12 @@ class MetaTestCaseClass(type):
                 }
 
         if hostnames:
-            if 'sites' not in dct:
-                dct['sites'] = {}
+            dct.setdefault('sites', {})
             for hostname in hostnames:
                 assert hostname not in dct['sites']
                 dct['sites'][hostname] = {'hostname': hostname}
 
-        if 'dry' in dct and dct['dry'] is True:
+        if dct.get('dry') is True:
             dct['net'] = False
 
         if (('sites' not in dct and 'site' not in dct)
@@ -834,7 +833,7 @@ class MetaTestCaseClass(type):
             # test class dependencies are declarative, this requires the
             # test writer explicitly sets 'site=False' so code reviewers
             # check that the script invoked by pwb will not load a site.
-            if 'pwb' in dct and dct['pwb']:
+            if dct.get('pwb'):
                 if 'site' not in dct:
                     raise Exception(
                         '{}: Test classes using pwb must set "site"; add '
@@ -861,30 +860,28 @@ class MetaTestCaseClass(type):
 
         # The following section is only processed if the test uses sites.
 
-        if 'dry' in dct and dct['dry']:
+        if dct.get('dry'):
             bases = cls.add_base(bases, DisconnectedSiteMixin)
             del dct['net']
         else:
             dct['net'] = True
 
-        if 'cacheinfo' in dct and dct['cacheinfo']:
+        if dct.get('cacheinfo'):
             bases = cls.add_base(bases, CacheInfoMixin)
 
-        if 'cached' in dct and dct['cached']:
+        if dct.get('cached'):
             bases = cls.add_base(bases, ForceCacheMixin)
 
-        if 'net' in dct and dct['net']:
+        if dct.get('net'):
             bases = cls.add_base(bases, CheckHostnameMixin)
         else:
             assert not hostnames, 'net must be True with hostnames defined'
 
-        if 'write' in dct and dct['write']:
-            if 'user' not in dct:
-                dct['user'] = True
+        if dct.get('write'):
+            dct.setdefault('user', True)
             bases = cls.add_base(bases, SiteWriteMixin)
 
-        if (('user' in dct and dct['user'])
-                or ('sysop' in dct and dct['sysop'])):
+        if dct.get('user') or dct.get('sysop'):
             bases = cls.add_base(bases, RequireUserMixin)
 
         for test in tests:
@@ -977,7 +974,7 @@ class TestCase(TestTimerMixin, TestCaseBase):
             interface = DrySite
 
         for data in cls.sites.values():
-            if ('code' in data and data['code'] in ('test', 'mediawiki')
+            if (data.get('code') in ('test', 'mediawiki')
                     and 'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
                 raise unittest.SkipTest(
                     'Site code "{}" and PYWIKIBOT_TEST_PROD_ONLY is set.'
