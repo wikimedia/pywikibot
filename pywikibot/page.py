@@ -1917,7 +1917,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             reason = pywikibot.input('Please enter a reason for the deletion:')
 
         # If user has 'delete' right, delete the page
-        if 'delete' in self.site.userinfo['rights']:
+        if self.site.has_right('delete'):
             answer = 'y'
             if prompt and not hasattr(self.site, '_noDeletePrompt'):
                 answer = pywikibot.input_choice(

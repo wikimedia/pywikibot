@@ -119,8 +119,8 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2008-2019
+# (C) xqt, 2009-2020
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -573,12 +573,9 @@ class CategoryMoveRobot(CategoryPreprocess):
             page don't exist.
         """
         self.site = pywikibot.Site()
-        self.can_move_cats = (
-            'move-categorypages' in self.site.userinfo['rights'])
-        self.noredirect = (
-            delete_oldcat
-            and 'suppressredirect' in self.site.userinfo['rights']
-        )
+        self.can_move_cats = self.site.has_right('move-categorypages')
+        self.noredirect = delete_oldcat \
+            and self.site.has_right('suppressredirect')
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()

@@ -427,8 +427,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         @return: A valid speedy deletion template.
         @rtype: str or None
         """
-        if self.getOption('delete') \
-           and 'delete' not in self.site.userinfo['rights']:
+        if self.getOption('delete') and not self.site.has_right('delete'):
             sd = self.getOption('sdtemplate')
             if not sd and i18n.twhas_key(self.site,
                                          'redirect-broken-redirect-template'):
@@ -465,7 +464,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         assert page.site == self.site, (
             'target page is on different site {0}'.format(page.site))
         reason = i18n.twtranslate(self.site, summary_key)
-        if 'delete' in page.site.userinfo['rights']:
+        if page.site.has_right('delete'):
             page.delete(reason, prompt=False)
         elif self.sdtemplate:
             pywikibot.output('User does not have delete right, '
