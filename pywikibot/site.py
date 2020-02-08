@@ -1959,15 +1959,17 @@ class APISite(BaseSite):
     def logged_in(self):
         """Verify the bot is logged into the site as the expected user.
 
-        The expected usernames are those provided as either the user or sysop
-        parameter at instantiation.
+        The expected usernames are those provided as the user parameter
+        at instantiation.
 
         @rtype: bool
         """
         if not hasattr(self, '_userinfo'):
             return False
+        if 'anon' in self.userinfo or not self.userinfo.get('id'):
+            return False
 
-        if 'name' not in self.userinfo or not self.userinfo['name']:
+        if not self.userinfo.get('name'):
             return False
 
         if self.userinfo['name'] != self.username():
@@ -2137,6 +2139,9 @@ class APISite(BaseSite):
             assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
             self._userinfo = uidata['query']['userinfo']
+            if 'anon' in self._userinfo or not self._userinfo.get('id'):
+                pywikibot.warning('No user is logged in on site {}'
+                                  .format(self))
         return self._userinfo
 
     userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
@@ -2183,7 +2188,7 @@ class APISite(BaseSite):
 
         @rtype: bool
         """
-        return 'blockinfo' in self._userinfo
+        return 'blockinfo' in self.userinfo
 
     @deprecated('has_right() or is_blocked()', since='20141218')
     @remove_last_args(['sysop'])
@@ -2279,7 +2284,7 @@ class APISite(BaseSite):
 
         U{https://www.mediawiki.org/wiki/API:Userinfo}
         """
-        return right.lower() in self._userinfo['rights']
+        return right.lower() in self.userinfo['rights']
 
     @remove_last_args(['sysop'])
     def has_group(self, group):
@@ -2289,12 +2294,12 @@ class APISite(BaseSite):
         but will usually include bot.
         U{https://www.mediawiki.org/wiki/API:Userinfo}
         """
-        return group.lower() in self._userinfo['groups']
+        return group.lower() in self.userinfo['groups']
 
     @remove_last_args(['sysop'])
     def messages(self):
         """Return true if the user has new messages, and false otherwise."""
-        return 'messages' in self._userinfo
+        return 'messages' in self.userinfo
 
     @need_extension('Echo')
     def notifications(self, **kwargs):

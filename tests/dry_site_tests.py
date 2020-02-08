@@ -30,18 +30,37 @@ class TestDrySite(DefaultDrySiteTestCase):
     def test_logged_in(self):
         """Test logged_in() method."""
         x = self.get_site()
-
-        x._userinfo = {'name': None, 'groups': []}
+        x._userinfo = {'name': None, 'groups': [], 'id': 1}
         x._username = 'user'
 
-        self.assertFalse(x.logged_in())
+        with self.subTest(variant='name: None'):
+            self.assertFalse(x.logged_in())
 
         x._userinfo['name'] = 'user'
-        self.assertTrue(x.logged_in())
+        with self.subTest(variant='name: user'):
+            self.assertTrue(x.logged_in())
 
+        x._userinfo['name'] = 'otheruser'
+        with self.subTest(variant='name: otheruseer'):
+            self.assertFalse(x.logged_in())
+
+        x._userinfo['id'] = 0
         x._userinfo['name'] = 'user'
+        with self.subTest(variant='id: 0'):
+            self.assertFalse(x.logged_in())
+
+        x._userinfo['id'] = 1
+        with self.subTest(variant='id: 1'):
+            self.assertTrue(x.logged_in())
+
+        x._userinfo['anon'] = ''
+        with self.subTest(variant='anon'):
+            self.assertFalse(x.logged_in())
+
+        del x._userinfo['anon']
         x._userinfo['groups'] = ['sysop']
-        self.assertTrue(x.logged_in())
+        with self.subTest(variant='sysop'):
+            self.assertTrue(x.logged_in())
 
     def test_user_agent(self):
         """Test different variants of user agents."""
