@@ -5612,7 +5612,7 @@ class APISite(BaseSite):
                         if newpage.exists():
                             for prot in self.page_restrictions(
                                     newpage).values():
-                                if prot[0] not in self._userinfo['groups']:
+                                if not self.has_group(prot[0]):
                                     failed_page = newpage
                                     break
                     else:
