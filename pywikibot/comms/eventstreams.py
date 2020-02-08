@@ -9,8 +9,8 @@ This module requires sseclient to be installed::
     pip install sseclient
 """
 #
-# (C) xqt, 2017-2018
-# (C) Pywikibot team, 2017-2019
+# (C) xqt, 2017-2020
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -285,6 +285,7 @@ class EventStreams(object):
         """Iterator."""
         n = 0
         event = None
+        ignore_first_empty_warning = True
         while self._total is None or n < self._total:
             if not hasattr(self, 'source'):
                 self.source = EventSource(**self.sse_kwargs)
@@ -316,8 +317,10 @@ class EventStreams(object):
                         if self.streamfilter(element):
                             n += 1
                             yield element
-                else:
+                elif not ignore_first_empty_warning:
                     warning('Empty message found.')
+                else:
+                    ignore_first_empty_warning = False
             elif event.event == 'error':
                 warning('Encountered error: {0}'.format(event.data))
             else:
