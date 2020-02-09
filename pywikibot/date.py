@@ -19,6 +19,7 @@ import datetime
 import re
 from string import digits as _decimalDigits  # noqa: N812
 
+from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import first_lower, first_upper, deprecated, UnicodeType
 
@@ -2215,9 +2216,10 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     return None, None
 
 
+@deprecated('date.format_date', since='20190526')
 class FormatDate(object):
 
-    """Format a date."""
+    """DEPRECATED. Format a date."""
 
     def __init__(self, site):
         """Initializer."""
@@ -2225,7 +2227,36 @@ class FormatDate(object):
 
     def __call__(self, m, d):
         """Return a formatted month and day."""
-        return formats[dayMnthFmts[m - 1]][self.site.lang](d)
+        return format_date(m, d, self.site)
+
+
+def format_date(month, day, lang=None, year=2000):
+    """Format a date localized to given lang.
+
+    @param month: month in range of 1..12
+    @type month: int
+    @param day: day of month in range of 1..31
+    @type day: int
+    @param lang: a site object or language key. Defaults to current site.
+    @type lang: BaseSite or string
+    @param year: year for which the date is to be formatted. always 29 will be
+        given For February except the year is given. Default is leap year 2000.
+    @type year: int
+    @return: localized date like "January 11"
+    @rtype: str
+    @raises ValueError: Wrong day value; must be 1-28/29/30/31
+    @raises IllegalMonthError: bad month number; must be 1-12
+    """
+    if not lang:
+        lang = Site().lang
+    elif hasattr(lang, 'lang'):
+        lang = lang.lang
+    max_day = calendar.monthrange(year, month)[1]
+    if not 1 <= day <= max_day:
+        raise ValueError(
+            'Wrong day value {day}; must be 1-{max_day}'
+            .format(day=day, max_day=max_day))
+    return formats[dayMnthFmts[month - 1]][lang](day)
 
 
 def formatYear(lang, year):
