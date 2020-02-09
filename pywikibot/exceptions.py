@@ -81,7 +81,7 @@ UserWarning: warnings targeted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -104,7 +104,7 @@ class NotImplementedWarning(_NotImplementedWarning):
     pass
 
 
-class ArgumentDeprecationWarning(UserWarning):
+class ArgumentDeprecationWarning(UserWarning, FutureWarning):
 
     """Command line argument that is no longer supported."""
 
