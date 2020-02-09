@@ -8437,7 +8437,7 @@ class DataSite(APISite):
         @type language: str
         @param total: Maximum number of pages to retrieve in total, or None in
             case of no limit.
-        @type limit: int or None
+        @type total: int or None
         @return: 'search' list from API output.
         @rtype: api.APIGenerator
         """

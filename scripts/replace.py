@@ -532,7 +532,7 @@ class ReplaceRobot(Bot):
     @param allowoverlap: when matches overlap, all of them are replaced.
     @type allowoverlap: bool
     @param recursive: Recurse replacement as long as possible.
-    @type recursice: bool
+    @type recursive: bool
     @warning: Be careful, this might lead to an infinite loop.
     @param addedCat: category to be added to every page touched
     @type addedCat: pywikibot.Category or str or None
