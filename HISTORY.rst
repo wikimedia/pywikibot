@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* backports.py will be removed with next release (T244664)
 * stdnum package is required for ISBN scripts and cosmetic_changes (T132919, T144288, T241141)
 * preload urllib.quote() with Python 2 (T243710, T222623)
 * Drop isbn_hyphenate package due to outdated data (T243157)

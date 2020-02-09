@@ -5,7 +5,7 @@ This module contained backports to support older Python versions.
 Their usage is deprecated and this module could be dropped soon.
 """
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,8 @@ import logging
 from pywikibot.tools import deprecated
 
 
-@deprecated('difflib._format_range_unified', since='20160111')
+@deprecated('difflib._format_range_unified', since='20160111',
+            future_warning=True)
 def format_range_unified(start, stop):
     """
     Convert range to the "ed" format.
@@ -29,7 +30,7 @@ def format_range_unified(start, stop):
     return _format_range_unified(start, stop)
 
 
-@deprecated('logging.NullHandler', since='20160111')
+@deprecated('logging.NullHandler', since='20160111', future_warning=True)
 class NullHandler(logging.NullHandler):
 
     """This handler does nothing."""
@@ -37,7 +38,7 @@ class NullHandler(logging.NullHandler):
     pass
 
 
-@deprecated('logging.captureWarnings', since='20160111')
+@deprecated('logging.captureWarnings', since='20160111', future_warning=True)
 def captureWarnings(capture):
     """
     Capture warnings into logging.
