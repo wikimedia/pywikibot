@@ -6109,6 +6109,7 @@ class APISite(BaseSite):
             if False add them (default).
         @return: True if API returned expected response; False otherwise
         @rtype: bool
+        @raises KeyError: 'watch' isn't in API response
 
         """
         parameters = {'action': 'watch',
@@ -6152,16 +6153,12 @@ class APISite(BaseSite):
         @rtype: bool
 
         """
-        parameters = {'action': 'watch',
-                      'title': page,
-                      'token': self.tokens['watch'],
-                      'unwatch': unwatch}
-        req = self._simple_request(**parameters)
-        result = req.submit()
-        if 'watch' not in result:
-            pywikibot.error('watchpage: Unexpected API response:\n%s' % result)
-            return False
-        return ('unwatched' if unwatch else 'watched') in result['watch']
+        try:
+            result = self.watch(page, unwatch)
+        except KeyError:
+            pywikibot.error('watchpage: Unexpected API response')
+            result = False
+        return result
 
     @need_right('purge')
     def purgepages(
