@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE BACKWARDS-COMPATIBILITY.
+WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE COMPAT BACKWARDS-COMPATIBILITY.
 
-Do not use in new scripts; use the source to find the appropriate
-function/method instead.
+IT IS DEPRECATED. DO NOT USE IT.
 
+Do not use this module anymore; use pywikibot.Category class
+or Page.change_category method instead.
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,7 +29,7 @@ __all__ = ('Category', 'change_category',)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Category',
                              replacement_name='pywikibot.Category',
-                             since='20141209')
+                             since='20141209', future_warning=True)
 wrapper._add_deprecated_attr('change_category',
                              replacement_name='Page.change_category',
-                             since='20141209')
+                             since='20141209', future_warning=True)
