@@ -1,2 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Package to provide compatibility with compat scripts."""
+"""
+WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE COMPAT BACKWARDS-COMPATIBILITY.
+
+IT IS DEPRECATED. DO NOT USE IT.
+"""

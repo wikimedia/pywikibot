@@ -1,30 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE BACKWARDS-COMPATIBILITY.
+WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE COMPAT BACKWARDS-COMPATIBILITY.
 
-Do not use in new scripts; use the source to find the appropriate
-function/method instead.
+IT IS DEPRECATED. DO NOT USE IT.
 
+Do not use this module anymore; use pywikibot.data.api.Request
+or Page/APISite highlevel methods instead.
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import pywikibot
 from pywikibot.data import api
-from pywikibot.tools import deprecated, deprecate_arg
-
-import io
+from pywikibot.tools import deprecated, deprecated_args, remove_last_args
 
 
-@deprecated('pywikibot.data.api.Request', since='20120603')
-@deprecate_arg('useAPI', None)
-@deprecate_arg('retryCount', None)
-@deprecate_arg('encodeTitle', None)
-def GetData(request, site=None, back_response=False):
+@deprecated('pywikibot.data.api.Request', since='20120603',
+            future_warning=True)
+@deprecated_args(useAPI=None, retryCount=None, encodeTitle=None)
+@remove_last_args(['back_response'])
+def GetData(request, site=None):
     """
     Query the server with the given request dict.
 
@@ -34,15 +32,7 @@ def GetData(request, site=None, back_response=False):
         request['site'] = site
 
     req = api.Request(**request)
-    result = req.submit()
-
-    if back_response:
-        pywikibot.warning('back_response is no longer supported; an empty '
-                          'response object will be returned')
-        res_dummy = io.StringIO()
-        res_dummy.__dict__.update({'code': 0, 'msg': ''})
-        return res_dummy, result
-    return result
+    return req.submit()
 
 
 __all__ = (GetData, )

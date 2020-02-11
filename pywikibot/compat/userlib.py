@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE BACKWARDS-COMPATIBILITY.
+WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE COMPAT BACKWARDS-COMPATIBILITY.
 
-Do not use in new scripts; use the source to find the appropriate
-function/method instead.
+IT IS DEPRECATED. DO NOT USE IT.
 
+Do not use this module anymore; use pywikibot.User instead.
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,4 +21,4 @@ __all__ = ('User',)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('User',
                              replacement_name='pywikibot.User',
-                             since='20141209')
+                             since='20141209', future_warning=True)
