@@ -87,7 +87,7 @@ install:
       if (-not(Test-Path($env:PYTHON))) {
         iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1')
       }
-  - pip install --upgrade pip
+  - python -m pip install --upgrade pip
   - pip install virtualenv
   - virtualenv env
   - env\Scripts\activate.bat
