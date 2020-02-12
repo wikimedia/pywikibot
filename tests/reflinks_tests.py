@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for reflinks script."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
 from tests import join_xml_data_path
 from tests.aspects import unittest, TestCase, ScriptMainTestCase
+from tests.utils import empty_sites
 
 
 class TestXMLPageGenerator(TestCase):
@@ -146,7 +147,8 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Tear down the test by undoing the bot class patch."""
         ReferencesRobot.__init__ = self._original_constructor
         ReferencesRobot.run = self._original_run
-        super(TestReferencesBotConstructor, self).tearDown()
+        with empty_sites():
+            super(TestReferencesBotConstructor, self).tearDown()
 
     def test_xml_simple(self):
         """Test the generator without any narrowing."""

@@ -29,6 +29,7 @@ from tests.aspects import (
     WikibaseTestCase, ScriptMainTestCase,
 )
 from tests.bot_tests import TWNBotTestCase
+from tests.utils import empty_sites
 
 if StdNumValidationError:
     AnyIsbnValidationException = (StdNumValidationError, IsbnExc)
@@ -209,13 +210,15 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase,
 
     def test_isbn_format(self):
         """Test format using the bot and wikibase."""
-        main('-page:' + self.test_page_qid, '-always', '-format')
-        self.assertEqual(self.setTarget_value, '0-9752298-0-X')
+        with empty_sites():
+            main('-page:' + self.test_page_qid, '-always', '-format')
+            self.assertEqual(self.setTarget_value, '0-9752298-0-X')
 
     def test_isbn_to13(self):
         """Test to13 using the bot and wikibase."""
-        main('-page:' + self.test_page_qid, '-always', '-to13')
-        self.assertTrue(self.setTarget_value, '978-0975229804')
+        with empty_sites():
+            main('-page:' + self.test_page_qid, '-always', '-to13')
+            self.assertTrue(self.setTarget_value, '978-0975229804')
 
 
 def setTarget_dummy(self, value):
