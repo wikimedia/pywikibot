@@ -2075,8 +2075,8 @@ class Request(MutableMapping):
                 if self.site.user():
                     result['error']['current user'] = self.site.user()
                 else:  # not logged in; show the IP
-                    si = self.site.siteinfo
-                    result['error']['current user'] = si['name']
+                    uinfo = self.site.userinfo
+                    result['error']['current user'] = uinfo['name']
 
             # raise error
             try:
