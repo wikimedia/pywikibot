@@ -7,6 +7,7 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from contextlib import contextmanager
 import inspect
 import json
 import os
@@ -697,3 +698,11 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
 
     return execute(command=command + args,
                    data_in=data_in, timeout=timeout, error=error)
+
+
+@contextmanager
+def empty_sites():
+    """Empty pywikibot._sites and pywikibot._url_cache cache on entry point."""
+    pywikibot._sites = {}
+    pywikibot._url_cache = {}
+    yield

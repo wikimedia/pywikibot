@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for scripts/delete.py."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,6 +13,7 @@ import pywikibot.page
 from scripts import delete
 
 from tests.aspects import unittest, ScriptMainTestCase
+from tests.utils import empty_sites
 
 
 class TestDeletionBotWrite(ScriptMainTestCase):
@@ -104,11 +105,14 @@ class TestDeletionBot(ScriptMainTestCase):
 
     def test_dry(self):
         """Test dry run of bot."""
-        delete.main('-page:Main Page', '-always', '-summary:foo')
-        self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False,
-                                            True, True])
-        delete.main('-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
-        self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
+        with empty_sites():
+            delete.main('-page:Main Page', '-always', '-summary:foo')
+            self.assertEqual(self.delete_args,
+                             ['[[Main Page]]', 'foo', False, True, True])
+        with empty_sites():
+            delete.main(
+                '-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
+            self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
 def delete_dummy(self, reason, prompt, mark, quit):

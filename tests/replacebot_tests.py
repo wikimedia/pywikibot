@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the replace script and ReplaceRobot class."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 
 from pywikibot import fixes
+from pywikibot.tools import suppress_warnings
 
 from scripts import replace
 
@@ -17,6 +18,7 @@ from tests import join_data_path
 
 from tests.aspects import unittest
 from tests.bot_tests import TWNBotTestCase
+from tests.utils import empty_sites
 
 # Load only the custom fixes
 fixes.fixes.clear()
@@ -79,7 +81,8 @@ class TestReplacementsMain(TWNBotTestCase):
         replace.ReplaceRobot = self._original_bot
         replace.pywikibot.input = self._original_input
         replace.pywikibot.Site = self._original_site
-        super(TestReplacementsMain, self).tearDown()
+        with empty_sites():
+            super(TestReplacementsMain, self).tearDown()
 
     def _fake_input(self, message):
         """Cache the message and return static text "TESTRUN"."""
@@ -98,7 +101,8 @@ class TestReplacementsMain(TWNBotTestCase):
         # old and new need to be together
         self.assertFalse(self._run('foo', '-pairsfile:/dev/null', 'bar'))
         # only old provided
-        self.assertFalse(self._run('foo'))
+        with empty_sites():
+            self.assertFalse(self._run('foo'))
 
         # In the end no bots should've been created
         self.assertFalse(self.bots)
@@ -159,7 +163,8 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertEqual(expected,
                          bot.apply_replacements('Hello 1', applied, page))
         self.assertEqual(applied, required_applied)
-        self.assertEqual(expected, bot.doReplacements('Hello 1', page))
+        with suppress_warnings('scripts.replace.ReplaceRobot.doReplacements'):
+            self.assertEqual(expected, bot.doReplacements('Hello 1', page))
 
     def test_only_cmd(self):
         """Test command line replacements only."""

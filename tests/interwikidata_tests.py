@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for scripts/interwikidata.py."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,6 +14,7 @@ from pywikibot import Link
 from scripts import interwikidata
 
 from tests.aspects import unittest, SiteAttributeTestCase
+from tests.utils import empty_sites
 
 
 class DummyBot(interwikidata.IWBot):
@@ -55,7 +56,8 @@ class TestInterwikidataBot(SiteAttributeTestCase):
     def test_main(self):
         """Test main function interwikidata.py."""
         # The main function should return False when no generator is defined.
-        self.assertFalse(interwikidata.main())
+        with empty_sites():
+            self.assertFalse(interwikidata.main())
 
     def test_iw_bot(self):
         """Test IWBot class."""

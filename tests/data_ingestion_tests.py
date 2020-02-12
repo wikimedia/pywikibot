@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,7 @@ from scripts import data_ingestion
 
 from tests import join_data_path, join_images_path
 from tests.aspects import unittest, TestCase, ScriptMainTestCase
+from tests.utils import empty_sites
 
 
 class TestPhoto(TestCase):
@@ -123,9 +124,10 @@ class TestDataIngestionBot(ScriptMainTestCase):
 
     def test_existing_file(self):
         """Test uploading a file that already exists."""
-        data_ingestion.main(
-            '-csvdir:tests/data',
-            '-page:User:John_Vandenberg/data_ingestion_test_template')
+        with empty_sites():
+            data_ingestion.main(
+                '-csvdir:tests/data',
+                '-page:User:John_Vandenberg/data_ingestion_test_template')
 
 
 if __name__ == '__main__':  # pragma: no cover
