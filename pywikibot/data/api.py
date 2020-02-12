@@ -120,11 +120,11 @@ class APIError(Error):
     def __str__(self):
         """Return a string representation."""
         if self.other:
-            return '{0}: {1} [{2}]'.format(
+            return '{0}: {1}\n[{2}]'.format(
                 self.code,
                 self.info,
-                '; '.join(
-                    '{0}:{1}'.format(key, val)
+                ';\n '.join(
+                    '{0}: {1}'.format(key, val)
                     for key, val in self.other.items()))
 
         return '{0}: {1}'.format(self.code, self.info)
@@ -2068,6 +2068,15 @@ class Request(MutableMapping):
             if code == 'cirrussearch-too-busy-error':  # T170647
                 self.wait()
                 continue
+
+            if code == 'urlshortener-blocked':  # T244062
+                # add additional informations to result['error']
+                result['error']['current site'] = self.site
+                if self.site.user():
+                    result['error']['current user'] = self.site.user()
+                else:  # not logged in; show the IP
+                    si = self.site.siteinfo
+                    result['error']['current user'] = si['name']
 
             # raise error
             try:
