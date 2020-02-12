@@ -214,8 +214,8 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                             self.current_page, ns_names))
                     return  # Not an orphan, do not delete.
 
-            if self.site.user() is None:
-                self.site.login()
+            if self.current_page.site.user() is None:
+                self.current_page.site.login()
             self.current_page.delete(self.summary,
                                      not self.getOption('always'),
                                      self.getOption('always'),
