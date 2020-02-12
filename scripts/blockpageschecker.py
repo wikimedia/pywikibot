@@ -44,7 +44,7 @@ Examples:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -309,7 +309,7 @@ def main(*args):
         # FIXME: This check does not work :
         # PreloadingGenerator cannot set correctly page.editRestriction
         # (see bug T57322)
-        # if not page.canBeEdited():
+        # if not page.has_permission():
         #    pywikibot.output(
         #        "%s is sysop-protected : this account can't edit "
         #        "it! Skipping..." % pagename)
@@ -319,7 +319,7 @@ def main(*args):
             editRestr = restrictions['edit']
         except KeyError:
             editRestr = None
-        if not page.canBeEdited():
+        if not page.has_permission():
             pywikibot.output('%s is protected: '
                              "this account can't edit it! Skipping..."
                              % pagename)

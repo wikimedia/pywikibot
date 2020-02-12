@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -464,7 +464,7 @@ class TestPageObject(DefaultSiteTestCase):
                 r'use interwiki\.page_empty_check\(page\) instead\.'):
             self.assertIsInstance(mainpage.isEmpty(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)
-        self.assertIsInstance(mainpage.canBeEdited(), bool)
+        self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
         self.assertIsInstance(mainpage.permalink(), basestring)

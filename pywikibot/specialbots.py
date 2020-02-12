@@ -308,7 +308,7 @@ class UploadRobot(BaseBot):
                     pywikibot.output(
                         'File exists and you asked to abort. Skipping.')
                     return None
-                if potential_file_page.canBeEdited():
+                if potential_file_page.has_permission():
                     if overwrite is None:
                         overwrite = not pywikibot.input_yn(
                             'File with name %s already exists. '

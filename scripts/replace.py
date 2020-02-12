@@ -137,7 +137,7 @@ the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -728,7 +728,7 @@ class ReplaceRobot(Bot):
             try:
                 # Load the page's text from the wiki
                 original_text = page.get(get_redirect=True)
-                if not page.canBeEdited():
+                if not page.has_permission():
                     pywikibot.output("You can't edit page "
                                      + page.title(as_link=True))
                     continue
