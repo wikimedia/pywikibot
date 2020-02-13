@@ -30,7 +30,7 @@ try:
     from collections.abc import Iterable, Container, Mapping
 except ImportError:  # Python 2.7
     from collections import Iterable, Container, Mapping
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from enum import IntEnum
 from warnings import warn
 
@@ -1845,6 +1845,9 @@ class RemovedSite(BaseSite):
         super(RemovedSite, self).__init__(code, fam, user)
 
 
+_mw_msg_cache = defaultdict(dict)
+
+
 class APISite(BaseSite):
 
     """
@@ -2376,81 +2379,86 @@ class APISite(BaseSite):
         except KeyError:
             return False
 
-    def mediawiki_messages(self, keys):
+    def mediawiki_messages(self, keys, lang=None):
         """Fetch the text of a set of MediaWiki messages.
-
-        If keys is '*' or ['*'], all messages will be fetched. (deprecated)
 
         The returned dict uses each key to store the associated message.
 
         @see: U{https://www.mediawiki.org/wiki/API:Allmessages}
 
         @param keys: MediaWiki messages to fetch
-        @type keys: set of str, '*' or ['*']
+        @type keys: iterable of str
+        @param lang: a language code, default is self.lang
+        @type lang: str or None
 
         @rtype dict
         """
-        if keys == '*' or keys == ['*']:
-            issue_deprecation_warning('mediawiki_messages("*")',
-                                      'specific messages', since='20150905')
-
-        if not all(_key in self._msgcache for _key in keys):
+        amlang = lang or self.lang
+        if not all(amlang in _mw_msg_cache
+                   and _key in _mw_msg_cache[amlang] for _key in keys):
             parameters = {'meta': 'allmessages',
                           'ammessages': keys,
-                          'amlang': self.lang,
+                          'amlang': amlang,
                           }
             msg_query = api.QueryGenerator(site=self, parameters=parameters)
 
             for msg in msg_query:
                 if 'missing' not in msg:
-                    self._msgcache[msg['name']] = msg['*']
+                    _mw_msg_cache[amlang][msg['name']] = msg['*']
 
-            # Return all messages
-            if keys == '*' or keys == ['*']:
-                return self._msgcache
+            # Check requested keys
+            result = {}
+            for key in keys:
+                try:
+                    result[key] = _mw_msg_cache[amlang][key]
+                except KeyError:
+                    raise KeyError("No message '{}' found for lang '{}'"
+                                   .format(key, amlang))
             else:
-                # Check requested keys
-                for key in keys:
-                    if key not in self._msgcache:
-                        raise KeyError("Site %s has no message '%s'"
-                                       % (self, key))
+                return result
 
-        return {_key: self._msgcache[_key] for _key in keys}
+        return {_key: _mw_msg_cache[amlang][_key] for _key in keys}
 
     @deprecated_args(forceReload=None)
-    def mediawiki_message(self, key):
+    def mediawiki_message(self, key, lang=None):
         """Fetch the text for a MediaWiki message.
 
         @param key: name of MediaWiki message
         @type key: str
+        @param lang: a language code, default is self.lang
+        @type lang: str or None
 
         @rtype unicode
         """
-        return self.mediawiki_messages([key])[key]
+        return self.mediawiki_messages([key], lang=lang)[key]
 
-    def has_mediawiki_message(self, key):
+    def has_mediawiki_message(self, key, lang=None):
         """Determine if the site defines a MediaWiki message.
 
         @param key: name of MediaWiki message
         @type key: str
+        @param lang: a language code, default is self.lang
+        @type lang: str or None
 
         @rtype: bool
         """
-        return self.has_all_mediawiki_messages([key])
+        return self.has_all_mediawiki_messages([key], lang=lang)
 
-    def has_all_mediawiki_messages(self, keys):
+    def has_all_mediawiki_messages(self, keys, lang=None):
         """Confirm that the site defines a set of MediaWiki messages.
 
         @param keys: names of MediaWiki messages
-        @type keys: set of str
+        @type keys: iterable of str
+        @param lang: a language code, default is self.lang
+        @type lang: str or None
 
         @rtype: bool
         """
         try:
-            self.mediawiki_messages(keys)
-            return True
+            self.mediawiki_messages(keys, lang=lang)
         except KeyError:
             return False
+        return True
 
     @property
     def months_names(self):
