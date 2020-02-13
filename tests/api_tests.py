@@ -98,7 +98,7 @@ class TestAPIMWException(DefaultSiteTestCase):
                 'API error internal_api_error_fake: Fake error message')
             pywikibot.error.assert_called_with(
                 'Detected MediaWiki API exception internal_api_error_fake: '
-                'Fake error message\n[servedby:unittest]; raising')
+                'Fake error message\n[servedby: unittest]; raising')
         finally:
             self.warning_patcher.stop()
             self.error_patcher.stop()
