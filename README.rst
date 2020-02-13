@@ -1,7 +1,7 @@
 .. image:: https://travis-ci.org/wikimedia/pywikibot.svg?branch=master
    :alt: Travis Build Status
    :target: https://travis-ci.org/wikimedia/pywikibot
-.. image:: https://img.shields.io/appveyor/ci/ladsgroup/pywikibot-g4xqx/master.svg?style=flat-square&label=AppVeyor%20CI
+.. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master
    :alt: AppVeyor Build Status
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graph/badge.svg
