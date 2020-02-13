@@ -49,7 +49,6 @@ from pywikibot.exceptions import (
     EntityTypeUnknownException,
     Error,
     FamilyMaintenanceWarning,
-    FatalServerError,
     InconsistentTitleReceived,
     InterwikiRedirectPage,
     IsNotRedirectPage,
@@ -5475,6 +5474,7 @@ class APISite(BaseSite):
     }
 
     @need_right('mergehistory')
+    @need_version('1.27.0-wmf.13')
     def merge_history(self, source, dest, timestamp=None, reason=None):
         """Merge revisions from one page into another.
 
@@ -5496,12 +5496,6 @@ class APISite(BaseSite):
         @param reason: Optional reason for the history merge
         @type reason: str
         """
-        # Check wiki version to see if action=mergehistory is supported
-        if self.mw_version < '1.27.0-wmf.13':
-            raise FatalServerError(str(self) + ' version must be '
-                                   '1.27.0-wmf.13 or newer to support the '
-                                   'history merge API.')
-
         # Data for error messages
         errdata = {
             'site': self,
@@ -6263,30 +6257,33 @@ class APISite(BaseSite):
         """
         if self.mw_version >= '1.27wmf9':
             return not self._siteinfo.get('general')['uploadsenabled']
+
         if hasattr(self, '_uploaddisabled'):
             return self._uploaddisabled
-        else:
-            # attempt a fake upload; on enabled sites will fail for:
-            # missingparam: One of the parameters
-            #    filekey, file, url, statuskey is required
-            # TODO: is there another way?
-            try:
-                req = self._request(throttle=False,
-                                    parameters={'action': 'upload',
-                                                'token': self.tokens['edit']})
-                req.submit()
-            except api.APIError as error:
-                if error.code == 'uploaddisabled':
-                    self._uploaddisabled = True
-                elif error.code == 'missingparam':
-                    # If the upload module is enabled, the above dummy request
-                    # does not have sufficient parameters and will cause a
-                    # 'missingparam' error.
-                    self._uploaddisabled = False
-                else:
-                    # Unexpected error
-                    raise
-                return self._uploaddisabled
+
+        # attempt a fake upload; on enabled sites will fail for:
+        # missingparam: One of the parameters
+        #    filekey, file, url, statuskey is required
+        # TODO: is there another way?
+        try:
+            req = self._request(throttle=False,
+                                parameters={'action': 'upload',
+                                            'token': self.tokens['edit']})
+            req.submit()
+        except api.APIError as error:
+            if error.code == 'uploaddisabled':
+                self._uploaddisabled = True
+            elif error.code == 'missingparam':
+                # If the upload module is enabled, the above dummy request
+                # does not have sufficient parameters and will cause a
+                # 'missingparam' error.
+                self._uploaddisabled = False
+            else:
+                # Unexpected error
+                raise
+            return self._uploaddisabled
+        raise RuntimeError(
+            'Unexpected success of upload action without parameters.')
 
     def stash_info(self, file_key, props=False):
         """Get the stash info for a given file key.
