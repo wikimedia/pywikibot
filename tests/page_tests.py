@@ -1181,6 +1181,8 @@ class TestPermalink(DefaultSiteTestCase):
 class TestShortLink(DefaultSiteTestCase):
     """Test that short link management is correct."""
 
+    user = True
+
     family = 'wikipedia'
     code = 'test'
 
