@@ -1673,7 +1673,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self._coords = []
             self.site.loadcoordinfo(self)
         if primary_only:
-            return self._coords[0] if len(self._coords) > 0 else None
+            return [coord for coord in self._coords if coord.primary]
         else:
             return self._coords
 

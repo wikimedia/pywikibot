@@ -254,18 +254,14 @@ class Timestamp(datetime.datetime):
 
 class Coordinate(_WbRepresentation):
 
-    """
-    Class for handling and storing Coordinates.
-
-    For now its just being used for DataSite, but
-    in the future we can use it for the GeoData extension.
-    """
+    """Class for handling and storing Coordinates."""
 
     _items = ('lat', 'lon', 'entity')
 
     @_deprecate_arg('entity', 'globe_item')
     def __init__(self, lat, lon, alt=None, precision=None, globe=None,
-                 typ='', name='', dim=None, site=None, globe_item=None):
+                 typ='', name='', dim=None, site=None, globe_item=None,
+                 primary=False):
         """
         Represent a geo coordinate.
 
@@ -290,6 +286,8 @@ class Coordinate(_WbRepresentation):
                            of this Wikibase item. Takes precedence over 'globe'
                            if present.
         @type globe_item: pywikibot.ItemPage or str
+        @param primary: True for a primary set of coordinates
+        @type primary: bool
         """
         self.lat = lat
         self.lon = lon
@@ -300,6 +298,7 @@ class Coordinate(_WbRepresentation):
         self.name = name
         self._dim = dim
         self.site = site or Site().data_repository()
+        self.primary = primary
 
         if globe:
             globe = globe.lower()
