@@ -1666,16 +1666,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Uses the MediaWiki extension GeoData.
 
         @param primary_only: Only return the coordinate indicated to be primary
-        @return: A list of Coordinate objects
-        @rtype: list
+        @return: A list of Coordinate objects or a single Coordinate if
+            primary_only is True
+        @rtype: list of Coordinate or Coordinate or None
         """
         if not hasattr(self, '_coords'):
             self._coords = []
             self.site.loadcoordinfo(self)
         if primary_only:
-            return [coord for coord in self._coords if coord.primary]
-        else:
-            return self._coords
+            for coord in self._coords:
+                if coord.primary:
+                    return coord
+            return None
+        return list(self._coords)
 
     @need_version('1.20')
     def page_image(self):
