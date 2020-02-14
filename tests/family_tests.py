@@ -51,7 +51,10 @@ class TestFamily(TestCase):
                     self.assertIsInstance(domain, basestring)
                     if domain.split(':', 1)[0] != 'localhost':
                         self.assertIn('.', domain)
-                self.assertEqual(f.name, name)
+                if name == 'test':
+                    self.assertEqual(f.name, 'wikipedia')
+                else:
+                    self.assertEqual(f.name, name)
 
                 with suppress_warnings(
                         'wowwiki_family.Family.languages_by_size '
@@ -176,7 +179,10 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
         self.assertEqual(code, self.current_code)
-        self.assertEqual(fam, self.current_family)
+        if self.current_family == 'test':
+            self.assertEqual(fam, 'wikipedia')
+        else:
+            self.assertEqual(fam, self.current_family)
         site = DrySite(code, fam, None)
         site._siteinfo._cache['general'] = ({'articlepath': self.article_path},
                                             True)
