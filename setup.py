@@ -98,14 +98,13 @@ extra_deps.update(script_deps)
 
 # ------- setup install_requires ------- #
 # packages which are mandatory
+# version.package_version() uses pathlib which is a python 3 library.
+# pathlib2 is required for python 2.7
 dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
                 'requests>=2.20.1; python_version != "3.4"',
                 'enum34>=1.1.6; python_version < "3"',
-                'ipaddress>=1.0.23; python_version < "3"']
-
-# version.package_version() uses pathlib which is a python 3 library.
-# pathlib2 is required for python 2.7
-dependencies.append('pathlib2;python_version<"3"')
+                'ipaddress>=1.0.23; python_version < "3"',
+                'pathlib2;python_version<"3"']
 
 # Python versions before 2.7.9 will cause urllib3 to trigger
 # InsecurePlatformWarning warnings for all HTTPS requests. By
