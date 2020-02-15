@@ -248,7 +248,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
                                Request, site=site,
                                parameters={'action': 'edit'})
 
-        site._userinfo = {'name': '1.2.3.4', 'groups': []}
+        site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
 
         # unicode string with "u" is returned with Python 2
         self.assertRaisesRegex(pywikibot.Error, " as IP u?'1.2.3.4'",
