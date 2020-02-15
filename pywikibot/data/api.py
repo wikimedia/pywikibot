@@ -3301,7 +3301,7 @@ def _update_coordinates(page, coordinates):
                                      name=co.get('name', ''),
                                      dim=int(co.get('dim', 0)) or None,
                                      globe=co['globe'],  # See [[gerrit:67886]]
-                                     primary=True if 'primary' in co else False
+                                     primary='primary' in co
                                      )
         coords.append(coord)
     page._coords = coords

@@ -612,6 +612,31 @@ class TestPageObject(DefaultSiteTestCase):
                                    mainpage.page_image)
 
 
+class TestPageCoordinates(TestCase):
+
+    """Test Page Object using German Wikipedia."""
+
+    family = 'wikipedia'
+    code = 'de'
+
+    cached = True
+
+    def test_coordinates(self):
+        """Test C{Page.coodinates} method."""
+        page = pywikibot.Page(self.site, 'Berlin')
+        with self.subTest(primary_only=False):
+            coords = page.coordinates()
+            self.assertIsInstance(coords, list)
+            for coord in coords:
+                self.assertIsInstance(coord, pywikibot.Coordinate)
+                self.assertIsInstance(coord.primary, bool)
+
+        with self.subTest(primary_only=True):
+            coord = page.coordinates(primary_only=True)
+            self.assertIsInstance(coord, pywikibot.Coordinate)
+            self.assertTrue(coord.primary)
+
+
 class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
 
     """Test deprecation of Page attributes."""
