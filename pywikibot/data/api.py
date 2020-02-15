@@ -695,11 +695,12 @@ class ParamInfo(Container):
         except KeyError:
             raise ValueError("paraminfo for '%s' not loaded" % module)
 
-        if 'parameters' not in module:
-            pywikibot.warning("module '%s' has no parameters" % module)
-            return
+        try:
+            params = module['parameters']
+        except KeyError:
+            pywikibot.warning("module '{}' has no parameters".format(module))
+            return None
 
-        params = module['parameters']
         param_data = [param for param in params
                       if param['name'] == param_name]
 
@@ -707,11 +708,7 @@ class ParamInfo(Container):
             return None
 
         assert(len(param_data) == 1)
-        param_data = param_data[0]
-        # pre 1.14 doesn't provide limit attribute on parameters
-        if 'multi' in param_data and 'limit' not in param_data:
-            param_data['limit'] = self._limit
-        return param_data
+        return param_data[0]
 
     @property
     @deprecated('submodules() or module_paths', since='20150715')
