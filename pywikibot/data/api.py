@@ -1514,7 +1514,7 @@ class Request(MutableMapping):
             self._params['wrap'] = ['']
 
         if config.maxlag:
-            self._params.setdefault('maxlag', str(config.maxlag))
+            self._params.setdefault('maxlag', [str(config.maxlag)])
         self._params.setdefault('format', ['json'])
         if self._params['format'] != ['json']:
             raise TypeError("Query format '%s' cannot be parsed."
