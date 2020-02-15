@@ -241,36 +241,38 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
 
     def test_no_user(self):
         """Test Request object when not a user."""
-        site = self.get_site()
+        self.site._userinfo = {}
+        with self.subTest(userinfo=self.site._userinfo):
+            self.assertRaisesRegex(pywikibot.Error,
+                                   'API write action attempted without user',
+                                   Request, site=self.site,
+                                   parameters={'action': 'edit'})
 
-        del site._userinfo
-        self.assertRaisesRegex(pywikibot.Error, ' without userinfo',
-                               Request, site=site,
-                               parameters={'action': 'edit'})
-
-        site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
-
-        # unicode string with "u" is returned with Python 2
-        self.assertRaisesRegex(pywikibot.Error, " as IP u?'1.2.3.4'",
-                               Request, site=site,
-                               parameters={'action': 'edit'})
+        self.site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
+        with self.subTest(userinfo=self.site._userinfo):
+            self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
+                                   Request, site=self.site,
+                                   parameters={'action': 'edit'})
 
     def test_unexpected_user(self):
         """Test Request object when username is not correct."""
-        site = self.get_site()
-        site._userinfo = {'name': 'other_username', 'groups': []}
-        site._username = 'myusername'
+        self.site._userinfo = {'name': 'other_username', 'groups': [],
+                               'id': '1'}
+        self.site._username = 'myusername'
         # Ignore warning: API write action by unexpected username commenced.
         with patch('pywikibot.warning'):
-            Request(site=site, parameters={'action': 'edit'})
+            Request(site=self.site, parameters={'action': 'edit'})
+        self.assertNotEqual(self.site.user(), self.site.username())
+        self.assertNotEqual(self.site.userinfo['name'], self.site.username())
+        self.assertFalse(self.site.logged_in())
 
     def test_normal(self):
         """Test Request object when username is correct."""
-        site = self.get_site()
-        site._userinfo = {'name': 'myusername', 'groups': []}
-        site._username = 'myusername'
-
-        Request(site=site, parameters={'action': 'edit'})
+        self.site._userinfo = {'name': 'myusername', 'groups': [], 'id': '1'}
+        self.site._username = 'myusername'
+        Request(site=self.site, parameters={'action': 'edit'})
+        self.assertEqual(self.site.user(), self.site.username())
+        self.assertTrue(self.site.logged_in())
 
 
 class DryMimeTests(TestCase):
@@ -310,7 +312,7 @@ class MimeTests(DefaultDrySiteTestCase):
         # fake write test needs the config username
         site = self.get_site()
         site._username = 'myusername'
-        site._userinfo = {'name': 'myusername', 'groups': []}
+        site._userinfo = {'name': 'myusername', 'groups': [], 'id': '1'}
         parameters = {'action': 'upload', 'file': 'MP_sounds.png',
                       'filename': join_images_path('MP_sounds.png')}
         req = Request(site=site, mime=True, parameters=parameters)
