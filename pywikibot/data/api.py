@@ -98,7 +98,7 @@ else:
 _logger = 'data.api'
 
 lagpattern = re.compile(
-    r'Waiting for [\w.: ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
+    r'Waiting for [\w.: ]+: (?P<lag>\d+(?:\.\d+)?) seconds? lagged')
 
 
 class APIError(Error):
@@ -2022,8 +2022,13 @@ class Request(MutableMapping):
                 if retries > max(5, pywikibot.config.max_retries):
                     break
                 pywikibot.log('Pausing due to database lag: ' + info)
-                lag = lagpattern.search(info)
-                lag = int(lag.group('lag')) if lag else 0
+
+                try:
+                    lag = result['error']['lag']
+                except KeyError:
+                    lag = lagpattern.search(info)
+                    lag = float(lag.group('lag')) if lag else 0.0
+
                 self.site.throttle.lag(lag * retries)
                 continue
 

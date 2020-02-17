@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -299,7 +299,7 @@ class Throttle(object):
         @param lagtime: The time to wait for the next request which is the
             last maxlag time from api warning. This is only used as a fallback
             if self.retry-after isn't set.
-        @type lagtime: int
+        @type lagtime: float
         """
         started = time.time()
         with self.lock:
