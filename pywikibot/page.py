@@ -3841,9 +3841,15 @@ class WikibaseEntity(object):
         return {}
 
     def concept_uri(self):
-        """Return the full concept URI."""
-        # todo: raise when self.id is -1
-        return '{0}{1}'.format(self.repo.concept_base_uri, self.id)
+        """
+        Return the full concept URI.
+
+        @raise NoWikibaseEntity: if this entity doesn't exist
+        """
+        entity_id = self.getID()
+        if entity_id == '-1':
+            raise pywikibot.NoWikibaseEntity(self)
+        return '{0}{1}'.format(self.repo.concept_base_uri, entity_id)
 
 
 class WikibasePage(BasePage, WikibaseEntity):
