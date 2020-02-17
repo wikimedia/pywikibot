@@ -2751,6 +2751,16 @@ class APISite(BaseSite):
                 pywikibot.exception('You have no API read permissions. Seems '
                                     'you are not logged in')
                 version = self.family.version(self.code)
+
+        if MediaWikiVersion(version) < MediaWikiVersion('1.19'):
+            warn('\n'
+                 + fill('Support of MediaWiki {version} will be dropped. '
+                        'It is recommended to use MediaWiki 1.19 or above. '
+                        'You may use Pywikibot stable release 3.0.20200111 '
+                        'for older MediaWiki versions. '
+                        'See T245350 for further information.'
+                        .format(version=version)), FutureWarning)
+
         return version
 
     @property
