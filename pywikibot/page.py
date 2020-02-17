@@ -431,7 +431,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         A stable identifier to be used as a key in hash-tables.
 
         This relies on the fact that the string
-        representation of an instance can not change after the construction.
+        representation of an instance cannot change after the construction.
         """
         return hash(self._cmpkey())
 
@@ -1118,7 +1118,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Return the protection types allowed for that page.
 
-        If the page doesn't exists it only returns "create". Otherwise it
+        If the page doesn't exist it only returns "create". Otherwise it
         returns all protection types provided by the site, except "create".
         It also removes "upload" if that page is not in the File namespace.
 
@@ -1143,7 +1143,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return p_types
 
     def has_permission(self, action='edit'):
-        """Determine whetherthe page can be modified.
+        """Determine whether the page can be modified.
 
         Return True if the bot has the permission of needed restriction level
         for the given action type.
