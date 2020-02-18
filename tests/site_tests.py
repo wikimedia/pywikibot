@@ -1947,6 +1947,10 @@ class SiteSysopTestCase(DefaultSiteTestCase):
     def test_deletedrevs(self):
         """Test the site.deletedrevs() method."""
         mysite = self.get_site()
+        if not mysite.has_right('deletedhistory'):
+            self.skipTest(
+                "You don't have permission to view the deleted revisions "
+                'on {0}.'.format(mysite))
         mainpage = self.get_mainpage()
         gen = mysite.deletedrevs(total=10, titles=mainpage)
 
@@ -2759,8 +2763,9 @@ class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
         self.site.loadrevisions(mainpage, total=12, rollback=True)
         self.assertIsNotEmpty(mainpage._revisions)
         self.assertLessEqual(len(mainpage._revisions), 12)
-        self.assertTrue(all(rev.rollbacktoken is not None
-                            for rev in mainpage._revisions.values()))
+        if self.site.has_right('rollback'):
+            self.assertTrue(all(rev.rollbacktoken is not None
+                                for rev in mainpage._revisions.values()))
 
 
 class TestBacklinks(TestCase):
