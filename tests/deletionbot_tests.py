@@ -85,6 +85,7 @@ class TestDeletionBot(ScriptMainTestCase):
     code = 'test'
 
     cached = True
+    user = True
 
     delete_args = []
     undelete_args = []
