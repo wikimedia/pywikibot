@@ -2751,23 +2751,6 @@ class TestSiteLoadRevisions(TestCase):
         # TODO test other optional arguments
 
 
-class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
-
-    """Test cases for Site.loadrevision() method."""
-
-    sysop = True
-
-    def test_rollback(self):
-        """Test the site.loadrevisions() method with rollback."""
-        mainpage = self.get_mainpage()
-        self.site.loadrevisions(mainpage, total=12, rollback=True)
-        self.assertIsNotEmpty(mainpage._revisions)
-        self.assertLessEqual(len(mainpage._revisions), 12)
-        if self.site.has_right('rollback'):
-            self.assertTrue(all(rev.rollbacktoken is not None
-                                for rev in mainpage._revisions.values()))
-
-
 class TestBacklinks(TestCase):
 
     """Test for backlinks (issue T194233)."""

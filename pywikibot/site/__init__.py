@@ -4049,10 +4049,11 @@ class APISite(BaseSite):
                                total=total, g_content=content, **cmargs)
 
     @deprecated_args(getText='content', sysop=None)
+    @remove_last_args(['rollback'])
     def loadrevisions(self, page, content=False, revids=None,
                       startid=None, endid=None, starttime=None,
                       endtime=None, rvdir=None, user=None, excludeuser=None,
-                      section=None, step=None, total=None, rollback=False):
+                      section=None, step=None, total=None):
         """Retrieve revision information and store it in page object.
 
         By default, retrieves the last (current) revision of the page,
@@ -4132,8 +4133,6 @@ class APISite(BaseSite):
             rvargs['rvprop'].append('content')
             if section is not None:
                 rvargs['rvsection'] = UnicodeType(section)
-        if rollback:
-            rvargs['rvtoken'] = 'rollback'
         if revids is None:
             rvtitle = page.title(with_section=False).encode(self.encoding())
             rvargs['titles'] = rvtitle
