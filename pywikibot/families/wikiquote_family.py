@@ -69,7 +69,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'sr': ('/док', ),
     }
 
-    def code2encodings(self, code):
+    def encodings(self, code):
         """
         Return a list of historical encodings for a specific language.
 
@@ -80,4 +80,4 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             return 'utf-8', 'iso8859-2'
         if code == 'ru':
             return 'utf-8', 'iso8859-5'
-        return (self.code2encoding(code), )
+        return super(Family, self).encodings(code)

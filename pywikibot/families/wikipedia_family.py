@@ -234,7 +234,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         else:
             return self.known_families
 
-    def code2encodings(self, code):
+    def encodings(self, code):
         """Return a list of historical encodings for a specific site."""
         # Historic compatibility
         if code == 'pl':
@@ -243,4 +243,4 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             return 'utf-8', 'iso8859-5'
         if code in self.latin1old:
             return 'utf-8', 'iso-8859-1'
-        return self.code2encoding(code)
+        return super(Family, self).encodings(code)
