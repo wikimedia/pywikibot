@@ -1382,22 +1382,24 @@ class Family(object):
             return 10
         return 1000 * int(M.group(1)) + int(M.group(2)) - 1000
 
-    def code2encoding(self, code):
+    def encoding(self, code):
         """Return the encoding for a specific language wiki."""
         return 'utf-8'
 
-    def code2encodings(self, code):
-        """Return list of historical encodings for a specific language Wiki."""
-        return (self.code2encoding(code), )
+    def encodings(self, code):
+        """Return list of historical encodings for a specific language wiki."""
+        return (self.encoding(code), )
 
     # aliases
-    def encoding(self, code):
-        """Return the encoding for a specific language Wiki."""
-        return self.code2encoding(code)
+    @deprecated('Site().encoding()', since='20200218')
+    def code2encoding(self, code):
+        """Return the encoding for a specific language wiki."""
+        return self.encoding(code)
 
-    def encodings(self, code):
-        """Return list of historical encodings for a specific language Wiki."""
-        return self.code2encodings(code)
+    @deprecated('Site().encodings()', since='20200218')
+    def code2encodings(self, code):
+        """Return list of historical encodings for a specific language wiki."""
+        return self.encodings(code)
 
     def __eq__(self, other):
         """Compare self with other.
