@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Support of MediaWiki releases below 1.19 will be dropped (T245350)
 * compat module is deprecated for 5 years and will be removed with next release (T183085)
 * ipaddress module is required for Python 2 (T243171)
 * tools.ip will be dropped in favour of tools.is_IP (T243171)
