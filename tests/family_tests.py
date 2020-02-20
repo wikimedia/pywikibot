@@ -37,30 +37,34 @@ class TestFamily(TestCase):
     def test_family_load_valid(self):
         """Test that a family can be loaded via Family.load."""
         for name in pywikibot.config.family_files:
-            f = Family.load(name)
-            self.assertIsInstance(f.langs, dict)
-            self.assertTrue(f.langs)
-            self.assertTrue(f.codes)
-            self.assertTrue(iter(f.codes))
-            self.assertIsInstance(next(iter(f.codes)), basestring)
-            self.assertTrue(f.domains)
-            self.assertTrue(iter(f.domains))
-            for domain in f.domains:
-                self.assertIsInstance(domain, basestring)
-                if domain.split(':', 1)[0] != 'localhost':
-                    self.assertIn('.', domain)
-            self.assertEqual(f.name, name)
+            with self.subTest(family=name):
+                with suppress_warnings('test_family is deprecated'):
+                    f = Family.load(name)
+                self.assertIsInstance(f.langs, dict)
+                self.assertTrue(f.langs)
+                self.assertTrue(f.codes)
+                self.assertTrue(iter(f.codes))
+                self.assertIsInstance(next(iter(f.codes)), basestring)
+                self.assertTrue(f.domains)
+                self.assertTrue(iter(f.domains))
+                for domain in f.domains:
+                    self.assertIsInstance(domain, basestring)
+                    if domain.split(':', 1)[0] != 'localhost':
+                        self.assertIn('.', domain)
+                self.assertEqual(f.name, name)
 
-            with suppress_warnings(
-                    'wowwiki_family.Family.languages_by_size is deprecated'):
-                self.assertIsInstance(f.languages_by_size, list)
-                self.assertGreaterEqual(set(f.langs), set(f.languages_by_size))
+                with suppress_warnings(
+                        'wowwiki_family.Family.languages_by_size '
+                        'is deprecated'):
+                    self.assertIsInstance(f.languages_by_size, list)
+                    self.assertGreaterEqual(set(f.langs),
+                                            set(f.languages_by_size))
 
-            if isinstance(f, SingleSiteFamily):
-                self.assertIsNotNone(f.code)
-                self.assertIsNotNone(f.domain)
-                self.assertEqual(set(f.langs), {f.code})
-                self.assertEqual(set(f.codes), {f.code})
+                if isinstance(f, SingleSiteFamily):
+                    self.assertIsNotNone(f.code)
+                    self.assertIsNotNone(f.domain)
+                    self.assertEqual(set(f.langs), {f.code})
+                    self.assertEqual(set(f.codes), {f.code})
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""
@@ -118,11 +122,6 @@ class TestFamily(TestCase):
         self.assertIsNone(family.obsolete['mh'])
         # offline site (see site tests test_removed_site)
         self.assertIsNone(family.obsolete['ru-sib'])
-
-    def test_get_obsolete_test(self):
-        """Test WikimediaFamily default obsolete."""
-        family = Family.load('test')
-        self.assertIn('dk', family.obsolete)
         self.assertIn('dk', family.interwiki_replacements)
 
     def test_set_obsolete(self):
@@ -141,7 +140,7 @@ class TestFamily(TestCase):
 
     def test_obsolete_readonly(self):
         """Test obsolete result not updatable."""
-        family = Family.load('test')
+        family = Family.load('wikipedia')
         self.assertRaisesRegex(
             TypeError,
             self.FAMILY_TYPEERROR_RE,
@@ -156,7 +155,7 @@ class TestFamily(TestCase):
 
     def test_WikimediaFamily_obsolete_readonly(self):
         """Test WikimediaFamily obsolete is readonly."""
-        family = Family.load('test')
+        family = Family.load('wikipedia')
         self.assertRaisesRegex(
             TypeError,
             self.FROZENSET_TYPEERROR_RE,
