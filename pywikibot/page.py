@@ -6039,11 +6039,9 @@ class Link(BaseLink):
         t = unicodedata.normalize('NFC', t)
 
         # This code was adapted from Title.php : secureAndSplit()
-        #
         if '\ufffd' in t:
-            raise pywikibot.Error(
-                "Title contains illegal char (\\uFFFD 'REPLACEMENT CHARACTER')"
-            )
+            raise pywikibot.InvalidTitle(
+                '%r contains illegal char %r' % (t, '\ufffd'))
 
         # Cleanup whitespace
         t = re.sub(
@@ -6182,7 +6180,7 @@ class Link(BaseLink):
         m = Link.illegal_titles_pattern.search(t)
         if m:
             raise pywikibot.InvalidTitle(
-                '%s contains illegal char(s) %s' % (repr(t), repr(m.group(0))))
+                '%r contains illegal char(s) %r' % (t, m.group(0)))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
