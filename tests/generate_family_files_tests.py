@@ -27,9 +27,9 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
     """Family file test creator."""
 
     def getapis(self):
-        """Only load additional ten additional different wikis randomly."""
+        """Only load up to additional ten different wikis randomly."""
         save = self.langs
-        self.langs = sample(save, 10)
+        self.langs = sample(save, min(len(save), 10))
         self.prefixes = [item['prefix'] for item in self.langs]
         super(FamilyTestGenerator, self).getapis()
         self.langs = save
