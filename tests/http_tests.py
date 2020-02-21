@@ -204,7 +204,7 @@ class TestHttpStatus(HttpbinTestCase):
         # A InvalidSchema is raised within requests
         self.assertRaisesRegex(
             requests.exceptions.InvalidSchema,
-            "No connection adapters were found for 'invalid://url'",
+            "No connection adapters were found for u?'invalid://url'",
             http.fetch, uri='invalid://url')
 
     def test_follow_redirects(self):
