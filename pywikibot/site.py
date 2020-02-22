@@ -7891,17 +7891,20 @@ class DataSite(APISite):
 
     def geo_shape_repository(self):
         """Return Site object for the geo-shapes repository e.g. commons."""
-        # Do this via API instead when T162561 is implemented.
-        code, fam = self.shared_geo_shape_repository()
-        if bool(code or fam):
-            return pywikibot.Site(code, fam, self.username())
+        url = self.siteinfo['general'].get('wikibase-geoshapestoragebaseurl')
+        if url:
+            return pywikibot.Site(url=url, user=self.username())
+        # todo: should this raise?
+        return None
 
     def tabular_data_repository(self):
         """Return Site object for the tabular-datas repository e.g. commons."""
-        # Do this via API instead when T164413 is implemented.
-        code, fam = self.shared_tabular_data_repository()
-        if bool(code or fam):
-            return pywikibot.Site(code, fam, self.username())
+        url = self.siteinfo['general'].get(
+            'wikibase-tabulardatastoragebaseurl')
+        if url:
+            return pywikibot.Site(url=url, user=self.username())
+        # todo: should this raise?
+        return None
 
     def loadcontent(self, identification, *props):
         """

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,16 +49,6 @@ class Family(family.WikimediaFamily):
     def calendarmodel(self, code):
         """Default calendar model for WbTime datatype."""
         return 'http://www.wikidata.org/entity/Q1985727'
-
-    def shared_geo_shape_repository(self, code):
-        """Return Wikimedia Commons as the repository for geo-shapes."""
-        # Per geoShapeStorageFrontendUrl settings in Wikibase
-        return ('commons', 'commons')
-
-    def shared_tabular_data_repository(self, code):
-        """Return Wikimedia Commons as the repository for tabular-datas."""
-        # Per tabularDataStorageFrontendUrl settings in Wikibase
-        return ('commons', 'commons')
 
     def default_globe(self, code):
         """Default globe for Coordinate datatype."""
