@@ -4,7 +4,12 @@ Release history
 Current release
 ---------------
 
+* Let Site('test', 'test) be equal to Site('test', 'wikipedia') (T228839)
 * Support of MediaWiki releases below 1.19 will be dropped (T245350)
+* Provide mediawiki_messages for foreign language codes
+* Use mw API IP/anon user detection (T245318)
+* Correctly choose primary coordinates in BasePage.coordinates() (T244963)
+* Rewrite APISite.page_can_be_edited (T244604)
 * compat module is deprecated for 5 years and will be removed with next release (T183085)
 * ipaddress module is required for Python 2 (T243171)
 * tools.ip will be dropped in favour of tools.is_IP (T243171)
