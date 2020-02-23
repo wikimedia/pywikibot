@@ -8,6 +8,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot import family
+from pywikibot.tools import classproperty
 
 
 # The Wikimedia family that is known as Wikiversity
@@ -18,9 +19,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiversity'
 
     languages_by_size = [
-        'de', 'en', 'fr', 'ru', 'zh', 'it', 'cs', 'beta', 'pt', 'es', 'ar',
-        'sv', 'sl', 'fi', 'el', 'hi', 'ko', 'ja',
+        'de', 'en', 'fr', 'ru', 'zh', 'it', 'cs', 'pt', 'es', 'ar', 'sv', 'sl',
+        'fi', 'el', 'hi', 'ko', 'ja',
     ]
+
+    test_codes = ['beta']
+
+    @classproperty
+    def code_aliases(cls):
+        cls.code_aliases = super(Family, cls).code_aliases.copy()
+        cls.code_aliases['mul'] = 'beta'
+        return cls.code_aliases
 
     category_redirect_templates = {
         '_default': (),

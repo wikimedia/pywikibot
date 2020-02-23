@@ -29,7 +29,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs', 'pt',
-        'www', 'gu', 'fa', 'uk', 'hu', 'ml', 'sv', 'ko', 'sr', 'bn', 'sa',
+        'mul', 'gu', 'fa', 'uk', 'hu', 'ml', 'sv', 'ko', 'sr', 'bn', 'sa',
         'hy', 'sl', 'te', 'el', 'ro', 'fi', 'ja', 'nap', 'vi', 'ta', 'az',
         'ca', 'br', 'th', 'nl', 'kn', 'hr', 'la', 'no', 'is', 'eo', 'vec',
         'tr', 'pms', 'et', 'be', 'da', 'mk', 'id', 'yi', 'bg', 'li', 'mr',
@@ -65,7 +65,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         cls.domains.append(cls.langs['beta'])
         return cls.domains
 
-    languages_by_size.append('mul')
+    # All requests to unknown languages are also redirected to
+    # the main page, so using mul alias, see T114574 and T241413
+    @classproperty
+    def code_aliases(cls):
+        cls.code_aliases = super(Family, cls).code_aliases.copy()
+        aliases = cls.alphabetic + ['-', 'www']
+        for code in aliases:
+            if (code not in cls.languages_by_size
+                    and code not in cls.code_aliases):
+                cls.code_aliases[code] = 'mul'
+        return cls.code_aliases
 
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation

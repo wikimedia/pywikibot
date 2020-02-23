@@ -1026,10 +1026,8 @@ class Family(object):
         if not all(x in NAME_CHARACTERS for x in cls.name):
             warn('Family name %s contains non-ascii characters' % cls.name,
                  FamilyMaintenanceWarning)
-        # FIXME: wikisource uses code '-' for www.wikisource.org
         for code in cls.langs.keys():
-            if not all(x in CODE_CHARACTERS for x in code) and \
-                    (cls.name == 'wikisource' or code[0] != '-'):
+            if not all(x in CODE_CHARACTERS for x in code):
                 warn('Family %s code %s contains non-ascii characters' %
                      (cls.name, code), FamilyMaintenanceWarning)
         Family._families[fam] = cls
@@ -1658,32 +1656,28 @@ class WikimediaFamily(Family):
     # For all except 'nl_nds', subdomains do exist as a redirect, but that
     # should not be relied upon.
     code_aliases = {
-        # Country aliases; see T87002
-        'dk': 'da',  # Wikipedia, Wikibooks and Wiktionary only.
+        # Country aliases, see T87002
+        'dk': 'da',
         'jp': 'ja',
 
-        # Language aliases
-        'nb': 'no',  # T86924
+        # Language aliases, see T86924
+        'nb': 'no',
 
-        # closed wiki redirection aliases
+        # Closed wiki redirection aliases
         'mo': 'ro',
 
-        # Incomplete language code change. T86915
+        # Incomplete language code change, see T86915
         'minnan': 'zh-min-nan',
         'nan': 'zh-min-nan',
 
-        # These two probably only apply to Wikipedia.
-        # Server not found for the other projects.
         'zh-tw': 'zh',
         'zh-cn': 'zh',
 
-        # miss-spelling
+        # Miss-spelling
         'nl_nds': 'nl-nds',
 
-        # Renamed; see T11823
+        # Renamed, see T11823
         'be-x-old': 'be-tarask',
-
-        '-': 'mul',  # T114574
     }
 
     # Not open for edits; stewards can still edit.

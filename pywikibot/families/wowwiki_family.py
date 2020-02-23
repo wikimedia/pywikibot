@@ -24,7 +24,7 @@ class Family(family.SubdomainFamily, family.FandomFamily):
         'pt-br', 'ru', 'sk', 'tr', 'uk', 'zh', 'zh-tw'
     )
 
-    interwiki_removals = ['hr', 'ro', 'sr', 'sv']
+    removed_wikis = ['hr', 'ro', 'sr', 'sv']
 
     @classproperty
     @deprecated('codes attribute', since='20190422')
