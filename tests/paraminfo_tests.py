@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -222,16 +222,6 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     """Verify Wikibase types using paraminfo."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Set up the test class."""
-        super(WikibaseKnownTypesTests, cls).setUpClass()
-        for site in cls.sites.values():
-            if site['site'].family.name.endswith('beta'):
-                raise unittest.SkipTest(
-                    '{}: skipping {!r} due to Bug T210322'
-                    .format(cls.__name__, site['site']))
-
     def test_entities(self):
         """Test known entities."""
         unsupported = {'form', 'lexeme', 'sense'}  # T195435
@@ -246,6 +236,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         unsupported = {
             'wikibase-form', 'wikibase-lexeme', 'wikibase-sense',  # T194890
             'musical-notation',  # T218506
+            'entity-schema',  # T245949
         }
         known = set(Property.types) | unsupported
         self._check_param_superset(
