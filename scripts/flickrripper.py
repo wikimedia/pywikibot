@@ -52,7 +52,7 @@ try:
 except ImportError as e:
     flickrapi = e
 
-
+# see https://www.flickr.com/services/api/flickr.photos.licenses.getInfo.html
 flickr_allowed_license = {
     0: False,  # All Rights Reserved
     1: False,  # Creative Commons Attribution-NonCommercial-ShareAlike License
@@ -63,6 +63,8 @@ flickr_allowed_license = {
     6: False,  # Creative Commons Attribution-NoDerivs License
     7: True,   # No known copyright restrictions
     8: True,   # United States Government Work
+    9: True,   # Public Domain Dedication (CC0)
+    10:True,   #Public Domain Mark
 }
 
 
