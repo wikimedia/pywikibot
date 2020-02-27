@@ -187,8 +187,8 @@ def getFilename(photoInfo, site=None, project='Flickr'):
                 description = description[:items]
             title = cleanUpTitle(description)
         else:
-            title = ''
-            # Should probably have the id of the photo as last resort.
+            # Use the id of the photo as last resort.
+            title = photoInfo.find('photo').attrib['id']
 
     if pywikibot.Page(site, 'File:{} - {} - {}.jpg'
                       .format(title, project, username)).exists():
