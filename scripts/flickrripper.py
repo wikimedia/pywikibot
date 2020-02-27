@@ -226,7 +226,7 @@ def cleanUpTitle(title):
     title = re.sub('[;]', ',', title)
     title = re.sub(r'[/+\\:]', '-', title)
     title = re.sub('--+', '-', title)
-    title = re.sub(',,+', ',', title)
+    title = re.sub('[,|]+', ',', title)
     title = re.sub('[-,^]([.]|$)', r'\1', title)
     title = title.replace(' ', '_')
     title = title.strip('_')
