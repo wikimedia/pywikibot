@@ -4158,21 +4158,34 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if diffto and 'claims' in diffto:
             temp = defaultdict(list)
-            claim_ids = set()
+            props_add = set(claims.keys())
+            props_orig = set(diffto['claims'].keys())
+            for prop in (props_orig | props_add):
+                if prop not in props_orig:
+                    temp[prop].extend(claims[prop])
+                    continue
+                if prop not in props_add:
+                    temp[prop].extend(
+                        {'id': claim['id'], 'remove': ''}
+                        for claim in diffto['claims'][prop] if 'id' in claim)
+                    continue
 
-            diffto_claims = diffto['claims']
+                claim_ids = set()
+                claim_map = {
+                    json['id']: json for json in diffto['claims'][prop]
+                    if 'id' in json}
+                for claim, json in zip(self.claims[prop], claims[prop]):
+                    if 'id' in json:
+                        claim_ids.add(json['id'])
+                        if json['id'] in claim_map:
+                            other = Claim.fromJSON(
+                                self.repo, claim_map[json['id']])
+                            if claim.same_as(other, ignore_rank=False,
+                                             ignore_refs=False):
+                                continue
+                    temp[prop].append(json)
 
-            for prop in claims:
-                for claim in claims[prop]:
-                    if (prop not in diffto_claims
-                            or claim not in diffto_claims[prop]):
-                        temp[prop].append(claim)
-
-                    if 'id' in claim:
-                        claim_ids.add(claim['id'])
-
-            for prop, prop_claims in diffto_claims.items():
-                for claim in prop_claims:
+                for claim in diffto['claims'][prop]:
                     if 'id' in claim and claim['id'] not in claim_ids:
                         temp[prop].append({'id': claim['id'], 'remove': ''})
 
@@ -5125,24 +5138,55 @@ class Claim(Property):
         if not isinstance(other, self.__class__):
             return False
 
-        for attr in ('id', 'snaktype', 'target'):
-            if getattr(self, attr) != getattr(other, attr):
-                return False
-
-        my_qualifiers = list(chain.from_iterable(self.qualifiers.values()))
-        other_qualifiers = list(chain.from_iterable(other.qualifiers.values()))
-        if len(my_qualifiers) != len(other_qualifiers):
-            return False
-        for q in my_qualifiers:
-            if q not in other_qualifiers:
-                return False
-        for q in other_qualifiers:
-            if q not in my_qualifiers:
-                return False
-        return True
+        return self.same_as(other)
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    @staticmethod
+    def _claim_mapping_same(this, other):
+        if len(this) != len(other):
+            return False
+        my_values = list(chain.from_iterable(this.values()))
+        other_values = list(chain.from_iterable(other.values()))
+        if len(my_values) != len(other_values):
+            return False
+        for val in my_values:
+            if val not in other_values:
+                return False
+        for val in other_values:
+            if val not in my_values:
+                return False
+        return True
+
+    def same_as(self, other, ignore_rank=True, ignore_quals=False,
+                ignore_refs=True):
+        """Check if two claims are same."""
+        if ignore_rank:
+            attributes = ['id', 'snaktype', 'target']
+        else:
+            attributes = ['id', 'snaktype', 'rank', 'target']
+        for attr in attributes:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        if not ignore_quals:
+            if not self._claim_mapping_same(self.qualifiers, other.qualifiers):
+                return False
+
+        if not ignore_refs:
+            if len(self.sources) != len(other.sources):
+                return False
+            for source in self.sources:
+                same = False
+                for other_source in other.sources:
+                    if self._claim_mapping_same(source, other_source):
+                        same = True
+                        break
+                if not same:
+                    return False
+
+        return True
 
     def copy(self):
         """
