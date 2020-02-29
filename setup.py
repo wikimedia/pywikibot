@@ -83,7 +83,8 @@ extra_deps = {
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
     'flickrripper.py': [
-        'flickrapi',
+        'flickrapi<3.0.0;python_version<"3.5"',
+        'flickrapi>=2.2;python_version>="3.5"',
         'Pillow<7.0.0;python_version<"3"',
         'Pillow<6.0.0;python_version=="3.4"',
         'Pillow;python_version>="3.5"',

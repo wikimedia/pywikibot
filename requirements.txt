@@ -50,7 +50,8 @@ google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
 # scripts/flickrripper.py
-flickrapi
+flickrapi < 3.0.0 ; python_version < '3.5'
+flickrapi >= 2.2 ; python_version >= '3.5'
 
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3
