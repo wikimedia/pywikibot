@@ -77,9 +77,9 @@ def getPhoto(flickr, photo_id):
     """
     while True:
         try:
-            photoInfo = flickr.photos_getInfo(photo_id=photo_id)
+            photoInfo = flickr.photos.getInfo(photo_id=photo_id)
             # xml.etree.ElementTree.dump(photoInfo)
-            photoSizes = flickr.photos_getSizes(photo_id=photo_id)
+            photoSizes = flickr.photos.getSizes(photo_id=photo_id)
             # xml.etree.ElementTree.dump(photoSizes)
             return photoInfo, photoSizes
         except flickrapi.exceptions.FlickrError:
