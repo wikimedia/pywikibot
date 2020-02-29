@@ -12,7 +12,7 @@ This module is responsible for
     - Basic HTTP error handling
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -244,10 +244,9 @@ def get_fake_user_agent():
     """
     if isinstance(config.fake_user_agent, StringTypes):
         return config.fake_user_agent
-    elif config.fake_user_agent or config.fake_user_agent is None:
-        return fake_user_agent()
-    else:
+    if config.fake_user_agent is False:
         return user_agent()
+    return fake_user_agent()
 
 
 def fake_user_agent():
@@ -257,11 +256,11 @@ def fake_user_agent():
     @rtype: str
     """
     try:
-        import fake_useragent
-        return fake_useragent.fake.UserAgent().random
+        from fake_useragent import UserAgent
     except ImportError:
         raise ImportError(  # Actually complain when fake_useragent is missing.
             'fake_useragent must be installed to get fake UAs.')
+    return UserAgent().random
 
 
 @deprecate_arg('ssl', None)
