@@ -242,11 +242,17 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
     The description is based on the info from flickrinfo and improved.
 
     """
-    description = '== {{int:filedesc}} ==\n{}'.format(flinfoDescription)
+    description = flinfoDescription
+    # use template {{Taken on}}
+    datetaken = re.search(r'\|Date=(.*)\n', description).group(1)
+    if datetaken:
+        datetaken = '{{Taken on|%s}}' % (datetaken)
+        description = re.sub(r'\|Date=.*\n', '|Date={}\n'.format(datetaken),
+                             description)
     if removeCategories:
         description = textlib.removeCategoryLinks(description,
-                                                  pywikibot.Site(
-                                                      'commons', 'commons'))
+                                                  pywikibot.Site('commons',
+                                                                 'commons'))
     if override:
         description = description.replace('{{cc-by-sa-2.0}}\n', '')
         description = description.replace('{{cc-by-2.0}}\n', '')
@@ -266,7 +272,7 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
                 '{{subst:CURRENTDAY2}}}}' % reviewer)
     if addCategory:
         description = description.replace('{{subst:unc}}\n', '')
-        description = description + '\n[[Category:' + addCategory + ']]\n'
+        description += '\n[[Category:{}]]\n'.format(addCategory)
     description = description.replace('\r\n', '\n')
     return description
 
