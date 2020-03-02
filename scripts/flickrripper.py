@@ -191,18 +191,19 @@ def getFilename(photoInfo, site=None, project='Flickr'):
         else:
             # Use the id of the photo as last resort.
             title = photoInfo.find('photo').attrib['id']
-
-    if pywikibot.Page(site, 'File:{} - {} - {}.jpg'
-                      .format(title, project, username)).exists():
+    fileformat = photoInfo.find('photo').attrib['originalformat']
+    if pywikibot.Page(site, 'File:{} - {} - {}.{}'
+                      .format(title, project, username, fileformat)).exists():
         i = 1
         while True:
-            name = '{} - {} - {} ({}).jpg'.format(title, project, username, i)
+            name = '{} - {} - {} ({}).{}'.format(title, project, username,
+                                                 i, fileformat)
             if pywikibot.Page(site, 'File:' + name).exists():
                 i += 1
             else:
                 return name
     else:
-        return '{} - {} - {}.jpg'.format(title, project, username)
+        return '{} - {} - {}.{}'.format(title, project, username, fileformat)
 
 
 def cleanUpTitle(title):
