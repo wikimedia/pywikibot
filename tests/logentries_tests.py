@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
 import pywikibot
@@ -20,7 +18,6 @@ from tests import unittest_print
 from tests.aspects import (
     unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
 )
-from tests.utils import add_metaclass
 
 
 class TestLogentriesBase(TestCase):
@@ -67,13 +64,17 @@ class TestLogentriesBase(TestCase):
         logentry = self._get_logentry(logtype)
         self.assertIn(logtype, logentry.__class__.__name__.lower())
         self.assertEqual(logentry._expected_type, logtype)
+
         if logtype not in LogEntryFactory._logtypes:
             self.assertIsInstance(logentry, OtherLogEntry)
+
         if self.site_key == 'old':
             self.assertNotIn('params', logentry.data)
         else:
             self.assertNotIn(logentry.type(), logentry.data)
+
         self.assertIsInstance(logentry.action(), UnicodeType)
+
         try:
             self.assertIsInstance(logentry.comment(), UnicodeType)
         except HiddenKeyError as e:
@@ -83,11 +84,21 @@ class TestLogentriesBase(TestCase):
                 r"don't have permission to view it\.")
         except KeyError as e:
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
+        else:
+            self.assertEqual(logentry.comment(), logentry['comment'])
+
         self.assertIsInstance(logentry.logid(), int)
         self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
+
         if 'title' in logentry.data:  # title may be missing
             self.assertIsInstance(logentry.ns(), int)
             self.assertIsInstance(logentry.pageid(), int)
+
+            # test new UserDict style
+            self.assertEqual(logentry.data['title'], logentry['title'])
+            self.assertEqual(logentry.ns(), logentry['ns'])
+            self.assertEqual(logentry.pageid(), logentry['pageid'])
+
             self.assertGreaterEqual(logentry.ns(), -2)
             self.assertGreaterEqual(logentry.pageid(), 0)
             if logtype == 'block' and logentry.isAutoblockRemoval:
@@ -100,9 +111,15 @@ class TestLogentriesBase(TestCase):
                 self.assertIsInstance(logentry.page(), pywikibot.Page)
         else:
             self.assertRaises(KeyError, logentry.page)
+
         self.assertEqual(logentry.type(), logtype)
         self.assertIsInstance(logentry.user(), UnicodeType)
         self.assertGreaterEqual(logentry.logid(), 0)
+
+        # test new UserDict style
+        self.assertEqual(logentry.type(), logentry['type'])
+        self.assertEqual(logentry.user(), logentry['user'])
+        self.assertEqual(logentry.logid(), logentry['logid'])
 
 
 class TestLogentriesMeta(MetaTestCaseClass):
@@ -128,12 +145,9 @@ class TestLogentriesMeta(MetaTestCaseClass):
         return super(TestLogentriesMeta, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestLogentries(TestLogentriesBase):
+class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
 
     """Test general LogEntry properties."""
-
-    __metaclass__ = TestLogentriesMeta
 
 
 class TestSimpleLogentries(TestLogentriesBase):
