@@ -268,6 +268,9 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
                 '{{flickrreview|%s|'
                 '{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-'
                 '{{subst:CURRENTDAY2}}}}' % reviewer)
+    if '{{subst:unc}}' not in description:
+        # Request category check
+        description += '\n{{subst:chc}}\n'
     if addCategory:
         description = description.replace('{{subst:unc}}\n', '')
         description = description + '\n[[Category:' + addCategory + ']]\n'
