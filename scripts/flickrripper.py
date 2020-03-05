@@ -141,12 +141,16 @@ def findDuplicateImages(photo, site=None):
     return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
 
-def getTags(photoInfo):
+def getTags(photoInfo, raw=False):
     """Get all the tags on a photo."""
     result = []
     for tag in photoInfo.find('photo').find('tags').findall('tag'):
-        result.append(tag.text.lower())
-
+        if raw:
+            # use original tag name
+            # see https://www.flickr.com/services/api/misc.tags.html
+            result.append(tag.attrib['raw'].lower())
+        else:
+            result.append(tag.text.lower())
     return result
 
 
