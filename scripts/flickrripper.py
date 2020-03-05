@@ -171,6 +171,7 @@ def getFilename(photoInfo, site=None, project='Flickr'):
     if not site:
         site = pywikibot.Site('commons', 'commons')
     username = photoInfo.find('photo').find('owner').attrib['username']
+    username = cleanUpTitle(username)
     title = photoInfo.find('photo').find('title').text
     if title:
         title = cleanUpTitle(title)
@@ -191,6 +192,7 @@ def getFilename(photoInfo, site=None, project='Flickr'):
         else:
             # Use the id of the photo as last resort.
             title = photoInfo.find('photo').attrib['id']
+
     fileformat = photoInfo.find('photo').attrib['originalformat']
     if pywikibot.Page(site, 'File:{} - {} - {}.{}'
                       .format(title, project, username, fileformat)).exists():
