@@ -6,16 +6,13 @@
 # Distributed under the terms of the MIT license.
 #
 import json
-import re
 
 from contextlib import suppress
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse
-
 from requests.exceptions import RequestException
 
 import pywikibot
-
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion
@@ -29,13 +26,6 @@ class MWSite:
 
     """Minimal wiki site class."""
 
-    REwgEnableApi = re.compile(r'wgEnableAPI ?= ?true')
-    REwgServer = re.compile(r'wgServer ?= ?"([^"]*)"')
-    REwgScriptPath = re.compile(r'wgScriptPath ?= ?"([^"]*)"')
-    REwgArticlePath = re.compile(r'wgArticlePath ?= ?"([^"]*)"')
-    REwgContentLanguage = re.compile(r'wgContentLanguage ?= ?"([^"]*)"')
-    REwgVersion = re.compile(r'wgVersion ?= ?"([^"]*)"')
-
     def __init__(self, fromurl):
         """
         Initializer.
@@ -43,7 +33,7 @@ class MWSite:
         @raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
         @raises Timeout: a timeout occurred while loading the site
-        @raises RuntimeError: Version not found or version less than 1.14
+        @raises RuntimeError: Version not found or version less than 1.19
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
@@ -66,18 +56,13 @@ class MWSite:
         self.scriptpath = wp.scriptpath
         self.articlepath = None
 
-        try:
-            self._parse_pre_117(data)
-        except Exception as e:
-            pywikibot.log('MW pre-1.17 detection failed: {0!r}'.format(e))
-
         if self.api:
             try:
-                self._parse_post_117()
+                self._parse_site()
             except (ServerError, RequestException):
                 raise
             except Exception as e:
-                pywikibot.log('MW 1.17+ detection failed: {0!r}'.format(e))
+                pywikibot.log('MW detection failed: {0!r}'.format(e))
 
             if not self.version:
                 self._fetch_old_version()
@@ -98,7 +83,7 @@ class MWSite:
                                    '{0}'.format(self.fromurl))
 
         if (not self.version
-                or self.version < MediaWikiVersion('1.14')):
+                or self.version < MediaWikiVersion('1.19')):
             raise RuntimeError('Unsupported version: {0}'.format(self.version))
 
     def __repr__(self):
@@ -118,21 +103,6 @@ class MWSite:
                                             iw['error']['info']))
         return [wiki for wiki in iw['query']['interwikimap']
                 if 'language' in wiki]
-
-    def _parse_pre_117(self, data):
-        """Parse HTML."""
-        if not self.REwgEnableApi.search(data):
-            pywikibot.log(
-                'wgEnableApi is not enabled in HTML of %s'
-                % self.fromurl)
-        with suppress(AttributeError):
-            self.version = MediaWikiVersion(
-                self.REwgVersion.search(data).group(1))
-
-        self.server = self.REwgServer.search(data).groups()[0]
-        self.scriptpath = self.REwgScriptPath.search(data).groups()[0]
-        self.articlepath = self.REwgArticlePath.search(data).groups()[0]
-        self.lang = self.REwgContentLanguage.search(data).groups()[0]
 
     def _fetch_old_version(self):
         """Extract the version from API help with ?version enabled."""
@@ -154,8 +124,8 @@ class MWSite:
             else:
                 self.version = MediaWikiVersion(self.version)
 
-    def _parse_post_117(self):
-        """Parse 1.17+ siteinfo data."""
+    def _parse_site(self):
+        """Parse siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
         check_response(response)
         # remove preleading newlines and Byte Order Mark (BOM), see T128992

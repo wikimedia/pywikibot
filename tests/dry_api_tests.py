@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
 import pywikibot
@@ -45,7 +43,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def setUp(self):
         """Initialize the fake requests."""
-        super(DryCachedRequestTests, self).setUp()
+        super().setUp()
         self.parms = {'action': 'query',
                       'meta': 'userinfo'}
         self.req = CachedRequest(expiry=1, site=self.basesite,
@@ -157,7 +155,7 @@ class MockCachedRequestKeyTests(TestCase):
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
-                return '1.14'  # lowest supported release
+                return '1.19'  # lowest supported release
 
             def protocol(self):
                 return 'http'
@@ -185,7 +183,7 @@ class MockCachedRequestKeyTests(TestCase):
                 raise Exception('Attribute {!r} not defined'.format(attr))
 
         self.mocksite = MockSite()
-        super(MockCachedRequestKeyTests, self).setUp()
+        super().setUp()
 
     def test_cachefile_path_different_users(self):
         """Test and compare file paths when different usernames are used."""
@@ -385,7 +383,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
 
     def setUp(self):
         """Add a real ParamInfo to the DrySite."""
-        super(ParamInfoDictTests, self).setUp()
+        super().setUp()
         site = self.get_site()
         site._paraminfo = ParamInfo(site)
         # Pretend that paraminfo has been loaded

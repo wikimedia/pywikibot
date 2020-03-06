@@ -88,9 +88,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
-        if self.site.mw_version < '1.16':
-            self.skipTest('requires v1.16+')
-
         old = self.site.siteinfo('general')
         self.assertIn('time', old)
         self.assertEqual(old, self.site.siteinfo['general'])
@@ -276,14 +273,13 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))
         self.assertTrue(mysite.sametitle('Test name', 'Test name'))
         self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
-        # User, MediaWiki (both since 1.16) and Special are always
+        # User, MediaWiki and Special are always
         # first-letter (== only first non-namespace letter is case insensitive)
         # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
         self.assertTrue(mysite.sametitle('Special:Always', 'Special:always'))
-        if mysite.mw_version >= '1.16':
-            self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
-            self.assertTrue(mysite.sametitle('MediaWiki:Always',
-                                             'MediaWiki:always'))
+        self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
+        self.assertTrue(mysite.sametitle('MediaWiki:Always',
+                                         'MediaWiki:always'))
 
     def test_constructors(self):
         """Test cases for site constructors."""
@@ -964,9 +960,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
-        if self.site.mw_version < '1.15':
-            self.skipTest('requires v1.15+')
-
         pages = list(self.get_site().protectedpages(type='create', total=10))
         # Do not check for the existence of pages as they might exist (T205883)
         self.assertLessEqual(len(pages), 10)
@@ -1478,22 +1471,6 @@ class TestRecentChanges(DefaultSiteTestCase):
             prefix = title[:title.index(':')]
             self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
             self.assertIn(change['ns'], [6, 7])
-
-    def test_pagelist(self):
-        """Test the site.recentchanges() with pagelist deprecated MW 1.14."""
-        mysite = self.site
-        mainpage = self.get_mainpage()
-        imagepage = self.imagepage
-        if mysite.mw_version <= '1.14':
-            pagelist = [mainpage]
-            if imagepage:
-                pagelist += [imagepage]
-            titlelist = {page.title() for page in pagelist}
-            for change in mysite.recentchanges(pagelist=pagelist,
-                                               total=5):
-                self.assertIsInstance(change, dict)
-                self.assertIn('title', change)
-                self.assertIn(change['title'], titlelist)
 
     def test_changetype(self):
         """Test the site.recentchanges() with changetype."""
@@ -2249,12 +2226,8 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def _test_tokens(self, version, test_version, additional_token):
         """Test tokens."""
-        if version and self._version < version:
-            raise unittest.SkipTest(
-                'Site {} version {} is too low for this tests.'
-                .format(self.mysite, self._version))
-
-        if version and self._version < test_version:
+        if version and (self._version < version
+                        or self._version < test_version):
             raise unittest.SkipTest(
                 'Site {} version {} is too low for this tests.'
                 .format(self.mysite, self._version))
@@ -2283,17 +2256,13 @@ class TestSiteTokens(DefaultSiteTestCase):
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
 
-    def test_patrol_tokens_in_mw_116(self):
-        """Test ability to get patrol token on MW 1.16 wiki."""
-        self._test_tokens('1.14', '1.16', 'patrol')
-
     def test_tokens_in_mw_119(self):
         """Test ability to get page tokens."""
         self._test_tokens(None, '1.19', 'delete')
 
     def test_patrol_tokens_in_mw_119(self):
         """Test ability to get patrol token on MW 1.19 wiki."""
-        self._test_tokens('1.14', '1.19', 'patrol')
+        self._test_tokens('1.19', '1.19', 'patrol')
 
     def test_tokens_in_mw_120_124wmf18(self):
         """Test ability to get page tokens."""
@@ -2301,7 +2270,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_patrol_tokens_in_mw_120(self):
         """Test ability to get patrol token."""
-        self._test_tokens('1.14', '1.20', 'patrol')
+        self._test_tokens('1.19', '1.20', 'patrol')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
@@ -2429,6 +2398,11 @@ class TestSiteInfo(DefaultSiteTestCase):
                          '([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)')
         self.assertIn(mysite.siteinfo['case'], ['first-letter',
                                                 'case-sensitive'])
+        self.assertIsInstance(
+            datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
+            datetime)
+        self.assertEqual(re.findall(r'\$1', mysite.siteinfo['articlepath']),
+                         ['$1'])
 
     def test_siteinfo_boolean(self):
         """Test conversion of boolean properties from empty strings."""
@@ -2437,18 +2411,6 @@ class TestSiteInfo(DefaultSiteTestCase):
 
         self.assertIsInstance(mysite.namespaces[0].subpages, bool)
         self.assertIsInstance(mysite.namespaces[0].content, bool)
-
-    def test_siteinfo_v1_16(self):
-        """Test v.16+ siteinfo values."""
-        if self.site.mw_version < '1.16':
-            self.skipTest('requires v1.16+')
-
-        mysite = self.get_site()
-        self.assertIsInstance(
-            datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
-            datetime)
-        self.assertEqual(re.findall(r'\$1', mysite.siteinfo['articlepath']),
-                         ['$1'])
 
     def test_properties_with_defaults(self):
         """Test the siteinfo properties with defaults."""
