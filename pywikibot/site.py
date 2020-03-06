@@ -781,11 +781,6 @@ class BaseSite(ComparableMixin):
         self._pagemutex = threading.Condition()
         self._locked_pages = set()
 
-    @deprecated(since='20141225', future_warning=True)
-    def has_api(self):
-        """Return whether this site has an API."""
-        return False
-
     @property
     @deprecated(
         "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'",
@@ -1912,11 +1907,6 @@ class APISite(BaseSite):
                     if site['dbname'] == dbname:
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of %s.' % dbname)
-
-    @deprecated(since='20141225', future_warning=True)
-    def has_api(self):
-        """Return whether this site has an API."""
-        return True
 
     @deprecated_args(step=None)
     def _generator(self, gen_class, type_arg=None, namespaces=None,
