@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Site.has_api method has been removed (T106121)
 * Bugfixes and improvements
 * Localisation updates
 
