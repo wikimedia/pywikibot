@@ -320,6 +320,11 @@ def processPhoto(flickr, photo_id='', flickrreview=False, reviewer='',
         else:
             filename = getFilename(photoInfo, photo_url=photoUrl)
             flinfoDescription = getFlinfoDescription(photo_id)
+            if 'Blacklisted user' in flinfoDescription:
+                pywikibot.warning('Blacklisted user found:\n'
+                                  + flinfoDescription)
+                return 0
+
             photoDescription = buildDescription(flinfoDescription,
                                                 flickrreview, reviewer,
                                                 override, addCategory,
