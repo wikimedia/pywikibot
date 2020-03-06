@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* backports.py has been removed (T244664)
 * Site.has_api method has been removed (T106121)
 * Bugfixes and improvements
 * Localisation updates
