@@ -12,6 +12,7 @@ environment:
   PYWIKIBOT_USER_CONFIG: "%appdata%\\Pywikibot\\user-config.py"
 
   PYSETUP_TEST_EXTRAS: "1"
+  PYSETUP_TEST_NO_UI: "1"
 
   matrix:
 
@@ -108,7 +109,6 @@ test_script:
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''wikidata''][''test''] = ''$env:PYWIKIBOT_USERNAME'';')"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''commons''][''commons''] = ''$env:PYWIKIBOT_USERNAME'';')"
 
-  - set PYSETUP_TEST_NO_UI=1
   - "%CMD_IN_ENV% coverage run setup.py test"
 
 on_finish:
