@@ -166,7 +166,7 @@ def getFlinfoDescription(photo_id):
         'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).text
 
 
-def getFilename(photoInfo, site=None, project='Flickr'):
+def getFilename(photoInfo, site=None, project='Flickr', photo_url=None):
     """Build a good filename for the upload based on the username and title.
 
     Prevents naming collisions.
@@ -198,6 +198,9 @@ def getFilename(photoInfo, site=None, project='Flickr'):
             title = photoInfo.find('photo').attrib['id']
 
     fileformat = photoInfo.find('photo').attrib['originalformat']
+    if not fileformat and photo_url:
+        fileformat = photo_url.split('.')[-1]
+
     if pywikibot.Page(site, 'File:{} - {} - {}.{}'
                       .format(title, project, username, fileformat)).exists():
         i = 1
@@ -315,7 +318,7 @@ def processPhoto(flickr, photo_id='', flickrreview=False, reviewer='',
             pywikibot.output('Found duplicate image at {}'
                              .format(duplicates.pop()))
         else:
-            filename = getFilename(photoInfo)
+            filename = getFilename(photoInfo, photo_url=photoUrl)
             flinfoDescription = getFlinfoDescription(photo_id)
             photoDescription = buildDescription(flinfoDescription,
                                                 flickrreview, reviewer,
