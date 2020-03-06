@@ -5606,7 +5606,7 @@ class Revision(DotReadableDict):
 
     def __init__(self, revid, timestamp, user, anon=False, comment='',
                  text=None, minor=False, rollbacktoken=None, parentid=None,
-                 contentmodel=None, sha1=None):
+                 contentmodel=None, sha1=None, slots=None):
         """
         Initializer.
 
@@ -5635,9 +5635,11 @@ class Revision(DotReadableDict):
         @type contentmodel: str
         @param sha1: sha1 of revision text (v1.19+)
         @type sha1: str
+        @param slots: revision slots (v1.32+)
+        @type slots: dict
         """
         self.revid = revid
-        self.text = text
+        self._text = text
         self.timestamp = timestamp
         self.user = user
         self.anon = anon
@@ -5647,6 +5649,7 @@ class Revision(DotReadableDict):
         self._parent_id = parentid
         self._content_model = contentmodel
         self._sha1 = sha1
+        self.slots = slots
 
     @property
     def parent_id(self):
@@ -5666,15 +5669,38 @@ class Revision(DotReadableDict):
         return self._parent_id
 
     @property
+    def text(self):
+        """
+        Return text of this revision.
+
+        This is meant for compatibility with older MW version which
+        didn't support revisions with slots. For newer MW versions,
+        this returns the contents of the main slot.
+
+        @return: text of the revision
+        @rtype: str or None if text not yet retrieved
+        """
+        if self.slots is not None:
+            return self.slots.get('main', {}).get('*')
+        return self._text
+
+    @property
     def content_model(self):
         """
         Return content model of the revision.
+
+        This is meant for compatibility with older MW version which
+        didn't support revisions with slots. For newer MW versions,
+        this returns the content model of the main slot.
 
         @return: content model
         @rtype: str
         @raises AssertionError: content model not supplied to the constructor
             which always occurs for MediaWiki versions lower than 1.21.
         """
+        if self._content_model is None and self.slots is not None:
+            self._content_model = self.slots.get('main', {}).get(
+                'contentmodel')
         # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
         assert self._content_model is not None, (
             'Revision {0} was instantiated without a content model'

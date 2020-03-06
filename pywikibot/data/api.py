@@ -3258,8 +3258,6 @@ def _update_revisions(page, revisions):
     """Update page revisions."""
     # TODO: T102735: Use the page content model for <1.21
     for rev in revisions:
-        if 'slots' in rev and 'main' in rev['slots']:  # MW 1.32+
-            rev.update(rev['slots']['main'])
         revision = pywikibot.page.Revision(
             revid=rev['revid'],
             timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
@@ -3267,10 +3265,11 @@ def _update_revisions(page, revisions):
             anon='anon' in rev,
             comment=rev.get('comment', ''),
             minor='minor' in rev,
-            text=rev.get('*'),
+            slots=rev.get('slots'),  # MW 1.32+
+            text=rev.get('*'),  # b/c
             rollbacktoken=rev.get('rollbacktoken'),
             parentid=rev.get('parentid'),
-            contentmodel=rev.get('contentmodel'),
+            contentmodel=rev.get('contentmodel'),  # b/c
             sha1=rev.get('sha1')
         )
         page._revisions[revision.revid] = revision
