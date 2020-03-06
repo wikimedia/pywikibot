@@ -9,9 +9,6 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _wbtypes.py                | Wikibase data type classes                           |
     +----------------------------+------------------------------------------------------+
-    | backports.py               | Deprecated module that contained backports to support|
-    |                            | older Python versions (could be dropped soon)        |
-    +----------------------------+------------------------------------------------------+
     | bot.py                     | User-interface related functions for building bots   |
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |
