@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Fix mul Wikisource aliases (T242537, T241413)
 * Let Site('test', 'test) be equal to Site('test', 'wikipedia') (T228839)
 * Support of MediaWiki releases below 1.19 will be dropped (T245350)
 * Provide mediawiki_messages for foreign language codes
