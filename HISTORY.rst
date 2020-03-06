@@ -17,11 +17,11 @@ Current release
 * Use mw API IP/anon user detection (T245318)
 * Correctly choose primary coordinates in BasePage.coordinates() (T244963)
 * Rewrite APISite.page_can_be_edited (T244604)
-* compat module is deprecated for 5 years and will be removed with next release (T183085)
+* compat module is deprecated for 5 years and will be removed in next release (T183085)
 * ipaddress module is required for Python 2 (T243171)
 * tools.ip will be dropped in favour of tools.is_IP (T243171)
-* tools.ip_regexp is deprecatd for 5 years and will be removed with next release
-* backports.py will be removed with next release (T244664)
+* tools.ip_regexp is deprecatd for 5 years and will be removed in next release
+* backports.py will be removed in next release (T244664)
 * stdnum package is required for ISBN scripts and cosmetic_changes (T132919, T144288, T241141)
 * preload urllib.quote() with Python 2 (T243710, T222623)
 * Drop isbn_hyphenate package due to outdated data (T243157)
@@ -29,7 +29,7 @@ Current release
 * Deprecate/remove sysop parameter in several methods and functions
 * Refactor Wikibase entity namespace handling (T160395)
 * Site.has_api method will be removed in next release
-* Category.copyTo and Category.copyAndKeep will be removed in the next release
+* Category.copyTo and Category.copyAndKeep will be removed in next release
 * weblib module has been removed (T85001)
 * botirc module has been removed (T212632)
 * Bugfixes and improvements
