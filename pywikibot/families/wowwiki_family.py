@@ -20,11 +20,13 @@ class Family(family.FandomFamily):
 
     codes = (
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
-        'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'nn', 'no', 'pl', 'pt',
+        'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'no', 'pl', 'pt',
         'pt-br', 'ru', 'sk', 'sv', 'tr', 'uk', 'zh', 'zh-tw'
     )
 
     removed_wikis = ['hr', 'ro', 'sr']
+
+    code_aliases = {'nn': 'no'}
 
     @classproperty
     @deprecated('codes attribute', since='20190422')
