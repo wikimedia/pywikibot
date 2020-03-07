@@ -253,9 +253,9 @@ class OfflineSiteTestCase(SiteDetectionTestCase):
 
     """Test offline sites."""
 
-    def test_seattlewiki(self):
-        """Test detection of MediaWiki sites for seattlewiki.org."""
-        self.assertNoSite('http://seattlewiki.org/wiki/$1')
+    def test_opensprints_wiki(self):
+        """Test detection of MediaWiki sites for wiki.opensprints.org."""
+        self.assertNoSite('http://wiki.opensprints.org/index.php?title=$1')
 
 
 class OtherSiteTestCase(SiteDetectionTestCase):
