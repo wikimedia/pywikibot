@@ -139,10 +139,19 @@ def handle_args(pwb_py, *args):
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
-def check_modules():
+def check_modules(script=None):
     """Check whether mandatory modules are present."""
     import pkg_resources
-    from setup import dependencies
+    if script:
+        from setup import script_deps
+        try:
+            from pathlib import Path
+        except ImportError:  # Python 2
+            from pathlib2 import Path
+        dependencies = script_deps.get(Path(script).name, [])
+    else:
+        from setup import dependencies
+
     missing_requirements = []
 
     for requirement in pkg_resources.parse_requirements(dependencies):
@@ -347,10 +356,11 @@ def main():
             warn('Parent module %s not found: %s'
                  % (file_package, e), ImportWarning)
 
-    run_python_file(filename,
-                    [filename] + args,
-                    [Path(relative_filename).stem] + argvu[1:],
-                    file_package)
+    if check_modules(filename) or '-help' in args:
+        run_python_file(filename,
+                        [filename] + args,
+                        [Path(relative_filename).stem] + argvu[1:],
+                        file_package)
     return True
 
 
