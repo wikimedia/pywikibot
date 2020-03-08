@@ -96,6 +96,7 @@ script_deps = {
 script_deps['data_ingestion.py'] = extra_deps['csv']
 
 extra_deps.update(script_deps)
+extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 
 # ------- setup install_requires ------- #
 # packages which are mandatory
