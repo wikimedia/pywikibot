@@ -4032,7 +4032,7 @@ class APISite(BaseSite):
             if self.mw_version < '1.18':
                 raise NotImplementedError(
                     'categorymembers: "endprefix" requires MW 1.18+')
-            cmargs['cmendsortkeyprefix'] = endprefix
+            cmargs['gcmendsortkeyprefix'] = endprefix
         elif endprefix:
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'endprefix'")
