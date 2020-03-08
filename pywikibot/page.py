@@ -3798,6 +3798,33 @@ class WikibaseEntity(object):
         """
         return {}
 
+    def toJSON(self, diffto=None):
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        @param diffto: JSON containing entity data
+        @type diffto: dict
+
+        @rtype: dict
+        """
+        return {}
+
+    @classmethod
+    def _normalizeData(cls, data):
+        """
+        Helper function to expand data into the Wikibase API structure.
+
+        @param data: The dict to normalize
+        @type data: dict
+
+        @return: the altered dict from parameter data.
+        @rtype: dict
+        """
+        return {}
+
     def exists(self):
         """
         Determine if an entity exists in the data repository.
@@ -3839,6 +3866,28 @@ class WikibaseEntity(object):
         if 'missing' in self._content:
             raise pywikibot.NoWikibaseEntity(self)
         return {}
+
+    def editEntity(self, data=None, **kwargs):
+        """
+        Edit an entity using Wikibase wbeditentity API.
+
+        @param data: Data to be saved
+        @type data: dict, or None to save the current content of the entity.
+        """
+        if data is None:
+            data = self.toJSON(diffto=getattr(self, '_content', None))
+        else:
+            data = self._normalizeData(data)
+
+        updates = self.repo.editEntity(self, data, **kwargs)
+
+        # the attribute may have been unset in ItemPage
+        if getattr(self, 'id', '-1') == '-1':
+            self.__init__(self.repo, updates['entity']['id'])
+
+        self._content = updates['entity']
+        self.get()
+        return updates
 
     def concept_uri(self):
         """
@@ -4242,6 +4291,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         @return: the altered dict from parameter data.
         @rtype: dict
         """
+        WikibaseEntity._normalizeData(data)
         for prop in ('labels', 'descriptions'):
             if prop not in data:
                 continue
@@ -4303,23 +4353,9 @@ class WikibasePage(BasePage, WikibaseEntity):
         else:
             baserevid = None
 
-        if data is None:
-            data = self.toJSON(
-                diffto=(self._content if hasattr(self, '_content') else None))
-        else:
-            data = WikibasePage._normalizeData(data)
-
-        updates = self.repo.editEntity(self, data,
-                                       baserevid=baserevid, **kwargs)
+        updates = super(WikibasePage, self).editEntity(
+            data, baserevid=baserevid, **kwargs)
         self.latest_revision_id = updates['entity']['lastrevid']
-
-        # todo: this variable is specific to ItemPage
-        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
-        if lazy_loading_id or self.id == '-1':
-            self.__init__(self.site, title=updates['entity']['id'])
-
-        self._content = updates['entity']
-        self.get()
 
     def editLabels(self, labels, **kwargs):
         """
@@ -4807,6 +4843,7 @@ class ItemPage(WikibasePage):
         with a value for 'site' and 'title'.
         """
         data = {}
+        # todo: move to _normalizeData
         for obj in sitelinks:
             if isinstance(obj, Page):
                 db_name = self.getdbName(obj.site)
