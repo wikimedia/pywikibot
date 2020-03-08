@@ -214,48 +214,54 @@ def read_desc(filename):
     return ''.join(desc)
 
 
-name = 'pywikibot'
-setup(
-    name=name,
-    version=get_version(name),
-    description='Python MediaWiki Bot Framework',
-    long_description=read_desc('README.rst'),
-    keywords=['API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
-              'pywikibot', 'pywikipedia', 'pywikipediabot', 'wiki',
-              'wikimedia', 'wikipedia'],
-    maintainer='The Pywikibot team',
-    maintainer_email='pywikibot@lists.wikimedia.org',
-    license='MIT License',
-    packages=[str(name)] + [package
-                            for package in find_packages()
-                            if package.startswith('pywikibot.')],
-    python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    install_requires=dependencies,
-    extras_require=extra_deps,
-    url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
-    download_url='https://tools.wmflabs.org/pywikibot/',
-    test_suite='tests.collector',
-    tests_require=test_deps,
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities',
-    ],
-    use_2to3=False
-)
+def main():
+    """Setup entry point."""
+    name = 'pywikibot'
+    setup(
+        name=name,
+        version=get_version(name),
+        description='Python MediaWiki Bot Framework',
+        long_description=read_desc('README.rst'),
+        keywords=['API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
+                  'pywikibot', 'pywikipedia', 'pywikipediabot', 'wiki',
+                  'wikimedia', 'wikipedia'],
+        maintainer='The Pywikibot team',
+        maintainer_email='pywikibot@lists.wikimedia.org',
+        license='MIT License',
+        packages=[str(name)] + [package
+                                for package in find_packages()
+                                if package.startswith('pywikibot.')],
+        python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+        install_requires=dependencies,
+        extras_require=extra_deps,
+        url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
+        download_url='https://tools.wmflabs.org/pywikibot/',
+        test_suite='tests.collector',
+        tests_require=test_deps,
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Environment :: Console',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: MIT License',
+            'Natural Language :: English',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 2',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.4',
+            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: Implementation :: CPython',
+            'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+            'Topic :: Utilities',
+        ],
+        use_2to3=False
+    )
+
+
+if __name__ == '__main__':
+    main()

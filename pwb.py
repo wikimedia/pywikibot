@@ -33,7 +33,7 @@ from warnings import warn
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 
-versions_required_message = """
+VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
@@ -48,7 +48,7 @@ def python_is_supported():
 
 
 if not python_is_supported():
-    print(versions_required_message.format(version=sys.version))
+    print(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
     sys.exit(1)
 
 pwb = None
@@ -139,6 +139,36 @@ def handle_args(pwb_py, *args):
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
+def check_modules():
+    """Check whether mandatory modules are present."""
+    import pkg_resources
+    from setup import dependencies
+    missing_requirements = []
+
+    for requirement in pkg_resources.parse_requirements(dependencies):
+        if requirement.marker is None \
+           or pkg_resources.evaluate_marker(str(requirement.marker)):
+            try:
+                pkg_resources.resource_exists(requirement, requirement.name)
+            except (pkg_resources.DistributionNotFound,
+                    pkg_resources.VersionConflict) as e:
+                print(e)
+                missing_requirements.append(requirement)
+
+    del pkg_resources
+    del dependencies
+
+    if not missing_requirements:
+        return True
+
+    print('\nPlease install/update required module{} with:\n\n'
+          .format('s' if len(missing_requirements) > 1 else ''))
+    for requirement in missing_requirements:
+        print('    pip install "{}"\n'
+              .format(str(requirement).partition(';')[0]))
+    return False
+
+
 # Establish a normalised path for the directory containing pwb.py.
 # Either it is '.' if the user's current working directory is the same,
 # or it is the absolute path for the directory of pwb.py
@@ -148,12 +178,8 @@ rewrite_path = absolute_path
 if rewrite_path not in sys.path[:2]:
     sys.path.insert(1, rewrite_path)
 
-try:
-    import requests
-except ImportError as e:
-    raise ImportError("{0}\nPython module 'requests' is required.\n"
-                      "Try running 'pip install requests'.".format(e))
-del requests
+if not check_modules():
+    sys.exit()
 
 filename, args, local_args = handle_args(*sys.argv)
 
