@@ -10,7 +10,6 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 import pywikibot.page
 
-from tests import patch
 from tests.aspects import unittest, TestCase
 
 
@@ -169,27 +168,6 @@ class TestCategoryDryObject(TestCase):
     code = 'en'
 
     dry = True
-
-    def test_copy_to(self):
-        """Test the copyTo method."""
-        site = self.get_site()
-        foo_cat = pywikibot.Category(site, 'Category:Foo')
-        with patch.object(pywikibot.Category, 'exists', return_value=True), \
-                patch.object(pywikibot, 'warning') as w:
-            self.assertFalse(foo_cat.copyTo('cattitle', 'message'))
-            w.assert_called_once_with(
-                'Target page Category:Cattitle already exists!')
-
-    def test_copy_and_keep(self):
-        """Test the copyAndKeep method."""
-        site = self.get_site()
-        foo_cat = pywikibot.Category(site, 'Category:Foo')
-        with patch.object(pywikibot.Category, 'exists', return_value=True), \
-                patch.object(pywikibot, 'warning') as w:
-            self.assertFalse(
-                foo_cat.copyAndKeep('cattitle', [], 'message'))
-            w.assert_called_once_with(
-                'Target page Category:Cattitle already exists!')
 
     def test_init_dry(self):
         """Test the category's __init__."""

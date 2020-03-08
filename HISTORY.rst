@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Category.copyTo and Category.copyAndKeep methods have been removed
 * Use site.userinfo getter instead of site._userinfo within api (T243794)
 * Fix endprefix parameter in Category.articles() (T247201)
 * Fix search for changed claims when saving entity (T246359)
