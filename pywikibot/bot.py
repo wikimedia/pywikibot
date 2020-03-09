@@ -103,6 +103,11 @@ try:
 except ImportError:  # PY2
     import ConfigParser as configparser  # noqa: N813
 
+try:
+    from pathlib import Path
+except ImportError:  # PY2
+    from pathlib2 import Path
+
 from textwrap import fill
 
 import pywikibot
@@ -878,12 +883,7 @@ def calledModuleName():
 
     @rtype: str
     """
-    # get commandline arguments
-    called = pywikibot.argvu[0].strip()
-    if '.py' in called:  # could end with .pyc, .pyw, etc. on some platforms
-        # clip off the '.py?' filename extension
-        called = called[:called.rindex('.py')]
-    return os.path.basename(called)
+    return Path(pywikibot.argvu[0]).stem
 
 
 def handle_args(args=None, do_help=True):
