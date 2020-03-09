@@ -14,7 +14,7 @@ to set the default site like (see T216825):
 
     python pwb.py -lang:de bot_tests -v
 """
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -184,6 +184,11 @@ except RuntimeError:
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
 
+try:
+    from pathlib import Path
+except ImportError:  # Python 2
+    from pathlib2 import Path
+
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
@@ -317,7 +322,10 @@ def main():
             warn('Parent module %s not found: %s'
                  % (file_package, e), ImportWarning)
 
-    run_python_file(filename, [filename] + args, argvu, file_package)
+    run_python_file(filename,
+                    [filename] + args,
+                    [Path(relative_filename).stem] + argvu[1:],
+                    file_package)
     return True
 
 
