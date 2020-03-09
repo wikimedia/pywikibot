@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2019
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -301,8 +301,11 @@ class TestEventSource(TestCase):
         ValueError 'Unterminated string' when json.load is processed
         if the limit is high enough.
         """
+        try:
+            self.es = EventStreamsTestClass(streams='recentchange')
+        except NotImplementedError as e:
+            self.skipTest(e)
         limit = 50
-        self.es = EventStreamsTestClass(streams='recentchange')
         self.es.set_maximum_items(limit)
         self.assertLength(list(self.es), limit)
 
