@@ -82,7 +82,7 @@ Contributing
 ------------
 
 Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
-`learn <https://www.mediawiki.org/wiki/Developer_access>`_ how to get
+`learn <https://www.mediawiki.org/wiki/Developer_account>`_ how to get
 started.
 
 .. include:: CODE_OF_CONDUCT.rst
