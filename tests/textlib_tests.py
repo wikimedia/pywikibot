@@ -16,7 +16,7 @@ from contextlib import suppress
 import pywikibot
 import pywikibot.textlib as textlib
 
-from pywikibot.site import _IWEntry
+from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 from pywikibot import UnknownSite
 
