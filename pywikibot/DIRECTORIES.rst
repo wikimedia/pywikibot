@@ -14,6 +14,8 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     |  pywikibot/families       | wiki-specific information and settings               |
     +---------------------------+------------------------------------------------------+
+    |  pywikibot/page           | Module with classes for MediaWiki page content       |
+    +---------------------------+------------------------------------------------------+
     |  pywikibot/site           | Module with classes for MediaWiki sites              |
     +---------------------------+------------------------------------------------------+
     |  pywikibot/tools          | Miscellaneous helper functions (not wiki-dependent)  |
