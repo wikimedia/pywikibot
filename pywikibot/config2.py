@@ -111,9 +111,9 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # to other modules.
 
 _private_values = {'authenticate', 'db_password'}
-_deprecated_variables = {'use_SSL_onlogin', 'use_SSL_always',
-                         'available_ssl_project', 'fake_user_agent',
-                         'special_page_limit', 'sysopnames', 'proxy'}
+_deprecated_variables = {'available_ssl_project', 'fake_user_agent',
+                         'panoramio', 'proxy', 'special_page_limit',
+                         'sysopnames', 'use_SSL_onlogin', 'use_SSL_always'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -903,12 +903,6 @@ pickle_protocol = 2
 # This section contains configuration options that are no longer in use.
 # They are kept here to prevent warnings about undefined parameters.
 
-panoramio = {
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': '',  # If so, under what reviewer name?
-}
-
-special_page_limit = 500
 sysopnames = collections.defaultdict(dict)
 
 # #############################################
