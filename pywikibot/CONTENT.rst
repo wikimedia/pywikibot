@@ -59,8 +59,6 @@ The contents of the package
     | proofreadpage.py           | Objects representing objects used with ProofreadPage |
     |                            | Extension                                            |
     +----------------------------+------------------------------------------------------+
-    | site.py                    | Objects representing MediaWiki sites (wikis)         |
-    +----------------------------+------------------------------------------------------+
     | site_detect.py             | Classes for detecting a MediaWiki site               |
     +----------------------------+------------------------------------------------------+
     | specialbots.py             | Predefined special bot classes                       |
@@ -113,6 +111,13 @@ The contents of the package
     | sparql.py                  | Objects representing SPARQL query API                |
     +----------------------------+------------------------------------------------------+
     | wikistats.py               | Objects representing WikiStats API                   |
+    +----------------------------+------------------------------------------------------+
+
+
+    +----------------------------+------------------------------------------------------+
+    | site                       | Module with classes for MediaWiki sites              |
+    +============================+======================================================+
+    | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
 
 

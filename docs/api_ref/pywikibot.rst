@@ -11,6 +11,7 @@ Subpackages
     pywikibot.comms
     pywikibot.data
     pywikibot.families
+    pywikibot.site
     pywikibot.tools
     pywikibot.userinterfaces
 
@@ -126,11 +127,6 @@ pywikibot.proofreadpage module
 ------------------------------
 
 .. automodule:: pywikibot.proofreadpage
-
-pywikibot.site module
----------------------
-
-.. automodule:: pywikibot.site
 
 pywikibot.site\_detect module
 -----------------------------
