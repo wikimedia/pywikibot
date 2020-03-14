@@ -3887,7 +3887,6 @@ class WikibaseEntity(object):
 
         self._content = updates['entity']
         self.get()
-        return updates
 
     def concept_uri(self):
         """
@@ -4353,9 +4352,8 @@ class WikibasePage(BasePage, WikibaseEntity):
         else:
             baserevid = None
 
-        updates = super(WikibasePage, self).editEntity(
+        super(WikibasePage, self).editEntity(
             data, baserevid=baserevid, **kwargs)
-        self.latest_revision_id = updates['entity']['lastrevid']
 
     def editLabels(self, labels, **kwargs):
         """
