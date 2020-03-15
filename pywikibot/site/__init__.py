@@ -5399,6 +5399,7 @@ class APISite(BaseSite):
                         _logger)
                     raise
                 assert 'edit' in result and 'result' in result['edit'], result
+
                 if result['edit']['result'] == 'Success':
                     if 'nochange' in result['edit']:
                         # null edit, page not changed
@@ -5411,19 +5412,22 @@ class APISite(BaseSite):
                     # not safe to assume that saved text is the same as sent
                     del page.text
                     return True
-                elif result['edit']['result'] == 'Failure':
+
+                if result['edit']['result'] == 'Failure':
                     if 'captcha' in result['edit']:
                         if not pywikibot.config.solve_captcha:
                             raise CaptchaError('captcha encountered while '
                                                'config.solve_captcha is False')
                         captcha = result['edit']['captcha']
                         req['captchaid'] = captcha['id']
+
                         if captcha['type'] == 'math':
                             # TODO: Should the input be parsed through eval
                             # in py3?
                             req['captchaword'] = input(captcha['question'])
                             continue
-                        elif 'url' in captcha:
+
+                        if 'url' in captcha:
                             import webbrowser
                             webbrowser.open('%s://%s%s'
                                             % (self.protocol(),
@@ -5433,30 +5437,33 @@ class APISite(BaseSite):
                                 'Please view CAPTCHA in your browser, '
                                 'then type answer here:')
                             continue
-                        else:
-                            pywikibot.error(
-                                'editpage: unknown CAPTCHA response %s, '
-                                'page not saved'
-                                % captcha)
-                            return False
-                    elif 'spamblacklist' in result['edit']:
+
+                        pywikibot.error(
+                            'editpage: unknown CAPTCHA response %s, '
+                            'page not saved'
+                            % captcha)
+                        return False
+
+                    if 'spamblacklist' in result['edit']:
                         raise SpamfilterError(page,
                                               result['edit']['spamblacklist'])
-                    elif 'code' in result['edit'] and 'info' in result['edit']:
+
+                    if 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(
                             'editpage: %s\n%s, '
                             % (result['edit']['code'], result['edit']['info']))
                         return False
-                    else:
-                        pywikibot.error('editpage: unknown failure reason %s'
-                                        % str(result))
-                        return False
-                else:
-                    pywikibot.error(
-                        "editpage: Unknown result code '%s' received; "
-                        'page not saved' % result['edit']['result'])
-                    pywikibot.log(str(result))
+
+                    pywikibot.error('editpage: unknown failure reason %s'
+                                    % str(result))
                     return False
+
+                pywikibot.error(
+                    "editpage: Unknown result code '%s' received; "
+                    'page not saved' % result['edit']['result'])
+                pywikibot.log(str(result))
+                return False
+
         finally:
             self.unlock_page(page)
 
