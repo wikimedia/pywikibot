@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2010-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ if sys.version_info[0] > 2:
     unicode = str
 
 _init_routines = []
-_inited_routines = []
+_inited_routines = set()
 
 
 def add_init_routine(routine):
@@ -35,10 +35,10 @@ def _init():
     for init_routine in _init_routines:
         if init_routine not in _inited_routines:
             init_routine()
-        _inited_routines.append(init_routine)
+        _inited_routines.add(init_routine)
 
     # Clear the list of routines to be inited
-    _init_routines[:] = []
+    _init_routines[:] = []  # the global variable is used with slice operator
 
 
 # User output/logging functions
