@@ -1246,18 +1246,19 @@ class Request(MutableMapping):
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
         if self.write:
-            if not hasattr(self.site, '_userinfo'):
-                raise Error('API write action attempted without userinfo')
-            assert('name' in self.site._userinfo)
+            try:
+                username = self.site.userinfo['name']
+            except KeyError:
+                raise Error('API write action attempted without user name')
 
-            if 'anon' in self.site._userinfo:
-                raise Error('API write action attempted as IP %r'
-                            % self.site._userinfo['name'])
+            if 'anon' in self.site.userinfo:
+                raise Error("API write action attempted as IP '{}'"
+                            .format(username))
 
-            if not self.site.user():
+            if not self.site.user() or self.site.username() != username:
                 pywikibot.warning(
-                    'API write action by unexpected username commenced.\n'
-                    'userinfo: %r' % self.site._userinfo)
+                    'API write action by unexpected username {} commenced.\n'
+                    'userinfo: {!r}'.format(username, self.site.userinfo))
 
         # MediaWiki 1.23 allows assertion for any action,
         # whereas earlier WMF wikis and others used an extension which
@@ -2185,19 +2186,16 @@ class CachedRequest(Request):
         """
         login_status = self.site._loginstatus
 
-        if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
-                hasattr(self.site, '_userinfo') and \
-                'name' in self.site._userinfo:
+        if login_status >= pywikibot.site.LoginStatus.AS_USER:
             # This uses the format of Page.__repr__, without performing
             # config.console_encoding as done by Page.__repr__.
             # The returned value can't be encoded to anything other than
             # ascii otherwise it creates an exception when _create_file_name()
             # tries to encode it as utf-8.
-            user_key = 'User(User:%s)' % self.site._userinfo['name']
+            user_key = 'User(User:{})'.format(self.site.userinfo['name'])
         else:
-            user_key = pywikibot.site.LoginStatus(
-                max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
-            user_key = repr(user_key)
+            user_key = repr(pywikibot.site.LoginStatus(
+                pywikibot.site.LoginStatus.NOT_LOGGED_IN))
 
         request_key = repr(sorted(self._encoded_items().items()))
         return repr(self.site) + user_key + request_key
