@@ -65,12 +65,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         gen = self.generator_instance
         gen.run()
 
-        with self.subTest(test='Test whether default is loaded'):
-            self.assertIn(self.site.lang, gen.wikis)
-
         with self.subTest(test='Test element counts'):
-            if self.site.lang not in gen.prefixes:
-                gen.prefixes += [self.site.lang]
             self.assertCountEqual(gen.prefixes, gen.wikis)
 
         # test creating Site from url
