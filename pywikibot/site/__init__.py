@@ -1336,7 +1336,7 @@ def need_right(right=None):
             elif right is not None and not self.has_right(right):
                 raise UserRightsError('User "{}" does not have required '
                                       'user right "{}"'
-                                      .format(self.user, right))
+                                      .format(self.user(), right))
             return fn(self, *args, **kwargs)
 
         if not __debug__:
