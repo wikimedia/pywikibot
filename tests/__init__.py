@@ -146,7 +146,7 @@ script_test_modules = {
     'deletionbot',
     'disambredir',
     'fixing_redirects',
-    'generate_family_files',
+    'generate_family_file',
     'generate_user_files',
     'imagecopy',
     'interwikidata',

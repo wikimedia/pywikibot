@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Test generate_family_files script."""
+"""Test generate_family_file script."""
 #
 # (C) Pywikibot team, 2018-2020
 #
