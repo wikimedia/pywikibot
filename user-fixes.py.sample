@@ -3,6 +3,8 @@
 #
 # This is only an example. Don't use it.
 #
+# Refer the manual for its construction at:
+# https://www.mediawiki.org/wiki/Manual:Pywikibot/fixes.py#Construction_of_a_fix
 from __future__ import unicode_literals
 
 fixes['example'] = {
