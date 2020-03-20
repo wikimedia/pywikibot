@@ -1599,12 +1599,15 @@ class TestRecentChanges(DefaultSiteTestCase):
             self.assertIsInstance(change, dict)
         for change in mysite.recentchanges(anon=False, total=5):
             self.assertIsInstance(change, dict)
-        for change in mysite.recentchanges(redirect=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertIn('redirect', change)
         for change in mysite.recentchanges(redirect=False, total=5):
             self.assertIsInstance(change, dict)
             self.assertNotIn('redirect', change)
+
+        # Subtest timeouts on Wikidata due to upstream issue, see T245989
+        if mysite.sitename != 'wikidata:wikidata':
+            for change in mysite.recentchanges(redirect=True, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertIn('redirect', change)
 
     def test_tag_filter(self):
         """Test the site.recentchanges() with tag filter."""
