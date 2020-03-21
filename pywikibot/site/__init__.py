@@ -3148,8 +3148,6 @@ class APISite(BaseSite):
 
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""
-        if not page.exists():
-            raise NoPage(page)
         if not hasattr(page, '_protection'):
             self.loadpageinfo(page)
         return page._protection
