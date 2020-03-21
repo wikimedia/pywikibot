@@ -359,20 +359,19 @@ def require_modules(*required_modules):
                 __import__(required_module, globals(), locals(), [], 0)
             except ImportError:
                 missing += [required_module]
-        if missing:
-            skip_decorator = unittest.skip('{0} not installed'.format(
-                ', '.join(missing)))
-            if (inspect.isclass(obj) and issubclass(obj, TestCaseBase)
-                    and 'nose' in sys.modules.keys()):
-                # There is a known bug in nosetests which causes setUpClass()
-                # to be called even if the unittest class is skipped.
-                # Here, we decorate setUpClass() as a patch to skip it
-                # because of the missing modules too.
-                # Upstream report: https://github.com/nose-devs/nose/issues/946
-                obj.setUpClass = classmethod(skip_decorator(lambda cls: None))
-            return skip_decorator(obj)
-        else:
+        if not missing:
             return obj
+        skip_decorator = unittest.skip('{0} not installed'.format(
+            ', '.join(missing)))
+        if (inspect.isclass(obj) and issubclass(obj, TestCaseBase)
+                and 'nose' in sys.modules.keys()):
+            # There is a known bug in nosetests which causes setUpClass()
+            # to be called even if the unittest class is skipped.
+            # Here, we decorate setUpClass() as a patch to skip it
+            # because of the missing modules too.
+            # Upstream report: https://github.com/nose-devs/nose/issues/946
+            obj.setUpClass = classmethod(skip_decorator(lambda cls: None))
+        return skip_decorator(obj)
 
     return test_requirement
 
