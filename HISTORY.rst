@@ -4,8 +4,13 @@ Release history
 Current release
 ---------------
 
+* Outdated secure connection overrides were removed (T247668)
+* Check for all modules which are needed by a script within pwb.py wrapper
+* Check for all modules which are mandatory within pwb.py wrapper script
+* Enable -help option with similar search of pwb.py (T241217)
 * compat module has been removed (T183085)
 * Category.copyTo and Category.copyAndKeep methods have been removed
+* Site.page_restrictions() does no longer raise NoPage (T214286)
 * Use site.userinfo getter instead of site._userinfo within api (T243794)
 * Fix endprefix parameter in Category.articles() (T247201)
 * Fix search for changed claims when saving entity (T246359)
