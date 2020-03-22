@@ -49,7 +49,6 @@ extra_deps = {
     'security': [
         'requests[security]'
         ';python_full_version=="2.7.7" or python_full_version=="2.7.8"',
-        'pycparser!=2.14',
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
