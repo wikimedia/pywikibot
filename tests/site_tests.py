@@ -1689,9 +1689,11 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.assertEqual(hit.namespace(), 0)
         except pywikibot.data.api.APIError as e:
             if e.code == 'gsrsearch-error' and 'timed out' in e.info:
-                self.skipTest('gsrsearch returned timeout on site: {!r}'
-                              .format(e))
-            raise
+                self.skipTest('gsrsearch returned timeout on site{}:\n{!r}'
+                              .format(mysite, e))
+            if e.code == 'gsrsearch-text-disabled':
+                self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
+                              .format(mysite, e))
 
     @suppress_warnings("where='title' is deprecated", DeprecationWarning)
     def test_search_where_title(self):
