@@ -306,27 +306,6 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
 
 
-class DryFakeUserAgentTestCase(TestCase):
-
-    """Test the generation of fake user agents.
-
-    If the method cannot import fake_useragent, the default user agent
-    will be returned, causing tests to fail. Therefore tests will skip
-    if fake_useragent is missing.
-    """
-
-    net = False
-
-    def _test_fake_user_agent_randomness(self):
-        """Test if user agent returns are randomized."""
-        self.assertNotEqual(http.fake_user_agent(), http.fake_user_agent())
-
-    @require_modules('fake_useragent')
-    def test_with_fake_useragent(self):
-        """Test fake user agent generation with fake_useragent module."""
-        self._test_fake_user_agent_randomness()
-
-
 class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     """Test the usage of fake user agent."""
@@ -392,12 +371,6 @@ class GetFakeUserAgentTestCase(TestCase):
         config.fake_user_agent = self.orig_fake_user_agent
         super(GetFakeUserAgentTestCase, self).tearDown()
 
-    def _test_fake_user_agent_randomness(self):
-        """Test if user agent returns are randomized."""
-        config.fake_user_agent = True
-        self.assertNotEqual(http.get_fake_user_agent(),
-                            http.get_fake_user_agent())
-
     def _test_config_settings(self):
         """Test if method honours configuration toggle."""
         # ON: True and None in config are considered turned on.
@@ -415,7 +388,6 @@ class GetFakeUserAgentTestCase(TestCase):
     @require_modules('fake_useragent')
     def test_with_fake_useragent(self):
         """Test method with fake_useragent module."""
-        self._test_fake_user_agent_randomness()
         self._test_config_settings()
 
 
