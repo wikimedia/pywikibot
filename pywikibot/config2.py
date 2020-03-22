@@ -51,6 +51,7 @@ import types
 from distutils.version import StrictVersion
 from locale import getdefaultlocale
 from os import getenv, environ
+from textwrap import fill
 from warnings import warn
 
 from requests import __version__ as requests_version
@@ -214,17 +215,6 @@ solve_captcha = True
 #
 # Note: the target wiki site must install OAuth extension
 authenticate = {}
-
-#
-# Secure connection overrides
-#
-# These settings are deprecated. They existed to support the Wikimedia
-# family which only served HTTPS on https://secure.wikimedia.org/<site>/<uri>
-# Use Family.protocol()
-use_SSL_onlogin = False  # if available, use SSL when logging in
-use_SSL_always = False   # if available, use SSL for all API queries
-# Available secure projects should be listed here.
-available_ssl_project = []
 
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = '.passwd'
@@ -1080,6 +1070,12 @@ def _assert_types(name, value, types):
         raise _DifferentTypeError(name, type(value), types)
 
 
+DEPRECATED_VARIABLE = (
+    '"{}" present in our user-config.py is no longer a supported '
+    'configuration variable and should be removed. Please inform the '
+    'maintainers if you depend on it.')
+
+
 def _check_user_config_types(user_config, default_values, skipped):
     """Check the types compared to the default values."""
     for name, value in user_config.items():
@@ -1095,14 +1091,18 @@ def _check_user_config_types(user_config, default_values, skipped):
             else:
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
-            warn('Configuration variable "{0}" is defined in your '
-                 'user-config.py but unknown. It can be a misspelled one or a '
-                 'variable that is no longer supported.'
-                 .format(name), UserWarning)
+            if name in _deprecated_variables:
+                warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
+                     _ConfigurationDeprecationWarning)
+            else:
+                warn('\n'
+                     + fill('Configuration variable "{0}" is defined in your '
+                            'user-config.py but unknown. It can be a '
+                            'misspelled one or a variable that is no longer '
+                            'supported.'.format(name)), UserWarning)
 
 
 _check_user_config_types(_exec_globals, _public_globals, _imports)
-
 
 # Copy the user config settings into globals
 _modified = {_key for _key in _public_globals.keys()
@@ -1122,9 +1122,8 @@ for _key in _modified:
     globals()[_key] = _exec_globals[_key]
 
     if _key in _deprecated_variables:
-        warn('"{0}" present in our user-config.py is no longer a supported '
-             'configuration variable. Please inform the maintainers if you '
-             'depend on it.'.format(_key), _ConfigurationDeprecationWarning)
+        warn(DEPRECATED_VARIABLE.format(_key),
+             _ConfigurationDeprecationWarning)
 
 # If we cannot auto-detect the console encoding (e.g. when piping data)
 # assume utf-8. On Linux, this will typically be correct; on windows,

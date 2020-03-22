@@ -1044,31 +1044,6 @@ class OptionSet(MutableMapping):
         return len(self._enabled) + len(self._disabled)
 
 
-class EnableSSLSiteWrapper(object):
-
-    """Wrapper to change the site protocol to https."""
-
-    def __init__(self, site):
-        """Initializer."""
-        self._site = site
-
-    def __repr__(self):
-        """Return internal representation."""
-        return repr(self._site)
-
-    def __eq__(self, other):
-        """Compare two objects."""
-        return self._site == other
-
-    def __getattr__(self, attr):
-        """Access object's site attributes."""
-        return getattr(self._site, attr)
-
-    def protocol(self):
-        """Return protocol."""
-        return 'https'
-
-
 class Request(MutableMapping):
 
     """A request to a Site's api.php interface.
@@ -1276,11 +1251,6 @@ class Request(MutableMapping):
                 and self.site.has_extension('AssertEdit')):
             pywikibot.debug('Adding user assertion', _logger)
             self['assert'] = 'user'  # make sure user is logged in
-
-        if (self.site.protocol() == 'http' and (config.use_SSL_always or (
-                self.action == 'login' and config.use_SSL_onlogin))
-                and self.site.family.name in config.available_ssl_project):
-            self.site = EnableSSLSiteWrapper(self.site)
 
     @classmethod
     def create_simple(cls, site, **kwargs):
