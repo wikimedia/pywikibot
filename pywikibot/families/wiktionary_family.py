@@ -40,7 +40,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'af', 'zh-min-nan', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'nds', 'lb', 'sl', 'bs', 'nah',
         'min', 'sa', 'kk', 'ms', 'tk', 'vec', 'km', 'sm', 'mk', 'hsb', 'be',
-        'yue', 'ga', 'gd', 'an', 'wo', 'ang', 'tt', 'shy', 'mt', 'sd', 'gn',
+        'yue', 'gd', 'ga', 'an', 'wo', 'ang', 'tt', 'shy', 'mt', 'sd', 'gn',
         'mr', 'ie', 'so', 'csb', 'ug', 'ia', 'st', 'fo', 'roa-rup', 'si',
         'hif', 'kl', 'su', 'ay', 'mi', 'jbo', 'zu', 'ln', 'yi', 'gu', 'na',
         'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
