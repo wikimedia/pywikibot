@@ -2665,11 +2665,12 @@ class FilePage(Page):
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
         lines = []
-        for info in self.get_file_history():
-            dimension = '{width}×{height} px ({size} bytes)'.format(**info)
+        for info in self.get_file_history().values():
+            dimension = '{width}×{height} px ({size} bytes)'.format(
+                **info.__dict__)
             lines.append('| {timestamp} || {user} || {dimension} |'
                          '| <nowiki>{comment}</nowiki>'
-                         ''.format(dimension=dimension, **info))
+                         ''.format(dimension=dimension, **info.__dict__))
         return ('{| class="wikitable"\n'
                 '! {{int:filehist-datetime}} || {{int:filehist-user}} |'
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
