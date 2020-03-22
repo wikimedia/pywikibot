@@ -14,7 +14,6 @@ coverage:
         enabled: yes
 
   ignore:
-    - pywikibot/compat
     - pywikibot/data/mysql.py
     - pywikibot/families/__init__.py
     - scripts/archive
