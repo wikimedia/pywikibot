@@ -7,7 +7,7 @@
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2037,19 +2037,19 @@ addFmt1('zh', False, makeMonthList('%d月%%d日'))
 for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
     formats[dayMnthFmts[i]]['wa'] = eval(
         'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%%dî d\' %s"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%%d d\' %s"), '
+        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), '
         'lambda p: p in [2,3,20,22,23]), '
-        '(lambda v: dh_dayOfMnth(v, "%%d di %s"), alwaysTrue)])'
-        % (waMonthNames[i], waMonthNames[i], waMonthNames[i]))
+        '(lambda v: dh_dayOfMnth(v, "%d di {mname}"), alwaysTrue)])'
+        .format(mname=waMonthNames[i]))
 
 # For month names beginning with a vowel...
 for i in (3, 7, 9):
     formats[dayMnthFmts[i]]['wa'] = eval(
         'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%%dî d\' %s"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%%d d\' %s"), alwaysTrue)])'
-        % (waMonthNames[i], waMonthNames[i]))
+        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
+        .format(mname=waMonthNames[i]))
 
 # Brazil uses '1añ' for the 1st of every month, and number without suffix for
 # all other days
@@ -2057,9 +2057,9 @@ brMonthNames = makeMonthNamedList('br', '%s', True)
 for i in range(0, 12):
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%%dañ %s"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%%d %s"), alwaysTrue)])'
-        % (brMonthNames[i], brMonthNames[i]))
+        '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '
+        '(lambda v: dh_dayOfMnth(v, "%d {mname}"), alwaysTrue)])'
+        .format(mname=brMonthNames[i]))
 
 #
 # Month of the Year: "en:May 1976"
