@@ -3854,7 +3854,8 @@ class TestLoginLogout(DefaultSiteTestCase):
                                               loginstatus.AS_USER))
             self.assertIn('_userinfo', site.__dict__.keys())
 
-        else:
+        # Fandom family wikis don't support API action=logout
+        elif 'fandom.com' not in site.hostname():
             site.logout()
             self.assertFalse(site.logged_in())
             self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)

@@ -2120,8 +2120,13 @@ class APISite(BaseSite):
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
-        uirequest = self._simple_request(action='logout',
-                                         token=self.tokens['csrf'])
+        req_params = {'action': 'logout'}
+        # csrf token introduced in MW 1.24
+        try:
+            req_params['token'] = self.tokens['csrf']
+        except Error:
+            pass
+        uirequest = self._simple_request(**req_params)
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
 
