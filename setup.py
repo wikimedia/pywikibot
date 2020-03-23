@@ -81,21 +81,18 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
+    'data_ingestion.py': extra_deps['csv'],
     'flickrripper.py': [
         'flickrapi<3.0.0;python_version<"3.5"',
         'flickrapi>=2.2;python_version>="3.5"',
-        'Pillow<7.0.0;python_version<"3"',
-        'Pillow<6.0.0;python_version=="3.4"',
-        'Pillow;python_version>="3.5"',
-    ],
-    'patrol.py': ['mwparserfromhell>=0.3.3'],
+    ] + extra_deps['Tkinter'],
+    'imageharvest.py': extra_deps['html'],
+    'isbn.py': extra_deps['isbn'],
+    'match_images.py': extra_deps['Tkinter'],
+    'patrol.py': extra_deps['mwparserfromhell'],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
 }
-script_deps['data_ingestion.py'] = extra_deps['csv']
-script_deps['imageharvest.py'] = extra_deps['html']
-script_deps['isbn.py'] = extra_deps['isbn']
-script_deps['match_images.py'] = script_deps['flickrripper.py']
 
 extra_deps.update(script_deps)
 extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})

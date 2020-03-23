@@ -121,7 +121,6 @@ import threading
 import time
 
 from functools import partial
-from warnings import warn
 
 try:
     import memento_client
@@ -957,10 +956,6 @@ def main(*args):
     gen = None
     xmlFilename = None
     HTTPignore = []
-
-    if isinstance(memento_client, ImportError):
-        warn('memento_client not imported: {0}'.format(memento_client),
-             ImportWarning)
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
