@@ -297,7 +297,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     if stdout is not None and out_result:
                         self.assertIn(stdout, out_result)
                     else:
-                        self.assertIsNone(out_result)
+                        self.assertIsEmpty(out_result)
 
                 self.assertIn(result['exit_code'], exit_codes)
                 sys.stdout.flush()
