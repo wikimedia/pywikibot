@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import sys
 
-from pywikibot.tools import has_module, PY2, StringTypes
+from pywikibot.tools import has_module, PY2
 
 from tests import join_root_path, unittest_print
 from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
@@ -224,40 +224,34 @@ class TestScriptMeta(MetaTestCaseClass):
             def testScript(self):
                 global_args = 'Global arguments available for all'
 
-                cmd = [script_name]
-
-                if args:
-                    cmd += args
-
+                cmd = [script_name] + args
                 data_in = script_input.get(script_name)
+                timeout = 5 if is_autorun else None
 
-                if is_autorun:
-                    timeout = 5
-                else:
-                    timeout = None
-
+                stdout, error = None, None
                 if self._results and script_name in self._results:
                     error = self._results[script_name]
-                    if isinstance(error, StringTypes):
-                        stdout = None
-                    else:
+                    if isinstance(error, tuple):
                         stdout, error = error
-                else:
-                    stdout = None
-                    error = None
 
                 test_overrides = {}
                 if not hasattr(self, 'net') or not self.net:
                     test_overrides['pywikibot.Site'] = 'None'
 
+                # run the script
                 result = execute_pwb(cmd, data_in, timeout=timeout,
                                      error=error, overrides=test_overrides)
 
-                stderr = result['stderr'].splitlines()
-                stderr_sleep = [l for l in stderr
-                                if l.startswith('Sleeping for ')]
-                stderr_other = [l for l in stderr
-                                if not l.startswith('Sleeping for ')]
+                err_result = result['stderr']
+                out_result = result['stdout']
+
+                stderr_sleep, stderr_other = [], []
+                for line in err_result.splitlines():
+                    if line.startswith('Sleeping for '):
+                        stderr_sleep.append(line)
+                    else:
+                        stderr_other.append(line)
+
                 if stderr_sleep:
                     unittest_print('\n'.join(stderr_sleep))
 
@@ -266,52 +260,46 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 if error:
                     self.assertIn(error, result['stderr'])
-
                     exit_codes = [0, 1, 2, -9]
+
                 elif not is_autorun:
-                    if stderr_other == []:
-                        stderr_other = None
-                    if stderr_other is not None:
+                    if not stderr_other:
+                        self.assertIn(global_args, out_result)
+                    else:
                         self.assertIn('Use -help for further information.',
                                       stderr_other)
                         self.assertNotIn('-help', args)
-                    else:
-                        self.assertIn(global_args, result['stdout'])
-
                     exit_codes = [0]
+
                 else:
                     # auto-run
                     exit_codes = [0, -9]
-
-                    if (not result['stdout'] and not result['stderr']):
+                    if not out_result and not err_result:
                         unittest_print(' auto-run script unresponsive after '
                                        '{} seconds'.format(timeout), end=' ')
-                    elif 'SIMULATION: edit action blocked' in result['stderr']:
+                    elif 'SIMULATION: edit action blocked' in err_result:
                         unittest_print(' auto-run script simulated edit '
                                        'blocked', end='  ')
                     else:
                         unittest_print(
                             ' auto-run script stderr within {} seconds: {!r}'
-                            .format(timeout, result['stderr']), end='  ')
+                            .format(timeout, err_result), end='  ')
 
                 self.assertNotIn('Traceback (most recent call last)',
-                                 result['stderr'])
-                self.assertNotIn('deprecated', result['stderr'].lower())
+                                 err_result)
+                self.assertNotIn('deprecated', err_result.lower())
 
                 # If stdout doesn't include global help..
-                if global_args not in result['stdout']:
+                if global_args not in out_result:
                     # Specifically look for deprecated
-                    self.assertNotIn('deprecated', result['stdout'].lower())
-                    if result['stdout'] == '':
-                        result['stdout'] = None
+                    self.assertNotIn('deprecated', out_result.lower())
                     # But also complain if there is any stdout
-                    if stdout is not None and result['stdout'] is not None:
-                        self.assertIn(stdout, result['stdout'])
+                    if stdout is not None and out_result:
+                        self.assertIn(stdout, out_result)
                     else:
-                        self.assertIsNone(result['stdout'])
+                        self.assertIsNone(out_result)
 
                 self.assertIn(result['exit_code'], exit_codes)
-
                 sys.stdout.flush()
 
             if not enable_autorun_tests and is_autorun:
@@ -341,6 +329,11 @@ class TestScriptMeta(MetaTestCaseClass):
             elif script_name in dct['_allowed_failures']:
                 dct[test_name] = unittest.skip(
                     '{} is in _allowed_failures list'
+                    .format(script_name))(dct[test_name])
+            elif script_name in failed_dep_script_set \
+                    and arguments == '-simulate':
+                dct[test_name] = unittest.skip(
+                    '{} has dependencies; skipping'
                     .format(script_name))(dct[test_name])
 
             # Disable test by default in nosetests
