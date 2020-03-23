@@ -9,6 +9,7 @@ import calendar
 import datetime
 import re
 
+from collections.abc import Mapping, MutableMapping
 from collections import defaultdict
 from contextlib import suppress
 from functools import singledispatch
@@ -510,339 +511,155 @@ def MakeParameter(decoder, param):
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-formats = {
-    'MonthName': {
-        'af': lambda v: slh(v, ['Januarie', 'Februarie', 'Maart', 'April',
-                                'Mei', 'Junie', 'Julie', 'Augustus',
-                                'September', 'Oktober', 'November',
-                                'Desember']),
-        'an': lambda v: slh(v, ['chinero', 'frebero', 'marzo', 'abril',
-                                'mayo', 'chunio', 'chulio', 'agosto',
-                                'setiembre', 'otubre', 'nobiembre',
-                                'abiento']),
-        'ang': lambda v: slh(v, ['Æfterra Gēola', 'Solmōnaþ', 'Hrēþmōnaþ',
-                                 'Ēastermōnaþ', 'Þrimilcemōnaþ', 'Sēremōnaþ',
-                                 'Mǣdmōnaþ', 'Wēodmōnaþ', 'Hāligmōnaþ',
-                                 'Winterfylleþ', 'Blōtmōnaþ', 'Gēolmōnaþ']),
-        'ar': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو',
-                                'يونيو', 'يوليو', 'أغسطس', 'سبتمبر',
-                                'أكتوبر', 'نوفمبر', 'ديسمبر']),
-        'arz': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'ابريل', 'مايو',
-                                 'يونيه', 'يوليه', 'اغسطس', 'سبتمبر',
-                                 'اكتوبر', 'نوفمبر', 'ديسمبر']),
-        'ast': lambda v: slh(v, ['xineru', 'febreru', 'marzu', 'abril',
-                                 'mayu', 'xunu', 'xunetu', 'agostu',
-                                 'setiembre', 'ochobre', 'payares',
-                                 'avientu']),
-        'be': lambda v: slh(v, ['студзень', 'люты', 'сакавік', 'красавік',
-                                'травень', 'чэрвень', 'ліпень', 'жнівень',
-                                'верасень', 'кастрычнік', 'лістапад',
-                                'сьнежань']),
-        'bg': lambda v: slh(v, ['януари', 'февруари', 'март', 'април',
-                                'май', 'юни', 'юли', 'август', 'септември',
-                                'октомври', 'ноември', 'декември']),
-        'bn': lambda v: slh(v, ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল',
-                                'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর',
-                                'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর']),
+class MonthNames(Mapping):
+
+    """A Mapping with reads month names from mediawiki messages."""
+
+    # Predefined month names which are needed at import time
+    months = {
         'br': lambda v: slh(v, ['Genver', "C'hwevrer", 'Meurzh', 'Ebrel',
                                 'Mae', 'Mezheven', 'Gouere', 'Eost',
                                 'Gwengolo', 'Here', 'Du', 'Kerzu']),
-        'bs': lambda v: slh(v, ['januar', 'februar', 'mart', 'april',
-                                'maj', 'juni', 'juli', 'august', 'septembar',
-                                'oktobar', 'novembar', 'decembar']),
-        'ca': lambda v: slh(v, ['gener', 'febrer', 'març', 'abril', 'maig',
-                                'juny', 'juliol', 'agost', 'setembre',
-                                'octubre', 'novembre', 'desembre']),
-        'ceb': lambda v: slh(v, ['Enero', 'Pebrero', 'Marso', 'Abril',
-                                 'Mayo', 'Hunyo', 'Hulyo', 'Agosto',
-                                 'Septiyembre', 'Oktubre', 'Nobiyembre',
-                                 'Disyembre']),
-        'co': lambda v: slh(v, ['ghjennaghju', 'frivaghju', 'marzu',
-                                'aprile', 'maghju', 'ghjugnu', 'lugliu',
-                                'aostu', 'settembre', 'uttrovi', 'nuvembri',
-                                'decembre']),
-        'cs': lambda v: slh(v, ['leden', 'únor', 'březen', 'duben',
-                                'květen', 'červen', 'červenec', 'srpen',
-                                'září', 'říjen', 'listopad', 'prosinec']),
-        'csb': lambda v: slh(v, ['stëcznik', 'gromicznik', 'strumiannik',
-                                 'łżëkwiôt', 'môj', 'czerwińc', 'lëpinc',
-                                 'zélnik', 'séwnik', 'rujan', 'lëstopadnik',
-                                 'gòdnik']),
-        'cv': lambda v: slh(v, ['кăрлач', 'нарăс', 'Пуш', 'Ака', 'çу',
-                                'çĕртме', 'утă', 'çурла', 'авăн', 'юпа', 'чӳк',
-                                'раштав']),
-        'cy': lambda v: slh(v, ['Ionawr', 'Chwefror', 'Mawrth', 'Ebrill',
-                                'Mai', 'Mehefin', 'Gorffennaf', 'Awst', 'Medi',
-                                'Hydref', 'Tachwedd', 'Rhagfyr']),
-        'da': lambda v: slh(v, ['januar', 'februar', 'marts', 'april', 'maj',
-                                'juni', 'juli', 'august', 'september',
-                                'oktober', 'november', 'december']),
-        'de': lambda v: slh(v, ['Januar', 'Februar', 'März', 'April',
-                                'Mai', 'Juni', 'Juli', 'August',
-                                'September', 'Oktober', 'November',
-                                'Dezember']),
-        'el': lambda v: slh(v, ['Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος',
-                                'Απρίλιος', 'Μάιος', 'Ιούνιος', 'Ιούλιος',
-                                'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος',
-                                'Νοέμβριος', 'Δεκέμβριος']),
         'en': lambda v: slh(v, enMonthNames),
-        'eo': lambda v: slh(v, ['Januaro', 'Februaro', 'Marto', 'Aprilo',
-                                'Majo', 'Junio', 'Julio', 'Aŭgusto',
-                                'Septembro', 'Oktobro', 'Novembro',
-                                'Decembro']),
-        'es': lambda v: slh(v, ['enero', 'febrero', 'marzo', 'abril', 'mayo',
-                                'junio', 'julio', 'agosto', 'septiembre',
-                                'octubre', 'noviembre', 'diciembre']),
-        'et': lambda v: slh(v, ['jaanuar', 'veebruar', 'märts', 'aprill',
-                                'mai', 'juuni', 'juuli', 'august', 'september',
-                                'oktoober', 'november', 'detsember']),
-        'eu': lambda v: slh(v, ['urtarrila', 'otsaila', 'martxoa', 'apirila',
-                                'maiatza', 'ekaina', 'uztaila', 'abuztua',
-                                'iraila', 'urria', 'azaroa', 'abendua']),
-        'fa': lambda v: slh(v, ['ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه',
-                                'ژوئن', 'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر',
-                                'نوامبر', 'دسامبر']),
-        'fi': lambda v: slh(v, ['tammikuu', 'helmikuu', 'maaliskuu',
-                                'huhtikuu', 'toukokuu', 'kesäkuu',
-                                'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu',
-                                'marraskuu', 'joulukuu']),
-        'fo': lambda v: slh(v, ['januar', 'februar', 'mars', 'apríl', 'mai',
-                                'juni', 'juli', 'august', 'september',
-                                'oktober', 'november', 'desember']),
-        'fr': lambda v: slh(v, ['janvier', 'février', 'mars (mois)',
-                                'avril', 'mai', 'juin', 'juillet', 'août',
-                                'septembre', 'octobre', 'novembre',
-                                'décembre']),
-        'fur': lambda v: slh(v, ['Zenâr', 'Fevrâr', 'Març', 'Avrîl', 'Mai',
-                                 'Jugn', 'Lui', 'Avost', 'Setembar', 'Otubar',
-                                 'Novembar', 'Dicembar']),
-        'fy': lambda v: slh(v, ['jannewaris', 'febrewaris', 'maart', 'april',
-                                'maaie', 'juny', 'july', 'augustus',
-                                'septimber', 'oktober', 'novimber',
-                                'desimber']),
-        'ga': lambda v: slh(v, ['Eanáir', 'Feabhra', 'Márta', 'Aibreán',
-                                'Bealtaine', 'Meitheamh', 'Iúil', 'Lúnasa',
-                                'Meán Fómhair', 'Deireadh Fómhair', 'Samhain',
-                                'Nollaig']),
-        'gl': lambda v: slh(v, ['xaneiro', 'febreiro', 'marzo', 'abril',
-                                'maio', 'xuño', 'xullo', 'agosto', 'setembro',
-                                'outubro', 'novembro', 'decembro']),
-        'gsw': lambda v: slh(v, ['Januar', 'Februar', 'März', 'April', 'Mai',
-                                 'Juni', 'Juli', 'August', 'September',
-                                 'Oktober', 'November', 'Dezember']),
-        'he': lambda v: slh(v, ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי',
-                                'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר',
-                                'נובמבר', 'דצמבר']),
-        'hi': lambda v: slh(v, ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई',
-                                'जून', 'जुलाई', 'अगस्त', 'सितम्बर', 'अक्टूबर',
-                                'नवम्बर', 'दिसम्बर']),
-        'hr': lambda v: slh(v, ['siječanj', 'veljača', 'ožujak', 'travanj',
-                                'svibanj', 'lipanj', 'srpanj', 'kolovoz',
-                                'rujan', 'listopad', 'studeni', 'prosinac']),
-        'hu': lambda v: slh(v, ['január', 'február', 'március', 'április',
-                                'május', 'június', 'július', 'augusztus',
-                                'szeptember', 'október', 'november',
-                                'december']),
-        'ia': lambda v: slh(v, ['januario', 'februario', 'martio', 'april',
-                                'maio', 'junio', 'julio', 'augusto',
-                                'septembre', 'octobre', 'novembre',
-                                'decembre']),
-        'id': lambda v: slh(v, ['Januari', 'Februari', 'Maret', 'April',
-                                'Mei', 'Juni', 'Juli', 'Agustus', 'September',
-                                'Oktober', 'November', 'Desember']),
-        'ie': lambda v: slh(v, ['januar', 'februar', 'marte', 'april',
-                                'may', 'junio', 'juli', 'august', 'septembre',
-                                'octobre', 'novembre', 'decembre']),
-        'io': lambda v: slh(v, ['januaro', 'februaro', 'Marto', 'aprilo',
-                                'mayo', 'junio', 'julio', 'agosto',
-                                'septembro', 'oktobro', 'novembro',
-                                'decembro']),
-        'is': lambda v: slh(v, ['janúar', 'febrúar', 'mars (mánuður)',
-                                'apríl', 'maí', 'júní', 'júlí', 'ágúst',
-                                'september', 'október', 'nóvember',
-                                'desember']),
-        'it': lambda v: slh(v, ['gennaio', 'febbraio', 'marzo', 'aprile',
-                                'maggio', 'giugno', 'luglio', 'agosto',
-                                'settembre', 'ottobre', 'novembre',
-                                'dicembre']),
         'ja': lambda v: slh(v, makeMonthList('%d月')),
-        'jv': lambda v: slh(v, ['Januari', 'Februari', 'Maret', 'April', 'Mei',
-                                'Juni', 'Juli', 'Agustus', 'September',
-                                'Oktober', 'November', 'Desember']),
-        'ka': lambda v: slh(v, ['იანვარი', 'თებერვალი', 'მარტი', 'აპრილი',
-                                'მაისი', 'ივნისი', 'ივლისი', 'აგვისტო',
-                                'სექტემბერი', 'ოქტომბერი', 'ნოემბერი',
-                                'დეკემბერი']),
-        'kn': lambda v: slh(v, ['ಜನವರಿ', 'ಫೆಬ್ರವರಿ', 'ಮಾರ್ಚಿ', 'ಎಪ್ರಿಲ್',
-                                'ಮೇ', 'ಜೂನ', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್',
-                                'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್']),
         'ko': lambda v: slh(v, makeMonthList('%d월')),
-        'ksh': lambda v: slh(v, ['Jannowaa', 'Febrowaa', 'Mä', 'Apprill',
-                                 'Meij', 'Juuni', 'Juuli', 'Aujuß',
-                                 'Sepptäber', 'Oktoober', 'Novemmber',
-                                 'Dezemmber']),
-        'ku': lambda v: slh(v, ['rêbendan', 'reşemî', 'adar', 'avrêl', 'gulan',
-                                'pûşper', 'tîrmeh', 'gelawêj (meh)', 'rezber',
-                                'kewçêr', 'sermawez', 'berfanbar']),
-        'kw': lambda v: slh(v, ['Mys Genver', 'Mys Whevrer', 'Mys Merth',
-                                'Mys Ebrel', 'Mys Me', 'Mys Metheven',
-                                'Mys Gortheren', 'Mys Est', 'Mys Gwyngala',
-                                'Mys Hedra', 'Mys Du', 'Mys Kevardhu']),
-        'la': lambda v: slh(v, ['Ianuarius', 'Februarius', 'Martius',
-                                'Aprilis', 'Maius', 'Iunius', 'Iulius',
-                                'Augustus (mensis)', 'September', 'October',
-                                'November', 'December']),
-        'lb': lambda v: slh(v, ['Januar', 'Februar', 'Mäerz', 'Abrëll', 'Mee',
-                                'Juni', 'Juli', 'August', 'September',
-                                'Oktober', 'November', 'Dezember']),
-        'li': lambda v: slh(v, ['jannewarie', 'fibberwarie', 'miert', 'april',
-                                'mei', 'juni', 'juli', 'augustus (maond)',
-                                'september', 'oktober', 'november',
-                                'december']),
-        'lt': lambda v: slh(v, ['Sausis', 'Vasaris', 'Kovas', 'Balandis',
-                                'Gegužė', 'Birželis', 'Liepa', 'Rugpjūtis',
-                                'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis']),
-        'lv': lambda v: slh(v, ['Janvāris', 'Februāris', 'Marts', 'Aprīlis',
-                                'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts',
-                                'Septembris', 'Oktobris', 'Novembris',
-                                'Decembris']),
-        'mhr': lambda v: slh(v, ['шорыкйол', 'пургыж', 'ӱярня', 'вӱдшор',
-                                 'ага', 'пеледыш', 'сӱрем', 'сорла', 'идым',
-                                 'шыжа', 'кылме', 'декабрь']),
-        'mi': lambda v: slh(v, ['Kohi-tātea', 'Hui-tanguru', 'Poutū-te-rangi',
-                                'Paenga-whāwhā', 'Haratua', 'Pipiri',
-                                'Hōngongoi', 'Here-turi-kōkā', 'Mahuru',
-                                'Whiringa-ā-nuku', 'Whiringa-ā-rangi',
-                                'Hakihea']),
-        'ml': lambda v: slh(v, ['ജനുവരി', 'ഫെബ്രുവരി', 'മാര്ച്', 'ഏപ്രില്',
-                                'മേയ്', 'ജൂണ്‍', 'ജൂലൈ', 'ആഗസ്റ്റ്‌',
-                                'സപ്തന്പര്', 'ഒക്ടോബര്', 'നവന്പര്',
-                                'ഡിസന്പര്']),
-        'mr': lambda v: slh(v, ['जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल',
-                                'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टेंबर',
-                                'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर']),
-        'ms': lambda v: slh(v, ['Januari', 'Februari', 'Mac', 'April', 'Mei',
-                                'Jun', 'Julai', 'Ogos', 'September', 'Oktober',
-                                'November', 'Disember']),
-        'nan': lambda v: slh(v, ['It-goe̍h', 'Jī-goe̍h', 'Saⁿ-goe̍h',
-                                 'Sì-goe̍h', 'Gō·-goe̍h', 'La̍k-goe̍h',
-                                 'Chhit-goe̍h', 'Peh-goe̍h', 'Káu-goe̍h',
-                                 'Cha̍p-goe̍h', 'Cha̍p-it-goe̍h',
-                                 'Cha̍p-jī-goe̍h']),
-        'nap': lambda v: slh(v, ['Jennaro', 'Frevaro', 'Màrzo', 'Abbrile',
-                                 'Maggio', 'Giùgno', 'Luglio', 'Aùsto',
-                                 'Settembre', 'Ottovre', 'Nuvembre',
-                                 'Dicembre']),
-        'nds': lambda v: slh(v, ['Januar', 'Februar', 'März', 'April', 'Mai',
-                                 'Juni', 'Juli', 'August', 'September',
-                                 'Oktober', 'November', 'Dezember']),
-        'nl': lambda v: slh(v, ['januari', 'februari', 'maart', 'april', 'mei',
-                                'juni', 'juli', 'augustus (maand)',
-                                'september', 'oktober', 'november',
-                                'december']),
-        'nn': lambda v: slh(v, ['januar', 'februar', 'månaden mars', 'april',
-                                'mai', 'juni', 'juli', 'august', 'september',
-                                'oktober', 'november', 'desember']),
-        'nb': lambda v: slh(v, ['januar', 'februar', 'mars', 'april', 'mai',
-                                'juni', 'juli', 'august', 'september',
-                                'oktober', 'november', 'desember']),
-        'oc': lambda v: slh(v, ['genièr', 'febrièr', 'març', 'abril',
-                                'mai', 'junh', 'julhet', 'agost', 'setembre',
-                                'octobre', 'novembre', 'decembre']),
-        'os': lambda v: slh(v, ['январь', 'февраль', 'мартъи', 'апрель', 'май',
-                                'июнь', 'июль', 'август', 'сентябрь',
-                                'октябрь', 'ноябрь', 'декабрь']),
-        'pdc': lambda v: slh(v, ['Yenner', 'Hanning', 'Matz', 'Abril', 'Moi',
-                                 'Yuni', 'Yuli', 'Aagscht', 'September',
-                                 'Oktower', 'Nowember', 'Disember']),
-        'pl': lambda v: slh(v, ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj',
-                                'czerwiec', 'lipiec', 'sierpień', 'wrzesień',
-                                'październik', 'listopad', 'grudzień']),
-        'pt': lambda v: slh(v, ['Janeiro', 'Fevereiro', 'Março', 'Abril',
-                                'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro',
-                                'Outubro', 'Novembro', 'Dezembro']),
-        'ro': lambda v: slh(v, ['ianuarie', 'februarie', 'martie', 'aprilie',
-                                'mai', 'iunie', 'iulie', 'august',
-                                'septembrie', 'octombrie', 'noiembrie',
-                                'decembrie']),
-        'ru': lambda v: slh(v, ['январь', 'февраль', 'март', 'апрель', 'май',
-                                'июнь', 'июль', 'август', 'сентябрь',
-                                'октябрь', 'ноябрь', 'декабрь']),
-        'sc': lambda v: slh(v, ['Ghennarzu', 'Frearzu', 'Martzu',
-                                'Abrile', 'Maju', 'Làmpadas', 'Triulas',
-                                'Aùstu', 'Cabudanni', 'Santugaìne',
-                                'Santadria', 'Nadale']),
-        'scn': lambda v: slh(v, ['jinnaru', 'frivaru', 'marzu', 'aprili',
-                                 'maiu', 'giugnu', 'giugnettu', 'austu',
-                                 'sittèmmiru', 'uttùviru', 'nuvèmmiru',
-                                 'dicèmmiru']),
-        'sco': lambda v: slh(v, ['Januar', 'Februar', 'Mairch', 'Aprile',
-                                 'Mey', 'Juin', 'Julie', 'August', 'September',
-                                 'October', 'November', 'December']),
-        'se': lambda v: slh(v, ['ođđajagimánnu', 'guovvamánnu', 'njukčamánnu',
-                                'cuoŋománnu', 'miessemánnu', 'geassemánnu',
-                                'suoidnemánnu', 'borgemánnu', 'čakčamánnu',
-                                'golggotmánnu', 'skábmamánnu', 'juovlamánnu']),
-        'sk': lambda v: slh(v, ['január', 'február', 'marec', 'apríl',
-                                'máj', 'jún', 'júl', 'august', 'september',
-                                'október', 'november', 'december']),
-        'sl': lambda v: slh(v, ['januar', 'februar', 'marec', 'april', 'maj',
-                                'junij', 'julij', 'avgust', 'september',
-                                'oktober', 'november', 'december']),
-        'sq': lambda v: slh(v, ['Janari', 'Shkurti', 'Marsi (muaj)', 'Prilli',
-                                'Maji', 'Qershori', 'Korriku', 'Gushti',
-                                'Shtatori', 'Tetori', 'Nëntori', 'Dhjetori']),
-        'sr': lambda v: slh(v, ['јануар', 'фебруар', 'март', 'април', 'мај',
-                                'јун', 'јул', 'август', 'септембар', 'октобар',
-                                'новембар', 'децембар']),
-        'su': lambda v: slh(v, ['Januari', 'Pébruari', 'Maret', 'April', 'Méi',
-                                'Juni', 'Juli', 'Agustus', 'Séptémber',
-                                'Oktober', 'Nopémber', 'Désémber']),
-        'sv': lambda v: slh(v, ['januari', 'februari', 'mars', 'april', 'maj',
-                                'juni', 'juli', 'augusti', 'september',
-                                'oktober', 'november', 'december']),
-        'ta': lambda v: slh(v, ['ஜனவரி', 'பிப்ரவரி', 'மார்ச்', 'ஏப்ரல்', 'மே',
-                                'ஜூன்', 'ஜூலை', 'ஆகஸ்டு', 'செப்டம்பர்',
-                                'அக்டோபர்', 'நவம்பர்', 'டிசம்பர்']),
-        'te': lambda v: slh(v, ['జనవరి', 'ఫిబ్రవరి', 'మార్చి', 'ఏప్రిల్',
-                                'మే', 'జూన్', 'జూలై', 'ఆగష్టు', 'సెప్టెంబర్',
-                                'అక్టోబర్', 'నవంబర్', 'డిసెంబర్']),
-        'th': lambda v: slh(v, ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน',
-                                'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม',
-                                'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']),
-        'tl': lambda v: slh(v, ['Enero', 'Pebrero', 'Marso', 'Abril', 'Mayo',
-                                'Hunyo', 'Hulyo', 'Agosto', 'Setyembre',
-                                'Oktubre', 'Nobyembre', 'Disyembre']),
-        'tpi': lambda v: slh(v, ['Janueri', 'Februeri', 'Mas', 'Epril', 'Me',
-                                 'Jun', 'Julai', 'Ogas', 'Septemba', 'Oktoba',
-                                 'Novemba', 'Disemba']),
-        'tr': lambda v: slh(v, ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs',
-                                'Haziran', 'Temmuz', 'Ağustos', 'Eylül',
-                                'Ekim', 'Kasım', 'Aralık']),
-        'tt': lambda v: slh(v, ['Ğínwar', 'Febräl', 'Mart', 'Äpril', 'May',
-                                'Yün', 'Yül', 'August', 'Sentäber', 'Öktäber',
-                                'Nöyäber', 'Dekäber']),
-        'uk': lambda v: slh(v, ['січень', 'лютий', 'березень', 'квітень',
-                                'травень', 'червень', 'липень', 'серпень',
-                                'вересень', 'жовтень', 'листопад', 'грудень']),
-        'ur': lambda v: slh(v, ['جنوری', 'فروری', 'مارچ',
-                                'اپريل', 'مئی', 'جون', 'جولائی', 'اگست',
-                                'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر']),
-        'vec': lambda v: slh(v, ['genaro', 'febraro', 'marzso', 'apriłe',
-                                 'majo', 'giugno', 'lujo', 'agosto',
-                                 'setenbre', 'otobre', 'novenbre',
-                                 'diçenbre']),
-        'vi': lambda v: slh(v, ['tháng một', 'tháng hai', 'tháng ba',
-                                'tháng tư', 'tháng năm', 'tháng sáu',
-                                'tháng bảy', 'tháng tám', 'tháng chín',
-                                'tháng mười', 'tháng mười một', 'tháng 12']),
-        'vo': lambda v: slh(v, ['Yanul', 'Febul', 'Mäzul', 'Prilul', 'Mayul',
-                                'Yunul', 'Yulul', 'Gustul', 'Setul', 'Tobul',
-                                'Novul', 'Dekul']),
         'wa': lambda v: slh(v, waMonthNames),
         'zh': lambda v: slh(v, makeMonthList('%d月')),
-    },
+    }
 
+    def __getitem__(self, lang):
+        if lang not in self.months:
+            site = Site()
+            months = list(site.mediawiki_messages(enMonthNames,
+                                                  lang=lang).values())
+            self.months[lang] = lambda v: slh(v, months)
+
+        return self.months[lang]
+
+    def __iter__(self):
+        return iter(self.months)
+
+    def __len__(self):
+        """Length of preloaded languages with all month names."""
+        return len(self.months)
+
+
+class MonthFormat(MutableMapping):
+
+    """A Mapping which creates months formats."""
+
+    day_formats = {
+        'af': ('%d {}', True),
+        'ang': ('%d {}', True),
+        'bg': ('%d {}', False),
+        'bn': ('{} %%B', None),
+        'ceb': ('{} %d', True),
+        'csb': ('%d {}a', False),
+        'cv': ('{}, %d', True),
+        'cy': ('%d {}', True),
+        'de': ('%d. {}', True),
+        'en': ('{} %d', True),
+        'eo': ('%d-a de {}', False),
+        'es': ('%d de {}', False),
+        'eu': ('{}aren %d', True),
+        'fi': ('%d. {}ta', False),
+        'fur': ('%d di {}', True),
+        'fy': ('%d {}', False),
+        'gl': ('%d de {}', False),
+        'gsw': ('%d. {}', True),
+        'he': ('%d ב{}', None),
+        'hu': ('{} %d.', True),
+        'ia': ('%d de {}', False),
+        'id': ('%d {}', True),
+        'ie': ('%d {}', False),
+        'io': ('%d di {}', False),
+        'it': ('%d {}', False),
+        'jv': ('%d {}', True),
+        'ka': ('%d {}', None),
+        'lb': ('%d. {}', True),
+        'mhr': ('%d {}', False),
+        'ml': ('{} %d', None),
+        'ms': ('%d {}', True),
+        'nap': ("%d 'e {}", False),
+        'nds': ('%d. {}', True),
+        'pt': ('%d de {}', True),
+        'ro': ('%d {}', False),
+        'sco': ('%d {}', True),
+        'scn': ('%d di {}', False),
+        'su': ('%d {}', True),
+        'sv': ('%d {}', False),
+        'ta': ('{} %d', None),
+        'te': ('{} %d', None),
+        'th': ('%d {}', None),  # %%T
+        'tl': ('{} %d', None),
+        'tr': ('%d {}', True),
+        'tt': ('%d. {}', True),
+        'vec': ('%d de {}', False),
+        'vo': ('{} %d', False),
+    }
+
+    year_formats = {
+        'ar': ('{} %d', None),
+        'cs': ('{} %d', None),
+        'eo': ('{} de %d', None),
+        'es': ('{} de %d', True),
+        'it': ('Attualità/Anno %d - {}', True),
+        'ka': ('{}, %d', None),
+        'sk': ('{} %d', None),
+        'th': ('{} พ.ศ. %%T', None),
+        'tl': ('{} %d', None),
+    }
+
+    def __init__(self, index, format_key):
+        """Initializer of MonthFormat mapping.
+
+        @param index: month number
+        @type index: int
+        @param format_key: formats key like Day_January or Year_December
+        @type format_key: str
+        """
+        self.index = index
+        self.variant, _, self.month = format_key.partition('_')
+        self.data = {}
+
+    def __getitem__(self, key):
+        if key not in self.data:
+            if self.variant == 'Day':
+                pattern, ucase = self.day_formats.get(key, ('%d. {}', False))
+                func = 'dh_dayOfMnth'
+            elif self.variant == 'Year':
+                pattern, ucase = self.year_formats.get(key, ('{} %d', True))
+                func = 'dh_mnthOfYear'
+            else:
+                raise KeyError("Wrong variant '{}'".format(self.variant))
+
+            if ucase:
+                f = first_upper
+            elif ucase is False:
+                f = first_lower
+            else:
+                f = str
+
+            month_pattern = pattern.format(f(monthName(key, self.index)))
+            expression = "lambda v: {}(v, '{}')".format(func, month_pattern)
+            self.data[key] = eval(expression)
+        return self.data[key]
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
+    def __delitem__(self, key):
+        raise NotImplementedError("Deleting of key '{}' is not implemented"
+                                  .format(key))
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+
+formats = {
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
         'be': lambda v: dh_number(v, '%d (лік)'),
@@ -1805,13 +1622,14 @@ formats = {
     },
 }
 
+formats['MonthName'] = MonthNames()
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles
 #
-for dayOfMonth in dayMnthFmts:
-    formats[dayOfMonth] = {}
-for monthOfYear in yrMnthFmts:
-    formats[monthOfYear] = {}
+for index, day_of_month in enumerate(dayMnthFmts, 1):
+    formats[day_of_month] = MonthFormat(index, day_of_month)
+for index, month_of_year in enumerate(yrMnthFmts, 1):
+    formats[month_of_year] = MonthFormat(index, month_of_year)
 
 
 def addFmt1(lang: str, isMnthOfYear, patterns):
@@ -1833,12 +1651,6 @@ def addFmt1(lang: str, isMnthOfYear, patterns):
             else:
                 formats[dayMnthFmts[i]][lang] = eval(
                     'lambda v: dh_dayOfMnth(v, "{}")'.format(patterns[i]))
-
-
-def addFmt2(lang, isMnthOfYear, pattern, makeUpperCase=None):
-    """Update yrMnthFmts and dayMnthFmts using addFmt1."""
-    addFmt1(lang, isMnthOfYear,
-            makeMonthNamedList(lang, pattern, makeUpperCase))
 
 
 def makeMonthList(pattern):
@@ -1865,12 +1677,10 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
 
 
 # Add day of the month formats to the formatting table: "en:May 15"
-addFmt2('af', False, '%%d %s', True)
 addFmt1('an', False, ['%d de chinero', '%d de frebero', '%d de marzo',
                       "%d d'abril", '%d de mayo', '%d de chunio',
                       '%d de chulio', "%d d'agosto", '%d de setiembre',
                       "%d d'otubre", '%d de nobiembre', "%d d'abiento"])
-addFmt2('ang', False, '%%d %s', True)
 addFmt1('ar', False, ['%d يناير', '%d فبراير', '%d مارس', '%d أبريل',
                       '%d مايو', '%d يونيو', '%d يوليو', '%d أغسطس',
                       '%d سبتمبر', '%d أكتوبر', '%d نوفمبر', '%d ديسمبر'])
@@ -1885,68 +1695,38 @@ addFmt1('be', False, ['%d студзеня', '%d лютага', '%d сакаві
                       '%d красавіка', '%d траўня', '%d чэрвеня',
                       '%d ліпеня', '%d жніўня', '%d верасьня',
                       '%d кастрычніка', '%d лістапада', '%d сьнежня'])
-addFmt2('bg', False, '%%d %s', False)
-addFmt2('bn', False, '%s %%B')
-addFmt2('bs', False, '%%d. %s', False)
 addFmt1('ca', False, ['%d de gener', '%d de febrer', '%d de març',
                       "%d d'abril", '%d de maig', '%d de juny',
                       '%d de juliol', "%d d'agost", '%d de setembre',
                       "%d d'octubre", '%d de novembre', '%d de desembre'])
-addFmt2('ceb', False, '%s %%d', True)
 addFmt1('co', False, ['%d di ghjennaghju', '%d di frivaghju', '%d di marzu',
                       "%d d'aprile", '%d di maghju', '%d di ghjugnu',
                       '%d di lugliu', "%d d'aost", '%d di settembre',
                       "%d d'uttrovi", '%d di nuvembri', '%d di decembre'])
-addFmt2('cs', False, '%%d. %s', False)
-addFmt2('csb', False, '%%d %sa', False)
-addFmt2('cv', False, '%s, %%d', True)
-addFmt2('cy', False, '%%d %s', True)
-addFmt2('da', False, '%%d. %s', False)
-addFmt2('de', False, '%%d. %s', True)
 addFmt1('el', False, ['%d Ιανουαρίου', '%d Φεβρουαρίου', '%d Μαρτίου',
                       '%d Απριλίου', '%d Μαΐου', '%d Ιουνίου', '%d Ιουλίου',
                       '%d Αυγούστου', '%d Σεπτεμβρίου', '%d Οκτωβρίου',
                       '%d Νοεμβρίου', '%d Δεκεμβρίου'])
-addFmt2('en', False, '%s %%d', True)
-addFmt2('eo', False, '%%d-a de %s', False)
-addFmt2('es', False, '%%d de %s', False)
-addFmt2('et', False, '%%d. %s', False)
-addFmt2('eu', False, '%saren %%d', True)
 addFmt1('fa', False, ['%d ژانویه', '%d فوریه', '%d مارس', '%d آوریل',
                       '%d مه', '%d ژوئن', '%d ژوئیه', '%d اوت',
                       '%d سپتامبر', '%d اکتبر', '%d نوامبر', '%d دسامبر'])
-addFmt2('fi', False, '%%d. %sta', False)
-addFmt2('fo', False, '%%d. %s', False)
 addFmt1('fr', False, ['%d janvier', '%d février', '%d mars', '%d avril',
                       '%d mai', '%d juin', '%d juillet', '%d août',
                       '%d septembre', '%d octobre', '%d novembre',
                       '%d décembre'])
-addFmt2('fur', False, '%%d di %s', True)
-addFmt2('fy', False, '%%d %s', False)
 addFmt1('ga', False, ['%d Eanáir', '%d Feabhra', '%d Márta', '%d Aibreán',
                       '%d Bealtaine', '%d Meitheamh', '%d Iúil', '%d Lúnasa',
                       '%d Meán Fómhair', '%d Deireadh Fómhair', '%d Samhain',
                       '%d Mí na Nollag'])
-addFmt2('gl', False, '%%d de %s', False)
-addFmt2('gsw', False, '%%d. %s', True)
-addFmt2('he', False, '%%d ב%s')
 addFmt1('hr', False, ['%d. siječnja', '%d. veljače', '%d. ožujka',
                       '%d. travnja', '%d. svibnja', '%d. lipnja', '%d. srpnja',
                       '%d. kolovoza', '%d. rujna', '%d. listopada',
                       '%d. studenog', '%d. prosinca'])
-addFmt2('hu', False, '%s %%d.', True)
-addFmt2('ia', False, '%%d de %s', False)
-addFmt2('id', False, '%%d %s', True)
-addFmt2('ie', False, '%%d %s', False)
-addFmt2('io', False, '%%d di %s', False)
 addFmt1('is', False, ['%d. janúar', '%d. febrúar', '%d. mars', '%d. apríl',
                       '%d. maí', '%d. júní', '%d. júlí', '%d. ágúst',
                       '%d. september', '%d. október', '%d. nóvember',
                       '%d. desember'])
-addFmt2('it', False, '%%d %s', False)
 addFmt1('ja', False, makeMonthList('%d月%%d日'))
-addFmt2('jv', False, '%%d %s', True)
-addFmt2('ka', False, '%%d %s')
 addFmt1('ko', False, makeMonthList('%d월 %%d일'))
 addFmt1('ku', False, ["%d'ê rêbendanê", "%d'ê reşemiyê", "%d'ê adarê",
                       "%d'ê avrêlê", "%d'ê gulanê", "%d'ê pûşperê",
@@ -1956,7 +1736,6 @@ addFmt1('la', False, ['%d Ianuarii', '%d Februarii', '%d Martii', '%d Aprilis',
                       '%d Maii', '%d Iunii', '%d Iulii', '%d Augusti',
                       '%d Septembris', '%d Octobris', '%d Novembris',
                       '%d Decembris'])
-addFmt2('lb', False, '%%d. %s', True)
 addFmt1('li', False, ['%d januari', '%d februari', '%d miert', '%d april',
                       '%d mei', '%d juni', '%d juli', '%d augustus',
                       '%d september', '%d oktober', '%d november',
@@ -1965,16 +1744,10 @@ addFmt1('lt', False, ['Sausio %d', 'Vasario %d', 'Kovo %d', 'Balandžio %d',
                       'Gegužės %d', 'Birželio %d', 'Liepos %d', 'Rugpjūčio %d',
                       'Rugsėjo %d', 'Spalio %d', 'Lapkričio %d',
                       'Gruodžio %d'])
-addFmt2('lv', False, '%%d. %s', False)
-addFmt2('mhr', False, '%%d %s', False)
 addFmt1('mk', False, ['%d јануари', '%d февруари', '%d март', '%d април',
                       '%d мај', '%d јуни', '%d јули', '%d август',
                       '%d септември', '%d октомври', '%d ноември',
                       '%d декември'])
-addFmt2('ml', False, '%s %%d')
-addFmt2('ms', False, '%%d %s', True)
-addFmt2('nap', False, "%%d 'e %s", False)
-addFmt2('nds', False, '%%d. %s', True)
 addFmt1('nl', False, ['%%d %s' % v
                       for v in ['januari', 'februari', 'maart', 'april', 'mei',
                                 'juni', 'juli', 'augustus', 'september',
@@ -1983,7 +1756,6 @@ addFmt1('nn', False, ['%%d. %s' % v
                       for v in ['januar', 'februar', 'mars', 'april',
                                 'mai', 'juni', 'juli', 'august', 'september',
                                 'oktober', 'november', 'desember']])
-addFmt2('nb', False, '%%d. %s', False)
 addFmt1('oc', False, ['%d de genièr', '%d de febrièr', '%d de març',
                       "%d d'abril", '%d de mai', '%d de junh', '%d de julhet',
                       "%d d'agost", '%d de setembre', "%d d'octobre",
@@ -1995,32 +1767,17 @@ addFmt1('pl', False, ['%d stycznia', '%d lutego', '%d marca', '%d kwietnia',
                       '%d maja', '%d czerwca', '%d lipca', '%d sierpnia',
                       '%d września', '%d października', '%d listopada',
                       '%d grudnia'])
-addFmt2('pt', False, '%%d de %s', True)
-addFmt2('ro', False, '%%d %s', False)
 addFmt1('ru', False, ['%d января', '%d февраля', '%d марта', '%d апреля',
                       '%d мая', '%d июня', '%d июля', '%d августа',
                       '%d сентября', '%d октября', '%d ноября', '%d декабря'])
-addFmt2('sco', False, '%%d %s', True)
-addFmt2('scn', False, '%%d di %s', False)
 addFmt1('se', False, ['ođđajagimánu %d.', 'guovvamánu %d.', 'njukčamánu %d.',
                       'cuoŋománu %d.', 'miessemánu %d.', 'geassemánu %d.',
                       'suoidnemánu %d.', 'borgemánu %d.', 'čakčamánu %d.',
                       'golggotmánu %d.', 'skábmamánu %d.', 'juovlamánu %d.'])
 addFmt1('sh', False, makeMonthList('%%d.%d.'))
-addFmt2('sk', False, '%%d. %s', False)
-addFmt2('sl', False, '%%d. %s', False)
 addFmt1('sq', False, ['%d Janar', '%d Shkurt', '%d Mars', '%d Prill', '%d Maj',
                       '%d Qershor', '%d Korrik', '%d Gusht', '%d Shtator',
                       '%d Tetor', '%d Nëntor', '%d Dhjetor'])
-addFmt2('sr', False, '%%d. %s', False)
-addFmt2('su', False, '%%d %s', True)
-addFmt2('sv', False, '%%d %s', False)
-addFmt2('ta', False, '%s %%d')
-addFmt2('te', False, '%s %%d')
-addFmt2('th', False, '%%d %s')  # %%T
-addFmt2('tl', False, '%s %%d')
-addFmt2('tr', False, '%%d %s', True)
-addFmt2('tt', False, '%%d. %s', True)
 addFmt1('uk', False, ['%d січня', '%d лютого', '%d березня', '%d квітня',
                       '%d травня', '%d червня', '%d липня', '%d серпня',
                       '%d вересня', '%d жовтня', '%d листопада', '%d грудня'])
@@ -2028,9 +1785,7 @@ addFmt1('ur', False, ['%d جنوری', '%d فروری', '%d مارچ',
                       '%d اپریل', '%d مئی', '%d جون', '%d جولائی',
                       '%d اگست', '%d ستمبر', '%d اکتوبر',
                       '%d نومبر', '%d دسمبر'])
-addFmt2('vec', False, '%%d de %s', False)
 addFmt1('vi', False, makeMonthList('%%d tháng %d'))
-addFmt2('vo', False, '%s %%d', False)
 addFmt1('zh', False, makeMonthList('%d月%%d日'))
 
 # Walloon names depend on the day number, thus we must generate various
@@ -2067,28 +1822,15 @@ for i in range(0, 12):
 #
 # Month of the Year: "en:May 1976"
 #
-addFmt2('af', True, '%s %%d', True)
-addFmt2('ar', True, '%s %%d')
-addFmt2('ang', True, '%s %%d', True)
-addFmt2('cs', True, '%s %%d')
-addFmt2('de', True, '%s %%d', True)
 addFmt1('el', True, ['Ιανουάριος %d', 'Φεβρουάριος %d', 'Μάρτιος %d',
                      'Απρίλιος %d', 'Μάιος %d', 'Ιούνιος %d', 'Ιούλιος %d',
                      'Άυγουστος %d', 'Σεπτέμβριος %d', 'Οκτώβριος %d',
                      'Νοέμβριος %d', 'Δεκέμβριος %d'])
-addFmt2('en', True, '%s %%d', True)
-addFmt2('eo', True, '%s de %%d')
-addFmt2('es', True, '%s de %%d', True)
-addFmt2('et', True, '%s %%d', True)
-addFmt2('fi', True, '%s %%d', True)
 addFmt1('fr', True, ['Janvier %d', 'Février %d', 'Mars %d', 'Avril %d',
                      'Mai %d', 'Juin %d', 'Juillet %d', 'Août %d',
                      'Septembre %d', 'Octobre %d', 'Novembre %d',
                      'Décembre %d'])
-addFmt2('he', True, '%s %%d', True)
-addFmt2('it', True, 'Attualità/Anno %%d - %s', True)
 addFmt1('ja', True, ['「最近の出来事」%%d年%d月' % mm for mm in range(1, 13)])
-addFmt2('ka', True, '%s, %%d')
 addFmt1('ko', True, ['%d년 1월', '%d년 2월', '%d년 3월', '%d년 4월', '%d년 5월',
                      '%d년 6월', '%d년 7월', '%d년 8월', '%d년 9월', '%d년 10월',
                      '%d년 11월', '%d년 12월'])
@@ -2101,16 +1843,8 @@ addFmt1('nl', True, ['Januari %d', 'Februari %d', 'Maart %d', 'April %d',
                      'Mei %d', 'Juni %d', 'Juli %d', 'Augustus %d',
                      'September %d', 'Oktober %d', 'November %d',
                      'December %d'])
-addFmt2('pl', True, '%s %%d', True)
 addFmt1('scn', True, [None, None, 'Marzu %d', None, None, None, None, None,
                       None, None, None, None])
-addFmt2('sk', True, '%s %%d')
-addFmt2('sv', True, '%s %%d', True)
-addFmt2('th', True, '%s พ.ศ. %%T')
-addFmt2('tl', True, '%s %%d')
-addFmt2('tt', True, '%s, %%d', True)
-addFmt2('uk', True, '%s %%d', True)
-addFmt2('ur', True, '%s %%d', True)
 addFmt1('vi', True, makeMonthList('Tháng %d năm %%d'))
 addFmt1('zh', True, makeMonthList('%%d年%d月'))
 
