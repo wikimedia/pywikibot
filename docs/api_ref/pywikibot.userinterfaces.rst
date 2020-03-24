@@ -6,11 +6,6 @@ pywikibot.userinterfaces package
 Submodules
 ----------
 
-pywikibot.userinterfaces.cgi\_interface module
-----------------------------------------------
-
-.. automodule:: pywikibot.userinterfaces.cgi_interface
-
 pywikibot.userinterfaces.gui module
 -----------------------------------
 
