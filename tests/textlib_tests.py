@@ -1624,60 +1624,6 @@ class TestUnescape(TestCase):
                          '!23<>\'"&&')
 
 
-class TestStarList(TestCase):
-
-    """Test starlist."""
-
-    net = False
-
-    def test_basic(self):
-        """Test standardizing {{linkfa}} without parameters."""
-        self.assertEqual(
-            'foo\n{{linkfa}}\nbar\n\n',
-            textlib.standardize_stars('foo\n{{linkfa}}\nbar'))
-
-    def test_with_params(self):
-        """Test standardizing text with {{linkfa|...}}."""
-        self.assertEqual(
-            'foo\nbar\n\n{{linkfa|...}}\n',
-            textlib.standardize_stars('foo\n{{linkfa|...}}\nbar'))
-
-    def test_with_sorting_params(self):
-        """Test standardizing text with sorting parameters."""
-        self.assertEqual(
-            'foo\n\n{{linkfa|bar}}\n{{linkfa|de}}\n'
-            '{{linkfa|en}}\n{{linkfa|fr}}\n',
-            textlib.standardize_stars(
-                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
-                '{{linkfa|fr}}\n{{linkfa|bar}}'))
-
-    def test_get_stars(self):
-        """Test get_starts method."""
-        self.assertEqual(
-            ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
-             '{{linkfa|fr}}\n', '{{linkfa|bar}}'],
-            textlib.get_stars(
-                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
-                '{{linkfa|fr}}\n{{linkfa|bar}}'))
-
-    def test_remove_stars(self):
-        """Test remove_stars method."""
-        self.assertEqual(
-            'foo\n{{linkfa|en}}\n{{linkfa|fr}}\n{{linkfa|bar}}',
-            textlib.remove_stars(
-                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
-                '{{linkfa|fr}}\n{{linkfa|bar}}', ['{{linkfa|de}}\n']))
-
-    def test_append_stars(self):
-        """Test append_stars method."""
-        self.assertEqual(
-            'foo\n\n{{linkfa|bar}}\n{{linkfa|de}}\n'
-            '{{linkfa|en}}\n{{linkfa|fr}}\n',
-            textlib.append_stars(
-                'foo', ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
-                        '{{linkfa|fr}}\n', '{{linkfa|bar}}']))
-
-
 class TestExtractSections(DefaultDrySiteTestCase):
 
     """Test the extract_sections function."""
