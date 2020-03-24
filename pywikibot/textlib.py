@@ -1915,9 +1915,9 @@ def glue_template_and_params(template_and_params):
     return '{{%s\n%s}}' % (template, text)
 
 
-# ---------------------------------
-# functions dealing with stars list
-# ---------------------------------
+# ----------------------------------------------
+# functions dealing with stars list (deprecated)
+# ----------------------------------------------
 
 starsList = [
     'bueno',
@@ -1950,6 +1950,7 @@ starsList = [
 ]
 
 
+@deprecated(future_warning=True, since='20200324')
 def get_stars(text):
     """
     Extract stars templates from wikitext.
@@ -1970,6 +1971,7 @@ def get_stars(text):
     return allstars
 
 
+@deprecated(future_warning=True, since='20200324')
 def remove_stars(text, stars_list):
     """
     Remove stars templates from text.
@@ -1985,6 +1987,7 @@ def remove_stars(text, stars_list):
     return text
 
 
+@deprecated(future_warning=True, since='20200324')
 def append_stars(text, stars_list, site=None):
     """
     Remove stars templates from text.
@@ -2009,6 +2012,7 @@ def append_stars(text, stars_list, site=None):
     return text
 
 
+@deprecated(future_warning=True, since='20200324')
 def standardize_stars(text):
     """Make sure that star templates are in the right order."""
     allstars = get_stars(text)
