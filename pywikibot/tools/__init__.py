@@ -1806,6 +1806,8 @@ def deprecated_args(**arg_pairs):
                     default='[deprecated name of ' + new_arg + ']'
                     if new_arg not in [True, False, None]
                     else NotImplemented)
+            params = collections.OrderedDict(sorted(params.items(),
+                                                    key=lambda x: x[1].kind))
             wrapper.__signature__ = inspect.Signature()
             wrapper.__signature__._parameters = params
 
