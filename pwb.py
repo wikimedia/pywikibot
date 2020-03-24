@@ -288,10 +288,10 @@ def find_filename(filename):
                     'scripts.userscripts']
 
     if config.user_script_paths:
-        if isinstance(config.user_script_paths, (tuple, list)):
+        if isinstance(config.user_script_paths, list):
             script_paths = config.user_script_paths + script_paths
         else:
-            warn("'user_script_paths' must be a list or tuple,\n"
+            warn("'user_script_paths' must be a list,\n"
                  'found: {0}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
