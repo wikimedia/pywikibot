@@ -182,10 +182,9 @@ def check_modules(script=None):
 # Either it is '.' if the user's current working directory is the same,
 # or it is the absolute path for the directory of pwb.py
 absolute_path = abspath(os.path.dirname(sys.argv[0]))
-rewrite_path = absolute_path
 
-if rewrite_path not in sys.path[:2]:
-    sys.path.insert(1, rewrite_path)
+if absolute_path not in sys.path[:2]:
+    sys.path.insert(1, absolute_path)
 
 if not check_modules():
     sys.exit()
