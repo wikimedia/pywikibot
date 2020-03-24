@@ -359,7 +359,7 @@ def main():
     if check_modules(filename) or '-help' in args:
         run_python_file(filename,
                         [filename] + args,
-                        [Path(relative_filename).stem] + argvu[1:],
+                        [Path(filename).stem] + argvu[1:],
                         file_package)
     return True
 
