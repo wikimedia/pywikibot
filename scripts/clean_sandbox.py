@@ -21,8 +21,21 @@ Furthermore, the following command line parameters are supported:
     -text          The text that substitutes in the sandbox, you can use this
                    when you haven't configured clean_candbox for your wiki.
 
-    -summary       Summary of the edit made by bot.
+    -summary       Summary of the edit made by bot. Overrides the default
+                   from i18n.
 
+All local parameters can be given inside a scripts.ini file. Options
+passed to the script are priorized over options read from ini file. See:
+https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
+
+For example:
+
+    [clean_sandbox]
+    # the parameter section for clean_sandbox script
+    summary = Bot: Cleaning sandbox
+    text = {{subst:Clean Sandbox}}
+    hours: 0.5
+    delay: 7
 """
 #
 # (C) Leonardo Gregianin, 2006
