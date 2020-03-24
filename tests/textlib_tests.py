@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2019
+# (C) Pywikibot team, 2011-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,8 +44,7 @@ class TestSectionFunctions(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
-                           % {'LS': config.LS})
+        self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super(TestSectionFunctions, self).setUp()
 
     def contains(self, fn, sn):
@@ -126,8 +125,7 @@ class TestFormatInterwiki(TestCase):
             'de': pywikibot.Page(pywikibot.Link('de:German', self.site)),
             'fr': pywikibot.Page(pywikibot.Link('fr:French', self.site))
         }
-        self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
-                         % {'LS': config.LS},
+        self.assertEqual('[[de:German]]\n[[fr:French]]\n',
                          textlib.interwikiFormat(interwikis, self.site))
 
     def test_interwiki_format_Link(self):
@@ -136,8 +134,7 @@ class TestFormatInterwiki(TestCase):
             'de': pywikibot.Link('de:German', self.site),
             'fr': pywikibot.Link('fr:French', self.site),
         }
-        self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
-                         % {'LS': config.LS},
+        self.assertEqual('[[de:German]]\n[[fr:French]]\n',
                          textlib.interwikiFormat(interwikis, self.site))
 
 
@@ -145,8 +142,7 @@ class TestFormatCategory(DefaultDrySiteTestCase):
 
     """Test category formatting."""
 
-    catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
-                 % {'LS': config.LS})
+    catresult = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
 
     def test_category_format_raw(self):
         """Test formatting categories as strings formatted as links."""
@@ -184,9 +180,8 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
     with both a newline and an empty string as separators.
     """
 
-    old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
-           '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
-           % {'LS': config.LS})
+    old = ('[[Category:Cat1]]\n[[Category:Cat2|]]\n'
+           '[[Category:Cat1| ]]\n[[Category:Cat2|key]]')
 
     def test_standard_links(self):
         """Test getting and replacing categories."""
@@ -194,29 +189,16 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
         self.assertEqual(self.old, new)
 
-    def test_adjoining_links(self):
-        """Test getting and replacing adjacent categories."""
-        cats_std = textlib.getCategoryLinks(self.old, site=self.site)
-        old = self.old.replace(config.LS, '')
-        cats = textlib.getCategoryLinks(old, site=self.site)
-        self.assertEqual(cats_std, cats)
-        sep = config.LS
-        config.line_separator = ''  # use an empty separator temporarily
-        new = textlib.replaceCategoryLinks(old, cats, site=self.site)
-        # Restore the default separator.
-        config.line_separator = sep
-        self.assertEqual(old, new)
-
     def test_indentation(self):
         """Test indentation from previous block."""
         # Block of text
-        old = 'Some text%(LS)s%(LS)s' % {'LS': config.LS} + self.old
+        old = 'Some text\n\n' + self.old
         cats = textlib.getCategoryLinks(old, site=self.site)
         new = textlib.replaceCategoryLinks(old, cats, site=self.site)
         self.assertEqual(old, new)
 
         # DEFAULTSORT
-        old_ds = '{{DEFAULTSORT:key}}%(LS)s' % {'LS': config.LS} + self.old
+        old_ds = '{{DEFAULTSORT:key}}\n' + self.old
         cats_ds = textlib.getCategoryLinks(old_ds, site=self.site)
         new_ds = textlib.replaceCategoryLinks(old_ds, cats_ds, site=self.site)
         self.assertEqual(old_ds, new_ds)

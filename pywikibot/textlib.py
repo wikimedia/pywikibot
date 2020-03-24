@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1230,9 +1230,8 @@ def interwikiFormat(links, insite=None):
     if insite.code in insite.family.interwiki_on_one_line:
         sep = ' '
     else:
-        sep = config.line_separator
-    s = sep.join(s) + config.line_separator
-    return s
+        sep = '\n'
+    return sep.join(s) + '\n'
 
 
 def interwikiSort(sites, insite=None):
@@ -1334,7 +1333,7 @@ def removeCategoryLinks(text, site=None, marker=''):
                          site=site)
     if marker:
         # avoid having multiple linefeeds at the end of the text
-        text = re.sub(r'\s*%s' % re.escape(marker), config.LS + marker,
+        text = re.sub(r'\s*%s' % re.escape(marker), '\n' + marker,
                       text.strip())
     return text.strip()
 
@@ -1449,7 +1448,7 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
         site = pywikibot.Site()
     if re.search(r'\{\{ *(' + r'|'.join(site.getmagicwords('defaultsort'))
                  + r')', oldtext, flags=re.I):
-        separator = config.line_separator
+        separator = '\n'
     else:
         separator = site.family.category_text_separator
     iseparator = site.family.interwiki_text_separator
@@ -1560,10 +1559,10 @@ def categoryFormat(categories, insite=None):
     if insite.category_on_one_line():
         sep = ' '
     else:
-        sep = config.line_separator
+        sep = '\n'
     # Some people don't like the categories sorted
     # catLinks.sort()
-    return sep.join(catLinks) + config.line_separator
+    return sep.join(catLinks) + '\n'
 
 
 # -------------------------------------
@@ -1996,18 +1995,17 @@ def append_stars(text, stars_list, site=None):
     @type stars_list: list
     @param site: a site where the given text is used.
         interwiki_text_separator is used when a site object is given.
-        Otherwise line_separator is used twice to separate stars list.
+        Otherwise two line separators are used to separate stars list.
     @type site: BaseSite
     @return: modified text
     @rtype: str
     """
-    LS = (config.line_separator * 2
-          if not site else site.family.interwiki_text_separator)
+    LS = '\n\n' if not site else site.family.interwiki_text_separator
     text = text.strip() + LS
     stars = stars_list[:]
     stars.sort()
     for element in stars:
-        text += element.strip() + config.line_separator
+        text += element.strip() + '\n'
     return text
 
 

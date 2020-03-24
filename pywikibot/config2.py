@@ -112,8 +112,9 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {'available_ssl_project', 'fake_user_agent',
-                         'panoramio', 'proxy', 'special_page_limit',
-                         'sysopnames', 'use_SSL_onlogin', 'use_SSL_always'}
+                         'line_separator', 'LS', 'panoramio', 'proxy',
+                         'special_page_limit', 'sysopnames', 'use_SSL_onlogin',
+                         'use_SSL_always'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -874,12 +875,6 @@ simulate = False
 # Increasing this value will increase memory space but could speed up
 # processing. As higher this value this effect will decrease.
 max_queue_size = 64
-
-# Define the line separator. Pages retrieved via API have "\n" whereas
-# pages fetched from screen (mostly) have "\r\n". Interwiki and category
-# separator settings in family files should use multiplied of this.
-# LS is a shortcut alias.
-line_separator = LS = '\n'
 
 # Settings to enable mwparserfromhell
 # <https://mwparserfromhell.readthedocs.org/en/latest/>

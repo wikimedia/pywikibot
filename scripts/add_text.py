@@ -56,7 +56,7 @@ Warning! Put it in one line, otherwise it won't work correctly:
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -223,8 +223,8 @@ def add_text(page, addText, summary=None, regexSkip=None,
     if not up:
         newtext = text
         # Translating the \\n into binary \n
-        addText = addText.replace('\\n', config.line_separator)
-        if (reorderEnabled):
+        addText = addText.replace('\\n', '\n')
+        if reorderEnabled:
             # Getting the categories
             categoriesInside = textlib.getCategoryLinks(newtext, site)
             # Deleting the categories
@@ -235,7 +235,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.removeLanguageLinks(newtext, site)
 
             # Adding the text
-            newtext += '{}{}'.format(config.line_separator, addText)
+            newtext += '\n' + addText
             # Reputting the categories
             newtext = textlib.replaceCategoryLinks(newtext,
                                                    categoriesInside, site,
@@ -244,9 +244,9 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.replaceLanguageLinks(newtext, interwikiInside,
                                                    site)
         else:
-            newtext += '{}{}'.format(config.line_separator, addText)
+            newtext += '\n' + addText
     else:
-        newtext = addText + config.line_separator + text
+        newtext = addText + '\n' + text
 
     if putText and text != newtext:
         pywikibot.output(color_format(
