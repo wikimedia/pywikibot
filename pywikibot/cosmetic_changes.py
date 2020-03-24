@@ -68,8 +68,8 @@ except ImportError:
 
 import pywikibot
 
-from pywikibot import config, textlib
 from pywikibot.page import url2unicode
+from pywikibot import textlib
 from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
                                _get_regexes)
 from pywikibot.tools import deprecated_args, first_lower, first_upper
@@ -711,7 +711,7 @@ class CosmeticChangesToolkit(object):
         return textlib.replaceExcept(
             text,
             r'(?m)^(={1,6})[ \t]*(?P<title>.*[^\s=])[ \t]*\1[ \t]*\r?\n',
-            r'\1 \g<title> \1%s' % config.LS,
+            r'\1 \g<title> \1\n',
             ['comment', 'math', 'nowiki', 'pre'])
 
     def putSpacesInLists(self, text):

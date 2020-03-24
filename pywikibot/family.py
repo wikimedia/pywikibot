@@ -817,7 +817,7 @@ class Family(object):
     # one-after-another on a single line
     interwiki_on_one_line = []
     # String used as separator between interwiki links and the text
-    interwiki_text_separator = config.line_separator * 2
+    interwiki_text_separator = '\n\n'
 
     # Similar for category
     category_attop = []
@@ -825,7 +825,7 @@ class Family(object):
     # one-after-another on a single line
     category_on_one_line = []
     # String used as separator between category links and the text
-    category_text_separator = config.line_separator * 2
+    category_text_separator = '\n\n'
     # When both at the bottom should categories come after interwikilinks?
     # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
     # extension which puts categories last on all sites. TO BE DEPRECATED!
