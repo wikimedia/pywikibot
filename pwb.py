@@ -139,6 +139,24 @@ def handle_args(pwb_py, *args):
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
+def _print_requirements(requirements, script, variant):
+    """Print pip command to install requirements."""
+    if not requirements:
+        return
+
+    if len(requirements) > 1:
+        format_string = '\nPackages necessary for {} are {}.'
+    else:
+        format_string = '\nA package necessary for {} is {}.'
+    print(format_string.format(script or 'pywikibot', variant))
+    print('Please update required module{} with:\n\n'
+          .format('s' if len(requirements) > 1 else ''))
+
+    for requirement in requirements:
+        print('    pip install "{}"\n'
+              .format(str(requirement).partition(';')[0]))
+
+
 def check_modules(script=None):
     """Check whether mandatory modules are present."""
     import pkg_resources
@@ -153,29 +171,33 @@ def check_modules(script=None):
         from setup import dependencies
 
     missing_requirements = []
-
+    version_conflicts = []
     for requirement in pkg_resources.parse_requirements(dependencies):
         if requirement.marker is None \
            or pkg_resources.evaluate_marker(str(requirement.marker)):
             try:
                 pkg_resources.resource_exists(requirement, requirement.name)
-            except (pkg_resources.DistributionNotFound,
-                    pkg_resources.VersionConflict) as e:
-                print(e)
+            except pkg_resources.DistributionNotFound as e:
                 missing_requirements.append(requirement)
+                print(e)
+            except pkg_resources.VersionConflict as e:
+                version_conflicts.append(requirement)
+                print(e)
 
     del pkg_resources
     del dependencies
 
-    if not missing_requirements:
-        return True
+    _print_requirements(missing_requirements, script, 'missing')
+    _print_requirements(version_conflicts, script, 'outdated')
 
-    print('\nPlease install/update required module{} with:\n\n'
-          .format('s' if len(missing_requirements) > 1 else ''))
-    for requirement in missing_requirements:
-        print('    pip install "{}"\n'
-              .format(str(requirement).partition(';')[0]))
-    return False
+    if version_conflicts and not missing_requirements:
+        print('\nYou may continue on your own risk; type CTRL-C to stop.')
+        try:
+            sleep(5)
+        except KeyboardInterrupt:
+            return False
+
+    return not missing_requirements
 
 
 # Establish a normalised path for the directory containing pwb.py.
