@@ -99,8 +99,6 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 
 # ------- setup install_requires ------- #
 # packages which are mandatory
-# version.package_version() uses pathlib which is a python 3 library.
-# pathlib2 is required for python 2.7
 dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
                 'requests>=2.20.1; python_version != "3.4"',
                 'enum34>=1.1.6,!=1.1.8; python_version < "3"',
