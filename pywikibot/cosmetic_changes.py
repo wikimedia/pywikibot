@@ -157,6 +157,12 @@ deprecatedTemplates = {
             ('Quellen', 'Belege fehlen\\g<parameters>'),
             ('Quellen fehlen', 'Belege fehlen\\g<parameters>'),
         ],
+        'ur': [
+            ('Infobox former country',
+             'خانہ معلومات سابقہ ملک\\g<parameters>'),
+            ('Infobox Former Country',
+             'خانہ معلومات سابقہ ملک\\g<parameters>'),
+        ],
     }
 }
 
