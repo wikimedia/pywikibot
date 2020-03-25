@@ -282,9 +282,9 @@ def find_filename(filename):
     """Search for the filename in the given script paths."""
     from pywikibot import config
 
-    script_paths = ['scripts',
-                    'scripts.maintenance',
-                    'scripts.userscripts']
+    script_paths = ['scripts.userscripts',
+                    'scripts',
+                    'scripts.maintenance']
 
     if config.user_script_paths:
         if isinstance(config.user_script_paths, list):
