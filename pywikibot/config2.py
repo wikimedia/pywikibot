@@ -558,9 +558,9 @@ debug_log = []
 #
 # The search order is
 # 1. user_script_paths in the given order
-# 2. scripts
-# 3. scripts/maintenance
-# 4. scripts/archive
+# 2. scripts/userscripts
+# 3. scripts
+# 4. scripts/maintenance
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
