@@ -3115,8 +3115,7 @@ class LoginManager(login.LoginManager):
                 return ''
             elif login_result['login']['result'] == 'NeedToken':
                 # Kept for backwards compatibility
-                # Generate a new token if invalid, see T224712
-                token = self.get_login_token(login_result['login']['token'])
+                token = login_result['login']['token']
                 login_request['lgtoken'] = token
                 continue
             elif login_result['login']['result'] == 'Throttled':
@@ -3132,52 +3131,23 @@ class LoginManager(login.LoginManager):
         """Ignore data; cookies are set by threadedhttp module."""
         http.cookie_jar.save()
 
-    def get_login_token(self, old_token=None):
+    def get_login_token(self):
         """Fetch login token from action=query&meta=tokens.
 
         Requires MediaWiki >= 1.27.
 
-        @param old_token: old token to try
-        @type old_token: str
         @return: login token
         @rtype: str
         """
         if self.site.mw_version < '1.27':
             raise NotImplementedError('The method get_login_token() requires '
                                       'at least MediaWiki version 1.27.')
-        if old_token and self.check_login_token(old_token) == 'valid':
-            return old_token
         login_token_request = self.site._request(
             use_get=False,
             parameters={'action': 'query', 'meta': 'tokens', 'type': 'login'},
         )
         login_token_result = login_token_request.submit()
         return login_token_result['query']['tokens'].get('logintoken')
-
-    def check_login_token(self, token):
-        """Check login token from action=checktoken.
-
-        Requires MediaWiki >= 1.27.
-
-        @param token: token to check
-        @tyoe token: str
-        @return: token validity status
-        @rtype: str
-        """
-        if self.site.mw_version < '1.27':
-            raise NotImplementedError('The method check_login_token() '
-                                      'requires at least MediaWiki '
-                                      'version 1.27.')
-        check_token_request = self.site._request(
-            use_get=False,
-            parameters={
-                'action': 'checktoken',
-                'type': 'login',
-                'token': token,
-            },
-        )
-        check_token_result = check_token_request.submit()
-        return check_token_result['checktoken'].get('result')
 
 
 def encode_url(query):
