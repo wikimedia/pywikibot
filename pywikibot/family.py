@@ -36,8 +36,9 @@ else:
 logger = logging.getLogger('pywiki.wiki.family')
 
 # Legal characters for Family.name and Family.langs keys
+# nl_nds code alias requires "_"
 NAME_CHARACTERS = string.ascii_letters + string.digits
-CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-'
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-_'
 
 
 class Family(object):
@@ -1568,6 +1569,11 @@ class SubdomainFamily(Family):
         # shortcut this classproperty
         cls.langs = {code: '{0}.{1}'.format(code, cls.domain)
                      for code in codes}
+
+        if hasattr(cls, 'code_aliases'):
+            cls.langs.update({alias: '{0}.{1}'.format(code, cls.domain)
+                              for alias, code in cls.code_aliases.items()})
+
         return cls.langs
 
     @classproperty
@@ -1597,7 +1603,12 @@ class FandomFamily(Family):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        return {code: cls.domain for code in cls.codes}
+        codes = cls.codes
+
+        if hasattr(cls, 'code_aliases'):
+            codes += tuple(cls.code_aliases.keys())
+
+        return {code: cls.domain for code in codes}
 
     def protocol(self, code):
         """Return 'https' as the protocol."""

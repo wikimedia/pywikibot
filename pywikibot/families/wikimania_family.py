@@ -23,7 +23,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '2014', '2015', '2016', '2017', '2018'
     ]
 
-    codes = ['wikimania']
+    codes = ['wikimania', 'team']
 
     code_aliases = {'2019': 'wikimania'}
 
@@ -32,10 +32,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        codes = cls.codes + cls.closed_wikis
-
-        # shortcut this classproperty
-        cls.langs = {code: '{}{}.{}'.format(cls.name, code, cls.domain)
-                     for code in codes if code != 'wikimania'}
-        cls.langs['wikimania'] = 'wikimania.{}'.format(cls.domain)
+        cls.langs = super(Family, cls).langs
+        for lang, url in cls.langs.items():
+            if not url.startswith(cls.name):
+                cls.langs[lang] = cls.name + url
         return cls.langs
