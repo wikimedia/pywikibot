@@ -3140,12 +3140,12 @@ class LoginManager(login.LoginManager):
         if self.site.family.ldapDomain:
             login_request[self.keyword('ldap')] = self.site.family.ldapDomain
 
-        # get token using meta=tokens if supported
-        if not below_mw_1_27:
-            login_request[self.keyword('token')] = self.get_login_token()
-
         self.site._loginstatus = -2  # IN_PROGRESS
         while True:
+            # get token using meta=tokens if supported
+            if not below_mw_1_27:
+                login_request[self.keyword('token')] = self.get_login_token()
+
             # try to login
             login_result = login_request.submit()
 
@@ -3163,10 +3163,11 @@ class LoginManager(login.LoginManager):
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
                 return ''
-            elif status == 'NeedToken':
-                # Kept for backwards compatibility
-                token = response['token']
-                login_request['lgtoken'] = token
+            elif status in ('NeedToken', 'WrongToken') and not below_mw_1_27:
+                # if incorrect login token was used,
+                # force relogin and generate fresh one
+                pywikibot.error('Received incorrect login token. '
+                                'Forcing re-login.')
                 continue
             elif (status == 'Throttled' or status == 'FAIL'
                   and response['messagecode'] == 'login-throttled'
