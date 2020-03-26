@@ -225,6 +225,105 @@ class ContextOption(OutputOption, StandardOption):
         pywikibot.output(self.text[start_context:end_context])
 
 
+class Choice(StandardOption):
+
+    """A simple choice consisting of a option, shortcut and handler."""
+
+    def __init__(self, option, shortcut, replacer):
+        """Initializer."""
+        super(Choice, self).__init__(option, shortcut)
+        self._replacer = replacer
+
+    @property
+    def replacer(self):
+        """The replacer."""
+        return self._replacer
+
+    def handle(self):
+        """Handle this choice. Must be implemented."""
+        raise NotImplementedError()
+
+    def handle_link(self):
+        """The current link will be handled by this choice."""
+        return False
+
+
+class StaticChoice(Choice):
+
+    """A static choice which just returns the given value."""
+
+    def __init__(self, option, shortcut, result):
+        """Create instance with replacer set to None."""
+        super(StaticChoice, self).__init__(option, shortcut, None)
+        self._result = result
+
+    def handle(self):
+        """Return the predefined value."""
+        return self._result
+
+
+class LinkChoice(Choice):
+
+    """A choice returning a mix of the link new and current link."""
+
+    def __init__(self, option, shortcut, replacer, replace_section,
+                 replace_label):
+        """Initializer."""
+        super(LinkChoice, self).__init__(option, shortcut, replacer)
+        self._section = replace_section
+        self._label = replace_label
+
+    def handle(self):
+        """Handle by either applying the new section or label."""
+        kwargs = {}
+        if self._section:
+            kwargs['section'] = self.replacer._new.section
+        else:
+            kwargs['section'] = self.replacer.current_link.section
+        if self._label:
+            if self.replacer._new.anchor is None:
+                kwargs['label'] = self.replacer._new.canonical_title()
+                if self.replacer._new.section:
+                    kwargs['label'] += '#' + self.replacer._new.section
+            else:
+                kwargs['label'] = self.replacer._new.anchor
+        else:
+            if self.replacer.current_link.anchor is None:
+                kwargs['label'] = self.replacer.current_groups['title']
+                if self.replacer.current_groups['section']:
+                    kwargs['label'] += '#' + \
+                                       self.replacer.current_groups['section']
+            else:
+                kwargs['label'] = self.replacer.current_link.anchor
+        return pywikibot.Link.create_separated(
+            self.replacer._new.canonical_title(), self.replacer._new.site,
+            **kwargs)
+
+
+class AlwaysChoice(Choice):
+
+    """Add an option to always apply the default."""
+
+    def __init__(self, replacer, option='always', shortcut='a'):
+        """Initializer."""
+        super(AlwaysChoice, self).__init__(option, shortcut, replacer)
+        self.always = False
+
+    def handle(self):
+        """Handle the custom shortcut."""
+        self.always = True
+        return self.answer
+
+    def handle_link(self):
+        """Directly return answer whether it's applying it always."""
+        return self.always
+
+    @property
+    def answer(self):
+        """Get the actual default answer instructing the replacement."""
+        return self.replacer.handle_answer(self.replacer._default)
+
+
 class IntegerOption(Option):
 
     """An option allowing a range of integers."""
