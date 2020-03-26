@@ -2017,14 +2017,14 @@ class WikidataBot(Bot, ExistingPageBot):
                                'property ID (e.g. P123) of it:'
                                % property_name).upper()
 
-    def user_edit_entity(self, item, data=None,
+    def user_edit_entity(self, entity, data=None,
                          ignore_save_related_errors=None,
                          ignore_server_errors=None, **kwargs):
         """
         Edit entity with data provided, with user confirmation as required.
 
-        @param item: page to be edited
-        @type item: pywikibot.page.ItemPage
+        @param entity: page to be edited
+        @type entity: WikibasePage
         @param data: data to be saved, or None if the diff should be created
           automatically
         @param ignore_save_related_errors: Ignore save related errors and
@@ -2048,10 +2048,9 @@ class WikidataBot(Bot, ExistingPageBot):
         show_diff = kwargs.pop('show_diff', True)
         if show_diff:
             if data is None:
-                diff = item.toJSON(diffto=(
-                    item._content if hasattr(item, '_content') else None))
+                diff = entity.toJSON(diffto=getattr(entity, '_content', None))
             else:
-                diff = pywikibot.page.WikibasePage._normalizeData(data)
+                diff = entity._normalizeData(data)
             pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
@@ -2060,7 +2059,7 @@ class WikidataBot(Bot, ExistingPageBot):
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
         return self._save_page(
-            item, item.editEntity, data,
+            entity, entity.editEntity, data,
             ignore_save_related_errors=ignore_save_related_errors,
             ignore_server_errors=ignore_server_errors, **kwargs)
 
