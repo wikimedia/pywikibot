@@ -3897,7 +3897,7 @@ class SiteLinkCollection(MutableMapping):
 
         @param key: site key as Site instance or db key
         @type key: pywikibot.Site or str
-        @rtype: SiteLink
+        @rtype: pywikibot.page.SiteLink
         """
         key = self.getdbName(key)
         return self._data[key]
@@ -3910,7 +3910,7 @@ class SiteLinkCollection(MutableMapping):
         @type key: pywikibot.Site or str
         @param val: page name as a string or JSON containing SiteLink data
         @type val: dict or str
-        @rtype: SiteLink
+        @rtype: pywikibot.page.SiteLink
         """
         if isinstance(val, UnicodeType):
             val = SiteLink(val, key)
