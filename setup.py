@@ -11,7 +11,7 @@ from __future__ import (absolute_import, division,
 import os
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -210,6 +210,18 @@ def read_desc(filename):
     return ''.join(desc)
 
 
+def get_packages(name):
+    """Find framework packages."""
+    if PY2:
+        from setuptools import find_packages
+        packages = [package for package in find_packages()
+                    if package.startswith(name + '.')]
+    else:
+        from setuptools import find_namespace_packages
+        packages = find_namespace_packages(include=[name + '.*'])
+    return [str(name)] + packages
+
+
 def main():
     """Setup entry point."""
     name = 'pywikibot'
@@ -224,9 +236,7 @@ def main():
         maintainer='The Pywikibot team',
         maintainer_email='pywikibot@lists.wikimedia.org',
         license='MIT License',
-        packages=[str(name)] + [package
-                                for package in find_packages()
-                                if package.startswith('pywikibot.')],
+        packages=get_packages(name),
         python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
         install_requires=dependencies,
         extras_require=extra_deps,
