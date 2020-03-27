@@ -3069,6 +3069,22 @@ class LoginManager(login.LoginManager):
 
     """Supply getCookie() method to use API interface."""
 
+    # API login parameters mapping
+    mapping = {
+        'user': ('lgname', 'username'),
+        'password': ('lgpassword', 'password'),
+        'ldap': ('lgdomain', 'domain'),
+        'token': ('lgtoken', 'logintoken'),
+        'result': ('result', 'status'),
+        'success': ('Success', 'PASS'),
+        'reason': ('reason', 'message')
+    }
+
+    def keyword(self, key):
+        """Get API keyword from mapping."""
+        index = 0 if self.action == 'login' else 1
+        return self.mapping[key][index]
+
     @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
     def getCookie(self):
         """Login to the site.
@@ -3089,43 +3105,79 @@ class LoginManager(login.LoginManager):
                     .format(diff.seconds))
                 pywikibot.sleep(diff.seconds)
 
+        below_mw_1_27 = self.site.mw_version < '1.27'
+
+        # prepare default login parameters
+        parameters = {'action': self.action,
+                      self.keyword('user'): self.login_name,
+                      self.keyword('password'): self.password}
+
+        if '@' in self.login_name or '@' in self.password or below_mw_1_27:
+            # Since MW 1.27 only for bot passwords.
+            # Bot passwords username contains @,
+            # otherwise @ is not allowed in usernames.
+            # @ in bot password is deprecated,
+            # but we don't want to break bots using it.
+            self.action = 'login'
+        else:
+            # Standard login request since MW 1.27
+            self.action = 'clientlogin'
+
+            # clientlogin requires non-empty loginreturnurl
+            parameters['loginreturnurl'] = 'https://example.com'
+
         # base login request
-        login_request = self.site._request(
-            use_get=False,
-            parameters={
-                'action': 'login',
-                'lgname': self.login_name,
-                'lgpassword': self.password,
-            })
+        login_request = self.site._request(use_get=False,
+                                           parameters=parameters)
 
         if self.site.family.ldapDomain:
-            login_request['lgdomain'] = self.site.family.ldapDomain
+            login_request[self.keyword('ldap')] = self.site.family.ldapDomain
 
         # get token using meta=tokens if supported
-        if self.site.mw_version >= '1.27':
-            login_request['lgtoken'] = self.get_login_token()
+        if not below_mw_1_27:
+            login_request[self.keyword('token')] = self.get_login_token()
 
         self.site._loginstatus = -2  # IN_PROGRESS
         while True:
+            # try to login
             login_result = login_request.submit()
-            if 'login' not in login_result:
-                raise RuntimeError(
-                    "API login response does not have 'login' key.")
-            if login_result['login']['result'] == 'Success':
+
+            # clientlogin response can be clientlogin or error
+            if self.action in login_result:
+                response = login_result[self.action]
+                result_key = self.keyword('result')
+            elif 'error' in login_result:
+                response = login_result['error']
+                result_key = 'code'
+            else:
+                raise RuntimeError('Unexpected API login response key.')
+
+            status = response[result_key]
+            fail_reason = response.get(self.keyword('reason'), '')
+            if status == self.keyword('success'):
                 return ''
-            elif login_result['login']['result'] == 'NeedToken':
+            elif status == 'NeedToken':
                 # Kept for backwards compatibility
-                token = login_result['login']['token']
+                token = response['token']
                 login_request['lgtoken'] = token
                 continue
-            elif login_result['login']['result'] == 'Throttled':
-                self._waituntil = datetime.datetime.now() + datetime.timedelta(
-                    seconds=int(login_result['login']['wait']))
+            elif (status == 'Throttled' or status == 'FAIL'
+                  and response['messagecode'] == 'login-throttled'
+                  or status == 'Failed' and 'wait' in fail_reason):
+                match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
+                if match:
+                    delta = datetime.timedelta(**{match[2]: int(match[1])})
+                wait = response.get('wait')
+                if wait:
+                    delta = datetime.timedelta(seconds=int(wait))
+                self._waituntil = datetime.datetime.now() + delta
                 break
             else:
                 break
-        info = login_result['login'].get('reason', '')
-        raise APIError(code=login_result['login']['result'], info=info)
+        if 'error' in login_result:
+            raise APIError(**response)
+        info = fail_reason
+        raise APIError(code=status, info=info)
 
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""
