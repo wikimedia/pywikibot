@@ -3107,11 +3107,6 @@ class LoginManager(login.LoginManager):
 
         below_mw_1_27 = self.site.mw_version < '1.27'
 
-        # prepare default login parameters
-        parameters = {'action': self.action,
-                      self.keyword('user'): self.login_name,
-                      self.keyword('password'): self.password}
-
         if '@' in self.login_name or '@' in self.password or below_mw_1_27:
             # Since MW 1.27 only for bot passwords.
             # Bot passwords username contains @,
@@ -3123,6 +3118,12 @@ class LoginManager(login.LoginManager):
             # Standard login request since MW 1.27
             self.action = 'clientlogin'
 
+        # prepare default login parameters
+        parameters = {'action': self.action,
+                      self.keyword('user'): self.login_name,
+                      self.keyword('password'): self.password}
+
+        if self.action == 'clientlogin':
             # clientlogin requires non-empty loginreturnurl
             parameters['loginreturnurl'] = 'https://example.com'
 
