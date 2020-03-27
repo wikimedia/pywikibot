@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20200326
+------------
+* site.py and page.py files were moved to their own folders and will be split in the future
 * Refactor data attributes of Wikibase entities (T233406)
 * Functions dealing with stars list are desupported and may be removed
 * Use path's stem of script filename within pwb.py wrapper (T248372)
