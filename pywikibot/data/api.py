@@ -1464,14 +1464,14 @@ class Request(MutableMapping):
             if not ('tokens' in meta and 'login' in typep):
                 if 'userinfo' not in meta:
                     meta = set(meta + ['userinfo'])
-                    self._params['meta'] = sorted(meta)
+                    self['meta'] = sorted(meta)
                 uiprop = self._params.get('uiprop', [])
                 uiprop = set(uiprop + ['blockinfo', 'hasmsg'])
-                self._params['uiprop'] = sorted(uiprop)
+                self['uiprop'] = sorted(uiprop)
             if 'prop' in self._params:
                 if self.site.has_extension('ProofreadPage'):
-                    prop = set(self._params['prop'] + ['proofread'])
-                    self._params['prop'] = sorted(prop)
+                    prop = set(self['prop'] + ['proofread'])
+                    self['prop'] = sorted(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'.
@@ -1479,14 +1479,14 @@ class Request(MutableMapping):
                     and self.site.mw_version >= '1.25wmf5'):
                 self._params.setdefault('rawcontinue', [''])
         elif self.action == 'help' and self.site.mw_version > '1.24':
-            self._params['wrap'] = ['']
+            self['wrap'] = ''
 
         if config.maxlag:
             self._params.setdefault('maxlag', [str(config.maxlag)])
         self._params.setdefault('format', ['json'])
-        if self._params['format'] != ['json']:
-            raise TypeError("Query format '%s' cannot be parsed."
-                            % self._params['format'])
+        if self['format'] != ['json']:
+            raise TypeError(
+                "Query format '{}' cannot be parsed.".format(self['format']))
 
         self.__defaulted = True
 
@@ -1766,11 +1766,11 @@ class Request(MutableMapping):
             for param in self._params:
                 if param.endswith('limit'):
                     # param values are stored a list of str
-                    value = self._params[param][0]
+                    value = self[param][0]
                     if value.isdigit():
-                        self._params[param] = [str(int(value) // 2)]
+                        self[param] = [str(int(value) // 2)]
                         pywikibot.output('Set {} = {}'
-                                         .format(param, self._params[param]))
+                                         .format(param, self[param]))
         else:
             if result and not isinstance(result, dict):
                 raise APIError('Unknown',
