@@ -3862,6 +3862,12 @@ class ClaimCollection(MutableMapping):
 
         return claims
 
+    def set_on_item(self, item):
+        """Set Claim.on_item attribute for all claims in this collection."""
+        for claims in self.values():
+            for claim in claims:
+                claim.on_item = item
+
 
 class SiteLinkCollection(MutableMapping):
     """A structure holding SiteLinks for a Wikibase item."""
@@ -4438,6 +4444,10 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
+
+        # xxx: this is ugly
+        if 'claims' in data:
+            self.claims.set_on_item(self)
 
         return data
 
@@ -5241,7 +5251,23 @@ class Claim(Property):
         self.qualifiers = OrderedDict()
         self.target = None
         self.snaktype = 'value'
-        self.on_item = None  # The item it's on
+        self._on_item = None  # The item it's on
+
+    @property
+    def on_item(self):
+        """Return item this claim is attached to."""
+        return self._on_item
+
+    @on_item.setter
+    def on_item(self, item):
+        self._on_item = item
+        for values in self.qualifiers.values():
+            for qualifier in values:
+                qualifier.on_item = item
+        for source in self.sources:
+            for values in source.values():
+                for source in values:
+                    source.on_item = item
 
     def __repr__(self):
         """Return the representation string."""
@@ -5577,6 +5603,7 @@ class Claim(Property):
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             for claim in claims:
                 claim.hash = data['reference']['hash']
+                claim.on_item = self.on_item
         source = defaultdict(list)
         for claim in claims:
             claim.isReference = True
@@ -5618,6 +5645,7 @@ class Claim(Property):
         if self.on_item is not None:
             data = self.repo.editQualifier(self, qualifier, **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            qualifier.on_item = self.on_item
         qualifier.isQualifier = True
         if qualifier.getID() in self.qualifiers:
             self.qualifiers[qualifier.getID()].append(qualifier)
@@ -5644,6 +5672,7 @@ class Claim(Property):
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for qualifier in qualifiers:
             self.qualifiers[qualifier.getID()].remove(qualifier)
+            qualifier.on_item = None
 
     def target_equals(self, value):
         """
