@@ -3126,6 +3126,7 @@ class LoginManager(login.LoginManager):
         if self.action == 'clientlogin':
             # clientlogin requires non-empty loginreturnurl
             parameters['loginreturnurl'] = 'https://example.com'
+            parameters['rememberMe'] = '1'
 
         # base login request
         login_request = self.site._request(use_get=False,
