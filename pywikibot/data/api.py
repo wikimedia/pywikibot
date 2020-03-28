@@ -3167,7 +3167,8 @@ class LoginManager(login.LoginManager):
                   or status == 'Failed' and 'wait' in fail_reason):
                 match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
                 if match:
-                    delta = datetime.timedelta(**{match[2]: int(match[1])})
+                    delta = datetime.timedelta(
+                        **{match.group(2): int(match.group(1))})
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
