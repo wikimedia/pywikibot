@@ -262,6 +262,7 @@ class LoginManager(object):
         'Illegal': 'is invalid',
         'readapidenied': 'does not have read permissions',
         'Failed': 'does not have read permissions',
+        'FAIL': 'does not have read permissions',
     }
 
     def login(self, retry=False, autocreate=False):
@@ -303,7 +304,7 @@ class LoginManager(object):
             if error_code in self._api_error:
                 error_msg = 'Username "{}" {} on {}'.format(
                     self.login_name, self._api_error[error_code], self.site)
-                if error_code == 'Failed':
+                if error_code in ('Failed', 'FAIL'):
                     error_msg += '\n.{}'.format(e.info)
                 raise NoUsername(error_msg)
 
