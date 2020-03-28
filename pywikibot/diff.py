@@ -271,16 +271,12 @@ class PatchManager(object):
             the charnumber in brackets (e.g. <200e>).
         @type replace_invisible: bool
         """
-        if '\n' in text_a or '\n' in text_b:
+        if '\n' in text_a or '\n' in text_b or not by_letter:
             self.a = text_a.splitlines(1)
             self.b = text_b.splitlines(1)
         else:
-            if by_letter:
-                self.a = text_a
-                self.b = text_b
-            else:
-                self.a = text_a.splitlines(1)
-                self.b = text_b.splitlines(1)
+            self.a = text_a
+            self.b = text_b
 
         # groups and hunk have same order (one hunk correspond to one group).
         s = difflib.SequenceMatcher(None, self.a, self.b)
@@ -453,7 +449,7 @@ class PatchManager(object):
             if choice not in answers:
                 choice = '?'
 
-            if choice == 'y' or choice == 'n':
+            if choice in ['y', 'n']:
                 super_hunk.reviewed = \
                     Hunk.APPR if choice == 'y' else Hunk.NOT_APPR
                 if next_pending is not None:
@@ -465,7 +461,7 @@ class PatchManager(object):
                     for hunk in super_hunk:
                         if hunk.reviewed == Hunk.PENDING:
                             hunk.reviewed = Hunk.NOT_APPR
-            elif choice == 'a' or choice == 'd':
+            elif choice in ['a', 'd']:
                 for super_hunk in super_hunks[position:]:
                     for hunk in super_hunk:
                         if hunk.reviewed == Hunk.PENDING:
@@ -476,15 +472,10 @@ class PatchManager(object):
                 hunk_list = []
                 rng_width = 18
                 for index, super_hunk in enumerate(super_hunks, start=1):
-                    if super_hunk.reviewed == Hunk.PENDING:
-                        status = ' '
-                    elif super_hunk.reviewed == Hunk.APPR:
-                        status = '+'
-                    elif super_hunk.reviewed == Hunk.NOT_APPR:
-                        status = '-'
-                    else:
-                        assert False, "The super hunk's review status is " \
-                                      'unknown.'
+                    assert super_hunk.reviewed in range(-1, 2), \
+                        "The super hunk's review status is unknown."
+                    status = ' +-'[super_hunk.reviewed]
+
                     if super_hunk[0].a_rng[1] - super_hunk[0].a_rng[0] > 0:
                         mode = '-'
                         first = self.a[super_hunk[0].a_rng[0]]
@@ -536,13 +527,11 @@ class PatchManager(object):
                                + super_hunks[position + 1:])
                 pywikibot.output(
                     'Split into {0} hunks'.format(len(super_hunk._hunks)))
-            elif choice == '?':
+            else:  # choice == '?':
                 pywikibot.output(color_format(
                     '{purple}{0}{default}', '\n'.join(
                         '{0} -> {1}'.format(answer, help_msg[answer])
                         for answer in answers)))
-            else:
-                assert False, '%s is not a valid option' % choice
 
     def apply(self):
         """Apply changes. If there are undecided changes, ask to review."""
