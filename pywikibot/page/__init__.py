@@ -46,10 +46,10 @@ from pywikibot.exceptions import (
 from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
-    compute_file_hash,
+    classproperty, compute_file_hash,
     UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    add_full_name, manage_wrapping,
+    add_full_name, manage_wrapping, suppress_warnings,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
     first_upper, redirect_func, remove_last_args, UnicodeType,
     StringTypes
@@ -1800,17 +1800,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
         result += '|}\n'
         return result
 
-    @deprecated('Page.revisions(content=True)', since='20150206')
+    @deprecated('Page.revisions(content=True)', since='20150206',
+                future_warning=True)
     @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
     def fullVersionHistory(self, reverse=False, total=None):
-        """Iterate previous versions including wikitext.
-
-        Takes same arguments as getVersionHistory.
-        """
-        return [rev.full_hist_entry()
+        """Return previous versions including content."""
+        with suppress_warnings(
+                'pywikibot.page.Revision.full_hist_entry is deprecated'):
+            revisions = [
+                rev.full_hist_entry()
                 for rev in self.revisions(content=True, reverse=reverse,
                                           total=total)
-                ]
+            ]
+        return revisions
 
     @deprecated_args(step=None)
     def contributors(self, total=None, starttime=None, endtime=None):
@@ -5802,11 +5804,11 @@ class Revision(DotReadableDict):
                                          'user',
                                          'comment'])
 
-    FullHistEntry = namedtuple('FullHistEntry', ['revid',
-                                                 'timestamp',
-                                                 'user',
-                                                 'text',
-                                                 'rollbacktoken'])
+    _FullHistEntry = namedtuple('FullHistEntry', ['revid',
+                                                  'timestamp',
+                                                  'user',
+                                                  'text',
+                                                  'rollbacktoken'])
 
     def __init__(self, revid, timestamp, user, anon=False, comment='',
                  text=None, minor=False, rollbacktoken=None, parentid=None,
@@ -5854,6 +5856,12 @@ class Revision(DotReadableDict):
         self._content_model = contentmodel
         self._sha1 = sha1
         self.slots = slots
+
+    @classproperty
+    @deprecated(since='20200329', future_warning=True)
+    def FullHistEntry(cls):
+        """Class property which returns deprecated FullHistEntry attribute."""
+        return cls._FullHistEntry
 
     @property
     def parent_id(self):
@@ -5938,10 +5946,15 @@ class Revision(DotReadableDict):
         return Revision.HistEntry(self.revid, self.timestamp, self.user,
                                   self.comment)
 
+    @deprecated(since='20200329', future_warning=True)
     def full_hist_entry(self):
         """Return a namedtuple with a Page full history record."""
-        return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
-                                      self.text, self.rollbacktoken)
+        with suppress_warnings(
+                'pywikibot.page.Revision.FullHistEntry is deprecated'):
+            entry = Revision.FullHistEntry(self.revid, self.timestamp,
+                                           self.user, self.text,
+                                           self.rollbacktoken)
+        return entry
 
     @staticmethod
     def _thank(revid, site, source='pywikibot'):
