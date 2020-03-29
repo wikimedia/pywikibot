@@ -10,6 +10,7 @@ scripts.maintenance.cache script
 --------------------------------
 
 .. automodule:: scripts.maintenance.cache
+   :ignore-module-all:
 
 scripts.maintenance.colors script
 ---------------------------------
