@@ -3163,11 +3163,18 @@ class LoginManager(login.LoginManager):
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
                 return ''
-            elif status in ('NeedToken', 'WrongToken') and not below_mw_1_27:
-                # if incorrect login token was used,
-                # force relogin and generate fresh one
-                pywikibot.error('Received incorrect login token. '
-                                'Forcing re-login.')
+            elif status in ('NeedToken', 'WrongToken'):
+                token = response.get('token')
+                if token and below_mw_1_27:
+                    # fetched token using action=login
+                    login_request['lgtoken'] = token
+                    pywikibot.log('Received login token, '
+                                  'proceed with login.')
+                else:
+                    # if incorrect login token was used,
+                    # force relogin and generate fresh one
+                    pywikibot.error('Received incorrect login token. '
+                                    'Forcing re-login.')
                 continue
             elif (status == 'Throttled' or status == 'FAIL'
                   and response['messagecode'] == 'login-throttled'
