@@ -2201,7 +2201,8 @@ class APISite(BaseSite):
             self._globaluserinfo['registration'] = iso_ts
         return self._globaluserinfo
 
-    globaluserinfo = property(fget=getglobaluserinfo, doc=getuserinfo.__doc__)
+    globaluserinfo = property(fget=getglobaluserinfo,
+                              doc=getglobaluserinfo.__doc__)
 
     @remove_last_args(['sysop'])
     def is_blocked(self):
