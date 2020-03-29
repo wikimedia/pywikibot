@@ -1834,7 +1834,12 @@ class Request(MutableMapping):
         elif code == 'assertuserfailed':
             message = 'User assertion failed.'
 
-        # Lastly, the purge module require a POST if used as anonymous user,
+        # If incorrect login token was used, we are logged out too.
+        elif (self.site._loginstatus == pywikibot.site.LoginStatus.IN_PROGRESS
+              and code == 'badtoken'):
+            message = 'Received incorrect login token.'
+
+        # Lastly, the purge module requires a POST if used as anonymous user,
         # but we normally send a GET request. If the API tells us the request
         # has to be POSTed, we're probably logged out.
         elif code == 'mustbeposted' and self.action == 'purge':
