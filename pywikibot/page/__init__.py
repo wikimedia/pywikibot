@@ -1758,9 +1758,16 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
-    # BREAKING CHANGE: in old framework, default value for getVersionHistory
-    #                  returned no more than 500 revisions; now, it iterates
-    #                  all revisions unless 'total' argument is used
+    # BREAKING CHANGES:
+    #
+    # in old framework, default value for getVersionHistory returned no more
+    # than 500 revisions; now, it returns a list of all revisions unless
+    # 'total' argument is used.
+    #
+    # in new framework each list entry is a tuple of 4 items:
+    # (revid, timestamp, user, comment)
+    # whereas old framework had a tuple of 6 items:
+    # (revid, timestamp, user, comment, size, tags)
     @deprecated('Page.revisions()', since='20150206')
     @deprecated_args(forceReload=None, revCount='total', step=None,
                      getAll=None, reverseOrder='reverse')
