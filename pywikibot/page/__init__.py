@@ -1770,7 +1770,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     # (revid, timestamp, user, comment, size, tags)
     #
     # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
-    @deprecated('Page.revisions()', since='20150206')
+    @deprecated('Page.revisions()', since='20150206', future_warning=True)
     @deprecated_args(forceReload=None, revCount='total', step=None,
                      getAll=None, reverseOrder='reverse')
     def getVersionHistory(self, reverse=False, total=None):
@@ -1784,9 +1784,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param total: iterate no more than this number of revisions in total
         """
-        return [rev.hist_entry()
+        with suppress_warnings(
+                'pywikibot.page.Revision.hist_entry is deprecated'):
+            revisions = [
+                rev.hist_entry()
                 for rev in self.revisions(reverse=reverse, total=total)
-                ]
+            ]
+        return revisions
 
     @deprecated_args(forceReload=None, reverseOrder='reverse', step=None)
     def getVersionHistoryTable(self, reverse=False, total=None):
@@ -5799,10 +5803,10 @@ class Revision(DotReadableDict):
 
     """A structure holding information about a single revision of a Page."""
 
-    HistEntry = namedtuple('HistEntry', ['revid',
-                                         'timestamp',
-                                         'user',
-                                         'comment'])
+    _HistEntry = namedtuple('HistEntry', ['revid',
+                                          'timestamp',
+                                          'user',
+                                          'comment'])
 
     _FullHistEntry = namedtuple('FullHistEntry', ['revid',
                                                   'timestamp',
@@ -5856,6 +5860,12 @@ class Revision(DotReadableDict):
         self._content_model = contentmodel
         self._sha1 = sha1
         self.slots = slots
+
+    @classproperty
+    @deprecated(since='20200329', future_warning=True)
+    def HistEntry(cls):
+        """Class property which returns deprecated class attribute."""
+        return cls._HistEntry
 
     @classproperty
     @deprecated(since='20200329', future_warning=True)
@@ -5941,10 +5951,14 @@ class Revision(DotReadableDict):
 
         return self._sha1
 
+    @deprecated(since='20200329', future_warning=True)
     def hist_entry(self):
         """Return a namedtuple with a Page history record."""
-        return Revision.HistEntry(self.revid, self.timestamp, self.user,
-                                  self.comment)
+        with suppress_warnings(
+                'pywikibot.page.Revision.HistEntry is deprecated'):
+            entry = Revision.HistEntry(self.revid, self.timestamp, self.user,
+                                       self.comment)
+        return entry
 
     @deprecated(since='20200329', future_warning=True)
     def full_hist_entry(self):
