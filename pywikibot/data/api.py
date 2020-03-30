@@ -1788,7 +1788,9 @@ class Request(MutableMapping):
             # that we are logged in as the correct user. If this is not the
             # case, force a re-login.
             username = result['query']['userinfo']['name']
-            if self.site.user() is not None and self.site.user() != username:
+            if (self.site.user() is not None and self.site.user() != username
+                    and self.site._loginstatus
+                    != pywikibot.site.LoginStatus.IN_PROGRESS):
                 pywikibot.error(
                     "Logged in as '{actual}' instead of '{expected}'.\n"
                     'Forcing re-login.'.format(actual=username,
