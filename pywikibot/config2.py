@@ -898,7 +898,7 @@ pickle_protocol = 2
 # This section contains configuration options that are no longer in use.
 # They are kept here to prevent warnings about undefined parameters.
 
-sysopnames = collections.defaultdict(dict)
+# No obsolete settings currently
 
 # #############################################
 

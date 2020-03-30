@@ -197,9 +197,7 @@ class ImageTransferBot(object):
                 reason = i18n.twtranslate(sourceSite,
                                           'imagetransfer-nowcommons_notice')
                 # try to delete the original image if we have a sysop account
-                if sourceSite.family.name in config.sysopnames \
-                   and sourceSite.lang in \
-                   config.sysopnames[sourceSite.family.name]:
+                if sourceSite.has_right('delete'):
                     if sourceImagePage.delete(reason):
                         return
                 if sourceSite.lang in nowCommonsTemplate \
