@@ -1898,8 +1898,7 @@ class Request(MutableMapping):
 
     def _bad_token(self, code):
         """Check for bad token."""
-        if (code != 'badtoken' or self.site._loginstatus
-                == pywikibot.site.LoginStatus.IN_PROGRESS):
+        if code != 'badtoken':
             return False
 
         user_tokens = self.site.tokens._tokens[self.site.user()]
@@ -1973,7 +1972,9 @@ class Request(MutableMapping):
 
             self._handle_warnings(result)
 
-            if 'error' not in result:
+            # LoginManager handles errors on its own
+            if ('error' not in result or self.site._loginstatus
+                    == pywikibot.site.LoginStatus.IN_PROGRESS):
                 return result
 
             error = result['error'].copy()
