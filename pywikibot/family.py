@@ -1369,23 +1369,6 @@ class Family(object):
         """
         return None
 
-    @deprecated('APISite.version()', since='20141225')
-    def versionnumber(self, code):
-        """DEPRECATED, use version() instead.
-
-        Use L{pywikibot.site.mw_version} to compare version strings.
-        Return an int identifying MediaWiki version.
-
-        Currently this is implemented as returning the minor version
-        number; i.e., 'X' in version '1.X.Y'
-        """
-        R = re.compile(r'(\d+).(\d+)')
-        M = R.search(self.version(code))
-        if not M:
-            # Version string malformatted; assume it should have been 1.10
-            return 10
-        return 1000 * int(M.group(1)) + int(M.group(2)) - 1000
-
     def encoding(self, code):
         """Return the encoding for a specific language wiki."""
         return 'utf-8'
