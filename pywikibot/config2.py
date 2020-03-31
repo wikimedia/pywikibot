@@ -1148,8 +1148,8 @@ if userinterface_lang is None:
 if family == 'wikipedia' and mylang == 'language':
     if __no_user_config != '2':
         warning('family and mylang are not set.\n'
-                "Defaulting to family='test' and mylang='test'.")
-    family = mylang = 'test'
+                "Defaulting to family='wikipedia' and mylang='test'.")
+    mylang = 'test'
 
 # Fix up socket_timeout
 # Older requests library expect a single value whereas newer versions also
