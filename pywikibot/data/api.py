@@ -1898,7 +1898,8 @@ class Request(MutableMapping):
 
     def _bad_token(self, code):
         """Check for bad token."""
-        if code != 'badtoken':
+        if (code != 'badtoken' or self.site._loginstatus
+                == pywikibot.site.LoginStatus.IN_PROGRESS):
             return False
 
         user_tokens = self.site.tokens._tokens[self.site.user()]
@@ -1972,9 +1973,7 @@ class Request(MutableMapping):
 
             self._handle_warnings(result)
 
-            # LoginManager handles errors on its own
-            if ('error' not in result or self.site._loginstatus
-                    == pywikibot.site.LoginStatus.IN_PROGRESS):
+            if 'error' not in result:
                 return result
 
             error = result['error'].copy()
@@ -3084,6 +3083,7 @@ class LoginManager(login.LoginManager):
         'token': ('lgtoken', 'logintoken'),
         'result': ('result', 'status'),
         'success': ('Success', 'PASS'),
+        'fail': ('Failed', 'FAIL'),
         'reason': ('reason', 'message')
     }
 
@@ -3149,7 +3149,10 @@ class LoginManager(login.LoginManager):
                 login_request[self.keyword('token')] = self.get_login_token()
 
             # try to login
-            login_result = login_request.submit()
+            try:
+                login_result = login_request.submit()
+            except APIError as e:
+                login_result = {'error': e.__dict__}
 
             # clientlogin response can be clientlogin or error
             if self.action in login_result:
@@ -3178,9 +3181,9 @@ class LoginManager(login.LoginManager):
                     pywikibot.error('Received incorrect login token. '
                                     'Forcing re-login.')
                 continue
-            elif (status == 'Throttled' or status == 'FAIL'
-                  and response['messagecode'] == 'login-throttled'
-                  or status == 'Failed' and 'wait' in fail_reason):
+            elif (status == 'Throttled' or status == self.keyword('fail')
+                  and (response['messagecode'] == 'login-throttled'
+                  or 'wait' in fail_reason)):
                 match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
                 if match:
                     delta = datetime.timedelta(
