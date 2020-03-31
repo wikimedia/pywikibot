@@ -5,8 +5,13 @@ Current release
 ---------------
 
 * Fix regression of combining sys.path in pwb.py wrapper (T249427)
-* pagengenerators.py no more support 'oursql' or 'MySQLdb'. It now solely
-  support PyMySQL https://pypi.org/project/PyMySQL/ (T243154, T89976)
+* Site and Page methods deprecated for 10 years or longer are desupported and may be removed (T106121)
+* Usage of SkipPageError with BaseBot is desupported and may be removed
+* Ignore InvalidTitle in textlib.replace_links() (T122091)
+* Raise ServerError also if connection to PetScan timeouts
+* pagegenerators.py no longer supports 'oursql' or 'MySQLdb'. It now solely supports PyMySQL (T243154, T89976)
+* Disfunctional Family.versionnumber() method was removed
+* Refactor login functionality (T137805, T224712, T248767, T248768, T248945)
 * Bugfixes and improvements
 * Localisation updates
 
