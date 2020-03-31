@@ -62,6 +62,8 @@ WikiBaseError: any issue specific to Wikibase.
 
 TimeoutError: request failed with a timeout
 
+  - MaxlagTimeoutError: request failed with a maxlag timeout
+
 DeprecationWarning: old functionality replaced by new functionality
 
 PendingDeprecationWarning: problematic code which has not yet been
