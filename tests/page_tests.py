@@ -1177,7 +1177,7 @@ class HtmlEntity(TestCase):
         self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
 
 
-class TestPermalink(DefaultSiteTestCase):
+class TestPermalink(TestCase):
     """Test that permalink links are correct."""
 
     family = 'wikipedia'
@@ -1201,7 +1201,7 @@ class TestPermalink(DefaultSiteTestCase):
                          'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
 
 
-class TestShortLink(DefaultSiteTestCase):
+class TestShortLink(TestCase):
     """Test that short link management is correct."""
 
     user = True
