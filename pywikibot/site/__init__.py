@@ -2135,6 +2135,9 @@ class APISite(BaseSite):
         self.tokens = TokenWallet(self)
         self._paraminfo = api.ParamInfo(self)
 
+        # Clear also cookies for site's second level domain (T224712)
+        api._invalidate_superior_cookies(self.family)
+
     def getuserinfo(self, force=False):
         """Retrieve userinfo from site and store in _userinfo attribute.
 
