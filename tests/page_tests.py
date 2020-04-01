@@ -1206,8 +1206,8 @@ class TestShortLink(TestCase):
 
     user = True
 
-    family = 'wikipedia'
-    code = 'test'
+    family = 'meta'
+    code = 'meta'
 
     def test_create_short_link(self):
         """Test create_short_link function."""
