@@ -52,39 +52,27 @@ class TestTranslate(TestCase):
         self.assertEqual(i18n.translate('en', self.msg_semi_localized,
                                         fallback=True),
                          'test-semi-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_semi_localized,
-                                        fallback=True),
-                         'test-semi-localized NL')
-        self.assertEqual(i18n.translate('fy', self.msg_semi_localized,
-                                        fallback=True),
-                         'test-semi-localized NL')
+        for code in ('nl', 'fy'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.msg_semi_localized,
+                                                fallback=True),
+                                 'test-semi-localized NL')
 
     def testNonLocalized(self):
         """Test translate with missing localisation."""
-        self.assertEqual(i18n.translate('en', self.msg_non_localized,
-                                        fallback=True),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.translate('fy', self.msg_non_localized,
-                                        fallback=True),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_non_localized,
-                                        fallback=True),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.translate('ru', self.msg_non_localized,
-                                        fallback=True),
-                         'test-non-localized EN')
+        for code in ('en', 'fy', 'nl', 'ru'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.msg_non_localized,
+                                                fallback=True),
+                                 'test-non-localized EN')
 
     def testNoEnglish(self):
         """Test translate with missing English text."""
-        self.assertEqual(i18n.translate('en', self.msg_no_english,
-                                        fallback=True),
-                         'test-no-english JA')
-        self.assertEqual(i18n.translate('fy', self.msg_no_english,
-                                        fallback=True),
-                         'test-no-english JA')
-        self.assertEqual(i18n.translate('nl', self.msg_no_english,
-                                        fallback=True),
-                         'test-no-english JA')
+        for code in ('en', 'fy', 'nl'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.msg_no_english,
+                                                fallback=True),
+                                 'test-no-english JA')
 
 
 class UserInterfaceLangTestCase(TestCase):
@@ -164,21 +152,17 @@ class TestTWTranslate(TWNTestCaseBase):
         """Test translating with fallback to alternative language."""
         self.assertEqual(i18n.twtranslate('en', 'test-semi-localized'),
                          'test-semi-localized EN')
-        self.assertEqual(i18n.twtranslate('nl', 'test-semi-localized'),
-                         'test-semi-localized NL')
-        self.assertEqual(i18n.twtranslate('fy', 'test-semi-localized'),
-                         'test-semi-localized NL')
+        for code in ('nl', 'fy'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.twtranslate(code, 'test-semi-localized'),
+                                 'test-semi-localized NL')
 
     def testNonLocalized(self):
         """Test translating non localized entries."""
-        self.assertEqual(i18n.twtranslate('en', 'test-non-localized'),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.twtranslate('fy', 'test-non-localized'),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.twtranslate('nl', 'test-non-localized'),
-                         'test-non-localized EN')
-        self.assertEqual(i18n.twtranslate('ru', 'test-non-localized'),
-                         'test-non-localized EN')
+        for code in ('en', 'fy', 'nl', 'ru'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.twtranslate(code, 'test-non-localized'),
+                                 'test-non-localized EN')
 
     def testNoEnglish(self):
         """Test translating into English with missing entry."""
