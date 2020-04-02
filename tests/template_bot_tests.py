@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test template bot module."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,41 +25,30 @@ class TestXMLPageGenerator(TestCase):
 
     dry = True
 
-    def test_no_match(self):
-        """Test pages without any desired templates."""
-        template = pywikibot.Page(self.site, 'Template:foobar')
+    def generator(self, title, xml='article-pear-0.10.xml'):
+        """Return XMLDumpPageGenerator list for a given template title."""
+        template = pywikibot.Page(self.site, title, ns=10)
         builder = _MultiTemplateMatchBuilder(self.site)
         predicate = builder.search_any_predicate([template])
         gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('article-pear-0.10.xml'),
+            filename=join_xml_data_path(xml),
             site=self.site,
             text_predicate=predicate)
-        pages = list(gen)
-        self.assertIsEmpty(pages)
+        return list(gen)
+
+    def test_no_match(self):
+        """Test pages without any desired templates."""
+        self.assertIsEmpty(self.generator('foobar'))
 
     def test_match(self):
         """Test pages with one match without parameters."""
-        template = pywikibot.Page(self.site, 'Template:stack begin')
-        builder = _MultiTemplateMatchBuilder(self.site)
-        predicate = builder.search_any_predicate([template])
-        gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('article-pear-0.10.xml'),
-            site=self.site,
-            text_predicate=predicate)
-        pages = list(gen)
+        pages = self.generator('stack begin')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Pear'], site=self.site)
 
     def test_match_with_params(self):
         """Test pages with one match with parameters."""
-        template = pywikibot.Page(self.site, 'Template:Taxobox')
-        builder = _MultiTemplateMatchBuilder(self.site)
-        predicate = builder.search_any_predicate([template])
-        gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('article-pear-0.10.xml'),
-            site=self.site,
-            text_predicate=predicate)
-        pages = list(gen)
+        pages = self.generator('Taxobox')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Pear'], site=self.site)
 
@@ -90,30 +79,14 @@ class TestXMLPageGenerator(TestCase):
 
     def test_match_msg(self):
         """Test pages with {{msg:..}}."""
-        template = pywikibot.Page(self.site, 'Template:Foo')
-        builder = _MultiTemplateMatchBuilder(self.site)
-
-        predicate = builder.search_any_predicate([template])
-        gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('dummy-template.xml'),
-            site=self.site,
-            text_predicate=predicate)
-        pages = list(gen)
+        pages = self.generator('Foo', 'dummy-template.xml')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Fake page with msg'],
                                    site=self.site)
 
     def test_match_unnecessary_template_prefix(self):
         """Test pages with {{template:..}}."""
-        template = pywikibot.Page(self.site, 'Template:Bar')
-        builder = _MultiTemplateMatchBuilder(self.site)
-
-        predicate = builder.search_any_predicate([template])
-        gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('dummy-template.xml'),
-            site=self.site,
-            text_predicate=predicate)
-        pages = list(gen)
+        pages = self.generator('Bar', 'dummy-template.xml')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(
             pages, ['Fake page with unnecessary template prefix'],
@@ -121,14 +94,7 @@ class TestXMLPageGenerator(TestCase):
 
     def test_nested_match(self):
         """Test pages with one match inside another template."""
-        template = pywikibot.Page(self.site, 'Template:boo')
-        builder = _MultiTemplateMatchBuilder(self.site)
-        predicate = builder.search_any_predicate([template])
-        gen = XMLDumpPageGenerator(
-            filename=join_xml_data_path('dummy-template.xml'),
-            site=self.site,
-            text_predicate=predicate)
-        pages = list(gen)
+        pages = self.generator('boo', 'dummy-template.xml')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(
             pages, ['Fake page with nested template'],
