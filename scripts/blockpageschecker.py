@@ -232,9 +232,6 @@ def main(*args):
     protectType = 'edit'
     namespace = 0
 
-    # To prevent Infinite loops
-    errorCount = 0
-
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
@@ -482,40 +479,40 @@ def main(*args):
                 if choice == 'a':
                     always = True
             if always or choice == 'y':
-                while True:
-                    try:
-                        page.put(text, commentUsed, force=True)
-                    except pywikibot.EditConflict:
-                        pywikibot.output('Edit conflict! skip!')
-                        break
-                    except pywikibot.ServerError:
-                        # Sometimes there is this error that's quite annoying
-                        # because can block the whole process for nothing.
-                        errorCount += 1
-                        if errorCount < 5:
-                            pywikibot.output('Server Error! Wait..')
-                            time.sleep(3)
-                            continue
-                        else:
-                            # Prevent Infinite Loops
-                            raise pywikibot.ServerError('Fifth Server Error!')
-                    except pywikibot.SpamfilterError as e:
-                        pywikibot.output('Cannot change %s because of '
-                                         'blacklist entry %s'
-                                         % (page.title(), e.url))
-                        break
-                    except pywikibot.LockedPage:
-                        pywikibot.output('The page is still protected. '
-                                         'Skipping...')
-                        break
-                    except pywikibot.PageNotSaved as error:
-                        pywikibot.output('Error putting page: %s'
-                                         % (error.args,))
-                        break
-                    else:
-                        # Break only if the errors are one after the other
-                        errorCount = 0
-                        break
+                save_page(page, text, commentUsed)
+
+
+def save_page(page, text, comment):
+    """Save a given page."""
+    # To prevent Infinite loops
+    error_count = 0
+    while True:
+        try:
+            page.put(text, comment, force=True)
+        except pywikibot.EditConflict:
+            pywikibot.output('Edit conflict! skip!')
+        except pywikibot.ServerError:
+            # Sometimes there is this error that's quite annoying
+            # because can block the whole process for nothing.
+            error_count += 1
+            if error_count < 5:
+                pywikibot.output('Server Error! Wait..')
+                time.sleep(3)
+                continue
+            else:
+                # Prevent Infinite Loops
+                raise pywikibot.ServerError('Fifth Server Error!')
+        except pywikibot.SpamfilterError as e:
+            pywikibot.output('Cannot change %s because of '
+                             'blacklist entry %s'
+                             % (page.title(), e.url))
+        except pywikibot.LockedPage:
+            pywikibot.output('The page is still protected. '
+                             'Skipping...')
+        except pywikibot.PageNotSaved as error:
+            pywikibot.output('Error putting page: %s'
+                             % (error.args,))
+        break
 
 
 if __name__ == '__main__':
