@@ -37,6 +37,7 @@ from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
     Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
 )
+from pywikibot.family import SubdomainFamily
 from pywikibot.tools import (
     deprecated, itergroup, PY2, PYTHON_VERSION,
     getargspec, UnicodeType, remove_last_args
@@ -99,6 +100,21 @@ _logger = 'data.api'
 
 lagpattern = re.compile(
     r'Waiting for [\w.: ]+: (?P<lag>\d+(?:\.\d+)?) seconds? lagged')
+
+
+def _invalidate_superior_cookies(family):
+    """
+    Clear cookies for site's second level domain.
+
+    get_login_token() will generate new cookies needed.
+    This is a workaround for requests bug, see T224712
+    and https://github.com/psf/requests/issues/5411
+    for more details.
+    """
+    if isinstance(family, SubdomainFamily):
+        for cookie in http.cookie_jar:
+            if family.domain == cookie.domain:
+                http.cookie_jar.clear(cookie.domain, cookie.path, cookie.name)
 
 
 class APIError(Error):
@@ -1916,6 +1932,9 @@ class Request(MutableMapping):
                 'invalidated them.'
                 .format(self.site.user(),
                         '", "'.join(sorted(set(invalid_param.values())))))
+            # invalidate superior wiki cookies (T224712)
+            _invalidate_superior_cookies(self.site.family)
+            # request new token(s) instead of invalid
             self.site.tokens.load_tokens(set(invalid_param.values()))
             # fix parameters; lets hope that it doesn't mistake actual
             # parameters as tokens
@@ -3180,6 +3199,8 @@ class LoginManager(login.LoginManager):
                     # force relogin and generate fresh one
                     pywikibot.error('Received incorrect login token. '
                                     'Forcing re-login.')
+                    # invalidate superior wiki cookies (T224712)
+                    _invalidate_superior_cookies(self.site.family)
                 continue
             elif (status == 'Throttled' or status == self.keyword('fail')
                   and (response['messagecode'] == 'login-throttled'
