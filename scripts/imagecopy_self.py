@@ -298,9 +298,7 @@ informationFields = {
 def supportedSite():
     """Check if this site is supported."""
     site = pywikibot.Site()
-    lang = site.code
-
-    lists = [
+    l10n_dicts = [
         nowCommonsTemplate,
         moveToCommonsTemplate,
         skipTemplates,
@@ -309,10 +307,7 @@ def supportedSite():
         informationTemplate,
         informationFields,
     ]
-    for item in lists:
-        if not item.get(lang):
-            return False
-    return True
+    return all(site.code in elem for elem in l10n_dicts)
 
 
 class imageFetcher(threading.Thread):
@@ -324,7 +319,7 @@ class imageFetcher(threading.Thread):
         self.pagegenerator = pagegenerator
         self.prefetchQueue = prefetchQueue
         imagerecat.initLists()
-        threading.Thread.__init__(self)
+        super().__init__()
 
     def run(self):
         """Run imageFetcher."""
@@ -336,29 +331,30 @@ class imageFetcher(threading.Thread):
 
     def processImage(self, page):
         """Work on a single image."""
-        if page.exists() and (page.namespace() == 6) and \
-           (not page.isRedirectPage()):
-            imagepage = pywikibot.FilePage(page.site(), page.title())
+        if not page.exists() or page.namespace() != 6 or page.isRedirectPage():
+            return
 
-            # First do autoskip.
-            if self.doiskip(imagepage):
-                pywikibot.output(
-                    'Skipping {} : Got a template on the skip list.'
-                    .format(page.title()))
-                return False
+        imagepage = pywikibot.FilePage(page.site(), page.title())
 
-            text = imagepage.get()
-            foundMatch = False
-            for (regex, replacement) in licenseTemplates[page.site.lang]:
-                match = re.search(regex, text, flags=re.IGNORECASE)
-                if match:
-                    foundMatch = True
-            if not foundMatch:
-                pywikibot.output(
-                    'Skipping {} : No suitable license template was found.'
-                    .format(page.title()))
-                return False
-            self.prefetchQueue.put(self.getNewFields(imagepage))
+        # First do autoskip.
+        if self.doiskip(imagepage):
+            pywikibot.output(
+                'Skipping {} : Got a template on the skip list.'
+                .format(page.title()))
+            return
+
+        text = imagepage.get()
+        for regex, replacement in licenseTemplates[page.site.lang]:
+            match = re.search(regex, text, flags=re.IGNORECASE)
+            if match:
+                break
+        else:
+            pywikibot.output(
+                'Skipping {} : No suitable license template was found.'
+                .format(page.title()))
+            return
+
+        self.prefetchQueue.put(self.getNewFields(imagepage))
 
     def doiskip(self, imagepage):
         """Skip this image or not.
@@ -377,8 +373,8 @@ class imageFetcher(threading.Thread):
 
     def getNewFields(self, imagepage):
         """Build a new description based on the imagepage."""
-        if '{{Information' in imagepage.get() or \
-           '{{information' in imagepage.get():
+        if '{{Information' in imagepage.get() \
+           or '{{information' in imagepage.get():
             (description, date, source, author, permission,
              other_versions) = self.getNewFieldsFromInformation(imagepage)
         else:
@@ -415,10 +411,10 @@ class imageFetcher(threading.Thread):
         description = ''
         permission = ''
         other_versions = ''
-        contents = {}
-
-        for key, value in informationFields[imagepage.site.lang].items():
-            contents[value] = ''
+        contents = {
+            value: ''
+            for value in informationFields[imagepage.site.lang].values()
+        }
 
         information = informationTemplate[imagepage.site.lang]
         fields = informationFields[imagepage.site.lang]
@@ -427,8 +423,8 @@ class imageFetcher(threading.Thread):
             if template.title() == information:
                 for param in params:
                     # Split at =
-                    field, sep, value = param.partition('=')
-                    # To lowercase, remove underscores and strip of spaces
+                    field, _, value = param.partition('=')
+                    # To lowercase, remove underscores and strip spaces
                     field = field.lower().replace('_', ' ').strip()
                     key = fields.get(field)
                     # See if first part is in fields list
@@ -444,7 +440,7 @@ class imageFetcher(threading.Thread):
         if contents['description']:
             description = self.convertLinks(contents['description'],
                                             imagepage.site())
-        if contents.get('remarks') and contents['remarks']:
+        if 'remarks' in contents:
             if description == '':
                 description = self.convertLinks(contents['remarks'],
                                                 imagepage.site())
@@ -458,14 +454,11 @@ class imageFetcher(threading.Thread):
                                                          imagepage.site()))
 
         # Date
-        if contents['date']:
-            date = contents['date']
-        else:
-            date = self.getUploadDate(imagepage)
+        date = contents['date'] or self.getUploadDate(imagepage)
 
         # Author
-        if not (contents['author'] == ''
-                or contents['author'] == self.getAuthor(imagepage)):
+        if contents['author'] \
+           and contents['author'] != self.getAuthor(imagepage):
             author = self.convertLinks(contents['author'], imagepage.site())
         else:
             author = self.getAuthorText(imagepage)
@@ -495,7 +488,7 @@ class imageFetcher(threading.Thread):
         for toRemove in sourceGarbage[imagepage.site.lang]:
             text = re.sub(toRemove, '', text, flags=re.IGNORECASE)
 
-        for (regex, repl) in licenseTemplates[imagepage.site.lang]:
+        for regex, _ in licenseTemplates[imagepage.site.lang]:
             text = re.sub(regex, '', text, flags=re.IGNORECASE)
 
         text = removeCategoryLinks(text, imagepage.site())
@@ -525,7 +518,7 @@ class imageFetcher(threading.Thread):
         site = imagepage.site()
         lang = site.code
         family = site.family.name
-        if source == '':
+        if not source:
             source = '{{Own}}'
 
         return (source.strip()
@@ -539,10 +532,9 @@ class imageFetcher(threading.Thread):
         family = site.family.name
 
         firstuploader = self.getAuthor(imagepage)
-        return ('[[:%(lang)s:User:%(firstuploader)s|%(firstuploader)s]] at '
-                '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]'
-                % {'lang': lang, 'family': family,
-                   'firstuploader': firstuploader})
+        return '[[:{lang}:User:{firstuploader}|{firstuploader}]] at ' \
+               '[http://{lang}.{family}.org {lang}.{family}]'.format(
+                   lang=lang, family=family, firstuploader=firstuploader)
 
     def getAuthor(self, imagepage):
         """Get the first uploader."""
@@ -583,14 +575,13 @@ class imageFetcher(threading.Thread):
         """Get categories for the image.
 
         Don't forget to filter.
-
         """
         result = ''
         (commonshelperCats, usage,
          galleries) = imagerecat.getCommonshelperCats(imagepage)
         newcats = imagerecat.applyAllFilters(commonshelperCats)
         for newcat in newcats:
-            result += '[[Category:' + newcat + ']] '
+            result += '[[Category:{}]] '.format(newcat)
         return result
 
 
@@ -603,16 +594,16 @@ class userInteraction(threading.Thread):
         self.prefetchQueue = prefetchQueue
         self.uploadQueue = uploadQueue
         self.autonomous = False
-        threading.Thread.__init__(self)
+        super().__init__()
 
     def run(self):
         """Run thread."""
         while True:
             fields = self.prefetchQueue.get()
-            if fields:
-                self.processImage(fields)
-            else:
+            if not fields:
                 break
+            self.processImage(fields)
+
         self.uploadQueue.put(None)
         pywikibot.output('User worked on all images.')
         return True
@@ -620,7 +611,6 @@ class userInteraction(threading.Thread):
     def setAutonomous(self):
         """Don't do any user interaction."""
         self.autonomous = True
-        return
 
     def processImage(self, fields):
         """Work on a single image."""
@@ -631,7 +621,7 @@ class userInteraction(threading.Thread):
                                                         'commons'),
                                          'File:' + fields.get('filename'))
             if CommonsPage.exists():
-                return False
+                return
         else:
             while True:
                 # Do the TkdialogICS to accept/reject and change the name
@@ -640,7 +630,7 @@ class userInteraction(threading.Thread):
                 if fields.get('skip'):
                     pywikibot.output('Skipping {} : User pressed skip.'
                                      .format(fields.get('imagepage').title()))
-                    return False
+                    return
 
                 # Check if the image already exists
                 CommonsPage = pywikibot.Page(pywikibot.Site('commons',
@@ -648,11 +638,11 @@ class userInteraction(threading.Thread):
                                              'File:' + fields.get('filename'))
                 if not CommonsPage.exists():
                     break
-                else:
-                    pywikibot.output('Image already exists, pick another name '
-                                     'or skip this image')
-                    # We don't overwrite images, pick another name, go to the
-                    # start of the loop
+
+                # We don't overwrite images, pick another name, go to the
+                # start of the loop
+                pywikibot.output('Image already exists, pick another name '
+                                 'or skip this image')
 
         # Put the fields in the queue to be uploaded
         self.uploadQueue.put(fields)
@@ -662,6 +652,10 @@ class TkdialogICS(Tkdialog):
 
     """The dialog window for image info."""
 
+    fieldnames = ['author', 'categories', 'date', 'description', 'filename',
+                  'imagepage', 'licensetemplate', 'other_versions',
+                  'permission', 'source']
+
     def __init__(self, fields):
         """Initializer.
 
@@ -669,7 +663,6 @@ class TkdialogICS(Tkdialog):
             imagepage, description, date, source, author, licensetemplate,
             categories
         """
-        """Initializer."""
         # Check if `Tkinter` wasn't imported
         if isinstance(Tkinter, ImportError):
             raise Tkinter
@@ -682,18 +675,9 @@ class TkdialogICS(Tkdialog):
 
         # Get all the relevant fields
         super().__init__()
-        self.imagepage = fields.get('imagepage')
-        self.filename = fields.get('filename')
+        for name in self.fieldnames:
+            setattr(self, name, fields.get(name))
 
-        self.description = fields.get('description')
-        self.date = fields.get('date')
-        self.source = fields.get('source')
-        self.author = fields.get('author')
-        self.permission = fields.get('permission')
-        self.other_versions = fields.get('other_versions')
-
-        self.licensetemplate = fields.get('licensetemplate')
-        self.categories = fields.get('categories')
         self.skip = False
 
         # Start building the page
@@ -827,17 +811,8 @@ class TkdialogICS(Tkdialog):
         """Activate dialog and return new name and if the image is skipped."""
         self.root.mainloop()
 
-        return {'imagepage': self.imagepage,
-                'filename': self.filename,
-                'description': self.description,
-                'date': self.date,
-                'source': self.source,
-                'author': self.author,
-                'permission': self.permission,
-                'other_versions': self.other_versions,
-                'licensetemplate': self.licensetemplate,
-                'categories': self.categories,
-                'skip': self.skip}
+        return {name: getattr(self, name)
+                for name in self.fieldnames + ['skip']}
 
     def open_in_browser(self):
         """The user pressed the View in browser button."""
@@ -858,16 +833,14 @@ class uploader(threading.Thread):
         """Run uploader."""
         while True:  # Change later
             fields = self.uploadQueue.get()
-            if fields:
-                self.processImage(fields)
-            else:
+            if not fields:
                 break
+            self.processImage(fields)
         return True
 
     def nochecktemplate(self):
         """Don't want to add {{BotMoveToCommons}}."""
         self.checktemplate = False
-        return
 
     def processImage(self, fields):
         """Work on a single image."""
@@ -881,8 +854,10 @@ class uploader(threading.Thread):
                           target_site=pywikibot.Site('commons', 'commons'))
         bot.run()
 
-        self.tagNowcommons(fields.get('imagepage'), fields.get('filename'))
-        self.replaceUsage(fields.get('imagepage'), fields.get('filename'))
+        imagepage = fields.get('imagepage')
+        filename = fields.get('filename')
+        self.tagNowcommons(imagepage, filename)
+        self.replaceUsage(imagepage, filename)
 
     def buildNewImageDescription(self, fields):
         """Build a new information template."""
@@ -912,7 +887,7 @@ class uploader(threading.Thread):
         cid += '\n'
         cid += self.getOriginalUploadLog(fields.get('imagepage'))
         cid += '__NOTOC__\n'
-        if fields.get('categories').strip() == '':
+        if not fields.get('categories').strip():
             cid = cid + '{{Subst:Unc}}'
         else:
             cid = cid + '%(categories)s\n' % fields
