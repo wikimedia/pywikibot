@@ -30,6 +30,7 @@ import sys
 
 from datetime import timedelta
 from functools import partial
+from requests.exceptions import ReadTimeout
 from warnings import warn
 
 import pywikibot
@@ -3077,7 +3078,11 @@ class PetScanPageGenerator(object):
         """Query PetScan."""
         url = 'https://petscan.wmflabs.org'
 
-        req = http.fetch(url, params=self.opts)
+        try:
+            req = http.fetch(url, params=self.opts)
+        except ReadTimeout:
+            raise ServerError(
+                'received ReadTimeout from {0}'.format(url))
         if 500 <= req.status < 600:
             raise ServerError(
                 'received {0} status from {1}'.format(req.status, req.uri))
