@@ -23,7 +23,7 @@ import re
 
 import pywikibot
 from pywikibot import config2 as config
-from pywikibot.exceptions import InvalidTitle
+from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import (
     deprecate_arg,
@@ -738,8 +738,8 @@ def replace_links(text, replace, site=None):
             link = pywikibot.Link.create_separated(
                 groups['title'], site, section=groups['section'],
                 label=groups['label'])
-        except pywikibot.SiteDefinitionError:
-            # unrecognized iw prefix
+        except (SiteDefinitionError, InvalidTitle):
+            # unrecognized iw prefix or invalid title
             curpos = end
             continue
 
