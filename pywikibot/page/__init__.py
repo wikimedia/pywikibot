@@ -2286,28 +2286,32 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
 # ####### DEPRECATED METHODS ########
 
-    @deprecated('Site.encoding()', since='20090307')
+    @deprecated('Site.encoding()', since='20090307', future_warning=True)
     def encoding(self):
         """DEPRECATED: use self.site.encoding instead."""
         return self.site.encoding()
 
-    @deprecated('Page.title(with_ns=False)', since='20090307')
+    @deprecated('Page.title(with_ns=False)', since='20090307',
+                future_warning=True)
     def titleWithoutNamespace(self, underscore=False):
         """DEPRECATED: use self.title(with_ns=False) instead."""
         return self.title(underscore=underscore, with_ns=False,
                           with_section=False)
 
-    @deprecated('Page.title(as_filename=True)', since='20090307')
+    @deprecated('Page.title(as_filename=True)', since='20090307',
+                future_warning=True)
     def titleForFilename(self):
         """DEPRECATED: use self.title(as_filename=True) instead."""
         return self.title(as_filename=True)
 
-    @deprecated('Page.title(with_section=False)', since='20090307')
+    @deprecated('Page.title(with_section=False)', since='20090307',
+                future_warning=True)
     def sectionFreeTitle(self, underscore=False):
         """DEPRECATED: use self.title(with_section=False) instead."""
         return self.title(underscore=underscore, with_section=False)
 
-    @deprecated('Page.title(as_link=True)', since='20090307')
+    @deprecated('Page.title(as_link=True)', since='20090307',
+                future_warning=True)
     @deprecated_args(
         forceInterwiki='force_interwiki', noInterwiki='no_interwiki')
     def aslink(
@@ -2317,7 +2321,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.title(as_link=True, force_interwiki=force_interwiki,
                           allow_interwiki=not no_interwiki, textlink=textlink)
 
-    @deprecated('Page.title(as_url=True)', since='20090307')
+    @deprecated('Page.title(as_url=True)', since='20090307',
+                future_warning=True)
     def urlname(self):
         """Return the Page title encoded for use in an URL.
 
@@ -3140,22 +3145,26 @@ class Category(Page):
                 yield cached_page
 
 # ### DEPRECATED METHODS ####
-    @deprecated('list(Category.subcategories(...))', since='20090307')
+    @deprecated('list(Category.subcategories(...))', since='20090307',
+                future_warning=True)
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))."""
         return sorted(set(self.subcategories(recurse)))
 
-    @deprecated('list(Category.articles(...))', since='20090307')
+    @deprecated('list(Category.articles(...))', since='20090307',
+                future_warning=True)
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))."""
         return sorted(set(self.articles(recurse)))
 
-    @deprecated('Category.categories()', since='20090307')
+    @deprecated('Category.categories()', since='20090307',
+                future_warning=True)
     def supercategories(self):
         """DEPRECATED: equivalent to self.categories()."""
         return self.categories()
 
-    @deprecated('list(Category.categories(...))', since='20090307')
+    @deprecated('list(Category.categories(...))', since='20090307',
+                future_warning=True)
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))."""
         return sorted(set(self.categories()))
@@ -3266,7 +3275,7 @@ class User(Page):
                     self._userprops['blockreason'] = r[0]['reason']
         return self._userprops
 
-    @deprecated('User.registration()', since='20100609')
+    @deprecated('User.registration()', since='20100609', future_warning=True)
     def registrationTime(self, force=False):
         """
         DEPRECATED. Fetch registration date for this user.
@@ -3526,7 +3535,7 @@ class User(Page):
         """
         return next(iter(self.logevents(total=1)), None)
 
-    @deprecated('contributions', since='20091130')
+    @deprecated('contributions', since='20091130', future_warning=True)
     @deprecate_arg('limit', 'total')  # To be consistent with rest of framework
     def editedPages(self, total=500):
         """

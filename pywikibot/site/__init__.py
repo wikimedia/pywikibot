@@ -1108,7 +1108,7 @@ class BaseSite(ComparableMixin):
                     '{site.family.name}_family for {site}'.format(site=self))
         return pywikibot.Category(pywikibot.Link(name, self))
 
-    @deprecated('pywikibot.Link', since='20090307')
+    @deprecated('pywikibot.Link', since='20090307', future_warning=True)
     def linkto(self, title, othersite=None):
         """DEPRECATED. Return a wikilink to a page.
 
@@ -1236,7 +1236,7 @@ class BaseSite(ComparableMixin):
 
     # deprecated methods for backwards-compatibility
 
-    @deprecated('family attribute', since='20090307')
+    @deprecated('family attribute', since='20090307', future_warning=True)
     def fam(self):
         """Return Family object for this Site."""
         return self.family
@@ -1998,7 +1998,7 @@ class APISite(BaseSite):
 
         return True
 
-    @deprecated('Site.user()', since='20090307')
+    @deprecated('Site.user()', since='20090307', future_warning=True)
     @remove_last_args(['sysop'])
     def loggedInAs(self):
         """Return the current username if logged in, otherwise return None.
@@ -4336,7 +4336,7 @@ class APISite(BaseSite):
             apgen.request['gapdir'] = 'descending'
         return apgen
 
-    @deprecated('Site.allpages()', since='20090307')
+    @deprecated('Site.allpages()', since='20090307', future_warning=True)
     def prefixindex(self, prefix, namespace=0, includeredirects=True):
         """Yield all pages with a given prefix. Deprecated.
 
@@ -4418,7 +4418,7 @@ class APISite(BaseSite):
             acgen.request['gacdir'] = 'descending'
         return acgen
 
-    @deprecated('Site.allcategories()', since='20090307')
+    @deprecated('Site.allcategories()', since='20090307', future_warning=True)
     def categories(self, number=10, repeat=False):
         """DEPRECATED."""
         if repeat:
@@ -6231,7 +6231,7 @@ class APISite(BaseSite):
             return all('linkupdate' in page for page in result)
         return True
 
-    @deprecated('Site().exturlusage', since='20090529')
+    @deprecated('Site().exturlusage', since='20090529', future_warning=True)
     def linksearch(self, siteurl, limit=None, euprotocol=None):
         """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit, protocol=euprotocol)
