@@ -117,7 +117,7 @@ class DjVuFile(object):
         return _str
 
     @property
-    @deprecated('DjVuFile.file', since='2010222')
+    @deprecated('DjVuFile.file', since='2010222', future_warning=True)
     def file_djvu(self):
         """Deprecated file_djvu instance variable."""
         return self.file
