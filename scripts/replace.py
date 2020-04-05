@@ -1171,13 +1171,13 @@ def main(*args):
     elif useSql:
         if not sql_query:
             whereClause = 'WHERE (%s)' % ' OR '.join(
-                ["old_text RLIKE '%s'" % prepareRegexForMySQL(
-                 old_regexp.pattern) for (old_regexp, new_text)
-                 in replacements])
+                "old_text RLIKE '%s'"
+                % prepareRegexForMySQL(old_regexp.pattern)
+                for (old_regexp, new_text) in replacements)
             if exceptions:
                 exceptClause = 'AND NOT (%s)' % ' OR '.join(
-                    ["old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)
-                     for exc in exceptions])
+                    "old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)
+                    for exc in exceptions)
             else:
                 exceptClause = ''
         query = sql_query or """

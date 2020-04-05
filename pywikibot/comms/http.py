@@ -130,7 +130,7 @@ def _flush():
 atexit.register(_flush)
 
 USER_AGENT_PRODUCTS = {
-    'python': 'Python/' + '.'.join([str(i) for i in sys.version_info]),
+    'python': 'Python/' + '.'.join(str(i) for i in sys.version_info),
     'http_backend': 'requests/' + requests.__version__,
     'pwb': 'Pywikibot/' + __version__,
 }

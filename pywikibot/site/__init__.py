@@ -372,9 +372,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                  if key not in standard_attr]
 
         if extra:
-            kwargs = ', ' + ', '.join([key + '=' + repr(value)
-                                       for (key, value) in
-                                       extra])
+            kwargs = ', ' + ', '.join(
+                key + '=' + repr(value) for key, value in extra)
         else:
             kwargs = ''
 
@@ -628,8 +627,8 @@ class NamespacesDict(Mapping, SelfCallMixin):
         if None in result:
             raise KeyError(
                 'Namespace identifier(s) not recognised: %s'
-                % ','.join([str(identifier) for identifier, ns in zip(
-                    identifiers, result) if ns is None]))
+                % ','.join(str(identifier) for identifier, ns in zip(
+                    identifiers, result) if ns is None))
 
         return result
 
