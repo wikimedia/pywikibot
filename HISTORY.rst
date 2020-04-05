@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20200405
+------------
+
 * Fix regression of combining sys.path in pwb.py wrapper (T249427)
 * Site and Page methods deprecated for 10 years or longer are desupported and may be removed (T106121)
 * Usage of SkipPageError with BaseBot is desupported and may be removed
