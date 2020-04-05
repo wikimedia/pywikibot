@@ -72,6 +72,8 @@ script:
       printf "usernames['wikipedia']['test'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;
       printf "usernames['wikidata']['test'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;
       printf "usernames['commons']['commons'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;
+      printf "usernames['meta']['meta'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;
+      printf "usernames['wikisource']['zh'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;
       printf "('%q', '%q')\n" "$PYWIKIBOT_USERNAME" "$USER_PASSWORD" > ~/.pywikibot/passwordfile ;
       echo "import os" >> ~/.pywikibot/user-config.py ;
       echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py ;
