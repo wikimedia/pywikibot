@@ -1860,7 +1860,7 @@ class Subject(interwiki_graph.Subject):
         # Allow for special case of a self-pointing interwiki link
         if removing and removing != [page.site]:
             self.problem('Found incorrect link to {} in {}'
-                         .format(', '.join([x.code for x in removing]), page),
+                         .format(', '.join(x.code for x in removing), page),
                          createneed=False)
             ask = True
         if self.conf.force or self.conf.cleanup:
@@ -1944,7 +1944,7 @@ class Subject(interwiki_graph.Subject):
             raise GiveUpOnPage('User asked us to give up')
         else:
             raise LinkMustBeRemoved('Found incorrect link to {} in {}'.format(
-                ', '.join([x.code for x in removing]), page))
+                ', '.join(x.code for x in removing), page))
 
     def reportBacklinks(self, new, updatedSites):
         """

@@ -539,8 +539,8 @@ What is it? """
         """Setup bot before running."""
         self.questionlist = {
             i: t for i, t in enumerate(templates[self.site.code], start=1)}
-        questions = '\n'.join(('{}) {}'.format(k, v)
-                               for k, v in self.questionlist.items()))
+        questions = '\n'.join('{}) {}'.format(k, v)
+                              for k, v in self.questionlist.items())
         self.question = questions + self.question
 
 

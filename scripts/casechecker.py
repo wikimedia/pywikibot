@@ -229,8 +229,8 @@ class CaseChecker(object):
                              % len(self.knownWords))
             if len(self.knownWords) > 0:
                 pywikibot.log('Whitelist: '
-                              + ', '.join([self.MakeLink(i, False)
-                                           for i in self.knownWords]))
+                              + ', '.join(self.MakeLink(i, False)
+                                          for i in self.knownWords))
         else:
             pywikibot.output('Whitelist is not known for language %s'
                              % self.site.code)
@@ -541,7 +541,7 @@ class CaseChecker(object):
             suggestions = list(mapLcl.values()) + list(mapLat.values())
             if len(suggestions) > 0:
                 infoText += ', word suggestions: ' + ', '.join(
-                    [self.ColorCodeWord(t) for t in suggestions])
+                    self.ColorCodeWord(t) for t in suggestions)
             else:
                 infoText += ', no suggestions'
         else:
@@ -572,7 +572,7 @@ class CaseChecker(object):
 
                 if len(possibleAlternatives) > 0:
                     infoText += ', can be converted to ' + ', '.join(
-                        [self.MakeLink(t) for t in possibleAlternatives])
+                        self.MakeLink(t) for t in possibleAlternatives)
                 else:
                     infoText += ', no suggestions'
         return (infoText, possibleAlternatives)
@@ -712,7 +712,7 @@ class CaseChecker(object):
     def PutNewPage(self, pageObj, pageTxt, msg):
         """Save new page."""
         title = pageObj.title(as_link=True, textlink=True)
-        coloredMsg = ', '.join([self.ColorCodeWord(m) for m in msg])
+        coloredMsg = ', '.join(self.ColorCodeWord(m) for m in msg)
         if pageObj.text == pageTxt:
             self.WikiLog('* Error: Text replacement failed in %s (%s)'
                          % (self.MakeLink(title, False), coloredMsg))
