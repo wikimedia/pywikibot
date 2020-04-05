@@ -44,11 +44,11 @@ from pywikibot.exceptions import (
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
     EditConflict, PageDeletedConflict, PageCreatedConflict,
     ServerError, FatalServerError, Server504Error,
-    CaptchaError, SpamfilterError, TitleblacklistError,
+    CaptchaError, SpamblacklistError, TitleblacklistError,
     CircularRedirect, InterwikiRedirectPage, WikiBaseError, NoWikibaseEntity,
     CoordinateGlobeUnknownException,
     DeprecatedPageNotFoundError as _DeprecatedPageNotFoundError,
-    _EmailUserError,
+    _DeprecatedSpamfilterError, _EmailUserError,
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
@@ -104,10 +104,10 @@ __all__ = (
     'Page', 'PageCreatedConflict', 'PageDeletedConflict', 'PageNotSaved',
     'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
     'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
-    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink', 'SpamfilterError',
-    'stdout', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
-    'UnicodeMixin', 'UnknownExtension', 'UnknownFamily', 'UnknownSite',
-    'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
+    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink',
+    'SpamblacklistError', 'stdout', 'TitleblacklistError', 'translate', 'ui',
+    'unicode2html', 'UnicodeMixin', 'UnknownExtension', 'UnknownFamily',
+    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
     'UserActionRefuse', 'UserBlocked', 'warning', 'WikiBaseError',
     'WikidataBot',
 )
@@ -1444,6 +1444,11 @@ wrapper._add_deprecated_attr(
     warning_message=('{0}.{1} is deprecated, and no longer '
                      'used by pywikibot; use http.fetch() instead.'),
     since='20140924')
+wrapper._add_deprecated_attr(
+    'SpamfilterError', _DeprecatedSpamfilterError,
+    warning_message='SpamfilterError is deprecated; '
+                    'use SpamblacklistError instead.',
+    since='20200405')
 wrapper._add_deprecated_attr(
     'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '

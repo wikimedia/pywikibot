@@ -63,7 +63,7 @@ from pywikibot.exceptions import (
     PageRelatedError,
     PageSaveRelatedError,
     SiteDefinitionError,
-    SpamfilterError,
+    SpamblacklistError,
     TitleblacklistError,
     UnknownExtension,
     UnknownSite,
@@ -5265,6 +5265,7 @@ class APISite(BaseSite):
         'protectedtitle': LockedNoPage,
         'cascadeprotected': CascadeLockedPage,
         'titleblacklist-forbidden': TitleblacklistError,
+        'spamblacklist': SpamblacklistError,
     }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
@@ -5390,16 +5391,24 @@ class APISite(BaseSite):
                             'logged in' % err.code,
                             _logger)
                     if err.code in self._ep_errors:
-                        if isinstance(self._ep_errors[err.code], UnicodeType):
+                        exception = self._ep_errors[err.code]
+                        if isinstance(exception, UnicodeType):
                             errdata = {
                                 'site': self,
                                 'title': page.title(with_section=False),
                                 'user': self.user(),
                                 'info': err.info
                             }
-                            raise Error(self._ep_errors[err.code] % errdata)
+                            raise Error(exception % errdata)
+                        elif issubclass(exception, SpamblacklistError):
+                            urls = ', '.join(err.other[err.code]['matches'])
+                            exec_string = ('raise exception(page, url="{}")'
+                                           .format(urls))
+                            if not PY2:
+                                exec_string += ' from None'
+                            exec(exec_string)
                         else:
-                            raise self._ep_errors[err.code](page)
+                            raise exception(page)
                     pywikibot.debug(
                         "editpage: Unexpected error code '%s' received."
                         % err.code,
@@ -5450,8 +5459,8 @@ class APISite(BaseSite):
                         return False
 
                     if 'spamblacklist' in result['edit']:
-                        raise SpamfilterError(page,
-                                              result['edit']['spamblacklist'])
+                        raise SpamblacklistError(
+                            page, result['edit']['spamblacklist'])
 
                     if 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(

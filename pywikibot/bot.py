@@ -1263,7 +1263,7 @@ class BaseBot(OptionHandler):
             if isinstance(e, pywikibot.EditConflict):
                 pywikibot.output('Skipping %s because of edit conflict'
                                  % page.title())
-            elif isinstance(e, pywikibot.SpamfilterError):
+            elif isinstance(e, pywikibot.SpamblacklistError):
                 pywikibot.output(
                     'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
