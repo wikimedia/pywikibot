@@ -2159,7 +2159,7 @@ for month in yrMnthFmts:
 
 def _format_limit_dom(days):
     """Return day of month format limit."""
-    assert days in range(29, 32)
+    assert 29 <= days <= 31
     return lambda v: 1 <= v <= days, 1, days + 1
 
 
