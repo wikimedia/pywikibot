@@ -205,8 +205,9 @@ def check_modules(script=None):
 # or it is the absolute path for the directory of pwb.py
 absolute_path = abspath(os.path.dirname(sys.argv[0]))
 
-if absolute_path not in sys.path[:2]:
-    sys.path.insert(1, absolute_path)
+# add absolute path because sys.path[0] is overridden
+# with os.path.dirname(filename) within run_python_file
+sys.path.insert(1, absolute_path)
 
 if not check_modules():
     sys.exit()
