@@ -51,10 +51,8 @@ class TestFamily(TestCase):
                     self.assertIsInstance(domain, basestring)
                     if domain.split(':', 1)[0] != 'localhost':
                         self.assertIn('.', domain)
-                if name == 'test':
-                    self.assertEqual(f.name, 'wikipedia')
-                else:
-                    self.assertEqual(f.name, name)
+
+                self.assertEqual(f.name, name)
 
                 with suppress_warnings(
                         'wowwiki_family.Family.languages_by_size '

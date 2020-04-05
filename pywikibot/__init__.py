@@ -1176,8 +1176,6 @@ def _code_fam_from_url(url):
         # Iterate through all families and look, which does apply to
         # the given URL
         for fam in config.family_files:
-            if fam == 'test':  # test_family.py is deprecated
-                continue
             family = Family.load(fam)
             code = family.from_url(url)
             if code is not None:
