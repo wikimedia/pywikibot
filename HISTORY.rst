@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Fix regression of combining sys.path in pwb.py wrapper (T249427)
 * pagengenerators.py no more support 'oursql' or 'MySQLdb'. It now solely
   support PyMySQL https://pypi.org/project/PyMySQL/ (T243154, T89976)
 * Bugfixes and improvements
