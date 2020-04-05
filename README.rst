@@ -76,7 +76,15 @@ It may require the following programs to function properly:
 
 * `7za`: To extract 7z files
 
-.. include:: HISTORY.rst
+Roadmap
+-------
+
+.. include:: ROADMAP.rst
+
+Release history
+---------------
+
+See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
 
 Contributing
 ------------

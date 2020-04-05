@@ -4,8 +4,6 @@ The contents of the package
     +----------------------------------------------------------------------------------+
     | README and config files:                                                         |
     +===========================+======================================================+
-    | ChangeLog                 | Log file to keep track of major changes versionwise  |
-    +---------------------------+------------------------------------------------------+
     | CODE_OF_CONDUCT.md        | Code of conduct reference                            |
     +---------------------------+------------------------------------------------------+
     | CONTENT.rst               | This Content description file                        |
@@ -32,6 +30,8 @@ The contents of the package
     |                           | of the Pywikibot framework to version 3              |
     +---------------------------+------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                        |
+    +---------------------------+------------------------------------------------------+
+    | ROADMAP.rst               | pypi version roadmap file                            |
     +---------------------------+------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot framework             |
     +---------------------------+------------------------------------------------------+

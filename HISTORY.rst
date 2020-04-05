@@ -1,25 +1,6 @@
 Release history
 ===============
 
-Current decommissions
----------------------
-
-* 3.0.20200405: Site and Page methods deprecated for 10 years or longer will be removed
-* 3.0.20200405: Usage of SkipPageError with BaseBot will be removed
-* 3.0.20200326: Functions dealing with stars list may be removed
-* 3.0.20200306: Support of MediaWiki releases below 1.19 will be dropped (T245350)
-* 3.0.20200306: tools.ip will be dropped in favour of tools.is_IP (T243171)
-* 3.0.20200306: tools.ip_regexp will be removed in next release
-* 3.0.20200111: Support for Python 3.4 will be dropped (T239542)
-* 3.0.20190722: test_family will be removed (T228375, T228300)
-* 3.0.20190722: Deprecation warning: support for Python 2 will be dropped in 4/2020 (T213287)
-
-Current release
----------------
-
-* Bugfixes and improvements
-* Localisation updates
-
 3.0.20200405
 ------------
 
@@ -394,49 +375,260 @@ Current release
 3.0.20170713
 ------------
 
-* Implement server side event client EventStreams
-* Add thanks log support
-* new ndashredir.py script to create hyphenated redirects
-* new followlive.py script to flag new articles
-* new WbUnknown data type for Wikibase
 * Deprecate APISite.newfiles()
-* new pagegenerators filter option -titleregexnot
 * Inverse of pagegenerators -namespace option
 * Bugfixes and improvements
 * Localisation updates
-* Remove panoramiopicker.py script
-* Remove anarchopedia family out of the framework
 * CODE_OF_CONDUCT included
+
+Bugfixes
+~~~~~~~~
+* Manage temporary readonly error (T154011)
+* Unbreak wbGeoShape and WbTabularData (T166362)
+* Clean up issue with _WbDataPage (T166362)
+* Re-enable xml for WikiStats with py2 (T165830)
+* Solve httplib.IncompleteRead exception in eventstreams (T168535)
+* Only force input_choise if self.always is given (T161483)
+* Add colon when replacing category and file weblink (T127745)
+* API Request: set uiprop only when ensuring 'userinfo' in meta (T169202)
+* Fix TestLazyLoginNotExistUsername test for Stewardwiki (T169458)
+
+Improvements
+~~~~~~~~~~~~
+* Introduce the new WbUnknown data type for Wikibase (T165961)
+* djvu.py: add replace_page() and delete_page()
+* Build GeoShape and TabularData from shared base class
+* Remove non-breaking spaces when tidying up a link (T130818)
+* Replace private mylang variables with mycode in generate_user_files.py
+* FilePage: remove deprecated use of fileUrl
+* Make socket_timeout recalculation reusable (T166539)
+* FilePage.download(): add revision parameter to download arbitrary revision (T166939)
+* Make pywikibot.Error more precise (T166982)
+* Implement pywikibot support for adding thanks to normal revisions (T135409)
+* Implement server side event client EventStreams (T158943)
+* new pagegenerators filter option -titleregexnot
+* Add exception for -namepace option (T167580)
+* InteractiveReplace: Allow no replacements by default
+* Encode default globe in family file
+* Add on to pywikibot support for thanking normal revisions (T135409)
+* Add log entry code for thanks log (T135413)
+* Create superclass for log entries with user targets
+* Use relative reference to class attribute
+* Allow pywikibot to authenticate against a private wiki (T153903)
+* Make WbRepresentations hashable (T167827)
+
+Updates
+~~~~~~~
+* Update linktails
+* Update languages_by_size
+* Update cross_allowed (global bot wikis group)
+* Add atjwiki to wikipedia family file (T168049)
+* remove closed sites from languages_by_size list
+* Update category_redirect_templates for wikipedia and commons Family
+* Update logevent type parameter list
+* Disable cleanUpSectionHeaders on jbo.wiktionary (T168399)
+* Add kbpwiki to wikipedia family file (T169216)
+* Remove anarchopedia family out of the framework (T167534)
 
 3.0.20170521
 ------------
 
-* Replaced the word 'async' with 'asynchronous' due to python 3.7
 * Support for Python 2.6 but higher releases are strictly recommended
 * Bugfixes and improvements
 * Localisation updates
+
+Bugfixes
+~~~~~~~~
+* Increase the default socket_timeout to 75 seconds (T163635)
+* use repr() of exceptions to prevent UnicodeDecodeErrors (T120222)
+* Handle offset mismatches during chunked upload (T156402)
+* Correct _wbtypes equality comparison (T160282)
+* Re-enable getFileVersionHistoryTable() method (T162528)
+* Replaced the word 'async' with 'asynchronous' due to py3.7 (T106230)
+* Raise ImportError if no editor is available (T163632)
+* templatesWithParams: cache and standardise params (T113892)
+* getInternetArchiveURL: Retry http.fetch if there is a ConnectionError (T164208)
+* Remove wikidataquery from pywikibot (T162585)
+
+Improvements
+~~~~~~~~~~~~
+* Introduce user_add_claim and allow asynchronous ItemPage.addClaim (T87493)
+* Enable private edit summary in specialbots (T162527)
+* Make a decorator for asynchronous methods
+* Provide options by a separate handler class
+* Show a warning when a LogEntry type is not known (T135505)
+* Add Wikibase Client extension requirement to APISite.unconnectedpages()
+* Update content after editing entity
+* Make WbTime from Timestamp and vice versa (T131624)
+* Add support for geo-shape Wikibase data type (T161726)
+* Add async parameter to ItemPage.editEntity (T86074)
+* Make sparql use Site to access sparql endpoint and entity_url (T159956)
+* timestripper: search wikilinks to reduce false matches
+* Set Coordinate globe via item
+* use extract_templates_and_params_regex_simple for template validation
+* Add _items for WbMonolingualText
+* Allow date-versioned pypi releases from setup.py (T152907)
+* Provide site to WbTime via WbTime.fromWikibase
+* Provide preloading via GeneratorFactory.getCombinedGenerator() (T135331)
+* Accept QuitKeyboardInterrupt in specialbots.Uploadbot (T163970)
+* Remove unnecessary description change message when uploading a file (T163108)
+* Add 'OptionHandler' to bot.__all__ tuple
+* Use FilePage.upload inside UploadRobot
+* Add support for tabular-data Wikibase data type (T163981)
+* Get thumburl information in FilePage() (T137011)
+
+Updates
+~~~~~~~
+* Update languages_by_size in family files
+* wikisource_family.py: Add "pa" to languages_by_size
+* Config2: limit the number of retries to 15 (T165898)
 
 3.0.20170403
 ------------
 
 * First major release from master branch
 * requests package is mandatory
-* Deprecate previous 2.0 branches
+* Deprecate previous 2.0 branches and tags
+
+Bugfixes
+~~~~~~~~
+* Use default summary when summary value does not contain a string (T160823)
+* Enable specialbots.py for PY3 (T161457)
+* Change tw(n)translate from Site.code to Site.lang dependency (T140624)
+* Do not use the "imp" module in Python 3 (T158640)
+* Make sure the order of parameters does not change (T161291)
+* Use pywikibot.tools.Counter instead of collections.Counter (T160620)
+* Introduce a new site method page_from_repository()
+* Add pagelist tag for replaceExcept (T151940)
+* logging in python3 when deprecated_args decorator is used (T159077)
+* Avoid ResourceWarning using subprocess in python 3.6 (T159646)
+* load_pages_from_pageids: do not fail on empty string (T153592)
+* Add missing not-equal comparison for wbtypes (T158848)
+* textlib.getCategoryLinks catch invalid category title exceptions (T154309)
+* Fix html2unicode (T130925)
+* Ignore first letter case on 'first-letter' sites, obey it otherwise (T130917)
+* textlib.py: Limit catastrophic backtracking in FILE_LINK_REGEX (T148959)
+* FilePage.get_file_history(): Check for len(self._file_revisions) (T155740)
+* Fix for positional_arg behavior of GeneratorFactory (T155227)
+* Fix broken LDAP based login (T90149)
+
+Improvements
+~~~~~~~~~~~~
+* Simplify User class
+* Renamed isImage and isCategory
+* Add -property option to pagegenerators.py
+* Add a new site method pages_with_property
+* Allow retrieval of unit as ItemPage for WbQuantity (T143594)
+* return result of userPut with put_current method
+* Provide a new generator which yields a subclass of Page
+* Implement FilePage.download()
+* make general function to compute file sha
+* Support adding units to WbQuantity through ItemPage or entity url (T143594)
+* Make PropertyPage.get() return a dictionary
+* Add Wikibase Client extension requirement to APISite.unconnectedpages()
+* Make Wikibase Property provide labels data
+* APISite.data_repository(): handle warning with re.match() (T156596)
+* GeneratorFactory: make getCategory respect self.site (T155687)
+* Fix and improve default regexes
+
+Updates
+~~~~~~~
+* Update linktrails
+* Update languages_by_size
+* Updating global bot wikis, closed wikis and deleted wikis
+* Deprecate site.has_transcluded_data
+* update plural rules
+* Correcting month names in date.py for Euskara (eu)
+* Linktrail for Euskara
+* Define template documentation subpages for es.wikibooks
+* self.doc_subpages for Meta-Wiki
+* Updating Wikibooks projects which allows global bots
+* Updated list of closed projects
+* Add 'Bilde' as a namespace alias for file namespace of nn Wikipedia (T154947)
 
 2.0rc5
 ------
 
+*17 August 2016*
+
 * Last stable 2.0 branch
+
+Bugfixes
+~~~~~~~~
+* Establish the project's name, once and for all
+* setup.py: Add Python 3.4 and 3.5 to pypi classifiers
+* Remove item count output in page generators
+* Test Python 3.5 on Travis
+* Fix docstring capitalization in return types and behavior
+* Stop reading 'cookieprefix' upon login
+* Fix travis global environment variables
+* Fix notifications building from JSON
+* pywikibot: Store ImportError in imported variable
+* Use default tox pip install
+* Add asteroids that are being used as locations
+* [bugfix] Fix test_translateMagicWords test
+* Fix ID for Rhea
+* [bugfix] pass User page object to NotEmailableError
+* Allow pywikibot to run on Windows 10 as well
+* listpages.py: Fix help docstring
+* pwb.py: make sure pywikibot is correctly loaded before starting a script
+* win32_unicode: force truetype font in console
+* Update main copyright year to 2016
+* [L10N] add "sco" to redirected category pages
+* date.py: fix Hungarian day-month title
+* Prevent <references.../> from being destroyed
+* [FIX] Page: Use repr-like if it can't be encoded
+* pywikibot.WARNING -> pywikibot.logging.WARNING
+* Do not expand text by default in getCategoryLinks
+* Typo fix
+* Prevent AttributeError for when filename is None
+* Split TestUserContribs between user and non-user
 
 2.0rc4
 ------
 
+*15 December 2015*
+
+Bugfixes
+~~~~~~~~
 * Remove dependency on pYsearch
+* Require google>=0.7
 * Desupport Python 2.6 for Pywikibot 2.0 release branch
+* config: Don't crash on later get_base_dir calls
+* cosmetic_changes: merge similar regexes
+* Update revId upon claim change
+* Update WOW hostnames
+* Mark site.patrol() as a user write action
+* Fix interwikiFormat support for Link
+* Changes are wrongly detected in the last langlink
+* getLanguageLinks: Skip own site
+* fix intersection of sets of namespaces
+* Import textlib.TimeStripper
+* Change "PyWikiBot" to "Pywikibot"
+* Stop crashing item loads due to support of units
+* __all__ items must be bytes on Python 2
+* Omit includeredirects parameter for allpages generator
+* Performance fix for sites using interwiki_putfirst option
+* Fix Persian Wikipedia configuration
+* rollback: Use Revision instance properly
+* Add must_be to DataSite write actions
+* Remove unneeded site argument to AutoFamily
+* Fix ComparableMixin
+* Deprecate ParamInfo.query_modules_with_limits
+* be-x-old is renamed to be-tarask
+* Correctly identify qualifier from JSON
 
 2.0rc3
 ------
 
+*30 September 2015*
+
+Bugfixes
+~~~~~~~~
+* New Wikipedia site: azb
+* Indexes in str.format
+* MediaWikiVersion: Accept new wmf style
+* i18n: always follow master
 * Bugfixes
 * Localisation updates
 * i18n: always follow master branch
@@ -444,6 +636,32 @@ Current release
 2.0rc2
 ------
 
+*9 July 2015*
+
+Configuration updates
+~~~~~~~~~~~~~~~~~~~~~
+* Changing the sandbox content template on Fa WP
+
+Family file updates
+~~~~~~~~~~~~~~~~~~~
+* Remove broken wikis from battlestarwiki family
+* Adding euskara and sicilianu languages to Vikidia family
+* WOW Wiki subdomains hr, ro & sr deleted
+* Add new Wikipedia languages gom and lrc
+
+Bugfixes
+~~~~~~~~
+* fix UnicodeDecodeError on api error
+* pwb.py now correctly passes arguments to generate_family_file
+* Fix Win32 config.editor detection
+* open_compressed: Wrap BZ2File in Py 2.7
+* Skip RC entries without a title
+* PatrolEntry: Allow cur/prev id to be str
+* Updates to i18n changes
+* Do not use ParamInfo during action=login
+* Let pydot encode labels for Python 3 support
+* Fix and test interwiki_graph
+* textlib: replaceExcept: Handle empty matches
 * Bugfixes and improvements
 * Localisation updates
 
@@ -451,6 +669,51 @@ Current release
 2.0rc1
 ------
 
+*25 May 2015*
+
+Major improvements include:
+
+* Sphinx documentation at https://doc.wikimedia.org/pywikibot/
+* Initial ProofreadPage support
+* Improved diff output, with context
+* Batch upload support
+* Compat scripts patrol.py and piper.py ported
+* isbn.py now supports wikibase
+* RecentChanges stream (rcstream) support
+
+Pywikibot API improvements include:
+
+* Python 3 ipaddress support
+* Support for Python warning system
+* Wikibase:
+   - added ISBN support
+   - added redirect support
+* Optionally uses external library for improved isbn validation
+* Automatically generating user files when -user, -family and -lang are
+  provided to a script
+* Page.content_model added
+* Page.contributors() and Page.revision_count() added
+* APISite.compare added
+* Site.undelete and Page.undelete added
+* DataSite.search_entities support
+* FilePage.latest_file_info and FilePage.oldest_file_info added
+* ItemClaimFilterPageGenerator added
+
+Low-level changes include:
+
+* Switch to JSON-based i18n data format
+* Unicode_literals used throughout source code
+* API badtoken recovery
+* API client side prevention of anonymous writes
+* API layer support for boolean and date datatypes
+* Improved MediaWiki version detection
+
+Other changes include:
+
+* Python 3 support fixes
+* Daemonize support
+* Allow pywikibot to load without i18n data
+* Appveyor CI Win32 builds
 * New scripts patrol.py and piper.py ported from old compat branch
 * isbn.py now supports wikibase
 * RecentChanges stream (rcstream) support
@@ -461,15 +724,41 @@ Current release
 2.0b3
 -----
 
+*30 November 2014*
+
+Major changes include:
+
+* Library initialisation no longer connects to servers
+* generate_user_files.py rewritten
+* API Version 1.14 support
+* Support HTTPS for families with certificate validation errors (Python 2 only)
+* API HTTP(S) GET support
+* API simplified continuation support
+* Upload uses a fake filename to avoid various MIME encoding issues
+* API class ParamInfo inspects API modules
+* Several QueryGenerator efficiency improvements
+* Improved 'same title' detection and 'get redirect target' handling
+* Site interwiki methods now use dynamic Interwikimap
+* Site methods return Namespace object instead of int
+* New WikiStats module
+* New PatchManager module used for showDiff
+* New pagegenerators, including -intersect support
+* Several category_redirect.py improvements
+* archivebot: support more languages
+* reflinks: changed from GPL to MIT
 * Bugfixes and improvements
 
 2.0b2
 -----
 
+*7 October 2014*
+
 * Bugfixes and improvements
 
 2.0b1
 -----
+
+*26 August 2013*
 
 * First stable release branch
 
@@ -489,4 +778,3 @@ Current release
 * scripts and libraries for standardizing content
 * tools for making minor modifications
 * script making interwiki links
-
