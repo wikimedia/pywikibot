@@ -559,7 +559,7 @@ class LinkChecker(object):
             # read the server's encoding, in case we need it later
             self.readEncodingFromResponse(self.response)
             # site down if the server status is between 400 and 499
-            alive = self.response.status not in range(400, 500)
+            alive = not (400 <= self.response.status < 500)
             if self.response.status in self.HTTPignore:
                 alive = False
             return alive, '{0} {1}'.format(self.response.status,

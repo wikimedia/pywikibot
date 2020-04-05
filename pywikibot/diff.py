@@ -472,7 +472,7 @@ class PatchManager(object):
                 hunk_list = []
                 rng_width = 18
                 for index, super_hunk in enumerate(super_hunks, start=1):
-                    assert super_hunk.reviewed in range(-1, 2), \
+                    assert -1 <= super_hunk.reviewed <= 1, \
                         "The super hunk's review status is unknown."
                     status = ' +-'[super_hunk.reviewed]
 

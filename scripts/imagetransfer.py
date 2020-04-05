@@ -274,7 +274,7 @@ class ImageTransferBot(object):
                     if not todo:
                         break
                     todo = int(todo)
-                if todo in range(len(imagelist)):
+                if 0 <= todo < len(imagelist):
                     if (imagelist[todo].fileIsShared()
                             and imagelist[todo].site.image_repository()
                             == self.targetSite.image_repository()):
