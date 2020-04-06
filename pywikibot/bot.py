@@ -1344,10 +1344,8 @@ class BaseBot(OptionHandler):
         skip_page and treat.
 
         @param item: any item from self.generator
-        @return: return the page object to be processed further or None if
-            page is a pywikibot.Page already and superclass' init_page isn't
-            to be called
-        @rtype: pywikibot.Page or None
+        @return: return the page object to be processed further
+        @rtype: pywikibot.Page
         """
         return item
 
@@ -1415,8 +1413,15 @@ class BaseBot(OptionHandler):
                         sys.exc_clear()
                     self._skip_counter += 1
                     continue
+
+                if initialized_page is None:
+                    issue_deprecation_warning(
+                        'Returning None from init_page() method',
+                        'return a pywikibot.page.BasePage object',
+                        since='20200406')
+                    page = item
                 else:
-                    page = initialized_page or item
+                    page = initialized_page
 
                 assert isinstance(page, pywikibot.page.BasePage), (
                     '"page" is not a pywikibot.page.BasePage object but {}.'
