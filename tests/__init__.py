@@ -109,7 +109,6 @@ library_test_modules = {
     'paraminfo',
     'plural',
     'proofreadpage',
-    'python',
     'site',
     'site_detect',
     'sparql',
