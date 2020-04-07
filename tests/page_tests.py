@@ -1206,11 +1206,16 @@ class TestShortLink(TestCase):
 
     user = True
 
-    family = 'meta'
-    code = 'meta'
+    family = 'wikipedia'
+    code = 'test'
 
     def test_create_short_link(self):
         """Test create_short_link function."""
+        # Make sure test user is logged in on meta:meta (T244062)
+        meta = pywikibot.Site('meta', 'meta')
+        if not meta.logged_in:
+            meta.login()
+
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
         with self.subTest(parameters='defaulted'):
