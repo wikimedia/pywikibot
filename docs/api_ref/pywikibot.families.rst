@@ -56,11 +56,6 @@ pywikibot.families.species\_family module
 
 .. automodule:: pywikibot.families.species_family
 
-pywikibot.families.test\_family module
---------------------------------------
-
-.. automodule:: pywikibot.families.test_family
-
 pywikibot.families.vikidia\_family module
 -----------------------------------------
 
