@@ -1607,9 +1607,9 @@ class WikimediaFamily(Family):
     """Class for all wikimedia families."""
 
     multi_language_content_families = [
-        'wikipedia', 'test',
-        'wiktionary', 'wikisource',
-        'wikibooks', 'wikinews', 'wikiquote',
+        'wikipedia', 'wiktionary',
+        'wikisource', 'wikibooks',
+        'wikinews', 'wikiquote',
         'wikiversity', 'wikivoyage',
     ]
 

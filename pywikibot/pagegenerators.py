@@ -3059,12 +3059,6 @@ class PetScanPageGenerator(object):
             'doit': ''
         }
 
-        # test wikipedia
-        if (self.site.code == 'test'
-                and self.site.family in ['test', 'wikipedia']):
-            query['language'] = 'test'
-            query['project'] = 'wikipedia'
-
         if namespaces:
             for namespace in namespaces:
                 query['ns[{0}]'.format(int(namespace))] = 1
