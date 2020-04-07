@@ -1213,7 +1213,7 @@ class TestShortLink(TestCase):
         """Test create_short_link function."""
         # Make sure test user is logged in on meta:meta (T244062)
         meta = pywikibot.Site('meta', 'meta')
-        if not meta.logged_in:
+        if not meta.logged_in():
             meta.login()
 
         site = self.get_site()
