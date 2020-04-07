@@ -38,8 +38,7 @@ class TestFamily(TestCase):
         """Test that a family can be loaded via Family.load."""
         for name in pywikibot.config.family_files:
             with self.subTest(family=name):
-                with suppress_warnings('test_family is deprecated'):
-                    f = Family.load(name)
+                f = Family.load(name)
                 self.assertIsInstance(f.langs, dict)
                 self.assertTrue(f.langs)
                 self.assertTrue(f.codes)
