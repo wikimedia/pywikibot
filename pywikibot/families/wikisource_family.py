@@ -73,6 +73,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         aliases = cls.alphabetic + ['-', 'www']
         for code in aliases:
             if (code not in cls.languages_by_size
+                    and code not in cls.closed_wikis
                     and code not in cls.code_aliases):
                 cls.code_aliases[code] = 'mul'
         return cls.code_aliases
