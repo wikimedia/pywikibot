@@ -715,9 +715,6 @@ Other changes include:
 * Allow pywikibot to load without i18n data
 * Appveyor CI Win32 builds
 * New scripts patrol.py and piper.py ported from old compat branch
-* isbn.py now supports wikibase
-* RecentChanges stream (rcstream) support
-* Sphinx documentation at https://doc.wikimedia.org/pywikibot/
 * Bugfixes and improvements
 * Localisation updates
 
