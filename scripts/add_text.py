@@ -248,7 +248,12 @@ def add_text(page, addText, summary=None, regexSkip=None,
     else:
         newtext = addText + '\n' + text
 
-    if putText and text != newtext:
+    if not putText:
+        # If someone load it as module, maybe it's not so useful to put the
+        # text in the page
+        return (text, newtext, always)
+
+    if text != newtext:
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
         pywikibot.showDiff(text, newtext)
@@ -256,11 +261,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
     # Let's put the changes.
     error_count = 0
     while True:
-        # If someone load it as module, maybe it's not so useful to put the
-        # text in the page
-        if not putText:
-            return (text, newtext, always)
-
         if not always:
             try:
                 choice = pywikibot.input_choice(
@@ -276,13 +276,14 @@ def add_text(page, addText, summary=None, regexSkip=None,
                 return (False, False, always)
             elif choice == 'b':
                 pywikibot.bot.open_webbrowser(page)
+                continue
 
-        if always or choice == 'y':
-            result = put_text(page, newtext, summary, error_count,
-                              asynchronous=not always)
-            if result is not None:
-                return (result, result, always)
-            error_count += 1
+        # either always or choice == 'y' is selected
+        result = put_text(page, newtext, summary, error_count,
+                          asynchronous=not always)
+        if result is not None:
+            return (result, result, always)
+        error_count += 1
 
 
 def main(*args):
