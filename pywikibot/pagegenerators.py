@@ -3051,8 +3051,8 @@ class PetScanPageGenerator(object):
         extra_options = extra_options or {}
 
         query = {
-            'language': self.site.lang,
-            'project': self.site.family,
+            'language': self.site.code,
+            'project': self.site.hostname().split('.')[-2],
             'combination': 'subset' if subset_combination else 'union',
             'categories': '\r\n'.join(categories),
             'format': 'json',
