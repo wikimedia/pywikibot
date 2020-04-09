@@ -1019,12 +1019,19 @@ class ThreadList(list):
 
     _logger = 'threadlist'
 
-    def __init__(self, limit=128, *args):
-        """Initializer."""
+    def __init__(self, limit=128, wait_time=2, *args):
+        """Initializer.
+
+        @param limit: the number of simultaneous threads
+        @type limit: int
+        @param wait_time: how long to wait if active threads exceeds limit
+        @type wait_time: int or float
+        """
         self.limit = limit
+        self.wait_time = wait_time
         super(ThreadList, self).__init__(*args)
         for item in self:
-            if not isinstance(threading.Thread, item):
+            if not isinstance(item, threading.Thread):
                 raise TypeError("Cannot add '%s' to ThreadList" % type(item))
 
     def active_count(self):
@@ -1042,7 +1049,7 @@ class ThreadList(list):
         if not isinstance(thd, threading.Thread):
             raise TypeError("Cannot append '%s' to ThreadList" % type(thd))
         while self.active_count() >= self.limit:
-            time.sleep(2)
+            time.sleep(self.wait_time)
         super(ThreadList, self).append(thd)
         thd.start()
         debug("thread %d ('%s') started" % (len(self), type(thd)),
