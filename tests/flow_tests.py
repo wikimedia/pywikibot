@@ -226,7 +226,7 @@ class TestFlowTopic(TestCase):
         topic = Topic(self.site, 'Topic:U5y4l1rzitlplyc5')
         self.assertEqual(topic.root.uuid, 'u5y4l1rzitlplyc5')
         replies = topic.replies()
-        self.assertLength(replies, 3)
+        self.assertLength(replies, 4)
         self.assertTrue(all(isinstance(reply, Post)
                             for reply in replies))
         self.assertEqual(replies[1].uuid, 'u5y5lysqcvyne4k1')
