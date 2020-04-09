@@ -83,10 +83,11 @@ def getversion(online=True):
 
     if online:
         try:
+            hsh3 = getversion_onlinerepo('tags/stable')
             hsh2 = getversion_onlinerepo()
             hsh1 = data['hsh']
             data['cmp_ver'] = 'UNKNOWN' if not hsh1 else (
-                'OUTDATED' if hsh1 != hsh2 else 'ok')
+                'OUTDATED' if hsh1 not in (hsh2, hsh3) else 'ok')
         except Exception:
             pass
 
@@ -383,14 +384,13 @@ def getversion_package(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo():
+def getversion_onlinerepo(path='branches/master'):
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
     buf = http.fetch(
-        uri='https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/'
-            'branches/master',
+        uri='https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/' + path,
         headers={'user-agent': '{pwb}'}).text[4:]
     try:
         hsh = json.loads(buf)['revision']
