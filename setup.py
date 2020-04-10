@@ -102,7 +102,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
                 'requests>=2.20.1; python_version != "3.4"',
                 'enum34>=1.1.6,!=1.1.8; python_version < "3"',
-                'ipaddress>=1.0.23; python_version < "3"',
+                'ipaddress; python_version < "3"',
                 'pathlib2;python_version<"3"']
 
 # Python versions before 2.7.9 will cause urllib3 to trigger
