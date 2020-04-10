@@ -245,11 +245,11 @@ class NowCommonsDeleteBot(Bot):
                 for par in params:
                     val = par.split('=')
                     if len(val) == 1 and not skip:
-                        filenameOnCommons = par[par.index(':') + 1:]
+                        filenameOnCommons = par[par.find(':') + 1:]
                         break
                     if val[0].strip() == '1':
                         filenameOnCommons = \
-                            val[1].strip()[val[1].strip().index(':') + 1:]
+                            val[1].strip()[val[1].strip().find(':') + 1:]
                         break
                     skip = True
                 if not filenameOnCommons:
