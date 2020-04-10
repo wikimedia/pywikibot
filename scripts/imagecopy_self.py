@@ -970,7 +970,6 @@ class uploader(threading.Thread):
                 "%(resolution)s (%(size)s bytes) ''"
                 "<nowiki>%(comment)s</nowiki>''\n" % {
                     'lang': lang,
-                    'family': family,
                     'date': date,
                     'username': username,
                     'resolution': resolution,
