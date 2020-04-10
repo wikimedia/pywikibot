@@ -41,10 +41,10 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': [
-        'Pillow<7.0.0,>=6.2.0;python_version<"3"',
-        'Pillow<6.0.0;python_version=="3.4"',  # vulnerability found
-        'Pillow>=6.2.1;python_version>="3.5"',  # 6.2.1 required for PY 3.8
+    'Tkinter': [  # vulnerability found in Pillow<6.2.2
+        'Pillow>=6.2.2,<7.0.0;python_version<"3"',
+        'Pillow<6.0.0;python_version=="3.4"',
+        'Pillow>=6.2.2;python_version>="3.5"',
     ],
     'security': [
         'requests[security]'
