@@ -13,6 +13,7 @@ ENV LC_ALL C.UTF-8
 ADD . /srv/pwb
 
 # pip version in stretch is too old :(
+RUN pip3 install -U setuptools
 RUN pip3 install -U pip
 
 RUN pip3 install -r /srv/pwb/requirements.txt
