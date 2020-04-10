@@ -629,7 +629,7 @@ def execute(command, data_in=None, timeout=None, error=None):
             str(pywikibot.config.userinterface_lang)
 
     # Set EDITOR to an executable that ignores all arguments and does nothing.
-    env[str('EDITOR')] = str('call' if OSWIN32 else 'true')
+    env[str('EDITOR')] = str('break' if OSWIN32 else 'true')
     try:
         p = Popen(
             command, env=env, stdout=PIPE, stderr=PIPE,

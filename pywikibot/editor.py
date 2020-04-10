@@ -3,7 +3,7 @@
 """Text editor class for your favourite editor."""
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,6 +13,8 @@ import codecs
 import os
 import subprocess
 import tempfile
+
+from sys import platform
 
 import pywikibot
 
@@ -101,7 +103,8 @@ class TextEditor(object):
                                  encoding=config.editor_encoding) as tempFile:
                     tempFile.write(text)
                 creationDate = os.stat(tempFilename).st_mtime
-                subprocess.call(self._command(tempFilename, text, jumpIndex))
+                cmd = self._command(tempFilename, text, jumpIndex)
+                subprocess.call(cmd, shell=platform == 'win32')
                 lastChangeDate = os.stat(tempFilename).st_mtime
                 if lastChangeDate == creationDate:
                     # Nothing changed
