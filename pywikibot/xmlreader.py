@@ -9,7 +9,7 @@ https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 import threading
 
-from xml.etree.cElementTree import iterparse
+from xml.etree.ElementTree import iterparse
 
 import xml.sax
 
@@ -116,7 +116,7 @@ class XmlDump(object):
             self._parse = self._parse_only_latest
 
     def parse(self):
-        """Generator using cElementTree iterparse function."""
+        """Generator using ElementTree iterparse function."""
         with open_archive(self.filename) as source:
             # iterparse's event must be a str but they are unicode with
             # unicode_literals in Python 2

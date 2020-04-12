@@ -24,7 +24,6 @@ Pywikibot makes use of some modules that are part of python, but that
 are not installed by default on some Linux distributions:
 
   * python-xml (required to parse XML via SaX2)
-  * python-celementtree (recommended if you use XML dumps)
   * python-tkinter (optional, used by some experimental GUI stuff)
 
 
