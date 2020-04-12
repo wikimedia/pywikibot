@@ -21,7 +21,7 @@ from functools import partial
 import json
 import socket
 
-import requests
+from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.response import httplib
 
@@ -33,7 +33,7 @@ except ImportError as e:
 from pywikibot import config, debug, Timestamp, Site, warning
 from pywikibot.tools import deprecated_args, StringTypes
 
-if LooseVersion(requests.__version__) < LooseVersion('2.20.1'):
+if LooseVersion(requests_version) < LooseVersion('2.20.1'):
     raise ImportError(
         'requests >= 2.20.1 is required for EventStreams;\n'
         "install it with 'pip install \"requests>=2.20.1\"'\n")

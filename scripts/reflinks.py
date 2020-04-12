@@ -63,7 +63,7 @@ from pywikibot.pagegenerators import (
 )
 from pywikibot.tools.formatter import color_format, PY2
 
-import requests
+from requests import codes
 
 from scripts import noreferences
 
@@ -589,7 +589,7 @@ class ReferencesRobot(Bot):
                                 'Redirect to root : {0} ', ref.link))
                             continue
 
-                    if f.status != requests.codes.ok:
+                    if f.status != codes.ok:
                         pywikibot.output('HTTP error ({0}) for {1} on {2}'
                                          .format(f.status, ref.url,
                                                  page.title(as_link=True)),

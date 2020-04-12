@@ -31,7 +31,7 @@ from __future__ import absolute_import, division, unicode_literals
 from functools import partial
 import json
 import re
-import requests
+from requests.exceptions import ReadTimeout
 import time
 
 try:
@@ -604,7 +604,7 @@ class ProofreadPage(pywikibot.Page):
                             _logger)
             try:
                 response = http.fetch(cmd_uri)
-            except requests.exceptions.ReadTimeout as e:
+            except ReadTimeout as e:
                 timeout = e
                 pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
             except Exception as e:

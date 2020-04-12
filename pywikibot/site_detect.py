@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import re
 
-from requests import RequestException
+from requests.exceptions import RequestException
 
 import pywikibot
 
