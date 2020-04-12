@@ -212,7 +212,7 @@ sys.path.insert(1, absolute_path)
 if not check_modules():
     sys.exit()
 
-filename, args, local_args = handle_args(*sys.argv)
+filename, script_args, global_args = handle_args(*sys.argv)
 
 # Search for user-config.py before creating one.
 # If successful, user-config.py already exists in one of the candidate
@@ -337,12 +337,12 @@ def main():
     if not filename:
         return False
 
-    if local_args:  # don't use sys.argv
-        pwb_args = pwb.handle_args(local_args)
-        if pwb_args:
+    if global_args:  # don't use sys.argv
+        unknown_args = pwb.handle_args(global_args)
+        if unknown_args:
             print('ERROR: unknown pwb.py argument{}: {}\n'
-                  .format('' if len(pwb_args) == 1 else 's',
-                          ', '.join(pwb_args)))
+                  .format('' if len(unknown_args) == 1 else 's',
+                          ', '.join(unknown_args)))
             return False
 
     file_package = None
@@ -378,9 +378,9 @@ def main():
             warn('Parent module %s not found: %s'
                  % (file_package, e), ImportWarning)
 
-    if check_modules(filename) or '-help' in args:
+    if check_modules(filename) or '-help' in script_args:
         run_python_file(filename,
-                        [filename] + args,
+                        [filename] + script_args,
                         [Path(filename).stem] + argvu[1:],
                         file_package)
     return True
