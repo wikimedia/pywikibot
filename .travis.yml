@@ -157,9 +157,13 @@ matrix:
       env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.9-dev'
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
   allow_failures:
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.9-dev'
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
 
 notifications:
   email:
