@@ -3,11 +3,7 @@
 language: python
 
 python:
-  - '2.7'
   - '3.5'
-  - '3.6'
-  - '3.7'
-  - '3.8'
 
 # OSX builds do not yet support Python
 os: linux
@@ -131,35 +127,13 @@ env:
 
 matrix:
   include:
-    - python: '2.7_with_system_site_packages'
-      env: LANGUAGE=nb FAMILY=wikipedia PYSETUP_TEST_EXTRAS=1 PYWIKIBOT_TEST_NO_RC=1
-      addons:
-        apt:
-          packages:
-            - djvulibre-bin
-            - graphviz
-            - python-ipaddr
-    - python: '2.7'
-      env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
-    - python: '3.6'
-      env: LANGUAGE=zh FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
-    - python: '3.5'
-      env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
-    - python: '3.5'
-      env: LANGUAGE=en FAMILY=musicbrainz PYWIKIBOT_SITE_ONLY=1
-    - python: '3.7'
-      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
-    - python: '3.7'
-      env: LANGUAGE=test FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.8'
       env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT_TEST_NO_RC=1
-    - python: '3.6'
-      env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
-    - python: '3.8'
-      env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.9-dev'
+      env: LANGUAGE=de FAMILY=wikipedia
   allow_failures:
-    - python: '3.8'
-      env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.9-dev'
+      env: LANGUAGE=de FAMILY=wikipedia
 
 notifications:
   email:
