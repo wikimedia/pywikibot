@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import datetime
 
-from requests import ConnectionError as RequestsConnectionError
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from pywikibot.tools import PY2
 from scripts import weblinkchecker
