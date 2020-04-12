@@ -21,6 +21,12 @@ from tests.basepage_tests import (
 )
 
 
+def setUpModule():  # noqa: N802
+    """Always skip."""
+    raise unittest.SkipTest('flow_tests.py tests are disabled '
+                            'due to upstream issue T249705.')
+
+
 class TestMediaWikiFlowSandbox(TestCase):
 
     """Test the Flow sandbox on MediaWiki.org."""
