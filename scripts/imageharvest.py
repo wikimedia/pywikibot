@@ -18,7 +18,7 @@ Other options:
 -justshown  Choose _only_ images shown on the page, not those linked
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,14 +34,14 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot.bot import QuitKeyboardInterrupt
+from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
 
 if not PY2:
-    import urllib
-    from urllib.request import urlopen
+    from urllib.parse import urljoin
 else:
-    from urllib import urlopen
+    from urlparse import urljoin
 
 fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
 
@@ -52,9 +52,13 @@ def get_imagelinks(url):
     if isinstance(BeautifulSoup, ImportError):
         raise BeautifulSoup
 
-    links = []
-    with urlopen(url) as f:
-        soup = BeautifulSoup(f.read(), 'html.parser')
+    response = fetch(url)
+    if response.status != 200:
+        pywikibot.output('Skipping url: {}'
+                         .format(url))
+        return []
+
+    soup = BeautifulSoup(response.text, 'html.parser')
 
     if not shown:
         tagname = 'a'
@@ -63,12 +67,13 @@ def get_imagelinks(url):
     else:
         tagname = ['a', 'img']
 
+    links = []
     for tag in soup.findAll(tagname):
         link = tag.get('src', tag.get('href', None))
         if link:
             ext = os.path.splitext(link)[1].lower().strip('.')
             if ext in fileformats:
-                links.append(urllib.basejoin(url, link))
+                links.append(urljoin(url, link))
     return links
 
 
