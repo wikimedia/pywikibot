@@ -388,6 +388,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     _allowed_failures = [
         'disambredir',
+        'imageharvest',  # T167726
         'misspelling',   # T94681
         'watchlist',     # T77965
         'lonelypages',   # T94680: uses exit code 1
