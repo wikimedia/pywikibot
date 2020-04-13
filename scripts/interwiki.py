@@ -340,8 +340,8 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2007-2019
+# (C) xqt, 2009-2020
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -352,7 +352,6 @@ from itertools import chain
 import os
 import pickle
 import re
-import shelve
 import socket
 import sys
 from textwrap import fill
@@ -447,7 +446,6 @@ class InterwikiBotConfig(object):
     hintnobracket = False
     hints = []
     hintsareright = False
-    contentsondisk = config.interwiki_contents_on_disk
     lacklanguage = None
     minlinks = 0
     quiet = False
@@ -556,81 +554,6 @@ class InterwikiBotConfig(object):
         else:
             return False
         return True
-
-
-class StoredPage(pywikibot.Page):
-
-    """
-    Store the Page contents on disk.
-
-    This is to avoid sucking too much memory when a big number of Page objects
-    will be loaded at the same time.
-    """
-
-    # Please prefix the class members names by SP
-    # to avoid possible name clashes with pywikibot.Page
-
-    # path to the shelve
-    SPpath = None
-    # shelve
-    SPstore = None
-
-    # attributes created by pywikibot.Page.__init__
-    SPcopy = ['_editrestriction',
-              '_site',
-              '_namespace',
-              '_section',
-              '_title',
-              'editRestriction',
-              'moveRestriction',
-              '_permalink',
-              '_userName',
-              '_ipedit',
-              '_editTime',
-              '_startTime',
-              '_revisionId',
-              '_deletedRevs']
-
-    def SPdeleteStore():
-        """Delete SPStore."""
-        if StoredPage.SPpath:
-            del StoredPage.SPstore
-            os.unlink(StoredPage.SPpath)
-    SPdeleteStore = staticmethod(SPdeleteStore)
-
-    def __init__(self, page):
-        """Initializer."""
-        for attr in StoredPage.SPcopy:
-            setattr(self, attr, getattr(page, attr))
-
-        if not StoredPage.SPpath:
-            index = 1
-            while True:
-                path = config.datafilepath('cache', 'pagestore' + str(index))
-                if not os.path.exists(path):
-                    break
-                index += 1
-            StoredPage.SPpath = path
-            StoredPage.SPstore = shelve.open(path)
-
-        self.SPkey = str(self)
-        self.SPcontentSet = False
-
-    def SPgetContents(self):
-        """Get stored content."""
-        return StoredPage.SPstore[self.SPkey]
-
-    def SPsetContents(self, contents):
-        """Store content."""
-        self.SPcontentSet = True
-        StoredPage.SPstore[self.SPkey] = contents
-
-    def SPdelContents(self):
-        """Delete stored content."""
-        if self.SPcontentSet:
-            del StoredPage.SPstore[self.SPkey]
-
-    _contents = property(SPgetContents, SPsetContents, SPdelContents)
 
 
 class PageTree(object):
@@ -783,9 +706,6 @@ class Subject(interwiki_graph.Subject):
         plus optionally a list of hints for translation
         """
         self.conf = conf
-        if self.conf.contentsondisk:
-            if originPage:
-                originPage = StoredPage(originPage)
 
         super(Subject, self).__init__(originPage)
 
@@ -882,8 +802,6 @@ class Subject(interwiki_graph.Subject):
 
         for link in links:
             page = pywikibot.Page(link)
-            if self.conf.contentsondisk:
-                page = StoredPage(page)
             self.todo.add(page)
             self.foundIn[page] = [None]
             if keephintedsites:
@@ -960,8 +878,6 @@ class Subject(interwiki_graph.Subject):
             self.foundIn[page].append(linkingPage)
             return False
         else:
-            if self.conf.contentsondisk:
-                page = StoredPage(page)
             self.foundIn[page] = [linkingPage]
             self.todo.add(page)
             counter.plus(page.site)
@@ -1275,8 +1191,6 @@ class Subject(interwiki_graph.Subject):
                     # the 1st existig page becomes the origin page, if none was
                     # supplied
                     if self.conf.initialredirect:
-                        if self.conf.contentsondisk:
-                            redirectTargetPage = StoredPage(redirectTargetPage)
                         # don't follow another redirect; it might be a self
                         # loop
                         if not redirectTargetPage.isRedirectPage() \
@@ -1692,27 +1606,6 @@ class Subject(interwiki_graph.Subject):
         # don't report backlinks for pages we already changed
         if config.interwiki_backlink:
             self.reportBacklinks(new, updatedSites)
-
-    def clean(self):
-        """
-        Delete the contents that are stored on disk for this Subject.
-
-        We cannot afford to define this in a StoredPage destructor because
-        StoredPage instances can get referenced cyclicly: that would stop the
-        garbage collector from destroying some of those objects.
-
-        It's also not necessary to set these lines as a Subject destructor:
-        deleting all stored content one entry by one entry when bailing out
-        after a KeyboardInterrupt for example is redundant, because the
-        whole storage file will be eventually removed.
-        """
-        if self.conf.contentsondisk:
-            for page in self.foundIn:
-                # foundIn can contain either Page or StoredPage objects
-                # calling the destructor on _contents will delete the
-                # disk records if necessary
-                if hasattr(page, '_contents'):
-                    del page._contents
 
     def replaceLinks(self, page, newPages):
         """Return True if saving was successful."""
@@ -2244,7 +2137,6 @@ class InterwikiBot(object):
             subj = self.subjects[i]
             if subj.isDone():
                 subj.finish()
-                subj.clean()
                 del self.subjects[i]
 
     def isDone(self):
@@ -2564,8 +2456,6 @@ def main(*args):
         dumpFileName = bot.dump(append)
         raise
     finally:
-        if iwconf.contentsondisk:
-            StoredPage.SPdeleteStore()
         if dumpFileName:
             try:
                 restoredFiles.remove(dumpFileName)

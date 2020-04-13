@@ -112,9 +112,9 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {'available_ssl_project', 'fake_user_agent',
-                         'line_separator', 'LS', 'panoramio', 'proxy',
-                         'special_page_limit', 'sysopnames', 'use_SSL_onlogin',
-                         'use_SSL_always'}
+                         'interwiki_contents_on_disk', 'line_separator', 'LS',
+                         'panoramio', 'proxy', 'special_page_limit',
+                         'sysopnames', 'use_SSL_onlogin', 'use_SSL_always'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -608,11 +608,6 @@ interwiki_graph_url = None
 
 # Save file with local articles without interwikis.
 without_interwiki = False
-
-# Experimental feature:
-# Store the page contents on disk (/cache/ directory) instead of loading
-# them in RAM.
-interwiki_contents_on_disk = False
 
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
