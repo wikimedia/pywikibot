@@ -1221,18 +1221,16 @@ class Request(MutableMapping):
         # things like throttling or skipping actions when we're in simulation
         # mode
         self.write = self.action in (
-            'edit', 'move', 'rollback', 'delete', 'undelete',
-            'protect', 'block', 'unblock', 'watch', 'patrol',
-            'import', 'userrights', 'upload', 'emailuser',
-            'createaccount', 'setnotificationtimestamp',
-            'filerevert', 'options', 'purge', 'revisiondelete',
-            'wbeditentity', 'wbsetlabel', 'wbsetdescription',
-            'wbsetaliases', 'wblinktitles', 'wbsetsitelink',
-            'wbcreateclaim', 'wbremoveclaims', 'wbsetclaimvalue',
-            'wbsetreference', 'wbremovereferences', 'wbsetclaim',
-            'wbcreateredirect', 'wbmergeitems', 'wbsetqualifier',
-            'wbremovequalifiers',
-            'thank', 'flowthank'
+            'block', 'createaccount', 'delete', 'edit', 'emailuser',
+            'filerevert', 'flowthank', 'import', 'move', 'options', 'patrol',
+            'protect', 'purge', 'revisiondelete', 'rollback',
+            'setnotificationtimestamp', 'setpagelanguage', 'thank', 'unblock',
+            'undelete', 'upload', 'userrights', 'watch',
+            'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
+            'wblinktitles', 'wbmergeitems', 'wbremoveclaims',
+            'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
+            'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
+            'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
         )
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
