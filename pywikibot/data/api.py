@@ -1221,11 +1221,12 @@ class Request(MutableMapping):
         # things like throttling or skipping actions when we're in simulation
         # mode
         self.write = self.action in (
-            'block', 'createaccount', 'delete', 'edit', 'emailuser',
-            'filerevert', 'flowthank', 'import', 'move', 'options', 'patrol',
-            'protect', 'purge', 'revisiondelete', 'rollback',
-            'setnotificationtimestamp', 'setpagelanguage', 'thank', 'unblock',
-            'undelete', 'upload', 'userrights', 'watch',
+            'block', 'clearhasmsg', 'createaccount', 'delete', 'edit',
+            'emailuser', 'filerevert', 'flowthank', 'imagerotate', 'import',
+            'managetags', 'mergehistory', 'move', 'options', 'patrol',
+            'protect', 'purge', 'resetpassword', 'revisiondelete', 'rollback',
+            'setnotificationtimestamp', 'setpagelanguage', 'tag', 'thank',
+            'unblock', 'undelete', 'upload', 'userrights', 'watch',
             'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
             'wblinktitles', 'wbmergeitems', 'wbremoveclaims',
             'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
