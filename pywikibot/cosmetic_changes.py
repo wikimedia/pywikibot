@@ -58,6 +58,8 @@ or by adding a list to the given one:
 #
 import re
 
+from typing import Optional
+
 import pywikibot
 
 from pywikibot.page import url2unicode
@@ -66,7 +68,8 @@ from pywikibot.textlib import (
     _get_regexes, _MultiTemplateMatchBuilder, FILE_LINK_REGEX
 )
 from pywikibot.tools import (
-    deprecated, deprecated_args, first_lower, first_upper
+    deprecated, deprecated_args, first_lower, first_upper,
+    issue_deprecation_warning,
 )
 
 try:
@@ -203,20 +206,47 @@ class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
-    @deprecated_args(debug='show_diff', redirect=None, diff='show_diff')
-    def __init__(self, site, show_diff=False, namespace=None, pageTitle=None,
-                 ignore=CANCEL_ALL):
-        """Initializer."""
-        self.site = site
+    @deprecated_args(redirect=None, diff='show_diff', site='page')
+    def __init__(self, page, *,
+                 show_diff: bool = False,
+                 namespace: Optional[int] = None,
+                 pageTitle: Optional[str] = None,
+                 ignore: int = CANCEL_ALL):
+        """Initializer.
+
+        @param page: the Page object containing the text to be modified
+        @type page: pywikibot.Page
+        @param show_diff: show difference after replacements (default: False)
+        @param namespace: DEPRECATED namespace parameter
+        @param pageTitle: DEPRECATED page title parameter
+        @param ignore: ignores if an error occurred and either skips the page
+            or only that method. It can be set one of the CANCEL constants
+        """
+        if isinstance(page, pywikibot.BaseSite):
+            self.site = page
+            self.title = pageTitle
+            try:
+                self.namespace = self.site.namespaces.resolve(namespace).pop(0)
+            except (KeyError, TypeError, IndexError):
+                raise ValueError('{} needs a valid namespace'
+                                 .format(self.__class__.__name__))
+            issue_deprecation_warning(
+                'site parameter of CosmeticChangesToolkit',
+                'a pywikibot.Page object as first parameter',
+                warning_class=FutureWarning,
+                since='20201102')
+        else:
+            if namespace is not None or pageTitle is not None:
+                raise TypeError(
+                    "'namespace' and 'pageTitle' arguments are invalid with "
+                    'a given Page object')
+            self.site = page.site
+            self.title = page.title()
+            self.namespace = page.namespace()
+
         self.show_diff = show_diff
-        try:
-            self.namespace = self.site.namespaces.resolve(namespace).pop(0)
-        except (KeyError, TypeError, IndexError):
-            raise ValueError('{0} needs a valid namespace'
-                             .format(self.__class__.__name__))
         self.template = (self.namespace == 10)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
-        self.title = pageTitle
         self.ignore = ignore
 
         self.common_methods = [
@@ -258,11 +288,12 @@ class CosmeticChangesToolkit:
         self.show_diff = bool(value)
 
     @classmethod
+    @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
+                future_warning=True, since='20200415')
     @deprecated_args(diff='show_diff')
     def from_page(cls, page, show_diff=False, ignore=CANCEL_ALL):
         """Create toolkit based on the page."""
-        return cls(page.site, show_diff=show_diff, namespace=page.namespace(),
-                   pageTitle=page.title(), ignore=ignore)
+        return cls(page, show_diff=show_diff, ignore=ignore)
 
     def safe_execute(self, method, text):
         """Execute the method and catch exceptions if enabled."""
