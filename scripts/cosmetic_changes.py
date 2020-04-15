@@ -70,7 +70,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
     def treat_page(self):
         """Treat page with the cosmetic toolkit."""
         cc_toolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
-            self.current_page, False, self.getOption('ignore'))
+            self.current_page, ignore=self.getOption('ignore'))
         changed_text = cc_toolkit.change(self.current_page.get())
         if changed_text is not False:
             self.put_current(new_text=changed_text,

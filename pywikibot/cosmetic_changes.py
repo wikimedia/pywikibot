@@ -71,7 +71,9 @@ from pywikibot.page import url2unicode
 from pywikibot import textlib
 from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
                                _get_regexes)
-from pywikibot.tools import deprecated_args, first_lower, first_upper
+from pywikibot.tools import (
+    deprecated, deprecated_args, first_lower, first_upper
+)
 
 
 # Subpage templates. Must be in lower case,
@@ -202,12 +204,12 @@ class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 
-    @deprecated_args(debug='diff', redirect=None)
-    def __init__(self, site, diff=False, namespace=None, pageTitle=None,
+    @deprecated_args(debug='show_diff', redirect=None, diff='show_diff')
+    def __init__(self, site, show_diff=False, namespace=None, pageTitle=None,
                  ignore=CANCEL_ALL):
         """Initializer."""
         self.site = site
-        self.diff = diff
+        self.show_diff = show_diff
         try:
             self.namespace = self.site.namespaces.resolve(namespace).pop(0)
         except (KeyError, TypeError, IndexError):
@@ -244,10 +246,23 @@ class CosmeticChangesToolkit(object):
         if stdnum_isbn:
             self.common_methods.append(self.fix_ISBN)
 
+    @property
+    @deprecated('show_diff', since='20200415')
+    def diff(self):
+        """CosmeticChangesToolkit.diff attribute getter."""
+        return self.show_diff
+
+    @diff.setter
+    @deprecated('show_diff', since='20200415')
+    def diff(self, value):
+        """CosmeticChangesToolkit.diff attribute setter."""
+        self.show_diff = bool(value)
+
     @classmethod
-    def from_page(cls, page, diff, ignore):
+    @deprecated_args(diff='show_diff')
+    def from_page(cls, page, show_diff=False, ignore=CANCEL_ALL):
         """Create toolkit based on the page."""
-        return cls(page.site, diff=diff, namespace=page.namespace(),
+        return cls(page.site, show_diff=show_diff, namespace=page.namespace(),
                    pageTitle=page.title(), ignore=ignore)
 
     def safe_execute(self, method, text):
@@ -283,7 +298,7 @@ class CosmeticChangesToolkit(object):
             else:
                 raise
         else:
-            if self.diff:
+            if self.show_diff:
                 pywikibot.showDiff(text, new_text)
             return new_text
 
