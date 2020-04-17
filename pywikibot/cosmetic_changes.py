@@ -682,7 +682,7 @@ class CosmeticChangesToolkit(object):
     def removeUselessSpaces(self, text):
         """Cleanup multiple or trailing spaces."""
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
-                      'table']
+                      'source', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
         text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1',
