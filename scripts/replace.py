@@ -156,7 +156,7 @@ from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
 from pywikibot import i18n, textlib, pagegenerators
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.tools import (
     chars,
     deprecated,
@@ -498,7 +498,7 @@ class XmlDumpReplacePageGenerator(object):
         return False
 
 
-class ReplaceRobot(SingleSiteBot):
+class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
     """A bot that can do text replacements.
 
@@ -713,46 +713,46 @@ class ReplaceRobot(SingleSiteBot):
         semicolon = self.site.mediawiki_message('semicolon-separator')
         return semicolon.join(summary_messages)
 
+    def skip_page(self, page):
+        """Check whether treat should be skipped for the page."""
+        if self.isTitleExcepted(page.title()):
+            pywikibot.warning(
+                'Skipping {} because the title is on the exceptions list.'
+                .format(page))
+            return True
+
+        if not page.has_permission():
+            pywikibot.warning("You can't edit page {}".format(page))
+            return True
+
+        return super(ReplaceRobot, self).skip_page(page)
+
     def treat(self, page):
         """Work on each page retrieved from generator."""
-        if self.isTitleExcepted(page.title()):
-            pywikibot.output(
-                'Skipping {0} because the title is on the exceptions list.'
-                .format(page.title(as_link=True)))
-            return
-
-        try:
-            # Load the page's text from the wiki
-            original_text = page.get(get_redirect=True)
-            if not page.has_permission():
-                pywikibot.output("You can't edit page "
-                                 + page.title(as_link=True))
-                return
-        except pywikibot.NoPage:
-            pywikibot.output('Page {0} not found'
-                             .format(page.title(as_link=True)))
-            return
-
+        original_text = page.text
         applied = set()
         new_text = original_text
         last_text = None
         context = 0
         while True:
             if self.isTextExcepted(new_text):
-                pywikibot.output('Skipping {0} because it contains text '
+                pywikibot.output('Skipping {} because it contains text '
                                  'that is on the exceptions list.'
-                                 .format(page.title(as_link=True)))
-                break
+                                 .format(page))
+                return
+
             while new_text != last_text:
                 last_text = new_text
                 new_text = self.apply_replacements(last_text, applied,
                                                    page)
                 if not self.getOption('recursive'):
                     break
+
             if new_text == original_text:
                 pywikibot.output('No changes were necessary in '
                                  + page.title(as_link=True))
-                break
+                return
+
             if self.addcat:
                 # Fetch only categories in wikitext, otherwise the others
                 # will be explicitly added.
