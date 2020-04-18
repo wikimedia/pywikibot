@@ -156,7 +156,8 @@ from pywikibot import editor as editarticle
 from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
-from pywikibot import i18n, textlib, pagegenerators, Bot
+from pywikibot import i18n, textlib, pagegenerators
+from pywikibot.bot import SingleSiteBot
 from pywikibot.tools import (
     chars,
     deprecated,
@@ -499,7 +500,7 @@ class XmlDumpReplacePageGenerator(object):
         return False
 
 
-class ReplaceRobot(Bot):
+class ReplaceRobot(SingleSiteBot):
 
     """A bot that can do text replacements.
 
