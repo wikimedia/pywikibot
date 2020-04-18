@@ -578,7 +578,6 @@ class ReplaceRobot(Bot):
 
         self.sleep = sleep
         self.summary = summary
-        self.changed_pages = 0
         self._pending_processed_titles = Queue()
 
     def isTitleExcepted(self, title, exceptions=None):
@@ -667,11 +666,10 @@ class ReplaceRobot(Bot):
             new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
 
-    def _count_changes(self, page, err):
-        """Count successfully changed pages; log changed titles for display."""
+    def _log_changes(self, page, err):
+        """Log changed titles for display."""
         # This is an async put callback
         if not isinstance(err, Exception):
-            self.changed_pages += 1
             self._pending_processed_titles.put((page.title(
                 as_link=True), True))
         else:  # unsuccessful pages
@@ -680,11 +678,11 @@ class ReplaceRobot(Bot):
 
     def _replace_async_callback(self, page, err):
         """Callback for asynchronous page edit."""
-        self._count_changes(page, err)
+        self._log_changes(page, err)
 
     def _replace_sync_callback(self, page, err):
         """Callback for synchronous page edit."""
-        self._count_changes(page, err)
+        self._log_changes(page, err)
         if isinstance(err, Exception):
             raise err
 
@@ -1200,7 +1198,6 @@ LIMIT 200""" % (whereClause, exceptClause)
     # Explicitly call pywikibot.stopme(). It will make sure the callback is
     # triggered before replace.py is unloaded.
     pywikibot.stopme()
-    pywikibot.output('\n{0} pages changed.'.format(bot.changed_pages))
 
 
 if __name__ == '__main__':
