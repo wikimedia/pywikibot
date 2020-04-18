@@ -810,11 +810,10 @@ class ReplaceRobot(Bot):
             if choice == 'a':
                 self.options['always'] = True
             if choice == 'y':
-                page.text = new_text
-                page.save(summary=self.generate_summary(applied),
-                          asynchronous=True,
+                self.save(page, original_text, new_text, applied,
+                          show_diff=False, quiet=True,
                           callback=self._replace_async_callback,
-                          quiet=True)
+                          asynchronous=True)
             while not self._pending_processed_titles.empty():
                 proc_title, res = self._pending_processed_titles.get()
                 pywikibot.output('Page {0}{1} saved'
@@ -824,29 +823,26 @@ class ReplaceRobot(Bot):
             break
 
         if self.getOption('always') and new_text != original_text:
-            try:
-                page.text = new_text
-                page.save(summary=self.generate_summary(applied),
-                          callback=self._replace_sync_callback, quiet=True)
-            except pywikibot.EditConflict:
-                pywikibot.output('Skipping {0} because of edit conflict'
-                                 .format(page.title(),))
-            except pywikibot.SpamfilterError as e:
-                pywikibot.output(
-                    'Cannot change {0} because of blacklist entry {1}'
-                    .format(page.title(), e.url))
-            except pywikibot.LockedPage:
-                pywikibot.output('Skipping {0} (locked page)'
-                                 .format(page.title(),))
-            except pywikibot.PageNotSaved as error:
-                pywikibot.output('Error putting page: {0}'
-                                 .format(error.args,))
+            self.save(page, original_text, new_text, applied,
+                      show_diff=False, quiet=True,
+                      callback=self._replace_sync_callback,
+                      asynchronous=False)
             if self._pending_processed_titles.qsize() > 50:
                 while not self._pending_processed_titles.empty():
                     proc_title, res = self._pending_processed_titles.get()
                     pywikibot.output('Page {0}{1} saved'
                                      .format(proc_title,
                                              '' if res else ' not'))
+
+    def save(self, page, oldtext, newtext, applied, **kwargs):
+        """Save the given page."""
+        self.userPut(page, oldtext, newtext,
+                     summary=self.generate_summary(applied),
+                     ignore_save_related_errors=True, **kwargs)
+
+    def user_confirm(self, question):
+        """Always return True due to our own input choice."""
+        return True
 
 
 def prepareRegexForMySQL(pattern):
