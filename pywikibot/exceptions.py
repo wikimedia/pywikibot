@@ -38,7 +38,7 @@ PageLoadRelatedError: any exception which happens while loading a Page.
 PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
 
-  - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
+  - SpamblacklistError: MediaWiki spam filter detected a blacklisted URL
   - TitleblacklistError: MediaWiki detected a blacklisted page title
   - OtherPageSaveError: misc. other save related exception.
   - LockedPage: Page is locked
@@ -451,7 +451,7 @@ class ArticleExistsConflict(EditConflict):
     pass
 
 
-class SpamfilterError(PageSaveRelatedError):
+class SpamblacklistError(PageSaveRelatedError):
 
     """Page save failed because MediaWiki detected a blacklisted spam URL."""
 
@@ -461,7 +461,7 @@ class SpamfilterError(PageSaveRelatedError):
     def __init__(self, page, url):
         """Initializer."""
         self.url = url
-        super(SpamfilterError, self).__init__(page)
+        super(SpamblacklistError, self).__init__(page)
 
 
 class TitleblacklistError(PageSaveRelatedError):
@@ -627,6 +627,14 @@ class _EmailUserError(UserRightsError, NotEmailableError):
     pass
 
 
+@__deprecated(since='20200405')
+class _DeprecatedSpamfilterError(SpamblacklistError):
+
+    """MediaWiki detected a blacklisted spam URL (deprecated)."""
+
+    pass
+
+
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr(
     'UploadWarning',
@@ -639,6 +647,10 @@ wrapper._add_deprecated_attr('PageNotFound', DeprecatedPageNotFoundError,
                                              'longer used by pywikibot; use '
                                              'http.fetch() instead.',
                              since='20141214')
+wrapper._add_deprecated_attr('SpamfilterError', _DeprecatedSpamfilterError,
+                             warning_message='SpamfilterError is deprecated; '
+                                             'use SpamblacklistError instead.',
+                             since='20200405')
 wrapper._add_deprecated_attr(
     'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
