@@ -93,11 +93,8 @@ def isAllowedLicense(photoInfo):
 
     TODO: Maybe add more licenses
     """
-    license = photoInfo.find('photo').attrib['license']
-    if flickr_allowed_license[int(license)]:
-        return True
-    else:
-        return False
+    photo_license = photoInfo.find('photo').attrib['license']
+    return flickr_allowed_license[int(photo_license)]
 
 
 def getPhotoUrl(photoSizes):
@@ -142,16 +139,14 @@ def findDuplicateImages(photo, site=None):
 
 
 def getTags(photoInfo, raw=False):
-    """Get all the tags on a photo."""
-    result = []
-    for tag in photoInfo.find('photo').find('tags').findall('tag'):
-        if raw:
-            # use original tag name
-            # see https://www.flickr.com/services/api/misc.tags.html
-            result.append(tag.attrib['raw'].lower())
-        else:
-            result.append(tag.text.lower())
-    return result
+    """Get all the tags on a photo.
+
+    @param raw: use original tag name
+        see https://www.flickr.com/services/api/misc.tags.html
+    @type raw: bool
+    """
+    return [tag.attrib['raw'].lower() if raw else tag.text.lower()
+            for tag in photoInfo.find('photo').find('tags').findall('tag')]
 
 
 def getFlinfoDescription(photo_id):
@@ -199,20 +194,14 @@ def getFilename(photoInfo, site=None, project='Flickr', photo_url=None):
 
     fileformat = photoInfo.find('photo').attrib['originalformat']
     if not fileformat and photo_url:
-        fileformat = photo_url.split('.')[-1]
-
-    if pywikibot.Page(site, 'File:{} - {} - {}.{}'
-                      .format(title, project, username, fileformat)).exists():
-        i = 1
-        while True:
-            name = '{} - {} - {} ({}).{}'.format(title, project, username,
+        _, fileformat = photo_url.rsplit('.', 1)
+    filename = '{} - {} - {}.{}'.format(title, project, username, fileformat)
+    i = 1
+    while pywikibot.FilePage(site, filename).exists():
+        filename = '{} - {} - {} ({}).{}'.format(title, project, username,
                                                  i, fileformat)
-            if pywikibot.Page(site, 'File:' + name).exists():
-                i += 1
-            else:
-                return name
-    else:
-        return '{} - {} - {}.{}'.format(title, project, username, fileformat)
+        i += 1
+    return filename
 
 
 def cleanUpTitle(title):
@@ -270,13 +259,13 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
             '')
         description = description.replace('=={{int:license}}==',
                                           '=={{int:license}}==\n' + override)
-    elif flickrreview:
-        if reviewer:
-            description = description.replace(
-                '{{flickrreview}}',
-                '{{flickrreview|%s|'
-                '{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-'
-                '{{subst:CURRENTDAY2}}}}' % reviewer)
+    elif flickrreview and reviewer:
+        description = description.replace(
+            '{{flickrreview}}',
+            '{{flickrreview|%s|'
+            '{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-'
+            '{{subst:CURRENTDAY2}}}}' % reviewer)
+
     if '{{subst:unc}}' not in description:
         # Request category check
         description += '\n{{subst:chc}}\n'
@@ -428,8 +417,6 @@ def getPhotos(flickr, user_id='', group_id='', photoset_id='',
                 gotPhotos = False
                 pywikibot.output('Flickr api problem, sleeping')
                 pywikibot.sleep(30)
-
-    return
 
 
 def main(*args):
