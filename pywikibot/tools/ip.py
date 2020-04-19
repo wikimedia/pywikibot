@@ -39,7 +39,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
     if PY2:
         # This backport fails many tests
         # https://pypi.org/project/py2-ipaddress
-        # It accepts u'1111' as a valid IP address.
+        # It accepts '1111' as a valid IP address.
         try:
             ip_address('1111')
             ip_address = None
@@ -49,7 +49,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
 
         # This backport only fails a few tests if given a unicode object
         # https://pypi.org/project/ipaddress
-        # However while it rejects u'1111', it will consider '1111' valid
+        # However while it rejects '1111', it will consider b'1111' valid
         try:
             ip_address(b'1111')
             warn('ipaddress backport is defective; patching; install ipaddr',
@@ -63,7 +63,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
 
             ip_address = ip_address_patched
         except ValueError:
-            # This means ipaddress has correctly determined '1111' is invalid
+            # This means ipaddress has correctly determined b'1111' is invalid
             pass
 elif not ip_address:
     warn('Importing ipaddr.IPAddress failed: %s\n'

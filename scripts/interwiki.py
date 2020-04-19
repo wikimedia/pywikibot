@@ -340,8 +340,8 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2007-2019
+# (C) xqt, 2009-2020
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1853,7 +1853,6 @@ class Subject(interwiki_graph.Subject):
             return False
         pywikibot.showDiff(oldtext, newtext)
 
-        # pywikibot.output(u"NOTE: Replace %s" % page)
         # Determine whether we need permission to submit
         ask = False
 
