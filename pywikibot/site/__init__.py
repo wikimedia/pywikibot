@@ -2355,8 +2355,8 @@ class APISite(BaseSite):
         if hasattr(notifications, 'values'):
             notifications = notifications.values()
 
-        for notification in notifications:
-            yield Notification.fromJSON(self, notification)
+        return (Notification.fromJSON(self, notification)
+                for notification in notifications)
 
     @need_extension('Echo')
     def notifications_mark_read(self, **kwargs):
