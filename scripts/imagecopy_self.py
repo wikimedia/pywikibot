@@ -45,7 +45,7 @@ check it yourself.
 # English Wikipedia specific bot by:
 # (C) Multichill 2010-2012
 #
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2010-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -897,10 +897,10 @@ class uploader(threading.Thread):
         pywikibot.output(cid)
         bot = UploadRobot(url=fields.get('imagepage').fileUrl(),
                           description=cid,
-                          useFilename=fields.get('filename'),
-                          keepFilename=True, verifyDescription=False,
-                          ignoreWarning=True,
-                          targetSite=pywikibot.Site('commons', 'commons'))
+                          use_filename=fields.get('filename'),
+                          keep_filename=True, verify_description=False,
+                          ignore_warning=True,
+                          target_site=pywikibot.Site('commons', 'commons'))
         bot.run()
 
         self.tagNowcommons(fields.get('imagepage'), fields.get('filename'))

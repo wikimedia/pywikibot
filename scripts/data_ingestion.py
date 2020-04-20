@@ -8,7 +8,7 @@ usage:
     python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
 """
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -198,10 +198,10 @@ class DataIngestionBot(pywikibot.Bot):
 
         bot = UploadRobot(url=photo.URL,
                           description=description,
-                          useFilename=title,
-                          keepFilename=True,
-                          verifyDescription=False,
-                          targetSite=self.site)
+                          use_filename=title,
+                          keep_filename=True,
+                          verify_description=False,
+                          target_site=self.site)
         bot._contents = photo.downloadPhoto().getvalue()
         bot._retrieved = True
         bot.run()
