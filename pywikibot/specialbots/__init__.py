@@ -147,13 +147,12 @@ class UploadRobot(BaseBot):
             info = infile.info()
 
             if PY2:
-                content_type = info.getheader('Content-Type')
-                content_len = info.getheader('Content-Length')
-                accept_ranges = info.getheader('Accept-Ranges')
+                info_get = info.getheader
             else:
-                content_type = info.get('Content-Type')
-                content_len = info.get('Content-Length')
-                accept_ranges = info.get('Accept-Ranges')
+                info_get = info.get
+            content_type = info_get('Content-Type')
+            content_len = info_get('Content-Length')
+            accept_ranges = info_get('Accept-Ranges')
 
             if 'text/html' in content_type:
                 pywikibot.output("Couldn't download the image: "
