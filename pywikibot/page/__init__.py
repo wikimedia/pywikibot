@@ -3548,8 +3548,7 @@ class User(Page):
         @param total: limit result to this number of pages.
         @type total: int.
         """
-        for item in self.contributions(total=total):
-            yield item[0]
+        return (item[0] for item in self.contributions(total=total))
 
     @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total=500, **kwargs):

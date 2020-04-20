@@ -1384,9 +1384,8 @@ def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
     # defaults to namespace 0 because that's how Special:Newpages defaults
     if site is None:
         site = pywikibot.Site()
-    for page, item in site.newpages(namespaces=namespaces, total=total,
-                                    returndict=True):
-        yield page
+    return (page for page, _ in site.newpages(namespaces=namespaces,
+                                              total=total, returndict=True))
 
 
 @deprecated_args(nobots=None, step=None)
@@ -1493,15 +1492,13 @@ def ImagesPageGenerator(pageWithImages, total=None, content=False):
 
 def InterwikiPageGenerator(page):
     """Iterate over all interwiki (non-language) links on a page."""
-    for link in page.interwiki():
-        yield pywikibot.Page(link)
+    return (pywikibot.Page(link) for link in page.interwiki())
 
 
 @deprecated_args(step=None)
 def LanguageLinksPageGenerator(page, total=None):
     """Iterate over all interwiki language links on a page."""
-    for link in page.iterlanglinks(total=total):
-        yield pywikibot.Page(link)
+    return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
 
 
 @deprecated_args(step=None)
@@ -1732,9 +1729,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
         pywikibot.exception(e)
         raise
 
-    for page in generator:
-        if page.namespace() in namespaces:
-            yield page
+    return (page for page in generator if page.namespace() in namespaces)
 
 
 @deprecated_args(ignoreList='ignore_list')
@@ -2283,10 +2278,8 @@ def NewimagesPageGenerator(total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for entry in site.logevents(logtype='upload', total=total):
-        # entry is an UploadEntry object
-        # entry.page() returns a Page object
-        yield entry.page()
+    return (entry.page()
+            for entry in site.logevents(logtype='upload', total=total))
 
 
 def WikibaseItemGenerator(gen):
@@ -2359,8 +2352,7 @@ def UnusedFilesGenerator(total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.unusedfiles(total=total):
-        yield page
+    return site.unusedfiles(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2374,8 +2366,7 @@ def WithoutInterwikiPageGenerator(total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.withoutinterwiki(total=total):
-        yield page
+    return site.withoutinterwiki(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2390,8 +2381,7 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedcategories(total=total):
-        yield page
+    return site.uncategorizedcategories(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2406,8 +2396,7 @@ def UnCategorizedImageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedimages(total=total):
-        yield page
+    return site.uncategorizedimages(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2422,8 +2411,7 @@ def UnCategorizedPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedpages(total=total):
-        yield page
+    return site.uncategorizedpages(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2438,8 +2426,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedtemplates(total=total):
-        yield page
+    return site.uncategorizedtemplates(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2454,8 +2441,7 @@ def LonelyPagesPageGenerator(total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.lonelypages(total=total):
-        yield page
+    return site.lonelypages(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2470,8 +2456,7 @@ def UnwatchedPagesPageGenerator(total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.unwatchedpages(total=total):
-        yield page
+    return site.unwatchedpages(total=total)
 
 
 def page_with_property_generator(name, total=None, site=None):
@@ -2517,8 +2502,7 @@ def AncientPagesPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page, timestamp in site.ancientpages(total=total):
-        yield page
+    return (page for page, _ in site.ancientpages(total=total))
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2533,8 +2517,7 @@ def DeadendPagesPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.deadendpages(total=total):
-        yield page
+    return site.deadendpages(total=total)
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2549,8 +2532,7 @@ def LongPagesPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page, length in site.longpages(total=total):
-        yield page
+    return (page for page, _ in site.longpages(total=total))
 
 
 @deprecated_args(number='total', repeat=None)
@@ -2565,8 +2547,7 @@ def ShortPagesPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page, length in site.shortpages(total=total):
-        yield page
+    return (page for page, _ in site.shortpages(total=total))
 
 
 @deprecated_args(number='total')
@@ -2581,8 +2562,7 @@ def RandomPageGenerator(total=None, site=None, namespaces=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=total, namespaces=namespaces):
-        yield page
+    return site.randompages(total=total, namespaces=namespaces)
 
 
 @deprecated_args(number='total')
@@ -2597,9 +2577,8 @@ def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=total, namespaces=namespaces,
-                                 redirects=True):
-        yield page
+    return site.randompages(total=total, namespaces=namespaces,
+                            redirects=True)
 
 
 @deprecated_args(link='url', euprotocol='protocol', step=None)
@@ -2636,8 +2615,7 @@ def SearchPageGenerator(query, total=None, namespaces=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.search(query, total=total, namespaces=namespaces):
-        yield page
+    return site.search(query, total=total, namespaces=namespaces)
 
 
 def LiveRCPageGenerator(site=None, total=None):
@@ -3005,8 +2983,7 @@ def WikibaseSearchItemPageGenerator(
     repo = site.data_repository()
 
     data = repo.search_entities(text, language, total=total)
-    for item in data:
-        yield pywikibot.ItemPage(repo, item['id'])
+    return (pywikibot.ItemPage(repo, item['id']) for item in data)
 
 
 class PetScanPageGenerator(object):
