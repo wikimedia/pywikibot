@@ -20,10 +20,10 @@ Command line options:
 
 -subst       Resolves the template by putting its text directly into the
              article. This is done by changing {{...}} or {{msg:...}} into
-             {{subst:...}}.
-             Substitution is not available inside <ref>...</ref>,
-             <gallery>...</gallery>, <poem>...</poem> and <pagelist ... />
-             tags.
+             {{subst:...}}. If you want to use safesubst, you
+             can do -subst:safe. Substitution is not available inside
+             <ref>...</ref>, <gallery>...</gallery>, <poem>...</poem>
+             and <pagelist ... /> tags.
 
 -assubst     Replaces the first argument as old template with the second
              argument as new template but substitutes it like -subst does.
@@ -230,8 +230,9 @@ class TemplateRobot(ReplaceBot):
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('subst'):
-                replacements.append((template_regex,
-                                     r'{{subst:%s\g<parameters>}}' % old))
+                replacements.append(
+                    (template_regex, r'{{%s:%s\g<parameters>}}' %
+                     (self.getOption('subst'), old)))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('remove'):
@@ -297,10 +298,12 @@ def main(*args):
     for arg in local_args:
         if arg == '-remove':
             options['remove'] = True
-        elif arg == '-subst':
-            options['subst'] = True
+        elif arg.startswith('-subst'):
+            options['subst'] = arg[len('-subst:'):] + 'subst'
+            assert options['subst'] in ('subst', 'safesubst')
         elif arg == '-assubst':
-            options['subst'] = options['remove'] = True
+            options['subst'] = 'subst'
+            options['remove'] = True
         elif arg == '-always':
             options['always'] = True
         elif arg.startswith('-xml'):
@@ -329,7 +332,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['templates'])
         return False
 
-    if options.get('subst', False) ^ options.get('remove', False):
+    if bool(options.get('subst', False)) ^ options.get('remove', False):
         for template_name in template_names:
             templates[template_name] = None
     else:
