@@ -48,7 +48,9 @@ import re
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+
+from pywikibot.bot import SingleSiteBot
 
 from scripts.replace import ReplaceRobot as ReplaceBot
 
@@ -74,7 +76,7 @@ class ImageRobot(ReplaceBot):
             'loose': False,
         })
 
-        Bot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, generator=generator, **kwargs)
 
         self.old_image = old_image
         self.new_image = new_image
