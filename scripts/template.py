@@ -122,8 +122,9 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, textlib, Bot
+from pywikibot import i18n, pagegenerators, textlib
 
+from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import deprecated, filter_unique
@@ -197,7 +198,7 @@ class TemplateRobot(ReplaceBot):
             'addedCat': None,
         })
 
-        Bot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, generator=generator, **kwargs)
 
         self.templates = templates
 
