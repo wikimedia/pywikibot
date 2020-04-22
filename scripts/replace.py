@@ -166,7 +166,6 @@ from pywikibot.tools import (
     PY2,
     UnicodeType
 )
-from pywikibot.tools.formatter import color_format
 
 if not PY2:
     from queue import Queue
@@ -765,8 +764,7 @@ class ReplaceRobot(SingleSiteBot):
                                                             site=page.site)
             # Show the title of the page we're working on.
             # Highlight the title in purple.
-            pywikibot.output(color_format(
-                '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
+            self.current_page = page
             pywikibot.showDiff(original_text, new_text, context=context)
             if self.getOption('always'):
                 break
