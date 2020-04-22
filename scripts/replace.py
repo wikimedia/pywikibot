@@ -666,7 +666,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
 
-    def _log_changes(self, page, err):
+    def _replace_async_callback(self, page, err):
         """Log changed titles for display."""
         # This is an async put callback
         if not isinstance(err, Exception):
@@ -675,16 +675,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         else:  # unsuccessful pages
             self._pending_processed_titles.put((page.title(as_link=True),
                                                 False))
-
-    def _replace_async_callback(self, page, err):
-        """Callback for asynchronous page edit."""
-        self._log_changes(page, err)
-
-    def _replace_sync_callback(self, page, err):
-        """Callback for synchronous page edit."""
-        self._log_changes(page, err)
-        if isinstance(err, Exception):
-            raise err
 
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
@@ -816,15 +806,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         if self.getOption('always') and new_text != original_text:
             self.save(page, original_text, new_text, applied,
-                      show_diff=False, quiet=True,
-                      callback=self._replace_sync_callback,
-                      asynchronous=False)
-            if self._pending_processed_titles.qsize() > 50:
-                while not self._pending_processed_titles.empty():
-                    proc_title, res = self._pending_processed_titles.get()
-                    pywikibot.output('Page {0}{1} saved'
-                                     .format(proc_title,
-                                             '' if res else ' not'))
+                      show_diff=False, asynchronous=False)
 
     def save(self, page, oldtext, newtext, applied, **kwargs):
         """Save the given page."""
