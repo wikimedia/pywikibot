@@ -1112,7 +1112,7 @@ class Request(MutableMapping):
     True
     >>> 'query' in data
     True
-    >>> sorted(str(key) for key in data[u'query'].keys())
+    >>> sorted(str(key) for key in data['query'].keys())
     ['namespaces', 'userinfo']
 
     """

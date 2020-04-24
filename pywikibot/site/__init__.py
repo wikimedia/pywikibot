@@ -2886,8 +2886,8 @@ class APISite(BaseSite):
                 keys: int in the range [0, 1, ..., 4]
                 values: category name corresponding to the 'key' quality level
             e.g. on en.wikisource:
-            {0: u'Without text', 1: u'Not proofread', 2: u'Problematic',
-             3: u'Proofread', 4: u'Validated'}
+            {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
+             3: 'Proofread', 4: 'Validated'}
 
         @param expiry: either a number of days or a datetime.timedelta object
         @type expiry: int (days), L{datetime.timedelta}, False (config)

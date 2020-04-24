@@ -510,9 +510,6 @@ class imageFetcher(threading.Thread):
     def getNewFieldsFromFreetext(self, imagepage):
         """Extract fields from free text for the new information template."""
         text = imagepage.get()
-        # text = re.sub(u'== Summary ==', u'', text, re.IGNORECASE)
-        # text = re.sub(u'== Licensing ==', u'', text, re.IGNORECASE)
-        # text = re.sub('\{\{(self|self2)\|[^\}]+\}\}', '', text, re.I)
 
         for toRemove in sourceGarbage[imagepage.site.lang]:
             text = re.sub(toRemove, '', text, flags=re.IGNORECASE)

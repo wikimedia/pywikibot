@@ -25,8 +25,8 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) xqt, 2013-2019
-# (C) Pywikibot team, 2013-2019
+# (C) xqt, 2013-2020
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,6 +39,7 @@ import json
 import os
 
 from pywikibot import config
+from pywikibot.tools import PY2
 
 
 class i18nBot(object):  # noqa: N801
@@ -78,14 +79,16 @@ class i18nBot(object):  # noqa: N801
             keys.insert(0, 'en')
 
         print('# -*- coding: utf-8 -*-')
+        if PY2:
+            print('from __future__ import unicode_literals')
         print('msg = {')
         for code in keys:
             print("    '%s': {" % code)
             for msg in sorted(self.messages.values()):
                 label = '{}-{}'.format(self.scriptname, msg)
                 if label in self.dict[code]:
-                    print("        '%s': u'%s'," % (label,
-                                                    self.dict[code][label]))
+                    print("        '{}': '{}',"
+                          .format(label, self.dict[code][label]))
             print('    },')
         print('};')
 

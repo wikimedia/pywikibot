@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2010-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -229,7 +229,8 @@ mylang = '{main_code}'
 {botpasswords}
 """
 
-PASSFILE_CONFIG = """# This is an automatically generated file used to store
+PASSFILE_CONFIG = """# -*- coding: utf-8 -*-
+# This is an automatically generated file used to store
 # BotPasswords.
 #
 # As a simpler (but less secure) alternative to OAuth, MediaWiki allows bot
@@ -239,6 +240,7 @@ PASSFILE_CONFIG = """# This is an automatically generated file used to store
 #
 # See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords for more
 # information.
+from __future__ import absolute_import, division, unicode_literals
 {botpasswords}"""
 
 
@@ -338,11 +340,11 @@ def create_user_config(main_family, main_code, main_username, force=False):
                                      botpasswordpass))
 
     if not userlist:  # Show a sample
-        usernames = "# usernames['{}']['{}'] = u'MyUsername'".format(
+        usernames = "# usernames['{}']['{}'] = 'MyUsername'".format(
             main_family, main_code)
     else:
         usernames = '\n'.join(
-            "usernames['{user.family}']['{user.code}'] = u'{user.name}'"
+            "usernames['{user.family}']['{user.code}'] = '{user.name}'"
             .format(user=user) for user in userlist)
         # Arbitrarily use the first key as default settings
         main_family, main_code = userlist[0].family, userlist[0].code
