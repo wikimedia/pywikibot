@@ -1,6 +1,11 @@
 Current release
 ~~~~~~~~~~~~~~~
 
+* Update wikimediachapter_family (T250802)
+* Raise SpamblacklistError with spamblacklist APIError (T249436)
+* Do not removeUselessSpaces inside source/syntaxhighlight tags (T250469)
+* Restrict Pillow to 6.2.2+ (T249911)
+* Fix PetScan generator language and project (T249704)
 * test_family has been removed (T228375, T228300)
 * Bugfixes and improvements
 * Localisation updates
