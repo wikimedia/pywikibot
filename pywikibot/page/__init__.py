@@ -54,7 +54,6 @@ from pywikibot.tools import (
     first_upper, redirect_func, remove_last_args, UnicodeType,
     StringTypes
 )
-from pywikibot.tools.ip import ip_regexp  # deprecated
 from pywikibot.tools import is_IP
 
 if not PY2:
@@ -93,7 +92,6 @@ __all__ = (
     'UnicodeToAsciiHtml',
     'unicode2html',
     'url2unicode',
-    'ip_regexp',  # unused & deprecated
 )
 
 logger = logging.getLogger('pywiki.wiki.page')

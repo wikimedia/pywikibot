@@ -390,7 +390,7 @@ def is_IP(IP):  # noqa N802, N803
     method = ip_address
     if not ip_address:  # Python 2 needs ipaddress to be installed
         issue_deprecation_warning(
-            'ipaddr module or tools.ip.ip_regexp', 'ipaddress module',
+            'ipaddr module', 'ipaddress module',
             warning_class=FutureWarning, since='20200120')
         from pywikibot.tools import ip
         with suppress_warnings('pywikibot.tools.ip.is_IP is deprecated'):
