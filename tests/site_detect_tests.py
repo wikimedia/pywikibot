@@ -15,6 +15,7 @@ from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
 from pywikibot.tools import PY2
 
+from tests import unittest_print
 from tests.aspects import unittest, TestCase, PatchingTestCase
 from tests.utils import DrySite
 
@@ -51,8 +52,11 @@ class SiteDetectionTestCase(TestCase):
         @type url: str
         @raises AssertionError: Site under url is MediaWiki powered
         """
-        self.assertRaises((AttributeError, ConnectionError, RuntimeError,
-                           ServerError, Timeout), MWSite, url)
+        with self.assertRaises((AttributeError, ConnectionError, RuntimeError,
+                                ServerError, Timeout)) as e:
+            MWSite(url)
+        unittest_print('\nassertNoSite expected exception:\n{e!r}'
+                       .format(e=e.exception))
 
 
 class StandardVersionSiteTestCase(SiteDetectionTestCase):
