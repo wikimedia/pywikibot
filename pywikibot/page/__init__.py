@@ -1768,6 +1768,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
     # (revid, timestamp, user, comment)
     # whereas old framework had a tuple of 6 items:
     # (revid, timestamp, user, comment, size, tags)
+    #
+    # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
     @deprecated('Page.revisions()', since='20150206')
     @deprecated_args(forceReload=None, revCount='total', step=None,
                      getAll=None, reverseOrder='reverse')
