@@ -895,12 +895,8 @@ def main(*args):
     # will become True when the user presses a ('yes to all') or uses the
     # -always flag.
     acceptall = False
-    # Will become True if the user inputs the commandline parameter -nocase
-    caseInsensitive = False
-    # Will become True if the user inputs the commandline parameter -dotall
-    dotall = False
-    # Will become True if the user inputs the commandline parameter -multiline
-    multiline = False
+    # Set the default regular expression flags
+    flags = re.UNICODE
     # Do all hits when they overlap
     allowoverlap = False
     # Do not recurse replacement
@@ -961,11 +957,11 @@ def main(*args):
         elif arg == '-recursive':
             recursive = True
         elif arg == '-nocase':
-            caseInsensitive = True
+            flags |= re.IGNORECASE
         elif arg == '-dotall':
-            dotall = True
+            flags |= re.DOTALL
         elif arg == '-multiline':
-            multiline = True
+            flags |= re.MULTILINE
         elif arg.startswith('-addcat:'):
             add_cat = arg[8:]
         elif arg.startswith('-summary:'):
@@ -1138,15 +1134,6 @@ def main(*args):
                 'description of the\nchanges your bot will make:')
         else:
             edit_summary = ''
-
-    # Set the regular expression flags
-    flags = re.UNICODE
-    if caseInsensitive:
-        flags = flags | re.IGNORECASE
-    if dotall:
-        flags = flags | re.DOTALL
-    if multiline:
-        flags = flags | re.MULTILINE
 
     # Pre-compile all regular expressions here to save time later
     for replacement in replacements:
