@@ -70,9 +70,8 @@ class TestTranslate(TestCase):
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
             with self.subTest(code=code):
-                self.assertEqual(i18n.translate(code, self.msg_no_english,
-                                                fallback=True),
-                                 'test-no-english JA')
+                with self.assertRaises(KeyError):
+                    i18n.translate(code, self.msg_no_english, fallback=True)
 
 
 class UserInterfaceLangTestCase(TestCase):
