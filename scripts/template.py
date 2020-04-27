@@ -109,7 +109,7 @@ user talk pages (namespace #3):
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
 # (C) xqt, 2009-2018
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -192,10 +192,10 @@ class TemplateRobot(ReplaceBot):
         @type templates: dict
         """
         self.availableOptions.update({
-            'subst': False,
+            'addcat': None,
             'remove': False,
+            'subst': False,
             'summary': None,
-            'addedCat': None,
         })
 
         SingleSiteBot.__init__(self, generator=generator, **kwargs)
@@ -262,7 +262,7 @@ class TemplateRobot(ReplaceBot):
         super(TemplateRobot, self).__init__(
             generator, replacements, exceptions,
             always=self.getOption('always'),
-            addedCat=self.getOption('addedCat'),
+            addcat=self.getOption('addcat'),
             summary=self.getOption('summary'))
 
 
@@ -313,7 +313,7 @@ def main(*args):
             else:
                 xmlfilename = arg[5:]
         elif arg.startswith('-addcat:'):
-            options['addedCat'] = arg[len('-addcat:'):]
+            options['addcat'] = arg[len('-addcat:'):]
         elif arg.startswith('-summary:'):
             options['summary'] = arg[len('-summary:'):]
         elif arg.startswith('-onlyuser:'):
