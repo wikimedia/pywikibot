@@ -152,7 +152,7 @@ import re
 import warnings
 
 import pywikibot
-from pywikibot import editor as editarticle
+from pywikibot import editor
 from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
@@ -471,7 +471,7 @@ class XmlDumpReplacePageGenerator(object):
 
     def isTitleExcepted(self, title):
         """
-        Return True iff one of the exceptions applies for the given title.
+        Return True if one of the exceptions applies for the given title.
 
         @rtype: bool
         """
@@ -488,7 +488,7 @@ class XmlDumpReplacePageGenerator(object):
 
     def isTextExcepted(self, text):
         """
-        Return True iff one of the exceptions applies for the given text.
+        Return True if one of the exceptions applies for the given text.
 
         @rtype: bool
         """
@@ -778,15 +778,15 @@ class ReplaceRobot(SingleSiteBot):
                 context = context * 3 if context else 3
                 continue
             if choice == 'e':
-                editor = editarticle.TextEditor()
-                as_edited = editor.edit(original_text)
+                text_editor = editor.TextEditor()
+                as_edited = text_editor.edit(original_text)
                 # if user didn't press Cancel
                 if as_edited and as_edited != new_text:
                     new_text = as_edited
                 continue
             if choice == 'l':
-                editor = editarticle.TextEditor()
-                as_edited = editor.edit(new_text)
+                text_editor = editor.TextEditor()
+                as_edited = text_editor.edit(new_text)
                 # if user didn't press Cancel
                 if as_edited and as_edited != new_text:
                     new_text = as_edited
@@ -880,7 +880,7 @@ def main(*args):
         'inside': [],
         'inside-tags': [],
         'require-title': [],  # using a separate requirements dict needs some
-    }                        # major refactoring of code.
+    }                         # major refactoring of code.
 
     # Should the elements of 'replacements' and 'exceptions' be interpreted
     # as regular expressions?
