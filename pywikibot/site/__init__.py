@@ -4610,18 +4610,39 @@ class APISite(BaseSite):
         return bkgen
 
     @deprecated_args(step=None)
-    def exturlusage(self, url=None, protocol='http', namespaces=None,
+    def exturlusage(self, url=None, protocol=None, namespaces=None,
                     total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
         @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
 
-        @param url: The URL to search for (without the protocol prefix);
-            this may include a '*' as a wildcard, only at the start of the
-            hostname
-        @param protocol: The protocol prefix (default: "http")
-
+        @param url: The URL to search for (with ot without the protocol
+            prefix); this may include a '*' as a wildcard, only at the start
+            of the hostname
+        @type url: str
+        @param namespaces: list of namespace numbers to fetch contribs from
+        @type namespaces: list of int
+        @param total: Maximum number of pages to retrieve in total
+        @type total: int
+        @param protocol: Protocol to search for, likely http or https, http by
+                default. Full list shown on Special:LinkSearch wikipage
+        @type protocol: str
         """
+        separator = '://'
+        if separator in url:
+            found_protocol = url[:url.index(separator)]
+            url = url[url.index(separator) + len(separator):]
+            if protocol and protocol != found_protocol:
+                raise ValueError('Protocol was specified, but a different one '
+                                 'was found in searched url')
+            protocol = found_protocol
+        if not protocol:
+            protocol = 'http'
+
+        # If url is * we make it None in order to search for every page
+        # with any URL.
+        if url == '*':
+            url = None
         return self._generator(api.PageGenerator, type_arg='exturlusage',
                                geuquery=url, geuprotocol=protocol,
                                namespaces=namespaces,

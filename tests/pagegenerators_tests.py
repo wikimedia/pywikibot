@@ -1626,6 +1626,50 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
                 assert False  # this shouldn't be reached
 
 
+class TestLinksearchPageGenerator(TestCase):
+
+    """Tests for pagegenerators.LinksearchPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_weblink(self):
+        """Test -weblink."""
+        cases = (('wikipedia.org', 'http://wikipedia.org'),
+                 ('en.wikipedia.org', 'http://en.wikipedia.org'),
+                 ('https://fr.wikipedia.org', 'https://fr.wikipedia.org'),
+                 ('ftp://*', 'ftp://'))
+
+        for search, expected in cases:
+            gf = pagegenerators.GeneratorFactory(site=self.site)
+            gf.handleArg('-weblink:%s' % search)
+            gf.handleArg('-ns:2')
+            gf.handleArg('-limit:1')
+            gen = gf.getCombinedGenerator()
+            genlist = list(gen)
+            self.assertLength(genlist, 1)
+
+            page = genlist[0]
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertTrue(page.exists())
+            self.assertEqual(page.namespace(), 2)
+            self.assertIn(expected, page.text)
+
+    def test_double_opposite_protocols(self):
+        """Test LinksearchPageGenerator with two opposite protocols."""
+        self.assertRaises(ValueError, pagegenerators.LinksearchPageGenerator,
+                          'http://w.wiki', protocol='https', site=self.site)
+
+    def test_double_same_protocols(self):
+        """Test LinksearchPageGenerator with two same protocols."""
+        gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
+                                                     protocol='https',
+                                                     site=self.site,
+                                                     total=1)
+        self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
+        self.assertEqual(len(list(gen)), 1)
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

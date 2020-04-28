@@ -993,10 +993,6 @@ class GeneratorFactory(object):
         if not value:
             value = pywikibot.input(
                 'Pages with which weblink should be processed?')
-        # If url is * we make it None in order to search for every page
-        # with any URL.
-        if value == '*':
-            value = None
         return LinksearchPageGenerator(value, site=self.site)
 
     def _handle_transcludes(self, value):
@@ -2583,10 +2579,10 @@ def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
 
 @deprecated_args(link='url', euprotocol='protocol', step=None)
 def LinksearchPageGenerator(url, namespaces=None, total=None,
-                            site=None, protocol='http'):
+                            site=None, protocol=None):
     """Yield all pages that link to a certain URL, like Special:Linksearch.
 
-    @param url: The URL to search for (without the protocol prefix);
+    @param url: The URL to search for (with ot without the protocol prefix);
             this may include a '*' as a wildcard, only at the start of the
             hostname
     @type url: str
@@ -2594,8 +2590,11 @@ def LinksearchPageGenerator(url, namespaces=None, total=None,
     @type namespaces: list of int
     @param total: Maximum number of pages to retrieve in total
     @type total: int
-    @param site: Site for generator results.
+    @param site: Site for generator results
     @type site: L{pywikibot.site.BaseSite}
+    @param protocol: Protocol to search for, likely http or https, http by
+            default. Full list shown on Special:LinkSearch wikipage
+    @type protocol: str
     """
     if site is None:
         site = pywikibot.Site()
