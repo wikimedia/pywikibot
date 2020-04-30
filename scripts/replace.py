@@ -937,7 +937,7 @@ def main(*args):
             fixes_set += [arg[5:]]
         elif arg.startswith('-sleep:'):
             options['sleep'] = float(arg[7:])
-        elif arg in ('-always', '-recursive', -'allowoverlap'):
+        elif arg in ('-always', '-recursive', '-allowoverlap'):
             options[arg[1:]] = True
         elif arg == '-nocase':
             flags |= re.IGNORECASE
