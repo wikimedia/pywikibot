@@ -155,6 +155,8 @@ def main(*args):
         return
 
     bot = NewItemRobot(generator, **options)
+    if not bot.site.logged_in():
+        bot.site.login()
     user = pywikibot.User(bot.site, bot.site.username())
     if bot.getOption('touch') == 'newly' \
             and 'autoconfirmed' not in user.groups():
