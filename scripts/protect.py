@@ -52,7 +52,6 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
     python pwb.py protect -file:unprotect.txt -unprotect -always
 """
 #
-# Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
 # (C) Pywikibot team, 2008-2019
