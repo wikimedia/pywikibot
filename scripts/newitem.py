@@ -21,7 +21,7 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,9 +56,9 @@ class NewItemRobot(WikidataBot):
         self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
-        self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(
+        self.pageAgeBefore = self.repo.server_time() - timedelta(
             days=self.pageAge)
-        self.lastEditBefore = self.repo.getcurrenttime() - timedelta(
+        self.lastEditBefore = self.repo.server_time() - timedelta(
             days=self.lastEdit)
         pywikibot.output('Page age is set to {0} days so only pages created'
                          '\nbefore {1} will be considered.'

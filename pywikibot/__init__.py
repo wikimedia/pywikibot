@@ -153,9 +153,8 @@ class Timestamp(datetime.datetime):
     when previously they returned a MediaWiki string representation, these
     methods also accept a Timestamp object, in which case they return a clone.
 
-    Use Site.getcurrenttime() for the current time; this is more reliable
+    Use Site.server_time() for the current time; this is more reliable
     than using Timestamp.utcnow().
-
     """
 
     mediawikiTSFormat = '%Y%m%d%H%M%S'
