@@ -3966,25 +3966,50 @@ class SiteLinkCollection(MutableMapping):
         return cls(repo, data)
 
     @classmethod
+    def _extract_JSON(cls, obj):
+        if isinstance(obj, SiteLink):
+            return obj.toJSON()
+        elif isinstance(obj, BaseLink):
+            db_name = cls.getdbName(obj.site)
+            return {'site': db_name, 'title': obj.title}
+        elif isinstance(obj, Page):
+            db_name = cls.getdbName(obj.site)
+            return {'site': db_name, 'title': obj.title()}
+        else:
+            return obj
+
+    @classmethod
     def normalizeData(cls, data):
         """
         Helper function to expand data into the Wikibase API structure.
 
         @param data: Data to normalize
-        @type data: list
+        @type data: list or dict
 
-        @return: the altered dict from parameter data.
+        @return: The dict with normalized data
         @rtype: dict
         """
         norm_data = {}
-        for obj in data:
-            if isinstance(obj, Page):
-                db_name = obj.site.dbName()
-                norm_data[db_name] = {'site': db_name, 'title': obj.title()}
-            else:
-                # TODO: Do some verification here
+        if isinstance(data, dict):
+            for key, obj in data.items():
+                key = cls.getdbName(key)
+                json = cls._extract_JSON(obj)
+                if isinstance(json, str):
+                    json = {'site': key, 'title': json}
+                elif key != json['site']:
+                    raise ValueError(
+                        "Key '{}' doesn't match the site of the value: '{}'"
+                        .format(key, json['site']))
+                norm_data[key] = json
+        else:
+            for obj in data:
+                json = cls._extract_JSON(obj)
+                if not isinstance(json, dict):
+                    raise ValueError(
+                        "Couldn't determine the site and title of the value: "
+                        '{!r}'.format(json))
                 db_name = obj['site']
-                norm_data[db_name] = obj
+                norm_data[db_name] = json
         return norm_data
 
     def toJSON(self, diffto=None):
@@ -4168,7 +4193,7 @@ class WikibaseEntity(object):
         @param data: The dict to normalize
         @type data: dict
 
-        @return: the altered dict from parameter data.
+        @return: The dict with normalized data
         @rtype: dict
         """
         norm_data = {}
@@ -4919,7 +4944,7 @@ class ItemPage(WikibasePage):
         """
         Set sitelinks. Calls setSitelinks().
 
-        A sitelink can either be a Page object,
+        A sitelink can be a Page object, a BaseLink object
         or a {'site':dbname,'title':title} dictionary.
         """
         self.setSitelinks([sitelink], **kwargs)
@@ -4950,7 +4975,7 @@ class ItemPage(WikibasePage):
         Set sitelinks.
 
         Sitelinks should be a list. Each item in the
-        list can either be a Page object, or a dict
+        list can either be a Page object, a BaseLink object, or a dict
         with a value for 'site' and 'title'.
         """
         data = {'sitelinks': sitelinks}
