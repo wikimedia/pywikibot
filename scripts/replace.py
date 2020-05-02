@@ -948,7 +948,7 @@ def main(*args):
         elif arg.startswith('-addcat:'):
             options['addcat'] = arg[8:]
         elif arg.startswith('-summary:'):
-            options['summary'] = arg[9:]
+            edit_summary = arg[9:]
         elif arg.startswith('-automaticsummary'):
             edit_summary = True
         elif arg.startswith('-manualinput'):
@@ -1156,7 +1156,8 @@ LIMIT 200""" % (whereClause, exceptClause)
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = ReplaceRobot(gen, replacements, exceptions, site=site, **options)
+    bot = ReplaceRobot(gen, replacements, exceptions, site=site,
+                       summary=edit_summary, **options)
     site.login()
     bot.run()
 
