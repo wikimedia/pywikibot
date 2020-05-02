@@ -1171,7 +1171,8 @@ class Request(MutableMapping):
         """
         if site is None:
             self.site = pywikibot.Site()
-            warn('Request() invoked without a site', RuntimeWarning, 2)
+            warn('Request() invoked without a site; setting to {}'
+                 .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
         if mime_params is not None:

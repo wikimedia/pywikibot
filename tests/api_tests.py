@@ -17,6 +17,7 @@ import pywikibot.login
 import pywikibot.page
 import pywikibot.site
 
+from pywikibot import config
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     suppress_warnings,
@@ -24,7 +25,7 @@ from pywikibot.tools import (
     UnicodeType,
 )
 
-from tests import patch
+from tests import patch, unittest_print
 from tests.aspects import (
     unittest,
     TestCase,
@@ -136,12 +137,25 @@ class TestApiFunctions(DefaultSiteTestCase):
 
     """API Request object test class."""
 
-    @suppress_warnings(r'Request\(\) invoked without a site', RuntimeWarning)
+    # @suppress_warnings(r'Request\(\) invoked without a site', RuntimeWarning)
     def testObjectCreation(self):
         """Test api.Request() constructor with implicit site creation."""
+        unittest_print('\n\n>>> Debugging stuff (T249090) ----')
+        unittest_print('config at method start:', config.mylang, config.family)
+        unittest_print('<<< ------------------------------\n')
+
         req = api.Request(parameters={'action': 'test', 'foo': '',
                                       'bar': 'test'})
         self.assertTrue(req)
+
+        unittest_print('>>> Debugging stuff (T249090) ----')
+        unittest_print('config:', config.mylang, config.family)
+        unittest_print('Request:', req)
+        unittest_print(req.__dict__)
+        unittest_print('config before asserting:',
+                       config.mylang, config.family)
+        unittest_print('<<< ------------------------------')
+
         self.assertEqual(req.site, self.get_site())
 
 
