@@ -1,6 +1,8 @@
 Current release
 ~~~~~~~~~~~~~~~
 
+* Unify and extend formats for setting sitelinks (T225863, T251512)
+* Do not return a random i18n.translation() result (T220099)
 * tools.ip_regexp has been removed (T174482)
 * Page.getVersionHistory and Page.fullVersionHistory() methods has been desupported (T136513, T151110)
 * Update wikimediachapter_family (T250802)
