@@ -1,7 +1,7 @@
 Current release
 ~~~~~~~~~~~~~~~
 
-* (currently empty)
+  **Note: This is the last release supporting Python 2 and Python 3.4**
 
 Future releases
 ~~~~~~~~~~~~~~~
