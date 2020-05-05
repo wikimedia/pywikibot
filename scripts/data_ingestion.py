@@ -1,11 +1,98 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-A generic bot to do data ingestion (batch uploading).
 
-usage:
+r"""
+A generic bot to do data ingestion (batch uploading) of photos or other files.
 
-    python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
+In addition it installs related metadata. The uploading is primarily from a url
+to a wiki-site.
+
+Required configuration files
+============================
+    - a 'Data ingestion' template on a wiki site that specifies the name of a
+      csv file, and csv configuration values.
+    - a csv file that specifies each file to upload, the file's copy-from URL
+      location, and some metadata.
+
+Required parameters
+===================
+The following parameters are required. The 'csvdir' and the 'page:csvFile' will
+be joined creating a path to a csv file that should contain specified
+information about files to upload.
+
+-csvdir           A directory path to csv files
+
+-page             A wiki path to templates. One of the templates at this
+                  location must be a 'Data ingestion' template with the
+                  following parameters.
+
+                      Required parameters
+                          csvFile
+
+                      Optional parameters
+                          sourceFormat
+                              options: 'csv'
+
+                          sourceFileKey
+                              options: 'StockNumber'
+
+                          csvDialect
+                              options: 'excel', ''
+
+                          csvDelimiter
+                              options: any delimiter, ',' is most common
+
+                          csvEncoding
+                              options: 'utf8', 'Windows-1252'
+
+                          formattingTemplate
+
+                          titleFormat
+
+
+Example 'Data ingestion' template
+=================================
+.. code::
+
+    {{Data ingestion
+    |sourceFormat=csv
+    |csvFile=csv_ingestion.csv
+    |sourceFileKey=%(StockNumber)
+    |csvDialect=
+    |csvDelimiter=,
+    |csvEncoding=utf8
+    |formattingTemplate=Template:Data ingestion test configuration
+    |titleFormat=%(name)s - %(set)s.%(_ext)s
+    }}
+
+
+Csv file
+========
+A full example can be found at tests/data/csv_ingestion.csv
+The 'url' field is the location a file will be copied from.
+
+csv field Headers::
+
+    description.en,source,author,license,set,name,url
+
+
+Usage
+=====
+.. code::
+
+    python pwb.py data_ingestion -csvdir:<local_dir/> -page:<cfg_page_on_wiki>
+
+
+Example
+=======
+Warning! Put it in one line, otherwise it won't work correctly.
+
+.. code::
+
+    python pwb.py data_ingestion \
+        -csvdir:"test/data" \
+        -page:"User:<Your-Username>/data_ingestion_test_template"
+
 """
 #
 # (C) Pywikibot team, 2012-2020
@@ -186,7 +273,13 @@ class DataIngestionBot(pywikibot.Bot):
         self.generator = value
 
     def treat(self, photo):
-        """Process each page."""
+        """
+        Process each page.
+
+        1. Check for existing duplicates on the wiki specified in self.site.
+        2. If duplicates are found, then skip uploading.
+        3. Download the file from photo.URL and upload the file to self.site.
+        """
         duplicates = photo.findDuplicateImages()
         if duplicates:
             pywikibot.output('Skipping duplicate of {!r}'
@@ -254,6 +347,10 @@ def main(*args):
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
+
+    # This factory is responsible for processing command line arguments
+    # that are also used by other scripts and that determine on which pages
+    # to work on.
     genFactory = pagegenerators.GeneratorFactory()
     csv_dir = None
 
