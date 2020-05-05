@@ -1221,7 +1221,7 @@ class Request(MutableMapping):
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
         # mode
-        self.write = self.action in (
+        self.write = self.action in {
             'block', 'clearhasmsg', 'createaccount', 'delete', 'edit',
             'emailuser', 'filerevert', 'flowthank', 'imagerotate', 'import',
             'managetags', 'mergehistory', 'move', 'options', 'patrol',
@@ -1233,7 +1233,7 @@ class Request(MutableMapping):
             'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
             'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
             'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
-        )
+        }
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
         if self.write:
