@@ -3,6 +3,7 @@ Current release
 
   **Note: This is the last release supporting Python 2 and Python 3.4**
 
+* tools.ip submodule has been removed (T243171)
 * Wait in BaseBot.exit() until asynchronous saving pages are completed
 * Solve IndexError when showing an empty diff with a non-zero context (T252724)
 * linktrails were added or updated for a lot of sites
@@ -21,6 +22,5 @@ Future releases
 * 3.0.20200405: Site and Page methods deprecated for 10 years or longer will be removed
 * 3.0.20200326: Functions dealing with stars list will be removed
 * 3.0.20200306: Support of MediaWiki releases below 1.19 will be dropped (T245350)
-* 3.0.20200306: tools.ip will be dropped in favour of tools.is_IP (T243171)
 * 3.0.20200111: Support for Python 3.4 will be dropped shortly (T239542)
 * 3.0.20190722: Support for Python 2 will be dropped shortly (T213287)

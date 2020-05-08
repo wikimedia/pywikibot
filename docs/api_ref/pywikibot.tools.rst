@@ -20,10 +20,3 @@ pywikibot.tools.formatter module
 --------------------------------
 
 .. automodule:: pywikibot.tools.formatter
-
-pywikibot.tools.ip module
--------------------------
-
-.. automodule:: pywikibot.tools.ip
-
-
