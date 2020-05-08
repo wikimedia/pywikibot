@@ -1,6 +1,22 @@
 Release history
 ===============
 
+3.0.20200508
+------------
+
+* Unify and extend formats for setting sitelinks (T225863, T251512)
+* Do not return a random i18n.translation() result (T220099)
+* tools.ip_regexp has been removed (T174482)
+* Page.getVersionHistory and Page.fullVersionHistory() methods has been desupported (T136513, T151110)
+* Update wikimediachapter_family (T250802)
+* Raise SpamblacklistError with spamblacklist APIError (T249436)
+* Do not removeUselessSpaces inside source/syntaxhighlight tags (T250469)
+* Restrict Pillow to 6.2.2+ (T249911)
+* Fix PetScan generator language and project (T249704)
+* test_family has been removed (T228375, T228300)
+* Bugfixes and improvements
+* Localisation updates
+
 3.0.20200405
 ------------
 
