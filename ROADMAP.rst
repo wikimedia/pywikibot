@@ -1,7 +1,8 @@
 Current release
 ~~~~~~~~~~~~~~~
 
-* (currently empty)
+* pagegenerators: handle protocols in -weblink (T251308, T251310)
+* Bugfixes and improvements
 
 Future releases
 ~~~~~~~~~~~~~~~
