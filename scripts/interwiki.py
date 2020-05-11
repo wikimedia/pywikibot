@@ -344,12 +344,14 @@ that you have to break it off, use "-continue" next time.
 from __future__ import absolute_import, division, unicode_literals
 
 import codecs
-from itertools import chain
 import os
 import pickle
 import re
 import socket
 import sys
+
+from collections import defaultdict
+from itertools import chain
 from textwrap import fill
 
 import pywikibot
@@ -579,7 +581,7 @@ class PageTree(object):
 
         @type tree: dict
         """
-        self.tree = {}
+        self.tree = defaultdict(list)
         self.size = 0
 
     def filter(self, site):
@@ -597,8 +599,6 @@ class PageTree(object):
     def add(self, page):
         """Add a page to the tree."""
         site = page.site
-        if site not in self.tree:
-            self.tree[site] = []
         self.tree[site].append(page)
         self.size += 1
 
@@ -606,17 +606,19 @@ class PageTree(object):
         """Remove a page from the tree."""
         try:
             self.tree[page.site].remove(page)
-            self.size -= 1
         except ValueError:
             pass
+        else:
+            self.size -= 1
 
     def removeSite(self, site):
         """Remove all pages from Site site."""
         try:
             self.size -= len(self.tree[site])
-            del self.tree[site]
         except KeyError:
             pass
+        else:
+            del self.tree[site]
 
     def siteCounts(self):
         """Yield (Site, number of pages in site) pairs."""
@@ -929,8 +931,8 @@ class Subject(interwiki_graph.Subject):
                     return True
                 else:
                     choice = pywikibot.input_choice(
-                        'WARNING: {} is in namespace {}, but {} is in '
-                        'namespace {}. Follow it anyway?'
+                        'WARNING: {} is in namespace "{}", but {} is in '
+                        'namespace "{}". Follow it anyway?'
                         .format(self.originPage, self.originPage.namespace(),
                                 linkedPage, linkedPage.namespace()),
                         [('Yes', 'y'), ('No', 'n'),
@@ -1931,6 +1933,11 @@ class InterwikiBot(object):
         self.generateNumber = number
         self.generateUntil = until
 
+    @property
+    def dump_titles(self):
+        """Return list of titles for dump file."""
+        return [s.originPage.title() for s in self.subjects]
+
     def dump(self, append=True):
         """Write dump file."""
         site = pywikibot.Site()
@@ -1943,9 +1950,8 @@ class InterwikiBot(object):
             mode = 'appended'
         else:
             mode = 'written'
-        titles = [s.originPage.title() for s in self.subjects]
         with open(dumpfn, mode[0] + 'b') as f:
-            pickle.dump(titles, f, protocol=config.pickle_protocol)
+            pickle.dump(self.dump_titles, f, protocol=config.pickle_protocol)
         pywikibot.output('Dump {0} ({1}) {2}.'
                          .format(site.code, site.family.name, mode))
         return dumpfn
@@ -2442,14 +2448,16 @@ def main(*args):
             singlePage = None
         bot.add(singlePage, hints=iwconf.hints)
 
+    append = not (optRestore or optContinue or iwconf.restore_all)
     try:
-        append = not (optRestore or optContinue or iwconf.restore_all)
         bot.run()
     except KeyboardInterrupt:
         dumpFileName = bot.dump(append)
     except Exception:
+        pywikibot.exception()
         dumpFileName = bot.dump(append)
-        raise
+    else:
+        pywikibot.output('Script terminated sucessfully.')
     finally:
         if dumpFileName:
             try:
