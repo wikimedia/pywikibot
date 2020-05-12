@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,8 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
         if not isinstance(_query, UnicodeType):
             _query = UnicodeType(_query, encoding='utf-8')
         _query = _query.strip()
-        _query = '\n'.join('    {0}'.format(l) for l in _query.splitlines())
+        _query = '\n'.join('    {0}'.format(line)
+                           for line in _query.splitlines())
         pywikibot.output('Executing query:\n' + _query)
 
     cursor.execute(query, params)

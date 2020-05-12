@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -89,10 +89,10 @@ class Hunk(object):
         """Generator of diff text for this hunk, without formatting."""
         # make sure each line ends with '\n' to prevent
         # behaviour like http://bugs.python.org/issue2142
-        def check_line(l):
-            if not l.endswith('\n'):
-                return l + '\n'
-            return l
+        def check_line(line):
+            if not line.endswith('\n'):
+                line += '\n'
+            return line
 
         for tag, i1, i2, j1, j2 in self.group:
             # equal/delete/insert add additional space after the sign as it's

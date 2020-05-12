@@ -39,7 +39,7 @@ The following parameters are supported:
  destination_wiki       destination wiki(s)
 """
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -169,16 +169,16 @@ class SyncSites(object):
                                       .format(site.user()))
             output = '== Pages that differ from original ==\n\n'
             if self.differences[site]:
-                output += ''.join('* [[:%s]]\n' % l for l in
-                                  self.differences[site])
+                output += ''.join('* [[:{}]]\n'.format(page_title)
+                                  for page_title in self.differences[site])
             else:
                 output += 'All important pages are the same'
 
             output += (
                 '\n\n== Admins from original that are missing here ==\n\n')
             if self.user_diff[site]:
-                output += ''.join('* %s\n' % l.replace('_', ' ') for l in
-                                  self.user_diff[site])
+                output += ''.join('* {}\n'.format(user_name.replace('_', ' '))
+                                  for user_name in self.user_diff[site])
             else:
                 output += (
                     'All users from original are also present on this wiki')

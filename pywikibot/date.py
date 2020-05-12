@@ -374,7 +374,7 @@ def escapePattern2(pattern):
                 continue
             if (len(s) in (2, 3) and s[0] == '%'
                     and s[-1] in _digitDecoders
-                    and(len(s) == 2 or s[1] in _decimalDigits)):
+                    and (len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
                 if isinstance(dec, UnicodeType):

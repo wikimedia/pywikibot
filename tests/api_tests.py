@@ -689,8 +689,7 @@ class TestPropertyGenerator(TestCase):
         """Test PropertyGenerator with prop 'info'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
-        titles = [l.title(with_section=False)
-                  for l in links]
+        titles = [link.title(with_section=False) for link in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop='info',
                                     parameters={'titles': '|'.join(titles)})
@@ -707,8 +706,7 @@ class TestPropertyGenerator(TestCase):
         """Test PropertyGenerator with prop 'revisions'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
-        titles = [l.title(with_section=False)
-                  for l in links]
+        titles = [link.title(with_section=False) for link in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop='revisions',
                                     parameters={'titles': '|'.join(titles)})
@@ -727,8 +725,7 @@ class TestPropertyGenerator(TestCase):
         """Test PropertyGenerator with prop 'revisions' and 'coordinates'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
-        titles = [l.title(with_section=False)
-                  for l in links]
+        titles = [link.title(with_section=False) for link in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop='revisions|coordinates',
                                     parameters={'titles': '|'.join(titles)})
@@ -747,8 +744,7 @@ class TestPropertyGenerator(TestCase):
         """Test PropertyGenerator with many limited props."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
-        titles = [l.title(with_section=False)
-                  for l in links]
+        titles = [link.title(with_section=False) for link in links]
         params = {
             'rvprop': 'ids|flags|timestamp|user|comment|content',
             'titles': '|'.join(titles)}
@@ -775,8 +771,7 @@ class TestPropertyGenerator(TestCase):
         """Test PropertyGenerator with many limited props and continuations."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
-        titles = [l.title(with_section=False)
-                  for l in links]
+        titles = [link.title(with_section=False) for link in links]
         gen = api.PropertyGenerator(
             site=self.site, prop='info|categoryinfo|langlinks|templates',
             parameters={'titles': '|'.join(titles)})

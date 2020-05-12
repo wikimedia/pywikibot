@@ -1629,7 +1629,7 @@ class Subject(interwiki_graph.Subject):
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
         new = newPages.copy()
-        interwikis = [pywikibot.Page(l) for l in page.iterlanglinks()]
+        interwikis = [pywikibot.Page(link) for link in page.iterlanglinks()]
 
         # remove interwiki links to ignore
         for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
@@ -1852,8 +1852,8 @@ class Subject(interwiki_graph.Subject):
                 page = new[site]
                 if not page.section():
                     try:
-                        linkedPages = {pywikibot.Page(l)
-                                       for l in page.iterlanglinks()}
+                        linkedPages = {pywikibot.Page(link)
+                                       for link in page.iterlanglinks()}
                     except pywikibot.NoPage:
                         pywikibot.warning(
                             'Page {} does no longer exist?!'.format(page))

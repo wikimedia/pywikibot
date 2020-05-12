@@ -721,9 +721,9 @@ class DisambiguationRobot(SingleSiteBot):
         """
         titles = {firstcap(t) for t in self.firstlinks(page)}
         links = list(links)
-        for l in links[:]:  # uses a copy because of remove!
-            if l.title() not in titles:
-                links.remove(l)
+        for link in links[:]:  # uses a copy because of remove!
+            if link.title() not in titles:
+                links.remove(link)
         return links
 
     def treat_links(self, refPage, disambPage):
@@ -1058,13 +1058,15 @@ class DisambiguationRobot(SingleSiteBot):
                     links = disambPage2.linkedPages()
                     if self.first_only:
                         links = self.firstize(disambPage2, links)
-                    links = [correctcap(l, disambPage2.get()) for l in links]
+                    links = [correctcap(link, disambPage2.get())
+                             for link in links]
                 except pywikibot.NoPage:
                     pywikibot.output('No page at {0}, using redirect target.'
                                      .format(disambTitle))
                     links = disambPage.linkedPages()[:1]
-                    links = [correctcap(l, disambPage.get(get_redirect=True))
-                             for l in links]
+                    links = [correctcap(link,
+                                        disambPage.get(get_redirect=True))
+                             for link in links]
                 self.alternatives += links
             else:
                 try:
@@ -1096,22 +1098,22 @@ or press enter to quit:""")
                         links = disambPage2.linkedPages()
                         if self.first_only:
                             links = self.firstize(disambPage2, links)
-                        links = [correctcap(l, disambPage2.get())
-                                 for l in links]
+                        links = [correctcap(link, disambPage2.get())
+                                 for link in links]
                     except pywikibot.NoPage:
                         pywikibot.output(
                             'Page does not exist; using first '
                             'link in page {0}.'.format(disambPage.title()))
                         links = disambPage.linkedPages()[:1]
-                        links = [correctcap(l, disambPage.get())
-                                 for l in links]
+                        links = [correctcap(link, disambPage.get())
+                                 for link in links]
                 else:
                     try:
                         links = disambPage.linkedPages()
                         if self.first_only:
                             links = self.firstize(disambPage, links)
-                        links = [correctcap(l, disambPage.get())
-                                 for l in links]
+                        links = [correctcap(link, disambPage.get())
+                                 for link in links]
                     except pywikibot.NoPage:
                         pywikibot.output('Page does not exist, skipping.')
                         return False

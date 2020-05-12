@@ -667,10 +667,10 @@ def replace_links(text, replace, site=None):
                              'a sequence, a Link or a basestring but '
                              'is "{0}"'.format(type(replacement)))
 
-    def title_section(l):
-        title = l.title
-        if l.section:
-            title += '#' + l.section
+    def title_section(link):
+        title = link.title
+        if link.section:
+            title += '#' + link.section
         return title
 
     if isinstance(replace, Sequence):

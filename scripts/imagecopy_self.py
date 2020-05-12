@@ -315,8 +315,8 @@ def supportedSite():
         informationTemplate,
         informationFields,
     ]
-    for l in lists:
-        if not l.get(lang):
+    for item in lists:
+        if not item.get(lang):
             return False
     return True
 

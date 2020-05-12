@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2010-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -154,8 +154,8 @@ class MWSite(object):
 
                 self.version = list(filter(
                     lambda x: x.startswith('MediaWiki'),
-                    (l.strip()
-                     for l in d['error']['*'].split('\n'))))[0].split()[1]
+                    (line.strip()
+                     for line in d['error']['*'].split('\n'))))[0].split()[1]
             except Exception:
                 pass
             else:
