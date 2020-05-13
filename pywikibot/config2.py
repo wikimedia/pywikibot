@@ -110,10 +110,11 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # to other modules.
 
 _private_values = {'authenticate', 'db_password'}
-_deprecated_variables = {'available_ssl_project', 'fake_user_agent',
-                         'interwiki_contents_on_disk', 'line_separator', 'LS',
-                         'panoramio', 'proxy', 'special_page_limit',
-                         'sysopnames', 'use_SSL_onlogin', 'use_SSL_always'}
+_deprecated_variables = {
+    'available_ssl_project', 'fake_user_agent', 'interwiki_contents_on_disk',
+    'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
+    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
+}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -869,13 +870,6 @@ simulate = False
 # Increasing this value will increase memory space but could speed up
 # processing. As higher this value this effect will decrease.
 max_queue_size = 64
-
-# Settings to enable mwparserfromhell
-# <https://mwparserfromhell.readthedocs.org/en/latest/>
-# Currently used in textlib.extract_templates_and_params
-# This is more accurate than our current regex, but only works
-# if the user has already installed the library.
-use_mwparserfromhell = True
 
 # Pickle protocol version to use for storing dumps.
 # This config variable is not used for loading dumps.

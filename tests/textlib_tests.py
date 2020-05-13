@@ -15,11 +15,11 @@ import re
 
 import pywikibot
 import pywikibot.textlib as textlib
-from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 
-from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
+from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import suppress_warnings
+from pywikibot import UnknownSite
 
 from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,
@@ -725,7 +725,7 @@ class TestGenericTemplateParams(PatchingTestCase):
 
     def test_removing_disabled_parts_regex(self):
         """Test removing disabled parts when using the regex variant."""
-        self.patch(config, 'use_mwparserfromhell', False)
+        self.patch(textlib, 'mwparserfromhell', Exception())
         textlib.extract_templates_and_params('{{a<!-- -->}}', True)
         self.assertEqual(self._text, '{{a}}')
         self.assertFalse(self._mwpfh)
@@ -739,7 +739,6 @@ class TestGenericTemplateParams(PatchingTestCase):
     @require_modules('mwparserfromhell')
     def test_removing_disabled_parts_mwpfh(self):
         """Test removing disabled parts when using the mwpfh variant."""
-        self.patch(config, 'use_mwparserfromhell', True)
         textlib.extract_templates_and_params('{{a<!-- -->}}', True)
         self.assertEqual(self._text, '{{a}}')
         self.assertTrue(self._mwpfh)
@@ -752,7 +751,7 @@ class TestGenericTemplateParams(PatchingTestCase):
 
     def test_strip_regex(self):
         """Test stripping values when using the regex variant."""
-        self.patch(config, 'use_mwparserfromhell', False)
+        self.patch(textlib, 'mwparserfromhell', Exception())
         textlib.extract_templates_and_params('{{a| foo }}', False, True)
         self.assertEqual(self._args, (False, True))
         self.assertFalse(self._mwpfh)
@@ -766,7 +765,6 @@ class TestGenericTemplateParams(PatchingTestCase):
     @require_modules('mwparserfromhell')
     def test_strip_mwpfh(self):
         """Test stripping values when using the mwpfh variant."""
-        self.patch(config, 'use_mwparserfromhell', True)
         textlib.extract_templates_and_params('{{a| foo }}', None, True)
         self.assertEqual(self._args, (True, ))
         self.assertTrue(self._mwpfh)
