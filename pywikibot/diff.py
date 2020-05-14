@@ -5,28 +5,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import difflib
 import math
 
-try:
-    from collections.abc import Sequence
-except ImportError:  # Python 2.7
-    from collections import Sequence
+from collections.abc import Sequence
 from difflib import _format_range_unified as format_range_unified
+from itertools import zip_longest
 
 import pywikibot
-from pywikibot.tools import chars, deprecated_args, PY2
+from pywikibot.tools import chars, deprecated_args
 from pywikibot.tools.formatter import color_format
 
-if not PY2:
-    from itertools import zip_longest
-else:
-    from itertools import izip_longest as zip_longest
 
-
-class Hunk(object):
+class Hunk:
 
     """One change hunk between a and b.
 
@@ -154,16 +145,14 @@ class Hunk(object):
             fmt = fmt if fmt else None
             yield self.color_line(line2, fmt)
 
-    def color_line(self, line, line_ref=None):
+    def color_line(self, line: str, line_ref=None):
         """Color line characters.
 
         If line_ref is None, the whole line is colored.
         If line_ref[i] is not blank, line[i] is colored.
         Color depends if line starts with +/-.
 
-        line: string
         line_ref: string.
-
         """
         color = line[0]
 
@@ -246,7 +235,7 @@ class _SuperHunk(Sequence):
             hunk.reviewed = reviewed
 
 
-class PatchManager(object):
+class PatchManager:
 
     """Apply patches to text_a to obtain a new text.
 
@@ -254,14 +243,12 @@ class PatchManager(object):
     """
 
     @deprecated_args(n='context')
-    def __init__(self, text_a, text_b, context=0, by_letter=False,
-                 replace_invisible=False):
+    def __init__(self, text_a: str, text_b: str, context=0, by_letter=False,
+                 replace_invisible=False) -> None:
         """Initializer.
 
         @param text_a: base text
-        @type text_a: basestring
         @param text_b: target text
-        @type text_b: basestring
         @param context: number of lines which are context
         @type context: int
         @param by_letter: if text_a and text_b are single lines, comparison can
@@ -271,10 +258,9 @@ class PatchManager(object):
             the charnumber in brackets (e.g. <200e>).
         @type replace_invisible: bool
         """
-        if '\n' in text_a or '\n' in text_b or not by_letter:
-            self.a = text_a.splitlines(1)
-            self.b = text_b.splitlines(1)
-        else:
+        self.a = text_a.splitlines(True)
+        self.b = text_b.splitlines(True)
+        if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
             self.a = text_a
             self.b = text_b
 
