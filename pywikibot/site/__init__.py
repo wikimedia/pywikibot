@@ -414,6 +414,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         if name == '':
             return ''
 
+        name = name.replace('_', ' ')
         parts = name.split(':', 4)
         count = len(parts)
         if count > 3 or (count == 3 and parts[2]):
