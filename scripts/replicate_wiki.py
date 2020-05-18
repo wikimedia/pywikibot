@@ -48,6 +48,7 @@ from __future__ import absolute_import, division, unicode_literals
 import sys
 
 from argparse import ArgumentParser
+from collections import defaultdict
 
 import pywikibot
 
@@ -98,13 +99,11 @@ class SyncSites(object):
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
 
-        self.differences = {}
-        self.user_diff = {}
+        self.differences = defaultdict(list)
+        self.user_diff = defaultdict(list)
         pywikibot.output('Syncing to ', newline=False)
         for s in self.sites:
             s.login()
-            self.differences[s] = []
-            self.user_diff[s] = []
             pywikibot.output(str(s), newline=False)
         pywikibot.output('')
 
