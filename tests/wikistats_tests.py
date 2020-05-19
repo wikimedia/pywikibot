@@ -20,7 +20,7 @@ class WikiStatsTestCase(TestCase):
 
     hostname = 'https://wikistats.wmflabs.org/api.php'
 
-    def test_sort(self):
+    def test_sort_numeric(self):
         """Test sorted results."""
         keys = ('good', 'prefix', 'total')
 
@@ -45,6 +45,21 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(top['total']), int(bottom['good']))
         self.assertGreater(int(top['good']), int(bottom['good']))
         self.assertGreater(int(top['total']), int(bottom['total']))
+
+    def test_sort_alphabetic(self):
+        """Test alphabetic sorted results."""
+        ws = WikiStats()
+        for reverse in (True, False):
+            last = ' ~'[reverse]  # first and last printable ASCII
+            data = ws.sorted('wikisource', 'prefix', reverse=reverse)
+            with self.subTest(reverse=reverse):
+                for entry in data:
+                    code = entry['prefix']
+                    if reverse:
+                        self.assertGreater(last, code)
+                    else:
+                        self.assertLess(last, code)
+                    last = code
 
     def test_sorting_order(self):
         """Test sorting order of languages_by_size."""
