@@ -3,6 +3,7 @@ Current release
 
 * pagegenerators: handle protocols in -weblink (T251308, T251310)
 * Bugfixes and improvements
+* Localisation updates
 
 Future releases
 ~~~~~~~~~~~~~~~
