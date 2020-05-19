@@ -1243,7 +1243,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     # config.usernames is initialised with a defaultdict for each family name
     family_name = str(fam)
 
-    code_to_user = config.usernames['*'].copy()
+    code_to_user = {}
+    if '*' in config.usernames:  # T253127: usernames is a defaultdict
+        code_to_user = config.usernames['*'].copy()
     code_to_user.update(config.usernames[family_name])
     user = user or code_to_user.get(code) or code_to_user.get('*')
 
