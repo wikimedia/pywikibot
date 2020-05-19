@@ -36,14 +36,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'pt', 'ja', 'vi', 'sr', 'th', 'chr', 'hi', 'ro', 'no', 'et', 'id',
         'ml', 'my', 'cs', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'jv', 'gl',
         'az', 'oc', 'eu', 'uk', 'br', 'da', 'lo', 'hr', 'is', 'fj', 'simple',
-        'la', 'tg', 'ky', 'ast', 'sk', 'bg', 'ps', 'ur', 'wa', 'cy', 'vo',
+        'la', 'tg', 'ky', 'ast', 'sk', 'bg', 'ur', 'ps', 'wa', 'cy', 'vo',
         'af', 'zh-min-nan', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'min', 'lb', 'nds', 'sl', 'bs',
-        'nah', 'sa', 'kk', 'ms', 'tk', 'vec', 'km', 'sm', 'mk', 'hsb', 'be',
+        'nah', 'sa', 'kk', 'ms', 'km', 'vec', 'tk', 'sm', 'mk', 'hsb', 'be',
         'yue', 'gd', 'ga', 'an', 'wo', 'ang', 'shy', 'tt', 'mt', 'sd', 'gn',
         'mr', 'ie', 'so', 'csb', 'ug', 'ia', 'st', 'fo', 'roa-rup', 'si',
-        'hif', 'kl', 'su', 'zu', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',
-        'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
+        'hif', 'kl', 'su', 'ay', 'mi', 'zu', 'jbo', 'ln', 'yi', 'gu', 'na',
+        'kw', 'gv', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu', 'am',
         'tpi', 'dv', 'ti', 'sg', 'tn', 'ks',
     ]
 
