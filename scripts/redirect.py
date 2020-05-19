@@ -356,9 +356,9 @@ class RedirectGenerator(OptionHandler):
                  - datetime.timedelta(0, self.offset * 3600))
         # self.offset hours ago
         offset_time = start.strftime('%Y%m%d%H%M%S')
-        pywikibot.output('Retrieving {0} moved pages...'
-                         ''.format(str(self.api_number)
-                                   if self.api_number is not None else 'all'))
+        pywikibot.output('Retrieving {} moved pages...'
+                         .format(self.api_number
+                                 if self.api_number is not None else 'all'))
         move_gen = self.site.logevents(logtype='move', start=offset_time)
         if self.api_number:
             move_gen.set_maximum_items(self.api_number)
@@ -415,8 +415,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         elif action == 'both':
             self.treat_page = self.fix_double_or_delete_broken_redirect
         else:
-            raise NotImplementedError('No valid action "{0}" found.'
-                                      ''.format(action))
+            raise NotImplementedError('No valid action "{}" found.'
+                                      .format(action))
 
     def get_sd_template(self):
         """Look for speedy deletion template and return it.
@@ -442,8 +442,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                     if page.exists():
                         return sd
             pywikibot.warning(
-                'No speedy deletion template {0}available.'
-                ''.format('"{0}" '.format(title) if title else ''))
+                'No speedy deletion template {}available.'
+                .format('"{}" '.format(title) if title else ''))
         return None
 
     def init_page(self, item):

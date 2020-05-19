@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cases for the WikiStats dataset."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,8 +55,8 @@ class WikiStatsTestCase(TestCase):
             curr = int(data[code]['good'])
             self.assertGreaterEqual(
                 last, curr,
-                '{0} ({1}) is greater than {2} ({3}).'
-                ''.format(code, curr, last_code, last))
+                '{} ({}) is greater than {} ({}).'
+                .format(code, curr, last_code, last))
             last = curr
             last_code = code
 

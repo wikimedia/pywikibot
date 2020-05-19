@@ -2692,7 +2692,7 @@ class FilePage(Page):
                 **info.__dict__)
             lines.append('| {timestamp} || {user} || {dimension} |'
                          '| <nowiki>{comment}</nowiki>'
-                         ''.format(dimension=dimension, **info.__dict__))
+                         .format(dimension=dimension, **info.__dict__))
         return ('{| class="wikitable"\n'
                 '! {{int:filehist-datetime}} || {{int:filehist-user}} |'
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
@@ -4812,8 +4812,8 @@ class ItemPage(WikibasePage):
         if hasattr(page, '_item'):
             return page._item
         if not page.site.has_data_repository:
-            raise pywikibot.WikiBaseError('{0} has no data repository'
-                                          ''.format(page.site))
+            raise pywikibot.WikiBaseError('{} has no data repository'
+                                          .format(page.site))
         if not lazy_load and not page.exists():
             raise pywikibot.NoPage(page)
 
