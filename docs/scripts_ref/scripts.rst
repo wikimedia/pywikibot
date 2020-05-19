@@ -83,6 +83,11 @@ cosmetic\_changes script
 
 .. automodule:: scripts.cosmetic_changes
 
+dataextend script
+-----------------
+
+.. automodule:: scripts.dataextend
+
 data\_ingestion script
 ----------------------
 

@@ -7,6 +7,12 @@ claimit script
 .. automodule:: scripts.claimit
    :no-members:
 
+dataextend script
+-----------------
+
+.. automodule:: scripts.dataextend
+   :no-members:
+
 harvest\_template script
 ------------------------
 
