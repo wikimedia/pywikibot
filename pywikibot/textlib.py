@@ -445,9 +445,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                         replacement += new[last:group_match.start()]
                         replacement += match.group(group_id) or ''
                     except IndexError:
-                        raise IndexError(
-                            'Invalid group reference: {0}\nGroups found: {1}'
-                            ''.format(group_id, match.groups()))
+                        raise IndexError('Invalid group reference: {}\n'
+                                         'Groups found: {}'
+                                         .format(group_id, match.groups()))
                     last = group_match.end()
                 replacement += new[last:]
 

@@ -7811,8 +7811,8 @@ class DataSite(APISite):
             'Site method with baserevid', 'claim with on_item set', depth=3,
             since='20150910')
         if baserevid != claim.on_item.latest_revision_id:
-            warn('Using baserevid {0} instead of claim baserevid {1}'
-                 ''.format(baserevid, claim.on_item.latest_revision_id),
+            warn('Using baserevid {} instead of claim baserevid {}'
+                 .format(baserevid, claim.on_item.latest_revision_id),
                  UserWarning, 3)
 
         return baserevid

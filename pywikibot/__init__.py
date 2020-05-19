@@ -1377,9 +1377,9 @@ def _flush(stop=True):
         try:
             _putthread.join(1)
         except KeyboardInterrupt:
-            if input_yn('There are {0} pages remaining in the queue. '
-                        'Estimated time remaining: {1}\nReally exit?'
-                        ''.format(*remaining()),
+            if input_yn('There are {} pages remaining in the queue. '
+                        'Estimated time remaining: {}\nReally exit?'
+                        .format(*remaining()),
                         default=False, automatic_quit=False):
                 return
 
