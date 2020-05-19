@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cases for the WikiStats dataset."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,23 +23,26 @@ class WikiStatsTestCase(TestCase):
 
     def test_sort(self):
         """Test sorted results."""
+        keys = ('good', 'prefix', 'total')
+
         ws = WikiStats()
         data = ws.sorted('wikipedia', 'total')
         top = data[0]
         bottom = data[-1]
-        self.assertIn('good', top)
-        self.assertIn('prefix', top)
-        self.assertIn('total', top)
-        self.assertIn('good', bottom)
-        self.assertIn('prefix', bottom)
-        self.assertIn('total', bottom)
-        self.assertIsInstance(top['good'], UnicodeType)
+
+        for key in keys:
+            with self.subTest(key=key):
+                self.assertIn(key, top)
+                self.assertIn(key, bottom)
+
         self.assertTrue(all(isinstance(key, UnicodeType)
                             for key in top.keys()
                             if key is not None))
+        self.assertIsInstance(top['good'], UnicodeType)
         self.assertIsInstance(top['total'], UnicodeType)
         self.assertIsInstance(bottom['good'], UnicodeType)
         self.assertIsInstance(bottom['total'], UnicodeType)
+
         self.assertGreater(int(top['total']), int(bottom['good']))
         self.assertGreater(int(top['good']), int(bottom['good']))
         self.assertGreater(int(top['total']), int(bottom['total']))
