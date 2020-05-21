@@ -58,7 +58,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'mdf', 'lg', 'atj', 'srn', 'xh', 'cu', 'gcr', 'chr', 'om', 'fj', 'ltg',
         'sm', 'got', 'kl', 'ak', 'pih', 'tn', 'tw', 'st', 'ts', 'rmy', 'bm',
         'chy', 'rn', 'nqo', 'tum', 'ny', 'mnw', 'ss', 'ch', 'pnt', 'iu', 'ady',
-        'ks', 've', 'ee', 'ik', 'sg', 'ff', 'ti', 'dz', 'din', 'cr',
+        'ks', 've', 'ee', 'ik', 'sg', 'ff', 'ti', 'dz', 'din', 'cr', 'awa',
     ]
 
     # Sites we want to edit but not count as real languages
