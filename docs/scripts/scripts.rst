@@ -271,6 +271,11 @@ scripts.pagefromfile script
 
 .. automodule:: scripts.pagefromfile
 
+scripts.parser\_function\_count script
+--------------------------------------
+
+.. automodule:: scripts.parser_function_count
+
 scripts.patrol script
 ---------------------
 
