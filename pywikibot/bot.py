@@ -1385,16 +1385,16 @@ class BaseBot(OptionHandler):
         @raise AssertionError: "page" is not a pywikibot.page.BasePage object
         """
         self._start_ts = pywikibot.Timestamp.now()
+        self.setup()
+
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable %s.generator not set.'
                                       % self.__class__.__name__)
-
         if PY2:
             # Python 2 does not clear previous exceptions and method `exit`
             # relies on sys.exc_info returning exceptions occurring in `run`.
             sys.exc_clear()
 
-        self.setup()
         try:
             for item in self.generator:
                 # preprocessing of the page
