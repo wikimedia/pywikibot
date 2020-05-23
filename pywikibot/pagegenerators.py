@@ -1895,7 +1895,7 @@ class RegexFilter(object):
     def __precompile(cls, regex, flag):
         """Precompile the regex list if needed."""
         # Enable multiple regexes
-        if not isinstance(regex, list):
+        if not isinstance(regex, (list, tuple)):
             regex = [regex]
         # Test if regex is already compiled.
         # We assume that all list components have the same type
