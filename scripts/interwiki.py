@@ -51,14 +51,6 @@ These command-line arguments can be used to specify which pages to work on:
                    pages, continue alphabetically starting at the last of the
                    dumped pages. The dump file will be subsequently removed.
 
-    -warnfile:     used as -warnfile:filename, reads all warnings from the
-                   given file that apply to the home wiki language,
-                   and read the rest of the warning as a hint. Then
-                   treats all the mentioned pages. A quicker way to
-                   implement warnfile suggestions without verifying them
-                   against the live wiki is using the warnfile.py
-                   script.
-
 &params;
 
 Additionally, these arguments can be used to restrict the bot to certain pages:
@@ -2243,23 +2235,6 @@ def botMayEdit(page):
     return True
 
 
-def readWarnfile(filename, bot):
-    """Read old interlanguage conflicts."""
-    import warnfile
-    reader = warnfile.WarnfileReader(filename)
-    # we won't use removeHints
-    (hints, removeHints) = reader.getHints()
-    for page, pagelist in hints.items():
-        # The WarnfileReader gives us a list of pagelinks, but
-        # titletranslate.py expects a list of strings, so we convert it back.
-        # TODO: This is a quite ugly hack, in the future we should maybe make
-        # titletranslate expect a list of pagelinks.
-        hintStrings = ['{}:{}'.format(hintedPage.site.lang,
-                                      hintedPage.title())
-                       for hintedPage in pagelist]
-        bot.add(page, hints=hintStrings)
-
-
 def page_empty_check(page):
     """
     Return True if page should be skipped as it is almost empty.
@@ -2301,7 +2276,6 @@ def main(*args):
     namespaces = []
     number = None
     until = None
-    warnfile = None
     # a normal PageGenerator (which doesn't give hints, only Pages)
     hintlessPageGen = None
     optContinue = False
@@ -2319,9 +2293,8 @@ def main(*args):
     for arg in local_args:
         if iwconf.readOptions(arg):
             continue
-        elif arg.startswith('-warnfile:'):
-            warnfile = arg[10:]
-        elif arg.startswith('-years'):
+
+        if arg.startswith('-years'):
             # Look if user gave a specific year at which to start
             # Must be a natural number or negative integer.
             if len(arg) > 7 and (arg[7:].isdigit()
@@ -2436,9 +2409,6 @@ def main(*args):
                 hintlessPageGen, namespaces, site)
         # we'll use iter() to create make a next() function available.
         bot.setPageGenerator(iter(hintlessPageGen), number=number, until=until)
-    elif warnfile:
-        # TODO: filter namespaces if -namespace parameter was used
-        readWarnfile(warnfile, bot)
     else:
         if not singlePageTitle and not opthintsonly:
             singlePageTitle = pywikibot.input('Which page to check:')
