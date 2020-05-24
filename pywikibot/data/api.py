@@ -1912,6 +1912,23 @@ class Request(MutableMapping):
         self.wait()
         return True
 
+    def _ratelimited(self):
+        """Handle ratelimited warning."""
+        ratelimits = self.site.userinfo['ratelimits']
+        delay = None
+
+        ratelimit = ratelimits.get(self.action, {})
+        # find the lowest wait time for the given action
+        for limit in ratelimit.values():
+            seconds = limit['seconds']
+            hits = limit['hits']
+            delay = min(delay or seconds, seconds / hits)
+
+        if not delay:
+            pywikibot.warning(
+                'No rate limit found for action {}'.format(self.action))
+        self.wait(delay)
+
     def _bad_token(self, code):
         """Check for bad token."""
         if (code != 'badtoken' or self.site._loginstatus
@@ -2047,6 +2064,10 @@ class Request(MutableMapping):
                 self.wait()
                 continue
 
+            if code == 'ratelimited':
+                self._ratelimited()
+                continue
+
             # If readapidenied is returned try to login
             if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
                 self.site.login()
@@ -2100,14 +2121,15 @@ class Request(MutableMapping):
 
         raise MaxlagTimeoutError(msg)
 
-    def wait(self):
+    def wait(self, delay=None):
         """Determine how long to wait after a failed request."""
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
-        pywikibot.warning('Waiting %s seconds before retrying.'
-                          % self.retry_wait)
-        pywikibot.sleep(self.retry_wait)
+        delay = delay or self.retry_wait
+        pywikibot.warning('Waiting {:.1g} seconds before retrying.'
+                          .format(delay))
+        pywikibot.sleep(delay)
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
