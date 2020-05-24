@@ -1311,16 +1311,18 @@ class BaseBot(OptionHandler):
             delta = (pywikibot.Timestamp.now() - self._start_ts)
             seconds = int(delta.total_seconds())
             if delta.days:
-                pywikibot.output('Execution time: %d days, %d seconds'
-                                 % (delta.days, delta.seconds))
+                pywikibot.output(
+                    'Execution time: {d.days} days, {d.seconds} seconds'
+                    .format(d=delta))
             else:
-                pywikibot.output('Execution time: %d seconds' % delta.seconds)
+                pywikibot.output('Execution time: {} seconds'
+                                 .format(delta.seconds))
             if self._treat_counter:
-                pywikibot.output('Read operation time: %d seconds'
-                                 % (seconds / self._treat_counter))
+                pywikibot.output('Read operation time: {:.1f} seconds'
+                                 .format(seconds / self._treat_counter))
             if self._save_counter:
-                pywikibot.output('Write operation time: %d seconds'
-                                 % (seconds / self._save_counter))
+                pywikibot.output('Write operation time: {:.1f} seconds'
+                                 .format(seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
