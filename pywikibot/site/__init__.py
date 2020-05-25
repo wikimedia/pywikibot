@@ -2159,7 +2159,7 @@ class APISite(BaseSite):
             uirequest = self._simple_request(
                 action='query',
                 meta='userinfo',
-                uiprop='blockinfo|hasmsg|groups|rights'
+                uiprop='blockinfo|hasmsg|groups|rights|ratelimits'
             )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
