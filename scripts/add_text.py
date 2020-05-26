@@ -140,7 +140,7 @@ def put_text(page, new, summary, count, asynchronous=False):
         else:
             raise pywikibot.ServerError(
                 'Server Error! Maximum retries exceeded')
-    except pywikibot.SpamfilterError as e:
+    except pywikibot.SpamblacklistError as e:
         pywikibot.output(
             'Cannot change {} because of blacklist entry {}'
             .format(page.title(), e.url))

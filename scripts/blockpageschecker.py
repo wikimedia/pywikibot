@@ -499,7 +499,7 @@ def save_page(page, text, comment):
             else:
                 # Prevent Infinite Loops
                 raise pywikibot.ServerError('Fifth Server Error!')
-        except pywikibot.SpamfilterError as e:
+        except pywikibot.SpamblacklistError as e:
             pywikibot.output('Cannot change %s because of '
                              'blacklist entry %s'
                              % (page.title(), e.url))

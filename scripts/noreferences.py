@@ -30,7 +30,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -727,7 +727,7 @@ class NoReferencesBot(Bot):
                 except pywikibot.EditConflict:
                     pywikibot.warning('Skipping {0} because of edit conflict'
                                       .format(page.title(as_link=True)))
-                except pywikibot.SpamfilterError as e:
+                except pywikibot.SpamblacklistError as e:
                     pywikibot.warning(
                         'Cannot change {0} because of blacklist entry {1}'
                         .format(page.title(as_link=True), e.url))
