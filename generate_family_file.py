@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """This script generates a family file from a given URL."""
 #
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2010-2020
 #
 # Distributed under the terms of the MIT license
 #
@@ -19,8 +19,8 @@ from os import environ, getenv
 # creating & retrieving urls
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
-    raw_input = input
-else:
+else:  # Python 2
+    input = raw_input  # noqa: F821
     from urlparse import urlparse
 
 
@@ -37,9 +37,9 @@ class FamilyFileGenerator(object):
         self.Wiki = _import_with_no_user_config(
             'pywikibot.site_detect').site_detect.MWSite
         if url is None:
-            url = raw_input('Please insert URL to wiki: ')
+            url = input('Please insert URL to wiki: ')
         if name is None:
-            name = raw_input('Please insert a short name (eg: freeciv): ')
+            name = input('Please insert a short name (eg: freeciv): ')
         self.dointerwiki = dointerwiki
         self.base_url = url
         self.name = name
@@ -82,7 +82,7 @@ class FamilyFileGenerator(object):
 
         if len(self.langs) > 1:
             if self.dointerwiki is None:
-                makeiw = raw_input(
+                makeiw = input(
                     '\nThere are %i languages available.'
                     '\nDo you want to generate interwiki links? '
                     'This might take a long time. ([y]es/[N]o/[e]dit)'
@@ -96,7 +96,7 @@ class FamilyFileGenerator(object):
             elif makeiw == 'e':
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
-                do_langs = raw_input('Which languages do you want: ')
+                do_langs = input('Which languages do you want: ')
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
@@ -124,8 +124,8 @@ class FamilyFileGenerator(object):
         print('Writing %s... ' % fn)
         try:
             open(fn)
-            if raw_input('%s already exists. Overwrite? (y/n)'
-                         % fn).lower() == 'n':
+            if input('{} already exists. Overwrite? (y/n)'
+                     .format(fn)).lower() == 'n':
                 print('Terminating.')
                 sys.exit(1)
         except IOError:  # file not found
