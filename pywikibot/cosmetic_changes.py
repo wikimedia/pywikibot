@@ -948,13 +948,15 @@ class CosmeticChangesToolkit(object):
         # FIXME: use textlib.NON_LATIN_DIGITS
         # valid digits
         digits = {
-            'ckb': '٠١٢٣٤٥٦٧٨٩',
-            'fa': '۰۱۲۳۴۵۶۷۸۹',
+            'ckb': ('٠١٢٣٤٥٦٧٨٩', 'fa'),
+            'fa': ('۰۱۲۳۴۵۶۷۸۹', 'ckb'),
         }
-        faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
-        new = digits.pop(self.site.code)
-        # This only works if there are only two items in digits dict
-        old = digits[list(digits.keys())[0]]
+        faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa'][0]
+
+        # For replacing old digits by new one
+        new, old_key = digits[self.site.code]
+        old = digits[old_key][0]
+
         # not to let bot edits in latin content
         exceptions.append(re.compile('[^%(fa)s] *?\"*? *?, *?[^%(fa)s]'
                                      % {'fa': faChrs}))
