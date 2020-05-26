@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Wrapper script to use Pywikibot in 'directory' mode.
+"""Wrapper script to invoke pywikibot-based scripts.
 
-Run scripts using:
+Run scripts with pywikibot in directory mode using:
 
     python pwb.py <pwb options> <name_of_script> <options>
 
-and it will use the package directory to store all user files, will fix up
-search paths so the package does not need to be installed, etc.
+This wrapper script uses the package directory to store all user files,
+will fix up search paths so the package does not need to be installed, etc.
 
 Currently <pwb options> are global options. This can be used for tests
-to set the default site like (see T216825):
+to set the default site (see T216825):
 
     python pwb.py -lang:de bot_tests -v
 """
@@ -32,6 +32,12 @@ from warnings import warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
+
+if not PY2:
+    from pathlib import Path
+else:
+    from pathlib2 import Path
+
 
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
@@ -161,10 +167,6 @@ def check_modules(script=None):
     import pkg_resources
     if script:
         from setup import script_deps
-        try:
-            from pathlib import Path
-        except ImportError:  # Python 2
-            from pathlib2 import Path
         dependencies = script_deps.get(Path(script).name, [])
     else:
         from setup import dependencies
@@ -229,11 +231,6 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-
-try:
-    from pathlib import Path
-except ImportError:  # Python 2
-    from pathlib2 import Path
 
 
 def find_alternates(filename, script_paths):
