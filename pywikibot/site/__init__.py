@@ -2754,8 +2754,9 @@ class APISite(BaseSite):
             warn('\n'
                  + fill('Support of MediaWiki {version} will be dropped. '
                         'It is recommended to use MediaWiki 1.19 or above. '
-                        'You may use Pywikibot stable release 3.0.20200111 '
-                        'for older MediaWiki versions. '
+                        'You may use every Pywikibot 3.0.X release from '
+                        'pypi index or the "python2" release from the '
+                        'repository for older MediaWiki versions. '
                         'See T245350 for further information.'
                         .format(version=version)), FutureWarning)
 
