@@ -64,6 +64,10 @@ script:
   - if [[ $FAMILY == 'wsbeta' ]]; then
       python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
     fi
+  - if [[ $FAMILY == 'btrfswiki' ]]; then
+      python -m generate_family_file 'https://btrfs.wiki.kernel.org/index.php/Main_Page' 'btrfswiki' 'y' ;
+      export PYWIKIBOT_USERNAME="$BTRFS_PYWIKIBOT_USERNAME" ;
+    fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"
 
@@ -157,11 +161,15 @@ matrix:
       env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.8'
+      env: LANGUAGE=en FAMILY=btrfswiki
     - python: '3.9-dev'
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
   allow_failures:
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
+    - python: '3.8'
+      env: LANGUAGE=en FAMILY=btrfswiki
     - python: '3.9-dev'
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
 
