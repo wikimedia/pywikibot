@@ -215,21 +215,6 @@ GLOBAL OPTIONS
 """
 
 
-# It's not possible to use pywikibot.exceptions.PageRelatedError as that is
-# importing pywikibot.data.api which then needs pywikibot.bot
-class SkipPageError(Exception):
-
-    """Skipped page in run."""
-
-    message = 'Page "{0}" skipped due to {1}.'
-
-    def __init__(self, page, reason):
-        """Initializer."""
-        super(SkipPageError, self).__init__(self.message.format(page, reason))
-        self.reason = reason
-        self.page = page
-
-
 class UnhandledAnswer(Exception):
 
     """The given answer didn't suffice."""
@@ -1398,22 +1383,7 @@ class BaseBot(OptionHandler):
         try:
             for item in self.generator:
                 # preprocessing of the page
-                try:
-                    initialized_page = self.init_page(item)
-                except SkipPageError as e:
-                    issue_deprecation_warning('Use of SkipPageError',
-                                              'BaseBot.skip_page() method',
-                                              warning_class=FutureWarning,
-                                              since='20180522')
-                    pywikibot.warning('Skipped "{0}" due to: {1}'.format(
-                                      item, e.reason))
-                    if PY2:
-                        # Python 2 does not clear the exception and it may seem
-                        # that the generator stopped due to an exception
-                        sys.exc_clear()
-                    self._skip_counter += 1
-                    continue
-
+                initialized_page = self.init_page(item)
                 if initialized_page is None:
                     issue_deprecation_warning(
                         'Returning None from init_page() method',
