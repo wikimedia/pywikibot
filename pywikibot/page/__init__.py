@@ -4616,13 +4616,6 @@ class WikibasePage(BasePage, WikibaseEntity):
                 'The provided Claim instance is already used in an entity')
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
-        for snaks in claim.qualifiers.values():
-            for snak in snaks:
-                snak.on_item = self
-        for source in claim.sources:
-            for snaks in source.values():
-                for snak in snaks:
-                    snak.on_item = self
 
     def removeClaims(self, claims, **kwargs):
         """
