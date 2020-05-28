@@ -398,16 +398,15 @@ def error_handling_callback(request):
         if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
             raise FatalServerError(str(request.data))
 
-    # if all else fails
-    if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.uri)
-        raise request.data
-
     if request.status == 504:
         raise Server504Error('Server %s timed out' % request.hostname)
 
     if request.status == 414:
         raise Server414Error('Too long GET request')
+
+    if isinstance(request.data, Exception):
+        error('An error occurred for uri ' + request.uri)
+        raise request.data
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
