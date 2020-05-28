@@ -1108,6 +1108,14 @@ class Family(object):
         """DEPRECATED: Build list of category redirect templates."""
         self._get_cr_templates(code, fallback)
 
+    def get_edit_restricted_templates(self, code):
+        """Return tuple of edit restricted templates."""
+        return self.edit_restricted_templates.get(code, ())
+
+    def get_archived_page_templates(self, code):
+        """Return tuple of archived page templates."""
+        return self.archived_page_templates.get(code, ())
+
     def disambig(self, code, fallback='_default'):
         """Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
