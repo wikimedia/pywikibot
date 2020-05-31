@@ -321,8 +321,6 @@ def find_filename(filename):
 def main():
     """Command line entry point."""
     global filename
-    if not filename:
-        return False
 
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
@@ -331,6 +329,9 @@ def main():
                   .format('' if len(unknown_args) == 1 else 's',
                           ', '.join(unknown_args)))
             return False
+
+    if not filename:
+        return False
 
     file_package = None
     argvu = pwb.argvu[1:]
