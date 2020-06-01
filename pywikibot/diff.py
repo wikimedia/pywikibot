@@ -90,9 +90,7 @@ class Hunk(object):
         # make sure each line ends with '\n' to prevent
         # behaviour like http://bugs.python.org/issue2142
         def check_line(line):
-            if not line.endswith('\n'):
-                line += '\n'
-            return line
+            return line if line.endswith('\n') else line + '\n'
 
         for tag, i1, i2, j1, j2 in self.group:
             # equal/delete/insert add additional space after the sign as it's
@@ -100,13 +98,13 @@ class Hunk(object):
             if tag == 'equal':
                 for line in self.a[i1:i2]:
                     yield '  ' + check_line(line)
-            if tag in ('delete'):
+            elif tag == 'delete':
                 for line in self.a[i1:i2]:
                     yield '- ' + check_line(line)
-            if tag in ('insert'):
+            elif tag == 'insert':
                 for line in self.b[j1:j2]:
                     yield '+ ' + check_line(line)
-            if tag in ('replace'):
+            elif tag == 'replace':
                 for line in difflib.ndiff(self.a[i1:i2], self.b[j1:j2]):
                     yield check_line(line)
 
