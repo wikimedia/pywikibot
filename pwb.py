@@ -102,12 +102,16 @@ def check_pwb_versions(package):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename, argv, argvu, package=None):
+def run_python_file(filename, args, package=None):
     """Run a python file as if it were the main program on the command line.
 
-    `filename` is the path to the file to execute, it need not be a .py file.
-    `args` is the argument array to present as sys.argv, as unicode strings.
-
+    :param filename: The path to the file to execute, it need not be a
+        .py file.
+    :type filename: str
+    :param args: is the argument list to present as sys.argv, as strings.
+    :type args: List[str]
+    :param package: The package of the script. Used for checks.
+    :type package: Optional[module]
     """
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
@@ -123,8 +127,8 @@ def run_python_file(filename, argv, argvu, package=None):
     old_argv = sys.argv
     old_argvu = pwb.argvu
 
-    sys.argv = argv
-    pwb.argvu = argvu
+    sys.argv = [filename] + args
+    pwb.argvu = [Path(filename).stem] + args
     sys.path.insert(0, os.path.dirname(filename))
 
     try:
@@ -281,9 +285,7 @@ except RuntimeError:
                                      or filename == 'version.py'):
         print("NOTE: 'user-config.py' was not found!")
         print('Please follow the prompts to create it:')
-        run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'),
-                        ['generate_user_files.py'],
-                        ['generate_user_files.py'])
+        run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'), [])
         # because we have loaded pywikibot without user-config.py loaded,
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
@@ -403,7 +405,6 @@ def execute():
         return False
 
     file_package = None
-    argvu = pwb.argvu[1:]
 
     if not os.path.exists(filename):
         filename = find_filename(filename)
@@ -440,10 +441,7 @@ def execute():
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)
     if site_package or check_modules(filename) or help_option:
-        run_python_file(filename,
-                        [filename] + script_args,
-                        [Path(filename).stem] + argvu[1:],
-                        module)
+        run_python_file(filename, script_args, module)
     return True
 
 

@@ -75,18 +75,22 @@ class TestPwb(PwbTestCase):
         self.assertEqual('Häuser', vpwb['stdout'].strip())
         self.assertEqual('Häuser', vpwb['stderr'].strip())
 
-    @unittest.expectedFailure  # T254435
     def test_argv(self):
         """Test argv of pywikibot.
 
         Make sure that argv passed to the script is not contaminated by
         global options given to pwb.py wrapper.
         """
-        script_path = join_pwb_tests_path('print_argv.py')
-        without_global_args = execute_pwb([script_path, '-help'])
-        with_no_global_args = execute_pwb(['-maxlag:5', script_path, '-help'])
+        script_name = 'print_argv'
+        script_path = join_pwb_tests_path(script_name + '.py')
+        script_opts = ['-help']
+        command = [script_path] + script_opts
+        without_global_args = execute_pwb(command)
+        with_no_global_args = execute_pwb(['-maxlag:5'] + command)
         self.assertEqual(without_global_args['stdout'],
                          with_no_global_args['stdout'])
+        self.assertEqual(without_global_args['stdout'].rstrip(),
+                         str([script_name] + script_opts))
 
     def test_script_found(self):
         """Test pwb.py script call which is found."""
