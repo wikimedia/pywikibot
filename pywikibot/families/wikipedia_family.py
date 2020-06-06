@@ -141,7 +141,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'koi', 'krc', 'ks', 'ku', 'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe',
         'lez', 'lfn', 'lg', 'li', 'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv',
         'map-bms', 'mdf', 'meta', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj',
-        'ms', 'mwl', 'my', 'myv', 'mzn', 'na', 'nah', 'nap', 'nds_nl', 'ne',
+        'ms', 'mwl', 'my', 'myv', 'mzn', 'na', 'nah', 'nap', 'nds-nl', 'ne',
         'new', 'nl', 'no', 'nov', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om',
         'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih',
         'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup',

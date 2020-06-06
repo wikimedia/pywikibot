@@ -36,7 +36,7 @@ else:
 logger = logging.getLogger('pywiki.wiki.family')
 
 # Legal characters for Family.name and Family.langs keys
-# nl_nds code alias requires "_"
+# nds_nl code alias requires "_"
 NAME_CHARACTERS = string.ascii_letters + string.digits
 CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-_'
 
@@ -1673,7 +1673,7 @@ class WikimediaFamily(Family):
         'zh-cn': 'zh',
 
         # Miss-spelling
-        'nl_nds': 'nl-nds',
+        'nds_nl': 'nds-nl',
 
         # Renamed, see T11823
         'be-x-old': 'be-tarask',
