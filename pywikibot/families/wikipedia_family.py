@@ -159,11 +159,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     nocapitalize = ['jbo']
 
     # Languages that used to be coded in iso-8859-1
-    latin1old = [
-        'de', 'en', 'et', 'es', 'ia', 'la', 'af', 'cs', 'fr', 'pt', 'sl',
-        'bs', 'fy', 'vi', 'lt', 'fi', 'it', 'no', 'simple', 'gl', 'eu',
-        'nds', 'co', 'mi', 'mr', 'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga',
-        'na', 'es', 'nl', 'da', 'dk', 'sv', 'test']
+    latin1old = {
+        'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'es', 'et', 'eu', 'fi',
+        'fr', 'fy', 'ga', 'gl', 'ia', 'id', 'it', 'la', 'lt', 'lv', 'mi', 'mr',
+        'na', 'nds', 'nl', 'no', 'pt', 'simple', 'sl', 'sv', 'sw', 'test',
+        'tt', 'uk', 'vi', 'vo'
+    }
 
     # Subpages for documentation.
     # TODO: List is incomplete, to be completed for missing languages.
