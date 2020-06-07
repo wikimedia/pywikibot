@@ -3174,7 +3174,7 @@ class APISite(BaseSite):
 
         @raises ValueError: invalid action parameter
         """
-        if action not in self.siteinfo['restrictions']['types']:
+        if action not in self.siteinfo.get('restrictions')['types']:
             raise ValueError('{}.page_can_be_edited(): Invalid value "{}" for '
                              '"action" parameter'
                              .format(self.__class__.__name__, action))
