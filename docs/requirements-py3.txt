@@ -2,5 +2,5 @@
 # using sphinx on python3.4.
 # requirements.txt and pywikibot[security] are also needed
 
-sphinx >= 1.8
-sphinx-epytext>=0.0.4
+sphinx >= 1.8, != 3.1.0
+sphinx-epytext >= 0.0.4
