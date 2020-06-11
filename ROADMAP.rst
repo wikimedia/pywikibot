@@ -3,6 +3,9 @@ Current release
 
   **Note: This is the last release supporting Python 2 and Python 3.4**
 
+* Resolve namespaces with underlines (T252940)
+* Bugfixes and improvements
+
 Future releases
 ~~~~~~~~~~~~~~~
 
