@@ -368,7 +368,8 @@ def get_base_dir(test_directory=None):
                 'location.\n'
                 '  Directory where user-config.py is searched is determined '
                 'as follows:\n\n    ') + get_base_dir.__doc__
-            raise RuntimeError(exc_text)
+            output(exc_text)
+            sys.exit(1)
 
     return base_dir
 
