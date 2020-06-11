@@ -2127,7 +2127,7 @@ class Request(MutableMapping):
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
         delay = delay or self.retry_wait
-        pywikibot.warning('Waiting {:.1g} seconds before retrying.'
+        pywikibot.warning('Waiting {:.1f} seconds before retrying.'
                           .format(delay))
         pywikibot.sleep(delay)
         # double the next wait, but do not exceed config.retry_max seconds
