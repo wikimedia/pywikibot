@@ -127,31 +127,31 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ab', 'ace', 'ady', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar',
-        'arc', 'arz', 'as', 'ast', 'atj', 'av', 'ay', 'az', 'ba', 'bar',
-        'bat-smg', 'bcl', 'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm',
-        'bo', 'bpy', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch',
-        'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv', 'cy',
-        'da', 'diq', 'dsb', 'dty', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et',
-        'eu', 'ext', 'fa', 'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga',
-        'gag', 'gan', 'gd', 'glk', 'gn', 'gom', 'gor', 'got', 'gu', 'gv', 'ha',
-        'hak', 'haw', 'he', 'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia',
-        'ie', 'ig', 'ik', 'ilo', 'inh', 'io', 'iu', 'ja', 'jam', 'jbo', 'jv',
-        'ka', 'kaa', 'kab', 'kbd', 'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko',
-        'koi', 'krc', 'ks', 'ku', 'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe',
-        'lez', 'lfn', 'lg', 'li', 'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv',
-        'map-bms', 'mdf', 'meta', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj',
-        'ms', 'mwl', 'my', 'myv', 'mzn', 'na', 'nah', 'nap', 'nds-nl', 'ne',
-        'new', 'nl', 'no', 'nov', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om',
-        'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih',
-        'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup',
-        'roa-tara', 'ru', 'rue', 'rw', 'sa', 'sah', 'sc', 'scn', 'sco', 'sd',
-        'se', 'sg', 'sh', 'shn', 'si', 'simple', 'sk', 'sm', 'sn', 'so', 'srn',
-        'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'ta', 'tcy', 'te', 'tet',
-        'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr', 'ts', 'tt',
-        'tum', 'tw', 'ty', 'tyv', 'udm', 'ug', 'uz', 've', 'vec', 'vep', 'vls',
-        'vo', 'wa', 'war', 'wo', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea',
-        'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
+        'ab', 'ace', 'ady', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc',
+        'arz', 'as', 'ast', 'atj', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg',
+        'bcl', 'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy',
+        'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
+        'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv', 'cy', 'da', 'diq',
+        'dsb', 'dty', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext',
+        'fa', 'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag', 'gan',
+        'gd', 'glk', 'gn', 'gom', 'gor', 'got', 'gu', 'gv', 'ha', 'hak', 'haw',
+        'he', 'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia', 'ie', 'ig',
+        'ik', 'ilo', 'inh', 'io', 'iu', 'ja', 'jam', 'jbo', 'jv', 'ka', 'kaa',
+        'kab', 'kbd', 'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc',
+        'ks', 'ku', 'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lfn',
+        'lg', 'li', 'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'map-bms',
+        'mdf', 'meta', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl',
+        'my', 'myv', 'mzn', 'na', 'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl',
+        'no', 'nov', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om', 'or', 'os',
+        'pa', 'pag', 'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb',
+        'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'ru',
+        'rue', 'rw', 'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh',
+        'shn', 'si', 'simple', 'sk', 'sm', 'sn', 'so', 'srn', 'ss', 'st',
+        'stq', 'su', 'sv', 'sw', 'szl', 'ta', 'tcy', 'te', 'tet', 'tg', 'th',
+        'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr', 'ts', 'tt', 'tum', 'tw',
+        'ty', 'tyv', 'udm', 'ug', 'uz', 've', 'vec', 'vep', 'vls', 'vo', 'wa',
+        'war', 'wo', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh',
+        'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
     ]
 
     # On most Wikipedias page names must start with a capital letter,
@@ -171,9 +171,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['ar', 'bn', 'cs', 'da', 'en', 'es', 'hr',
-                      'hu', 'id', 'ilo', 'ja', 'ms',
-                      'pt', 'ro', 'ru', 'simple', 'sh', 'vi', 'zh']
+                     ['ar', 'bn', 'cs', 'da', 'en', 'es', 'hr', 'hu', 'id',
+                      'ilo', 'ja', 'ms', 'pt', 'ro', 'ru', 'simple', 'sh',
+                      'vi', 'zh']
                      ),
         'bs': ('/dok', ),
         'ca': ('/ús', ),
@@ -218,8 +218,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # should be avoided
     archived_page_templates = {
         'cs': ('Archiv', 'Archiv Wikipedie', 'Archiv diskuse',
-               'Archivace start', 'Posloupnost archivů',
-               'Rfa-archiv-start', 'Rfc-archiv-start',),
+               'Archivace start', 'Posloupnost archivů', 'Rfa-archiv-start',
+               'Rfc-archiv-start',),
         'de': ('Archiv',),
     }
 
