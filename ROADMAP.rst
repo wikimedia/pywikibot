@@ -5,6 +5,7 @@ Current release
 
 * Resolve namespaces with underlines (T252940)
 * Bugfixes and improvements
+* Localisation updates
 
 Future releases
 ~~~~~~~~~~~~~~~
