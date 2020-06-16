@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,9 +14,7 @@ import pywikibot
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.logentries import (
     LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
-from pywikibot.tools import (
-    UnicodeType as unicode,
-)
+from pywikibot.tools import UnicodeType
 
 from tests import unittest_print
 from tests.aspects import (
@@ -75,9 +73,9 @@ class TestLogentriesBase(TestCase):
             self.assertNotIn('params', logentry.data)
         else:
             self.assertNotIn(logentry.type(), logentry.data)
-        self.assertIsInstance(logentry.action(), unicode)
+        self.assertIsInstance(logentry.action(), UnicodeType)
         try:
-            self.assertIsInstance(logentry.comment(), unicode)
+            self.assertIsInstance(logentry.comment(), UnicodeType)
         except HiddenKeyError as e:
             self.assertRegex(
                 str(e),
@@ -103,7 +101,7 @@ class TestLogentriesBase(TestCase):
         else:
             self.assertRaises(KeyError, logentry.page)
         self.assertEqual(logentry.type(), logtype)
-        self.assertIsInstance(logentry.user(), unicode)
+        self.assertIsInstance(logentry.user(), UnicodeType)
         self.assertGreaterEqual(logentry.logid(), 0)
 
 
@@ -164,7 +162,7 @@ class TestLogentryParams(TestLogentriesBase):
 
     """Test LogEntry properties specific to their action."""
 
-    def test_BlockEntry(self, key):
+    def test_block_entry(self, key):
         """Test BlockEntry methods."""
         # only 'block' entries can be tested
         for logentry in self.site.logevents(logtype='block', total=5):
@@ -184,23 +182,23 @@ class TestLogentryParams(TestLogentriesBase):
                     self.assertIsNone(logentry.duration())
                 break
 
-    def test_RightsEntry(self, key):
+    def test_rights_entry(self, key):
         """Test RightsEntry methods."""
         logentry = self._get_logentry('rights')
         self.assertIsInstance(logentry.oldgroups, list)
         self.assertIsInstance(logentry.newgroups, list)
 
-    def test_MoveEntry(self, key):
+    def test_move_entry(self, key):
         """Test MoveEntry methods."""
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
         self.assertEqual(logentry.target_page.namespace(),
                          logentry.target_ns.id)
-        self.assertIsInstance(logentry.target_title, unicode)
+        self.assertIsInstance(logentry.target_title, UnicodeType)
         self.assertIsInstance(logentry.target_page, pywikibot.Page)
         self.assertIsInstance(logentry.suppressedredirect(), bool)
 
-    def test_PatrolEntry(self, key):
+    def test_patrol_entry(self, key):
         """Test PatrolEntry methods."""
         logentry = self._get_logentry('patrol')
         self.assertIsInstance(logentry.current_id, int)
@@ -263,7 +261,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
     """Test cases for deprecated logentry methods."""
 
-    def test_MoveEntry(self, key):
+    def test_move_entry(self, key):
         """Test deprecated MoveEntry methods."""
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
@@ -274,7 +272,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         self.assertOneDeprecationParts(
             'pywikibot.logentries.MoveEntry.new_title', 'target_page')
 
-    def test_LogEntry_title(self, key):
+    def test_logentry_title(self, key):
         """Test title and page return the same instance."""
         # Request multiple log entries in the hope that one might have no
         # title entry
@@ -287,7 +285,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
                 self.assertRaises(KeyError, logentry.title)
                 self.assertOneDeprecation()
 
-    def test_getMovedTarget(self, key):
+    def test_get_moved_target(self, key):
         """Test getMovedTarget method."""
         # main page was moved around
         if self.sites[key]['target'] is None:
