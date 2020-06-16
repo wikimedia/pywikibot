@@ -14,6 +14,8 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import tempfile
 
+from contextlib import closing
+
 import pywikibot
 import pywikibot.data.api
 
@@ -138,32 +140,31 @@ class UploadRobot(BaseBot):
                 pywikibot.output('Resume download...')
                 uo.addheader('Range', 'bytes=%s-' % rlen)
 
-            infile = uo.open(file_url)
-            info = infile.info()
+            with closing(uo.open(file_url)) as infile:
+                info = infile.info()
 
-            if PY2:
-                info_get = info.getheader
-            else:
-                info_get = info.get
-            content_type = info_get('Content-Type')
-            content_len = info_get('Content-Length')
-            accept_ranges = info_get('Accept-Ranges')
+                if PY2:
+                    info_get = info.getheader
+                else:
+                    info_get = info.get
+                content_type = info_get('Content-Type')
+                content_len = info_get('Content-Length')
+                accept_ranges = info_get('Accept-Ranges')
 
-            if 'text/html' in content_type:
-                pywikibot.output("Couldn't download the image: "
-                                 'the requested URL was not found on server.')
-                return
+                if 'text/html' in content_type:
+                    pywikibot.output(
+                        "Couldn't download the image: "
+                        'the requested URL was not found on server.')
+                    return
 
-            valid_ranges = accept_ranges == 'bytes'
+                valid_ranges = accept_ranges == 'bytes'
 
-            if resume:
-                _contents += infile.read()
-            else:
-                _contents = infile.read()
+                if resume:
+                    _contents += infile.read()
+                else:
+                    _contents = infile.read()
 
-            infile.close()
             retrieved = True
-
             if content_len:
                 rlen = len(_contents)
                 content_len = int(content_len)
