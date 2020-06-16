@@ -87,7 +87,6 @@ __all__ = (
 
 import codecs
 import datetime
-from importlib import import_module
 import json
 import logging
 import logging.handlers
@@ -95,8 +94,12 @@ import os
 import sys
 import time
 import warnings
-from warnings import warn
 import webbrowser
+
+from contextlib import closing
+from importlib import import_module
+from textwrap import fill
+from warnings import warn
 
 try:
     import configparser
@@ -108,7 +111,6 @@ try:
 except ImportError:  # PY2
     from pathlib2 import Path
 
-from textwrap import fill
 
 import pywikibot
 from pywikibot import config2 as config
@@ -1008,14 +1010,15 @@ def writeToCommandLogFile():
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
     except IOError:
         command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
-    # add a timestamp in ISO 8601 formulation
-    iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    command_log_file.write('%s r%s Python %s '
-                           % (iso_date, version.getversiondict()['rev'],
-                              sys.version.split()[0]))
-    s = ' '.join(args)
-    command_log_file.write(s + os.linesep)
-    command_log_file.close()
+
+    with closing(command_log_file):
+        # add a timestamp in ISO 8601 formulation
+        iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        command_log_file.write('{} r{} Python {} '
+                               .format(iso_date,
+                                       version.getversiondict()['rev'],
+                                       sys.version.split()[0]))
+        command_log_file.write(' '.join(args) + os.linesep)
 
 
 def open_webbrowser(page):
