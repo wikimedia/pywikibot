@@ -310,8 +310,6 @@ def _get_regexes(keys, site):
         _create_default_regexes()
 
     result = []
-    # 'dontTouchRegexes' exist to reduce git blame only.
-    dontTouchRegexes = result
 
     for exc in keys:
         if isinstance(exc, UnicodeType):
@@ -342,10 +340,10 @@ def _get_regexes(keys, site):
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
-                dontTouchRegexes.append(_tag_regex('syntaxhighlight'))
+                result.append(_tag_regex('syntaxhighlight'))
         else:
             # assume it's a regular expression
-            dontTouchRegexes.append(exc)
+            result.append(exc)
 
     return result
 
