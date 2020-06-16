@@ -7,6 +7,8 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from contextlib import closing
+
 import pywikibot
 
 try:
@@ -57,28 +59,24 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    conn = pymysql.connect(config.db_hostname,
-                           db=config.db_name_format.format(dbname),
-                           port=config.db_port,
-                           charset='utf8',
-                           **credentials)
+    with closing(pymysql.connect(config.db_hostname,
+                                 db=config.db_name_format.format(dbname),
+                                 port=config.db_port,
+                                 charset='utf8',
+                                 **credentials)) as conn, \
+         closing(conn.cursor()) as cursor:
 
-    cursor = conn.cursor()
+        if verbose:
+            _query = cursor.mogrify(query, params)
 
-    if verbose:
-        _query = cursor.mogrify(query, params)
+            if not isinstance(_query, UnicodeType):
+                _query = UnicodeType(_query, encoding='utf-8')
+            _query = _query.strip()
+            _query = '\n'.join('    {0}'.format(line)
+                               for line in _query.splitlines())
+            pywikibot.output('Executing query:\n' + _query)
 
-        if not isinstance(_query, UnicodeType):
-            _query = UnicodeType(_query, encoding='utf-8')
-        _query = _query.strip()
-        _query = '\n'.join('    {0}'.format(line)
-                           for line in _query.splitlines())
-        pywikibot.output('Executing query:\n' + _query)
+        cursor.execute(query, params)
 
-    cursor.execute(query, params)
-
-    for row in cursor:
-        yield row
-
-    cursor.close()
-    conn.close()
+        for row in cursor:
+            yield row
