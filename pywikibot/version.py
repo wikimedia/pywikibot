@@ -18,6 +18,7 @@ import sys
 import time
 import xml.dom.minidom
 
+from contextlib import closing
 from distutils import log
 from distutils.sysconfig import get_python_lib
 from io import BytesIO
@@ -182,15 +183,16 @@ def svn_rev_info(path):
     # We haven't found the information in entries file.
     # Use sqlite table for new entries format
     from sqlite3 import dbapi2 as sqlite
-    con = sqlite.connect(os.path.join(_program_dir, '.svn/wc.db'))
-    cur = con.cursor()
-    cur.execute("""select
+    with closing(
+            sqlite.connect(os.path.join(_program_dir, '.svn/wc.db'))) as con:
+        cur = con.cursor()
+        cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
-    name, tag, rev, date, checksum = cur.fetchone()
-    cur.execute('select root from repository')
-    tag, = cur.fetchone()
-    con.close()
+        name, tag, rev, date, checksum = cur.fetchone()
+        cur.execute('select root from repository')
+        tag, = cur.fetchone()
+
     tag = os.path.split(tag)[1]
     date = time.gmtime(date / 1000000)
     return tag, rev, date
