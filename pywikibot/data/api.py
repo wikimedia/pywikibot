@@ -5,28 +5,24 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 import hashlib
 import inspect
 import json
 import os
+import pickle
 import pprint
 import re
 import traceback
 
-try:
-    from collections.abc import Container, MutableMapping, Sized
-except ImportError:  # Python 2.7
-    from collections import Container, MutableMapping, Sized
-from email.mime.nonmultipart import MIMENonMultipart
-from warnings import warn
 
-try:
-    import cPickle as pickle  # noqa: N813
-except ImportError:
-    import pickle
+from collections.abc import Container, MutableMapping, Sized
+from email.generator import BytesGenerator
+from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
+from email.mime.nonmultipart import MIMENonMultipart
+from io import BytesIO
+from warnings import warn
+from urllib.parse import urlencode, unquote
 
 import pywikibot
 
@@ -39,61 +35,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import SubdomainFamily
 from pywikibot.tools import (
-    deprecated, itergroup, PY2, PYTHON_VERSION,
-    getargspec, UnicodeType, remove_last_args
+    deprecated, itergroup, PYTHON_VERSION,
+    getargspec, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
-
-if not PY2:
-    from urllib.parse import urlencode, unquote
-
-    # Bug: T113120, T228841
-    # Subclassing necessary to fix bug of the email package in Python 3:
-    # see https://bugs.python.org/issue19003
-    # see https://bugs.python.org/issue18886
-    # The following solution might be removed if the bug is fixed for
-    # Python versions which are supported by PWB.
-
-    from email.generator import BytesGenerator
-    from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
-    from io import BytesIO
-
-    class CTEBinaryBytesGenerator(BytesGenerator):
-
-        """Workaround for bug in python 3 email handling of CTE binary."""
-
-        def __init__(self, *args, **kwargs):
-            """Initializer."""
-            super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
-            self._writeBody = self._write_body
-
-        def _write_body(self, msg):
-            if msg['content-transfer-encoding'] == 'binary':
-                self._fp.write(msg.get_payload(decode=True))
-            else:
-                super(CTEBinaryBytesGenerator, self)._handle_text(msg)
-
-    class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
-
-        """Workaround for bug in python 3 email handling of CTE binary."""
-
-        def as_bytes(self, unixfrom=False, policy=None):
-            """Return unmodified binary payload."""
-            policy = self.policy if policy is None else policy
-            fp = BytesIO()
-            g = CTEBinaryBytesGenerator(fp, mangle_from_=False, policy=policy)
-            g.flatten(self, unixfrom=unixfrom)
-            return fp.getvalue()
-
-    MIMEMultipart = CTEBinaryMIMEMultipart
-else:
-    from urllib import urlencode, unquote
-    from email.mime.multipart import MIMEMultipart
-
-    # Bug: T243710 (Python 2)
-    # see https://github.com/jxtech/wechatpy/issues/375
-    from urllib import quote
-    quote(b'non-empty-string', safe=b'')
 
 
 _logger = 'data.api'
@@ -117,6 +62,45 @@ def _invalidate_superior_cookies(family):
                 http.cookie_jar.clear(cookie.domain, cookie.path, cookie.name)
 
 
+# Bug: T113120, T228841
+# Subclassing necessary to fix bug of the email package in Python 3:
+# see https://bugs.python.org/issue19003
+# see https://bugs.python.org/issue18886
+# The following solution might be removed if the bug is fixed for
+# Python versions which are supported by PWB, probably with Python 3.5
+
+class CTEBinaryBytesGenerator(BytesGenerator):
+
+    """Workaround for bug in python 3 email handling of CTE binary."""
+
+    def __init__(self, *args, **kwargs):
+        """Initializer."""
+        super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
+        self._writeBody = self._write_body
+
+    def _write_body(self, msg):
+        if msg['content-transfer-encoding'] == 'binary':
+            self._fp.write(msg.get_payload(decode=True))
+        else:
+            super(CTEBinaryBytesGenerator, self)._handle_text(msg)
+
+
+class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
+
+    """Workaround for bug in python 3 email handling of CTE binary."""
+
+    def as_bytes(self, unixfrom=False, policy=None):
+        """Return unmodified binary payload."""
+        policy = self.policy if policy is None else policy
+        fp = BytesIO()
+        g = CTEBinaryBytesGenerator(fp, mangle_from_=False, policy=policy)
+        g.flatten(self, unixfrom=unixfrom)
+        return fp.getvalue()
+
+
+MIMEMultipart = CTEBinaryMIMEMultipart
+
+
 class APIError(Error):
 
     """The wiki site returned an error message."""
@@ -126,7 +110,7 @@ class APIError(Error):
         self.code = code
         self.info = info
         self.other = kwargs
-        self.unicode = UnicodeType(self.__str__())
+        self.unicode = self.__str__()
 
     def __repr__(self):
         """Return internal representation."""
@@ -330,7 +314,7 @@ class ParamInfo(Sized, Container):
         assert('mime' in result['help'])
         assert(result['help']['mime'] == 'text/plain')
         assert('help' in result['help'])
-        assert(isinstance(result['help']['help'], UnicodeType))
+        assert(isinstance(result['help']['help'], str))
 
         help_text = result['help']['help']
 
@@ -374,7 +358,7 @@ class ParamInfo(Sized, Container):
         @type modules: iterable or basestring
         @rtype: set
         """
-        if isinstance(modules, UnicodeType):
+        if isinstance(modules, str):
             return set(modules.split('|'))
         return set(modules)
 
@@ -1065,9 +1049,9 @@ class Request(MutableMapping):
     """A request to a Site's api.php interface.
 
     Attributes of this object (except for the special parameters listed
-    below) get passed as commands to api.php, and can be get or set using
-    the dict interface. All attributes must be strings (or unicode). Use
-    an empty string for parameters that don't require a value. For example,
+    below) get passed as commands to api.php, and can be get or set
+    using the dict interface. All attributes must be strings. Use an
+    empty string for parameters that don't require a value. For example,
     Request(action="query", titles="Foo bar", prop="info", redirects="")
     corresponds to the API request
     "api.php?action=query&titles=Foo%20bar&prop=info&redirects"
@@ -1353,8 +1337,7 @@ class Request(MutableMapping):
          * datetime.datetime (using strftime and ISO8601 format)
          * pywikibot.page.BasePage (using title (+namespace; -section))
 
-        All other datatypes are converted to string using unicode() on Python 2
-        and str() on Python 3.
+        All other datatypes are converted to string.
         """
         if isinstance(value, datetime.datetime):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
@@ -1362,7 +1345,7 @@ class Request(MutableMapping):
             assert(value.site == self.site)
             return value.title(with_section=False)
         else:
-            return UnicodeType(value)
+            return str(value)
 
     def __getitem__(self, key):
         """Implement dict interface."""
@@ -1379,15 +1362,14 @@ class Request(MutableMapping):
 
         @type value: str in site encoding
             (string types may be a `|`-separated list)
-            iterable, where items are converted to unicode
+            iterable, where items are converted to string
             with special handling for datetime.datetime to convert it to a
             string using the ISO 8601 format accepted by the MediaWiki API.
         """
-        # Allow site encoded bytes (note: str is a subclass of bytes in py2)
         if isinstance(value, bytes):
             value = value.decode(self.site.encoding())
 
-        if isinstance(value, UnicodeType):
+        if isinstance(value, str):
             value = value.split('|')
 
         if hasattr(value, 'api_iter'):
@@ -1542,10 +1524,6 @@ class Request(MutableMapping):
             # which is not a superset of ascii may be problematic.
             try:
                 value.encode('ascii')
-                # In Python 2, ascii API params should be represented as 'foo'
-                # rather than u'foo'
-                if PY2:
-                    value = str(value)
             except UnicodeError:
                 try:
                     value = value.encode(self.site.encoding())
@@ -1553,10 +1531,7 @@ class Request(MutableMapping):
                     pywikibot.error(
                         "_encoded_items: '%s' could not be encoded as '%s':"
                         ' %r' % (key, self.site.encoding(), value))
-            if PY2:
-                key = key.encode('ascii')
-            else:
-                assert key.encode('ascii')
+            assert key.encode('ascii')
             assert isinstance(key, str)
             params[key] = value
         return params
@@ -1596,6 +1571,7 @@ class Request(MutableMapping):
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
             return {action: {'result': 'Success', 'nochange': ''}}
+        return None
 
     def _is_wikibase_error_retryable(self, error):
         ERR_MSG = (
@@ -1687,10 +1663,7 @@ class Request(MutableMapping):
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
-        if not PY2:
-            body = container.as_bytes()
-        else:
-            body = container.as_string()
+        body = container.as_bytes()
         marker = b'\n\n'  # separates headers from body
         eoh = body.find(marker)
         body = body[eoh + len(marker):]
@@ -1767,7 +1740,7 @@ class Request(MutableMapping):
         @raises APIError: unknown action found
         @raises APIError: unknown query result type
         """
-        if not isinstance(data, UnicodeType):
+        if not isinstance(data, str):
             data = data.decode(self.site.encoding())
         pywikibot.debug(('API response received from {}:\n'
                          .format(self.site)) + data, _logger)
@@ -1897,12 +1870,7 @@ class Request(MutableMapping):
 
         pywikibot.error('Detected MediaWiki API exception {}{}'
                         .format(e, '; retrying' if retry else '; raising'))
-        # Due to bug T66958, Page's repr may return non ASCII bytes
-        # Get as bytes in PY2 and decode with the console encoding as
-        # the rest should be ASCII anyway.
         param_repr = str(self._params)
-        if PY2:
-            param_repr = param_repr.decode(config.console_encoding)
         pywikibot.log('MediaWiki exception {} details:\n'
                       '          query=\n{}\n'
                       '          response=\n{}'
@@ -2020,7 +1988,7 @@ class Request(MutableMapping):
                 if key in ('error', 'warnings'):
                     continue
                 assert key not in error
-                assert isinstance(result[key], UnicodeType), \
+                assert isinstance(result[key], str), \
                     'Unexpected %s: %r' % (key, result[key])
                 error[key] = result[key]
 
@@ -2102,12 +2070,7 @@ class Request(MutableMapping):
 
             # raise error
             try:
-                # Due to bug T66958, Page's repr may return non ASCII bytes
-                # Get as bytes in PY2 and decode with the console encoding as
-                # the rest should be ASCII anyway.
                 param_repr = str(self._params)
-                if PY2:
-                    param_repr = param_repr.decode(config.console_encoding)
                 pywikibot.log('API Error: query=\n%s'
                               % pprint.pformat(param_repr))
                 pywikibot.log('           response=\n%s'
@@ -2698,7 +2661,7 @@ class QueryGenerator(_RequestWrapper):
 
             return False
 
-        if isinstance(namespaces, UnicodeType):
+        if isinstance(namespaces, str):
             namespaces = namespaces.split('|')
 
         # Use Namespace id (int) here; Request will cast int to str
@@ -2727,11 +2690,14 @@ class QueryGenerator(_RequestWrapper):
                 "Missing '%s' key(s) in ['%s'] value."
                 % (self.continuekey, self.continue_name))
             return True
+
         for query_continue_pair in self.data['query-continue'].values():
             self._add_continues(query_continue_pair)
+        return False  # a new request with query-continue is needed
 
     def _continue(self):
         self._add_continues(self.data['continue'])
+        return False  # a new request with continue is needed
 
     def _add_continues(self, continue_pair):
         for key, value in continue_pair.items():
@@ -2872,7 +2838,7 @@ class QueryGenerator(_RequestWrapper):
                 if 'query' not in self.data:
                     pywikibot.log("%s: 'query' not found in api response." %
                                   self.__class__.__name__)
-                    pywikibot.log(UnicodeType(self.data))
+                    pywikibot.log(str(self.data))
                 # if (query-)continue is present, self.resultkey might not have
                 # been fetched yet
                 if self.continue_name not in self.data:
@@ -3056,7 +3022,7 @@ class PropertyGenerator(QueryGenerator):
             if isinstance(v, list):
                 old_dict[k].extend(v)
                 continue
-            assert isinstance(v, (UnicodeType, int)), (
+            assert isinstance(v, (str, int)), (
                 'continued API result had an unexpected type: %s' % type(v))
 
 
@@ -3285,14 +3251,6 @@ def encode_url(query):
     """
     if hasattr(query, 'items'):
         query = list(query.items())
-
-    if PY2:
-        def _encode(x):
-            if isinstance(x, UnicodeType):
-                return x.encode('utf-8')
-            else:
-                return x
-        query = [(pair[0], _encode(pair[1])) for pair in query]
 
     # parameters ending on 'token' should go last
     # wpEditToken should go very last
