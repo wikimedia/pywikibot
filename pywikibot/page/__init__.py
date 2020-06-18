@@ -926,18 +926,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         ns = self.namespace()
         if ns < 0:  # Special page
-            return
-        if self.isTalkPage():
-            if self.namespace() == 1:
-                return Page(self.site, self.title(with_ns=False))
-            else:
-                return Page(self.site,
-                            '%s:%s' % (self.site.namespace(ns - 1),
-                                       self.title(with_ns=False)))
-        else:
-            return Page(self.site,
-                        '%s:%s' % (self.site.namespace(ns + 1),
-                                   self.title(with_ns=False)))
+            return None
+
+        title = self.title(with_ns=False)
+        new_ns = ns + (1, -1)[self.isTalkPage()]
+        return Page(self.site,
+                    '{}:{}'.format(self.site.namespace(new_ns), title))
 
     def is_categorypage(self):
         """Return True if the page is a Category, False otherwise."""
@@ -1957,7 +1951,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                return self.site.deletepage(self, reason)
+                self.site.deletepage(self, reason)
+                return
+
         else:  # Otherwise mark it for deletion
             if mark or hasattr(self.site, '_noMarkDeletePrompt'):
                 answer = 'y'
@@ -2010,7 +2006,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @return: a list of [date, editor, comment, text, restoration
             marker]. text will be None, unless content is True (or has
             been retrieved earlier). If timestamp is not found, returns
-            None.
+            empty list.
         @rtype: list
         """
         if hasattr(self, '_deletedRevs'):
@@ -2018,12 +2014,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     not content
                     or 'content' in self._deletedRevs[timestamp]):
                 return self._deletedRevs[timestamp]
+
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1):
             # should only be one item with one revision
             if item['title'] == self.title:
                 if 'revisions' in item:
                     return item['revisions'][0]
+        return []
 
     def markDeletedRevision(self, timestamp, undelete=True):
         """
@@ -2150,7 +2148,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 answer = 'y'
                 self.site._noProtectPrompt = True
         if answer == 'y':
-            return self.site.protect(self, protections, reason, **kwargs)
+            self.site.protect(self, protections, reason, **kwargs)
 
     @deprecated_args(
         comment='summary', oldCat='old_cat', newCat='new_cat',
@@ -3306,11 +3304,11 @@ class User(Page):
 
         @rtype: pywikibot.Timestamp or None
         """
-        if self.isAnonymous():
-            return None
-        reg = self.getprops(force).get('registration')
-        if reg:
-            return pywikibot.Timestamp.fromISOformat(reg)
+        if not self.isAnonymous():
+            reg = self.getprops(force).get('registration')
+            if reg:
+                return pywikibot.Timestamp.fromISOformat(reg)
+        return None
 
     def editCount(self, force=False):
         """
@@ -6102,6 +6100,10 @@ class BaseLink(UnicodeMixin, ComparableMixin):
             except KeyError:
                 ns = self.site.namespaces[default_nskey]
             return ns
+
+        raise TypeError(
+            'Invalid type "{}" for Page._nskey. Must be int or str.'
+            .format(type(self._nskey)))
 
     @property
     def site(self):
