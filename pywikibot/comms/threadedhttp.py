@@ -76,20 +76,17 @@ class HttpRequest:
     @property
     def exception(self):
         """Get the exception, if any."""
-        if isinstance(self.data, Exception):
-            return self.data
+        return self.data if isinstance(self.data, Exception) else None
 
     @property
     def response_headers(self):
         """Return the response headers."""
-        if not self.exception:
-            return self.data.headers
+        return self.data.headers if not self.exception else None
 
     @property
     def raw(self):
         """Return the raw response body."""
-        if not self.exception:
-            return self.data.content
+        return self.data.content if not self.exception else None
 
     @property
     def parsed_uri(self):
@@ -109,8 +106,7 @@ class HttpRequest:
 
         @rtype: int
         """
-        if not self.exception:
-            return self.data.status_code
+        return self.data.status_code if not self.exception else None
 
     @property
     def header_encoding(self):
@@ -146,15 +142,15 @@ class HttpRequest:
                 charset = 'latin1'
             else:
                 charset = self.charset
+            lookup = codecs.lookup(charset) if charset else None
             if (self.header_encoding
-                and codecs.lookup(
-                    self.header_encoding) != (
-                        codecs.lookup(charset) if charset else None)):
+                and (lookup is None
+                     or codecs.lookup(self.header_encoding) != lookup)):
                 if charset:
                     pywikibot.warning(
-                        'Encoding "{0}" requested but "{1}" '
-                        'received in the header.'.format(
-                            charset, self.header_encoding))
+                        'Encoding "{}" requested but "{}" '
+                        'received in the header.'
+                        .format(charset, self.header_encoding))
                 try:
                     # TODO: Buffer decoded content, weakref does remove it too
                     #       early (directly after this method)
