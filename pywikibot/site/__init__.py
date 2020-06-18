@@ -5193,7 +5193,8 @@ class APISite(BaseSite):
                 'ususers': usernames, 'usprop': usprop})
         return usgen
 
-    @deprecated('Site.randompages(total=1)', since='20130828')
+    @deprecated('Site.randompages(total=1)', since='20130828',
+                future_warning=True)
     def randompage(self, redirect=False):
         """
         DEPRECATED.
@@ -5203,7 +5204,8 @@ class APISite(BaseSite):
         """
         return self.randompages(total=1, redirects=redirect)
 
-    @deprecated('Site.randompages(total=1, redirects=True)', since='20130828')
+    @deprecated('Site.randompages(total=1, redirects=True)', since='20130828',
+                future_warning=True)
     def randomredirectpage(self):
         """
         DEPRECATED: Use Site.randompages() instead.

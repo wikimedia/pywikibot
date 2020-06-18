@@ -322,7 +322,7 @@ class UploadRobot(BaseBot):
                     continue
             else:
                 try:
-                    if potential_file_page.fileIsShared():
+                    if potential_file_page.file_is_shared():
                         pywikibot.output(
                             'File with name %s already exists in shared '
                             'repository and cannot be overwritten.' % filename)

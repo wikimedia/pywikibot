@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,7 +21,7 @@ from tests.aspects import unittest, TestCase, DeprecationTestCase
 
 class TestShareFiles(TestCase):
 
-    """Test fileIsShared, exists and fileUrl/get_file_url with shared files."""
+    """Test file_is_shared, exists, fileUrl/get_file_url with shared files."""
 
     sites = {
         'enwiki': {
@@ -55,7 +55,7 @@ class TestShareFiles(TestCase):
         self.assertEqual(itwp_file.fileUrl(), itwp_file.get_file_url())
 
     def testSharedOnly(self):
-        """Test fileIsShared() on file page with shared file only."""
+        """Test file_is_shared() on file page with shared file only."""
         title = 'File:Sepp Maier 1.JPG'
 
         commons = self.get_site('commons')
@@ -69,8 +69,8 @@ class TestShareFiles(TestCase):
         self.assertFalse(itwp_file.exists())
         self.assertTrue(commons_file.exists())
 
-        self.assertTrue(itwp_file.fileIsShared())
-        self.assertTrue(commons_file.fileIsShared())
+        self.assertTrue(itwp_file.file_is_shared())
+        self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.get_file_url())
 
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
@@ -80,7 +80,7 @@ class TestShareFiles(TestCase):
             itwp_file.get()
 
     def testLocalOnly(self):
-        """Test fileIsShared() on file page with local file only."""
+        """Test file_is_shared() on file page with local file only."""
         title = 'File:Untitled (Three Forms), stainless steel sculpture by ' \
                 '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
 
@@ -96,14 +96,14 @@ class TestShareFiles(TestCase):
         self.assertTrue(enwp_file.exists())
         self.assertFalse(commons_file.exists())
 
-        self.assertFalse(enwp_file.fileIsShared())
+        self.assertFalse(enwp_file.file_is_shared())
 
         page_doesnt_exist_exc_regex = re.escape(
             "Page [[commons:{}]] doesn't exist.".format(title))
         with self.assertRaisesRegex(
                 pywikibot.NoPage,
                 page_doesnt_exist_exc_regex):
-            commons_file.fileIsShared()
+            commons_file.file_is_shared()
 
         with self.assertRaisesRegex(
                 pywikibot.NoPage,
@@ -116,7 +116,7 @@ class TestShareFiles(TestCase):
             commons_file.get()
 
     def testOnBoth(self):
-        """Test fileIsShared() on file page with local and shared file."""
+        """Test file_is_shared() on file page with local and shared file."""
         title = 'File:Pulsante spam.png'
 
         commons = self.get_site('commons')
@@ -131,8 +131,8 @@ class TestShareFiles(TestCase):
         self.assertTrue(itwp_file.exists())
         self.assertTrue(commons_file.exists())
 
-        self.assertFalse(itwp_file.fileIsShared())
-        self.assertTrue(commons_file.fileIsShared())
+        self.assertFalse(itwp_file.file_is_shared())
+        self.assertTrue(commons_file.file_is_shared())
 
     def testNonFileLocal(self):
         """Test file page, without local file, existing on the local wiki."""
@@ -144,7 +144,7 @@ class TestShareFiles(TestCase):
 
         self.assertTrue(testwp_file.latest_file_info.url)
         self.assertTrue(testwp_file.exists())
-        self.assertTrue(testwp_file.fileIsShared())
+        self.assertTrue(testwp_file.file_is_shared())
 
         commons_file = pywikibot.FilePage(commons, title)
         self.assertEqual(testwp_file.get_file_url(),

@@ -12,7 +12,7 @@ Parameters:
                 If not used, all pages are used.
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,9 +64,9 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
 
     def treat(self, image):
         """Process one image page."""
-        # Use fileUrl() and fileIsShared() to confirm it is local media
+        # Use fileUrl() and file_is_shared() to confirm it is local media
         # rather than a local page with the same name as shared media.
-        if (image.fileUrl() and not image.fileIsShared()
+        if (image.fileUrl() and not image.file_is_shared()
                 and 'http://' not in image.text):
             if self.template_image in image.text:
                 pywikibot.output('{0} done already'
