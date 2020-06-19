@@ -121,6 +121,7 @@ class Throttle(object):
                                           'site': this_site})
                     if not pid and this_pid >= my_pid:
                         my_pid = this_pid + 1  # next unused process id
+            finally:
                 f.close()
 
             if not pid:
@@ -131,13 +132,12 @@ class Throttle(object):
                               'site': mysite})
             processes.sort(key=lambda p: (p['pid'], p['site']))
             try:
-                f = open(self.ctrlfilename, 'w')
-                for p in processes:
-                    f.write('%(pid)s %(time)s %(site)s\n' % p)
+                with open(self.ctrlfilename, 'w') as f:
+                    for p in processes:
+                        f.write('{pid} {time} {site}\n'.format(**p))
             except IOError:
                 pass
-            else:
-                f.close()
+
             self.process_multiplicity = count
             pywikibot.log(
                 'Found {0} {1} processes running, including this one.'.format(
