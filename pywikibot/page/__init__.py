@@ -295,7 +295,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self._pageid
 
     @deprecated_args(
-        decode=None, savetitle='as_url', withNamespace='with_ns',
+        decode=True, savetitle='as_url', withNamespace='with_ns',
         withSection='with_section', forceInterwiki='force_interwiki',
         asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
     def title(self, underscore=False, with_ns=True,
