@@ -346,7 +346,7 @@ def processPhoto(flickr, photo_id='', flickrreview=False, reviewer='',
                                   use_filename=newFilename,
                                   keep_filename=True,
                                   verify_description=False)
-                bot.upload_image(debug=False)
+                bot.upload_file()
                 return 1
     else:
         pywikibot.output('Invalid license')
