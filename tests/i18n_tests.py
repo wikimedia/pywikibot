@@ -9,30 +9,166 @@ from contextlib import suppress
 
 import pywikibot
 
-from pywikibot import i18n, bot, plural
+from pywikibot import bot, i18n, plural
 
 from tests.aspects import (
-    unittest, TestCase, DefaultSiteTestCase, PwbTestCase,
     AutoDeprecationTestCase,
+    DefaultSiteTestCase,
+    PwbTestCase,
+    TestCase,
+    unittest,
 )
+
+
+class Site:
+
+    """An object holding code and family, duck typing a pywikibot Site."""
+
+    class Family:
+
+        """Nested class to hold the family name attribute."""
+
+        pass
+
+    def __init__(self, code, family='wikipedia'):
+        """Initializer."""
+        self.code = code
+        self.family = self.Family()
+        setattr(self.family, 'name', family)
+
+    def __repr__(self):
+        return "'{site.family.name}:{site.code}'".format(site=self)
 
 
 class TestTranslate(TestCase):
 
-    """Test translate method."""
+    """Test translate method with fallback True."""
 
     net = False
 
-    def setUp(self):
-        """Set up test method."""
-        self.msg_localized = {'en': 'test-localized EN',
-                              'nl': 'test-localized NL',
-                              'fy': 'test-localized FY'}
-        self.msg_semi_localized = {'en': 'test-semi-localized EN',
-                                   'nl': 'test-semi-localized NL'}
-        self.msg_non_localized = {'en': 'test-non-localized EN'}
-        self.msg_no_english = {'ja': 'test-no-english JA'}
-        super().setUp()
+    xdict = {
+        'en': 'test-localized EN',
+        'commons': 'test-localized COMMONS',
+        'wikipedia': {
+            'nl': 'test-localized WP-NL',
+            'fy': 'test-localized WP-FY',
+            'wikipedia': {  # test a deeply nested xdict
+                'de': 'test-localized WP-DE',
+            },
+        },
+        'wikisource': {
+            'en': 'test-localized WS-EN',
+            'fy': 'test-localized WS-FY',
+            'ja': 'test-localized WS-JA',
+        },
+    }
+
+    def test_translate_commons(self):
+        """Test localization with xdict for commons.
+
+        Test whether the localzation is found either with the Site object
+        or with the site code.
+        """
+        site = Site('commons', 'commons')
+        for code in (site, 'commons'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.xdict),
+                                 'test-localized COMMONS')
+
+    def test_translate_de(self):
+        """Test localization fallbacks for 'de' with xdict.
+
+        'de' key is defined in a nested 'wikipedia' sub dict. This should
+        always fall back to this nested 'wikipedia' entry.
+        """
+        site1 = Site('de', 'wikipedia')
+        site2 = Site('de', 'wikibooks')
+        site3 = Site('de', 'wikisource')
+        for code in (site1, site2, site3, 'de'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.xdict),
+                                 'test-localized WP-DE')
+
+    def test_translate_en(self):
+        """Test localization fallbacks for 'en' with xdict.
+
+        'en' key is defined directly in xdict. This topmost key goes over
+        site specific key. Therefore 'test-localized WS-EN' is not given
+        back.
+        """
+        site1 = Site('en', 'wikipedia')
+        site2 = Site('en', 'wikibooks')
+        site3 = Site('en', 'wikisource')
+        for code in (site1, site2, site3, 'en'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.xdict),
+                                 'test-localized EN')
+
+    def test_translate_fy(self):
+        """Test localization fallbacks for 'fy' with xdict.
+
+        'fy' key is defined in 'wikipedia' and  'wikisource' sub dicts.
+        They should have different localizations for these two families but
+        'wikisource' should have a fallback to the 'wikipedia' entry.
+
+        Note: If the translate code is given as string, the result depends
+        on the current config.family entry. Therefore there is no test with
+        the code given as string.
+        """
+        site1 = Site('fy', 'wikipedia')
+        site2 = Site('fy', 'wikibooks')
+        site3 = Site('fy', 'wikisource')
+        for code in (site1, site2):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.xdict),
+                                 'test-localized WP-FY')
+        self.assertEqual(i18n.translate(site3, self.xdict),
+                         'test-localized WS-FY')
+
+    def test_translate_nl(self):
+        """Test localization fallbacks for 'nl' with xdict.
+
+        'nl' key is defined in 'wikipedia' sub dict. Therefore all
+        localizations have a fallback to the 'wikipedia' entry.
+        """
+        site1 = Site('nl', 'wikipedia')
+        site2 = Site('nl', 'wikibooks')
+        site3 = Site('nl', 'wikisource')
+        for code in (site1, site2, site3, 'nl'):
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.xdict),
+                                 'test-localized WP-NL')
+
+    def test_translate_ja(self):
+        """Test localization fallbacks for 'ja' with xdict.
+
+        'ja' key is defined in 'wkisource' sub dict only. Therefore there
+        is no fallback to the 'wikipedia' entry and the localization result
+        is None.
+        """
+        site1 = Site('ja', 'wikipedia')
+        site2 = Site('ja', 'wikibooks')
+        site3 = Site('ja', 'wikisource')
+        for code in (site1, site2):
+            with self.subTest(code=code):
+                self.assertIsNone(i18n.translate(code, self.xdict))
+        self.assertEqual(i18n.translate(site3, self.xdict),
+                         'test-localized WS-JA')
+
+
+class TestFallbackTranslate(TestCase):
+
+    """Test translate method with fallback True."""
+
+    net = False
+
+    msg_localized = {'en': 'test-localized EN',
+                     'nl': 'test-localized NL',
+                     'fy': 'test-localized FY'}
+    msg_semi_localized = {'en': 'test-semi-localized EN',
+                          'nl': 'test-semi-localized NL'}
+    msg_non_localized = {'en': 'test-non-localized EN'}
+    msg_no_english = {'ja': 'test-no-english JA'}
 
     def test_localized(self):
         """Test fully localized translations."""
