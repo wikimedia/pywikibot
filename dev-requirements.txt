@@ -1,7 +1,7 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
-pytest < 4.1 ; python_version < '3'
-pytest-cov < 2.6 ; python_version < '3'
+pytest < 5 ; python_version < '3'
+pytest-cov >= 2.6.1 ; python_version < '3'
 pytest < 5 ; python_version == '3.4'
 pytest-cov >= 2.6.1, < 2.9 ; python_version == '3.4'
 pytest ; python_version >= '3.5'
