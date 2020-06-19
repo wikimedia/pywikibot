@@ -272,6 +272,7 @@ netext = {
         'zh': '{{subst:welcome}} %s',
     },
     'wikiquote': {
+        'ar': '{{subst:ترحيب}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikisource': {
