@@ -666,6 +666,10 @@ class DataBodyParameterTestCase(HttpbinTestCase):
 
     def test_fetch(self):
         """Test that using the data and body params produce same results."""
+        tracker = (
+            'X-Amzn-Trace-Id', 'X-B3-Parentspanid', 'X-B3-Spanid',
+            'X-B3-Traceid', 'X-Forwarded-Client-Cert',
+        )
         r_data_request = http.fetch(uri=self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
@@ -676,9 +680,10 @@ class DataBodyParameterTestCase(HttpbinTestCase):
         r_data = json.loads(r_data_request.text)
         r_body = json.loads(r_body_request.text)
 
-        # remove X-Amzn-Trace-Id if present (T243662)
-        r_data['headers'].pop('X-Amzn-Trace-Id', None)
-        r_body['headers'].pop('X-Amzn-Trace-Id', None)
+        # remove tracker ids if present (T243662, T255862)
+        for tracker_id in tracker:
+            r_data['headers'].pop(tracker_id, None)
+            r_body['headers'].pop(tracker_id, None)
 
         self.assertDictEqual(r_data, r_body)
 
