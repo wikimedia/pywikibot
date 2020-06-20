@@ -196,7 +196,8 @@ locale.setlocale(locale.LC_ALL, '')
 # FIXME: Not all language/project combinations have been defined yet.
 #        Add the following strings to customise for a language:
 #        logbook, netext, report_page, bad_pag, report_text, random_sign,
-#        whitelist_pg, final_new_text_additions, logpage_header
+#        whitelist_pg, final_new_text_additions, logpage_header if
+#        different from wikipedia entry
 
 ############################################################################
 
@@ -263,42 +264,30 @@ netext = {
         'zh-yue': '{{歡迎}}--%s',
     },
     'wikibooks': {
-        'ar': '{{subst:ترحيب}} %s',
-        'bs': '{{Dobrodošlica}} %s',
         'es': '{{subst:bienivenido usuario}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikinews': {
-        'ar': '{{subst:ترحيب}} %s',
-        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{خوشامد۲|%s}}',
         'it': '{{subst:benvenuto}}',
         'zh': '{{subst:welcome}} %s',
     },
     'wikiquote': {
-        'ar': '{{subst:ترحيب}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikisource': {
-        'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
-        'bs': '{{Dobrodošlica}} %s',
-        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
         'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
-        'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম|%s}}',
-        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{جا:خوشامد|%s}}',
-        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'it': '{{subst:Utente:Filnik/Benve|firma=%s}}',
         'ml': '{{subst:സ്വാഗതം}}',
         'ur': '{{جا:خوش آمدید}}%s',
     },
     'wikiversity': {
-        'ar': '{{subst:ترحيب}} %s',
         'de': '{{subst:Willkommen|%s}}',
         'el': '{{subst:καλωσόρισμα}} %s',
         'en': '{{subst:Welcome}}\n\n{{subst:Talktome}} %s',
