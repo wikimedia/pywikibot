@@ -57,7 +57,7 @@ from pywikibot.tools import (
 from pywikibot.tools import is_IP
 
 if not PY2:
-    from html import entities as htmlentitydefs
+    from html.entities import name2codepoint
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 else:
     if __debug__ and not PY2:
@@ -65,7 +65,7 @@ else:
 
     chr = unichr
 
-    import htmlentitydefs
+    from htmlentitydefs import name2codepoint
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 
@@ -6842,11 +6842,7 @@ def html2unicode(text, ignore=None, exceptions=None):
             unicode_codepoint = int(match.group('hex'), 16)
         elif match.group('name'):
             name = match.group('name')
-            if name in htmlentitydefs.name2codepoint:
-                # We found a known HTML entity.
-                unicode_codepoint = htmlentitydefs.name2codepoint[name]
-            else:
-                unicode_codepoint = False
+            unicode_codepoint = name2codepoint.get(name, False)
 
         unicode_codepoint = _ILLEGAL_HTML_ENTITIES_MAPPING.get(
             unicode_codepoint, unicode_codepoint)
