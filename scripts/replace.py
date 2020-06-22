@@ -162,14 +162,8 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    PY2,
     UnicodeType
 )
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue
 
 
 # This is required for the text that is shown when you run this script
@@ -578,8 +572,6 @@ class ReplaceRobot(SingleSiteBot):
         if self.addcat and isinstance(self.addcat, UnicodeType):
             self.addcat = pywikibot.Category(self.site, self.addcat)
 
-        self._pending_processed_titles = Queue()
-
     def isTitleExcepted(self, title, exceptions=None):
         """
         Return True iff one of the exceptions applies for the given title.
@@ -665,26 +657,6 @@ class ReplaceRobot(SingleSiteBot):
             warnings.simplefilter('ignore', DeprecationWarning)
             new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
-
-    def _log_changes(self, page, err):
-        """Log changed titles for display."""
-        # This is an async put callback
-        if not isinstance(err, Exception):
-            self._pending_processed_titles.put((page.title(
-                as_link=True), True))
-        else:  # unsuccessful pages
-            self._pending_processed_titles.put((page.title(as_link=True),
-                                                False))
-
-    def _replace_async_callback(self, page, err):
-        """Callback for asynchronous page edit."""
-        self._log_changes(page, err)
-
-    def _replace_sync_callback(self, page, err):
-        """Callback for synchronous page edit."""
-        self._log_changes(page, err)
-        if isinstance(err, Exception):
-            raise err
 
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
@@ -803,28 +775,14 @@ class ReplaceRobot(SingleSiteBot):
                 self.options['always'] = True
             if choice == 'y':
                 self.save(page, original_text, new_text, applied,
-                          show_diff=False, quiet=True,
-                          callback=self._replace_async_callback,
-                          asynchronous=True)
-            while not self._pending_processed_titles.empty():
-                proc_title, res = self._pending_processed_titles.get()
-                pywikibot.output('Page {0}{1} saved'
-                                 .format(proc_title,
-                                         '' if res else ' not'))
+                          show_diff=False, asynchronous=True)
+
             # choice must be 'N'
             break
 
         if self.getOption('always') and new_text != original_text:
             self.save(page, original_text, new_text, applied,
-                      show_diff=False, quiet=True,
-                      callback=self._replace_sync_callback,
-                      asynchronous=False)
-            if self._pending_processed_titles.qsize() > 50:
-                while not self._pending_processed_titles.empty():
-                    proc_title, res = self._pending_processed_titles.get()
-                    pywikibot.output('Page {0}{1} saved'
-                                     .format(proc_title,
-                                             '' if res else ' not'))
+                      show_diff=False, quiet=True, asynchronous=False)
 
     def save(self, page, oldtext, newtext, applied, **kwargs):
         """Save the given page."""
@@ -1151,19 +1109,13 @@ LIMIT 200""" % (whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
 
     gen = genFactory.getCombinedGenerator(gen, preload=True)
-
-    if not gen:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    if pywikibot.bot.suggest_help(missing_generator=not gen):
         return
 
     bot = ReplaceRobot(gen, replacements, exceptions, site=site,
                        summary=edit_summary, **options)
     site.login()
     bot.run()
-
-    # Explicitly call pywikibot.stopme(). It will make sure the callback is
-    # triggered before replace.py is unloaded.
-    pywikibot.stopme()
 
 
 if __name__ == '__main__':
