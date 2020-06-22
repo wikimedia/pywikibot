@@ -51,6 +51,7 @@ colors = [
 
 _color_pat = '%s|previous' % '|'.join(colors)
 colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
+input_lock = threading.Lock()
 
 if __debug__ and not PY2:
     raw_input = NotImplemented  # pyflakes workaround
@@ -78,6 +79,8 @@ class UI(object):
 
         self.stderr = sys.stderr
         self.stdout = sys.stdout
+        self.output_cache = []
+        self._force_to_stream = False
 
     def init_handlers(self, root_logger, default_stream='stderr'):
         """Initialize the handlers for user output.
@@ -188,7 +191,31 @@ class UI(object):
                 # set the new color, but only if they change
                 self.encounter_color(color_stack[-1], target_stream)
 
+    def cache_output(self, *args, **kwargs):
+        """Put text into cache."""
+        self.output_cache.append((args, kwargs))
+
+    def flush_output_cache(self):
+        """Output cached text."""
+        while self.output_cache:
+            args, kwargs = self.output_cache.pop(0)
+            self.stream_output(*args, **kwargs)
+
     def output(self, text, toStdout=False, targetStream=None):
+        """
+        Forward text to a cache or a stream output.
+
+        All input methods locks the output to a stream but collect them in
+        output_cache. They will be printed when input methods are finished.
+        """
+        if input_lock.locked() and not self._force_to_stream:
+            self.cache_output(text, toStdout=toStdout,
+                              targetStream=targetStream)
+        else:
+            self.stream_output(text, toStdout=toStdout,
+                               targetStream=targetStream)
+
+    def stream_output(self, text, toStdout=False, targetStream=None):
         """
         Output text to a stream.
 
@@ -246,6 +273,19 @@ class UI(object):
 
         self._print(text, targetStream)
 
+    def force_to_stream(self, output_func):
+        """
+        Force output to stream_output.
+
+        pywikibot.output will forced to stream_output and not to cache_output
+        whenn passed through this function.
+        @param output_func: an output function calling pywikibot.output
+        @type output_func: function
+        """
+        self._force_to_stream = True
+        output_func()
+        self._force_to_stream = False
+
     def _raw_input(self):
         if not PY2:
             return input()
@@ -285,20 +325,28 @@ class UI(object):
             question = question + ' (default: %s)' % default
         question = question + end_marker
         if force:
-            self.output(question + '\n')
+            self.stream_output(question + '\n')
             return default
         # sound the terminal bell to notify the user
         if config.ring_bell:
             sys.stdout.write('\07')
-        # TODO: make sure this is logged as well
-        while True:
-            self.output(question + ' ')
-            text = self._input_reraise_cntl_c(password)
-            if text:
-                return text
+        nested = input_lock.locked()
+        if not nested:
+            input_lock.acquire()
+        try:
+            # TODO: make sure this is logged as well
+            while True:
+                self.stream_output(question + ' ')
+                text = self._input_reraise_cntl_c(password)
+                if text:
+                    return text
 
-            if default is not None:
-                return default
+                if default is not None:
+                    return default
+        finally:
+            if not nested:
+                self.flush_output_cache()
+                input_lock.release()
 
     def _input_reraise_cntl_c(self, password):
         """Input and decode, and re-raise Control-C."""
@@ -372,30 +420,39 @@ class UI(object):
             # TODO: Test for uniquity
 
         handled = False
-        while not handled:
-            for option in options:
-                if isinstance(option, OutputOption) and option.before_question:
-                    option.output()
-            output = Option.formatted(question, options, default)
-            if force:
-                self.output(output + '\n')
-                answer = default
-            else:
-                answer = self.input(output) or default
-            # something entered or default is defined
-            if answer:
-                for index, option in enumerate(options):
-                    if option.handled(answer):
-                        answer = option.result(answer)
-                        handled = option.stop
-                        break
-
-        if isinstance(answer, ChoiceException):
-            raise answer
-        elif not return_shortcut:
-            return index
+        if input_lock.locked():
+            raise RuntimeError("input_choice call can't be nested")
         else:
-            return answer
+            input_lock.acquire()
+        try:
+            while not handled:
+                for option in options:
+                    if isinstance(option, OutputOption) \
+                       and option.before_question:
+                        self.force_to_stream(option.output)
+                output = Option.formatted(question, options, default)
+                if force:
+                    self.stream_output(output + '\n')
+                    answer = default
+                else:
+                    answer = self.input(output) or default
+                # something entered or default is defined
+                if answer:
+                    for index, option in enumerate(options):
+                        if option.handled(answer):
+                            answer = option.result(answer)
+                            handled = option.stop
+                            break
+
+            if isinstance(answer, ChoiceException):
+                raise answer
+            elif not return_shortcut:
+                return index
+            else:
+                return answer
+        finally:
+            self.flush_output_cache()
+            input_lock.release()
 
     @deprecated('input_choice', since='20140825')
     def inputChoice(self, question, options, hotkeys, default=None):
@@ -423,21 +480,29 @@ class UI(object):
         for n, i in enumerate(clist):
             pywikibot.output(line_template.format(n + 1, i))
 
-        while True:
-            choice = self.input(message, default=default, force=force)
-            try:
-                choice = int(choice) - 1
-            except ValueError:
+        if input_lock.locked():
+            raise RuntimeError("input_list_choice call can't be nested")
+        else:
+            input_lock.acquire()
+        try:
+            while True:
+                choice = self.input(message, default=default, force=force)
                 try:
-                    choice = clist.index(choice)
-                except IndexError:
-                    choice = -1
+                    choice = int(choice) - 1
+                except ValueError:
+                    try:
+                        choice = clist.index(choice)
+                    except IndexError:
+                        choice = -1
 
-            # User typed choice number
-            if 0 <= choice < len(clist):
-                return clist[choice]
-            else:
-                pywikibot.error('Invalid response')
+                # User typed choice number
+                if 0 <= choice < len(clist):
+                    return clist[choice]
+                else:
+                    pywikibot.error('Invalid response')
+        finally:
+            self.flush_output_cache()
+            input_lock.release()
 
     def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.
