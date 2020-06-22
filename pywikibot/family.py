@@ -36,9 +36,10 @@ else:
 logger = logging.getLogger('pywiki.wiki.family')
 
 # Legal characters for Family.name and Family.langs keys
-# nds_nl code alias requires "_"
 NAME_CHARACTERS = string.ascii_letters + string.digits
-CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-_'
+# nds_nl code alias requires "_"n
+# dash must be the last char to be reused as regex in update_linktrails
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
 class Family(object):
@@ -164,11 +165,11 @@ class Family(object):
     fyinterwiki.sort(key=lambda x:
                      x.replace('y', 'i') + x.count('y') * '!')
 
-    # letters that can follow a wikilink and are regarded as part of
-    # this link
-    # This depends on the linktrail setting in LanguageXx.php and on
-    # [[MediaWiki:Linktrail]].
-    # Note: this is a regular expression.
+    # Letters that can follow a wikilink and are regarded as part of
+    # this link. This depends on the linktrail setting in LanguageXx.php
+    #
+    # Do not use this dict directly but Site.linktrail or Family.linktrail
+    # methods instead
     linktrails = {
         '_default': '[a-z]*',
         'ab': '[a-zабвгҕдежзӡикқҟлмнопҧрстҭуфхҳцҵчҷҽҿшыҩџьә]*',
@@ -183,6 +184,7 @@ class Family(object):
         'ay': '[a-záéíóúñ]*',
         'az': '[a-zçəğıöşü]*',
         'azb': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'ba': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяәөүғҡңҙҫһ“»]*',
         'bar': '[äöüßa-z]*',
         'bat-smg': '[a-ząčęėįšųūž]*',
         'be': '[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
@@ -201,20 +203,19 @@ class Family(object):
         'crh': '[a-zâçğıñöşüа-яёʺʹ“»]*',
         'cs': '[a-záčďéěíňóřšťúůýž]*',
         'csb': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
-        'cu': ('[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчшщъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђё'
-               'јйљњќуўџэ҄я“»]*'),
+        'cu': '[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчш'
+              'щъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђёјйљњќуўџэ҄я“»]*',
         'cv': '[a-zа-яĕçăӳ"»]*',
         'cy': '[àáâèéêìíîïòóôûŵŷa-z]*',
         'da': '[a-zæøå]*',
         'de': '[äöüßa-z]*',
         'din': '[äëɛɛ̈éɣïŋöɔɔ̈óa-z]*',
         'dsb': '[äöüßa-z]*',
-        'el': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέή'
-               'ίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
+        'el': '[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘ'
+              'ΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*',
         'eml': '[a-zàéèíîìóòúù]*',
         'es': '[a-záéíóúñ]*',
         'et': '[äöõšüža-z]*',
-        'eu': '[a-záéíóúñ]*',
         'ext': '[a-záéíóúñ]*',
         'fa': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
         'ff': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
@@ -227,6 +228,7 @@ class Family(object):
         'fur': '[a-zàéèíîìóòúù]*',
         'fy': '[a-zàáèéìíòóùúâêîôûäëïöü]*',
         'gag': '[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
+        'gan': '',
         'gcr': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'gl': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
         'glk': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
@@ -240,14 +242,15 @@ class Family(object):
         'hu': '[a-záéíóúöüőűÁÉÍÓÚÖÜŐŰ]*',
         'hy': '[a-zաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև«»]*',
         'hyw': '[a-zաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև«»]*',
+        'ii': '',
         'inh': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
         'is': '[áðéíóúýþæöa-z-–]*',
         'it': '[a-zàéèíîìóòúù]*',
         'ka': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
         'kab': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'kbp': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-        'kk': ('[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһ'
-               'ٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*'),
+        'kk': '[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһٴ'
+              'ابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*',
         'kl': '[a-zæøå]*',
         'koi': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
         'krc': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -290,15 +293,16 @@ class Family(object):
         'oc': '[a-zàâçéèêîôû]*',
         'olo': '[a-zčČšŠžŽäÄöÖ]*',
         'or': '[a-z଀-୿]*',
-        'pa': ('[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾ'
-               'ਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*'),
+        'os': '[a-zаæбвгдеёжзийклмнопрстуфхцчшщъыьэюя“»]*',
+        'pa': '[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮ'
+              'ਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*',
         'pcd': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'pdc': '[äöüßa-z]*',
         'pfl': '[äöüßa-z]*',
         'pl': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
         'pms': '[a-zàéèíîìóòúù]*',
-        'pnt': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ'
-                'άέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
+        'pnt': '[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘ'
+               'ΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*',
         'pt': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
         'qu': '[a-záéíóúñ]*',
         'rmy': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
@@ -310,16 +314,18 @@ class Family(object):
         'sa': '[a-zऀ-ॣ०-꣠-ꣿ]*',
         'sah': '[a-zабвгҕдеёжзийклмнҥоөпрсһтуүфхцчшщъыьэюя]*',
         'scn': '[a-zàéèíîìóòúù]*',
+        'se': '[a-zàáâçčʒǯđðéèêëǧǥȟíìîïıǩŋñóòôõßšŧúùûýÿüžþæøåäö]*',
         'sg': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'sh': '[a-zčćđžš]*',
         'sk': '[a-záäčďéíľĺňóôŕšťúýž]*',
         'sl': '[a-zčćđžš]*',
-        'sr': ('[abvgdđežzijklljmnnjoprstćufhcčdžšабвгдђежзијклљмнњопрстћу'
-               'фхцчџш]*'),
+        'sr': '[abvgdđežzijklljmnnjoprstćufhcčdž'
+              'šабвгдђежзијклљмнњопрстћуфхцчџш]*',
         'srn': '[a-zäöüïëéèà]*',
         'stq': '[äöüßa-z]*',
         'sv': '[a-zåäöéÅÄÖÉ]*',
         'szl': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
+        'szy': '',
         'ta': '[஀-௿]*',
         'te': '[ఁ-౯]*',
         'tet': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
@@ -339,10 +345,13 @@ class Family(object):
         'vls': '[a-zäöüïëéèà]*',
         'wa': '[a-zåâêîôûçéè]*',
         'wo': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'wuu': '',
         'xal': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
         'xmf': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
         'yi': '[a-zא-ת]*',
+        'za': '',
         'zea': '[a-zäöüïëéèà]*',
+        'zh': '',
     }
 
     # A dictionary where keys are family codes that can be used in
@@ -1056,11 +1065,6 @@ class Family(object):
         """Return regex for trailing chars displayed as part of a link.
 
         Returns a string, not a compiled regular expression object.
-
-        This reads from the family file, and **not** from
-        [[MediaWiki:Linktrail]], because the MW software currently uses a
-        built-in linktrail from its message files and ignores the wiki
-        value.
         """
         if code in self.linktrails:
             return self.linktrails[code]
