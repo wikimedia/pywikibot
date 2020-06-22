@@ -210,6 +210,8 @@ GLOBAL OPTIONS
 -simulate         Disables writing to the server. Useful for testing and
                   debugging of new code (if given, doesn't do any real
                   changes, but only shows what would have been changed).
+                  An integer or float value may be given to simulate a
+                  processing time; the bot just waits for given seconds.
 
 -<config var>:n   You may use all given numeric config variables as option and
                   modify it with command line.
@@ -839,7 +841,7 @@ def handle_args(args=None, do_help=True):
             output('NOTE: option cosmetic_changes is %s\n'
                    % config.cosmetic_changes)
         elif option == '-simulate':
-            config.simulate = True
+            config.simulate = value or True
         #
         #  DEBUG control:
         #

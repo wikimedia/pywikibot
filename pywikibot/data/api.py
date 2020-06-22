@@ -1592,6 +1592,9 @@ class Request(MutableMapping):
             pywikibot.output(color_format(
                 '{lightyellow}SIMULATION: {0} action blocked.{default}',
                 action))
+            # for more realistic simulation
+            if config.simulate is not True:
+                pywikibot.sleep(float(config.simulate))
             return {action: {'result': 'Success', 'nochange': ''}}
 
     def _is_wikibase_error_retryable(self, error):
