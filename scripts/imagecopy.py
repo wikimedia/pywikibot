@@ -56,16 +56,8 @@ deletion):
 
 By default the bot works on your home wiki (set in user-config)
 """
-# Based on upload.py by:
-# (C) Rob W.W. Hooft, Andre Engels 2003-2007
-# (C) Wikipedian, Keichwa, Leogregianin, Rikwade, Misza13 2003-2007
 #
-# New bot by:
-# (C) Kyle/Orgullomoore, Siebrand Mazeland 2007-2008
-#
-# Another rewrite by:
-# (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -289,9 +281,9 @@ class imageTransfer(threading.Thread):
             CH += '[[Category:' + self.category + ']]'
 
         bot = UploadRobot(url=self.imagePage.fileUrl(), description=CH,
-                          useFilename=self.newname, keepFilename=True,
-                          verifyDescription=False, ignoreWarning=True,
-                          targetSite=self.image_repo)
+                          use_filename=self.newname, keep_filename=True,
+                          verify_description=False, ignore_warning=True,
+                          target_site=self.image_repo)
         bot.run()
 
         # Should check if the image actually was uploaded

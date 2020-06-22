@@ -21,7 +21,6 @@ Command line options:
    -main       only check pages in the main namespace, not in the talk,
                wikipedia, user, etc. namespaces.
 """
-# (C) Daniel Herding, 2007
 # (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.

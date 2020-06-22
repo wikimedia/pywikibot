@@ -105,8 +105,7 @@ Loads all wiki pages where dead links were found during a prior run:
     python pwb.py weblinkchecker -repeat
 """
 #
-# (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -847,9 +846,9 @@ class DeadLinkReportThread(threading.Thread):
                                          'weblinkchecker-summary'))
                     try:
                         talkPage.put(content, comment)
-                    except pywikibot.SpamfilterError as error:
+                    except pywikibot.SpamblacklistError as error:
                         pywikibot.output(color_format(
-                            '{lightaqua}** SpamfilterError while trying to '
+                            '{lightaqua}** SpamblacklistError while trying to '
                             'change {0}: {1}{default}',
                             talkPage.title(as_link=True), error.url))
 

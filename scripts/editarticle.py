@@ -24,7 +24,6 @@ The following parameters are supported:
 --watch
 """
 #
-# (C) Gerrit Holl, 2004
 # (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.

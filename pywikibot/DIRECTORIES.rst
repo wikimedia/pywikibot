@@ -16,6 +16,8 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     |  pywikibot/site           | Module with classes for MediaWiki sites              |
     +---------------------------+------------------------------------------------------+
+    |  pywikibot/specialbots    | Module containing special bots reusable by scripts   |
+    +---------------------------+------------------------------------------------------+
     |  pywikibot/tools          | Miscellaneous helper functions (not wiki-dependent)  |
     +---------------------------+------------------------------------------------------+
     |  pywikibot/userinterfaces | GUI and terminal interface                           |

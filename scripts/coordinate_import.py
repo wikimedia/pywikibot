@@ -37,7 +37,6 @@ The following command line parameters are supported:
 &params;
 """
 #
-# (C) Multichill, 2014
 # (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of MIT License.

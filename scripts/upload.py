@@ -51,8 +51,7 @@ The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -214,10 +213,10 @@ def main(*args):
     else:
         url = [url]
 
-    bot = UploadRobot(url, description=description, useFilename=use_filename,
-                      keepFilename=keep_filename,
-                      verifyDescription=verify_description, aborts=aborts,
-                      ignoreWarning=ignorewarn, chunk_size=chunk_size,
+    bot = UploadRobot(url, description=description, use_filename=use_filename,
+                      keep_filename=keep_filename,
+                      verify_description=verify_description, aborts=aborts,
+                      ignore_warning=ignorewarn, chunk_size=chunk_size,
                       always=always, summary=summary,
                       filename_prefix=filename_prefix)
     bot.run()

@@ -41,9 +41,6 @@ Examples:
 
 """
 #
-# (C) Monobi a.k.a. Wikihermit, 2007
-# (C) Filnik, 2007-2011
-# (C) Nicolas Dumazet (NicDumZ), 2008-2009
 # (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
@@ -502,7 +499,7 @@ def save_page(page, text, comment):
             else:
                 # Prevent Infinite Loops
                 raise pywikibot.ServerError('Fifth Server Error!')
-        except pywikibot.SpamfilterError as e:
+        except pywikibot.SpamblacklistError as e:
             pywikibot.output('Cannot change %s because of '
                              'blacklist entry %s'
                              % (page.title(), e.url))

@@ -8,7 +8,7 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,7 +20,7 @@ from pywikibot import (
     Error,
     NoPage,
     LockedPage,
-    SpamfilterError,
+    SpamblacklistError,
     TitleblacklistError,
     OtherPageSaveError,
     NoCreateError,
@@ -54,7 +54,8 @@ class TestSaveFailure(TestCase):
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
         try:
-            self.assertRaisesRegex(SpamfilterError, 'badsite.com', page.save)
+            self.assertRaisesRegex(SpamblacklistError, 'badsite.com',
+                                   page.save)
         except OtherPageSaveError as e:
             self.skipTest(e)
 

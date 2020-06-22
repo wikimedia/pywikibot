@@ -20,10 +20,10 @@ Command line options:
 
 -subst       Resolves the template by putting its text directly into the
              article. This is done by changing {{...}} or {{msg:...}} into
-             {{subst:...}}.
-             Substitution is not available inside <ref>...</ref>,
-             <gallery>...</gallery>, <poem>...</poem> and <pagelist ... />
-             tags.
+             {{subst:...}}. If you want to use safesubst, you
+             can do -subst:safe. Substitution is not available inside
+             <ref>...</ref>, <gallery>...</gallery>, <poem>...</poem>
+             and <pagelist ... /> tags.
 
 -assubst     Replaces the first argument as old template with the second
              argument as new template but substitutes it like -subst does.
@@ -106,10 +106,7 @@ user talk pages (namespace #3):
 
 """
 #
-# (C) Daniel Herding, 2004
-# (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -122,8 +119,9 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, textlib, Bot
+from pywikibot import i18n, pagegenerators, textlib
 
+from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import deprecated, filter_unique
@@ -191,13 +189,13 @@ class TemplateRobot(ReplaceBot):
         @type templates: dict
         """
         self.availableOptions.update({
-            'subst': False,
+            'addcat': None,
             'remove': False,
+            'subst': False,
             'summary': None,
-            'addedCat': None,
         })
 
-        Bot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, generator=generator, **kwargs)
 
         self.templates = templates
 
@@ -229,8 +227,9 @@ class TemplateRobot(ReplaceBot):
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('subst'):
-                replacements.append((template_regex,
-                                     r'{{subst:%s\g<parameters>}}' % old))
+                replacements.append(
+                    (template_regex, r'{{%s:%s\g<parameters>}}' %
+                     (self.getOption('subst'), old)))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('remove'):
@@ -260,7 +259,7 @@ class TemplateRobot(ReplaceBot):
         super(TemplateRobot, self).__init__(
             generator, replacements, exceptions,
             always=self.getOption('always'),
-            addedCat=self.getOption('addedCat'),
+            addcat=self.getOption('addcat'),
             summary=self.getOption('summary'))
 
 
@@ -296,10 +295,12 @@ def main(*args):
     for arg in local_args:
         if arg == '-remove':
             options['remove'] = True
-        elif arg == '-subst':
-            options['subst'] = True
+        elif arg.startswith('-subst'):
+            options['subst'] = arg[len('-subst:'):] + 'subst'
+            assert options['subst'] in ('subst', 'safesubst')
         elif arg == '-assubst':
-            options['subst'] = options['remove'] = True
+            options['subst'] = 'subst'
+            options['remove'] = True
         elif arg == '-always':
             options['always'] = True
         elif arg.startswith('-xml'):
@@ -309,7 +310,7 @@ def main(*args):
             else:
                 xmlfilename = arg[5:]
         elif arg.startswith('-addcat:'):
-            options['addedCat'] = arg[len('-addcat:'):]
+            options['addcat'] = arg[len('-addcat:'):]
         elif arg.startswith('-summary:'):
             options['summary'] = arg[len('-summary:'):]
         elif arg.startswith('-onlyuser:'):
@@ -328,7 +329,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['templates'])
         return False
 
-    if options.get('subst', False) ^ options.get('remove', False):
+    if bool(options.get('subst', False)) ^ options.get('remove', False):
         for template_name in template_names:
             templates[template_name] = None
     else:

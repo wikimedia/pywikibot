@@ -13,6 +13,7 @@ Subpackages
     pywikibot.families
     pywikibot.page
     pywikibot.site
+    pywikibot.specialbots
     pywikibot.tools
     pywikibot.userinterfaces
 
@@ -128,11 +129,6 @@ pywikibot.site\_detect module
 -----------------------------
 
 .. automodule:: pywikibot.site_detect
-
-pywikibot.specialbots module
-----------------------------
-
-.. automodule:: pywikibot.specialbots
 
 pywikibot.textlib module
 ------------------------

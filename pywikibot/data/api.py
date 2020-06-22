@@ -1112,7 +1112,7 @@ class Request(MutableMapping):
     True
     >>> 'query' in data
     True
-    >>> sorted(str(key) for key in data[u'query'].keys())
+    >>> sorted(str(key) for key in data['query'].keys())
     ['namespaces', 'userinfo']
 
     """
@@ -1171,7 +1171,8 @@ class Request(MutableMapping):
         """
         if site is None:
             self.site = pywikibot.Site()
-            warn('Request() invoked without a site', RuntimeWarning, 2)
+            warn('Request() invoked without a site; setting to {}'
+                 .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
         if mime_params is not None:
@@ -1220,20 +1221,19 @@ class Request(MutableMapping):
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
         # mode
-        self.write = self.action in (
-            'edit', 'move', 'rollback', 'delete', 'undelete',
-            'protect', 'block', 'unblock', 'watch', 'patrol',
-            'import', 'userrights', 'upload', 'emailuser',
-            'createaccount', 'setnotificationtimestamp',
-            'filerevert', 'options', 'purge', 'revisiondelete',
-            'wbeditentity', 'wbsetlabel', 'wbsetdescription',
-            'wbsetaliases', 'wblinktitles', 'wbsetsitelink',
-            'wbcreateclaim', 'wbremoveclaims', 'wbsetclaimvalue',
-            'wbsetreference', 'wbremovereferences', 'wbsetclaim',
-            'wbcreateredirect', 'wbmergeitems', 'wbsetqualifier',
-            'wbremovequalifiers',
-            'thank', 'flowthank'
-        )
+        self.write = self.action in {
+            'block', 'clearhasmsg', 'createaccount', 'delete', 'edit',
+            'emailuser', 'filerevert', 'flowthank', 'imagerotate', 'import',
+            'managetags', 'mergehistory', 'move', 'options', 'patrol',
+            'protect', 'purge', 'resetpassword', 'revisiondelete', 'rollback',
+            'setnotificationtimestamp', 'setpagelanguage', 'tag', 'thank',
+            'unblock', 'undelete', 'upload', 'userrights', 'watch',
+            'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
+            'wblinktitles', 'wbmergeitems', 'wbremoveclaims',
+            'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
+            'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
+            'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
+        }
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
         if self.write:
@@ -1912,6 +1912,23 @@ class Request(MutableMapping):
         self.wait()
         return True
 
+    def _ratelimited(self):
+        """Handle ratelimited warning."""
+        ratelimits = self.site.userinfo['ratelimits']
+        delay = None
+
+        ratelimit = ratelimits.get(self.action, {})
+        # find the lowest wait time for the given action
+        for limit in ratelimit.values():
+            seconds = limit['seconds']
+            hits = limit['hits']
+            delay = min(delay or seconds, seconds / hits)
+
+        if not delay:
+            pywikibot.warning(
+                'No rate limit found for action {}'.format(self.action))
+        self.wait(delay)
+
     def _bad_token(self, code):
         """Check for bad token."""
         if (code != 'badtoken' or self.site._loginstatus
@@ -2047,6 +2064,10 @@ class Request(MutableMapping):
                 self.wait()
                 continue
 
+            if code == 'ratelimited':
+                self._ratelimited()
+                continue
+
             # If readapidenied is returned try to login
             if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
                 self.site.login()
@@ -2100,14 +2121,15 @@ class Request(MutableMapping):
 
         raise MaxlagTimeoutError(msg)
 
-    def wait(self):
+    def wait(self, delay=None):
         """Determine how long to wait after a failed request."""
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
-        pywikibot.warning('Waiting %s seconds before retrying.'
-                          % self.retry_wait)
-        pywikibot.sleep(self.retry_wait)
+        delay = delay or self.retry_wait
+        pywikibot.warning('Waiting {:.1f} seconds before retrying.'
+                          .format(delay))
+        pywikibot.sleep(delay)
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 

@@ -32,20 +32,7 @@ Use -nochecktemplate if you don't want to add the check template. Be sure to
 check it yourself.
 """
 #
-# Based on upload.py by:
-# (C) Rob W.W. Hooft, Andre Engels 2003-2007
-# (C) Wikipedian, Keichwa, Leogregianin, Rikwade, Misza13 2003-2007
-#
-# New bot by:
-# (C) Kyle/Orgullomoore, Siebrand Mazeland 2007
-#
-# Another rewrite by:
-# (C) Multichill 2008
-#
-# English Wikipedia specific bot by:
-# (C) Multichill 2010-2012
-#
-# (C) Pywikibot team, 2010-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -328,8 +315,8 @@ def supportedSite():
         informationTemplate,
         informationFields,
     ]
-    for l in lists:
-        if not l.get(lang):
+    for item in lists:
+        if not item.get(lang):
             return False
     return True
 
@@ -510,9 +497,6 @@ class imageFetcher(threading.Thread):
     def getNewFieldsFromFreetext(self, imagepage):
         """Extract fields from free text for the new information template."""
         text = imagepage.get()
-        # text = re.sub(u'== Summary ==', u'', text, re.IGNORECASE)
-        # text = re.sub(u'== Licensing ==', u'', text, re.IGNORECASE)
-        # text = re.sub('\{\{(self|self2)\|[^\}]+\}\}', '', text, re.I)
 
         for toRemove in sourceGarbage[imagepage.site.lang]:
             text = re.sub(toRemove, '', text, flags=re.IGNORECASE)
@@ -897,10 +881,10 @@ class uploader(threading.Thread):
         pywikibot.output(cid)
         bot = UploadRobot(url=fields.get('imagepage').fileUrl(),
                           description=cid,
-                          useFilename=fields.get('filename'),
-                          keepFilename=True, verifyDescription=False,
-                          ignoreWarning=True,
-                          targetSite=pywikibot.Site('commons', 'commons'))
+                          use_filename=fields.get('filename'),
+                          keep_filename=True, verify_description=False,
+                          ignore_warning=True,
+                          target_site=pywikibot.Site('commons', 'commons'))
         bot.run()
 
         self.tagNowcommons(fields.get('imagepage'), fields.get('filename'))

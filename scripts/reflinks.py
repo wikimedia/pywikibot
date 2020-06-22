@@ -38,7 +38,6 @@ The following generators and filters are supported:
 
 &params;
 """
-# (C) Nicolas Dumazet (NicDumZ), 2008
 # (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
@@ -461,8 +460,8 @@ class ReferencesRobot(Bot):
 
     def httpError(self, err_num, link, pagetitleaslink):
         """Log HTTP Error."""
-        pywikibot.stdout('HTTP error ({0}) for {1} on {2}'
-                         ''.format(err_num, link, pagetitleaslink))
+        pywikibot.stdout('HTTP error ({}) for {} on {}'
+                         .format(err_num, link, pagetitleaslink))
 
     def getPDFTitle(self, ref, f):
         """Use pdfinfo to retrieve title from a PDF.

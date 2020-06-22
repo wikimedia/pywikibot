@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -364,22 +364,57 @@ class TestNamespacesDictLookupName(TestCase):
 
     net = False
 
+    tests = {
+        4: ['project', 'PROJECT', 'Project', 'Project:'],
+        5: ['project talk', 'PROJECT TALK', 'Project talk', 'Project Talk:',
+            'project_talk', 'PROJECT_TALK', 'Project_talk', 'Project_Talk:'],
+    }
+
+    def setUp(self):
+        """Setup namespaces dict."""
+        super(TestNamespacesDictLookupName, self).setUp()
+        self.namespaces = builtin_NamespacesDict()
+
     def test_lookup_name(self):
-        """Test lookup_name."""
-        namespaces = builtin_NamespacesDict()
-        self.assertIs(namespaces.lookup_name('project'), namespaces[4])
-        self.assertIs(namespaces.lookup_name('PROJECT'), namespaces[4])
-        self.assertIs(namespaces.lookup_name('Project'), namespaces[4])
-        self.assertIs(namespaces.lookup_name('Project:'), namespaces[4])
+        """Test lookup_name and getitem."""
+        for ns_id, values in self.tests.items():
+            for name in values:
+                with self.subTest(name=name, ns_id=ns_id):
+                    # test lookup_name
+                    self.assertIs(self.namespaces.lookup_name(name),
+                                  self.namespaces[ns_id])
+                    # test __getitem__
+                    self.assertEqual(self.namespaces[name].id, ns_id)
+
+    def test_getattr(self):
+        """Test NamespacesDict.__getattr__."""
+        for ns_id, values in self.tests.items():
+            for name in values:
+                if name.endswith(':') or ' ' in name:
+                    continue  # no valid attribute but causes syntax error
+
+                with self.subTest(name=name, ns_id=ns_id):
+                    if name.isupper():
+                        result = eval('self.namespaces.{name}.id'
+                                      .format(name=name))
+                        self.assertEqual(result, ns_id)
+                    else:
+                        with self.assertRaises(AttributeError):
+                            exec('self.namespaces.{name}.id'
+                                 .format(name=name))
 
     def test_lookup_normalized_name(self):
         """Test lookup_normalized_name."""
-        namespaces = builtin_NamespacesDict()
-        self.assertIs(namespaces.lookup_normalized_name('project'),
-                      namespaces[4])
-        self.assertIsNone(namespaces.lookup_normalized_name('PROJECT'))
-        self.assertIsNone(namespaces.lookup_normalized_name('Project'))
-        self.assertIsNone(namespaces.lookup_normalized_name('Project:'))
+        for ns_id, values in self.tests.items():
+            for name in values:
+                with self.subTest(name=name, ns_id=ns_id):
+                    if name.islower() and '_' not in name:
+                        self.assertIs(
+                            self.namespaces.lookup_normalized_name(name),
+                            self.namespaces[ns_id])
+                    else:
+                        self.assertIsNone(
+                            self.namespaces.lookup_normalized_name(name))
 
 
 class TestNamespacesDictGetItem(TestCase):

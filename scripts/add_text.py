@@ -55,7 +55,6 @@ Warning! Put it in one line, otherwise it won't work correctly:
 """
 
 #
-# (C) Filnik, 2007-2010
 # (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
@@ -141,7 +140,7 @@ def put_text(page, new, summary, count, asynchronous=False):
         else:
             raise pywikibot.ServerError(
                 'Server Error! Maximum retries exceeded')
-    except pywikibot.SpamfilterError as e:
+    except pywikibot.SpamblacklistError as e:
         pywikibot.output(
             'Cannot change {} because of blacklist entry {}'
             .format(page.title(), e.url))

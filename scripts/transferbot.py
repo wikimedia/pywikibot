@@ -46,7 +46,6 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 
 """
 #
-# (C) Merlijn van Deen, 2014
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.

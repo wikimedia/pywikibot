@@ -40,7 +40,7 @@ class SiteDetectionTestCase(TestCase):
         """
         try:
             self.assertIsInstance(MWSite(url), MWSite)
-        except (ServerError, Timeout, ConnectionError) as e:
+        except (ServerError, Timeout) as e:
             self.skipTest(e)
 
     def assertNoSite(self, url):
@@ -88,10 +88,6 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for en.wikifur.com."""
         self.assertSite('https://en.wikifur.com/wiki/$1')
 
-    def test_bluwiki(self):
-        """Test detection of MediaWiki sites for bluwiki.com."""
-        self.assertSite('http://bluwiki.com/go/$1')
-
 
 class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
 
@@ -114,28 +110,14 @@ class Pre114SiteTestCase(SiteDetectionTestCase):
 
     """Test pre 1.14 sites which should be detected as unsupported."""
 
-    def test_livepedia(self):
-        """Test detection of MediaWiki sites for www.livepedia.gr."""
-        self.assertNoSite(
-            'http://www.livepedia.gr/index.php?title=$1')  # v1.12
-
     def test_wikifon(self):
         """Test detection of MediaWiki sites for www.wikifon.org."""
         self.assertNoSite('http://www.wikifon.org/$1')  # v1.11
-
-    def test_reuters(self):
-        """Test detection of MediaWiki sites for glossary.reuters.com."""
-        self.assertNoSite(
-            'http://glossary.reuters.com/index.php?title=$1')  # v1.11
 
     def test_wikitree(self):
         """Test detection of MediaWiki sites for wikitree.org."""
         # v1.11, with no query module
         self.assertNoSite('http://wikitree.org/index.php?title=$1')
-
-    def test_wikinvest(self):
-        """Test detection of MediaWiki sites for www.wikinvest.com."""
-        self.assertNoSite('http://www.wikinvest.com/$1')  # v1.9
 
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
@@ -149,10 +131,6 @@ class PreAPISiteTestCase(SiteDetectionTestCase):
     def test_thelemapedia(self):
         """Test detection of MediaWiki sites for www.thelemapedia.org."""
         self.assertNoSite('http://www.thelemapedia.org/index.php/$1')
-
-    def test_blahus(self):
-        """Test detection of MediaWiki sites for esperanto.blahus.cz."""
-        self.assertNoSite('http://esperanto.blahus.cz/cxej/vikio/index.php/$1')
 
     def test_werelate(self):
         """Test detection of MediaWiki sites for www.werelate.org."""
@@ -221,10 +199,6 @@ class NoSiteTestCase(SiteDetectionTestCase):
     def test_ecyrd(self):
         """Test detection of MediaWiki sites for www.ecyrd.com."""
         self.assertNoSite('http://www.ecyrd.com/JSPWiki/Wiki.jsp?page=$1')
-
-    def test_operawiki(self):
-        """Test detection of MediaWiki sites for operawiki.info."""
-        self.assertNoSite('http://operawiki.info/$1')
 
     def test_tvtropes(self):
         """Test detection of MediaWiki sites for www.tvtropes.org."""

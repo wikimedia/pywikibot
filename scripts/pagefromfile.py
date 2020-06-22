@@ -61,8 +61,7 @@ a parameter -appendtop:foo would add 'foo' between them. A new line
 can be added between them by specifying '\n' as a value.
 """
 #
-# (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #

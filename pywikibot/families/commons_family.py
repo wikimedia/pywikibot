@@ -19,6 +19,7 @@ class Family(family.WikimediaFamily):
 
     langs = {
         'commons': 'commons.wikimedia.org',
+        'test': 'test-commons.wikimedia.org',
         'beta': 'commons.wikimedia.beta.wmflabs.org'
     }
 

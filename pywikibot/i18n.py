@@ -17,7 +17,7 @@ an __init__.py, and a message bundle called 'pywikibot' containing
 messages. See L{twtranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -614,14 +614,10 @@ def translate(code, xdict, parameters=None, fallback=False):
                 trans = xdict[code]
                 break
         else:
-            if fallback is not True:
-                # this shouldn't simply return "any one" code but when fallback
-                # was True before 65518573d2b0, it did just that. When False it
-                # did just return None. It's now also returning None in the new
-                # iterable mode.
+            if fallback is False:
                 return None
-            code = list(xdict.keys())[0]
-            trans = xdict[code]
+            raise KeyError('No fallback key found in lookup dict for "{}"'
+                           .format(code))
     if trans is None:
         return None  # return None if we have no translation found
     if parameters is None:

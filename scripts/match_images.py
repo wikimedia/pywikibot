@@ -23,7 +23,6 @@ This is just a first version so that other people can play around with it.
 Expect the code to change a lot!
 """
 #
-# (c) Multichill, 2009
 # (c) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.

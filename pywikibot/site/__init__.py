@@ -63,7 +63,7 @@ from pywikibot.exceptions import (
     PageRelatedError,
     PageSaveRelatedError,
     SiteDefinitionError,
-    SpamfilterError,
+    SpamblacklistError,
     TitleblacklistError,
     UnknownExtension,
     UnknownSite,
@@ -414,6 +414,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         if name == '':
             return ''
 
+        name = name.replace('_', ' ')
         parts = name.split(':', 4)
         count = len(parts)
         if count > 3 or (count == 3 and parts[2]):
@@ -2159,7 +2160,7 @@ class APISite(BaseSite):
             uirequest = self._simple_request(
                 action='query',
                 meta='userinfo',
-                uiprop='blockinfo|hasmsg|groups|rights'
+                uiprop='blockinfo|hasmsg|groups|rights|ratelimits'
             )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
@@ -2355,8 +2356,8 @@ class APISite(BaseSite):
         if hasattr(notifications, 'values'):
             notifications = notifications.values()
 
-        for notification in notifications:
-            yield Notification.fromJSON(self, notification)
+        return (Notification.fromJSON(self, notification)
+                for notification in notifications)
 
     @need_extension('Echo')
     def notifications_mark_read(self, **kwargs):
@@ -2754,8 +2755,9 @@ class APISite(BaseSite):
             warn('\n'
                  + fill('Support of MediaWiki {version} will be dropped. '
                         'It is recommended to use MediaWiki 1.19 or above. '
-                        'You may use Pywikibot stable release 3.0.20200111 '
-                        'for older MediaWiki versions. '
+                        'You may use every Pywikibot 3.0.X release from '
+                        'pypi index or the "python2" release from the '
+                        'repository for older MediaWiki versions. '
                         'See T245350 for further information.'
                         .format(version=version)), FutureWarning)
 
@@ -2886,8 +2888,8 @@ class APISite(BaseSite):
                 keys: int in the range [0, 1, ..., 4]
                 values: category name corresponding to the 'key' quality level
             e.g. on en.wikisource:
-            {0: u'Without text', 1: u'Not proofread', 2: u'Problematic',
-             3: u'Proofread', 4: u'Validated'}
+            {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
+             3: 'Proofread', 4: 'Validated'}
 
         @param expiry: either a number of days or a datetime.timedelta object
         @type expiry: int (days), L{datetime.timedelta}, False (config)
@@ -3174,7 +3176,7 @@ class APISite(BaseSite):
 
         @raises ValueError: invalid action parameter
         """
-        if action not in self.siteinfo['restrictions']['types']:
+        if action not in self.siteinfo.get('restrictions')['types']:
             raise ValueError('{}.page_can_be_edited(): Invalid value "{}" for '
                              '"action" parameter'
                              .format(self.__class__.__name__, action))
@@ -4610,18 +4612,39 @@ class APISite(BaseSite):
         return bkgen
 
     @deprecated_args(step=None)
-    def exturlusage(self, url=None, protocol='http', namespaces=None,
+    def exturlusage(self, url=None, protocol=None, namespaces=None,
                     total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
         @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
 
-        @param url: The URL to search for (without the protocol prefix);
-            this may include a '*' as a wildcard, only at the start of the
-            hostname
-        @param protocol: The protocol prefix (default: "http")
-
+        @param url: The URL to search for (with ot without the protocol
+            prefix); this may include a '*' as a wildcard, only at the start
+            of the hostname
+        @type url: str
+        @param namespaces: list of namespace numbers to fetch contribs from
+        @type namespaces: list of int
+        @param total: Maximum number of pages to retrieve in total
+        @type total: int
+        @param protocol: Protocol to search for, likely http or https, http by
+                default. Full list shown on Special:LinkSearch wikipage
+        @type protocol: str
         """
+        separator = '://'
+        if separator in url:
+            found_protocol = url[:url.index(separator)]
+            url = url[url.index(separator) + len(separator):]
+            if protocol and protocol != found_protocol:
+                raise ValueError('Protocol was specified, but a different one '
+                                 'was found in searched url')
+            protocol = found_protocol
+        if not protocol:
+            protocol = 'http'
+
+        # If url is * we make it None in order to search for every page
+        # with any URL.
+        if url == '*':
+            url = None
         return self._generator(api.PageGenerator, type_arg='exturlusage',
                                geuquery=url, geuprotocol=protocol,
                                namespaces=namespaces,
@@ -5264,6 +5287,7 @@ class APISite(BaseSite):
         'protectedtitle': LockedNoPage,
         'cascadeprotected': CascadeLockedPage,
         'titleblacklist-forbidden': TitleblacklistError,
+        'spamblacklist': SpamblacklistError,
     }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
@@ -5389,16 +5413,24 @@ class APISite(BaseSite):
                             'logged in' % err.code,
                             _logger)
                     if err.code in self._ep_errors:
-                        if isinstance(self._ep_errors[err.code], UnicodeType):
+                        exception = self._ep_errors[err.code]
+                        if isinstance(exception, UnicodeType):
                             errdata = {
                                 'site': self,
                                 'title': page.title(with_section=False),
                                 'user': self.user(),
                                 'info': err.info
                             }
-                            raise Error(self._ep_errors[err.code] % errdata)
+                            raise Error(exception % errdata)
+                        elif issubclass(exception, SpamblacklistError):
+                            urls = ', '.join(err.other[err.code]['matches'])
+                            exec_string = ('raise exception(page, url="{}")'
+                                           .format(urls))
+                            if not PY2:
+                                exec_string += ' from None'
+                            exec(exec_string)
                         else:
-                            raise self._ep_errors[err.code](page)
+                            raise exception(page)
                     pywikibot.debug(
                         "editpage: Unexpected error code '%s' received."
                         % err.code,
@@ -5449,8 +5481,8 @@ class APISite(BaseSite):
                         return False
 
                     if 'spamblacklist' in result['edit']:
-                        raise SpamfilterError(page,
-                                              result['edit']['spamblacklist'])
+                        raise SpamblacklistError(
+                            page, result['edit']['spamblacklist'])
 
                     if 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(
@@ -6235,35 +6267,26 @@ class APISite(BaseSite):
         """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit, protocol=euprotocol)
 
-    def _get_titles_with_hash(self, hash_found=None):
-        """Helper for the deprecated method get(Files|Images)FromAnHash."""
-        # This should be removed with together with get(Files|Images)FromHash
-        if hash_found is None:
-            # This makes absolutely NO sense.
-            pywikibot.warning(
-                'The "hash_found" parameter in "getFilesFromAnHash" and '
-                '"getImagesFromAnHash" are not optional.')
-            return
-        return [image.title(with_ns=False)
-                for image in self.allimages(sha1=hash_found)]
-
-    @deprecated('Site().allimages', since='20141219')
-    def getFilesFromAnHash(self, hash_found=None):
+    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
+                future_warning=True)
+    def getFilesFromAnHash(self, hash_found):
         """
         Return all files that have the same hash.
 
         DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
         """
-        return self._get_titles_with_hash(hash_found)
+        return [image.title(with_ns=False)
+                for image in self.allimages(sha1=hash_found)]
 
-    @deprecated('Site().allimages', since='20141219')
-    def getImagesFromAnHash(self, hash_found=None):
+    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
+                future_warning=True)
+    def getImagesFromAnHash(self, hash_found):
         """
         Return all images that have the same hash.
 
         DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
         """
-        return self._get_titles_with_hash(hash_found)
+        return self.getFilesFromAnHash(hash_found)
 
     @need_right('edit')
     def is_uploaddisabled(self):
@@ -7781,8 +7804,8 @@ class DataSite(APISite):
             'Site method with baserevid', 'claim with on_item set', depth=3,
             since='20150910')
         if baserevid != claim.on_item.latest_revision_id:
-            warn('Using baserevid {0} instead of claim baserevid {1}'
-                 ''.format(baserevid, claim.on_item.latest_revision_id),
+            warn('Using baserevid {} instead of claim baserevid {}'
+                 .format(baserevid, claim.on_item.latest_revision_id),
                  UserWarning, 3)
 
         return baserevid

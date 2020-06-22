@@ -51,14 +51,6 @@ These command-line arguments can be used to specify which pages to work on:
                    pages, continue alphabetically starting at the last of the
                    dumped pages. The dump file will be subsequently removed.
 
-    -warnfile:     used as -warnfile:filename, reads all warnings from the
-                   given file that apply to the home wiki language,
-                   and read the rest of the warning as a hint. Then
-                   treats all the mentioned pages. A quicker way to
-                   implement warnfile suggestions without verifying them
-                   against the live wiki is using the warnfile.py
-                   script.
-
 &params;
 
 Additionally, these arguments can be used to restrict the bot to certain pages:
@@ -337,24 +329,21 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Rob W.W. Hooft, 2003
-# (C) Daniel Herding, 2004
-# (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import codecs
-from itertools import chain
 import os
 import pickle
 import re
-import shelve
 import socket
 import sys
+
+from collections import defaultdict
+from itertools import chain
 from textwrap import fill
 
 import pywikibot
@@ -447,7 +436,6 @@ class InterwikiBotConfig(object):
     hintnobracket = False
     hints = []
     hintsareright = False
-    contentsondisk = config.interwiki_contents_on_disk
     lacklanguage = None
     minlinks = 0
     quiet = False
@@ -558,81 +546,6 @@ class InterwikiBotConfig(object):
         return True
 
 
-class StoredPage(pywikibot.Page):
-
-    """
-    Store the Page contents on disk.
-
-    This is to avoid sucking too much memory when a big number of Page objects
-    will be loaded at the same time.
-    """
-
-    # Please prefix the class members names by SP
-    # to avoid possible name clashes with pywikibot.Page
-
-    # path to the shelve
-    SPpath = None
-    # shelve
-    SPstore = None
-
-    # attributes created by pywikibot.Page.__init__
-    SPcopy = ['_editrestriction',
-              '_site',
-              '_namespace',
-              '_section',
-              '_title',
-              'editRestriction',
-              'moveRestriction',
-              '_permalink',
-              '_userName',
-              '_ipedit',
-              '_editTime',
-              '_startTime',
-              '_revisionId',
-              '_deletedRevs']
-
-    def SPdeleteStore():
-        """Delete SPStore."""
-        if StoredPage.SPpath:
-            del StoredPage.SPstore
-            os.unlink(StoredPage.SPpath)
-    SPdeleteStore = staticmethod(SPdeleteStore)
-
-    def __init__(self, page):
-        """Initializer."""
-        for attr in StoredPage.SPcopy:
-            setattr(self, attr, getattr(page, attr))
-
-        if not StoredPage.SPpath:
-            index = 1
-            while True:
-                path = config.datafilepath('cache', 'pagestore' + str(index))
-                if not os.path.exists(path):
-                    break
-                index += 1
-            StoredPage.SPpath = path
-            StoredPage.SPstore = shelve.open(path)
-
-        self.SPkey = str(self)
-        self.SPcontentSet = False
-
-    def SPgetContents(self):
-        """Get stored content."""
-        return StoredPage.SPstore[self.SPkey]
-
-    def SPsetContents(self, contents):
-        """Store content."""
-        self.SPcontentSet = True
-        StoredPage.SPstore[self.SPkey] = contents
-
-    def SPdelContents(self):
-        """Delete stored content."""
-        if self.SPcontentSet:
-            del StoredPage.SPstore[self.SPkey]
-
-    _contents = property(SPgetContents, SPsetContents, SPdelContents)
-
-
 class PageTree(object):
 
     """
@@ -660,7 +573,7 @@ class PageTree(object):
 
         @type tree: dict
         """
-        self.tree = {}
+        self.tree = defaultdict(list)
         self.size = 0
 
     def filter(self, site):
@@ -678,8 +591,6 @@ class PageTree(object):
     def add(self, page):
         """Add a page to the tree."""
         site = page.site
-        if site not in self.tree:
-            self.tree[site] = []
         self.tree[site].append(page)
         self.size += 1
 
@@ -687,17 +598,19 @@ class PageTree(object):
         """Remove a page from the tree."""
         try:
             self.tree[page.site].remove(page)
-            self.size -= 1
         except ValueError:
             pass
+        else:
+            self.size -= 1
 
     def removeSite(self, site):
         """Remove all pages from Site site."""
         try:
             self.size -= len(self.tree[site])
-            del self.tree[site]
         except KeyError:
             pass
+        else:
+            del self.tree[site]
 
     def siteCounts(self):
         """Yield (Site, number of pages in site) pairs."""
@@ -783,9 +696,6 @@ class Subject(interwiki_graph.Subject):
         plus optionally a list of hints for translation
         """
         self.conf = conf
-        if self.conf.contentsondisk:
-            if originPage:
-                originPage = StoredPage(originPage)
 
         super(Subject, self).__init__(originPage)
 
@@ -882,8 +792,6 @@ class Subject(interwiki_graph.Subject):
 
         for link in links:
             page = pywikibot.Page(link)
-            if self.conf.contentsondisk:
-                page = StoredPage(page)
             self.todo.add(page)
             self.foundIn[page] = [None]
             if keephintedsites:
@@ -960,8 +868,6 @@ class Subject(interwiki_graph.Subject):
             self.foundIn[page].append(linkingPage)
             return False
         else:
-            if self.conf.contentsondisk:
-                page = StoredPage(page)
             self.foundIn[page] = [linkingPage]
             self.todo.add(page)
             counter.plus(page.site)
@@ -1017,8 +923,8 @@ class Subject(interwiki_graph.Subject):
                     return True
                 else:
                     choice = pywikibot.input_choice(
-                        'WARNING: {} is in namespace {}, but {} is in '
-                        'namespace {}. Follow it anyway?'
+                        'WARNING: {} is in namespace "{}", but {} is in '
+                        'namespace "{}". Follow it anyway?'
                         .format(self.originPage, self.originPage.namespace(),
                                 linkedPage, linkedPage.namespace()),
                         [('Yes', 'y'), ('No', 'n'),
@@ -1275,8 +1181,6 @@ class Subject(interwiki_graph.Subject):
                     # the 1st existig page becomes the origin page, if none was
                     # supplied
                     if self.conf.initialredirect:
-                        if self.conf.contentsondisk:
-                            redirectTargetPage = StoredPage(redirectTargetPage)
                         # don't follow another redirect; it might be a self
                         # loop
                         if not redirectTargetPage.isRedirectPage() \
@@ -1693,27 +1597,6 @@ class Subject(interwiki_graph.Subject):
         if config.interwiki_backlink:
             self.reportBacklinks(new, updatedSites)
 
-    def clean(self):
-        """
-        Delete the contents that are stored on disk for this Subject.
-
-        We cannot afford to define this in a StoredPage destructor because
-        StoredPage instances can get referenced cyclicly: that would stop the
-        garbage collector from destroying some of those objects.
-
-        It's also not necessary to set these lines as a Subject destructor:
-        deleting all stored content one entry by one entry when bailing out
-        after a KeyboardInterrupt for example is redundant, because the
-        whole storage file will be eventually removed.
-        """
-        if self.conf.contentsondisk:
-            for page in self.foundIn:
-                # foundIn can contain either Page or StoredPage objects
-                # calling the destructor on _contents will delete the
-                # disk records if necessary
-                if hasattr(page, '_contents'):
-                    del page._contents
-
     def replaceLinks(self, page, newPages):
         """Return True if saving was successful."""
         if self.conf.localonly:
@@ -1738,7 +1621,7 @@ class Subject(interwiki_graph.Subject):
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
         new = newPages.copy()
-        interwikis = [pywikibot.Page(l) for l in page.iterlanglinks()]
+        interwikis = [pywikibot.Page(link) for link in page.iterlanglinks()]
 
         # remove interwiki links to ignore
         for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
@@ -1853,7 +1736,6 @@ class Subject(interwiki_graph.Subject):
             return False
         pywikibot.showDiff(oldtext, newtext)
 
-        # pywikibot.output(u"NOTE: Replace %s" % page)
         # Determine whether we need permission to submit
         ask = False
 
@@ -1911,12 +1793,12 @@ class Subject(interwiki_graph.Subject):
                         'ERROR putting page: An edit conflict occurred. '
                         'Giving up.')
                     raise SaveError('Edit conflict')
-                except (pywikibot.SpamfilterError) as error:
+                except pywikibot.SpamblacklistError as error:
                     pywikibot.output(
                         'ERROR putting page: {0} blacklisted by spamfilter. '
                         'Giving up.'.format(error.url))
                     raise SaveError('Spam filter')
-                except (pywikibot.PageNotSaved) as error:
+                except pywikibot.PageNotSaved as error:
                     pywikibot.output('ERROR putting page: {}'
                                      .format(error.args,))
                     raise SaveError('PageNotSaved')
@@ -1962,8 +1844,8 @@ class Subject(interwiki_graph.Subject):
                 page = new[site]
                 if not page.section():
                     try:
-                        linkedPages = {pywikibot.Page(l)
-                                       for l in page.iterlanglinks()}
+                        linkedPages = {pywikibot.Page(link)
+                                       for link in page.iterlanglinks()}
                     except pywikibot.NoPage:
                         pywikibot.warning(
                             'Page {} does no longer exist?!'.format(page))
@@ -2043,6 +1925,11 @@ class InterwikiBot(object):
         self.generateNumber = number
         self.generateUntil = until
 
+    @property
+    def dump_titles(self):
+        """Return list of titles for dump file."""
+        return [s.originPage.title() for s in self.subjects]
+
     def dump(self, append=True):
         """Write dump file."""
         site = pywikibot.Site()
@@ -2055,9 +1942,8 @@ class InterwikiBot(object):
             mode = 'appended'
         else:
             mode = 'written'
-        titles = [s.originPage.title() for s in self.subjects]
         with open(dumpfn, mode[0] + 'b') as f:
-            pickle.dump(titles, f, protocol=config.pickle_protocol)
+            pickle.dump(self.dump_titles, f, protocol=config.pickle_protocol)
         pywikibot.output('Dump {0} ({1}) {2}.'
                          .format(site.code, site.family.name, mode))
         return dumpfn
@@ -2244,7 +2130,6 @@ class InterwikiBot(object):
             subj = self.subjects[i]
             if subj.isDone():
                 subj.finish()
-                subj.clean()
                 del self.subjects[i]
 
     def isDone(self):
@@ -2350,23 +2235,6 @@ def botMayEdit(page):
     return True
 
 
-def readWarnfile(filename, bot):
-    """Read old interlanguage conflicts."""
-    import warnfile
-    reader = warnfile.WarnfileReader(filename)
-    # we won't use removeHints
-    (hints, removeHints) = reader.getHints()
-    for page, pagelist in hints.items():
-        # The WarnfileReader gives us a list of pagelinks, but
-        # titletranslate.py expects a list of strings, so we convert it back.
-        # TODO: This is a quite ugly hack, in the future we should maybe make
-        # titletranslate expect a list of pagelinks.
-        hintStrings = ['{}:{}'.format(hintedPage.site.lang,
-                                      hintedPage.title())
-                       for hintedPage in pagelist]
-        bot.add(page, hints=hintStrings)
-
-
 def page_empty_check(page):
     """
     Return True if page should be skipped as it is almost empty.
@@ -2378,18 +2246,18 @@ def page_empty_check(page):
 
     @rtype: bool
     """
+    txt = page.text
     # Check if the page is in content namespace
     if page.namespace().content:
         # Check if the page contains at least 50 characters
-        return len(page.text) < 50
-    else:
-        if not page.is_categorypage():
-            txt = page.get()
-            txt = textlib.removeLanguageLinks(txt, site=page.site)
-            txt = textlib.removeCategoryLinks(txt, site=page.site)
-            return len(txt) < 4
-        else:
-            return False
+        return len(txt) < 50
+
+    if not page.is_categorypage():
+        txt = textlib.removeLanguageLinks(txt, site=page.site)
+        txt = textlib.removeCategoryLinks(txt, site=page.site)
+        return len(txt) < 4
+
+    return False
 
 
 def main(*args):
@@ -2408,7 +2276,6 @@ def main(*args):
     namespaces = []
     number = None
     until = None
-    warnfile = None
     # a normal PageGenerator (which doesn't give hints, only Pages)
     hintlessPageGen = None
     optContinue = False
@@ -2426,9 +2293,8 @@ def main(*args):
     for arg in local_args:
         if iwconf.readOptions(arg):
             continue
-        elif arg.startswith('-warnfile:'):
-            warnfile = arg[10:]
-        elif arg.startswith('-years'):
+
+        if arg.startswith('-years'):
             # Look if user gave a specific year at which to start
             # Must be a natural number or negative integer.
             if len(arg) > 7 and (arg[7:].isdigit()
@@ -2543,9 +2409,6 @@ def main(*args):
                 hintlessPageGen, namespaces, site)
         # we'll use iter() to create make a next() function available.
         bot.setPageGenerator(iter(hintlessPageGen), number=number, until=until)
-    elif warnfile:
-        # TODO: filter namespaces if -namespace parameter was used
-        readWarnfile(warnfile, bot)
     else:
         if not singlePageTitle and not opthintsonly:
             singlePageTitle = pywikibot.input('Which page to check:')
@@ -2555,17 +2418,17 @@ def main(*args):
             singlePage = None
         bot.add(singlePage, hints=iwconf.hints)
 
+    append = not (optRestore or optContinue or iwconf.restore_all)
     try:
-        append = not (optRestore or optContinue or iwconf.restore_all)
         bot.run()
     except KeyboardInterrupt:
         dumpFileName = bot.dump(append)
     except Exception:
+        pywikibot.exception()
         dumpFileName = bot.dump(append)
-        raise
+    else:
+        pywikibot.output('Script terminated sucessfully.')
     finally:
-        if iwconf.contentsondisk:
-            StoredPage.SPdeleteStore()
         if dumpFileName:
             try:
                 restoredFiles.remove(dumpFileName)

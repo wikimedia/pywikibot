@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -408,8 +408,8 @@ class CaseChecker(object):
                     msg = []
                     foundSuggestions = False
 
-                    for l in allLinks:
-                        ltxt = l['title']
+                    for link in allLinks:
+                        ltxt = link['title']
                         err = self.ProcessTitle(ltxt)
                         if err:
                             if len(err[1]) > 0:
@@ -484,14 +484,14 @@ class CaseChecker(object):
             # See if it would make sense to treat the whole word as either
             # cyrilic or latin
             mightBeLat = mightBeLcl = True
-            for l in badWord:
-                if l in self.localLtr:
-                    if mightBeLat and l not in self.localSuspects:
+            for letter in badWord:
+                if letter in self.localLtr:
+                    if mightBeLat and letter not in self.localSuspects:
                         mightBeLat = False
                 else:
-                    if mightBeLcl and l not in self.latinSuspects:
+                    if mightBeLcl and letter not in self.latinSuspects:
                         mightBeLcl = False
-                    if l not in ascii_letters:
+                    if letter not in ascii_letters:
                         raise ValueError('Assert failed')
 
             # Some words are well known and frequently mixed-typed
@@ -645,16 +645,16 @@ class CaseChecker(object):
             res += self.lclClrFnt
         else:
             res += self.latClrFnt
-        for l in word:
-            if l in self.localLtr:
+        for letter in word:
+            if letter in self.localLtr:
                 if not lastIsCyr:
                     res += self.suffixClr + self.lclClrFnt
                     lastIsCyr = True
-            elif l in ascii_letters:
+            elif letter in ascii_letters:
                 if lastIsCyr:
                     res += self.suffixClr + self.latClrFnt
                     lastIsCyr = False
-            res += l
+            res += letter
         return res + self.suffixClr + '</b>'
 
     def _ColorCodeWordScreen(self, word):
@@ -664,16 +664,16 @@ class CaseChecker(object):
             res += self.colorFormatLocalColor
         else:
             res += self.colorFormatLatinColor
-        for l in word:
-            if l in self.localLtr:
+        for letter in word:
+            if letter in self.localLtr:
                 if not lastIsCyr:
                     res += self.colorFormatLocalColor
                     lastIsCyr = True
-            elif l in self.latLtr:
+            elif letter in self.latLtr:
                 if lastIsCyr:
                     res += self.colorFormatLatinColor
                     lastIsCyr = False
-            res += l
+            res += letter
         return formatter.color_format(res + self.colorFormatSuffix)
 
     def AddNoSuggestionTitle(self, title):

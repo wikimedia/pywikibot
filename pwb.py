@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Wrapper script to use Pywikibot in 'directory' mode.
+"""Wrapper script to invoke pywikibot-based scripts.
 
-Run scripts using:
+Run scripts with pywikibot in directory mode using:
 
     python pwb.py <pwb options> <name_of_script> <options>
 
-and it will use the package directory to store all user files, will fix up
-search paths so the package does not need to be installed, etc.
+This wrapper script uses the package directory to store all user files,
+will fix up search paths so the package does not need to be installed, etc.
 
 Currently <pwb options> are global options. This can be used for tests
-to set the default site like (see T216825):
+to set the default site (see T216825):
 
     python pwb.py -lang:de bot_tests -v
 """
@@ -32,6 +32,12 @@ from warnings import warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
+
+if not PY2:
+    from pathlib import Path
+else:
+    from pathlib2 import Path
+
 
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
@@ -88,11 +94,10 @@ def run_python_file(filename, argv, argvu, package=None):
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
     old_argvu = pwb.argvu
-    old_path0 = sys.path[0]
 
     sys.argv = argv
     pwb.argvu = argvu
-    sys.path[0] = os.path.dirname(filename)
+    sys.path.insert(0, os.path.dirname(filename))
 
     try:
         with open(filename, 'rb') as f:
@@ -105,7 +110,7 @@ def run_python_file(filename, argv, argvu, package=None):
 
         # Restore the old argv and path
         sys.argv = old_argv
-        sys.path[0] = old_path0
+        sys.path.pop(0)
         pwb.argvu = old_argvu
 
 # end of snippet from coverage
@@ -162,10 +167,6 @@ def check_modules(script=None):
     import pkg_resources
     if script:
         from setup import script_deps
-        try:
-            from pathlib import Path
-        except ImportError:  # Python 2
-            from pathlib2 import Path
         dependencies = script_deps.get(Path(script).name, [])
     else:
         from setup import dependencies
@@ -200,15 +201,6 @@ def check_modules(script=None):
     return not missing_requirements
 
 
-# Establish a normalised path for the directory containing pwb.py.
-# Either it is '.' if the user's current working directory is the same,
-# or it is the absolute path for the directory of pwb.py
-absolute_path = abspath(os.path.dirname(sys.argv[0]))
-
-# add absolute path because sys.path[0] is overridden
-# with os.path.dirname(filename) within run_python_file
-sys.path.insert(1, absolute_path)
-
 if not check_modules():
     sys.exit()
 
@@ -239,11 +231,6 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-
-try:
-    from pathlib import Path
-except ImportError:  # Python 2
-    from pathlib2 import Path
 
 
 def find_alternates(filename, script_paths):
@@ -334,8 +321,6 @@ def find_filename(filename):
 def main():
     """Command line entry point."""
     global filename
-    if not filename:
-        return False
 
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
@@ -344,6 +329,9 @@ def main():
                   .format('' if len(unknown_args) == 1 else 's',
                           ', '.join(unknown_args)))
             return False
+
+    if not filename:
+        return False
 
     file_package = None
     argvu = pwb.argvu[1:]
@@ -362,6 +350,7 @@ def main():
     # a much more detailed implementation is in coverage's find_module.
     # https://bitbucket.org/ned/coveragepy/src/default/coverage/execfile.py
     cwd = abspath(os.getcwd())
+    absolute_path = abspath(os.path.dirname(sys.argv[0]))
     if absolute_path == cwd:
         absolute_filename = abspath(filename)[:len(cwd)]
         if absolute_filename == cwd:

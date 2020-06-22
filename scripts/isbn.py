@@ -196,7 +196,7 @@ class IsbnBot(Bot):
             except pywikibot.EditConflict:
                 pywikibot.output('Skipping {0} because of edit conflict'
                                  .format(page.title()))
-            except pywikibot.SpamfilterError as e:
+            except pywikibot.SpamblacklistError as e:
                 pywikibot.output(
                     'Cannot change {0} because of blacklist entry {1}'
                     .format(page.title(), e.url))

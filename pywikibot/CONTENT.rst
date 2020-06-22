@@ -59,8 +59,6 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | site_detect.py             | Classes for detecting a MediaWiki site               |
     +----------------------------+------------------------------------------------------+
-    | specialbots.py             | Predefined special bot classes                       |
-    +----------------------------+------------------------------------------------------+
     | textlib.py                 | Functions for manipulating wiki-text                 |
     +----------------------------+------------------------------------------------------+
     | throttle.py                | Mechanics to slow down wiki read and/or write rate   |
@@ -110,6 +108,17 @@ The contents of the package
     | site                       | Module with classes for MediaWiki sites              |
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
+    +----------------------------+------------------------------------------------------+
+
+
+    +----------------------------+------------------------------------------------------+
+    | specialbots                | Module containing special bots reusable by scripts   |
+    +============================+======================================================+
+    | __init__.py                | Predefined special bot classes                       |
+    +----------------------------+------------------------------------------------------+
+    | _unlink.py                 | Predefined BaseUnlinkBot special bot class           |
+    +----------------------------+------------------------------------------------------+
+    | _upload.py                 | Predefined UploadRobot special bot class             |
     +----------------------------+------------------------------------------------------+
 
 

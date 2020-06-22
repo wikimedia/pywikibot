@@ -47,9 +47,6 @@ Please fix these if you are capable and motivated:
   will exit.
 """
 #
-# (C) Wikipedian, 2006-2007
-# (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2020
 # (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -169,12 +169,12 @@ class WikiStats(object):
         if table in self._data.setdefault('xml', {}):
             return self._data['xml'][table]
 
-        from xml.etree import cElementTree
+        from xml.etree import ElementTree
 
         data = self.raw_cached(table, 'xml')
 
         f = BytesIO(data)
-        tree = cElementTree.parse(f)
+        tree = ElementTree.parse(f)
 
         data = []
 

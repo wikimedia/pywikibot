@@ -87,7 +87,6 @@ __all__ = (
 
 import codecs
 import datetime
-from importlib import import_module
 import json
 import logging
 import logging.handlers
@@ -95,8 +94,12 @@ import os
 import sys
 import time
 import warnings
-from warnings import warn
 import webbrowser
+
+from contextlib import closing
+from importlib import import_module
+from textwrap import fill
+from warnings import warn
 
 try:
     import configparser
@@ -108,7 +111,6 @@ try:
 except ImportError:  # PY2
     from pathlib2 import Path
 
-from textwrap import fill
 
 import pywikibot
 from pywikibot import config2 as config
@@ -213,21 +215,6 @@ GLOBAL OPTIONS
                   modify it with command line.
 
 """
-
-
-# It's not possible to use pywikibot.exceptions.PageRelatedError as that is
-# importing pywikibot.data.api which then needs pywikibot.bot
-class SkipPageError(Exception):
-
-    """Skipped page in run."""
-
-    message = 'Page "{0}" skipped due to {1}.'
-
-    def __init__(self, page, reason):
-        """Initializer."""
-        super(SkipPageError, self).__init__(self.message.format(page, reason))
-        self.reason = reason
-        self.page = page
 
 
 class UnhandledAnswer(Exception):
@@ -1023,14 +1010,15 @@ def writeToCommandLogFile():
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
     except IOError:
         command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
-    # add a timestamp in ISO 8601 formulation
-    iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    command_log_file.write('%s r%s Python %s '
-                           % (iso_date, version.getversiondict()['rev'],
-                              sys.version.split()[0]))
-    s = ' '.join(args)
-    command_log_file.write(s + os.linesep)
-    command_log_file.close()
+
+    with closing(command_log_file):
+        # add a timestamp in ISO 8601 formulation
+        iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        command_log_file.write('{} r{} Python {} '
+                               .format(iso_date,
+                                       version.getversiondict()['rev'],
+                                       sys.version.split()[0]))
+        command_log_file.write(' '.join(args) + os.linesep)
 
 
 def open_webbrowser(page):
@@ -1263,7 +1251,7 @@ class BaseBot(OptionHandler):
             if isinstance(e, pywikibot.EditConflict):
                 pywikibot.output('Skipping %s because of edit conflict'
                                  % page.title())
-            elif isinstance(e, pywikibot.SpamfilterError):
+            elif isinstance(e, pywikibot.SpamblacklistError):
                 pywikibot.output(
                     'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
@@ -1311,16 +1299,18 @@ class BaseBot(OptionHandler):
             delta = (pywikibot.Timestamp.now() - self._start_ts)
             seconds = int(delta.total_seconds())
             if delta.days:
-                pywikibot.output('Execution time: %d days, %d seconds'
-                                 % (delta.days, delta.seconds))
+                pywikibot.output(
+                    'Execution time: {d.days} days, {d.seconds} seconds'
+                    .format(d=delta))
             else:
-                pywikibot.output('Execution time: %d seconds' % delta.seconds)
+                pywikibot.output('Execution time: {} seconds'
+                                 .format(delta.seconds))
             if self._treat_counter:
-                pywikibot.output('Read operation time: %d seconds'
-                                 % (seconds / self._treat_counter))
+                pywikibot.output('Read operation time: {:.1f} seconds'
+                                 .format(seconds / self._treat_counter))
             if self._save_counter:
-                pywikibot.output('Write operation time: %d seconds'
-                                 % (seconds / self._save_counter))
+                pywikibot.output('Write operation time: {:.1f} seconds'
+                                 .format(seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1385,35 +1375,20 @@ class BaseBot(OptionHandler):
         @raise AssertionError: "page" is not a pywikibot.page.BasePage object
         """
         self._start_ts = pywikibot.Timestamp.now()
+        self.setup()
+
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable %s.generator not set.'
                                       % self.__class__.__name__)
-
         if PY2:
             # Python 2 does not clear previous exceptions and method `exit`
             # relies on sys.exc_info returning exceptions occurring in `run`.
             sys.exc_clear()
 
-        self.setup()
         try:
             for item in self.generator:
                 # preprocessing of the page
-                try:
-                    initialized_page = self.init_page(item)
-                except SkipPageError as e:
-                    issue_deprecation_warning('Use of SkipPageError',
-                                              'BaseBot.skip_page() method',
-                                              warning_class=FutureWarning,
-                                              since='20180522')
-                    pywikibot.warning('Skipped "{0}" due to: {1}'.format(
-                                      item, e.reason))
-                    if PY2:
-                        # Python 2 does not clear the exception and it may seem
-                        # that the generator stopped due to an exception
-                        sys.exc_clear()
-                    self._skip_counter += 1
-                    continue
-
+                initialized_page = self.init_page(item)
                 if initialized_page is None:
                     issue_deprecation_warning(
                         'Returning None from init_page() method',

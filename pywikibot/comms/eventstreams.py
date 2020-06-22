@@ -9,7 +9,6 @@ This module requires sseclient to be installed::
     pip install sseclient
 """
 #
-# (C) xqt, 2017-2020
 # (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.

@@ -58,6 +58,7 @@ class Family(family.WikimediaFamily):
         """Supported globes for Coordinate datatype."""
         return {
             'ariel': 'http://www.wikidata.org/entity/Q3343',
+            'bennu': 'http://www.wikidata.org/entity/Q11558',
             'callisto': 'http://www.wikidata.org/entity/Q3134',
             'ceres': 'http://www.wikidata.org/entity/Q596',
             'deimos': 'http://www.wikidata.org/entity/Q7548',
@@ -83,6 +84,7 @@ class Family(family.WikimediaFamily):
             'phoebe': 'http://www.wikidata.org/entity/Q17975',
             'pluto': 'http://www.wikidata.org/entity/Q339',
             'rhea': 'http://www.wikidata.org/entity/Q15050',
+            'ryugu': 'http://www.wikidata.org/entity/Q1385178',
             'steins': 'http://www.wikidata.org/entity/Q150249',
             'tethys': 'http://www.wikidata.org/entity/Q15047',
             'titan': 'http://www.wikidata.org/entity/Q2565',

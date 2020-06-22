@@ -28,8 +28,7 @@ used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -184,11 +183,11 @@ class ImageTransferBot(object):
             pywikibot.output('Image description page is redirect.')
         else:
             bot = UploadRobot(url=url, description=description,
-                              targetSite=self.targetSite,
-                              urlEncoding=sourceSite.encoding(),
-                              keepFilename=self.keep_name,
-                              verifyDescription=not self.keep_name,
-                              ignoreWarning=self.ignore_warning)
+                              target_site=self.targetSite,
+                              url_encoding=sourceSite.encoding(),
+                              keep_filename=self.keep_name,
+                              verify_description=not self.keep_name,
+                              ignore_warning=self.ignore_warning)
             # try to upload
             targetFilename = bot.run()
             if targetFilename and self.targetSite.family.name == 'commons' \

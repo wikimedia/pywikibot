@@ -7,7 +7,7 @@ should be added locally.
 https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,9 +79,8 @@ class TestPwb(PwbTestCase):
     def test_script_found(self):
         """Test pwb.py script call which is found."""
         stdout = io.StringIO(execute_pwb(['pwb'])['stdout'])
-        self.assertEqual(
-            stdout.readline().strip(),
-            "Wrapper script to use Pywikibot in 'directory' mode.")
+        self.assertEqual(stdout.readline().strip(),
+                         'Wrapper script to invoke pywikibot-based scripts.')
 
     def test_script_not_found(self):
         """Test pwbot.py script call which is not found."""

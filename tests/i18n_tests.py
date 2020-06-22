@@ -35,19 +35,15 @@ class TestTranslate(TestCase):
         self.msg_no_english = {'ja': 'test-no-english JA'}
         super(TestTranslate, self).setUp()
 
-    def testLocalized(self):
+    def test_localized(self):
         """Test fully localized translations."""
-        self.assertEqual(i18n.translate('en', self.msg_localized,
-                                        fallback=True),
-                         'test-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_localized,
-                                        fallback=True),
-                         'test-localized NL')
-        self.assertEqual(i18n.translate('fy', self.msg_localized,
-                                        fallback=True),
-                         'test-localized FY')
+        for code, msg in self.msg_localized.items():
+            with self.subTest(code=code):
+                self.assertEqual(i18n.translate(code, self.msg_localized,
+                                                fallback=True),
+                                 msg)
 
-    def testSemiLocalized(self):
+    def test_semi_localized(self):
         """Test translate by fallback to an alternative language."""
         self.assertEqual(i18n.translate('en', self.msg_semi_localized,
                                         fallback=True),
@@ -58,7 +54,7 @@ class TestTranslate(TestCase):
                                                 fallback=True),
                                  'test-semi-localized NL')
 
-    def testNonLocalized(self):
+    def test_non_localized(self):
         """Test translate with missing localisation."""
         for code in ('en', 'fy', 'nl', 'ru'):
             with self.subTest(code=code):
@@ -70,9 +66,8 @@ class TestTranslate(TestCase):
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
             with self.subTest(code=code):
-                self.assertEqual(i18n.translate(code, self.msg_no_english,
-                                                fallback=True),
-                                 'test-no-english JA')
+                with self.assertRaises(KeyError):
+                    i18n.translate(code, self.msg_no_english, fallback=True)
 
 
 class UserInterfaceLangTestCase(TestCase):

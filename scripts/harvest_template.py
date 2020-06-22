@@ -88,8 +88,7 @@ will not add duplicate claims for the same member:
         -multi
 """
 #
-# (C) Multichill, Amir, 2013
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of MIT License.
 #
@@ -336,8 +335,8 @@ class HarvestRobot(WikidataBot):
                         image = pywikibot.FilePage(image.getRedirectTarget())
                     if not image.exists():
                         pywikibot.output(
-                            "{0} doesn't exist. I can't link to it"
-                            ''.format(image.title(as_link=True)))
+                            "{} doesn't exist. I can't link to it"
+                            .format(image.title(as_link=True)))
                         continue
                     claim.setTarget(image)
                 else:

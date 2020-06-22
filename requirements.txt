@@ -23,6 +23,7 @@ requests>=2.20.1,<2.22.0; python_version == '3.4'
 requests>=2.20.1; python_version != '3.4'
 enum34>=1.1.6,!=1.1.8; python_version < '3'
 ipaddress ; python_version < '3'
+pathlib2 ; python_version < '3'
 # requests security extra
 requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
 

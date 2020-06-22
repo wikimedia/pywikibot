@@ -18,8 +18,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikivoyage'
 
     languages_by_size = [
-        'en', 'de', 'pl', 'fa', 'it', 'fr', 'ru', 'zh', 'nl', 'pt', 'es', 'he',
-        'fi', 'sv', 'el', 'vi', 'ro', 'uk', 'bn', 'ps', 'hi',
+        'en', 'de', 'pl', 'it', 'fa', 'fr', 'ru', 'zh', 'nl', 'pt', 'es', 'he',
+        'vi', 'fi', 'sv', 'el', 'ro', 'uk', 'bn', 'ps', 'hi',
     ]
 
     category_redirect_templates = {

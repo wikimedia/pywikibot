@@ -32,7 +32,6 @@ build paths relative to base_dir:
  - shortpath
 """
 #
-# (C) Rob W.W. Hooft, 2003
 # (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
@@ -111,10 +110,11 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # to other modules.
 
 _private_values = {'authenticate', 'db_password'}
-_deprecated_variables = {'available_ssl_project', 'fake_user_agent',
-                         'line_separator', 'LS', 'panoramio', 'proxy',
-                         'special_page_limit', 'sysopnames', 'use_SSL_onlogin',
-                         'use_SSL_always'}
+_deprecated_variables = {
+    'available_ssl_project', 'fake_user_agent', 'interwiki_contents_on_disk',
+    'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
+    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
+}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -609,11 +609,6 @@ interwiki_graph_url = None
 # Save file with local articles without interwikis.
 without_interwiki = False
 
-# Experimental feature:
-# Store the page contents on disk (/cache/ directory) instead of loading
-# them in RAM.
-interwiki_contents_on_disk = False
-
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
 # Set disambiguation_comment[FAMILY][LANG] to a non-empty string to override
@@ -876,18 +871,14 @@ simulate = False
 # processing. As higher this value this effect will decrease.
 max_queue_size = 64
 
-# Settings to enable mwparserfromhell
-# <https://mwparserfromhell.readthedocs.org/en/latest/>
-# Currently used in textlib.extract_templates_and_params
-# This is more accurate than our current regex, but only works
-# if the user has already installed the library.
-use_mwparserfromhell = True
-
 # Pickle protocol version to use for storing dumps.
 # This config variable is not used for loading dumps.
+# Version 0 is a more or less human-readable protocol
 # Version 2 is common to both Python 2 and 3, and should
 # be used when dumps are accessed by both versions.
-# Version 4 is only available for Python 3.4
+# Version 3 is only available for Python 3
+# Version 4 is only available for Python 3.4+
+# Version 5 was added with Python 3.8
 pickle_protocol = 2
 
 # ============================
@@ -956,13 +947,12 @@ def _win32_extension_command(extension):
     fileexts_key = \
         r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
     key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
-    _winreg = winreg  # exists for git blame only; do not use
     try:
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
         _prog_id = winreg.EnumValue(key1, 0)[0]
-        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                r'%s\shell\open\command' % _prog_id)
-        _cmd = _winreg.QueryValueEx(_key2, None)[0]
+        _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
+                               r'{}\shell\open\command'.format(_prog_id))
+        _cmd = winreg.QueryValueEx(_key2, None)[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
         if cmd.find('%1'):

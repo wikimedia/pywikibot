@@ -113,14 +113,7 @@ Or to do it all from the command-line, use the following syntax:
 This will move all pages in the category US to the category United States.
 """
 #
-# (C) Rob W.W. Hooft, 2004
-# (C) Daniel Herding, 2004
-# (C) Wikipedian, 2004-2008
-# (C) leogregianin, 2004-2008
-# (C) Ben McIlwain (CydeWeys), 2006-2015
-# (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2020
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #

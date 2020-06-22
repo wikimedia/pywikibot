@@ -52,7 +52,6 @@ or by adding a list to the given one:
                                      'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2020
 # (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
@@ -72,7 +71,9 @@ from pywikibot.page import url2unicode
 from pywikibot import textlib
 from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
                                _get_regexes)
-from pywikibot.tools import deprecated_args, first_lower, first_upper
+from pywikibot.tools import (
+    deprecated, deprecated_args, first_lower, first_upper
+)
 
 
 # Subpage templates. Must be in lower case,
@@ -203,12 +204,12 @@ class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 
-    @deprecated_args(debug='diff', redirect=None)
-    def __init__(self, site, diff=False, namespace=None, pageTitle=None,
+    @deprecated_args(debug='show_diff', redirect=None, diff='show_diff')
+    def __init__(self, site, show_diff=False, namespace=None, pageTitle=None,
                  ignore=CANCEL_ALL):
         """Initializer."""
         self.site = site
-        self.diff = diff
+        self.show_diff = show_diff
         try:
             self.namespace = self.site.namespaces.resolve(namespace).pop(0)
         except (KeyError, TypeError, IndexError):
@@ -245,10 +246,23 @@ class CosmeticChangesToolkit(object):
         if stdnum_isbn:
             self.common_methods.append(self.fix_ISBN)
 
+    @property
+    @deprecated('show_diff', since='20200415')
+    def diff(self):
+        """CosmeticChangesToolkit.diff attribute getter."""
+        return self.show_diff
+
+    @diff.setter
+    @deprecated('show_diff', since='20200415')
+    def diff(self, value):
+        """CosmeticChangesToolkit.diff attribute setter."""
+        self.show_diff = bool(value)
+
     @classmethod
-    def from_page(cls, page, diff, ignore):
+    @deprecated_args(diff='show_diff')
+    def from_page(cls, page, show_diff=False, ignore=CANCEL_ALL):
         """Create toolkit based on the page."""
-        return cls(page.site, diff=diff, namespace=page.namespace(),
+        return cls(page.site, show_diff=show_diff, namespace=page.namespace(),
                    pageTitle=page.title(), ignore=ignore)
 
     def safe_execute(self, method, text):
@@ -258,8 +272,8 @@ class CosmeticChangesToolkit(object):
             result = method(text)
         except Exception as e:
             if self.ignore == CANCEL_METHOD:
-                pywikibot.warning('Unable to perform "{0}" on "{1}"!'.format(
-                    method.__name__, self.title))
+                pywikibot.warning('Unable to perform "{}" on "{}"!'
+                                  .format(method.__name__, self.title))
                 pywikibot.exception(e)
             else:
                 raise
@@ -284,7 +298,7 @@ class CosmeticChangesToolkit(object):
             else:
                 raise
         else:
-            if self.diff:
+            if self.show_diff:
                 pywikibot.showDiff(text, new_text)
             return new_text
 
@@ -682,7 +696,7 @@ class CosmeticChangesToolkit(object):
     def removeUselessSpaces(self, text):
         """Cleanup multiple or trailing spaces."""
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
-                      'table']
+                      'source', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
         text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1',
@@ -931,19 +945,13 @@ class CosmeticChangesToolkit(object):
             'startspace',
             'inputbox',
         ]
-        # FIXME: use textlib.NON_LATIN_DIGITS
-        # valid digits
-        digits = {
-            'ckb': '٠١٢٣٤٥٦٧٨٩',
-            'fa': '۰۱۲۳۴۵۶۷۸۹',
-        }
+
+        digits = textlib.NON_LATIN_DIGITS
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
-        new = digits.pop(self.site.code)
-        # This only works if there are only two items in digits dict
-        old = digits[list(digits.keys())[0]]
+
         # not to let bot edits in latin content
-        exceptions.append(re.compile('[^%(fa)s] *?\"*? *?, *?[^%(fa)s]'
-                                     % {'fa': faChrs}))
+        exceptions.append(re.compile('[^{fa}] *?"*? *?, *?[^{fa}]'
+                                     .format(fa=faChrs)))
         text = textlib.replaceExcept(text, ',', '،', exceptions,
                                      site=self.site)
         if self.site.code == 'ckb':
@@ -962,23 +970,6 @@ class CosmeticChangesToolkit(object):
 
         return text
 
-        # FIXME: split this function into two.
-        # replace persian/arabic digits
-        # deactivated due to bug T57185
-        for i in range(0, 10):
-            text = textlib.replaceExcept(text, old[i], new[i], exceptions)
-        # do not change digits in class, style and table params
-        pattern = re.compile(r'\w+=(".+?"|\d+)', re.UNICODE)
-        exceptions.append(pattern)
-        # do not change digits inside html-tags
-        pattern = re.compile('<[/]*?[^</]+?[/]*?>', re.UNICODE)
-        exceptions.append(pattern)
-        exceptions.append('table')  # exclude tables for now
-        # replace digits
-        for i in range(0, 10):
-            text = textlib.replaceExcept(text, str(i), new[i], exceptions)
-        return text
-
     def commonsfiledesc(self, text):
         """
         Clean up file descriptions on the Wikimedia Commons.
@@ -990,7 +981,8 @@ class CosmeticChangesToolkit(object):
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
         if self.site.sitename != 'commons:commons' or self.namespace == 6:
-            return
+            return text
+
         # section headers to {{int:}} versions
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',
                       'pre', 'source', 'ref', 'timeline']

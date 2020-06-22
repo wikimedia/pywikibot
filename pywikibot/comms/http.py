@@ -162,21 +162,19 @@ def user_agent_username(username=None):
     """
     if not username:
         return ''
+
     username = username.replace(' ', '_')  # Avoid spaces or %20.
     try:
         username.encode('ascii')  # just test, but not actually use it
     except UnicodeEncodeError:
-        pass
+        username = quote(username.encode('utf-8'))
     else:
         # % is legal in the default $wgLegalTitleChars
         # This is so that ops know the real pywikibot will not
         # allow a useragent in the username to allow through a hand-coded
         # percent-encoded value.
         if '%' in username:
-            return quote(username)
-        else:
-            return username
-    username = quote(username.encode('utf-8'))
+            username = quote(username)
     return username
 
 
@@ -398,16 +396,15 @@ def error_handling_callback(request):
         if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
             raise FatalServerError(str(request.data))
 
-    # if all else fails
-    if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.uri)
-        raise request.data
-
     if request.status == 504:
         raise Server504Error('Server %s timed out' % request.hostname)
 
     if request.status == 414:
         raise Server414Error('Too long GET request')
+
+    if isinstance(request.data, Exception):
+        error('An error occurred for uri ' + request.uri)
+        raise request.data
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.

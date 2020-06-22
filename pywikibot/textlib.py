@@ -22,7 +22,6 @@ import datetime
 import re
 
 import pywikibot
-from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import (
@@ -311,8 +310,6 @@ def _get_regexes(keys, site):
         _create_default_regexes()
 
     result = []
-    # 'dontTouchRegexes' exist to reduce git blame only.
-    dontTouchRegexes = result
 
     for exc in keys:
         if isinstance(exc, UnicodeType):
@@ -343,10 +340,10 @@ def _get_regexes(keys, site):
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
-                dontTouchRegexes.append(_tag_regex('syntaxhighlight'))
+                result.append(_tag_regex('syntaxhighlight'))
         else:
             # assume it's a regular expression
-            dontTouchRegexes.append(exc)
+            result.append(exc)
 
     return result
 
@@ -446,9 +443,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                         replacement += new[last:group_match.start()]
                         replacement += match.group(group_id) or ''
                     except IndexError:
-                        raise IndexError(
-                            'Invalid group reference: {0}\nGroups found: {1}'
-                            ''.format(group_id, match.groups()))
+                        raise IndexError('Invalid group reference: {}\n'
+                                         'Groups found: {}'
+                                         .format(group_id, match.groups()))
                     last = group_match.end()
                 replacement += new[last:]
 
@@ -667,10 +664,10 @@ def replace_links(text, replace, site=None):
                              'a sequence, a Link or a basestring but '
                              'is "{0}"'.format(type(replacement)))
 
-    def title_section(l):
-        title = l.title
-        if l.section:
-            title += '#' + l.section
+    def title_section(link):
+        title = link.title
+        if link.section:
+            title += '#' + link.section
         return title
 
     if isinstance(replace, Sequence):
@@ -1615,9 +1612,8 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
 
-    This uses the package L{mwparserfromhell} (mwpfh) if it is installed
-    and enabled by config.mwparserfromhell. Otherwise it falls back on a
-    regex based implementation.
+    This uses the package L{mwparserfromhell} (mwpfh) if it is installed.
+    Otherwise it falls back on a regex based implementation.
 
     There are minor differences between the two implementations.
 
@@ -1636,33 +1632,29 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     @type text: str
     @param remove_disabled_parts: Remove disabled wikitext such as comments
         and pre. If None (default), this is enabled when mwparserfromhell
-        is not available or is disabled in the config, and disabled if
-        mwparserfromhell is present and enabled in the config.
+        is not available and disabled if mwparserfromhell is present.
     @type remove_disabled_parts: bool or None
     @param strip: if enabled, strip arguments and values of templates.
         If None (default), this is enabled when mwparserfromhell
-        is not available or is disabled in the config, and disabled if
-        mwparserfromhell is present and enabled in the config.
+        is not available and disabled if mwparserfromhell is present.
     @type strip: bool
     @return: list of template name and params
     @rtype: list of tuple
     """
-    use_mwparserfromhell = (config.use_mwparserfromhell
-                            and not isinstance(mwparserfromhell, Exception))
+    use_regex = isinstance(mwparserfromhell, Exception)
 
     if remove_disabled_parts is None:
-        remove_disabled_parts = not use_mwparserfromhell
-
-    if strip is None:
-        strip = not use_mwparserfromhell
-
+        remove_disabled_parts = use_regex
     if remove_disabled_parts:
         text = removeDisabledParts(text)
 
-    if use_mwparserfromhell:
-        return extract_templates_and_params_mwpfh(text, strip)
-    else:
+    if strip is None:
+        strip = use_regex
+
+    if use_regex:
         return extract_templates_and_params_regex(text, False, strip)
+    else:
+        return extract_templates_and_params_mwpfh(text, strip)
 
 
 def extract_templates_and_params_mwpfh(text, strip=False):
@@ -1673,8 +1665,7 @@ def extract_templates_and_params_mwpfh(text, strip=False):
 
     Use extract_templates_and_params, which will select this
     mwparserfromhell implementation if based on whether the
-    mwparserfromhell package is installed and enabled by
-    config.mwparserfromhell.
+    mwparserfromhell package is installed.
 
     @param text: The wikitext from which templates are extracted
     @type text: str

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Stdout, stderr and argv support for unicode."""
 #
-# (C) David-Sarah Hopwood, 2010
 # (C) Pywikibot team, 2012-2018
 #
 ##############################################
@@ -20,7 +19,6 @@
 #
 ################################################
 #
-# stdin support added by Merlijn van Deen <valhallasw@gmail.com>, March 2012
 # Licensed under both CC-BY-SA and the MIT license.
 #
 ################################################

@@ -47,7 +47,6 @@ but 'p' must be included.
 
 """
 #
-# (C) Legoktm, 2013
 # (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.

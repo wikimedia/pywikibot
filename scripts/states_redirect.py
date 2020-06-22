@@ -16,7 +16,6 @@ PRE-REQUISITE : Need to install python-pycountry library.
 * Install with pip: pip install pycountry
 """
 #
-# (C) Andre Engels, 2004
 # (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.

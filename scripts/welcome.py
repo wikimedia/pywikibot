@@ -157,14 +157,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
 badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Alfio, 2005
-# (C) Kyle/Orgullomoore, 2006-2007
-# (C) Siebrand Mazeland, 2006-2009
-# (C) Filnik, 2007-2011
-# (C) Daniel Herding, 2007
-# (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2019
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -269,6 +262,7 @@ netext = {
         'ar': '{{subst:ترحيب}} %s',
         'bs': '{{Dobrodošlica}} %s',
         'es': '{{subst:bienivenido usuario}} %s',
+        'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikinews': {
         'ar': '{{subst:ترحيب}} %s',
@@ -277,11 +271,16 @@ netext = {
         'it': '{{subst:benvenuto}}',
         'zh': '{{subst:welcome}} %s',
     },
+    'wikiquote': {
+        'ar': '{{subst:ترحيب}} %s',
+        'ml': '{{subst:സ്വാഗതം}}',
+    },
     'wikisource': {
         'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
         'bs': '{{Dobrodošlica}} %s',
         'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
+        'ml': '{{subst:സ്വാഗതം}}',
         'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
@@ -291,6 +290,7 @@ netext = {
         'fa': '{{جا:خوشامد|%s}}',
         'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'it': '{{subst:Utente:Filnik/Benve|firma=%s}}',
+        'ml': '{{subst:സ്വാഗതം}}',
         'ur': '{{جا:خوش آمدید}}%s',
     },
     'wikiversity': {

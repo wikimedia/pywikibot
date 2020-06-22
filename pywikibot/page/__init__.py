@@ -46,19 +46,18 @@ from pywikibot.exceptions import (
 from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
-    compute_file_hash,
+    classproperty, compute_file_hash,
     UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    add_full_name, manage_wrapping,
+    add_full_name, manage_wrapping, suppress_warnings,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
     first_upper, redirect_func, remove_last_args, UnicodeType,
     StringTypes
 )
-from pywikibot.tools.ip import ip_regexp  # deprecated
 from pywikibot.tools import is_IP
 
 if not PY2:
-    from html import entities as htmlentitydefs
+    from html.entities import name2codepoint
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 else:
     if __debug__ and not PY2:
@@ -66,7 +65,7 @@ else:
 
     chr = unichr
 
-    import htmlentitydefs
+    from htmlentitydefs import name2codepoint
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 
@@ -93,7 +92,6 @@ __all__ = (
     'UnicodeToAsciiHtml',
     'unicode2html',
     'url2unicode',
-    'ip_regexp',  # unused & deprecated
 )
 
 logger = logging.getLogger('pywiki.wiki.page')
@@ -1768,7 +1766,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
     # (revid, timestamp, user, comment)
     # whereas old framework had a tuple of 6 items:
     # (revid, timestamp, user, comment, size, tags)
-    @deprecated('Page.revisions()', since='20150206')
+    #
+    # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
+    @deprecated('Page.revisions()', since='20150206', future_warning=True)
     @deprecated_args(forceReload=None, revCount='total', step=None,
                      getAll=None, reverseOrder='reverse')
     def getVersionHistory(self, reverse=False, total=None):
@@ -1782,9 +1782,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param total: iterate no more than this number of revisions in total
         """
-        return [rev.hist_entry()
+        with suppress_warnings(
+                'pywikibot.page.Revision.hist_entry is deprecated'):
+            revisions = [
+                rev.hist_entry()
                 for rev in self.revisions(reverse=reverse, total=total)
-                ]
+            ]
+        return revisions
 
     @deprecated_args(forceReload=None, reverseOrder='reverse', step=None)
     def getVersionHistoryTable(self, reverse=False, total=None):
@@ -1798,17 +1802,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
         result += '|}\n'
         return result
 
-    @deprecated('Page.revisions(content=True)', since='20150206')
+    @deprecated('Page.revisions(content=True)', since='20150206',
+                future_warning=True)
     @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
     def fullVersionHistory(self, reverse=False, total=None):
-        """Iterate previous versions including wikitext.
-
-        Takes same arguments as getVersionHistory.
-        """
-        return [rev.full_hist_entry()
+        """Return previous versions including content."""
+        with suppress_warnings(
+                'pywikibot.page.Revision.full_hist_entry is deprecated'):
+            revisions = [
+                rev.full_hist_entry()
                 for rev in self.revisions(content=True, reverse=reverse,
                                           total=total)
-                ]
+            ]
+        return revisions
 
     @deprecated_args(step=None)
     def contributors(self, total=None, starttime=None, endtime=None):
@@ -2686,7 +2692,7 @@ class FilePage(Page):
                 **info.__dict__)
             lines.append('| {timestamp} || {user} || {dimension} |'
                          '| <nowiki>{comment}</nowiki>'
-                         ''.format(dimension=dimension, **info.__dict__))
+                         .format(dimension=dimension, **info.__dict__))
         return ('{| class="wikitable"\n'
                 '! {{int:filehist-datetime}} || {{int:filehist-user}} |'
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
@@ -3548,8 +3554,7 @@ class User(Page):
         @param total: limit result to this number of pages.
         @type total: int.
         """
-        for item in self.contributions(total=total):
-            yield item[0]
+        return (item[0] for item in self.contributions(total=total))
 
     @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total=500, **kwargs):
@@ -3961,25 +3966,50 @@ class SiteLinkCollection(MutableMapping):
         return cls(repo, data)
 
     @classmethod
+    def _extract_JSON(cls, obj):
+        if isinstance(obj, SiteLink):
+            return obj.toJSON()
+        elif isinstance(obj, BaseLink):
+            db_name = cls.getdbName(obj.site)
+            return {'site': db_name, 'title': obj.title}
+        elif isinstance(obj, Page):
+            db_name = cls.getdbName(obj.site)
+            return {'site': db_name, 'title': obj.title()}
+        else:
+            return obj
+
+    @classmethod
     def normalizeData(cls, data):
         """
         Helper function to expand data into the Wikibase API structure.
 
         @param data: Data to normalize
-        @type data: list
+        @type data: list or dict
 
-        @return: the altered dict from parameter data.
+        @return: The dict with normalized data
         @rtype: dict
         """
         norm_data = {}
-        for obj in data:
-            if isinstance(obj, Page):
-                db_name = obj.site.dbName()
-                norm_data[db_name] = {'site': db_name, 'title': obj.title()}
-            else:
-                # TODO: Do some verification here
+        if isinstance(data, dict):
+            for key, obj in data.items():
+                key = cls.getdbName(key)
+                json = cls._extract_JSON(obj)
+                if isinstance(json, str):
+                    json = {'site': key, 'title': json}
+                elif key != json['site']:
+                    raise ValueError(
+                        "Key '{}' doesn't match the site of the value: '{}'"
+                        .format(key, json['site']))
+                norm_data[key] = json
+        else:
+            for obj in data:
+                json = cls._extract_JSON(obj)
+                if not isinstance(json, dict):
+                    raise ValueError(
+                        "Couldn't determine the site and title of the value: "
+                        '{!r}'.format(json))
                 db_name = obj['site']
-                norm_data[db_name] = obj
+                norm_data[db_name] = json
         return norm_data
 
     def toJSON(self, diffto=None):
@@ -4163,7 +4193,7 @@ class WikibaseEntity(object):
         @param data: The dict to normalize
         @type data: dict
 
-        @return: the altered dict from parameter data.
+        @return: The dict with normalized data
         @rtype: dict
         """
         norm_data = {}
@@ -4586,13 +4616,6 @@ class WikibasePage(BasePage, WikibaseEntity):
                 'The provided Claim instance is already used in an entity')
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
-        for snaks in claim.qualifiers.values():
-            for snak in snaks:
-                snak.on_item = self
-        for source in claim.sources:
-            for snaks in source.values():
-                for snak in snaks:
-                    snak.on_item = self
 
     def removeClaims(self, claims, **kwargs):
         """
@@ -4782,8 +4805,8 @@ class ItemPage(WikibasePage):
         if hasattr(page, '_item'):
             return page._item
         if not page.site.has_data_repository:
-            raise pywikibot.WikiBaseError('{0} has no data repository'
-                                          ''.format(page.site))
+            raise pywikibot.WikiBaseError('{} has no data repository'
+                                          .format(page.site))
         if not lazy_load and not page.exists():
             raise pywikibot.NoPage(page)
 
@@ -4914,7 +4937,7 @@ class ItemPage(WikibasePage):
         """
         Set sitelinks. Calls setSitelinks().
 
-        A sitelink can either be a Page object,
+        A sitelink can be a Page object, a BaseLink object
         or a {'site':dbname,'title':title} dictionary.
         """
         self.setSitelinks([sitelink], **kwargs)
@@ -4945,7 +4968,7 @@ class ItemPage(WikibasePage):
         Set sitelinks.
 
         Sitelinks should be a list. Each item in the
-        list can either be a Page object, or a dict
+        list can either be a Page object, a BaseLink object, or a dict
         with a value for 'site' and 'title'.
         """
         data = {'sitelinks': sitelinks}
@@ -5796,16 +5819,16 @@ class Revision(DotReadableDict):
 
     """A structure holding information about a single revision of a Page."""
 
-    HistEntry = namedtuple('HistEntry', ['revid',
-                                         'timestamp',
-                                         'user',
-                                         'comment'])
+    _HistEntry = namedtuple('HistEntry', ['revid',
+                                          'timestamp',
+                                          'user',
+                                          'comment'])
 
-    FullHistEntry = namedtuple('FullHistEntry', ['revid',
-                                                 'timestamp',
-                                                 'user',
-                                                 'text',
-                                                 'rollbacktoken'])
+    _FullHistEntry = namedtuple('FullHistEntry', ['revid',
+                                                  'timestamp',
+                                                  'user',
+                                                  'text',
+                                                  'rollbacktoken'])
 
     def __init__(self, revid, timestamp, user, anon=False, comment='',
                  text=None, minor=False, rollbacktoken=None, parentid=None,
@@ -5853,6 +5876,18 @@ class Revision(DotReadableDict):
         self._content_model = contentmodel
         self._sha1 = sha1
         self.slots = slots
+
+    @classproperty
+    @deprecated(since='20200329', future_warning=True)
+    def HistEntry(cls):
+        """Class property which returns deprecated class attribute."""
+        return cls._HistEntry
+
+    @classproperty
+    @deprecated(since='20200329', future_warning=True)
+    def FullHistEntry(cls):
+        """Class property which returns deprecated FullHistEntry attribute."""
+        return cls._FullHistEntry
 
     @property
     def parent_id(self):
@@ -5932,15 +5967,24 @@ class Revision(DotReadableDict):
 
         return self._sha1
 
+    @deprecated(since='20200329', future_warning=True)
     def hist_entry(self):
         """Return a namedtuple with a Page history record."""
-        return Revision.HistEntry(self.revid, self.timestamp, self.user,
-                                  self.comment)
+        with suppress_warnings(
+                'pywikibot.page.Revision.HistEntry is deprecated'):
+            entry = Revision.HistEntry(self.revid, self.timestamp, self.user,
+                                       self.comment)
+        return entry
 
+    @deprecated(since='20200329', future_warning=True)
     def full_hist_entry(self):
         """Return a namedtuple with a Page full history record."""
-        return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
-                                      self.text, self.rollbacktoken)
+        with suppress_warnings(
+                'pywikibot.page.Revision.FullHistEntry is deprecated'):
+            entry = Revision.FullHistEntry(self.revid, self.timestamp,
+                                           self.user, self.text,
+                                           self.rollbacktoken)
+        return entry
 
     @staticmethod
     def _thank(revid, site, source='pywikibot'):
@@ -6798,11 +6842,7 @@ def html2unicode(text, ignore=None, exceptions=None):
             unicode_codepoint = int(match.group('hex'), 16)
         elif match.group('name'):
             name = match.group('name')
-            if name in htmlentitydefs.name2codepoint:
-                # We found a known HTML entity.
-                unicode_codepoint = htmlentitydefs.name2codepoint[name]
-            else:
-                unicode_codepoint = False
+            unicode_codepoint = name2codepoint.get(name, False)
 
         unicode_codepoint = _ILLEGAL_HTML_ENTITIES_MAPPING.get(
             unicode_codepoint, unicode_codepoint)

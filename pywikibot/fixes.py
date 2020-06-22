@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -96,9 +96,6 @@ fixes = {
             'de': 'Bot: korrigiere Grammatik',
         },
         'replacements': [
-            #   (u'([Ss]owohl) ([^,\.]+?), als auch', r'\1 \2 als auch'),
-            #   (u'([Ww]eder) ([^,\.]+?), noch', r'\1 \2 noch'),
-            #
             # Vorsicht bei Substantiven, z. B. 3-Jähriger!
             (r'(\d+)(minütig|stündig|tägig|wöchig|jährig|minütlich|stündlich'
              r'|täglich|wöchentlich|jährlich|fach|mal|malig|köpfig|teilig'
@@ -128,7 +125,6 @@ fixes = {
             # z.B. nach Quellenangaben
             (r'([a-zäöüß](\]\])?) ([,.!?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])',
              r'\1\3 \4'),
-            #   (u'([a-z]\.)([A-Z])', r'\1 \2'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -357,16 +353,6 @@ fixes = {
             'de': 'Bot: Korrigiere Datumsformat',
         },
         'replacements': [
-            # space after birth sign w/ year
-            #   (u'\(\*(\d{3,4})', u'(* \\1'),
-            # space after death sign w/ year
-            #   (u'†(\d{3,4})', u'† \\1'),
-            #   (u'&dagger;(\d{3,4})', u'† \\1'),
-            # space after birth sign w/ linked date
-            #   (u'\(\*\[\[(\d)', u'(* [[\\1'),
-            # space after death sign w/ linked date
-            #   (u'†\[\[(\d)', u'† [[\\1'),
-            #   (u'&dagger;\[\[(\d)', u'† [[\\1'),
             (r'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|'
              r'September|Oktober|November|Dezember)) (\d{1,4})\]\]',
              r'[[\1]] [[\2]]'),
@@ -449,9 +435,6 @@ fixes = {
             'ar': 'تدقيق إملائي',
         },
         'replacements': [
-            # FIXME: Do not replace comma in non-Arabic text,
-            # interwiki, image links or <math> syntax.
-            #   (u' ,', u' ،'),
             (r'(\A|\s)إمرأة(\Z|\s)', '\\1امرأة\\2'),
             (r'(\A|\s)الى(\Z|\s)', '\\1إلى\\2'),
             (r'(\A|\s)إسم(\Z|\s)', '\\1اسم\\2'),
@@ -646,8 +629,6 @@ fixes = {
             ('eunet.yu',                    'eunet.rs'),
             ('www.zastava-arms.co.yu',      'www.zastava-arms.co.rs'),
             ('www.airportnis.co.yu',        'www.airportnis.rs'),
-            # Archive links don't seem to work
-            # (u'www.danas.co.yu',             u'www.danas.rs'),
             ('www.belex.co.yu',             'www.belex.rs'),
             ('beograd.org.yu',              'beograd.rs'),
             ('www.vlada.cg.yu',             'www.vlada.me'),

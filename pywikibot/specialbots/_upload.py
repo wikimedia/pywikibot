@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Library containing special bots."""
+"""Special bot library containing UploadRobot.
+
+Do not import classes directly from here but from specialbots.
+"""
 #
-# (C) Rob W.W. Hooft, Andre Engels 2003-2004
 # (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
@@ -12,18 +14,14 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import tempfile
 
+from contextlib import closing
+
 import pywikibot
 import pywikibot.data.api
 
 from pywikibot import config
 
-from pywikibot.bot import (
-    BaseBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot,
-    InteractiveReplace, ChoiceException, UnhandledAnswer, AlwaysChoice,
-    QuitKeyboardInterrupt,
-)
-from pywikibot.editor import TextEditor
-from pywikibot.textlib import replace_links
+from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.tools import PY2, deprecated, deprecated_args, UnicodeType
 from pywikibot.tools.formatter import color_format
 
@@ -39,11 +37,15 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(uploadByUrl=None)
-    def __init__(self, url, urlEncoding=None, description='',
-                 useFilename=None, keepFilename=False, verifyDescription=True,
-                 ignoreWarning=False, targetSite=None, aborts=[], chunk_size=0,
-                 summary=None, filename_prefix=None, **kwargs):
+    @deprecated_args(uploadByUrl=None, urlEncoding='url_encoding',
+                     useFilename='use_filename', keepFilename='keep_filename',
+                     verifyDescription='verify_description',
+                     ignoreWarning='ignore_warning', targetSite='target_site')
+    def __init__(self, url, url_encoding=None, description='',
+                 use_filename=None, keep_filename=False,
+                 verify_description=True, ignore_warning=False,
+                 target_site=None, aborts=[], chunk_size=0, summary=None,
+                 filename_prefix=None, **kwargs):
         """
         Initializer.
 
@@ -53,24 +55,24 @@ class UploadRobot(BaseBot):
         @param description: Description of file for its page. If multiple files
             are uploading the same description is used for every file.
         @type description: str
-        @param useFilename: Specify title of the file's page. If multiple
+        @param use_filename: Specify title of the file's page. If multiple
             files are uploading it asks to change the name for second, third,
             etc. files, otherwise the last file will overwrite the other.
-        @type useFilename: str
-        @param keepFilename: Set to True to keep original names of urls and
+        @type use_filename: str
+        @param keep_filename: Set to True to keep original names of urls and
             files, otherwise it will ask to enter a name for each file.
-        @type keepFilename: bool
+        @type keep_filename: bool
         @param summary: Summary of the upload
         @type summary: str
-        @param verifyDescription: Set to True to proofread the description.
-        @type verifyDescription: bool
-        @param ignoreWarning: Set this to True to upload even if another file
+        @param verify_description: Set to True to proofread the description.
+        @type verify_description: bool
+        @param ignore_warning: Set this to True to upload even if another file
             would be overwritten or another mistake would be risked. Set it to
             an array of warning codes to selectively ignore specific warnings.
-        @type ignoreWarning: bool or list
-        @param targetSite: Set the site to upload to. If target site is not
+        @type ignore_warning: bool or list
+        @param target_site: Set the site to upload to. If target site is not
             given it's taken from user-config.py.
-        @type targetSite: object
+        @type target_site: object
         @param aborts: List of the warning types to abort upload on. Set to
             True to abort on any warning.
         @type aborts: bool or list
@@ -81,9 +83,9 @@ class UploadRobot(BaseBot):
         @param filename_prefix: Specify prefix for the title of every
             file's page.
         @type filename_prefix: str
-        @param always: Disables any input, requires that either ignoreWarning
+        @param always: Disables any input, requires that either ignore_warning
             or aborts are set to True and that the description is also set. It
-            overwrites verifyDescription to False and keepFilename to True.
+            overwrites verify_description to False and keep_filename to True.
         @type always: bool
 
         @deprecated: Using upload_image() is deprecated, use upload_file() with
@@ -92,9 +94,9 @@ class UploadRobot(BaseBot):
         """
         super(UploadRobot, self).__init__(**kwargs)
         always = self.getOption('always')
-        if (always and ignoreWarning is not True and aborts is not True):
+        if (always and ignore_warning is not True and aborts is not True):
             raise ValueError('When always is set to True, either '
-                             'ignoreWarning or aborts must be set to True.')
+                             'ignore_warning or aborts must be set to True.')
         if always and not description:
             raise ValueError('When always is set to True, the description '
                              'must be set.')
@@ -102,27 +104,22 @@ class UploadRobot(BaseBot):
         if isinstance(self.url, UnicodeType):
             pywikibot.warning('url as string is deprecated. '
                               'Use an iterable instead.')
-        self.urlEncoding = urlEncoding
+        self.url_encoding = url_encoding
         self.description = description
-        self.useFilename = useFilename
-        self.keepFilename = keepFilename or always
-        self.verifyDescription = verifyDescription and not always
-        self.ignoreWarning = ignoreWarning
+        self.use_filename = use_filename
+        self.keep_filename = keep_filename or always
+        self.verify_description = verify_description and not always
+        self.ignore_warning = ignore_warning
         self.aborts = aborts
         self.chunk_size = chunk_size
         self.summary = summary
         self.filename_prefix = filename_prefix
         if config.upload_to_commons:
-            self.targetSite = targetSite or pywikibot.Site('commons',
-                                                           'commons')
+            self.target_site = target_site or pywikibot.Site('commons',
+                                                             'commons')
         else:
-            self.targetSite = targetSite or pywikibot.Site()
-        self.targetSite.login()
-
-    @deprecated(since='20141211')
-    def urlOK(self):
-        """Return True if self.url is a URL or an existing local file."""
-        return '://' in self.url or os.path.exists(self.url)
+            self.target_site = target_site or pywikibot.Site()
+        self.target_site.login()
 
     def read_file_content(self, file_url=None):
         """Return name of temp file in which remote file is saved."""
@@ -143,33 +140,31 @@ class UploadRobot(BaseBot):
                 pywikibot.output('Resume download...')
                 uo.addheader('Range', 'bytes=%s-' % rlen)
 
-            infile = uo.open(file_url)
-            info = infile.info()
+            with closing(uo.open(file_url)) as infile:
+                info = infile.info()
 
-            if PY2:
-                content_type = info.getheader('Content-Type')
-                content_len = info.getheader('Content-Length')
-                accept_ranges = info.getheader('Accept-Ranges')
-            else:
-                content_type = info.get('Content-Type')
-                content_len = info.get('Content-Length')
-                accept_ranges = info.get('Accept-Ranges')
+                if PY2:
+                    info_get = info.getheader
+                else:
+                    info_get = info.get
+                content_type = info_get('Content-Type')
+                content_len = info_get('Content-Length')
+                accept_ranges = info_get('Accept-Ranges')
 
-            if 'text/html' in content_type:
-                pywikibot.output("Couldn't download the image: "
-                                 'the requested URL was not found on server.')
-                return
+                if 'text/html' in content_type:
+                    pywikibot.output(
+                        "Couldn't download the image: "
+                        'the requested URL was not found on server.')
+                    return
 
-            valid_ranges = accept_ranges == 'bytes'
+                valid_ranges = accept_ranges == 'bytes'
 
-            if resume:
-                _contents += infile.read()
-            else:
-                _contents = infile.read()
+                if resume:
+                    _contents += infile.read()
+                else:
+                    _contents = infile.read()
 
-            infile.close()
             retrieved = True
-
             if content_len:
                 rlen = len(_contents)
                 content_len = int(content_len)
@@ -207,8 +202,8 @@ class UploadRobot(BaseBot):
         if self.aborts is not True:
             if warning in self.aborts:
                 return False
-        if self.ignoreWarning is True or (self.ignoreWarning is not False
-                                          and warning in self.ignoreWarning):
+        if self.ignore_warning is True or (self.ignore_warning is not False
+                                           and warning in self.ignore_warning):
             return True
         return None if self.aborts is not True else False
 
@@ -247,11 +242,11 @@ class UploadRobot(BaseBot):
             # extract the path portion of the URL
             filename = urlparse(filename).path
         filename = os.path.basename(filename)
-        if self.useFilename:
-            filename = self.useFilename
+        if self.use_filename:
+            filename = self.use_filename
         if self.filename_prefix:
             filename = self.filename_prefix + filename
-        if not self.keepFilename:
+        if not self.keep_filename:
             pywikibot.output(
                 'The filename on the target wiki will default to: %s'
                 % filename)
@@ -264,7 +259,7 @@ class UploadRobot(BaseBot):
         # forbidden characters are handled by pywikibot/page.py
         forbidden = ':*?/\\'  # to be extended
         try:
-            allowed_formats = self.targetSite.siteinfo.get(
+            allowed_formats = self.target_site.siteinfo.get(
                 'fileextensions', get_default=False)
         except KeyError:
             allowed_formats = []
@@ -301,7 +296,8 @@ class UploadRobot(BaseBot):
                         % (' '.join(allowed_formats), ext),
                         default=False, automatic_quit=False):
                     continue
-            potential_file_page = pywikibot.FilePage(self.targetSite, filename)
+            potential_file_page = pywikibot.FilePage(self.target_site,
+                                                     filename)
             if potential_file_page.exists():
                 overwrite = self._handle_warning('exists')
                 if overwrite is False:
@@ -342,7 +338,7 @@ class UploadRobot(BaseBot):
             pywikibot.output('The suggested description is:\n%s'
                              % self.description)
 
-        while not self.description or self.verifyDescription:
+        while not self.description or self.verify_description:
             if not self.description:
                 pywikibot.output(color_format(
                     '{lightred}It is not possible to upload a file '
@@ -350,7 +346,7 @@ class UploadRobot(BaseBot):
             assert not always
             # if no description, ask if user want to add one or quit,
             # and loop until one is filled.
-            # if self.verifyDescription, ask if user want to change it
+            # if self.verify_description, ask if user want to change it
             # or continue.
             if self.description:
                 question = 'Do you want to change this description?'
@@ -361,18 +357,18 @@ class UploadRobot(BaseBot):
                 from pywikibot import editor as editarticle
                 editor = editarticle.TextEditor()
                 try:
-                    newDescription = editor.edit(self.description)
+                    new_description = editor.edit(self.description)
                 except ImportError:
                     raise
                 except Exception as e:
                     pywikibot.error(e)
                     continue
                 # if user saved / didn't press Cancel
-                if newDescription:
-                    self.description = newDescription
+                if new_description:
+                    self.description = new_description
             elif not self.description:
                 raise QuitKeyboardInterrupt
-            self.verifyDescription = False
+            self.verify_description = False
 
         return filename
 
@@ -390,10 +386,10 @@ class UploadRobot(BaseBot):
         @param warn_code: The warning message
         @type warn_code: str
         """
-        if self.ignoreWarning is True:
+        if self.ignore_warning is True:
             return True
         else:
-            return warn_code in self.ignoreWarning
+            return warn_code in self.ignore_warning
 
     @deprecated('UploadRobot.upload_file()', since='20141211')
     @deprecated_args(debug=None)
@@ -416,13 +412,13 @@ class UploadRobot(BaseBot):
         if not filename:
             return None
 
-        site = self.targetSite
+        site = self.target_site
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
         pywikibot.output('Uploading file to {0}...'.format(site))
 
-        ignore_warnings = self.ignoreWarning is True or self._handle_warnings
+        ignore_warnings = self.ignore_warning is True or self._handle_warnings
         if '://' in file_url and not site.has_right('upload_by_url'):
             file_url = self.read_file_content(file_url)
 
@@ -454,17 +450,17 @@ class UploadRobot(BaseBot):
     def run(self):
         """Run bot."""
         # early check that upload is enabled
-        if self.targetSite.is_uploaddisabled():
+        if self.target_site.is_uploaddisabled():
             pywikibot.error(
                 'Upload error: Local file uploads are disabled on %s.'
-                % self.targetSite)
+                % self.target_site)
             return
 
         # early check that user has proper rights to upload
-        if not self.targetSite.has_right('upload'):
+        if not self.target_site.has_right('upload'):
             pywikibot.error(
                 "User '%s' does not have upload rights on site %s."
-                % (self.targetSite.user(), self.targetSite))
+                % (self.target_site.user(), self.target_site))
             return
 
         try:
@@ -485,76 +481,3 @@ class UploadRobot(BaseBot):
                                  self.__class__.__name__)
         finally:
             self.exit()
-
-
-class EditReplacement(ChoiceException, UnhandledAnswer):
-
-    """The text should be edited and replacement should be restarted."""
-
-    def __init__(self):
-        """Initializer."""
-        super(EditReplacement, self).__init__('edit', 'e')
-        self.stop = True
-
-
-class InteractiveUnlink(InteractiveReplace):
-
-    """An implementation which just allows unlinking."""
-
-    def __init__(self, bot):
-        """Create default settings."""
-        super(InteractiveUnlink, self).__init__(
-            old_link=bot.pageToUnlink, new_link=False, default='u')
-        self._always = AlwaysChoice(self, 'unlink all pages', 'a')
-        self._always.always = bot.getOption('always')
-        self.additional_choices = [
-            AlwaysChoice(self, 'unlink all on page', 'p'),
-            self._always, EditReplacement()]
-        self._bot = bot
-        self.context = 100
-        self.context_change = 100
-
-    def handle_answer(self, choice):
-        """Handle choice and store in bot's options."""
-        answer = super(InteractiveUnlink, self).handle_answer(choice)
-        self._bot.options['always'] = self._always.always
-        return answer
-
-
-class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
-
-    """A basic bot unlinking a given link from the current page."""
-
-    def __init__(self, **kwargs):
-        """Redirect all parameters and add namespace as an available option."""
-        self.availableOptions.update({
-            'namespaces': [],
-            # Which namespaces should be processed?
-            # default to [] which means all namespaces will be processed
-        })
-        super(BaseUnlinkBot, self).__init__(**kwargs)
-
-    def _create_callback(self):
-        """Create a new callback instance for replace_links."""
-        return InteractiveUnlink(self)
-
-    def unlink(self, target_page):
-        """Unlink all links linking to the target page."""
-        text = self.current_page.text
-        while True:
-            unlink_callback = self._create_callback()
-            try:
-                text = replace_links(text, unlink_callback, target_page.site)
-            except EditReplacement:
-                new_text = TextEditor().edit(
-                    unlink_callback.current_text,
-                    jumpIndex=unlink_callback.current_range[0])
-                # if user didn't press Cancel
-                if new_text:
-                    text = new_text
-                else:
-                    text = unlink_callback.current_text
-            else:
-                break
-
-        self.put_current(text)

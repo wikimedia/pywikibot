@@ -44,11 +44,11 @@ from pywikibot.exceptions import (
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
     EditConflict, PageDeletedConflict, PageCreatedConflict,
     ServerError, FatalServerError, Server504Error,
-    CaptchaError, SpamfilterError, TitleblacklistError,
+    CaptchaError, SpamblacklistError, TitleblacklistError,
     CircularRedirect, InterwikiRedirectPage, WikiBaseError, NoWikibaseEntity,
     CoordinateGlobeUnknownException,
     DeprecatedPageNotFoundError as _DeprecatedPageNotFoundError,
-    _EmailUserError,
+    _DeprecatedSpamfilterError, _EmailUserError,
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
@@ -104,10 +104,10 @@ __all__ = (
     'Page', 'PageCreatedConflict', 'PageDeletedConflict', 'PageNotSaved',
     'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
     'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
-    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink', 'SpamfilterError',
-    'stdout', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
-    'UnicodeMixin', 'UnknownExtension', 'UnknownFamily', 'UnknownSite',
-    'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
+    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink',
+    'SpamblacklistError', 'stdout', 'TitleblacklistError', 'translate', 'ui',
+    'unicode2html', 'UnicodeMixin', 'UnknownExtension', 'UnknownFamily',
+    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
     'UserActionRefuse', 'UserBlocked', 'warning', 'WikiBaseError',
     'WikidataBot',
 )
@@ -153,9 +153,8 @@ class Timestamp(datetime.datetime):
     when previously they returned a MediaWiki string representation, these
     methods also accept a Timestamp object, in which case they return a clone.
 
-    Use Site.getcurrenttime() for the current time; this is more reliable
+    Use Site.server_time() for the current time; this is more reliable
     than using Timestamp.utcnow().
-
     """
 
     mediawikiTSFormat = '%Y%m%d%H%M%S'
@@ -1244,7 +1243,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     # config.usernames is initialised with a defaultdict for each family name
     family_name = str(fam)
 
-    code_to_user = config.usernames['*'].copy()
+    code_to_user = {}
+    if '*' in config.usernames:  # T253127: usernames is a defaultdict
+        code_to_user = config.usernames['*'].copy()
     code_to_user.update(config.usernames[family_name])
     user = user or code_to_user.get(code) or code_to_user.get('*')
 
@@ -1378,9 +1379,9 @@ def _flush(stop=True):
         try:
             _putthread.join(1)
         except KeyboardInterrupt:
-            if input_yn('There are {0} pages remaining in the queue. '
-                        'Estimated time remaining: {1}\nReally exit?'
-                        ''.format(*remaining()),
+            if input_yn('There are {} pages remaining in the queue. '
+                        'Estimated time remaining: {}\nReally exit?'
+                        .format(*remaining()),
                         default=False, automatic_quit=False):
                 return
 
@@ -1442,6 +1443,11 @@ wrapper._add_deprecated_attr(
     warning_message=('{0}.{1} is deprecated, and no longer '
                      'used by pywikibot; use http.fetch() instead.'),
     since='20140924')
+wrapper._add_deprecated_attr(
+    'SpamfilterError', _DeprecatedSpamfilterError,
+    warning_message='SpamfilterError is deprecated; '
+                    'use SpamblacklistError instead.',
+    since='20200405')
 wrapper._add_deprecated_attr(
     'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
