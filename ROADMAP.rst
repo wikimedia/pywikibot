@@ -3,6 +3,8 @@ Current release
 
   **Note: This is the last release supporting Python 2 and Python 3.4**
 
+* Wait in BaseBot.exit() until asynchronous saving pages are completed
+* Solve IndexError when showing an empty diff with a non-zero context (T252724)
 * linktrails were added or updated for a lot of sites
 * Resolve namespaces with underlines (T252940)
 * Fix getversion_svn for Python 3.6+ (T253617, T132292)
@@ -12,6 +14,7 @@ Current release
 Future releases
 ~~~~~~~~~~~~~~~
 
+* (current) tools.count, tools.Counter, tools.OrderedDict and ContextManagerWrapper will be removed
 * (current) getFilesFromAnHash and getImagesFromAnHash Site methods will be removed
 * 3.0.20200508: PageNotFound, SpamfilterError and UserActionRefuse exceptions will be removed (T253681)
 * 3.0.20200508: Page.getVersionHistory and Page.fullVersionHistory() methods will be removed (T136513, T151110)
