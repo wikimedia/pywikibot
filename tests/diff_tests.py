@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test diff module."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -180,7 +180,16 @@ class TestPatchManager(TestCase):
         for case in self.cases:
             p = PatchManager(case[0], case[1])
             for key in case[2].keys():  # for each hunk
-                self.assertEqual(p.hunks[key].diff_plain_text, case[2][key])
+                with self.subTest(case=case[0].strip(), key=key):
+                    self.assertEqual(p.hunks[key].diff_plain_text,
+                                     case[2][key])
+
+    def test_patch_manager_no_diff(self):
+        """Test PatchManager for the same strings."""
+        for context in range(2):
+            p = PatchManager('Pywikibot', 'Pywikibot', context=context)
+            with self.subTest(context=context):
+                self.assertIsEmpty(p.hunks)
 
 
 class TestCherryPick(TestCase):
