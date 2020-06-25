@@ -2198,9 +2198,11 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111')
+wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111',
+                             future_warning=True)
 wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict,
-                             since='20160111')
-wrapper._add_deprecated_attr('count', itertools.count, since='20160111')
+                             since='20160111', future_warning=True)
+wrapper._add_deprecated_attr('count', itertools.count, since='20160111',
+                             future_warning=True)
 wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='',
-                             since='20180402')
+                             since='20180402', future_warning=True)
