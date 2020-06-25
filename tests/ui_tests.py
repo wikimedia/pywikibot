@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -882,9 +882,8 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
 
 if __name__ == '__main__':  # pragma: no cover
     try:
-        try:
-            unittest.main()
-        except SystemExit:
-            pass
+        unittest.main()
+    except SystemExit:
+        pass
     finally:
         unpatch()
