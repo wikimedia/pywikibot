@@ -149,7 +149,7 @@ class TestGeneral(WikidataTestCase):
                                                 'numeric-id': 1})
 
     def test_cmp(self):
-        """Test WikibasePage.__cmp__."""
+        """Test WikibasePage comparison."""
         self.assertEqual(ItemPage.fromPage(self.mainpage),
                          ItemPage(self.get_repo(), 'q5296'))
 
