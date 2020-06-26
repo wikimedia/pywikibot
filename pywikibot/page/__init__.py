@@ -1180,14 +1180,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @rtype: bool
         """
-        # TODO: move this to Site object?
-
-        # FIXME: templatesWithParams is defined in Page only.
         if not hasattr(self, 'templatesWithParams'):
             return True
 
         if config.ignore_bot_templates:  # Check the "master ignore switch"
             return True
+
         username = self.site.user()
         try:
             templates = self.templatesWithParams()
@@ -1197,48 +1195,85 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return True
 
         # go through all templates and look for any restriction
-        # multiple bots/nobots templates are allowed
-        restrictions = self.site.family.edit_restricted_templates.get(
-            self.site.code)
+        restrictions = set(self.site.get_edit_restricted_templates())
+
         # also add archive templates for non-archive bots
         if pywikibot.calledModuleName() != 'archivebot':
-            archived = self.site.family.archived_page_templates.get(
-                self.site.code)
-            if restrictions and archived:
-                restrictions += archived
-            elif archived:
-                restrictions = archived
+            restrictions.update(self.site.get_archived_page_templates())
 
+        # multiple bots/nobots templates are allowed
         for template, params in templates:
             title = template.title(with_ns=False)
-            if restrictions:
-                if title in restrictions:
-                    return False
+
+            if title in restrictions:
+                return False
+
+            if title not in ('Bots', 'Nobots'):
+                continue
+
+            try:
+                key, sep, value = params[0].partition('=')
+            except IndexError:
+                key, sep, value = '', '', ''
+                names = set()
+            else:
+                if not sep:
+                    key, value = value, key
+                key = key.strip()
+                names = {name.strip() for name in value.split(',')}
+
+            if len(params) > 1:
+                pywikibot.warning(
+                    '{{%s|%s}} has more than 1 parameter; taking the first.'
+                    % (title.lower(), '|'.join(params)))
+
             if title == 'Nobots':
                 if not params:
                     return False
-                else:
-                    bots = [bot.strip() for bot in params[0].split(',')]
-                    if 'all' in bots or pywikibot.calledModuleName() in bots \
-                       or username in bots:
-                        return False
-            elif title == 'Bots':
-                if not params:
-                    return True
-                else:
-                    (ttype, bots) = [part.strip() for part
-                                     in params[0].split('=', 1)]
-                    bots = [bot.strip() for bot in bots.split(',')]
-                    if ttype == 'allow':
-                        return 'all' in bots or username in bots
-                    if ttype == 'deny':
-                        return not ('all' in bots or username in bots)
-                    if ttype == 'allowscript':
-                        return ('all' in bots
-                                or pywikibot.calledModuleName() in bots)
-                    if ttype == 'denyscript':
-                        return not ('all' in bots
-                                    or pywikibot.calledModuleName() in bots)
+
+                if key:
+                    pywikibot.error(
+                        '%s parameter for {{nobots}} is not allowed. '
+                        'Edit declined' % key)
+                    return False
+
+                if 'all' in names \
+                   or pywikibot.calledModuleName() in names \
+                   or username in names:
+                    return False
+
+            if title == 'Bots':
+                if value and not key:
+                    pywikibot.warning(
+                        '{{bots|%s}} is not valid. Ignoring.' % value)
+                    continue
+
+                if key and not value:
+                    pywikibot.warning(
+                        '{{bots|%s=}} is not valid. Ignoring.' % key)
+                    continue
+
+                if key == 'allow' and not ('all' in names
+                                           or username in names):
+                    return False
+
+                if key == 'deny' and ('all' in names or username in names):
+                    return False
+
+                if key == 'allowscript' \
+                   and not ('all' in names
+                            or pywikibot.calledModuleName() in names):
+                    return False
+
+                if key == 'denyscript' \
+                   and ('all' in names
+                        or pywikibot.calledModuleName() in names):
+                    return False
+
+                if key:  # ignore unrecognized keys with a warning
+                    pywikibot.warning(
+                        '{{bots|%s}} is not valid. Ignoring.' % params[0])
+
         # no restricting template found
         return True
 
