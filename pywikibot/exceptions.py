@@ -89,14 +89,7 @@ UserWarning: warnings targeted at users
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from pywikibot.tools import (
-    # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
-    deprecated as __deprecated,
-    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    UnicodeMixin,
-    UnicodeType,
-    _NotImplementedWarning,
-)
+from pywikibot.tools import UnicodeMixin, UnicodeType, _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -609,50 +602,3 @@ class MaxlagTimeoutError(TimeoutError):
     """Request failed with a maxlag timeout error."""
 
     pass
-
-
-@__deprecated(since='20141214')
-class DeprecatedPageNotFoundError(Error):
-
-    """Page not found (deprecated)."""
-
-    pass
-
-
-@__deprecated(since='20141218')
-class _EmailUserError(UserRightsError, NotEmailableError):
-
-    """Email related error."""
-
-    pass
-
-
-@__deprecated(since='20200405')
-class _DeprecatedSpamfilterError(SpamblacklistError):
-
-    """MediaWiki detected a blacklisted spam URL (deprecated)."""
-
-    pass
-
-
-wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'UploadWarning',
-    replacement_name='pywikibot.data.api.UploadWarning',
-    warning_message='pywikibot.exceptions.UploadWarning is deprecated; '
-                    'use APISite.upload with a warning handler instead.',
-    since='20150921')
-wrapper._add_deprecated_attr('PageNotFound', DeprecatedPageNotFoundError,
-                             warning_message='{0}.{1} is deprecated, and no '
-                                             'longer used by pywikibot; use '
-                                             'http.fetch() instead.',
-                             since='20141214')
-wrapper._add_deprecated_attr('SpamfilterError', _DeprecatedSpamfilterError,
-                             warning_message='SpamfilterError is deprecated; '
-                                             'use SpamblacklistError instead.',
-                             since='20200405')
-wrapper._add_deprecated_attr(
-    'UserActionRefuse', _EmailUserError,
-    warning_message='UserActionRefuse is deprecated; '
-                    'use UserRightsError and/or NotEmailableError',
-    since='20141218')

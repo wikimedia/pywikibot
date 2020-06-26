@@ -32,7 +32,7 @@ from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
 )
 from pywikibot import config2 as config
-from pywikibot.data.api import UploadWarning as _UploadWarning
+from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
@@ -47,8 +47,6 @@ from pywikibot.exceptions import (
     CaptchaError, SpamblacklistError, TitleblacklistError,
     CircularRedirect, InterwikiRedirectPage, WikiBaseError, NoWikibaseEntity,
     CoordinateGlobeUnknownException,
-    DeprecatedPageNotFoundError as _DeprecatedPageNotFoundError,
-    _DeprecatedSpamfilterError, _EmailUserError,
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
@@ -108,8 +106,7 @@ __all__ = (
     'SpamblacklistError', 'stdout', 'TitleblacklistError', 'translate', 'ui',
     'unicode2html', 'UnicodeMixin', 'UnknownExtension', 'UnknownFamily',
     'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
-    'UserActionRefuse', 'UserBlocked', 'warning', 'WikiBaseError',
-    'WikidataBot',
+    'UserBlocked', 'warning', 'WikiBaseError', 'WikidataBot',
 )
 __all__ += textlib_methods
 
@@ -1439,30 +1436,10 @@ wrapper._add_deprecated_attr(
     'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
     since='20150921')
 wrapper._add_deprecated_attr(
-    'PageNotFound', _DeprecatedPageNotFoundError,
-    warning_message=('{0}.{1} is deprecated, and no longer '
-                     'used by pywikibot; use http.fetch() instead.'),
-    since='20140924')
-wrapper._add_deprecated_attr(
-    'SpamfilterError', _DeprecatedSpamfilterError,
-    warning_message='SpamfilterError is deprecated; '
-                    'use SpamblacklistError instead.',
-    since='20200405')
-wrapper._add_deprecated_attr(
-    'UserActionRefuse', _EmailUserError,
-    warning_message='UserActionRefuse is deprecated; '
-                    'use UserRightsError and/or NotEmailableError instead.',
-    since='20141218')
-wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
                     'use pywikibot.bot.QuitKeyboardInterrupt instead.',
     since='20150619')
-wrapper._add_deprecated_attr(
-    'UploadWarning', _UploadWarning,
-    warning_message='pywikibot.UploadWarning is deprecated; '
-                    'use APISite.upload with a warning handler instead.',
-    since='20150921')
 wrapper._add_deprecated_attr(
     'MediaWikiVersion', _MediaWikiVersion,
     warning_message='pywikibot.MediaWikiVersion is deprecated; '
