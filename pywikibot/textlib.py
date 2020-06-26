@@ -316,7 +316,7 @@ def _get_regexes(keys, site):
             # assume the string is a reference to a standard regex above,
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
-                if type(_regex_cache[exc]) is tuple:
+                if isinstance(_regex_cache[exc], tuple):
                     if not site and exc in ('interwiki', 'property', 'invoke',
                                             'category', 'file'):
                         issue_deprecation_warning(

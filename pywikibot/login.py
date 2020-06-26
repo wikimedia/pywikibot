@@ -232,10 +232,12 @@ class LoginManager(object):
                 entry = eval(line)
             except SyntaxError:
                 entry = None
-            if type(entry) is not tuple:
+
+            if not isinstance(entry, tuple):
                 warn('Invalid tuple in line {0}'.format(line_nr),
                      _PasswordFileWarning)
                 continue
+
             if not 2 <= len(entry) <= 4:
                 warn('The length of tuple in line {0} should be 2 to 4 ({1} '
                      'given)'.format(line_nr, entry), _PasswordFileWarning)
