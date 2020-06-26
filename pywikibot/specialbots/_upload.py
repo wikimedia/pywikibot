@@ -37,7 +37,7 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(uploadByUrl=None, urlEncoding='url_encoding',
+    @deprecated_args(uploadByUrl=True, urlEncoding='url_encoding',
                      useFilename='use_filename', keepFilename='keep_filename',
                      verifyDescription='verify_description',
                      ignoreWarning='ignore_warning', targetSite='target_site')
@@ -87,10 +87,6 @@ class UploadRobot(BaseBot):
             or aborts are set to True and that the description is also set. It
             overwrites verify_description to False and keep_filename to True.
         @type always: bool
-
-        @deprecated: Using upload_image() is deprecated, use upload_file() with
-            file_url param instead
-
         """
         super(UploadRobot, self).__init__(**kwargs)
         always = self.getOption('always')
@@ -392,12 +388,12 @@ class UploadRobot(BaseBot):
             return warn_code in self.ignore_warning
 
     @deprecated('UploadRobot.upload_file()', since='20141211')
-    @deprecated_args(debug=None)
+    @deprecated_args(debug=True)
     def upload_image(self):
         """Upload image."""
         return self.upload_file(self.url)
 
-    @deprecated_args(debug=None)
+    @deprecated_args(debug=True)
     def upload_file(self, file_url, _file_key=None, _offset=0):
         """
         Upload the image at file_url to the target wiki.
