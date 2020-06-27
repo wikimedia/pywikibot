@@ -30,6 +30,7 @@ except ImportError:  # Python 2.7
 from datetime import datetime
 from distutils.version import Version
 from functools import wraps
+from ipaddress import ip_address
 from warnings import catch_warnings, showwarning, warn
 
 from pywikibot.logging import debug
@@ -42,16 +43,11 @@ if not PY2:
     import queue
     StringTypes = (str, bytes)
     UnicodeType = str
-    from ipaddress import ip_address
 else:
     from itertools import izip_longest as zip_longest
     import Queue as queue  # noqa: N813
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
-    try:
-        from ipaddress import ip_address
-    except ImportError:
-        ip_address = None
 
 try:
     import bz2
@@ -387,17 +383,8 @@ def is_IP(IP):  # noqa N802, N803
     @type IP: str
     @rtype: bool
     """
-    method = ip_address
-    if not ip_address:  # Python 2 needs ipaddress to be installed
-        issue_deprecation_warning(
-            'ipaddr module', 'ipaddress module',
-            warning_class=FutureWarning, since='20200120')
-        from pywikibot.tools import ip
-        with suppress_warnings('pywikibot.tools.ip.is_IP is deprecated'):
-            method = ip.is_IP
-
     try:
-        method(IP)
+        ip_address(IP)
     except ValueError:
         pass
     else:
