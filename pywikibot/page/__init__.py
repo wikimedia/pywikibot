@@ -6899,7 +6899,7 @@ def UnicodeToAsciiHtml(s):
     html = []
     for c in s:
         cord = ord(c)
-        if 31 < cord < 128:
+        if 31 < cord < 127:
             html.append(c)
         else:
             html.append('&#%d;' % cord)
