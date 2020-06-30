@@ -753,14 +753,6 @@ class TestPageRepr(TestPageBaseUnicode):
         self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual('{0!r}'.format(self.page), "Page('Ō')")
 
-    @unittest.skipIf(not PY2, 'Python 2 specific test')
-    @unittest.expectedFailure
-    def test_ASCII_compatible(self):
-        """Test that repr returns ASCII compatible bytes in Python 2."""
-        page = pywikibot.Page(self.site, 'ä')
-        # Bug T95809, the repr in Python 2 should be decodable as ASCII
-        repr(page).decode('ascii')
-
 
 class TestPageReprASCII(TestPageBaseUnicode):
 
