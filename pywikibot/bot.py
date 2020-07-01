@@ -1290,28 +1290,36 @@ class BaseBot(OptionHandler):
         May be overridden by subclasses.
         """
         self.teardown()
+        if hasattr(self, '_start_ts'):
+            read_delta = pywikibot.Timestamp.now() - self._start_ts
+            read_seconds = int(read_delta.total_seconds())
+
+        # wait until pending threads finished but don't close the queue
+        pywikibot.stopme()
+
         pywikibot.output('\n{} pages read'
                          '\n{} pages written'
                          '\n{} pages skipped'
                          .format(self._treat_counter,
                                  self._save_counter,
                                  self._skip_counter))
+
         if hasattr(self, '_start_ts'):
-            delta = (pywikibot.Timestamp.now() - self._start_ts)
-            seconds = int(delta.total_seconds())
-            if delta.days:
+            write_delta = pywikibot.Timestamp.now() - self._start_ts
+            write_seconds = int(write_delta.total_seconds())
+            if write_delta.days:
                 pywikibot.output(
                     'Execution time: {d.days} days, {d.seconds} seconds'
-                    .format(d=delta))
+                    .format(d=write_delta))
             else:
                 pywikibot.output('Execution time: {} seconds'
-                                 .format(delta.seconds))
+                                 .format(write_delta.seconds))
             if self._treat_counter:
                 pywikibot.output('Read operation time: {:.1f} seconds'
-                                 .format(seconds / self._treat_counter))
+                                 .format(read_seconds / self._treat_counter))
             if self._save_counter:
                 pywikibot.output('Write operation time: {:.1f} seconds'
-                                 .format(seconds / self._save_counter))
+                                 .format(write_seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
