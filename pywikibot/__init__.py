@@ -982,11 +982,13 @@ class _WbDataPage(_WbRepresentation):
         @type site: str
         """
         if not isinstance(page, Page):
-            raise ValueError('Page must be a pywikibot.Page object.')
+            raise ValueError(
+                'Page {} must be a pywikibot.Page object not a {}.'
+                .format(page, type(page)))
 
         # validate page exists
         if not page.exists():
-            raise ValueError('Page must exist.')
+            raise ValueError('Page {} must exist.'.format(page))
 
         # validate page is on the right site, and that site supports the type
         if not data_site:
