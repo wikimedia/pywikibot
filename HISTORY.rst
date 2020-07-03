@@ -1,6 +1,21 @@
 Release history
 ===============
 
+3.0.20200703
+------------
+
+* Page.botMayEdit() method was improved (T253709)
+* PageNotFound, SpamfilterError, UserActionRefuse exceptions were removed (T253681)
+* tools.ip submodule has been removed (T243171)
+* Wait in BaseBot.exit() until asynchronous saving pages are completed
+* Solve IndexError when showing an empty diff with a non-zero context (T252724)
+* linktrails were added or updated for a lot of sites
+* Resolve namespaces with underlines (T252940)
+* Fix getversion_svn for Python 3.6+ (T253617, T132292)
+* Bugfixes and improvements
+* Localisation updates
+
+
 3.0.20200609
 ------------
 

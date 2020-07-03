@@ -27,12 +27,10 @@ are not installed by default on some Linux distributions:
   * python-tkinter (optional, used by some experimental GUI stuff)
 
 
-You need to have at least Python version `2.7.4 <http://www.python.org/download/>`_
+You need to have at least Python version `3.5.0 <http://www.python.org/download/>`_
 or newer installed on your computer to be able to run any of the code in this
-package, but not 3.0-3.3. Support for older versions of Python is not planned
-and versions 2.7 and 3.4 will be dropped soon as well. It works fine with 3.5+
-versions of Python installed. Please refer the manual at mediawiki for further
-details and restrictions.
+package. Please refer the manual at mediawiki for further details and
+restrictions.
 
 
 You do not need to "install" this package to be able to make use of

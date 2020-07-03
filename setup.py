@@ -167,7 +167,7 @@ def get_version(name):
     @return: pywikibot module version string
     @rtype: str
     """
-    version = '3.0'
+    version = '4.0'
     try:
         import subprocess
         date = subprocess.check_output(
