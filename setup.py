@@ -5,29 +5,25 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
 import os
 import sys
 
 from setuptools import setup
 
 PYTHON_VERSION = sys.version_info[:3]
-PY2 = (PYTHON_VERSION[0] == 2)
 
 versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.7.4+ or 3.4+.
+This version of Pywikibot only supports Python 3.5+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to pwb.py
-    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 4)
+    return PYTHON_VERSION >= (3, 5, 0)
 
 
 if not python_is_supported():
@@ -42,27 +38,18 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': [  # vulnerability found in Pillow<6.2.2
-        'Pillow>=6.2.2,<7.0.0;python_version<"3"',
-        'Pillow<6.0.0;python_version=="3.4"',
-        'Pillow>=6.2.2;python_version>="3.5"',
-    ],
-    'security': [
-        'requests[security]'
-        ';python_full_version=="2.7.7" or python_full_version=="2.7.8"',
+        'Pillow>=6.2.2',
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.7.5',
-        'pydocstyle<=3.0.0;python_version<"3"',
-        'pydocstyle>=4.0.0;python_version>="3.4"',
+        'pydocstyle>=4.0.0',
         'hacking',
         'flake8-coding',
         'flake8-comprehensions>=3.1.4;python_version>="3.8"',
-        'flake8-comprehensions>=2.2.0;python_version>="3.5"',
-        'flake8-comprehensions>=2.0.0,<2.2.0;python_version=="3.4"',
-        'flake8-comprehensions<2.0.0;python_version<"3"',
+        'flake8-comprehensions>=2.2.0',
         'flake8-docstrings>=1.3.1',
         'flake8-future-import',
         'flake8-mock>=0.3',
@@ -74,17 +61,13 @@ extra_deps = {
         'pep8-naming>=0.7',
         'pyflakes>=2.1.0',
     ],
-    # Additional core library dependencies which are only available on Python 2
-    'csv': ['unicodecsv;python_version<"3"'],
 }
 
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
-    'data_ingestion.py': extra_deps['csv'],
     'flickrripper.py': [
-        'flickrapi<3.0.0;python_version<"3.5"',
-        'flickrapi>=2.2;python_version>="3.5"',
+        'flickrapi>=2.2',
     ] + extra_deps['Tkinter'],
     'imageharvest.py': extra_deps['html'],
     'isbn.py': extra_deps['isbn'],
@@ -99,21 +82,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 
 # ------- setup install_requires ------- #
 # packages which are mandatory
-dependencies = ['requests>=2.20.1,<2.22.0; python_version == "3.4"',
-                'requests>=2.20.1; python_version != "3.4"',
-                'enum34>=1.1.6,!=1.1.8; python_version < "3"',
-                'ipaddress; python_version < "3"',
-                'pathlib2;python_version<"3"']
-
-# Python versions before 2.7.9 will cause urllib3 to trigger
-# InsecurePlatformWarning warnings for all HTTPS requests. By
-# installing with security extras, requests will automatically set
-# them up and the warnings will stop. See
-# <https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning>
-# for more details.
-# There is no secure version of cryptography for Python 2.7.6 or older.
-dependencies += extra_deps['security']
-
+dependencies = ['requests>=2.20.1']
 
 try:
     import bz2
@@ -132,14 +101,10 @@ test_deps = ['bz2file', 'mock']
 # These tests may be disabled because pywin32 depends on VC++, is time
 # consuming to build, and the console window can't be accessed during appveyor
 # builds.
-# Microsoft makes available a compiler for Python 2.7
-# http://www.microsoft.com/en-au/download/details.aspx?id=44266
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
     test_deps += [
-        'pywinauto>0.6.4;python_version>="3.5" or python_version<"3"',
-        'pywinauto<=0.6.4;python_version=="3.4"',
-        'pywin32>220;python_version>="3.5" or python_version<"3"',
-        'pywin32<=220;python_version=="3.4"',
+        'pywinauto>0.6.4',
+        'pywin32>220',
     ]
 
 # Add all dependencies as test dependencies,
@@ -147,15 +112,9 @@ if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
     test_deps += [i for k, v in extra_deps.items() if k != 'flake8' for i in v]
 
-    if 'requests[security]' in test_deps:
-        # Bug T105767 on Python 2.7 release 9+
-        if PY2 and PYTHON_VERSION[2] >= 9:
-            test_deps.remove('requests[security]')
-
 # These extra dependencies are needed other unittest fails to load tests.
-test_deps += extra_deps['csv']
 test_deps += extra_deps['eventstreams']
-test_deps += ['six;python_version>="3"']
+test_deps += ['six']
 
 
 def get_version(name):
@@ -210,13 +169,8 @@ def read_desc(filename):
 
 def get_packages(name):
     """Find framework packages."""
-    if PY2:
-        from setuptools import find_packages
-        packages = [package for package in find_packages()
-                    if package.startswith(name + '.')]
-    else:
-        from setuptools import find_namespace_packages
-        packages = find_namespace_packages(include=[name + '.*'])
+    from setuptools import find_namespace_packages
+    packages = find_namespace_packages(include=[name + '.*'])
     return [str(name)] + packages
 
 
@@ -235,7 +189,7 @@ def main():
         maintainer_email='pywikibot@lists.wikimedia.org',
         license='MIT License',
         packages=get_packages(name),
-        python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+        python_requires='>=3.5.0',
         install_requires=dependencies,
         extras_require=extra_deps,
         url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
@@ -250,10 +204,7 @@ def main():
             'Natural Language :: English',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',

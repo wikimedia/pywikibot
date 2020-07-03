@@ -19,13 +19,7 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README-conversion.txt
-requests>=2.20.1,<2.22.0; python_version == '3.4'
-requests>=2.20.1; python_version != '3.4'
-enum34>=1.1.6,!=1.1.8; python_version < '3'
-ipaddress ; python_version < '3'
-pathlib2 ; python_version < '3'
-# requests security extra
-requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
+requests>=2.20.1
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
@@ -35,24 +29,18 @@ mwoauth>=0.2.4,!=0.3.1
 # core interwiki_graph.py:
 pydot >= 1.2
 
-# wikistats.py and scripts
-unicodecsv ; python_version < '3'
-
 # cosmetic_changes and scripts/isbn
 python-stdnum >= 1.13
 
 # GUI
-Pillow >= 6.2.2, < 7.0.0 ; python_version < '3'
-Pillow < 6.0.0 ; python_version == '3.4'
-Pillow >= 6.2.2 ; python_version >= '3.5'
+Pillow >= 6.2.2
 
 # core pagegenerators
 google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
 # scripts/flickrripper.py
-flickrapi < 3.0.0 ; python_version < '3.5'
-flickrapi >= 2.2 ; python_version >= '3.5'
+flickrapi >= 2.2
 
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3
