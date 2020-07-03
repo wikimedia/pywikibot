@@ -11,8 +11,6 @@ mixin to show cache usage is included.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
 import inspect
 import itertools
 import os
@@ -21,11 +19,8 @@ import sys
 import time
 import warnings
 
-from contextlib import contextmanager
-try:
-    from collections.abc import Sized
-except ImportError:  # Python 2.7
-    from collections import Sized
+from contextlib import contextmanager, suppress
+from collections.abc import Sized
 
 import pywikibot
 
@@ -38,7 +33,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
-from pywikibot.tools import PY2, StringTypes
 
 import tests
 
@@ -66,49 +60,6 @@ OSWIN32 = (sys.platform == 'win32')
 class TestCaseBase(unittest.TestCase):
 
     """Base class for all tests."""
-
-    if not hasattr(unittest.TestCase, 'subTest'):
-        @contextmanager
-        def subTest(self, *args, **kwargs):
-            """Dummy subTest context manager for Python 2 that does nothing."""
-            yield
-
-    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
-        def assertRaisesRegex(self, *args, **kwargs):
-            """
-            Wrapper of unittest.assertRaisesRegexp for Python 2 unittest.
-
-            assertRaisesRegexp is deprecated in Python 3.
-            """
-            return self.assertRaisesRegexp(*args, **kwargs)
-
-    if not hasattr(unittest.TestCase, 'assertRegex'):
-        def assertRegex(self, *args, **kwargs):
-            """
-            Wrapper of unittest.assertRegexpMatches for Python 2 unittest.
-
-            assertRegexpMatches is deprecated in Python 3.
-            """
-            return self.assertRegexpMatches(*args, **kwargs)
-
-    if not hasattr(unittest.TestCase, 'assertNotRegex'):
-        def assertNotRegex(self, *args, **kwargs):
-            """
-            Wrapper of unittest.assertNotRegexpMatches for Python 2 unittest.
-
-            assertNotRegexpMatches is deprecated in Python 3.
-            """
-            return self.assertNotRegexpMatches(*args, **kwargs)
-
-    if not hasattr(unittest.TestCase, 'assertCountEqual'):
-
-        def assertCountEqual(self, *args, **kwargs):
-            """
-            Wrapper of unittest.assertItemsEqual for Python 2 unittest.
-
-            assertItemsEqual is removed in Python 3.
-            """
-            return self.assertItemsEqual(*args, **kwargs)
 
     def assertIsEmpty(self, seq, msg=None):
         """Check that the sequence is empty."""
@@ -154,7 +105,7 @@ class TestCaseBase(unittest.TestCase):
         All args must be already converted to a string.
         """
         for arg in args:
-            self.assertIsInstance(arg, StringTypes)
+            self.assertIsInstance(arg, str)
         self.assertMethod(method, *args)
 
     def assertPageInNamespaces(self, page, namespaces):
@@ -193,14 +144,12 @@ class TestCaseBase(unittest.TestCase):
 
         gen_pages = list(gen)
 
-        try:
+        with suppress(StopIteration):
             gen_pages.append(next(original_iter))
             next(original_iter)
             if not site:
                 site = gen_pages[0].site
             gen_pages.append(pywikibot.Page(site, '...'))
-        except StopIteration:
-            pass
 
         for page in gen_pages:
             self.assertIsInstance(page, pywikibot.Page)
@@ -671,10 +620,8 @@ class RequireUserMixin(TestCaseBase):
                     'Site {} has readonly state: {}'.format(
                         site, site.siteinfo.get('readonlyreason', '')))
 
-            try:
+            with suppress(NoUsername):
                 site.login()
-            except NoUsername:
-                pass
 
             if not site.user():
                 raise unittest.SkipTest(
@@ -983,13 +930,11 @@ class TestCase(TestTimerMixin, TestCaseBase):
                 data['site'] = Site(data['code'], data['family'],
                                     interface=interface)
             if 'hostname' not in data and 'site' in data:
-                try:
+                # Ignore if the family has defined this as
+                # obsolete without a mapping to a hostname.
+                with suppress(KeyError):
                     data['hostname'] = (
                         data['site'].base_url(data['site'].path()))
-                except KeyError:
-                    # The family has defined this as obsolete
-                    # without a mapping to a hostname.
-                    pass
 
         cm.__exit__(None, None, None)
 
@@ -1461,16 +1406,14 @@ class PwbTestCase(TestCase):
         if 'PYWIKIBOT_DIR' in os.environ:
             self.orig_pywikibot_dir = os.environ['PYWIKIBOT_DIR']
         base_dir = pywikibot.config.base_dir
-        if OSWIN32 and PY2:
-            base_dir = str(base_dir)
-        os.environ[str('PYWIKIBOT_DIR')] = base_dir
+        os.environ['PYWIKIBOT_DIR'] = base_dir
 
     def tearDown(self):
         """Restore the environment after running the pwb.py script."""
         super(PwbTestCase, self).tearDown()
         del os.environ['PYWIKIBOT_DIR']
         if self.orig_pywikibot_dir:
-            os.environ[str('PYWIKIBOT_DIR')] = self.orig_pywikibot_dir
+            os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
     def _execute(self, args, data_in=None, timeout=None, error=None):
         site = self.get_site()
