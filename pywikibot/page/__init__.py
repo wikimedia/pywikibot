@@ -1186,7 +1186,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if config.ignore_bot_templates:  # Check the "master ignore switch"
             return True
 
-        username = self.site.user()
+        username = self.site.username()
         try:
             templates = self.templatesWithParams()
         except (pywikibot.NoPage,
