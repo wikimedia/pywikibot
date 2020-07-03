@@ -2429,7 +2429,7 @@ class Page(BasePage):
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
-        titles = [t.title() for t in self.templates()]
+        titles = {t.title() for t in self.templates()}
         templates = self.raw_extracted_templates
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
