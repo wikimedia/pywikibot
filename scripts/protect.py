@@ -54,7 +54,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import SingleSiteBot, CurrentPageBot
 from pywikibot.tools import PY2
 
 if PY2:
@@ -73,11 +73,11 @@ if PY2:
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class ProtectionRobot(SingleSiteBot):
+class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 
     """This bot allows protection of pages en masse."""
 
-    def __init__(self, generator, protections, site=None, **kwargs):
+    def __init__(self, generator, protections, **kwargs):
         """
         Create a new ProtectionRobot.
 
@@ -85,37 +85,34 @@ class ProtectionRobot(SingleSiteBot):
         @type generator: generator
         @param protections: protections as a dict with "type": "level"
         @type protections: dict
-        @param site: The site to which the protections apply. By default it's
-            using the site of the first page returned from the generator. If
-            True it's using the configured site.
-        @type site: None, True or Site
-        @param kwargs: additional arguments directly feed to Bot.__init__()
+        @param kwargs: additional arguments directly feed to super().__init__()
         """
         self.availableOptions.update({
             'summary': None,
             'expiry': None,
         })
-        super(ProtectionRobot, self).__init__(site=site, **kwargs)
+        super(ProtectionRobot, self).__init__(**kwargs)
         self.generator = generator
         self.protections = protections
 
-    def treat(self, page):
+    def treat_page(self):
         """Run the bot's action on each page.
 
-        Bot.run() loops through everything in the page generator and applies
-        the protections using this function.
+        treat_page treats every page given by the generator and applies
+        the protections using this method.
         """
-        self.current_page = page
         if not self.user_confirm(
                 'Do you want to change the protection level of {0}?'
-                .format(page.title(as_link=True, force_interwiki=True))):
+                .format(self.current_page.title(as_link=True,
+                                                force_interwiki=True))):
             return
-        applicable = page.applicable_protections()
+
+        applicable = self.current_page.applicable_protections()
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)
-        page.protect(reason=self.getOption('summary'),
-                     expiry=self.getOption('expiry'),
-                     protections=protections)
+        self.current_page.protect(reason=self.getOption('summary'),
+                                  expiry=self.getOption('expiry'),
+                                  protections=protections)
 
 
 def check_protection_level(operation, level, levels, default=None):
@@ -243,7 +240,7 @@ def main(*args):
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
                 'Enter a reason for the protection change:')
-        bot = ProtectionRobot(generator, combined_protections, site, **options)
+        bot = ProtectionRobot(generator, combined_protections, **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

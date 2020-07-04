@@ -414,6 +414,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         if name == '':
             return ''
 
+        name = name.replace('_', ' ')
         parts = name.split(':', 4)
         count = len(parts)
         if count > 3 or (count == 3 and parts[2]):
@@ -2754,8 +2755,9 @@ class APISite(BaseSite):
             warn('\n'
                  + fill('Support of MediaWiki {version} will be dropped. '
                         'It is recommended to use MediaWiki 1.19 or above. '
-                        'You may use Pywikibot stable release 3.0.20200111 '
-                        'for older MediaWiki versions. '
+                        'You may use every Pywikibot 3.0.X release from '
+                        'pypi index or the "python2" release from the '
+                        'repository for older MediaWiki versions. '
                         'See T245350 for further information.'
                         .format(version=version)), FutureWarning)
 
@@ -6265,35 +6267,26 @@ class APISite(BaseSite):
         """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit, protocol=euprotocol)
 
-    def _get_titles_with_hash(self, hash_found=None):
-        """Helper for the deprecated method get(Files|Images)FromAnHash."""
-        # This should be removed with together with get(Files|Images)FromHash
-        if hash_found is None:
-            # This makes absolutely NO sense.
-            pywikibot.warning(
-                'The "hash_found" parameter in "getFilesFromAnHash" and '
-                '"getImagesFromAnHash" are not optional.')
-            return
-        return [image.title(with_ns=False)
-                for image in self.allimages(sha1=hash_found)]
-
-    @deprecated('Site().allimages', since='20141219')
-    def getFilesFromAnHash(self, hash_found=None):
+    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
+                future_warning=True)
+    def getFilesFromAnHash(self, hash_found):
         """
         Return all files that have the same hash.
 
         DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
         """
-        return self._get_titles_with_hash(hash_found)
+        return [image.title(with_ns=False)
+                for image in self.allimages(sha1=hash_found)]
 
-    @deprecated('Site().allimages', since='20141219')
-    def getImagesFromAnHash(self, hash_found=None):
+    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
+                future_warning=True)
+    def getImagesFromAnHash(self, hash_found):
         """
         Return all images that have the same hash.
 
         DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
         """
-        return self._get_titles_with_hash(hash_found)
+        return self.getFilesFromAnHash(hash_found)
 
     @need_right('edit')
     def is_uploaddisabled(self):

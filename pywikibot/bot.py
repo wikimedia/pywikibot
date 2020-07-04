@@ -87,7 +87,6 @@ __all__ = (
 
 import codecs
 import datetime
-from importlib import import_module
 import json
 import logging
 import logging.handlers
@@ -95,8 +94,12 @@ import os
 import sys
 import time
 import warnings
-from warnings import warn
 import webbrowser
+
+from contextlib import closing
+from importlib import import_module
+from textwrap import fill
+from warnings import warn
 
 try:
     import configparser
@@ -108,7 +111,6 @@ try:
 except ImportError:  # PY2
     from pathlib2 import Path
 
-from textwrap import fill
 
 import pywikibot
 from pywikibot import config2 as config
@@ -372,7 +374,8 @@ def writelogheader():
     if not http or not hasattr(http, 'threads') or not len(http.threads):
         return
 
-    log('=== Pywikibot framework v3.0 -- Logging header ===')
+    log('=== Pywikibot framework v{} -- Logging header ==='
+        .format(pywikibot.__version__))
 
     # script call
     log('COMMAND: {0}'.format(sys.argv))
@@ -1008,14 +1011,15 @@ def writeToCommandLogFile():
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
     except IOError:
         command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
-    # add a timestamp in ISO 8601 formulation
-    iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    command_log_file.write('%s r%s Python %s '
-                           % (iso_date, version.getversiondict()['rev'],
-                              sys.version.split()[0]))
-    s = ' '.join(args)
-    command_log_file.write(s + os.linesep)
-    command_log_file.close()
+
+    with closing(command_log_file):
+        # add a timestamp in ISO 8601 formulation
+        iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        command_log_file.write('{} r{} Python {} '
+                               .format(iso_date,
+                                       version.getversiondict()['rev'],
+                                       sys.version.split()[0]))
+        command_log_file.write(' '.join(args) + os.linesep)
 
 
 def open_webbrowser(page):
@@ -1286,26 +1290,36 @@ class BaseBot(OptionHandler):
         May be overridden by subclasses.
         """
         self.teardown()
+        if hasattr(self, '_start_ts'):
+            read_delta = pywikibot.Timestamp.now() - self._start_ts
+            read_seconds = int(read_delta.total_seconds())
+
+        # wait until pending threads finished but don't close the queue
+        pywikibot.stopme()
+
         pywikibot.output('\n{} pages read'
                          '\n{} pages written'
                          '\n{} pages skipped'
                          .format(self._treat_counter,
                                  self._save_counter,
                                  self._skip_counter))
+
         if hasattr(self, '_start_ts'):
-            delta = (pywikibot.Timestamp.now() - self._start_ts)
-            seconds = int(delta.total_seconds())
-            if delta.days:
-                pywikibot.output('Execution time: %d days, %d seconds'
-                                 % (delta.days, delta.seconds))
+            write_delta = pywikibot.Timestamp.now() - self._start_ts
+            write_seconds = int(write_delta.total_seconds())
+            if write_delta.days:
+                pywikibot.output(
+                    'Execution time: {d.days} days, {d.seconds} seconds'
+                    .format(d=write_delta))
             else:
-                pywikibot.output('Execution time: %d seconds' % delta.seconds)
+                pywikibot.output('Execution time: {} seconds'
+                                 .format(write_delta.seconds))
             if self._treat_counter:
-                pywikibot.output('Read operation time: %d seconds'
-                                 % (seconds / self._treat_counter))
+                pywikibot.output('Read operation time: {:.1f} seconds'
+                                 .format(read_seconds / self._treat_counter))
             if self._save_counter:
-                pywikibot.output('Write operation time: %d seconds'
-                                 % (seconds / self._save_counter))
+                pywikibot.output('Write operation time: {:.1f} seconds'
+                                 .format(write_seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()

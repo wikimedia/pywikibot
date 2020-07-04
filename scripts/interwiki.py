@@ -2246,18 +2246,18 @@ def page_empty_check(page):
 
     @rtype: bool
     """
+    txt = page.text
     # Check if the page is in content namespace
     if page.namespace().content:
         # Check if the page contains at least 50 characters
-        return len(page.text) < 50
-    else:
-        if not page.is_categorypage():
-            txt = page.get()
-            txt = textlib.removeLanguageLinks(txt, site=page.site)
-            txt = textlib.removeCategoryLinks(txt, site=page.site)
-            return len(txt) < 4
-        else:
-            return False
+        return len(txt) < 50
+
+    if not page.is_categorypage():
+        txt = textlib.removeLanguageLinks(txt, site=page.site)
+        txt = textlib.removeCategoryLinks(txt, site=page.site)
+        return len(txt) < 4
+
+    return False
 
 
 def main(*args):

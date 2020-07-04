@@ -338,6 +338,10 @@ class PatchManager(object):
     def _generate_super_hunks(self, hunks=None):
         if hunks is None:
             hunks = self.hunks
+
+        if not hunks:
+            return []
+
         if self.context:
             # Determine if two hunks are connected by self.context
             super_hunk = []

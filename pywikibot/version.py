@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,6 +18,7 @@ import sys
 import time
 import xml.dom.minidom
 
+from contextlib import closing
 from distutils import log
 from distutils.sysconfig import get_python_lib
 from io import BytesIO
@@ -34,10 +35,8 @@ except ImportError:
 try:
     import pathlib
 except ImportError:
-    try:
-        import pathlib2 as pathlib
-    except ImportError as e:
-        pathlib = e
+    import pathlib2 as pathlib  # Python 2
+
 
 import pywikibot
 
@@ -148,7 +147,6 @@ def getversiondict():
     return cache
 
 
-@deprecated('getversion_svn_setuptools', since='20150405')
 def svn_rev_info(path):
     """Fetch information about the current revision of an Subversion checkout.
 
@@ -185,15 +183,16 @@ def svn_rev_info(path):
     # We haven't found the information in entries file.
     # Use sqlite table for new entries format
     from sqlite3 import dbapi2 as sqlite
-    con = sqlite.connect(os.path.join(_program_dir, '.svn/wc.db'))
-    cur = con.cursor()
-    cur.execute("""select
+    with closing(
+            sqlite.connect(os.path.join(_program_dir, '.svn/wc.db'))) as con:
+        cur = con.cursor()
+        cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
-    name, tag, rev, date, checksum = cur.fetchone()
-    cur.execute('select root from repository')
-    tag, = cur.fetchone()
-    con.close()
+        name, tag, rev, date, checksum = cur.fetchone()
+        cur.execute('select root from repository')
+        tag, = cur.fetchone()
+
     tag = os.path.split(tag)[1]
     date = time.gmtime(date / 1000000)
     return tag, rev, date
@@ -254,7 +253,6 @@ def getversion_svn_setuptools(path=None):
     return (tag, rev, date, hsh)
 
 
-@deprecated('getversion_svn_setuptools', since='20150405')
 def getversion_svn(path=None):
     """Get version info for a Subversion checkout.
 
@@ -274,7 +272,7 @@ def getversion_svn(path=None):
     # date.tm_isdst is -1 means unknown state
     # compare its contents except daylight saving time status
     else:
-        for i in range(date.n_fields - 1):
+        for i in range(len(date) - 1):
             assert date[i] == date2[i], 'Date of version is not consistent'
 
     rev = 's%s' % rev
@@ -570,16 +568,10 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     # Remove any pywikibot sub-modules which were loaded as a package.
     # e.g. 'wikipedia_family.py' is loaded as 'wikipedia'
     _program_dir = _get_program_dir()
-    if isinstance(pathlib, Exception):
-        dir_parts = _program_dir.split(os.sep)
-    else:
-        dir_parts = pathlib.Path(_program_dir).parts
+    dir_parts = pathlib.Path(_program_dir).parts
     length = len(dir_parts)
     for path, name in paths.items():
-        if isinstance(pathlib, Exception):
-            lib_parts = os.path.normpath(path).split(os.sep)
-        else:
-            lib_parts = pathlib.Path(path).parts
+        lib_parts = pathlib.Path(path).parts
         if dir_parts != lib_parts[:length]:
             continue
         if lib_parts[length] != '.tox':

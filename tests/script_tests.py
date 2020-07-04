@@ -273,7 +273,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 else:
                     # auto-run
-                    exit_codes = [0, -9]
+                    # returncode is 1 if the process is killed
+                    exit_codes = [0, 1, -9]
                     if not out_result and not err_result:
                         unittest_print(' auto-run script unresponsive after '
                                        '{} seconds'.format(timeout), end=' ')
@@ -390,7 +391,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
         'disambredir',
         'misspelling',   # T94681
         'watchlist',     # T77965
-        'lonelypages',   # T94680: uses exit code 1
     ]
 
     _arguments = '-simulate'

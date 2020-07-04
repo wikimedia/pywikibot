@@ -31,12 +31,16 @@ from datetime import timedelta
 from textwrap import fill
 
 import pywikibot
-from pywikibot import pagegenerators, WikidataBot
+from pywikibot import pagegenerators
+from pywikibot.bot import NoRedirectPageBot, WikidataBot
 from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
                                   PageNotSaved)
 
 
-class NewItemRobot(WikidataBot):
+DELETION_TEMPLATES = ('Q4847311', 'Q6687153', 'Q21528265')
+
+
+class NewItemRobot(WikidataBot, NoRedirectPageBot):
 
     """A bot to create new items."""
 
@@ -56,17 +60,23 @@ class NewItemRobot(WikidataBot):
         self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
+        self._skipping_templates = {}
+
+    def setup(self):
+        """Setup ages."""
+        super(NewItemRobot, self).setup()
+
         self.pageAgeBefore = self.repo.server_time() - timedelta(
             days=self.pageAge)
         self.lastEditBefore = self.repo.server_time() - timedelta(
             days=self.lastEdit)
         pywikibot.output('Page age is set to {0} days so only pages created'
-                         '\nbefore {1} will be considered.'
+                         '\nbefore {1} will be considered.\n'
                          .format(self.pageAge, self.pageAgeBefore.isoformat()))
         pywikibot.output(
             'Last edit is set to {0} days so only pages last edited'
-            '\nbefore {1} will be considered.'.format(
-                self.lastEdit, self.lastEditBefore.isoformat()))
+            '\nbefore {1} will be considered.\n'
+            .format(self.lastEdit, self.lastEditBefore.isoformat()))
 
     @staticmethod
     def _touch_page(page):
@@ -87,6 +97,83 @@ class NewItemRobot(WikidataBot):
         if exc is None and self.getOption('touch'):
             self._touch_page(page)
 
+    def get_skipping_templates(self, site):
+        """Get templates which leads the page to be skipped.
+
+        If the script is used for multiple sites, hold the skipping templates
+        as attribute.
+        """
+        if site in self._skipping_templates:
+            return self._skipping_templates[site]
+
+        skipping_templates = set()
+        pywikibot.output('Retrieving skipping templates for site {}...'
+                         .format(site))
+        for item in DELETION_TEMPLATES:
+            template = site.page_from_repository(item)
+
+            if template is None:
+                continue
+
+            skipping_templates.add(template)
+            # also add redirect templates
+            skipping_templates.update(
+                template.getReferences(follow_redirects=False,
+                                       with_template_inclusion=False,
+                                       filter_redirects=True,
+                                       namespaces=site.namespaces.TEMPLATE))
+        self._skipping_templates[site] = skipping_templates
+        return skipping_templates
+
+    def skip_templates(self, page):
+        """Check whether the page is to be skipped due to skipping template.
+
+        @param page: treated page
+        @type page: pywikibot.Page
+        @return: the template which leads to skip
+        @rtype: str
+        """
+        skipping_templates = self.get_skipping_templates(page.site)
+        for template, _ in page.templatesWithParams():
+            if template in skipping_templates:
+                return template.title(with_ns=False)
+        return ''
+
+    def skip_page(self, page):
+        """Skip pages which are unwanted to treat."""
+        if page.editTime() > self.lastEditBefore:
+            pywikibot.output(
+                'Last edit on {page} was on {page.latest_revision.timestamp}.'
+                '\nToo recent. Skipping.'.format(page=page))
+            return True
+
+        if page.oldest_revision.timestamp > self.pageAgeBefore:
+            pywikibot.output(
+                'Page creation of {page} on {page.oldest_revision.timestamp} '
+                'is too recent. Skipping.'.format(page=page))
+            return True
+
+        if page.isCategoryRedirect():
+            pywikibot.output('{} is a category redirect. Skipping.'
+                             .format(page))
+            return True
+
+        if page.langlinks():
+            # FIXME: Implement this
+            pywikibot.output(
+                'Found language links (interwiki links) for {}.\n'
+                "Haven't implemented that yet so skipping."
+                .format(page))
+            return True
+
+        template = self.skip_templates(page)
+        if template:
+            pywikibot.output('%s contains {{%s}}. Skipping.'
+                             % (page, template))
+            return True
+
+        return super(NewItemRobot, self).skip_page(page)
+
     def treat_page_and_item(self, page, item):
         """Treat page/item."""
         if item and item.exists():
@@ -94,32 +181,6 @@ class NewItemRobot(WikidataBot):
                              .format(page, item))
             if self.getOption('touch') is True:
                 self._touch_page(page)
-            return
-
-        if page.isRedirectPage():
-            pywikibot.output('{0} is a redirect page. Skipping.'.format(page))
-            return
-        if page.editTime() > self.lastEditBefore:
-            pywikibot.output(
-                'Last edit on {0} was on {1}.\nToo recent. Skipping.'
-                .format(page, page.editTime().isoformat()))
-            return
-
-        if page.oldest_revision.timestamp > self.pageAgeBefore:
-            pywikibot.output(
-                'Page creation of {0} on {1} is too recent. Skipping.'
-                .format(page, page.editTime().isoformat()))
-            return
-        if page.isCategoryRedirect():
-            pywikibot.output('{0} is a category redirect. Skipping.'
-                             .format(page))
-            return
-
-        if page.langlinks():
-            # FIXME: Implement this
-            pywikibot.output(
-                'Found language links (interwiki links).\n'
-                "Haven't implemented that yet so skipping.")
             return
 
         self.create_item_for_page(

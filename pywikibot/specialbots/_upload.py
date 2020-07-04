@@ -14,6 +14,8 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import tempfile
 
+from contextlib import closing
+
 import pywikibot
 import pywikibot.data.api
 
@@ -35,7 +37,7 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(uploadByUrl=None, urlEncoding='url_encoding',
+    @deprecated_args(uploadByUrl=True, urlEncoding='url_encoding',
                      useFilename='use_filename', keepFilename='keep_filename',
                      verifyDescription='verify_description',
                      ignoreWarning='ignore_warning', targetSite='target_site')
@@ -85,10 +87,6 @@ class UploadRobot(BaseBot):
             or aborts are set to True and that the description is also set. It
             overwrites verify_description to False and keep_filename to True.
         @type always: bool
-
-        @deprecated: Using upload_image() is deprecated, use upload_file() with
-            file_url param instead
-
         """
         super(UploadRobot, self).__init__(**kwargs)
         always = self.getOption('always')
@@ -138,32 +136,31 @@ class UploadRobot(BaseBot):
                 pywikibot.output('Resume download...')
                 uo.addheader('Range', 'bytes=%s-' % rlen)
 
-            infile = uo.open(file_url)
-            info = infile.info()
+            with closing(uo.open(file_url)) as infile:
+                info = infile.info()
 
-            if PY2:
-                info_get = info.getheader
-            else:
-                info_get = info.get
-            content_type = info_get('Content-Type')
-            content_len = info_get('Content-Length')
-            accept_ranges = info_get('Accept-Ranges')
+                if PY2:
+                    info_get = info.getheader
+                else:
+                    info_get = info.get
+                content_type = info_get('Content-Type')
+                content_len = info_get('Content-Length')
+                accept_ranges = info_get('Accept-Ranges')
 
-            if 'text/html' in content_type:
-                pywikibot.output("Couldn't download the image: "
-                                 'the requested URL was not found on server.')
-                return
+                if 'text/html' in content_type:
+                    pywikibot.output(
+                        "Couldn't download the image: "
+                        'the requested URL was not found on server.')
+                    return
 
-            valid_ranges = accept_ranges == 'bytes'
+                valid_ranges = accept_ranges == 'bytes'
 
-            if resume:
-                _contents += infile.read()
-            else:
-                _contents = infile.read()
+                if resume:
+                    _contents += infile.read()
+                else:
+                    _contents = infile.read()
 
-            infile.close()
             retrieved = True
-
             if content_len:
                 rlen = len(_contents)
                 content_len = int(content_len)
@@ -391,12 +388,12 @@ class UploadRobot(BaseBot):
             return warn_code in self.ignore_warning
 
     @deprecated('UploadRobot.upload_file()', since='20141211')
-    @deprecated_args(debug=None)
+    @deprecated_args(debug=True)
     def upload_image(self):
         """Upload image."""
         return self.upload_file(self.url)
 
-    @deprecated_args(debug=None)
+    @deprecated_args(debug=True)
     def upload_file(self, file_url, _file_key=None, _offset=0):
         """
         Upload the image at file_url to the target wiki.

@@ -310,15 +310,13 @@ def _get_regexes(keys, site):
         _create_default_regexes()
 
     result = []
-    # 'dontTouchRegexes' exist to reduce git blame only.
-    dontTouchRegexes = result
 
     for exc in keys:
         if isinstance(exc, UnicodeType):
             # assume the string is a reference to a standard regex above,
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
-                if type(_regex_cache[exc]) is tuple:
+                if isinstance(_regex_cache[exc], tuple):
                     if not site and exc in ('interwiki', 'property', 'invoke',
                                             'category', 'file'):
                         issue_deprecation_warning(
@@ -342,10 +340,10 @@ def _get_regexes(keys, site):
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
-                dontTouchRegexes.append(_tag_regex('syntaxhighlight'))
+                result.append(_tag_regex('syntaxhighlight'))
         else:
             # assume it's a regular expression
-            dontTouchRegexes.append(exc)
+            result.append(exc)
 
     return result
 

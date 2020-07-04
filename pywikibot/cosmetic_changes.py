@@ -272,8 +272,8 @@ class CosmeticChangesToolkit(object):
             result = method(text)
         except Exception as e:
             if self.ignore == CANCEL_METHOD:
-                pywikibot.warning('Unable to perform "{0}" on "{1}"!'.format(
-                    method.__name__, self.title))
+                pywikibot.warning('Unable to perform "{}" on "{}"!'
+                                  .format(method.__name__, self.title))
                 pywikibot.exception(e)
             else:
                 raise
@@ -945,19 +945,13 @@ class CosmeticChangesToolkit(object):
             'startspace',
             'inputbox',
         ]
-        # FIXME: use textlib.NON_LATIN_DIGITS
-        # valid digits
-        digits = {
-            'ckb': '٠١٢٣٤٥٦٧٨٩',
-            'fa': '۰۱۲۳۴۵۶۷۸۹',
-        }
+
+        digits = textlib.NON_LATIN_DIGITS
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
-        new = digits.pop(self.site.code)
-        # This only works if there are only two items in digits dict
-        old = digits[list(digits.keys())[0]]
+
         # not to let bot edits in latin content
-        exceptions.append(re.compile('[^%(fa)s] *?\"*? *?, *?[^%(fa)s]'
-                                     % {'fa': faChrs}))
+        exceptions.append(re.compile('[^{fa}] *?"*? *?, *?[^{fa}]'
+                                     .format(fa=faChrs)))
         text = textlib.replaceExcept(text, ',', '،', exceptions,
                                      site=self.site)
         if self.site.code == 'ckb':
@@ -976,23 +970,6 @@ class CosmeticChangesToolkit(object):
 
         return text
 
-        # FIXME: split this function into two.
-        # replace persian/arabic digits
-        # deactivated due to bug T57185
-        for i in range(0, 10):
-            text = textlib.replaceExcept(text, old[i], new[i], exceptions)
-        # do not change digits in class, style and table params
-        pattern = re.compile(r'\w+=(".+?"|\d+)', re.UNICODE)
-        exceptions.append(pattern)
-        # do not change digits inside html-tags
-        pattern = re.compile('<[/]*?[^</]+?[/]*?>', re.UNICODE)
-        exceptions.append(pattern)
-        exceptions.append('table')  # exclude tables for now
-        # replace digits
-        for i in range(0, 10):
-            text = textlib.replaceExcept(text, str(i), new[i], exceptions)
-        return text
-
     def commonsfiledesc(self, text):
         """
         Clean up file descriptions on the Wikimedia Commons.
@@ -1004,7 +981,8 @@ class CosmeticChangesToolkit(object):
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
         if self.site.sitename != 'commons:commons' or self.namespace == 6:
-            return
+            return text
+
         # section headers to {{int:}} versions
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',
                       'pre', 'source', 'ref', 'timeline']

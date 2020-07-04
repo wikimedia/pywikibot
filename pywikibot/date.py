@@ -355,8 +355,6 @@ _reParameters = re.compile('|'.join('(%%[1-9]?%s)' % s
 # A map of sitecode+pattern to (re matching object and corresponding decoders)
 _escPtrnCache2 = {}
 
-_listTypes = [list, tuple]
-
 
 def escapePattern2(pattern):
     """
@@ -464,7 +462,7 @@ def dh(value, pattern, encf, decf, filter=None):
 
         params = encf(value)
 
-        if type(params) in _listTypes:
+        if isinstance(params, (tuple, list)):
             assert len(params) == len(decoders), (
                 'parameter count ({0}) does not match decoder count ({1})'
                 .format(len(params), len(decoders)))

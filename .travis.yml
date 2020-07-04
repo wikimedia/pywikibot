@@ -47,6 +47,8 @@ before_install:
 
 before_script:
   - pip install -U setuptools
+  # Make Travis reinstall default pytest (T255349)
+  - pip uninstall -y pytest
   - pip install -r dev-requirements.txt
 
 script:

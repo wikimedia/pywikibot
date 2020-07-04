@@ -7,20 +7,14 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from contextlib import contextmanager
 import inspect
 import json
 import os
-from subprocess import PIPE, Popen
 import sys
 import warnings
 
-try:
-    from collections.abc import Mapping
-except ImportError:  # Python 2.7
-    from collections import Mapping
-    from multiprocessing import TimeoutError
-    from threading import Timer
+from contextlib import contextmanager
+from subprocess import PIPE, Popen
 from types import ModuleType
 
 try:
@@ -39,11 +33,16 @@ from pywikibot.tools import (
     PY2, PYTHON_VERSION,
     UnicodeType as unicode,
 )
+
 from tests import _pwb_py, unittest
 
 if not PY2:
+    from collections.abc import Mapping
     import six
+    from subprocess import TimeoutExpired
 else:
+    from collections import Mapping
+    from threading import Timer
     ResourceWarning = None
 
 
@@ -602,7 +601,7 @@ def execute(command, data_in=None, timeout=None, error=None):
     @type command: list of unicode
     """
     if PY2 or PYTHON_VERSION < (3, 5, 0):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:128')
+        command.insert(1, '-W ignore::FutureWarning:pywikibot:125')
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
     # Any environment variables added on Windows must be of type
@@ -658,18 +657,18 @@ def execute(command, data_in=None, timeout=None, error=None):
         p.stdin.flush()  # _communicate() otherwise has a broken pipe
 
     if PY2:   # subprocess.communicate does not support timeout
-        def timeout_handler():
-            p.kill()
-            raise TimeoutError
-
-        timer = Timer(timeout, timeout_handler)
+        timer = Timer(timeout, p.kill)
         timer.start()
         try:
             stdout_data, stderr_data = p.communicate()
         finally:
             timer.cancel()
     else:
-        stdout_data, stderr_data = p.communicate(timeout=timeout)
+        try:
+            stdout_data, stderr_data = p.communicate(timeout=timeout)
+        except TimeoutExpired:
+            p.kill()
+            stdout_data, stderr_data = p.communicate()
     return {'exit_code': p.returncode,
             'stdout': stdout_data.decode(config.console_encoding),
             'stderr': stderr_data.decode(config.console_encoding)}

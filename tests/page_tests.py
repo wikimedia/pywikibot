@@ -753,14 +753,6 @@ class TestPageRepr(TestPageBaseUnicode):
         self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual('{0!r}'.format(self.page), "Page('Ō')")
 
-    @unittest.skipIf(not PY2, 'Python 2 specific test')
-    @unittest.expectedFailure
-    def test_ASCII_compatible(self):
-        """Test that repr returns ASCII compatible bytes in Python 2."""
-        page = pywikibot.Page(self.site, 'ä')
-        # Bug T95809, the repr in Python 2 should be decodable as ASCII
-        repr(page).decode('ascii')
-
 
 class TestPageReprASCII(TestPageBaseUnicode):
 
@@ -793,98 +785,152 @@ class TestPageBotMayEdit(TestCase):
     cached = True
     user = True
 
-    @mock.patch.object(config, 'ignore_bot_templates', False)
-    def test_bot_may_edit_general(self):
-        """Test that bot is allowed to edit."""
-        site = self.get_site()
-        user = site.user()
-
-        page = pywikibot.Page(site, 'not_existent_page_for_pywikibot_tests')
-        if page.exists():
+    def setUp(self):
+        """Setup test."""
+        super(TestPageBotMayEdit, self).setUp()
+        self.page = pywikibot.Page(self.site,
+                                   'not_existent_page_for_pywikibot_tests')
+        if self.page.exists():
             self.skipTest(
                 'Page {} exists! Change page name in tests/page_tests.py'
-                .format(page.title()))
+                .format(self.page.title()))
+
+    @mock.patch.object(config, 'ignore_bot_templates', False)
+    def test_bot_may_edit_nobots(self):
+        """Test with {{nobots}} that bot is allowed to edit."""
+        self.page._templates = [pywikibot.Page(self.site, 'Template:Nobots')]
+        user = self.site.user()
 
         # Ban all compliant bots (shortcut).
-        page.text = '{{nobots}}'
-        page._templates = [pywikibot.Page(site, 'Template:Nobots')]
-        self.assertFalse(page.botMayEdit())
+        self.page.text = '{{nobots}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Ban all compliant bots not in the list, syntax for de wp.
-        page.text = '{{nobots|HagermanBot,Werdnabot}}'
-        self.assertTrue(page.botMayEdit(),
-                        '{}: {} but user={}'
-                        .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{nobots|HagermanBot,Werdnabot}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
 
         # Ban all compliant bots not in the list, syntax for de wp.
-        page.text = '{{nobots|%s, HagermanBot,Werdnabot}}' % user
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{nobots|%s, HagermanBot,Werdnabot}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Ban all bots, syntax for de wp.
-        page.text = '{{nobots|all}}'
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{nobots|all}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Decline wrong nobots parameter
+        self.page.text = '{{nobots|allow=%s}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Decline wrong nobots parameter
+        self.page.text = '{{nobots|deny=%s}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Decline wrong nobots parameter
+        self.page.text = '{{nobots|decline=%s}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Decline empty keyword parameter with nobots
+        self.page.text = '{{nobots|with_empty_parameter=}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Ignore second parameter
+        self.page.text = '{{nobots|%s|MyBot}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
+
+        # Ignore second parameter
+        self.page.text = '{{nobots|MyBot|%s}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
+
+    @mock.patch.object(config, 'ignore_bot_templates', False)
+    def test_bot_may_edit_bots(self):
+        """Test with {{bots}} that bot is allowed to edit."""
+        self.page._templates = [pywikibot.Page(self.site, 'Template:Bots')]
+        user = self.site.user()
 
         # Allow all bots (shortcut).
-        page.text = '{{bots}}'
-        page._templates = [pywikibot.Page(site, 'Template:Bots')]
-        self.assertTrue(page.botMayEdit())
+        self.page.text = '{{bots}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
 
         # Ban all compliant bots not in the list.
-        page.text = '{{bots|allow=HagermanBot,Werdnabot}}'
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|allow=HagermanBot,Werdnabot}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Ban all compliant bots in the list.
-        page.text = '{{bots|deny=HagermanBot,Werdnabot}}'
-        self.assertTrue(page.botMayEdit(),
-                        '{}: {} but user={}'
-                        .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|deny=HagermanBot,Werdnabot}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
 
         # Ban all compliant bots not in the list.
-        page.text = '{{bots|allow=%s, HagermanBot}}' % user
-        self.assertTrue(page.botMayEdit(),
-                        '{}: {} but user={}'
-                        .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|allow=%s, HagermanBot}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
 
         # Ban all compliant bots in the list.
-        page.text = '{{bots|deny=%s, HagermanBot}}' % user
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|deny=%s, HagermanBot}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Allow all bots.
-        page.text = '{{bots|allow=all}}'
-        self.assertTrue(page.botMayEdit(),
-                        '{}: {} but user={}'
-                        .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|allow=all}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
 
         # Ban all compliant bots.
-        page.text = '{{bots|allow=none}}'
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|allow=none}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Ban all compliant bots.
-        page.text = '{{bots|deny=all}}'
-        self.assertFalse(page.botMayEdit(),
-                         '{}: {} but user={}'
-                         .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|deny=all}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertFalse(self.page.botMayEdit())
 
         # Allow all bots.
-        page.text = '{{bots|deny=none}}'
-        self.assertTrue(page.botMayEdit(),
-                        '{}: {} but user={}'
-                        .format(page.text, page.botMayEdit(), user))
+        self.page.text = '{{bots|deny=none}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
+
+        # Ignore missing named parameter.
+        self.page.text = '{{bots|%s}}' % user
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
+
+        # Ignore empty keyword parameter with bots
+        for param in ('allow', 'deny', 'empty_parameter'):
+            self.page.text = '{{bots|%s=}}' % param
+            with self.subTest(template=self.page.text, user=user, param=param):
+                self.assertTrue(self.page.botMayEdit())
+
+        # Ignore unknown keyword parameter with bots
+        self.page.text = '{{bots|with=unknown_parameter}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
+
+        # Ignore unknown empty parameter keyword with bots
+        self.page.text = '{{bots|with_empty_parameter=}}'
+        with self.subTest(template=self.page.text, user=user):
+            self.assertTrue(self.page.botMayEdit())
+
+    @mock.patch.object(config, 'ignore_bot_templates', False)
+    def test_bot_may_edit_inuse(self):
+        """Test with {{inuse}} that bot is allowed to edit."""
+        self.page._templates = [pywikibot.Page(self.site, 'Template:In use')]
 
         # Ban all users including bots.
-        page.text = '{{in use}}'
-        page._templates = [pywikibot.Page(site, 'Template:In use')]
-        self.assertFalse(page.botMayEdit())
+        self.page.text = '{{in use}}'
+        self.assertFalse(self.page.botMayEdit())
 
 
 class TestPageHistory(DefaultSiteTestCase):

@@ -26,8 +26,7 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies        |
     +---------------------------+------------------------------------------------------+
-    | README-conversion.txt     | Guide to converting bot scripts from version 1       |
-    |                           | of the Pywikibot framework to version 3              |
+    | README-conversion.txt     | Compat to Core branch conversion hints               |
     +---------------------------+------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                        |
     +---------------------------+------------------------------------------------------+

@@ -1,6 +1,21 @@
 Release history
 ===============
 
+3.0.20200609
+------------
+
+* Fix page_can_be_edited for MediaWiki < 1.23 (T254623)
+* Show global options with pwb.py -help
+* Usage of SkipPageError with BaseBot has been removed
+* Throttle requests after ratelimits exceeded (T253180)
+* Make Pywikibot daemon logs unexecutable (T253472)
+* Check for missing generator after BaseBot.setup() call
+* Do not change usernames when creating a Site (T253127)
+* pagegenerators: handle protocols in -weblink (T251308, T251310)
+* Bugfixes and improvements
+* Localisation updates
+
+
 3.0.20200508
 ------------
 
@@ -10,6 +25,7 @@ Release history
 * Page.getVersionHistory and Page.fullVersionHistory() methods has been desupported (T136513, T151110)
 * Update wikimediachapter_family (T250802)
 * Raise SpamblacklistError with spamblacklist APIError (T249436)
+* SpamfilterError was renamed to SpamblacklistError (T249436)
 * Do not removeUselessSpaces inside source/syntaxhighlight tags (T250469)
 * Restrict Pillow to 6.2.2+ (T249911)
 * Fix PetScan generator language and project (T249704)
@@ -648,6 +664,7 @@ Bugfixes
 * Bugfixes
 * Localisation updates
 * i18n: always follow master branch
+* exception.UploadWarning was replaced by data.api.UploadWarning
 
 2.0rc2
 ------
@@ -723,6 +740,8 @@ Low-level changes include:
 * API client side prevention of anonymous writes
 * API layer support for boolean and date datatypes
 * Improved MediaWiki version detection
+* PageNotFound exception is no longer used
+* UserActionRefuse exception was replaced by UserRightsError and NotEmailableError
 
 Other changes include:
 

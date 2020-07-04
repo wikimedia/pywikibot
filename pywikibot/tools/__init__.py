@@ -30,6 +30,7 @@ except ImportError:  # Python 2.7
 from datetime import datetime
 from distutils.version import Version
 from functools import wraps
+from ipaddress import ip_address
 from warnings import catch_warnings, showwarning, warn
 
 from pywikibot.logging import debug
@@ -42,16 +43,11 @@ if not PY2:
     import queue
     StringTypes = (str, bytes)
     UnicodeType = str
-    from ipaddress import ip_address
 else:
     from itertools import izip_longest as zip_longest
     import Queue as queue  # noqa: N813
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
-    try:
-        from ipaddress import ip_address
-    except ImportError:
-        ip_address = None
 
 try:
     import bz2
@@ -387,17 +383,8 @@ def is_IP(IP):  # noqa N802, N803
     @type IP: str
     @rtype: bool
     """
-    method = ip_address
-    if not ip_address:  # Python 2 needs ipaddress to be installed
-        issue_deprecation_warning(
-            'ipaddr module', 'ipaddress module',
-            warning_class=FutureWarning, since='20200120')
-        from pywikibot.tools import ip
-        with suppress_warnings('pywikibot.tools.ip.is_IP is deprecated'):
-            method = ip.is_IP
-
     try:
-        method(IP)
+        ip_address(IP)
     except ValueError:
         pass
     else:
@@ -1734,17 +1721,45 @@ def deprecated(*args, **kwargs):
 
 
 def deprecate_arg(old_arg, new_arg):
-    """Decorator to declare old_arg deprecated and replace it with new_arg."""
+    """Decorator to declare old_arg deprecated and replace it with new_arg.
+
+    Usage:
+
+        @deprecate_arg('foo', 'bar')
+        def my_function(bar='baz'): pass
+        # replaces 'foo' keyword by 'bar' used by my_function
+
+        @deprecare_arg('foo', None)
+        def my_function(): pass
+        # ignores 'foo' keyword no longer used by my_function
+
+    deprecated_args decorator should be used in favour of this
+    deprecate_arg decorator but it is held to deprecate args which become
+    a reserved word in future Python releases and to prevent syntax errors.
+
+    @param old_arg: old keyword
+    @type old_arg: str
+    @param new_arg: new keyword
+    @type new_arg: str or None or bool
+    """
     return deprecated_args(**{old_arg: new_arg})
 
 
 def deprecated_args(**arg_pairs):
-    """
-    Decorator to declare multiple args deprecated.
+    """Decorator to declare multiple args deprecated.
 
-    @param arg_pairs: Each entry points to the new argument name. With True or
-        None it drops the value and prints a warning. If False it just drops
-        the value.
+    Usage:
+
+        @deprecated_args(foo='bar', baz=None)
+        def my_function(bar='baz'): pass
+        # replaces 'foo' keyword by 'bar' and ignores 'baz' keyword
+
+    @param arg_pairs: Each entry points to the new argument name. If an
+        argument is to be removed, the value may be one of the following:
+        - None: shows a DeprecationWarning
+        - False: shows a PendingDeprecationWarning
+        - True: shows a FutureWarning (only once)
+        - empty string: no warning is printed
     """
     def decorator(obj):
         """Outer wrapper.
@@ -1770,30 +1785,37 @@ def deprecated_args(**arg_pairs):
                     'old_arg': old_arg,
                     'new_arg': new_arg,
                 }
-                if old_arg in __kw:
-                    if new_arg not in [True, False, None]:
-                        if new_arg in __kw:
-                            warn('%(new_arg)s argument of %(name)s '
-                                 'replaces %(old_arg)s; cannot use both.'
-                                 % output_args,
-                                 RuntimeWarning, depth)
-                        else:
-                            # If the value is positionally given this will
-                            # cause a TypeError, which is intentional
-                            warn('%(old_arg)s argument of %(name)s '
-                                 'is deprecated; use %(new_arg)s instead.'
-                                 % output_args,
-                                 DeprecationWarning, depth)
-                            __kw[new_arg] = __kw[old_arg]
+                if old_arg not in __kw:
+                    continue
+
+                if new_arg not in [True, False, None, '']:
+                    if new_arg in __kw:
+                        warn('{new_arg} argument of {name} '
+                             'replaces {old_arg}; cannot use both.'
+                             .format(**output_args),
+                             RuntimeWarning, depth)
                     else:
-                        if new_arg is False:
-                            cls = PendingDeprecationWarning
-                        else:
-                            cls = DeprecationWarning
-                        warn('%(old_arg)s argument of %(name)s is deprecated.'
-                             % output_args,
-                             cls, depth)
-                    del __kw[old_arg]
+                        # If the value is positionally given this will
+                        # cause a TypeError, which is intentional
+                        warn('{old_arg} argument of {name} '
+                             'is deprecated; use {new_arg} instead.'
+                             .format(**output_args),
+                             DeprecationWarning, depth)
+                        __kw[new_arg] = __kw[old_arg]
+                elif new_arg == '':
+                    pass
+                else:
+                    if new_arg is False:
+                        cls = PendingDeprecationWarning
+                    elif new_arg is True:
+                        cls = FutureWarning
+                    else:  # new_arg is None
+                        cls = DeprecationWarning
+                    warn('{old_arg} argument of {name} is deprecated.'
+                         .format(**output_args),
+                         cls, depth)
+                del __kw[old_arg]
+
             return obj(*__args, **__kw)
 
         if not __debug__:
@@ -1810,8 +1832,8 @@ def deprecated_args(**arg_pairs):
             for old_arg, new_arg in arg_pairs.items():
                 params[old_arg] = inspect.Parameter(
                     old_arg, kind=inspect._POSITIONAL_OR_KEYWORD,
-                    default='[deprecated name of ' + new_arg + ']'
-                    if new_arg not in [True, False, None]
+                    default='[deprecated name of {}]'.format(new_arg)
+                    if new_arg not in [True, False, None, '']
                     else NotImplemented)
             params = collections.OrderedDict(sorted(params.items(),
                                                     key=lambda x: x[1].kind))
@@ -2198,9 +2220,11 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111')
+wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111',
+                             future_warning=True)
 wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict,
-                             since='20160111')
-wrapper._add_deprecated_attr('count', itertools.count, since='20160111')
+                             since='20160111', future_warning=True)
+wrapper._add_deprecated_attr('count', itertools.count, since='20160111',
+                             future_warning=True)
 wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='',
-                             since='20180402')
+                             since='20180402', future_warning=True)

@@ -55,6 +55,7 @@ from warnings import warn
 
 from requests import __version__ as requests_version
 
+from pywikibot import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import PY2, issue_deprecation_warning
 
@@ -237,7 +238,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = 'Pywikibot 3.0-dev'
+default_edit_summary = 'Pywikibot ' + pwb_version
 
 # What permissions to use to set private files to it
 # such as password file.
@@ -947,13 +948,12 @@ def _win32_extension_command(extension):
     fileexts_key = \
         r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
     key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
-    _winreg = winreg  # exists for git blame only; do not use
     try:
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
         _prog_id = winreg.EnumValue(key1, 0)[0]
-        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                r'%s\shell\open\command' % _prog_id)
-        _cmd = _winreg.QueryValueEx(_key2, None)[0]
+        _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
+                               r'{}\shell\open\command'.format(_prog_id))
+        _cmd = winreg.QueryValueEx(_key2, None)[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
         if cmd.find('%1'):
