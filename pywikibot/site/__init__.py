@@ -1108,19 +1108,6 @@ class BaseSite(ComparableMixin):
                     '{site.family.name}_family for {site}'.format(site=self))
         return pywikibot.Category(pywikibot.Link(name, self))
 
-    @deprecated('pywikibot.Link', since='20090307', future_warning=True)
-    def linkto(self, title, othersite=None):
-        """DEPRECATED. Return a wikilink to a page.
-
-        @param title: Title of the page to link to
-        @type title: str
-        @param othersite: Generate a interwiki link for use on this site.
-        @type othersite: BaseSite or None
-
-        @rtype: str
-        """
-        return pywikibot.Link(title, self).astext(othersite)
-
     def isInterwikiLink(self, text):
         """Return True if text is in the form of an interwiki link.
 
@@ -1235,11 +1222,6 @@ class BaseSite(ComparableMixin):
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
 
     # deprecated methods for backwards-compatibility
-
-    @deprecated('family attribute', since='20090307', future_warning=True)
-    def fam(self):
-        """Return Family object for this Site."""
-        return self.family
 
     @deprecated('pywikibot.data.api.encode_url', since='20151211')
     def urlEncode(self, query):
@@ -1997,21 +1979,6 @@ class APISite(BaseSite):
             return False
 
         return True
-
-    @deprecated('Site.user()', since='20090307', future_warning=True)
-    @remove_last_args(['sysop'])
-    def loggedInAs(self):
-        """Return the current username if logged in, otherwise return None.
-
-        DEPRECATED (use .user() method instead)
-
-        @param sysop: if True, test if user is logged in as the sysop user
-                     instead of the normal user.
-        @type sysop: bool
-
-        @rtype: bool
-        """
-        return self.logged_in() and self.user()
 
     def is_oauth_token_available(self):
         """
@@ -4337,21 +4304,6 @@ class APISite(BaseSite):
             apgen.request['gapdir'] = 'descending'
         return apgen
 
-    @deprecated('Site.allpages()', since='20090307', future_warning=True)
-    def prefixindex(self, prefix, namespace=0, includeredirects=True):
-        """Yield all pages with a given prefix. Deprecated.
-
-        Use allpages() with the prefix= parameter instead of this method.
-        """
-        if not includeredirects:
-            filterredir = False
-        elif includeredirects == 'only':
-            filterredir = True
-        else:
-            filterredir = None
-        return self.allpages(prefix=prefix, namespace=namespace,
-                             filterredir=filterredir)
-
     @deprecated_args(step=None)
     def alllinks(self, start='!', prefix='', namespace=0, unique=False,
                  fromids=False, total=None):
@@ -4418,15 +4370,6 @@ class APISite(BaseSite):
         if reverse:
             acgen.request['gacdir'] = 'descending'
         return acgen
-
-    @deprecated('Site.allcategories()', since='20090307', future_warning=True)
-    def categories(self, number=10, repeat=False):
-        """DEPRECATED."""
-        if repeat:
-            limit = None
-        else:
-            limit = number
-        return self.allcategories(total=limit)
 
     def isBot(self, username):
         """Return True is username is a bot user."""
@@ -6261,32 +6204,6 @@ class APISite(BaseSite):
         if forcelinkupdate or forcerecursivelinkupdate:
             return all('linkupdate' in page for page in result)
         return True
-
-    @deprecated('Site().exturlusage', since='20090529', future_warning=True)
-    def linksearch(self, siteurl, limit=None, euprotocol=None):
-        """Backwards-compatible interface to exturlusage()."""
-        return self.exturlusage(siteurl, total=limit, protocol=euprotocol)
-
-    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
-                future_warning=True)
-    def getFilesFromAnHash(self, hash_found):
-        """
-        Return all files that have the same hash.
-
-        DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
-        """
-        return [image.title(with_ns=False)
-                for image in self.allimages(sha1=hash_found)]
-
-    @deprecated('Site().allimages(sha1=hash_found)', since='20141219',
-                future_warning=True)
-    def getImagesFromAnHash(self, hash_found):
-        """
-        Return all images that have the same hash.
-
-        DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
-        """
-        return self.getFilesFromAnHash(hash_found)
 
     @need_right('edit')
     def is_uploaddisabled(self):
