@@ -63,8 +63,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
             self.cct.resolveHtmlEntities(
                 '&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
         self.assertEqual(
-            '<code>&#32;</code>',
-            self.cct.resolveHtmlEntities('<code>&#32;</code>'))
+            '<syntaxhighlight>&#32;</syntaxhighlight>',
+            self.cct.resolveHtmlEntities(
+                '<syntaxhighlight>&#32;</syntaxhighlight>'))
+        self.assertEqual(
+            '<!-- &ndash; -->',
+            self.cct.resolveHtmlEntities('<!-- &ndash; -->'))
 
     def test_removeUselessSpaces(self):
         """Test removeUselessSpaces method."""

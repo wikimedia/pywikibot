@@ -646,7 +646,10 @@ class CosmeticChangesToolkit(object):
         if self.template:
             ignore += [32]  # Space ( )
             ignore += [58]  # Colon (:)
-        text = pywikibot.html2unicode(text, ignore=ignore, exceptions=['code'])
+        # TODO: T254350 - what other extension tags should be avoided?
+        # (graph, math, score, timeline, etc.)
+        text = pywikibot.html2unicode(
+            text, ignore=ignore, exceptions=['comment', 'source'])
         return text
 
     def removeEmptySections(self, text):
