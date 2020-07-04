@@ -16,8 +16,6 @@ from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
 from types import ModuleType
 
-import six
-
 try:
     from cryptography import __version__ as cryptography_version
     cryptography_version = list(map(int, cryptography_version.split('.')))
@@ -55,11 +53,6 @@ def expected_failure_if(expect):
         return unittest.expectedFailure
     else:
         return lambda orig: orig
-
-
-def add_metaclass(cls):
-    """Call six's add_metaclass with the site's __metaclass__ in Python 3."""
-    return six.add_metaclass(cls.__metaclass__)(cls)
 
 
 def fixed_generator(iterable):

@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from datetime import datetime
 
 from pywikibot import date
 
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
-from tests.utils import add_metaclass
 
 
 class TestDateMeta(MetaTestCaseClass):
@@ -55,12 +53,9 @@ class TestDateMeta(MetaTestCaseClass):
         return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestDate(TestCase):
+class TestDate(TestCase, metaclass=TestDateMeta):
 
     """Test cases for date library processed by unittest."""
-
-    __metaclass__ = TestDateMeta
 
     net = False
 
@@ -108,7 +103,5 @@ class TestMonthDelta(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

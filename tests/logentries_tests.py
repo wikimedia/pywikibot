@@ -7,6 +7,8 @@
 #
 import datetime
 
+from contextlib import suppress
+
 import pywikibot
 
 from pywikibot.exceptions import HiddenKeyError
@@ -148,6 +150,8 @@ class TestLogentriesMeta(MetaTestCaseClass):
 class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
 
     """Test general LogEntry properties."""
+
+    pass
 
 
 class TestSimpleLogentries(TestLogentriesBase):
@@ -335,7 +339,5 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
