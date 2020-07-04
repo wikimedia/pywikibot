@@ -61,11 +61,6 @@ scripts.category\_redirect script
 
 .. automodule:: scripts.category_redirect
 
-scripts.cfd script
-------------------
-
-.. automodule:: scripts.cfd
-
 scripts.checkimages script
 --------------------------
 
