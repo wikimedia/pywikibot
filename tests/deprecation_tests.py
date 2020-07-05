@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
@@ -608,11 +608,8 @@ class DeprecatorTestCase(DeprecationTestCase):
         """Test invalid @remove_last_args on functions."""
         self.assertRaisesRegex(
             TypeError,
-            # Python 3
-            r'(deprecated_all2\(\) missing 1 required positional argument: '
-            r"'foo'|"
-            # Python 2
-            r'deprecated_all2\(\) takes exactly 1 argument \(0 given\))',
+            r'deprecated_all2\(\) missing 1 required positional argument: '
+            r"'foo'",
             deprecated_all2)
 
         self.assertRaisesRegex(
@@ -632,11 +629,8 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         self.assertRaisesRegex(
             TypeError,
-            # Python 3
-            r'(deprecated_all2\(\) missing 1 required positional argument: '
-            r"'foo'|"
-            # Python 2
-            r'deprecated_all2\(\) takes exactly 2 arguments \(1 given\))',
+            r'deprecated_all2\(\) missing 1 required positional argument: '
+            r"'foo'",
             f.deprecated_all2)
 
         self.assertRaisesRegex(
@@ -816,7 +810,5 @@ class DeprecatorTestCase(DeprecationTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

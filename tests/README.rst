@@ -272,10 +272,6 @@ Replaces `target` with object specified in `new`. Refer to mock's documentation.
 This is especially useful in tests, where requests to third-parties should be
 avoided.
 
-In Python 3, this is part of the built-in unittest module. But `mock` should
-be installed using pip for Python 2. Import whichever is available from the
-`tests` package.
-
 ::
 
   from tests import patch

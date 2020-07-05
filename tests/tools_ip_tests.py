@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 """Test IP module/regex."""
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
-from pywikibot.tools import is_IP, PY2, PYTHON_VERSION
+from pywikibot.tools import is_IP, PYTHON_VERSION
 
 from tests import unittest_print
 from tests.aspects import unittest, TestCase
@@ -34,9 +34,7 @@ class IPAddressModuleTestCase(TestCase):
         """Perform one ip_address test."""
         self.total += 1
         with self.subTest(ip_address=ip_address):
-            msg = '"{}" match should be {} - not OK'.format(
-                ip_address, result) if PY2 else None
-            self.assertEqual(result, is_IP(ip_address), msg)
+            self.assertEqual(result, is_IP(ip_address))
 
     def test_ipaddress_module(self):
         """Test ipaddress module."""
@@ -658,7 +656,5 @@ class IPAddressModuleTestCase(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

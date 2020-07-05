@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2019
+# (C) Pywikibot team, 2009-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
-
 import calendar
 import datetime
 import logging
 import sys
+
+from contextlib import suppress
 
 import pywikibot
 from pywikibot import pagegenerators, date
@@ -23,7 +23,7 @@ from pywikibot.pagegenerators import (
     CategorizedPageGenerator
 )
 
-from pywikibot.tools import has_module, PY2, suppress_warnings
+from pywikibot.tools import has_module, suppress_warnings
 
 from tests import join_data_path, mock
 from tests.aspects import (
@@ -36,8 +36,6 @@ from tests.aspects import (
 )
 from tests.thread_tests import GeneratorIntersectTestCase
 
-if PY2:
-    from future_builtins import zip
 
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
@@ -1340,8 +1338,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         pages = list(gen)
         self.assertLessEqual(len(pages), 5)
-        for page in pages:
-            yield page
+        yield from pages
 
     def test_wanted_pages(self):
         """Test wantedpages generator."""
@@ -1671,7 +1668,5 @@ class TestLinksearchPageGenerator(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

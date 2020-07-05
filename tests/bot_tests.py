@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import sys
+
+from contextlib import suppress
 
 import pywikibot
 import pywikibot.bot
 
 from pywikibot import i18n
-from pywikibot.tools import PY2, suppress_warnings
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
@@ -234,17 +234,12 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
             self.bot.site = self.de
         with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
             self.bot.site
-        if PY2:
-            # The exc_info still contains the AttributeError :/
-            sys.exc_clear()
+
         self.bot.treat = self._treat(self._generator())
         self.bot.exit = self._exit(4)
         self.bot.run()
         with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
             self.bot.site
-        if PY2:
-            # The exc_info still contains the AttributeError :/
-            sys.exc_clear()
 
     def test_Bot(self):
         """Test normal Bot class."""
@@ -294,12 +289,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                       pywikibot.Page(self.de, 'Page 3')],
                                      post_treat)
 
-        # TODO: sys.exc_info is empty in Python 3
-        if not PY2:
-            exc = None
-        else:
-            exc = KeyboardInterrupt
-        self.bot.exit = self._exit(2, exception=exc)
+        self.bot.exit = self._exit(2, exception=None)
         self.bot.run()
 
 
@@ -368,7 +358,5 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

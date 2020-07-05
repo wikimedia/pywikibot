@@ -5,21 +5,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from random import sample
+from urllib.parse import urlparse
 
 from pywikibot import Site
-from pywikibot.tools import PY2
 
 from tests.aspects import unittest, DefaultSiteTestCase
 
 import generate_family_file
-
-if not PY2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
@@ -105,7 +99,5 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
