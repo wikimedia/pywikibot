@@ -129,7 +129,7 @@ if os.name == 'nt':
             setattr(pywikibot.ui, key, value)
 
         def cls(self):
-            os.system('cls')
+            subprocess.run('cls', shell=True)
 
     class pywikibotManager(BaseManager):
 
@@ -683,7 +683,9 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
 
     def testOutputUnicodeText_no_transliterate(self):
         self.sendstdin(
-            "python -c \"import os, pywikibot; os.system('cls'); "
+            'python -c \"'
+            'import subprocess, pywikibot; '
+            "subprocess.run('cls', shell=True); "
             "pywikibot.output('\\n'.join(pywikibot.handleArgs()))\" "
             'Alpha Bετα Гамма دلتا\n')
         lines = []
