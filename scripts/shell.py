@@ -14,13 +14,10 @@ Usage:
 
 If no arguments are given, the pywikibot library will not be loaded.
 """
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
 import code
 import sys
 
@@ -53,9 +50,10 @@ def main(*args):
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
-        import os
-        os.system('title Python {} Shell'.format(*sys.version.split(' ', 1)))
-        del os
+        import subprocess
+        subprocess.run('title Python {} Shell'
+                       .format(*sys.version.split(' ', 1)), shell=True)
+        del subprocess
     args = []
     if sys.argv and sys.argv[0].endswith(('shell', 'shell.py')):
         args = sys.argv[1:]
