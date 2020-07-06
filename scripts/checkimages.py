@@ -785,7 +785,7 @@ class checkImagesBot(object):
                         return True  # continue with the check-part
 
             pywikibot.output(self.imageName + ' is on commons!')
-            if self.image.fileIsShared():
+            if self.image.file_is_shared():
                 pywikibot.output(
                     "But, the file doesn't exist on your project! Skip...")
                 # We have to skip the check part for that image because

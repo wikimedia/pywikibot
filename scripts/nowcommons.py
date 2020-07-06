@@ -268,7 +268,7 @@ class NowCommonsDeleteBot(Bot):
             self.current_page = page
             try:
                 localImagePage = pywikibot.FilePage(self.site, page.title())
-                if localImagePage.fileIsShared():
+                if localImagePage.file_is_shared():
                     pywikibot.output('File is already on Commons.')
                     continue
                 sha1 = localImagePage.latest_file_info.sha1
