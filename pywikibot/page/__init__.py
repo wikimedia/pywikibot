@@ -1774,14 +1774,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse', step=None)
+    @deprecated_args(getText='content', reverseOrder='reverse', step=None,
+                     rollback=None)
     def revisions(self, reverse=False, total=None, content=False,
-                  rollback=False, starttime=None, endtime=None):
+                  starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
         self.site.loadrevisions(self, content=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
-                                total=total, rollback=rollback)
+                                total=total)
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
