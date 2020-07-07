@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 """Utility to show pywikibot colors."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import itergroup
-from pywikibot.userinterfaces.terminal_interface_base import colors as colors
+from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
 def main():

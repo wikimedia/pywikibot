@@ -29,19 +29,15 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
 import codecs
 from importlib import import_module
 import json
 import os
 
 from pywikibot import config
-from pywikibot.tools import PY2
 
 
-class i18nBot(object):  # noqa: N801
+class i18nBot:  # noqa: N801
 
     """I18n bot."""
 
@@ -78,8 +74,6 @@ class i18nBot(object):  # noqa: N801
             keys.insert(0, 'en')
 
         print('# -*- coding: utf-8 -*-')
-        if PY2:
-            print('from __future__ import unicode_literals')
         print('msg = {')
         for code in keys:
             print("    '%s': {" % code)
