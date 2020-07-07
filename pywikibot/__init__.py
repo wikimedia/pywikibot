@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-__version__ = __release__ = '4.0.dev0'
-__url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
-
 import atexit
 import datetime
 from decimal import Decimal
@@ -20,6 +17,12 @@ import threading
 import time
 
 from warnings import warn
+
+from pywikibot.__metadata__ import (
+    __copyright__, __description__, __download_url__, __license__,
+    __maintainer__, __maintainer_email__, __name__, __url__, __version__)
+
+__release__ = __version__  # backward compatibility
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
@@ -89,6 +92,9 @@ textlib_methods = (
 )
 
 __all__ = (
+    '__copyright__', '__description__', '__download_url__', '__license__',
+    '__maintainer__', '__maintainer_email__', '__name__', '__release__',
+    '__url__', '__version__',
     'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',

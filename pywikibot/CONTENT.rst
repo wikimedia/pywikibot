@@ -7,6 +7,8 @@ The contents of the package
     | __init__.py                | Initialization of the pywikibot framework,           |
     |                            | basic classes and methods                            |
     +----------------------------+------------------------------------------------------+
+    | __metadata__.py            | pywikibot framework metadata file                    |
+    +----------------------------+------------------------------------------------------+
     | _wbtypes.py                | Wikibase data type classes                           |
     +----------------------------+------------------------------------------------------+
     | bot.py                     | User-interface related functions for building bots   |
