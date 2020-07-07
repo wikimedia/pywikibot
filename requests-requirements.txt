@@ -1,5 +1,0 @@
-# This file is DEPRECATED! Use `pip install pywikibot[security]` instead.
-#
-# The period below installs pywikibot[security] from setup.py automatically
-# on Python < 2.7.9.
-.
