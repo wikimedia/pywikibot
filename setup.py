@@ -36,7 +36,7 @@ from setuptools import setup
 
 PYTHON_VERSION = sys.version_info[:3]
 
-versions_required_message = """
+VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
@@ -46,12 +46,12 @@ This version of Pywikibot only supports Python 3.5+.
 
 def python_is_supported():
     """Check that Python is supported."""
-    # Any change to this must be copied to pwb.py
     return PYTHON_VERSION >= (3, 5, 0)
 
 
 if not python_is_supported():
-    raise RuntimeError(versions_required_message.format(version=sys.version))
+    # pwb.py checks this exception
+    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 # ------- setup extra_requires ------- #
 extra_deps = {
