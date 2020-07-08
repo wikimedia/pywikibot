@@ -44,7 +44,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'gn', 'mr', 'ie', 'so', 'csb', 'ug', 'fo', 'st', 'roa-rup', 'si',
         'hif', 'kl', 'su', 'ay', 'mi', 'zu', 'jbo', 'ln', 'yi', 'gu', 'na',
         'gv', 'kw', 'tpi', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu',
-        'am', 'dv', 'sg', 'ti', 'tn', 'gom', 'ks',
+        'am', 'dv', 'sg', 'ti', 'tn', 'gom', 'ks', 'shn',
     ]
 
     category_redirect_templates = {
@@ -100,7 +100,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha', 'ps', 'dv', 'ks', 'ne', 'pi',
         'bh', 'mr', 'sa', 'hi', 'as', 'bn', 'pa', 'pnb', 'gu', 'or', 'ta',
         'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz', 'ka', 'ti', 'am', 'chr',
-        'iu', 'km', 'zh', 'ja', 'ko'
+        'iu', 'km', 'zh', 'ja', 'ko', 'shn',
     ]
 
     @classproperty
