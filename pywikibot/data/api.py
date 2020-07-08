@@ -15,11 +15,11 @@ import pprint
 import re
 import traceback
 
-
 from collections.abc import Container, MutableMapping, Sized
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
+from inspect import getfullargspec
 from io import BytesIO
 from warnings import warn
 from urllib.parse import urlencode, unquote
@@ -35,8 +35,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import SubdomainFamily
 from pywikibot.tools import (
-    deprecated, itergroup, PYTHON_VERSION,
-    getargspec, remove_last_args
+    deprecated, itergroup, PYTHON_VERSION, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
 
@@ -1299,7 +1298,7 @@ class Request(MutableMapping):
         for super_cls in inspect.getmro(cls):
             if not super_cls.__name__.endswith('Request'):
                 break
-            args |= set(getargspec(super_cls.__init__)[0])
+            args |= set(getfullargspec(super_cls.__init__).args)
         else:
             raise ValueError('Request was not a super class of '
                              '{0!r}'.format(cls))

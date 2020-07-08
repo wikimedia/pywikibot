@@ -25,6 +25,7 @@ from datetime import datetime
 from distutils.version import LooseVersion, Version
 from functools import wraps
 from importlib import import_module
+from inspect import getfullargspec
 from ipaddress import ip_address
 from itertools import zip_longest
 from warnings import catch_warnings, showwarning, warn
@@ -34,7 +35,6 @@ from pywikibot.tools._unidata import _first_upper_exception
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
-
 StringTypes = (str, bytes)
 UnicodeType = str
 
@@ -52,37 +52,6 @@ try:
     import lzma
 except ImportError as lzma_import_error:
     lzma = lzma_import_error
-
-
-if PYTHON_VERSION < (3, 5):
-    # although deprecated in 3 completely no message was emitted until 3.5
-    ArgSpec = inspect.ArgSpec
-    getargspec = inspect.getargspec
-else:
-    ArgSpec = collections.namedtuple('ArgSpec', ['args', 'varargs', 'keywords',
-                                                 'defaults'])
-
-    def getargspec(func):
-        """Python 3 implementation using inspect.signature."""
-        sig = inspect.signature(func)
-        args = []
-        defaults = []
-        varargs = None
-        kwargs = None
-        for p in sig.parameters.values():
-            if p.kind == inspect.Parameter.VAR_POSITIONAL:
-                varargs = p.name
-            elif p.kind == inspect.Parameter.VAR_KEYWORD:
-                kwargs = p.name
-            else:
-                args += [p.name]
-                if p.default != inspect.Parameter.empty:
-                    defaults += [p.default]
-        if defaults:
-            defaults = tuple(defaults)
-        else:
-            defaults = None
-        return ArgSpec(args, varargs, kwargs, defaults)
 
 
 _logger = 'tools'
@@ -1559,7 +1528,7 @@ def remove_last_args(arg_names):
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
-            args, varargs, kwargs, _ = getargspec(wrapper.__wrapped__)
+            args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
                 raise ValueError('{0} may not have * or ** args.'.format(
                     name))
@@ -1935,3 +1904,7 @@ wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
                              since='20200723', future_warning=True)
 wrapper._add_deprecated_attr('IteratorNextMixin', replacement_name='',
                              since='20200723', future_warning=True)
+wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
+                             since='20200712', future_warning=True)
+wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
+                             since='20200712', future_warning=True)

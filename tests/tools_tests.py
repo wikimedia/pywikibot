@@ -6,11 +6,9 @@
 #
 # Distributed under the terms of the MIT license.
 import decimal
-import inspect
 import os.path
 import subprocess
 import tempfile
-import warnings
 
 from collections.abc import Mapping
 from collections import OrderedDict
@@ -22,7 +20,7 @@ from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path, mock
 from tests.aspects import (
-    unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
+    unittest, require_modules, DeprecationTestCase, TestCase
 )
 
 
@@ -621,79 +619,6 @@ class TestFilterUnique(TestCase):
 
         # And it should not resume
         self.assertRaises(StopIteration, next, deduper)
-
-
-class MetaTestArgSpec(MetaTestCaseClass):
-
-    """Metaclass to create dynamically the tests. Set the net flag to false."""
-
-    def __new__(cls, name, bases, dct):
-        """Create a new test case class."""
-        def create_test(method):
-            def test_method(self):
-                """Test getargspec."""
-                # all expect at least self and param
-                expected = method(1, 2)
-                returned = self.getargspec(method)
-                self.assertEqual(returned, expected)
-                self.assertIsInstance(returned, self.expected_class)
-                self.assertNoDeprecation()
-            return test_method
-
-        for attr, tested_method in list(dct.items()):
-            if attr.startswith('_method_test_'):
-                suffix = attr[len('_method_test_'):]
-                cls.add_method(dct, 'test_method_' + suffix,
-                               create_test(tested_method),
-                               doc_suffix='on {0}'.format(suffix))
-
-        dct['net'] = False
-        return super().__new__(cls, name, bases, dct)
-
-
-class TestArgSpec(DeprecationTestCase, metaclass=MetaTestArgSpec):
-
-    """Test getargspec and ArgSpec from tools."""
-
-    expected_class = tools.ArgSpec
-
-    def _method_test_args(self, param):
-        """Test method with two positional arguments."""
-        return (['self', 'param'], None, None, None)
-
-    def _method_test_kwargs(self, param=42):
-        """Test method with one positional and one keyword argument."""
-        return (['self', 'param'], None, None, (42,))
-
-    def _method_test_varargs(self, param, *var):
-        """Test method with two positional arguments and var args."""
-        return (['self', 'param'], 'var', None, None)
-
-    def _method_test_varkwargs(self, param, **var):
-        """Test method with two positional arguments and var kwargs."""
-        return (['self', 'param'], None, 'var', None)
-
-    def _method_test_vars(self, param, *args, **kwargs):
-        """Test method with two positional arguments and both var args."""
-        return (['self', 'param'], 'args', 'kwargs', None)
-
-    def getargspec(self, method):
-        """Call tested getargspec function."""
-        return tools.getargspec(method)
-
-
-class TestPythonArgSpec(TestArgSpec):
-
-    """Test the same tests using Python's implementation."""
-
-    expected_class = inspect.ArgSpec
-
-    def getargspec(self, method):
-        """Call inspect's getargspec function."""
-        with warnings.catch_warnings():
-            if not tools.PY2:
-                warnings.simplefilter('ignore', DeprecationWarning)
-            return inspect.getargspec(method)
 
 
 class TestFileModeChecker(TestCase):
