@@ -170,11 +170,6 @@ def get_validated_version():
     if 'sdist' not in sys.argv:
         return version
 
-    if PY2:
-        raise RuntimeError(
-            'A new distribution cannot be created with Python {}'
-            .format(sys.version.split(None, 1)[0]))
-
     # validate version for sdist
     from contextlib import suppress
     from subprocess import run, PIPE
@@ -188,7 +183,7 @@ def get_validated_version():
     for tag in ('stable', 'python2'):
         with suppress(ValueError):
             tags.remove(tag)
-        
+
     last_tag = tags[-1]
 
     warnings = []
