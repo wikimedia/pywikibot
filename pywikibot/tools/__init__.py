@@ -364,16 +364,6 @@ class _NotImplementedWarning(RuntimeWarning):
     pass
 
 
-class NotImplementedClass(object):
-
-    """No implementation is available."""
-
-    def __init__(self, *args, **kwargs):
-        """Initializer."""
-        raise NotImplementedError(
-            '%s: %s' % (self.__class__.__name__, self.__doc__))
-
-
 def is_IP(IP):  # noqa N802, N803
     """Verify the IP address provided is valid.
 
