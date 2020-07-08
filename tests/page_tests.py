@@ -459,10 +459,6 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
-        with suppress_warnings(
-                r'pywikibot\.page\.BasePage\.isEmpty is deprecated[\s\w]+; '
-                r'use interwiki\.page_empty_check\(page\) instead\.'):
-            self.assertIsInstance(mainpage.isEmpty(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
