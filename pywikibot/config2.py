@@ -50,10 +50,9 @@ import types
 from distutils.version import StrictVersion
 from locale import getdefaultlocale
 from os import getenv, environ
+from requests import __version__ as requests_version
 from textwrap import fill
 from warnings import warn
-
-from requests import __version__ as requests_version
 
 from pywikibot import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
@@ -313,7 +312,7 @@ def get_base_dir(test_directory=None):
 
     base_dir = ''
     for arg in sys.argv[1:]:
-        if arg.startswith(str('-dir:')):
+        if arg.startswith('-dir:'):
             base_dir = arg[5:]
             base_dir = os.path.expanduser(base_dir)
             break
@@ -378,7 +377,7 @@ def get_base_dir(test_directory=None):
 base_dir = get_base_dir()
 
 for arg in sys.argv[1:]:
-    if arg.startswith(str('-verbose')) or arg == str('-v'):
+    if arg.startswith('-verbose') or arg == '-v':
         output('The base directory is ' + base_dir)
         break
 family_files = {}

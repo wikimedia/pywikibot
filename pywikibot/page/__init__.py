@@ -373,7 +373,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = title.replace(' ', '_')
         if as_url:
             encoded_title = title.encode(self.site.encoding())
-            title = quote_from_bytes(encoded_title, safe=str(''))
+            title = quote_from_bytes(encoded_title, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems, but still are valid in MediaWiki titles:
@@ -415,7 +415,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             except UnicodeEncodeError:
                 # okay console encoding didn't work, at least try something
                 title = self.title().encode('unicode_escape')
-        return str('{0}({1})').format(self.__class__.__name__, title)
+        return '{0}({1})'.format(self.__class__.__name__, title)
 
     def _cmpkey(self):
         """

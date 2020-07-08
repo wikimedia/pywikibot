@@ -118,10 +118,7 @@ class XmlDump(object):
     def parse(self):
         """Generator using ElementTree iterparse function."""
         with open_archive(self.filename) as source:
-            # iterparse's event must be a str but they are unicode with
-            # unicode_literals in Python 2
-            context = iterparse(source, events=(str('start'), str('end'),
-                                                str('start-ns')))
+            context = iterparse(source, events=('start', 'end', 'start-ns'))
             self.root = None
 
             for event, elem in context:
@@ -131,8 +128,7 @@ class XmlDump(object):
                 if event == 'start' and self.root is None:
                     self.root = elem
                     continue
-                for rev in self._parse(event, elem):
-                    yield rev
+                yield from self._parse(event, elem)
 
     def _parse_only_latest(self, event, elem):
         """Parser that yields only the latest revision."""
