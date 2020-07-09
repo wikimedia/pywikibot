@@ -5,24 +5,18 @@
 #
 # Distributed under the terms of the MIT license.
 #
-
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
+from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError, Timeout
 
 import pywikibot
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
-from pywikibot.tools import PY2
 
 from tests import unittest_print
 from tests.aspects import unittest, TestCase, PatchingTestCase
 from tests.utils import DrySite
-
-if not PY2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 class SiteDetectionTestCase(TestCase):
@@ -161,7 +155,6 @@ class APIHiddenTestCase(SiteDetectionTestCase):
         """
         self.assertNoSite('http://wikisophia.org/index.php?title=$1')
 
-    @unittest.expectedFailure
     def test_ecoreality(self):
         """Test detection of MediaWiki sites for www.EcoReality.org.
 
@@ -345,7 +338,5 @@ class PrivateWikiTestCase(PatchingTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
