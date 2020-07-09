@@ -707,8 +707,8 @@ class GeneratorFactory(object):
                                 'processed?')
         if not value.startswith(self.site.namespace(6) + ':'):
             value = 'Image:' + value
-        page = pywikibot.FilePage(self.site, value)
-        return FileLinksGenerator(page)
+        file_page = pywikibot.FilePage(self.site, value)
+        return file_page.usingPages()
 
     def _handle_linter(self, value):
         """Handle `-linter` argument."""
@@ -770,16 +770,15 @@ class GeneratorFactory(object):
 
     def _handle_unusedfiles(self, value):
         """Handle `-unusedfiles` argument."""
-        return UnusedFilesGenerator(total=_int_none(value), site=self.site)
+        return self.site.unusedfiles(total=_int_none(value))
 
     def _handle_lonelypages(self, value):
         """Handle `-lonelypages` argument."""
-        return LonelyPagesPageGenerator(total=_int_none(value), site=self.site)
+        return self.site.lonelypages(total=_int_none(value))
 
     def _handle_unwatched(self, value):
         """Handle `-unwatched` argument."""
-        return UnwatchedPagesPageGenerator(
-            total=_int_none(value), site=self.site)
+        return self.site.unwatchedpage(total=_int_none(value))
 
     def _handle_wantedpages(self, value):
         """Handle `-wantedpages` argument."""
@@ -807,7 +806,7 @@ class GeneratorFactory(object):
             if value in '?' or value not in pnames:
                 prefix, value = pywikibot.input_choice(
                     question, ShowingListOption(pnames))
-        return page_with_property_generator(value, site=self.site)
+        return self.site.pages_with_property(value)
 
     def _handle_usercontribs(self, value):
         """Handle `-usercontribs` argument."""
@@ -817,8 +816,7 @@ class GeneratorFactory(object):
 
     def _handle_withoutinterwiki(self, value):
         """Handle `-withoutinterwiki` argument."""
-        return WithoutInterwikiPageGenerator(
-            total=_int_none(value), site=self.site)
+        return self.site.withoutinterwiki(total=_int_none(value))
 
     def _handle_interwiki(self, value):
         """Handle `-interwiki` argument."""
@@ -836,8 +834,8 @@ class GeneratorFactory(object):
         # before -randomredirect
         # otherwise default namespace is 0
         namespaces = self.namespaces or 0
-        return RandomRedirectPageGenerator(
-            total=_int_none(value), site=self.site, namespaces=namespaces)
+        return self.site.randompages(total=_int_none(value),
+                                     namespaces=namespaces, redirects=True)
 
     def _handle_random(self, value):
         """Handle `-random` argument."""
@@ -846,8 +844,8 @@ class GeneratorFactory(object):
         # before -random
         # otherwise default namespace is 0
         namespaces = self.namespaces or 0
-        return RandomPageGenerator(
-            total=_int_none(value), site=self.site, namespaces=namespaces)
+        return self.site.randompages(total=_int_none(value),
+                                     namespaces=namespaces)
 
     def _handle_recentchanges(self, value):
         """Handle `-recentchanges` argument."""
@@ -958,19 +956,19 @@ class GeneratorFactory(object):
         """Handle `-pageid` argument."""
         if not value:
             value = pywikibot.input('What pageid do you want to use?')
-        return PagesFromPageidGenerator(value, site=self.site)
+        return self.site.load_pages_from_pageids(value)
 
     def _handle_uncatfiles(self, value):
         """Handle `-uncatfiles` argument."""
-        return UnCategorizedImageGenerator(site=self.site)
+        return self.site.uncategorizedimages()
 
     def _handle_uncatcat(self, value):
         """Handle `-uncatcat` argument."""
-        return UnCategorizedCategoryGenerator(site=self.site)
+        return self.site.uncategorizedcategories()
 
     def _handle_uncat(self, value):
         """Handle `-uncat` argument."""
-        return UnCategorizedPageGenerator(site=self.site)
+        return self.site.uncategorizedpages()
 
     def _handle_ref(self, value):
         """Handle `-ref` argument."""
@@ -978,7 +976,7 @@ class GeneratorFactory(object):
             value = pywikibot.input(
                 'Links to which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return ReferringPageGenerator(page)
+        return page.getReferences()
 
     def _handle_links(self, value):
         """Handle `-links` argument."""
@@ -986,14 +984,14 @@ class GeneratorFactory(object):
             value = pywikibot.input(
                 'Links from which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return LinkedPageGenerator(page)
+        return page.linkedPages()
 
     def _handle_weblink(self, value):
         """Handle `-weblink` argument."""
         if not value:
             value = pywikibot.input(
                 'Pages with which weblink should be processed?')
-        return LinksearchPageGenerator(value, site=self.site)
+        return self.site.exturlusage(value)
 
     def _handle_transcludes(self, value):
         """Handle `-transcludes` argument."""
@@ -1003,7 +1001,7 @@ class GeneratorFactory(object):
         page = pywikibot.Page(pywikibot.Link(value,
                                              default_namespace=10,
                                              source=self.site))
-        return ReferringPageGenerator(page, onlyTemplateInclusion=True)
+        return page.getReferences(only_template_inclusion=True)
 
     def _handle_start(self, value):
         """Handle `-start` argument."""
@@ -1044,7 +1042,7 @@ class GeneratorFactory(object):
             value = pywikibot.input(
                 'Images on which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return ImagesPageGenerator(page)
+        return page.imagelinks()
 
     def _handle_searchitem(self, value):
         """Handle `-searchitem` argument."""
@@ -1061,7 +1059,7 @@ class GeneratorFactory(object):
         if not value:
             value = pywikibot.input('What do you want to search for?')
         # In order to be useful, all namespaces are required
-        return SearchPageGenerator(value, namespaces=[], site=self.site)
+        return self.site.search(value, namespaces=[])
 
     @staticmethod
     def _handle_google(value):
@@ -1474,15 +1472,17 @@ def UnconnectedPageGenerator(site=None, total=None):
     return site.unconnected_pages(total=total)
 
 
+@deprecated('File.usingPages()', since='20200515')
 @deprecated_args(referredImagePage='referredFilePage', step=None)
 def FileLinksGenerator(referredFilePage, total=None, content=False):
-    """Yield Pages on which the file referredFilePage is displayed."""
+    """DEPRECATED. Yield Pages on which referredFilePage file is displayed."""
     return referredFilePage.usingPages(total=total, content=content)
 
 
+@deprecated('Page.imagelinks()', since='20200515')
 @deprecated_args(step=None)
 def ImagesPageGenerator(pageWithImages, total=None, content=False):
-    """Yield FilePages displayed on pageWithImages."""
+    """DEPRECATED. Yield FilePages displayed on pageWithImages."""
     return pageWithImages.imagelinks(total=total, content=content)
 
 
@@ -1497,12 +1497,13 @@ def LanguageLinksPageGenerator(page, total=None):
     return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
 
 
+@deprecated('Page.getReferences()', since='20200515')
 @deprecated_args(step=None)
 def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
                            onlyTemplateInclusion=False,
                            total=None, content=False):
-    """Yield all pages referring to a specific page."""
+    """DEPRECATED. Yield all pages referring to a specific page."""
     return referredPage.getReferences(
         follow_redirects=followRedirects,
         with_template_inclusion=withTemplateInclusion,
@@ -1572,9 +1573,10 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
             yield s
 
 
+@deprecated('Page.linkedPages()', since='20200515')
 @deprecated_args(step=None)
 def LinkedPageGenerator(linkingPage, total=None, content=False):
-    """Yield all pages linked from a specific page.
+    """DEPRECATED. Yield all pages linked from a specific page.
 
     See L{pywikibot.page.BasePage.linkedPages} for details.
 
@@ -1644,9 +1646,10 @@ def PagesFromTitlesGenerator(iterable, site=None):
         yield pywikibot.Page(pywikibot.Link(title, site))
 
 
+@deprecated('site.load_pages_from_pageids()', since='20200515')
 def PagesFromPageidGenerator(pageids, site=None):
     """
-    Return a page generator from pageids.
+    DEPRECATED. Return a page generator from pageids.
 
     Pages are iterated in the same order than in the underlying pageids.
     Pageids are filtered and only one page is returned in case of
@@ -2336,10 +2339,11 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
         yield page
 
 
+@deprecated('Site.unusedfiles()', since='20200515')
 @deprecated_args(extension=None, number='total', repeat=None)
 def UnusedFilesGenerator(total=None, site=None):
     """
-    Unused files generator.
+    DEPRECATED. Unused files generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2351,10 +2355,11 @@ def UnusedFilesGenerator(total=None, site=None):
     return site.unusedfiles(total=total)
 
 
+@deprecated('Site.withoutinterwiki()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def WithoutInterwikiPageGenerator(total=None, site=None):
     """
-    Page lacking interwikis generator.
+    DEPRECATED. Page lacking interwikis generator.
 
     @param total: Maximum number of pages to retrieve in total
     @param site: Site for generator results.
@@ -2365,10 +2370,11 @@ def WithoutInterwikiPageGenerator(total=None, site=None):
     return site.withoutinterwiki(total=total)
 
 
+@deprecated('Site.uncategorizedcategories()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def UnCategorizedCategoryGenerator(total=100, site=None):
     """
-    Uncategorized category generator.
+    DEPRECATED. Uncategorized category generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2380,10 +2386,11 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
     return site.uncategorizedcategories(total=total)
 
 
+@deprecated('Site.uncategorizedimages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def UnCategorizedImageGenerator(total=100, site=None):
     """
-    Uncategorized file generator.
+    DEPRECATED. Uncategorized file generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2395,10 +2402,11 @@ def UnCategorizedImageGenerator(total=100, site=None):
     return site.uncategorizedimages(total=total)
 
 
+@deprecated('Site.uncategorizedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def UnCategorizedPageGenerator(total=100, site=None):
     """
-    Uncategorized page generator.
+    DEPRECATED. Uncategorized page generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2410,10 +2418,11 @@ def UnCategorizedPageGenerator(total=100, site=None):
     return site.uncategorizedpages(total=total)
 
 
+@deprecated('Site.uncategorizedtemplates()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def UnCategorizedTemplateGenerator(total=100, site=None):
     """
-    Uncategorized template generator.
+    DEPRECATED. Uncategorized template generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2425,10 +2434,11 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
     return site.uncategorizedtemplates(total=total)
 
 
+@deprecated('Site.lonelypages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def LonelyPagesPageGenerator(total=None, site=None):
     """
-    Lonely page generator.
+    DEPRECATED. Lonely page generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2440,10 +2450,11 @@ def LonelyPagesPageGenerator(total=None, site=None):
     return site.lonelypages(total=total)
 
 
+@deprecated('Site.unwatchedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def UnwatchedPagesPageGenerator(total=None, site=None):
     """
-    Unwatched page generator.
+    DEPRECATED. Unwatched page generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2455,6 +2466,7 @@ def UnwatchedPagesPageGenerator(total=None, site=None):
     return site.unwatchedpages(total=total)
 
 
+@deprecated('Site.pages_with_property()', since='20200515')
 def page_with_property_generator(name, total=None, site=None):
     """
     Special:PagesWithProperty page generator.
@@ -2501,10 +2513,11 @@ def AncientPagesPageGenerator(total=100, site=None):
     return (page for page, _ in site.ancientpages(total=total))
 
 
+@deprecated('Site.deadendpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
 def DeadendPagesPageGenerator(total=100, site=None):
     """
-    Dead-end page generator.
+    DEPRECATED. Dead-end page generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2546,10 +2559,11 @@ def ShortPagesPageGenerator(total=100, site=None):
     return (page for page, _ in site.shortpages(total=total))
 
 
+@deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
 def RandomPageGenerator(total=None, site=None, namespaces=None):
     """
-    Random page generator.
+    DEPRECATED. Random page generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2561,10 +2575,11 @@ def RandomPageGenerator(total=None, site=None, namespaces=None):
     return site.randompages(total=total, namespaces=namespaces)
 
 
+@deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
 def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
     """
-    Random redirect generator.
+    DEPRECATED. Random redirect generator.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
@@ -2577,10 +2592,11 @@ def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
                             redirects=True)
 
 
+@deprecated('Site.exturlusage()', since='20200515')
 @deprecated_args(link='url', euprotocol='protocol', step=None)
 def LinksearchPageGenerator(url, namespaces=None, total=None,
                             site=None, protocol=None):
-    """Yield all pages that link to a certain URL, like Special:Linksearch.
+    """DEPRECATED. Yield all pages that link to a certain URL.
 
     @param url: The URL to search for (with ot without the protocol prefix);
             this may include a '*' as a wildcard, only at the start of the
@@ -2602,10 +2618,11 @@ def LinksearchPageGenerator(url, namespaces=None, total=None,
                             total=total, content=False)
 
 
+@deprecated('Site.search()', since='20200515')
 @deprecated_args(number='total', step=None)
 def SearchPageGenerator(query, total=None, namespaces=None, site=None):
     """
-    Yield pages from the MediaWiki internal search engine.
+    DEPRECATED. Yield pages from the MediaWiki internal search engine.
 
     @param total: Maximum number of pages to retrieve in total
     @type total: int
