@@ -10,7 +10,7 @@ to create the Index page, making the upload feature independent from the format
 of the file, as long as it is supported by the MW ProofreadPage extension.
 
 As alternative, if '-ocr' option is selected,
-https://tools.wmflabs.org/phetools OCR tool will be used to get text.
+https://phetools.toolforge.org/ OCR tool will be used to get text.
 In this case, also already existing pages with quality value 'Not Proofread'
 can be treated. '-force' will override existing page in this case.
 
@@ -33,14 +33,14 @@ The following parameters are supported:
     -showdiff:  show difference between current text and new text when
                 saving the page.
 
-    -ocr:       use OCR tools hosted on https://tools.wmflabs.org.
+    -ocr:       use OCR tools hosted on https://toolforge.org.
                 By default no OCR is done, i.e. only not-(yet)-existing
                 pages in Page ns will be treated and text will be fetched
                 via preload.
                 If -ocr is provided, default OCR method is:
-                 - https://tools.wmflabs.org/phetools
+                 - https://phetools.toolforge.org/
                 If ocr:googleOCR is given, OCR method is:
-                 - https://tools.wmflabs.org/ws-google-ocr
+                 - https://ws-google-ocr.toolforge.org/
 
     -threads:n  number of threads used to fetch OCR from OCR tools.
                 default is 5; valid only if '-ocr' is selected.
