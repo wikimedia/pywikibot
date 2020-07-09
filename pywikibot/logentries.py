@@ -1,47 +1,30 @@
 # -*- coding: utf-8 -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from collections import UserDict
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated, classproperty, UnicodeType
+from pywikibot.tools import deprecated, classproperty
 
 _logger = 'wiki'
 
 
-class LogDict(dict):
+class LogEntry(UserDict):
 
+    """Generic log entry.
+
+    LogEntry parameters may be retrieved by the corresponding method
+    or the LogEntry key. The following statements are equivalent:
+
+    action = logentry.action()
+    action = logentry['action']
+    action = logentry.data['action']
     """
-    Simple custom dict that raises custom Errors when a key is missing.
-
-    HiddenKeyError is raised when the user does not have permission.
-    KeyError is raised otherwise.
-
-    It also logs debugging information when a key is missing.
-    """
-
-    def __missing__(self, key):
-        """Debug when the key is missing."""
-        pywikibot.debug('API log entry received:\n' + repr(self),
-                        _logger)
-        if ((key in ('ns', 'title', 'pageid', 'logpage', 'params', 'action')
-             and 'actionhidden' in self)
-                or (key == 'comment' and 'commenthidden' in self)
-                or (key == 'user' and 'userhidden' in self)):
-            raise HiddenKeyError(
-                "Log entry ({0}) has a hidden '{1}' key and you don't have "
-                'permission to view it.'.format(self._type, key))
-        raise KeyError("Log entry (%s) has no '%s' key" % (self._type, key))
-
-
-class LogEntry(object):
-
-    """Generic log entry."""
 
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
@@ -50,13 +33,32 @@ class LogEntry(object):
 
     def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""
-        self.data = LogDict(apidata)
+        super(LogEntry, self).__init__(apidata)
         self.site = site
         expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
             raise Error('Wrong log type! Expecting %s, received %s instead.'
                         % (expected_type, self.type()))
-        self.data._type = self.type()
+
+    def __missing__(self, key):
+        """Debug when the key is missing.
+
+        HiddenKeyError is raised when the user does not have permission.
+        KeyError is raised otherwise.
+
+        It also logs debugging information when a key is missing.
+        """
+        pywikibot.debug('API log entry received:\n' + repr(self),
+                        _logger)
+        hidden = {'action', 'logpage', 'ns', 'pageid', 'params', 'title'}
+        if ((key in hidden and 'actionhidden' in self)
+            or (key == 'comment' and 'commenthidden' in self)
+                or (key == 'user' and 'userhidden' in self)):
+            raise HiddenKeyError(
+                "Log entry ({}) has a hidden '{}' key and you don't have "
+                'permission to view it.'.format(self['type'], key))
+        raise KeyError("Log entry ({}) has no '{}' key"
+                       .format(self['type'], key))
 
     def __repr__(self):
         """Return a string representation of LogEntry object."""
@@ -76,9 +78,13 @@ class LogEntry(object):
             return False
         return self.logid() == other.logid() and self.site == other.site
 
-    def __ne__(self, other):
-        """Compare if self is not equal to other."""
-        return not self == other
+    def __getattr__(self, item):
+        """Return several items from dict used as methods."""
+        if item in ('action', 'comment', 'logid', 'ns', 'pageid', 'type',
+                    'user'):  # TODO use specific User class for 'user'?
+            return lambda: self[item]
+
+        return super(LogEntry, self).__getattribute__(item)
 
     @property
     def _params(self):
@@ -87,22 +93,10 @@ class LogEntry(object):
 
         @rtype: dict or None
         """
-        if 'params' in self.data:
-            return self.data['params']
+        if 'params' in self:
+            return self['params']
         else:  # try old mw style preceding mw 1.19
-            return self.data[self._expected_type]
-
-    def logid(self):
-        """Return the id of the log entry."""
-        return self.data['logid']
-
-    def pageid(self):
-        """Return the log id of the page handled by this log entry."""
-        return self.data['pageid']
-
-    def ns(self):
-        """Return the namespace id of the page handled by this log entry."""
-        return self.data['ns']
+            return self[self._expected_type]
 
     @deprecated('page()', since='20150617')
     def title(self):
@@ -122,35 +116,15 @@ class LogEntry(object):
         @rtype: pywikibot.Page
         """
         if not hasattr(self, '_page'):
-            self._page = pywikibot.Page(self.site, self.data['title'])
+            self._page = pywikibot.Page(self.site, self['title'])
         return self._page
-
-    def type(self):
-        """The type of this logentry."""
-        return self.data['type']
-
-    def action(self):
-        """The action of this log entry."""
-        return self.data['action']
-
-    def user(self):
-        """Return the user name doing this action."""
-        # TODO use specific User class ?
-        return self.data['user']
 
     def timestamp(self):
         """Timestamp object corresponding to event timestamp."""
         if not hasattr(self, '_timestamp'):
             self._timestamp = pywikibot.Timestamp.fromISOformat(
-                self.data['timestamp'])
+                self['timestamp'])
         return self._timestamp
-
-    def comment(self):
-        """Return the logentry's comment.
-
-        @rtype: str
-        """
-        return self.data['comment']
 
 
 class OtherLogEntry(LogEntry):
@@ -174,7 +148,7 @@ class UserTargetLogEntry(LogEntry):
         @rtype: pywikibot.User
         """
         if not hasattr(self, '_page'):
-            self._page = pywikibot.User(self.site, self.data['title'])
+            self._page = pywikibot.User(self.site, self['title'])
         return self._page
 
 
@@ -194,10 +168,10 @@ class BlockEntry(LogEntry):
         super(BlockEntry, self).__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
         # See bug T19781
-        pos = self.data['title'].find('#')
+        pos = self['title'].find('#')
         self.isAutoblockRemoval = pos > 0
         if self.isAutoblockRemoval:
-            self._blockid = int(self.data['title'][pos + 1:])
+            self._blockid = int(self['title'][pos + 1:])
 
     def page(self):
         """
@@ -228,7 +202,7 @@ class BlockEntry(LogEntry):
         if not hasattr(self, '_flags'):
             self._flags = self._params['flags']
             # pre mw 1.19 returned a delimited string.
-            if isinstance(self._flags, UnicodeType):
+            if isinstance(self._flags, str):
                 if self._flags:
                     self._flags = self._flags.split(',')
                 else:
@@ -300,7 +274,7 @@ class UploadEntry(LogEntry):
         @rtype: pywikibot.FilePage
         """
         if not hasattr(self, '_page'):
-            self._page = pywikibot.FilePage(self.site, self.data['title'])
+            self._page = pywikibot.FilePage(self.site, self['title'])
         return self._page
 
 
