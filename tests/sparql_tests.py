@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """Test cases for the SPARQL API."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot.data.sparql as sparql
-from pywikibot.tools import UnicodeType
 
 from tests.aspects import unittest, TestCase, WikidataTestCase
 from tests import patch
@@ -191,11 +188,6 @@ class Shared(object):
         def test__str__returnsStringType(self):
             """__str__ should return type str."""
             self.assertIsInstance(self.object_under_test.__str__(), str)
-
-        def test__unicode__returnsUnicodeType(self):
-            """__unicode__ should return type unicode."""
-            self.assertIsInstance(self.object_under_test.__unicode__(),
-                                  UnicodeType)
 
 
 class LiteralTests(Shared.SparqlNodeTests):
