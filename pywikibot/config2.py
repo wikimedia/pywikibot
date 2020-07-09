@@ -706,7 +706,7 @@ db_name_format = '{0}'
 db_connect_file = user_home_path('.my.cnf')
 # local port for mysql server
 # ssh -L 4711:enwiki.analytics.db.svc.eqiad.wmflabs:3306 \
-#     user@login.tools.wmflabs.org
+#     user@login.toolforge.org
 db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############

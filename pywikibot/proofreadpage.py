@@ -12,11 +12,11 @@ This module includes objects:
 
 
 OCR support of page scans via:
-- https://tools.wmflabs.org/phetools/hocr_cgi.py
-- https://tools.wmflabs.org/phetools/ocr.php
+- https://phetools.toolforge.org/hocr_cgi.py
+- https://phetools.toolforge.org/ocr.php
 - inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 
-- https://tools.wmflabs.org/ws-google-ocr/
+- https://ws-google-ocr.toolforge.org/
 - inspired by https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 - see also: https://wikisource.org/wiki/Wikisource:Google_OCR
 
@@ -129,14 +129,14 @@ class ProofreadPage(pywikibot.Page):
     p_close_no_div = re.compile('</noinclude>')  # V2 page format.
 
     # phetools ocr utility
-    _HOCR_CMD = ('https://tools.wmflabs.org/phetools/hocr_cgi.py?'
+    _HOCR_CMD = ('https://phetools.toolforge.org/hocr_cgi.py?'
                  'cmd=hocr&book={book}&lang={lang}&user={user}')
 
-    _OCR_CMD = ('https://tools.wmflabs.org/phetools/ocr.php?'
+    _OCR_CMD = ('https://phetools.toolforge.org/ocr.php?'
                 'cmd=ocr&url={url_image}&lang={lang}&user={user}')
 
     # googleOCR ocr utility
-    _GOCR_CMD = ('https://tools.wmflabs.org/ws-google-ocr/api.php?'
+    _GOCR_CMD = ('https://ws-google-ocr.toolforge.org/api.php?'
                  'image={url_image}&lang={lang}')
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
@@ -643,7 +643,7 @@ class ProofreadPage(pywikibot.Page):
             return (error, parser_func(_text))
 
     def _do_hocr(self):
-        """Do hocr using //tools.wmflabs.org/phetools/hocr_cgi.py?cmd=hocr.
+        """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
 
         This is the main method for 'phetools'.
         Fallback method is ocr.

@@ -18,7 +18,7 @@ from tests.aspects import TestCase
 class CommonsHelperMethodTest(TestCase):
     """Test CommonsHelper methods in imagecopy."""
 
-    hostname = 'https://tools.wmflabs.org/commonshelper/'
+    hostname = 'https://commonshelper.toolforge.org/'
 
     @unittest.expectedFailure  # T207579
     def test_pageTextPost(self):

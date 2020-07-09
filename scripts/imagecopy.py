@@ -219,7 +219,7 @@ def pageTextPost(url, parameters):
     while not gotInfo:
         try:
             commonsHelperPage = fetch(
-                'https://tools.wmflabs.org/commonshelper/',
+                'https://commonshelper.toolforge.org/',
                 method='POST',
                 data=parameters)
             data = commonsHelperPage.data.content.decode('utf-8')
@@ -257,7 +257,7 @@ class imageTransfer(threading.Thread):
                   }
 
         pywikibot.output(tosend)
-        CH = pageTextPost('http://tools.wmflabs.org/commonshelper/index.php',
+        CH = pageTextPost('https://commonshelper.toolforge.org/index.php',
                           tosend)
         pywikibot.output('Got CH desc.')
 
