@@ -72,6 +72,7 @@ extra_deps = {
         'pydocstyle>=4.0.0',
         'hacking',
         'flake8-coding',
+        'flake8-colors',
         'flake8-comprehensions>=3.1.4;python_version>="3.8"',
         'flake8-comprehensions>=2.2.0',
         'flake8-docstrings>=1.3.1',
