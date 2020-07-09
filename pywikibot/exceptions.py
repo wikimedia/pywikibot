@@ -87,9 +87,7 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from pywikibot.tools import UnicodeMixin, UnicodeType, _NotImplementedWarning
+from pywikibot.tools import _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -113,17 +111,16 @@ class FamilyMaintenanceWarning(UserWarning):
     pass
 
 
-class Error(UnicodeMixin, Exception):
+class Error(Exception):
 
     """Pywikibot error."""
 
-    # NOTE: UnicodeMixin must be the first object Error class is derived from.
-    def __init__(self, arg):
+    def __init__(self, arg: str):
         """Initializer."""
         self.unicode = arg
 
-    def __unicode__(self):
-        """Return a unicode string representation."""
+    def __str__(self) -> str:
+        """Return a string representation."""
         return self.unicode
 
 
@@ -159,10 +156,9 @@ class PageRelatedError(Error):
         self.site = page.site
 
         if '%(' in self.message and ')s' in self.message:
-            super(PageRelatedError, self).__init__(
-                self.message % self.__dict__)
+            super().__init__(self.message % self.__dict__)
         else:
-            super(PageRelatedError, self).__init__(self.message % page)
+            super().__init__(self.message % page)
 
     def getPage(self):
         """Return the page related to the exception."""
@@ -182,7 +178,7 @@ class PageSaveRelatedError(PageRelatedError):
     @property
     def args(self):
         """Expose args."""
-        return UnicodeType(self)
+        return str(self)
 
 
 class OtherPageSaveError(PageSaveRelatedError):
@@ -198,12 +194,12 @@ class OtherPageSaveError(PageSaveRelatedError):
         @type reason: Exception or basestring
         """
         self.reason = reason
-        super(OtherPageSaveError, self).__init__(page)
+        super().__init__(page)
 
     @property
     def args(self):
         """Expose args."""
-        return UnicodeType(self.reason)
+        return str(self.reason)
 
 
 class NoUsername(Error):
@@ -262,7 +258,7 @@ class InconsistentTitleReceived(PageLoadRelatedError):
 
         """
         self.message = "Query on %s returned data on '{0}'".format(actual)
-        super(InconsistentTitleReceived, self).__init__(page)
+        super().__init__(page)
 
 
 class SiteDefinitionError(Error):
@@ -351,7 +347,7 @@ class InterwikiRedirectPage(PageRelatedError):
         """
         self.target_page = target_page
         self.target_site = target_page.site
-        super(InterwikiRedirectPage, self).__init__(page)
+        super().__init__(page)
 
 
 class InvalidTitle(Error):
@@ -454,7 +450,7 @@ class SpamblacklistError(PageSaveRelatedError):
     def __init__(self, page, url):
         """Initializer."""
         self.url = url
-        super(SpamblacklistError, self).__init__(page)
+        super().__init__(page)
 
 
 class TitleblacklistError(PageSaveRelatedError):
@@ -571,8 +567,8 @@ class NoWikibaseEntity(WikiBaseError):
         @param entity: Wikibase entity
         @type entity: WikibaseEntity
         """
-        super(NoWikibaseEntity, self).__init__(
-            "Entity '%s' doesn't exist on %s" % (entity.id, entity.repo))
+        super().__init__("Entity '%s' doesn't exist on %s"
+                         % (entity.id, entity.repo))
         self.entity = entity
 
 
