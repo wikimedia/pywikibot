@@ -5,17 +5,16 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import atexit
 import datetime
-from decimal import Decimal
 import math
 import re
-import sys
 import threading
 import time
 
+from contextlib import suppress
+from decimal import Decimal
+from queue import Queue
 from warnings import warn
 
 from pywikibot.__metadata__ import (
@@ -66,17 +65,9 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PY2, PYTHON_VERSION,
     UnicodeMixin,
-    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
-
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue
 
 
 textlib_methods = (
@@ -114,19 +105,6 @@ __all__ = (
 )
 __all__ += textlib_methods
 
-if PY2:
-    # T111615: Python 2 requires __all__ is bytes
-    globals()['__all__'] = tuple(bytes(item) for item in __all__)
-
-if PY2 or PYTHON_VERSION < (3, 5, 0):
-    warn("""
-
-Python {version} will be dropped soon.
-It is recommended to use Python 3.5 or above.
-See {what} for further information.
-""".format(version=sys.version.split(None, 1)[0],
-           what='T213287' if PY2 else 'T239542'),
-         FutureWarning)  # probably adjust the line no in utils.execute()
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
@@ -795,7 +773,7 @@ class WbQuantity(_WbRepresentation):
         self.site = site or Site().data_repository()
 
         # also allow entity URIs to be provided via unit parameter
-        if isinstance(unit, UnicodeType) and \
+        if isinstance(unit, str) and \
                 unit.partition('://')[0] not in ('http', 'https'):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
@@ -837,7 +815,7 @@ class WbQuantity(_WbRepresentation):
         @type lazy_load: bool
         @return: pywikibot.ItemPage
         """
-        if not isinstance(self._unit, UnicodeType):
+        if not isinstance(self._unit, str):
             return self._unit
 
         repo = repo or self.site
@@ -1254,8 +1232,6 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
-        if PY2:  # Must not be unicode in Python 2
-            interface = str(interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
@@ -1389,11 +1365,9 @@ def _flush(stop=True):
                 return
 
     # only need one drop() call because all throttles use the same global pid
-    try:
+    with suppress(IndexError):
         list(_sites.values())[0].throttle.drop()
         log('Dropped throttle(s).')
-    except IndexError:
-        pass
 
 
 atexit.register(_flush)
@@ -1417,10 +1391,8 @@ def async_request(request, *args, **kwargs):
     if not _putthread.is_alive():
         try:
             page_put_queue.mutex.acquire()
-            try:
+            with suppress(AssertionError, RuntimeError):
                 _putthread.start()
-            except (AssertionError, RuntimeError):
-                pass
         finally:
             page_put_queue.mutex.release()
     page_put_queue.put((request, args, kwargs))
