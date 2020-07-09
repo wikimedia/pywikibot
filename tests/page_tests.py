@@ -5,11 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-
 import pickle
 import re
+
+from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
@@ -17,12 +16,7 @@ import pywikibot.page
 from pywikibot import config
 from pywikibot import InvalidTitle
 
-from pywikibot.tools import (
-    PY2,
-    StringTypes as basestring,
-    suppress_warnings,
-    UnicodeType as unicode,
-)
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
@@ -449,13 +443,13 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        self.assertIsInstance(mainpage.get(), unicode)
+        self.assertIsInstance(mainpage.get(), str)
         with suppress_warnings(
                 r'pywikibot\.page\.BasePage\.latestRevision '
                 r'is deprecated[\s\w]+; '
                 r'use latest_revision_id instead\.'):
             self.assertIsInstance(mainpage.latestRevision(), int)
-        self.assertIsInstance(mainpage.userName(), unicode)
+        self.assertIsInstance(mainpage.userName(), str)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
@@ -463,7 +457,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
-        self.assertIsInstance(mainpage.permalink(), basestring)
+        self.assertIsInstance(mainpage.permalink(), str)
 
     def test_talk_page(self):
         """Test various methods that rely on API: talk page."""
@@ -472,7 +466,7 @@ class TestPageObject(DefaultSiteTestCase):
         if not maintalk.exists():
             self.skipTest("No talk page for {}'s main page"
                           .format(self.get_site()))
-        self.assertIsInstance(maintalk.get(get_redirect=True), unicode)
+        self.assertIsInstance(maintalk.get(get_redirect=True), str)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
 
@@ -538,7 +532,7 @@ class TestPageObject(DefaultSiteTestCase):
         for p in mainpage.categories():
             self.assertIsInstance(p, pywikibot.Category)
         for p in mainpage.extlinks():
-            self.assertIsInstance(p, unicode)
+            self.assertIsInstance(p, str)
 
     def testPickleAbility(self):
         """Test the ability to pickle the page."""
@@ -642,8 +636,8 @@ class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
         self.assertEqual(creator,
                          (mainpage.oldest_revision.user,
                           mainpage.oldest_revision.timestamp.isoformat()))
-        self.assertIsInstance(creator[0], unicode)
-        self.assertIsInstance(creator[1], unicode)
+        self.assertIsInstance(creator[0], str)
+        self.assertIsInstance(creator[1], str)
         self._ignore_unknown_warning_packages = True  # T163175
         self.assertDeprecation()
 
@@ -728,23 +722,8 @@ class TestPageRepr(TestPageBaseUnicode):
         page = pywikibot.Page(self.get_site(), 'Ō')
         self.assertIsInstance(repr(page), str)
 
-    @unittest.skipIf(not PY2, 'Python 2 specific test')
     def test_unicode_value(self):
-        """Test repr(Page('<non-ascii>')) is represented simply as utf8."""
-        page = pywikibot.Page(self.get_site(), 'Ō')
-        self.assertEqual(repr(page), b'Page(\xc5\x8c)')
-
-    @unittest.skipIf(not PY2, 'Python 2 specific test')
-    def test_unicode_percent_r_failure(self):
-        """Test '{x!r}'.format() raises exception for non-ASCII Page."""
-        # This raises an exception on Python 2, but passes on Python 3
-        page = pywikibot.Page(self.get_site(), 'Ō')
-        self.assertRaisesRegex(UnicodeDecodeError, '', unicode.format,
-                               '{0!r}', page)
-
-    @unittest.skipIf(PY2, 'Python 3+ specific test')
-    def test_unicode_value_py3(self):
-        """Test to capture actual Python 3 result pre unicode_literals."""
+        """Test to capture actual Python result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual('{0!r}'.format(self.page), "Page('Ō')")
@@ -764,11 +743,6 @@ class TestPageReprASCII(TestPageBaseUnicode):
         """Restore the original console encoding."""
         config.console_encoding = self._old_encoding
         super(TestPageReprASCII, self).tearDown()
-
-    @unittest.skipIf(not PY2, 'Python 2 specific test')
-    def test_incapable_encoding(self):
-        """Test that repr works even if console encoding does not."""
-        self.assertEqual(repr(self.page), b'Page(\\u014c)')
 
 
 class TestPageBotMayEdit(TestCase):
@@ -962,7 +936,7 @@ class TestPageHistory(DefaultSiteTestCase):
         self.assertIsInstance(top_two, list)
         self.assertLength(top_two, 2)
         self.assertIsInstance(top_two[0], tuple)
-        self.assertIsInstance(top_two[0][0], basestring)
+        self.assertIsInstance(top_two[0][0], str)
         self.assertIsInstance(top_two[0][1], int)
         top_two_usernames = {top_two[0][0], top_two[1][0]}
         self.assertLength(top_two_usernames, 2)
@@ -1272,7 +1246,5 @@ class TestShortLink(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
