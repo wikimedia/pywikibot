@@ -2766,6 +2766,8 @@ class APISite(BaseSite):
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username())
 
+        return None
+
     def data_repository(self):
         """
         Return the data repository connected to this site.
@@ -7816,7 +7818,6 @@ class DataSite(APISite):
 
             return wbdata['entities'][ids]
         else:
-            # not implemented yet
             raise NotImplementedError
 
     def data_repository(self):
@@ -7836,7 +7837,7 @@ class DataSite(APISite):
         url = self.siteinfo['general'].get('wikibase-geoshapestoragebaseurl')
         if url:
             return pywikibot.Site(url=url, user=self.username())
-        # todo: should this raise?
+
         return None
 
     def tabular_data_repository(self):
@@ -7845,7 +7846,7 @@ class DataSite(APISite):
             'wikibase-tabulardatastoragebaseurl')
         if url:
             return pywikibot.Site(url=url, user=self.username())
-        # todo: should this raise?
+
         return None
 
     def loadcontent(self, identification, *props):
@@ -7998,8 +7999,7 @@ class DataSite(APISite):
 
         params['data'] = json.dumps(data)
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def addClaim(self, entity, claim, bot=True, summary=None):
@@ -8061,8 +8061,7 @@ class DataSite(APISite):
 
         params['baserevid'] = claim.on_item.latest_revision_id
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def save_claim(self, claim, summary=None, bot=True):
@@ -8146,8 +8145,7 @@ class DataSite(APISite):
         params['snaks'] = json.dumps(snak)
 
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def editQualifier(self, claim, qualifier, new=False, bot=True,
@@ -8184,8 +8182,7 @@ class DataSite(APISite):
         params['property'] = qualifier.getID()
 
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def removeClaims(self, claims, bot=True, summary=None, baserevid=None):
@@ -8218,8 +8215,7 @@ class DataSite(APISite):
         }
 
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def removeSources(self, claim, sources,
@@ -8249,8 +8245,7 @@ class DataSite(APISite):
         }
 
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def remove_qualifiers(self, claim, qualifiers,
@@ -8281,8 +8276,7 @@ class DataSite(APISite):
         }
 
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def linkTitles(self, page1, page2, bot=True):
@@ -8309,8 +8303,7 @@ class DataSite(APISite):
         if bot:
             params['bot'] = 1
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('item-merge')
     @deprecated_args(ignoreconflicts='ignore_conflicts', fromItem='from_item',
@@ -8346,8 +8339,7 @@ class DataSite(APISite):
         if bot:
             params['bot'] = 1
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('item-redirect')
     def set_redirect_target(self, from_item, to_item, bot=True):
@@ -8369,8 +8361,7 @@ class DataSite(APISite):
             'bot': bot,
         }
         req = self._simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     def createNewItemFromPage(self, page, bot=True, **kwargs):
