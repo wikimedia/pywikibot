@@ -17,9 +17,9 @@ import re
 import traceback
 
 try:
-    from collections.abc import Container, MutableMapping
+    from collections.abc import Container, MutableMapping, Sized
 except ImportError:  # Python 2.7
-    from collections import Container, MutableMapping
+    from collections import Container, MutableMapping, Sized
 from email.mime.nonmultipart import MIMENonMultipart
 from warnings import warn
 
@@ -182,7 +182,7 @@ class APIMWException(APIError):
         super(APIMWException, self).__init__(code, info, **kwargs)
 
 
-class ParamInfo(Container):
+class ParamInfo(Sized, Container):
 
     """
     API parameter information data object.
