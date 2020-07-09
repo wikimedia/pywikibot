@@ -5,17 +5,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import sys
 
-from pywikibot.tools import has_module, PY2
+from contextlib import suppress
+
+from pywikibot.tools import has_module
 
 from tests import join_root_path, unittest_print
 from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
                            PwbTestCase)
-from tests.utils import execute_pwb, add_metaclass
+from tests.utils import execute_pwb
 
 scripts_path = join_root_path('scripts')
 
@@ -30,9 +30,6 @@ script_deps = {
     'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
 }
-
-if PY2:
-    script_deps['data_ingestion'] = ['unicodecsv']
 
 
 def check_script_deps(script_name):
@@ -132,6 +129,8 @@ no_args_expected_results = {
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this automatic message',
+    'replicate_wiki':
+        'error: the following arguments are required: destination',
     'shell': ('>>> ', 'Welcome to the'),
     'transferbot': 'Target site not different from source site',
     'unusedfiles': ('Working on', None),
@@ -143,12 +142,6 @@ no_args_expected_results = {
     'revertbot': 'Fetching new batch of contributions',
     'upload': 'ERROR: Upload error',
 }
-
-if not PY2:
-    no_args_expected_results['replicate_wiki'] = (
-        'error: the following arguments are required: destination')
-else:
-    no_args_expected_results['replicate_wiki'] = 'error: too few arguments'
 
 
 enable_autorun_tests = (
@@ -345,15 +338,12 @@ class TestScriptMeta(MetaTestCaseClass):
         return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestScriptHelp(PwbTestCase):
+class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
     """Test cases for running scripts with -help.
 
     All scripts should not create a Site for -help, so net = False.
     """
-
-    __metaclass__ = TestScriptMeta
 
     net = False
 
@@ -366,8 +356,8 @@ class TestScriptHelp(PwbTestCase):
     _results = None
 
 
-@add_metaclass
-class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
+class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
+                         metaclass=TestScriptMeta):
 
     """Test cases for scripts.
 
@@ -376,8 +366,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     Site.login() is called in the test runner, which means that the scripts
     run in pwb can automatically login using the saved cookies.
     """
-
-    __metaclass__ = TestScriptMeta
 
     user = True
 
@@ -397,7 +385,5 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

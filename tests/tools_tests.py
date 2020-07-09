@@ -2,23 +2,20 @@
 # -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
-
-try:
-    from collections.abc import Mapping
-except ImportError:  # Python 2.7
-    from collections import Mapping
-from collections import OrderedDict
 import decimal
-from importlib import import_module
 import inspect
 import os.path
 import subprocess
 import tempfile
 import warnings
+
+from collections.abc import Mapping
+from collections import OrderedDict
+from contextlib import suppress
+from importlib import import_module
 
 from pywikibot import tools
 from pywikibot.tools import classproperty, suppress_warnings
@@ -27,7 +24,6 @@ from tests import join_xml_data_path, mock
 from tests.aspects import (
     unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
 )
-from tests.utils import add_metaclass
 
 
 class ContextManagerWrapperTestCase(TestCase):
@@ -715,12 +711,9 @@ class MetaTestArgSpec(MetaTestCaseClass):
         return super(MetaTestArgSpec, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestArgSpec(DeprecationTestCase):
+class TestArgSpec(DeprecationTestCase, metaclass=MetaTestArgSpec):
 
     """Test getargspec and ArgSpec from tools."""
-
-    __metaclass__ = MetaTestArgSpec
 
     expected_class = tools.ArgSpec
 
@@ -913,7 +906,5 @@ class TestMergeGenerator(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

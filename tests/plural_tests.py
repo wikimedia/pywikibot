@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 """Test plural module."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot import plural
 
-from tests.aspects import (
-    unittest, TestCase, MetaTestCaseClass,
-)
-from tests.utils import add_metaclass
+from tests.aspects import unittest, TestCase, MetaTestCaseClass
 
 
 class MetaPluralRulesTest(MetaTestCaseClass):
@@ -55,12 +52,9 @@ class MetaPluralRulesTest(MetaTestCaseClass):
         return super(MetaPluralRulesTest, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestPluralRules(TestCase):
+class TestPluralRules(TestCase, metaclass=MetaPluralRulesTest):
 
     """Test the consistency of the plural rules."""
-
-    __metaclass__ = MetaPluralRulesTest
 
     net = False
     # for callable plural rules it'll test up until this number, this number
@@ -69,7 +63,5 @@ class TestPluralRules(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

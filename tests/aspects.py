@@ -39,7 +39,7 @@ import tests
 from tests import (
     safe_repr, unittest, patch_request, unpatch_request, unittest_print)
 from tests.utils import (
-    add_metaclass, execute_pwb, DrySite, DryRequest,
+    execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
 )
 
@@ -886,12 +886,9 @@ class MetaTestCaseClass(type):
             dct[test_name].__doc__ = doc
 
 
-@add_metaclass
-class TestCase(TestTimerMixin, TestCaseBase):
+class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
 
     """Run tests on pre-defined sites."""
-
-    __metaclass__ = MetaTestCaseClass
 
     @classmethod
     def setUpClass(cls):
