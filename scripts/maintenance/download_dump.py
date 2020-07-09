@@ -14,40 +14,19 @@ This script supports the following command line parameters:
 
 """
 #
-# (C) Pywikibot team, 2017-2019
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import binascii
 import os.path
 import sys
-from os import remove, symlink, urandom
 
-try:
-    from os import replace
-except ImportError:   # py2
-    if sys.platform == 'win32':
-        import os
-
-        def replace(src, dst):
-            """Rename a file or directory, overwriting the destination."""
-            try:
-                os.rename(src, dst)
-            except OSError:
-                remove(dst)
-                os.rename(src, dst)
-    else:
-        from os import rename as replace
+from os import remove, replace, symlink, urandom
 
 import pywikibot
 from pywikibot import Bot
 from pywikibot.comms.http import fetch
-from pywikibot.tools import PY2
-
-if PY2:
-    from future_builtins import map
 
 
 class DownloadDumpBot(Bot):

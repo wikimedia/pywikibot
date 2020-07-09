@@ -69,8 +69,6 @@ Available output commands:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 import hashlib
 import os
@@ -324,34 +322,31 @@ def _parse_command(command, name):
     obj = globals().get(command)
     if callable(obj):
         return obj
-    else:
-        try:
-            return eval('lambda entry: ' + command)
-        except Exception:
-            pywikibot.exception()
-            pywikibot.error(
-                'Cannot compile {0} command: {1}'.format(name, command))
-            return None
+
+    try:
+        return eval('lambda entry: ' + command)
+    except Exception:
+        pywikibot.exception()
+        pywikibot.error(
+            'Cannot compile {0} command: {1}'.format(name, command))
+        return None
 
 
 # Filter commands
 
 def has_password(entry):
     """Entry has a password in the entry."""
-    if 'lgpassword' in entry._uniquedescriptionstr():
-        return entry
+    return entry if 'lgpassword' in entry._uniquedescriptionstr() else None
 
 
 def is_logout(entry):
     """Entry is a logout entry."""
-    if not entry._data and 'logout' in entry.key:
-        return entry
+    return entry if not entry._data and 'logout' in entry.key else None
 
 
 def empty_response(entry):
     """Entry has no data."""
-    if not entry._data and 'logout' not in entry.key:
-        return entry
+    return entry if not entry._data and 'logout' not in entry.key else None
 
 
 def not_accessed(entry):
@@ -367,18 +362,21 @@ def incorrect_hash(entry):
     """Incorrect hash."""
     if hashlib.sha256(entry.key.encode('utf-8')).hexdigest() != entry.filename:
         return entry
+    return None
 
 
 def older_than(entry, interval):
     """Find older entries."""
     if entry._cachetime + interval < datetime.datetime.utcnow():
         return entry
+    return None
 
 
 def newer_than(entry, interval):
     """Find newer entries."""
     if entry._cachetime + interval >= datetime.datetime.utcnow():
         return entry
+    return None
 
 
 def older_than_one_day(entry):
@@ -389,8 +387,7 @@ def older_than_one_day(entry):
 
 def recent(entry):
     """Find entries newer than on hour."""
-    if newer_than(entry, datetime.timedelta(hours=1)):
-        return entry
+    return entry if newer_than(entry, datetime.timedelta(hours=1)) else None
 
 
 # Output commands
