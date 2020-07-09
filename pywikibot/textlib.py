@@ -13,13 +13,10 @@ and return a unicode string.
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from collections import OrderedDict, namedtuple
-try:
-    from collections.abc import Sequence
-except ImportError:  # Python 2.7
-    from collections import Sequence
 import datetime
 import re
+
+from collections import OrderedDict, namedtuple
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -35,8 +32,10 @@ from pywikibot.tools import (
 )
 
 if not PY2:
+    from collections.abc import Sequence
     from html.parser import HTMLParser
 else:
+    from collections import Sequence
     from future_builtins import zip
     from HTMLParser import HTMLParser
 
@@ -515,27 +514,42 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
     # thanks to:
     # https://www.hellboundhackers.org/articles/read-article.php?article_id=841
     parser = _GetDataHTML()
-    parser.keeptags = keeptags
-    parser.feed(text)
-    parser.close()
+    with parser:
+        parser.keeptags = keeptags
+        parser.feed(text)
     return parser.textdata
 
 
 # thanks to https://docs.python.org/3/library/html.parser.html
 class _GetDataHTML(HTMLParser):
+
+    """HTML parser which removes html tags except they are listed in keeptags.
+
+    This class is also a context manager which closes itself at exit time.
+    """
+
     textdata = ''
     keeptags = []
 
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *exc_info):
+        self.close()
+
     def handle_data(self, data):
+        """Add data to text."""
         self.textdata += data
 
     def handle_starttag(self, tag, attrs):
+        """Add start tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '<%s>' % tag
+            self.textdata += '<{}>'.format(tag)
 
     def handle_endtag(self, tag):
+        """Add end tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '</%s>' % tag
+            self.textdata += '</{}>'.format(tag)
 
 
 def isDisabled(text, index, tags=None):
