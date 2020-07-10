@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -77,9 +77,7 @@ class Win32UI(terminal_interface_base.UI):
 
     def _raw_input(self):
         data = self.stdin.readline()
-        # data is in both Python versions str but '\x1a' is unicode in Python 2
-        # so explicitly convert into str as it otherwise tries to decode data
-        if str('\x1a') in data:
+        if '\x1a' in data:
             raise EOFError()
         return data.strip()
 

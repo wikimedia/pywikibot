@@ -1102,7 +1102,7 @@ class TestUrlEncoding(TestCase):
     def test_url_encoding_from_basestring(self):
         """Test encoding basestring values."""
         query = {'token': 'test\xe2\x80\x94test'}
-        expect = str('token=test%C3%A2%C2%80%C2%94test')
+        expect = 'token=test%C3%A2%C2%80%C2%94test'
         result = api.encode_url(query)
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
