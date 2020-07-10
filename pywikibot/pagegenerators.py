@@ -18,8 +18,6 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import calendar
 import codecs
 import datetime
@@ -30,6 +28,7 @@ import sys
 
 from datetime import timedelta
 from functools import partial
+from itertools import zip_longest
 from requests.exceptions import ReadTimeout
 from warnings import warn
 
@@ -57,12 +56,7 @@ from pywikibot.exceptions import (
     UnknownExtension,
 )
 from pywikibot.proofreadpage import ProofreadPage
-from pywikibot.tools import PY2, UnicodeType
 
-if not PY2:
-    from itertools import zip_longest
-else:
-    from itertools import izip_longest as zip_longest
 
 _logger = 'pagegenerators'
 
@@ -423,7 +417,7 @@ _filter_unique_pages = partial(
     filter_unique, key=lambda page: '{}:{}:{}'.format(*page._cmpkey()))
 
 
-class GeneratorFactory(object):
+class GeneratorFactory:
 
     """Process command line arguments and return appropriate page generator.
 
@@ -674,7 +668,7 @@ class GeneratorFactory(object):
         """
         total = None
         start = start or None  # because start might be an empty string
-        if isinstance(start, UnicodeType) and len(start) == 8:
+        if isinstance(start, str) and len(start) == 8:
             start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
         elif start is not None:
             try:
@@ -1209,11 +1203,7 @@ class GeneratorFactory(object):
         if value == '':
             value = None
 
-        try:
-            handler = getattr(self, '_handle_' + arg[1:], None)
-        except UnicodeEncodeError:
-            # getattr() on py2 does implicit unicode -> str
-            return False
+        handler = getattr(self, '_handle_' + arg[1:], None)
         if handler:
             handler_result = handler(value)
             if isinstance(handler_result, bool):
@@ -1545,8 +1535,7 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
                         return
             return
         kwargs['startprefix'] = start
-    for a in category.articles(**kwargs):
-        yield a
+    yield from category.articles(**kwargs)
 
 
 @deprecated_args(step=None)
@@ -1633,7 +1622,7 @@ def TextfilePageGenerator(filename=None, site=None):
 
 def PagesFromTitlesGenerator(iterable, site=None):
     """
-    Generate pages from the titles (unicode strings) yielded by iterable.
+    Generate pages from the titles (strings) yielded by iterable.
 
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -1641,7 +1630,7 @@ def PagesFromTitlesGenerator(iterable, site=None):
     if site is None:
         site = pywikibot.Site()
     for title in iterable:
-        if not isinstance(title, UnicodeType):
+        if not isinstance(title, str):
             break
         yield pywikibot.Page(pywikibot.Link(title, site))
 
@@ -1783,7 +1772,7 @@ def RedirectFilterPageGenerator(generator, no_redirects=True,
                                  % page)
 
 
-class ItemClaimFilter(object):
+class ItemClaimFilter:
 
     """Item claim filter."""
 
@@ -1876,7 +1865,7 @@ def SubpageFilterGenerator(generator, max_depth=0, show_filtered=False):
                     % page)
 
 
-class RegexFilter(object):
+class RegexFilter:
 
     """Regex filter."""
 
@@ -1902,7 +1891,7 @@ class RegexFilter(object):
             regex = [regex]
         # Test if regex is already compiled.
         # We assume that all list components have the same type
-        if isinstance(regex[0], UnicodeType):
+        if isinstance(regex[0], str):
             regex = [re.compile(r, flag) for r in regex]
         return regex
 
@@ -2093,7 +2082,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
     @type show_filtered: bool
     """
     if timestamp:
-        if isinstance(timestamp, UnicodeType):
+        if isinstance(timestamp, str):
             ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
         else:
             ts = timestamp
@@ -2190,8 +2179,8 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                 else:
                     break
             pywikibot.sleep(sleep_duration)
-        for item in list(filtered_generator())[::-1]:
-            yield item
+
+        yield from list(filtered_generator())[::-1]
 
 
 @deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=None)
@@ -2213,12 +2202,11 @@ def PreloadingGenerator(generator, groupsize=50):
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            for i in site.preloadpages(group, groupsize):
-                yield i
+            yield from site.preloadpages(group, groupsize)
+
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        for i in site.preloadpages(pages, groupsize):
-            yield i
+        yield from site.preloadpages(pages, groupsize)
 
 
 @deprecated_args(step='groupsize')
@@ -2232,8 +2220,7 @@ def DequePreloadingGenerator(generator, groupsize=50):
         if not page_count:
             return
 
-        for page in PreloadingGenerator(generator, page_count):
-            yield page
+        yield from PreloadingGenerator(generator, page_count)
 
 
 @deprecated_args(step='groupsize')
@@ -2256,13 +2243,12 @@ def PreloadingEntityGenerator(generator, groupsize=50):
             # if this site is at the groupsize, process it
             group = sites.pop(site)
             repo = site.data_repository()
-            for i in repo.preload_entities(group, groupsize):
-                yield i
+            yield from repo.preload_entities(group, groupsize)
+
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
         repo = site.data_repository()
-        for i in repo.preload_entities(pages, groupsize):
-            yield i
+        yield from repo.preload_entities(pages, groupsize)
 
 
 @deprecated_args(number='total', step=None, repeat=None)
@@ -2667,7 +2653,7 @@ def LiveRCPageGenerator(site=None, total=None):
 # following classes just ported from version 1 without revision; not tested
 
 
-class GoogleSearchPageGenerator(object):
+class GoogleSearchPageGenerator:
 
     """
     Page generator using Google search results.
@@ -2719,8 +2705,7 @@ class GoogleSearchPageGenerator(object):
                             'To install, please run: pip install google.')
             exit(1)
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
-        for url in google.search(query):
-            yield url
+        yield from google.search(query)
 
     def __iter__(self):
         """Iterate results."""
@@ -2845,10 +2830,7 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
     def __next__(self):
         """Get next Page."""
         while True:
-            try:
-                entry = next(self.parser)
-            except StopIteration:
-                raise
+            entry = next(self.parser)
             if self.skipping:
                 if entry.title < self.start:
                     continue
@@ -2867,7 +2849,7 @@ class XMLDumpPageGenerator(XMLDumpOldPageGenerator):
 
     def __next__(self):
         """Get next Page from dump and remove the text."""
-        page = super(XMLDumpPageGenerator, self).__next__()
+        page = super().__next__()
         del page.text
         return page
 
@@ -3002,7 +2984,7 @@ def WikibaseSearchItemPageGenerator(
     return (pywikibot.ItemPage(repo, item['id']) for item in data)
 
 
-class PetScanPageGenerator(object):
+class PetScanPageGenerator:
     """Queries PetScan (https://petscan.wmflabs.org/) to generate pages."""
 
     def __init__(self, categories, subset_combination=True, namespaces=None,
@@ -3075,8 +3057,7 @@ class PetScanPageGenerator(object):
                 'received {0} status from {1}'.format(req.status, req.uri))
         j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
-        for raw_page in raw_pages:
-            yield raw_page
+        yield from raw_pages
 
     def __iter__(self):
         for raw_page in self.query():
