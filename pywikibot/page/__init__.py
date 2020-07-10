@@ -282,7 +282,7 @@ class BasePage(ComparableMixin):
         decode=True, savetitle='as_url', withNamespace='with_ns',
         withSection='with_section', forceInterwiki='force_interwiki',
         asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
-    def title(self, underscore=False, with_ns=True,
+    def title(self, *, underscore=False, with_ns=True,
               with_section=True, as_url=False, as_link=False,
               allow_interwiki=True, force_interwiki=False, textlink=False,
               as_filename=False, insite=None, without_brackets=False) -> str:
