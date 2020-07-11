@@ -38,12 +38,10 @@ For example:
     delay: 7
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 import sys
 import time
@@ -157,9 +155,9 @@ class SandboxBot(Bot, ConfigParserBot):
         'delay_td': None,  # not a real option but __init__ sets it
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
-        super(SandboxBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if self.getOption('delay') < 0:
             d = min(15, max(5, int(self.getOption('hours') * 60)))
             self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
@@ -184,7 +182,7 @@ class SandboxBot(Bot, ConfigParserBot):
                 sys.exit()
             self.generator = pages
 
-    def run(self):
+    def run(self) -> None:
         """Run bot."""
         self.site.login()
         while True:
@@ -257,7 +255,7 @@ class SandboxBot(Bot, ConfigParserBot):
                 pywikibot.sleep(self.getOption('hours') * 60 * 60)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
