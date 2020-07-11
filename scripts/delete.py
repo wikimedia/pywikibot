@@ -52,14 +52,13 @@ Delete everything in the category "To delete" without prompting:
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 
+from typing import DefaultDict, Set
 from warnings import warn
 
 import pywikibot
@@ -68,11 +67,14 @@ from pywikibot import exceptions
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 from pywikibot.page import Page
+from pywikibot.site import Namespace
 from pywikibot.tools import islice_with_ellipsis
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
+
+RefTable = DefaultDict[Namespace, Page]
 
 
 class PageWithRefs(Page):
@@ -83,13 +85,13 @@ class PageWithRefs(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    def __init__(self, source, title='', ns=0):
+    def __init__(self, source, title='', ns=0) -> None:
         """Initializer."""
-        super(PageWithRefs, self).__init__(source, title, ns)
-        _cache_attrs = list(super(PageWithRefs, self)._cache_attrs)
+        super().__init__(source, title, ns)
+        _cache_attrs = list(super()._cache_attrs)
         _cache_attrs = tuple(_cache_attrs + ['_ref_table'])
 
-    def get_ref_table(self, *args, **kwargs):
+    def get_ref_table(self, *args, **kwargs) -> RefTable:
         """Build mapping table with pages which links the current page."""
         ref_table = collections.defaultdict(list)
         for page in self.getReferences(*args, **kwargs):
@@ -97,7 +99,7 @@ class PageWithRefs(Page):
         return ref_table
 
     @property
-    def ref_table(self):
+    def ref_table(self) -> RefTable:
         """
         Build link reference table lazily.
 
@@ -109,7 +111,7 @@ class PageWithRefs(Page):
             self._ref_table = self.get_ref_table()
         return self._ref_table
 
-    def namespaces_with_ref_to_page(self, namespaces=None):
+    def namespaces_with_ref_to_page(self, namespaces=None) -> Set[Namespace]:
         """
         Check if current page has links from pages in namepaces.
 
@@ -118,7 +120,6 @@ class PageWithRefs(Page):
 
         @param namespaces: Namespace to check
         @type namespaces: iterable of Namespace objects
-        @rtype set: namespaces where a ref to page is present
         """
         if namespaces is None:
             namespaces = self.site.namespaces()
@@ -130,7 +131,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
-    def __init__(self, generator, summary, **kwargs):
+    def __init__(self, generator, summary, **kwargs) -> None:
         """
         Initializer.
 
@@ -144,13 +145,13 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
             'isorphan': 0,
             'orphansonly': [],
         })
-        super(DeletionRobot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
         self.summary = summary
         # Upcast pages to PageWithRefs()
         self.generator = (PageWithRefs(p) for p in self.generator)
 
-    def display_references(self):
+    def display_references(self) -> None:
         """
         Display pages that link to the current page, sorted per namespace.
 
@@ -183,7 +184,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                 for page in islice_with_ellipsis(refs[ns], show_n_pages):
                     pywikibot.output('      {0!s}'.format(page.title()))
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
         if self.getOption('undelete') and page.exists():
             pywikibot.output('Skipping: {0} already exists.'.format(page))
@@ -191,9 +192,9 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         if not self.getOption('undelete') and not page.exists():
             pywikibot.output('Skipping: {0} does not exist.'.format(page))
             return True
-        return super(DeletionRobot, self).skip_page(page)
+        return super().skip_page(page)
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Process one page from the generator."""
         if self.getOption('undelete'):
             self.current_page.undelete(self.summary)
@@ -222,7 +223,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                                      quit=True)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
