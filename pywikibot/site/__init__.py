@@ -2670,7 +2670,7 @@ class APISite(BaseSite):
         """
         extensions = self.siteinfo['extensions']
         for ext in extensions:
-            if ext['name'] == name:
+            if 'name' in ext and ext['name'] == name:
                 return True
         return False
 
