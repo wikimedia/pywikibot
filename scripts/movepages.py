@@ -36,17 +36,15 @@ Furthermore, the following command line parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 import pywikibot
 
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import MultipleSitesBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.tools import issue_deprecation_warning
-from pywikibot import i18n, pagegenerators
 
-from pywikibot.bot import MultipleSitesBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -57,7 +55,7 @@ class MovePagesBot(MultipleSitesBot):
 
     """Page move bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
         self.availableOptions.update({
             'prefix': None,
@@ -66,14 +64,14 @@ class MovePagesBot(MultipleSitesBot):
             'skipredirects': False,
             'summary': None,
         })
-        super(MovePagesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = generator
         self.appendAll = False
         self.regexAll = False
         self.noNamespace = False
 
-    def moveOne(self, page, newPageTitle):
+    def moveOne(self, page, newPageTitle) -> None:
         """Move on page to newPageTitle."""
         try:
             msg = self.getOption('summary')
@@ -88,7 +86,7 @@ class MovePagesBot(MultipleSitesBot):
         except pywikibot.PageRelatedError as error:
             pywikibot.output(error)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a single page."""
         self.current_page = page
         if self.getOption('skipredirects') and page.isRedirectPage():
@@ -174,7 +172,7 @@ class MovePagesBot(MultipleSitesBot):
                     self.moveOne(page, newPageTitle)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
