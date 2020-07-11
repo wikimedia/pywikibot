@@ -59,11 +59,11 @@ Warning! Put it in one line, otherwise it won't work correctly:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import re
 import sys
+
+from typing import Optional, Tuple, Union
 
 import pywikibot
 
@@ -74,7 +74,7 @@ from pywikibot.tools.formatter import color_format
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def get_text(page, old, create):
+def get_text(page, old, create) -> str:
     """
     Get text on page. If old is not None, return old.
 
@@ -86,7 +86,6 @@ def get_text(page, old, create):
     @param create: Create the page if it doesn't exist
     @type create: bool
     @return: The page's text or old parameter if not None
-    @rtype: str
     """
     if old is None:
         try:
@@ -108,7 +107,7 @@ def get_text(page, old, create):
     return text
 
 
-def put_text(page, new, summary, count, asynchronous=False):
+def put_text(page, new, summary, count, asynchronous=False) -> Optional[bool]:
     """
     Save the new text.
 
@@ -124,7 +123,6 @@ def put_text(page, new, summary, count, asynchronous=False):
     @type asynchronous: bool
     @return: True if successful, False if unsuccessful, None if
         waiting for server
-    @rtype: bool / None
     """
     page.text = new
     try:
@@ -155,7 +153,8 @@ def put_text(page, new, summary, count, asynchronous=False):
 
 def add_text(page, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
-             oldTextGiven=None, reorderEnabled=True, create=False):
+             oldTextGiven=None, reorderEnabled=True, create=False
+             ) -> Union[Tuple[bool, bool, bool], Tuple[str, str, bool]]:
     """
     Add text to a page.
 
@@ -185,8 +184,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
     @type create: bool
     @return: If putText=True: (success, success, always)
         else: (text, newtext, always)
-    @rtype: Tuple of (bool, bool, bool) or (str, str, bool)
-        depending on value of putText parameter
     """
     site = page.site
     if not summary:
@@ -284,7 +281,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             error_count += 1
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
