@@ -49,7 +49,7 @@ def python_is_supported():
     return PYTHON_VERSION >= (3, 5, 0)
 
 
-if not python_is_supported():
+if not python_is_supported():  # pragma: no cover
     # pwb.py checks this exception
     raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
@@ -111,7 +111,7 @@ dependencies = ['requests>=2.20.1']
 
 try:
     import bz2
-except ImportError:
+except ImportError:  # pragma: no cover
     # Use bz2file if the python is not compiled with bz2 support.
     dependencies.append('bz2file')
 else:
@@ -134,7 +134,7 @@ if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
 
 # Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.
-if 'PYSETUP_TEST_EXTRAS' in os.environ:
+if 'PYSETUP_TEST_EXTRAS' in os.environ:  # pragma: no cover
     test_deps += [i for k, v in extra_deps.items() if k != 'flake8' for i in v]
 
 # These extra dependencies are needed other unittest fails to load tests.
@@ -154,7 +154,7 @@ with open(os.path.join(path, name, '__metadata__.py')) as f:
 assert metadata.__name__ == name
 
 
-def get_validated_version():
+def get_validated_version():  # pragma: no cover
     """Get a validated pywikibot module version string.
 
     The version number from pywikibot.__metadata__.__version__ is used.
@@ -213,7 +213,7 @@ def get_validated_version():
     return version
 
 
-def read_desc(filename):
+def read_desc(filename):  # pragma: no cover
     """Read long description.
 
     Combine included restructured text files which must be done before
@@ -234,7 +234,7 @@ def read_desc(filename):
     return ''.join(desc)
 
 
-def get_packages(name):
+def get_packages(name):  # pragma: no cover
     """Find framework packages."""
     from setuptools import find_namespace_packages
     packages = find_namespace_packages(include=[name + '.*'])
@@ -287,5 +287,5 @@ def main():
         print('\nDistribution package created for version {}'.format(version))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
