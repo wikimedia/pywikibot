@@ -29,12 +29,10 @@ The following generators and filters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -69,7 +67,7 @@ class BasicBot(
 
     summary_key = 'basic-changing'
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """
         Initializer.
 
@@ -87,12 +85,12 @@ class BasicBot(
         })
 
         # call initializer of the super class
-        super(BasicBot, self).__init__(site=True, **kwargs)
+        super().__init__(site=True, **kwargs)
 
         # assign the generator to the bot
         self.generator = generator
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
         text = self.current_page.text
 
@@ -124,7 +122,7 @@ class BasicBot(
         self.put_current(text, summary=self.getOption('summary'))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
