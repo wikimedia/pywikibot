@@ -14,12 +14,10 @@ Usage:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of MIT License.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import pagegenerators, WikidataBot
@@ -31,7 +29,7 @@ class IllustrateRobot(WikidataBot):
 
     """A bot to add Wikidata image claims."""
 
-    def __init__(self, generator, wdproperty='P18'):
+    def __init__(self, generator, wdproperty='P18') -> None:
         """
         Initializer.
 
@@ -40,7 +38,7 @@ class IllustrateRobot(WikidataBot):
         @param wdproperty: The property to add. Should be of type commonsMedia
         @type wdproperty: str
         """
-        super(IllustrateRobot, self).__init__()
+        super().__init__()
         self.generator = generator
         self.wdproperty = wdproperty
         self.cacheSources()
@@ -50,7 +48,7 @@ class IllustrateRobot(WikidataBot):
             raise ValueError('{} is of type {}, should be commonsMedia'
                              .format(self.wdproperty, claim.type))
 
-    def treat_page_and_item(self, page, item):
+    def treat_page_and_item(self, page, item) -> None:
         """Treat a page / item."""
         pywikibot.output('Found ' + item.title())
         imagename = page.properties().get('page_image_free')
@@ -82,7 +80,7 @@ class IllustrateRobot(WikidataBot):
         self.user_add_claim(item, newclaim, page.site)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
