@@ -61,23 +61,21 @@ a parameter -appendtop:foo would add 'foo' between them. A new line
 can be added between them by specifying '\n' as a value.
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import os
 import re
 
+from typing import Generator, Tuple
 from warnings import warn
 
 import pywikibot
 
 from pywikibot import config, i18n
-from pywikibot.bot import SingleSiteBot, CurrentPageBot
-from pywikibot.bot import OptionHandler
+from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 
 
@@ -99,7 +97,7 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         self.availableOptions.update({
             'always': True,
@@ -113,18 +111,18 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             'showdiff': False,
         })
 
-        super(PageFromFileRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.availableOptions.update(
-            {'always': False if self.getOption('showdiff') else True})
+            {'always': not self.getOption('showdiff')})
 
-    def init_page(self, item):
+    def init_page(self, item) -> pywikibot.Page:
         """Get the tuple and return the page object to be processed."""
         title, content = item
         page = pywikibot.Page(self.site, title)
         page.text = content.strip()
-        return super(PageFromFileRobot, self).init_page(page)
+        return super().init_page(page)
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Upload page content."""
         page = self.current_page
         title = page.title()
@@ -208,14 +206,14 @@ class PageFromFileReader(OptionHandler):
         'title': None,
     }
 
-    def __init__(self, filename, **kwargs):
+    def __init__(self, filename, **kwargs) -> None:
         """Initializer.
 
         Check if self.file name exists. If not, ask for a new filename.
         User can quit.
 
         """
-        super(PageFromFileReader, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.filename = filename
         self.pageStartMarker = self.getOption('begin')
         self.pageEndMarker = self.getOption('end')
@@ -224,7 +222,7 @@ class PageFromFileReader(OptionHandler):
         self.include = self.getOption('include')
         self.notitle = self.getOption('notitle')
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[Tuple[str, str], None, None]:
         """Read file and yield a tuple of page title and content."""
         pywikibot.output("\n\nReading '{0}'...".format(self.filename))
         try:
@@ -256,7 +254,7 @@ class PageFromFileReader(OptionHandler):
             position += length
             yield title, contents
 
-    def findpage(self, text):
+    def findpage(self, text) -> Tuple[int, str, str]:
         """Find page to work on."""
         if self.getOption('textonly'):
             pattern = '^(.*)$'
@@ -286,7 +284,7 @@ class PageFromFileReader(OptionHandler):
         return location.end(), title, contents
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
