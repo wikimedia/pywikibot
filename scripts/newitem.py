@@ -25,10 +25,9 @@ This script understands various command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from datetime import timedelta
 from textwrap import fill
+from typing import Set
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -46,7 +45,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
 
     treat_missing_item = True
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
             'always': True,
@@ -56,15 +55,15 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
                                # created items) or True (touch all pages)
         })
 
-        super(NewItemRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
         self._skipping_templates = {}
 
-    def setup(self):
+    def setup(self) -> None:
         """Setup ages."""
-        super(NewItemRobot, self).setup()
+        super().setup()
 
         self.pageAgeBefore = self.repo.server_time() - timedelta(
             days=self.pageAge)
@@ -79,7 +78,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
             .format(self.lastEdit, self.lastEditBefore.isoformat()))
 
     @staticmethod
-    def _touch_page(page):
+    def _touch_page(page) -> None:
         try:
             pywikibot.output('Doing a null edit on the page.')
             page.touch()
@@ -93,11 +92,11 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
             pywikibot.error('Page {0} not saved.'.format(
                 page.title(as_link=True)))
 
-    def _callback(self, page, exc):
+    def _callback(self, page, exc) -> None:
         if exc is None and self.getOption('touch'):
             self._touch_page(page)
 
-    def get_skipping_templates(self, site):
+    def get_skipping_templates(self, site) -> Set[pywikibot.Page]:
         """Get templates which leads the page to be skipped.
 
         If the script is used for multiple sites, hold the skipping templates
@@ -125,13 +124,12 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         self._skipping_templates[site] = skipping_templates
         return skipping_templates
 
-    def skip_templates(self, page):
+    def skip_templates(self, page) -> str:
         """Check whether the page is to be skipped due to skipping template.
 
         @param page: treated page
         @type page: pywikibot.Page
         @return: the template which leads to skip
-        @rtype: str
         """
         skipping_templates = self.get_skipping_templates(page.site)
         for template, _ in page.templatesWithParams():
@@ -139,7 +137,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
                 return template.title(with_ns=False)
         return ''
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Skip pages which are unwanted to treat."""
         if page.editTime() > self.lastEditBefore:
             pywikibot.output(
@@ -174,7 +172,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
 
         return super(NewItemRobot, self).skip_page(page)
 
-    def treat_page_and_item(self, page, item):
+    def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""
         if item and item.exists():
             pywikibot.output('{0} already has an item: {1}.'
@@ -187,7 +185,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
             page, callback=lambda _, exc: self._callback(page, exc))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
