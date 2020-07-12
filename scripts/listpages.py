@@ -88,23 +88,22 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import re
 
 import pywikibot
+
 from pywikibot import config2 as config, i18n
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
 
-class Formatter(object):
+class Formatter:
 
     """Structure with Page attributes exposed for formatting from cmd line."""
 
@@ -121,7 +120,7 @@ class Formatter(object):
     # Identify which formats need outputlang
     fmt_need_lang = [k for k, v in fmt_options.items() if 'trs_title' in v]
 
-    def __init__(self, page, outputlang=None, default='******'):
+    def __init__(self, page, outputlang=None, default='******') -> None:
         """
         Initializer.
 
@@ -153,7 +152,7 @@ class Formatter(object):
             except pywikibot.Error:
                 self.trs_title = '{0}:{1}'.format(default, page._link.title)
 
-    def output(self, num=None, fmt='1'):
+    def output(self, num=None, fmt='1') -> str:
         """Output formatted string."""
         fmt = self.fmt_options.get(fmt, fmt)
         # If selected format requires trs_title, outputlang must be set.
@@ -168,7 +167,7 @@ class Formatter(object):
             return fmt.format(num=num, page=self)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -246,7 +245,7 @@ def main(*args):
                                 'You can use the -overwrite argument to '
                                 'replace the content of this page.'
                                 .format(page_target.title(as_link=True)))
-            return False
+            return
         if re.match('[a-z_-]+$', summary):
             summary = i18n.twtranslate(site, summary)
 
