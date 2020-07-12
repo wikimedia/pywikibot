@@ -28,15 +28,11 @@ Purge mode:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import pagegenerators
 
 from pywikibot.bot import MultipleSitesBot
-from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import issue_deprecation_warning
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -45,14 +41,14 @@ class TouchBot(MultipleSitesBot):
 
     """Page touch bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Initialize a TouchBot instance with the options and generator."""
         self.availableOptions.update({
             'botflag': False,
         })
-        super(TouchBot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Touch the given page."""
         try:
             page.touch(botflag=self.getOption('botflag'))
@@ -71,7 +67,7 @@ class PurgeBot(MultipleSitesBot):
 
     """Purge each page on the generator."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Initialize a PurgeBot instance with the options and generator."""
         self.availableOptions = {
             'converttitles': None,
@@ -79,9 +75,9 @@ class PurgeBot(MultipleSitesBot):
             'forcerecursivelinkupdate': None,
             'redirects': None
         }
-        super(PurgeBot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Purge the given page."""
         pywikibot.output('Page {0}{1} purged'.format(
             page.title(as_link=True),
@@ -89,7 +85,7 @@ class PurgeBot(MultipleSitesBot):
         ))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -110,18 +106,13 @@ def main(*args):
             continue
         if arg == '-purge':
             bot_class = PurgeBot
-        elif arg == '-redir':
-            issue_deprecation_warning(
-                '\n-redir', depth=1, warning_class=ArgumentDeprecationWarning,
-                since='20150514')
         elif arg.startswith('-'):
             options[arg[1:].lower()] = True
 
-    gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        bot = bot_class(generator=gen, **options)
+    if gen_factory.gens:
+        gen = gen_factory.getCombinedGenerator(preload=True)
         pywikibot.Site().login()
-        bot.run()
+        bot_class(generator=gen, **options).run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
 
