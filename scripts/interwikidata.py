@@ -23,11 +23,11 @@ Furthermore, the following command line parameters are supported:
 -summary:         Use your own edit summary for cleaning the page.
 """
 
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals, division, absolute_import
+from typing import Set, Union
 
 import pywikibot
 
@@ -39,7 +39,7 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 # Allowed namespaces. main, project, template, category
-namespaces = [0, 4, 10, 14]
+NAMESPACES = (0, 4, 10, 14)
 
 # TODO: Some templates on pages, like csd, inuse and afd templates,
 # should cause the bot to skip the page, see T134497
@@ -49,7 +49,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
     """The bot for interwiki."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initialize the bot."""
         self.availableOptions.update({
             'clean': False,
@@ -58,7 +58,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             'summary': None,
             'ignore_ns': False,  # used by interwikidata_tests only
         })
-        super(IWBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if not self.site.has_data_repository:
             raise ValueError('{site} does not have a data repository, '
                              'use interwiki.py instead.'.format(
@@ -68,20 +68,20 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             self.options['summary'] = pywikibot.i18n.twtranslate(
                 self.site, 'interwikidata-clean-summary')
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Check page."""
-        if (self.current_page.namespace() not in namespaces
+        if (self.current_page.namespace() not in NAMESPACES
                 and not self.getOption('ignore_ns')):
             output('{page} is not in allowed namespaces, skipping'
                    .format(page=self.current_page.title(
                        as_link=True)))
-            return False
+            return
         self.iwlangs = pywikibot.textlib.getLanguageLinks(
             self.current_page.text, insite=self.current_page.site)
         if not self.iwlangs:
             output('No interlanguagelinks on {page}'.format(
                 page=self.current_page.title(as_link=True)))
-            return False
+            return
         try:
             item = pywikibot.ItemPage.fromPage(self.current_page)
         except pywikibot.NoPage:
@@ -99,7 +99,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             self.current_item = item
             self.clean_page()
 
-    def create_item(self):
+    def create_item(self) -> pywikibot.ItemPage:
         """Create item in repo for current_page."""
         data = {'sitelinks':
                 {self.site.dbName():
@@ -127,7 +127,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         output('Created item {item}'.format(item=item.getID()))
         return item
 
-    def handle_complicated(self):
+    def handle_complicated(self) -> bool:
         """
         Handle pages when they have interwiki conflict.
 
@@ -138,7 +138,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         """
         return False
 
-    def clean_page(self):
+    def clean_page(self) -> None:
         """Clean interwiki links from the page."""
         if not self.iwlangs:
             return
@@ -147,13 +147,13 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             if not self.handle_complicated():
                 warning('Interwiki conflict in {}, skipping...'
                         .format(self.current_page.title(as_link=True)))
-                return False
+                return
         output('Cleaning up the page')
         new_text = pywikibot.textlib.removeLanguageLinks(
             self.current_page.text, site=self.current_page.site)
         self.put_current(new_text, summary=self.getOption('summary'))
 
-    def get_items(self):
+    def get_items(self) -> Set[pywikibot.ItemPage]:
         """Return all items of pages linked through the interwiki."""
         wd_data = set()
         for iw_page in self.iwlangs.values():
@@ -168,7 +168,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                        .format(iw_page.title(as_link=True)))
         return wd_data
 
-    def try_to_add(self):
+    def try_to_add(self) -> Union[pywikibot.ItemPage, bool, None]:
         """Add current page in repo."""
         wd_data = self.get_items()
         if not wd_data:
@@ -188,7 +188,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             self.current_page.title(as_link=True, insite=item.site)))
         return item
 
-    def try_to_merge(self, item):
+    def try_to_merge(self, item) -> Union[pywikibot.ItemPage, bool, None]:
         """Merge two items."""
         wd_data = self.get_items()
         if not wd_data:
@@ -209,7 +209,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return target_item
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
