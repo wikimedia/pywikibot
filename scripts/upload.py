@@ -55,8 +55,6 @@ parameter, and for a description.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import math
 import os
@@ -71,7 +69,7 @@ CHUNK_SIZE_REGEX = re.compile(
     r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
 
 
-def get_chunk_size(match):
+def get_chunk_size(match) -> int:
     """Get chunk size."""
     if not match:
         pywikibot.error('Chunk size parameter is not valid.')
@@ -96,7 +94,7 @@ def get_chunk_size(match):
     return chunk_size
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -166,7 +164,7 @@ def main(*args):
         if description:
             pywikibot.error('Both a description and a -descfile were '
                             'provided. Please specify only one of those.')
-            return False
+            return
         with codecs.open(description_file,
                          encoding=pywikibot.config.textfile_encoding) as f:
             description = f.read().replace('\r\n', '\n')
@@ -199,7 +197,7 @@ def main(*args):
                            'defined for all codes. ')
         additional += 'Unable to run in -always mode'
         suggest_help(missing_parameters=missing, additional_text=additional)
-        return False
+        return
 
     if os.path.isdir(url):
         file_list = []
