@@ -38,21 +38,19 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
+
+from typing import Dict, Generator, List, Tuple
 
 import pywikibot
 
-templates = ['ref', 'note', 'ref label', 'note label', 'reflist']
 
-
-class TemplateCountRobot(object):
+class TemplateCountRobot:
 
     """Template count bot."""
 
     @classmethod
-    def countTemplates(cls, templates, namespaces):
+    def countTemplates(cls, templates, namespaces) -> None:
         """
         Display number of transclusions for a list of templates.
 
@@ -78,7 +76,7 @@ class TemplateCountRobot(object):
                          .format(datetime.datetime.utcnow().isoformat()))
 
     @classmethod
-    def listTemplates(cls, templates, namespaces):
+    def listTemplates(cls, templates, namespaces) -> None:
         """
         Display transcluded pages for a list of templates.
 
@@ -105,7 +103,8 @@ class TemplateCountRobot(object):
                          .format(datetime.datetime.utcnow().isoformat()))
 
     @classmethod
-    def template_dict(cls, templates, namespaces):
+    def template_dict(cls, templates, namespaces) -> Dict[
+            str, List[pywikibot.Page]]:
         """
         Create a dict of templates and its transcluded pages.
 
@@ -116,13 +115,12 @@ class TemplateCountRobot(object):
         @type templates: list
         @param namespaces: list of namespace numbers
         @type namespaces: list
-
-        @rtype: dict
         """
         return dict(cls.template_dict_generator(templates, namespaces))
 
     @staticmethod
-    def template_dict_generator(templates, namespaces):
+    def template_dict_generator(templates, namespaces) -> Generator[
+            Tuple[str, List[pywikibot.Page]], None, None]:
         """
         Yield transclusions of each template in 'templates'.
 
@@ -134,21 +132,16 @@ class TemplateCountRobot(object):
         @type templates: list
         @param namespaces: list of namespace numbers
         @type namespaces: list
-
-        @rtype: generator
         """
         mysite = pywikibot.Site()
         mytpl = mysite.namespaces.TEMPLATE
         for template in templates:
-            transcluding_array = []
             gen = pywikibot.Page(mysite, template, ns=mytpl).getReferences(
                 namespaces=namespaces, only_template_inclusion=True)
-            for page in gen:
-                transcluding_array.append(page)
-            yield template, transcluding_array
+            yield template, list(gen)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -178,7 +171,7 @@ def main(*args):
 
     robot = TemplateCountRobot()
     if not args_list:
-        args_list = templates
+        args_list = ['ref', 'note', 'ref label', 'note label', 'reflist']
 
     if 'reflist' in args_list:
         pywikibot.output(
