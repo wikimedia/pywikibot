@@ -6,8 +6,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import os
 import sys
@@ -19,7 +17,7 @@ from pywikibot.version import getversion, get_toolforge_hostname
 try:
     import requests
 except ImportError:
-    class DummyRequests(object):
+    class DummyRequests:
 
         """Fake requests instance."""
 
@@ -30,14 +28,14 @@ except ImportError:
 WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 
-def check_environ(environ_name):
+def check_environ(environ_name) -> None:
     """Print environment variable."""
     pywikibot.output('{0}: {1}'.format(environ_name,
                                        os.environ.get(environ_name,
                                                       'Not set')))
 
 
-def main(*args):
+def main(*args) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: ' + getversion())
     pywikibot.output('Release version: ' + pywikibot.__version__)
