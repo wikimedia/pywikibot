@@ -2486,7 +2486,7 @@ class APISite(BaseSite):
                     # v1.14 defined and as ',&#32;and'; fixed in v1.15
                     msgs['and'] = ' and'
                 else:
-                    msgs[key] = pywikibot.html2UnicodeType(value)
+                    msgs[key] = pywikibot.html2unicode(value)
 
         concat = msgs['and'] + msgs['word-separator']
         return msgs['comma-separator'].join(
