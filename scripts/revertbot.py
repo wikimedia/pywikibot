@@ -37,14 +37,14 @@ and override its `callback` method. Here is a sample:
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from typing import Union
 
 import pywikibot
 
@@ -67,11 +67,11 @@ class BaseRevertBot(OptionHandler):
         'limit': 500
     }
 
-    def __init__(self, site=None, **kwargs):
+    def __init__(self, site=None, **kwargs) -> None:
         """Initializer."""
         self.site = site or pywikibot.Site()
         self.user = kwargs.pop('user', self.site.username())
-        super(BaseRevertBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @deprecate_arg('max', 'total')
     def get_contributions(self, total=500, ns=None):
@@ -79,7 +79,7 @@ class BaseRevertBot(OptionHandler):
         return self.site.usercontribs(user=self.user, namespaces=ns,
                                       total=total)
 
-    def revert_contribs(self, callback=None):
+    def revert_contribs(self, callback=None) -> None:
         """Revert contributions."""
         if callback is None:
             callback = self.callback
@@ -94,11 +94,11 @@ class BaseRevertBot(OptionHandler):
             else:
                 self.log('Skipped {0} by callback'.format(item['title']))
 
-    def callback(self, item):
+    def callback(self, item) -> bool:
         """Callback function."""
         return 'top' in item
 
-    def revert(self, item):
+    def revert(self, item) -> Union[str, bool]:
         """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
         history = list(page.revisions(total=2))
@@ -144,7 +144,7 @@ class BaseRevertBot(OptionHandler):
         return 'The edit(s) made in {0} by {1} was rollbacked'.format(
             page.title(), self.user)
 
-    def log(self, msg):
+    def log(self, msg) -> None:
         """Log the message msg."""
         pywikibot.output(msg)
 
