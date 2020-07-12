@@ -110,22 +110,18 @@ user talk pages (namespace #3):
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from itertools import chain
 import re
 
+from itertools import chain
 from warnings import warn
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, textlib
-
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import deprecated, filter_unique
-
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -139,7 +135,7 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
     (cur table), and may not still transclude the template.
     """
 
-    def __init__(self, templates, xmlfilename):
+    def __init__(self, templates, xmlfilename) -> None:
         """
         Initializer.
 
@@ -169,15 +165,15 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
             r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}'
             % '|'.join(template_patterns))
 
-        super(XmlDumpTemplatePageGenerator, self).__init__(
-            xmlfilename, site=mysite, text_predicate=template_regex.search)
+        super().__init__(xmlfilename, site=mysite,
+                         text_predicate=template_regex.search)
 
 
 class TemplateRobot(ReplaceBot):
 
     """This bot will replace, remove or subst all occurrences of a template."""
 
-    def __init__(self, generator, templates, **kwargs):
+    def __init__(self, generator, templates, **kwargs) -> None:
         """
         Initializer.
 
@@ -256,14 +252,14 @@ class TemplateRobot(ReplaceBot):
                 replacements.append((template_regex,
                                      r'{{%s\g<parameters>}}' % new))
 
-        super(TemplateRobot, self).__init__(
+        super().__init__(
             generator, replacements, exceptions,
             always=self.getOption('always'),
             addcat=self.getOption('addcat'),
             summary=self.getOption('summary'))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -381,7 +377,4 @@ def main(*args):
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception:
-        pywikibot.error('Fatal error:', exc_info=True)
+    main()
