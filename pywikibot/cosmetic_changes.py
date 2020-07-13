@@ -451,13 +451,13 @@ class CosmeticChangesToolkit(object):
                                   'img_right', 'img_none', 'img_framed',
                                   'img_frameless', 'img_border', 'img_upright',
                                   ]:
-                    aliases = list(self.site.getmagicwords(magicword))
-                    preferred = aliases.pop(0)
+                    aliases = self.site.getmagicwords(magicword)
+                    preferred = aliases[0]
+                    aliases = set(aliases[1:])
                     if not aliases:
                         continue
-                    split[1:] = list(map(
-                        lambda x: preferred if x.strip() in aliases else x,
-                        split[1:]))
+                    split[1:] = [preferred if x.strip() in aliases else x
+                                 for x in split[1:]]
                 return '|'.join(split) + ']]'
 
             exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']

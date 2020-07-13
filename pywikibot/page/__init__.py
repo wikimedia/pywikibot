@@ -1337,12 +1337,12 @@ class BasePage(ComparableMixin):
         if config.cosmetic_changes_mylang_only:
             cc = ((family == config.family
                    and self.site.lang == config.mylang)
-                  or family in list(config.cosmetic_changes_enable.keys())
+                  or family in config.cosmetic_changes_enable
                   and self.site.lang in config.cosmetic_changes_enable[family])
         else:
             cc = True
         cc = (cc and not
-              (family in list(config.cosmetic_changes_disable.keys())
+              (family in config.cosmetic_changes_disable
                and self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return summary

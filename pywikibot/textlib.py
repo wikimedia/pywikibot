@@ -998,7 +998,7 @@ def getLanguageLinks(text, insite=None, template_subpage=False):
         # language, or if it's e.g. a category tag or an internal link
         if lang in fam.obsolete:
             lang = fam.obsolete[lang]
-        if lang in list(fam.langs.keys()):
+        if lang in fam.langs:
             if '|' in pagetitle:
                 # ignore text after the pipe
                 pagetitle = pagetitle[:pagetitle.index('|')]

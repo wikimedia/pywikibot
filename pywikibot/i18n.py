@@ -608,7 +608,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         if fallback is True:
             codes += _altlang(code) + ['_default', 'en']
         elif fallback is not False:
-            codes += list(fallback)
+            codes.extend(fallback)
         for code in codes:
             if code in xdict:
                 trans = xdict[code]
