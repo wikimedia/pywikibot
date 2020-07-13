@@ -472,7 +472,7 @@ class CosmeticChangesToolkit(object):
             # push ']]' out and re-add below
             split[-1] = split[-1][:-2]
             return '{}|{}]]'.format(
-                split[0], '|'.join(cache.get(x, x) for x in split[1:]))
+                split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
 
         cache = {}
         exceptions = ['nowiki', 'comment', 'pre', 'source']
