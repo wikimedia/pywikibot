@@ -5,26 +5,24 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import absolute_import, division, unicode_literals
+
 import codecs
 import datetime
+from importlib import import_module
 import json
 import os
-import pathlib
 import socket
 import subprocess
 import sys
 import time
 import xml.dom.minidom
 
-from contextlib import closing, suppress
-from importlib import import_module
+from contextlib import closing
+from distutils import log
+from distutils.sysconfig import get_python_lib
 from io import BytesIO
 from warnings import warn
-
-import pywikibot
-
-from pywikibot import config2 as config
-from pywikibot.tools import deprecated
 
 try:
     from setuptools import svn_utils
@@ -33,6 +31,17 @@ except ImportError:
         from setuptools_svn import svn_utils
     except ImportError as e:
         svn_utils = e
+
+try:
+    import pathlib
+except ImportError:
+    import pathlib2 as pathlib  # Python 2
+
+
+import pywikibot
+
+from pywikibot import config2 as config
+from pywikibot.tools import deprecated, PY2, UnicodeType
 
 cache = None
 _logger = 'version'
@@ -70,15 +79,17 @@ def getversion(online=True):
     data['cmp_ver'] = 'n/a'
 
     if online:
-        with suppress(Exception):
+        try:
             hsh3 = getversion_onlinerepo('tags/stable')
             hsh2 = getversion_onlinerepo()
             hsh1 = data['hsh']
             data['cmp_ver'] = 'UNKNOWN' if not hsh1 else (
                 'OUTDATED' if hsh1 not in (hsh2, hsh3) else 'ok')
+        except Exception:
+            pass
 
     data['hsh'] = data['hsh'][:7]  # make short hash from full hash
-    return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format(**data)
+    return '%(tag)s (%(hsh)s, %(rev)s, %(date)s, %(cmp_ver)s)' % data
 
 
 def getversiondict():
@@ -124,7 +135,7 @@ def getversiondict():
         pywikibot.debug('version algorithm exceptions:\n%r'
                         % exceptions, _logger)
 
-    if isinstance(date, str):
+    if isinstance(date, UnicodeType):
         datestring = date
     elif isinstance(date, time.struct_time):
         datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
@@ -155,14 +166,14 @@ def svn_rev_info(path):
         with open(filename) as entries:
             version = entries.readline().strip()
             if version != '12':
-                for _ in range(3):
+                for i in range(3):
                     entries.readline()
                 tag = entries.readline().strip()
                 t = tag.split('://', 1)
                 t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/',
                                     '')
                 tag = '[{0}] {1}'.format(*t)
-                for _ in range(4):
+                for i in range(4):
                     entries.readline()
                 date = time.strptime(entries.readline()[:19],
                                      '%Y-%m-%dT%H:%M:%S')
@@ -224,8 +235,6 @@ def getversion_svn_setuptools(path=None):
     """
     if isinstance(svn_utils, Exception):
         raise svn_utils
-
-    from distutils import log  # T257772
     tag = 'pywikibot-core'
     _program_dir = path or _get_program_dir()
     svninfo = svn_utils.SvnInfo(_program_dir)
@@ -408,8 +417,10 @@ def getfileversion(filename):
         with codecs.open(fn, 'r', 'utf-8') as f:
             for line in f.readlines():
                 if line.find('__version__') == 0:
-                    with suppress(Exception):
+                    try:
                         exec(line)
+                    except Exception:
+                        pass
                     break
         stat = os.stat(fn)
         mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
@@ -431,7 +442,6 @@ def get_module_version(module):
     """
     if hasattr(module, '__version__'):
         return module.__version__[5:-1]
-    return None
 
 
 def get_module_filename(module):
@@ -449,12 +459,13 @@ def get_module_filename(module):
     """
     if hasattr(module, '__file__') and os.path.exists(module.__file__):
         filename = module.__file__
+        if PY2:
+            filename = os.path.abspath(filename)
         if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
             filename = filename[:-1]
         program_dir = _get_program_dir()
         if filename[:len(program_dir)] == program_dir:
             return filename
-    return None
 
 
 def get_module_mtime(module):
@@ -469,7 +480,6 @@ def get_module_mtime(module):
     filename = get_module_filename(module)
     if filename:
         return datetime.datetime.fromtimestamp(os.stat(filename).st_mtime)
-    return None
 
 
 def package_versions(modules=None, builtins=False, standard_lib=None):
@@ -485,8 +495,6 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     @param standard_lib: Include standard library packages
     @type standard_lib: Boolean, or None for automatic selection
     """
-    from distutils.sysconfig import get_python_lib  # T257772
-
     if not modules:
         modules = sys.modules.keys()
 
@@ -500,7 +508,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
     # Improve performance by removing builtins from the list if possible.
     if builtins is False:
-        root_packages = root_packages - builtin_packages
+        root_packages = list(root_packages - builtin_packages)
 
     std_lib_packages = []
 
@@ -532,6 +540,9 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             path = package.__file__
             if '__init__.py' in path:
                 path = path[0:path.index('__init__.py')]
+
+            if PY2:
+                path = path.decode(sys.getfilesystemencoding())
 
             info['path'] = path
             assert path not in paths, 'Path of the package is in defined paths'
