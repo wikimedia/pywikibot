@@ -442,31 +442,45 @@ class CosmeticChangesToolkit(object):
         # not wanted at ru
         # arz uses english stylish codes
         # no need to run on English wikis
-        if self.site.code not in ['arz', 'en', 'ru']:
-            def replace_magicword(match):
-                split = match.group().split('|')
-                # push ']]' out and re-add below
-                split[-1] = split[-1][:-2]
-                for magicword in ['img_thumbnail', 'img_left', 'img_center',
-                                  'img_right', 'img_none', 'img_framed',
-                                  'img_frameless', 'img_border', 'img_upright',
-                                  ]:
-                    aliases = self.site.getmagicwords(magicword)
-                    preferred = aliases[0]
-                    aliases = set(aliases[1:])
-                    if not aliases:
-                        continue
-                    split[1:] = [preferred if x.strip() in aliases else x
-                                 for x in split[1:]]
-                return '|'.join(split) + ']]'
+        if self.site.code in ['arz', 'en', 'ru']:
+            return text
 
-            exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
-            regex = re.compile(
-                FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-                flags=re.X)
-            text = textlib.replaceExcept(text, regex, replace_magicword,
-                                         exceptions)
-        return text
+        def init_cache():
+            for magicword in ('img_thumbnail', 'img_left', 'img_center',
+                              'img_right', 'img_none', 'img_framed',
+                              'img_frameless', 'img_border', 'img_upright',
+                              'img_baseline', 'img_sub', 'img_super',
+                              'img_top', 'img_text_top', 'img_middle',
+                              'img_bottom', 'img_text_bottom'):
+                aliases = self.site.getmagicwords(magicword)
+                if len(aliases) > 1:
+                    cache.update((alias, aliases[0]) for alias in aliases[1:]
+                                 if '$1' not in alias)
+            if not cache:
+                cache[False] = True  # signal there is nothing to replace
+
+        def replace_magicword(match):
+            if cache.get(False):
+                return match.group()
+            split = match.group().split('|')
+            if len(split) == 1:
+                return match.group()
+
+            if not cache:
+                init_cache()
+
+            # push ']]' out and re-add below
+            split[-1] = split[-1][:-2]
+            return '{}|{}]]'.format(
+                split[0], '|'.join(cache.get(x, x) for x in split[1:]))
+
+        cache = {}
+        exceptions = ['nowiki', 'comment', 'pre', 'source']
+        regex = re.compile(
+            FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
+            flags=re.X)
+        return textlib.replaceExcept(
+            text, regex, replace_magicword, exceptions)
 
     def cleanUpLinks(self, text):
         """Tidy up wikilinks found in a string.
