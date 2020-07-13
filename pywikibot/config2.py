@@ -1169,9 +1169,7 @@ if __name__ == '__main__':
             _all = False
         else:
             warning('Unknown arg {0} ignored'.format(_arg))
-    _k = list(globals().keys())
-    _k.sort()
-    for _name in _k:
+    for _name in sorted(globals().keys()):
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:
