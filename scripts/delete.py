@@ -58,7 +58,7 @@ Delete everything in the category "To delete" without prompting:
 #
 import collections
 
-from typing import DefaultDict, Set
+from typing import Set
 from warnings import warn
 
 import pywikibot
@@ -68,7 +68,13 @@ from pywikibot import i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
-from pywikibot.tools import islice_with_ellipsis
+from pywikibot.tools import islice_with_ellipsis, PYTHON_VERSION
+
+if PYTHON_VERSION < (3, 5, 2):
+    from typing import Dict as DefaultDict
+else:
+    from typing import DefaultDict
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
