@@ -1,6 +1,8 @@
 Current release
 ~~~~~~~~~~~~~~~
 
+* Improve performance of CosmeticChangesToolkit.translateMagicWords
+* Prohibit positional arguments with Page.title()
 * Functions dealing with stars list were removed
 * Some pagegenerators functions were deprecated which should be replaced by site generators
 * LogEntry became a UserDict; all content can be accessed by its key
@@ -17,7 +19,7 @@ Current release
 Future releases
 ~~~~~~~~~~~~~~~
 
-* (current): Methods deprecated for 8 years or longer will be removed
+* 4.0.0: Methods deprecated for 8 years or longer will be removed
 * 3.0.20200703: Unsupported debug parameter of UploadRobot will be removed
 * 3.0.20200703: Unported compat decode parameter of Page.title() will be removed
 * 3.0.20200703: tools.count, tools.Counter, tools.OrderedDict and ContextManagerWrapper will be removed
