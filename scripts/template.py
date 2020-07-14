@@ -113,13 +113,11 @@ user talk pages (namespace #3):
 import re
 
 from itertools import chain
-from warnings import warn
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import deprecated, filter_unique
 from scripts.replace import ReplaceRobot as ReplaceBot
@@ -279,12 +277,6 @@ def main(*args) -> None:
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
-
-    # Avoid conflicts with pagegenerators.py parameters.
-    if any(arg.startswith('-category:') for arg in local_args):
-        warn('-category (to append a category to each edited page) has been'
-             ' renamed to -addcat; make sure you are using the correct param.',
-             ArgumentDeprecationWarning)
 
     site = pywikibot.Site()
     gen_factory = pagegenerators.GeneratorFactory()

@@ -672,13 +672,8 @@ class DryFactoryGeneratorTest(TestCase):
         gf.handleArg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
         self.assertIsInstance(gf.namespaces, frozenset)
-        with suppress_warnings(
-            'Cannot handle arg -namespaces as namespaces can not be altered '
-            'after a generator is created.',
-            pywikibot.exceptions.ArgumentDeprecationWarning
-        ):
+        with self.assertRaises(AssertionError):
             gf.handleArg('-ns:0')
-
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_unsupported_quality_level_filter(self):

@@ -59,11 +59,9 @@ Delete everything in the category "To delete" without prompting:
 import collections
 
 from typing import Set
-from warnings import warn
 
 import pywikibot
 
-from pywikibot import exceptions
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 from pywikibot.page import Page
@@ -256,10 +254,6 @@ def main(*args) -> None:
                 summary = pywikibot.input('Enter a reason for the deletion:')
             else:
                 summary = arg[len('-summary:'):]
-        elif arg.startswith('-images'):
-            warn('-image option is deprecated. Please use -imageused instead.',
-                 exceptions.ArgumentDeprecationWarning)
-            local_args.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
             options['undelete'] = True
         elif arg.startswith('-isorphan'):

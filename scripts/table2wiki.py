@@ -56,9 +56,7 @@ from pywikibot import config, i18n, pagegenerators, xmlreader
 
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            suggest_help, input_yn)
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import replaceExcept
-from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -533,25 +531,15 @@ def main(*args):
     gen_factory = pagegenerators.GeneratorFactory(positional_arg_name='page')
 
     for arg in local_args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         if option == '-xml':
             filename = value or pywikibot.input(
                 "Please enter the XML dump's filename:")
             gen = TableXmlDumpPageGenerator(filename)
-        elif option == '-auto':
-            issue_deprecation_warning(
-                'The usage of "-auto"', '-always',
-                1, ArgumentDeprecationWarning, since='20170205')
-            options['always'] = True
         elif option in ['-always', '-quiet', '-skipwarning']:
             options[option[1:]] = True
         else:
-            if option in ('-sql', '-mysqlquery'):
-                if option == '-sql':
-                    issue_deprecation_warning(
-                        'The usage of "-sql"', '-mysqlquery',
-                        1, ArgumentDeprecationWarning, since='20170205')
-
+            if option == '-mysqlquery':
                 query = value or """
 SELECT page_namespace, page_title
 FROM page JOIN text ON (page_id = old_id)

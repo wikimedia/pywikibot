@@ -1354,14 +1354,6 @@ def main(*args):
                 'The usage of "-yesterday"',
                 '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
                 2, ArgumentDeprecationWarning, since='20160305')
-        elif arg.startswith('-recentchanges'):
-            if param_value is None:
-                arg = arg + ':120,70'
-                issue_deprecation_warning(
-                    '-recentchanges without parameters',
-                    '-recentchanges:offset,duration',
-                    2, ArgumentDeprecationWarning, since='20160320')
-            gen_factory.handleArg(arg)
         else:
             gen_factory.handleArg(arg)
 
