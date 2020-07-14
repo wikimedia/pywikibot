@@ -507,7 +507,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
                            automatic_quit=automatic_quit, force=force)
 
 
-@deprecated('input_choice', since='20140825')
+@deprecated('input_choice', since='20140825', future_warning=True)
 def inputChoice(question, answers, hotkeys, default=None):
     """Ask the user a question with several options, return the user's choice.
 

@@ -387,7 +387,8 @@ class UploadRobot(BaseBot):
         else:
             return warn_code in self.ignore_warning
 
-    @deprecated('UploadRobot.upload_file()', since='20141211')
+    @deprecated('UploadRobot.upload_file()', since='20141211',
+                future_warning=True)
     @deprecated_args(debug=True)
     def upload_image(self):
         """Upload image."""

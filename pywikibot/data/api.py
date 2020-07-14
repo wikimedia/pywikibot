@@ -2933,7 +2933,7 @@ class PageGenerator(QueryGenerator):
         return p
 
 
-@deprecated('PageGenerator', since='20141106')
+@deprecated('PageGenerator', since='20141106', future_warning=True)
 class CategoryPageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields Category objects instead of Pages."""
@@ -2941,7 +2941,7 @@ class CategoryPageGenerator(PageGenerator):
     pass
 
 
-@deprecated('PageGenerator', since='20141106')
+@deprecated('PageGenerator', since='20141106', future_warning=True)
 class ImagePageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields FilePage objects instead of Pages."""

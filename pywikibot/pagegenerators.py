@@ -1222,7 +1222,8 @@ def _int_none(v):
 @deprecated('Site.allpages()', since='20180512')
 @deprecated_args(step=None)
 def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
-                          site=None, total=None, content=False):
+                          site=None, total=None, content=False
+                          ):  # pragma: no cover
     """
     Iterate Page objects for all titles in a single namespace.
 
@@ -1327,7 +1328,7 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
             pywikibot.exception(e)
 
 
-@deprecated('LogeventsPageGenerator', since='20141210')
+@deprecated('LogeventsPageGenerator', since='20141210', future_warning=True)
 @deprecated_args(number='total', mode='logtype', repeat=None)
 def LogpagesPageGenerator(total=500, logtype='', user=None,
                           site=None, namespace=[]):
@@ -1349,7 +1350,8 @@ def LogpagesPageGenerator(total=500, logtype='', user=None,
     @type total: int
     """
     return LogeventsPageGenerator(total=total, logtype=logtype, user=user,
-                                  site=site, namespace=namespace)
+                                  site=site,
+                                  namespace=namespace)  # pragma: no cover
 
 
 @deprecated_args(number='total', step=None, namespace='namespaces',
@@ -1466,14 +1468,16 @@ def UnconnectedPageGenerator(site=None, total=None):
 @deprecated_args(referredImagePage='referredFilePage', step=None)
 def FileLinksGenerator(referredFilePage, total=None, content=False):
     """DEPRECATED. Yield Pages on which referredFilePage file is displayed."""
-    return referredFilePage.usingPages(total=total, content=content)
+    return referredFilePage.usingPages(total=total,
+                                       content=content)  # pragma: no cover
 
 
 @deprecated('Page.imagelinks()', since='20200515')
 @deprecated_args(step=None)
 def ImagesPageGenerator(pageWithImages, total=None, content=False):
     """DEPRECATED. Yield FilePages displayed on pageWithImages."""
-    return pageWithImages.imagelinks(total=total, content=content)
+    return pageWithImages.imagelinks(total=total,
+                                     content=content)  # pragma: no cover
 
 
 def InterwikiPageGenerator(page):
@@ -1579,7 +1583,8 @@ def LinkedPageGenerator(linkingPage, total=None, content=False):
         linkingPage
     @rtype: generator
     """
-    return linkingPage.linkedPages(total=total, content=content)
+    return linkingPage.linkedPages(total=total,
+                                   content=content)  # pragma: no cover
 
 
 def TextfilePageGenerator(filename=None, site=None):
@@ -2097,7 +2102,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
 @deprecated('itertools.chain(*iterables)', since='20180513')
 def CombinedPageGenerator(generators):
     """Yield from each iterable until exhausted, then proceed with the next."""
-    return itertools.chain(*generators)
+    return itertools.chain(*generators)  # pragma: no cover
 
 
 def PageClassGenerator(generator):
@@ -2327,7 +2332,7 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
 
 @deprecated('Site.unusedfiles()', since='20200515')
 @deprecated_args(extension=None, number='total', repeat=None)
-def UnusedFilesGenerator(total=None, site=None):
+def UnusedFilesGenerator(total=None, site=None):  # pragma: no cover
     """
     DEPRECATED. Unused files generator.
 
@@ -2343,7 +2348,7 @@ def UnusedFilesGenerator(total=None, site=None):
 
 @deprecated('Site.withoutinterwiki()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def WithoutInterwikiPageGenerator(total=None, site=None):
+def WithoutInterwikiPageGenerator(total=None, site=None):  # pragma: no cover
     """
     DEPRECATED. Page lacking interwikis generator.
 
@@ -2358,7 +2363,7 @@ def WithoutInterwikiPageGenerator(total=None, site=None):
 
 @deprecated('Site.uncategorizedcategories()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedCategoryGenerator(total=100, site=None):
+def UnCategorizedCategoryGenerator(total=100, site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized category generator.
 
@@ -2374,7 +2379,7 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
 
 @deprecated('Site.uncategorizedimages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedImageGenerator(total=100, site=None):
+def UnCategorizedImageGenerator(total=100, site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized file generator.
 
@@ -2390,7 +2395,7 @@ def UnCategorizedImageGenerator(total=100, site=None):
 
 @deprecated('Site.uncategorizedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedPageGenerator(total=100, site=None):
+def UnCategorizedPageGenerator(total=100, site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized page generator.
 
@@ -2406,7 +2411,7 @@ def UnCategorizedPageGenerator(total=100, site=None):
 
 @deprecated('Site.uncategorizedtemplates()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedTemplateGenerator(total=100, site=None):
+def UnCategorizedTemplateGenerator(total=100, site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized template generator.
 
@@ -2422,7 +2427,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
 
 @deprecated('Site.lonelypages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def LonelyPagesPageGenerator(total=None, site=None):
+def LonelyPagesPageGenerator(total=None, site=None):  # pragma: no cover
     """
     DEPRECATED. Lonely page generator.
 
@@ -2438,7 +2443,7 @@ def LonelyPagesPageGenerator(total=None, site=None):
 
 @deprecated('Site.unwatchedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnwatchedPagesPageGenerator(total=None, site=None):
+def UnwatchedPagesPageGenerator(total=None, site=None):  # pragma: no cover
     """
     DEPRECATED. Unwatched page generator.
 
@@ -2453,7 +2458,8 @@ def UnwatchedPagesPageGenerator(total=None, site=None):
 
 
 @deprecated('Site.pages_with_property()', since='20200515')
-def page_with_property_generator(name, total=None, site=None):
+def page_with_property_generator(name, total=None,
+                                 site=None):  # pragma: no cover
     """
     Special:PagesWithProperty page generator.
 
@@ -2470,7 +2476,7 @@ def page_with_property_generator(name, total=None, site=None):
 
 
 @deprecated('Site.wantedpages', since='20180803')
-def WantedPagesPageGenerator(total=100, site=None):
+def WantedPagesPageGenerator(total=100, site=None):  # pragma: no cover
     """
     Wanted page generator.
 
@@ -2485,7 +2491,7 @@ def WantedPagesPageGenerator(total=100, site=None):
 
 
 @deprecated_args(number='total', repeat=None)
-def AncientPagesPageGenerator(total=100, site=None):
+def AncientPagesPageGenerator(total=100, site=None):  # pragma: no cover
     """
     Ancient page generator.
 
@@ -2501,7 +2507,7 @@ def AncientPagesPageGenerator(total=100, site=None):
 
 @deprecated('Site.deadendpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def DeadendPagesPageGenerator(total=100, site=None):
+def DeadendPagesPageGenerator(total=100, site=None):  # pragma: no cover
     """
     DEPRECATED. Dead-end page generator.
 
@@ -2547,7 +2553,8 @@ def ShortPagesPageGenerator(total=100, site=None):
 
 @deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
-def RandomPageGenerator(total=None, site=None, namespaces=None):
+def RandomPageGenerator(total=None, site=None,
+                        namespaces=None):  # pragma: no cover
     """
     DEPRECATED. Random page generator.
 
@@ -2563,7 +2570,8 @@ def RandomPageGenerator(total=None, site=None, namespaces=None):
 
 @deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
-def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
+def RandomRedirectPageGenerator(total=None, site=None,
+                                namespaces=None):  # pragma: no cover
     """
     DEPRECATED. Random redirect generator.
 
@@ -2606,7 +2614,8 @@ def LinksearchPageGenerator(url, namespaces=None, total=None,
 
 @deprecated('Site.search()', since='20200515')
 @deprecated_args(number='total', step=None)
-def SearchPageGenerator(query, total=None, namespaces=None, site=None):
+def SearchPageGenerator(query, total=None, namespaces=None,
+                        site=None):  # pragma: no cover
     """
     DEPRECATED. Yield pages from the MediaWiki internal search engine.
 
@@ -3080,19 +3089,18 @@ CategoryGenerator = redirect_func(
     PageClassGenerator, old_name='CategoryGenerator', since='20161017')
 UnCategorizedTemplatesGenerator = redirect_func(
     UnCategorizedTemplateGenerator, old_name='UnCategorizedTemplatesGenerator',
-    since='20141225')
+    since='20141225', future_warning=True)
 RecentchangesPageGenerator = redirect_func(
     RecentChangesPageGenerator, old_name='RecentchangesPageGenerator',
-    since='20141225')
+    since='20141225', future_warning=True)
 # Deprecated old names from Pywikibot 2.0 beta1
 WikidataItemGenerator = redirect_func(
-    WikibaseItemGenerator, old_name='WikidataItemGenerator', since='20141225')
-
-
-if __name__ == '__main__':
-    pywikibot.output('Pagegenerators cannot be run as script - are you '
-                     'looking for listpages.py?')
-
+    WikibaseItemGenerator, old_name='WikidataItemGenerator',
+    since='20141225', future_warning=True)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
                              since='20181128')
+
+if __name__ == '__main__':  # pragma: no cover
+    pywikibot.output('Pagegenerators cannot be run as script - are you '
+                     'looking for listpages.py?')
