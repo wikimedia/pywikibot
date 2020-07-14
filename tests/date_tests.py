@@ -60,6 +60,36 @@ class TestDate(TestCase, metaclass=TestDateMeta):
     net = False
 
 
+class TestMonthName(TestCase):
+
+    """Test MonthName format."""
+
+    net = True
+
+    def test_month_name_formats(self):
+        """Test MonthName format."""
+        formatname = 'MonthName'
+        for code in date.formats['Cat_BirthsAD']:
+            try:
+                convert = date.formats[formatname][code]
+            except KeyError:  # Not all month names are available yet
+                continue
+            predicate, start, stop = date.formatLimits[formatname]
+            for value in range(start, stop):
+                with self.subTest(code=code, month=value):
+                    self.assertTrue(
+                        predicate(value),
+                        "date.formats['{}']['{}']:\ninvalid value {}"
+                        .format(formatname, code, value))
+
+                    new_value = convert(convert(value))
+                    self.assertEqual(
+                        new_value, value,
+                        "date.formats['{}']['{}']:\n"
+                        'value {} does not match {}'
+                        .format(formatname, code, new_value, value))
+
+
 class TestMonthDelta(TestCase):
 
     """Tests for adding months to a date and getting the months between two."""
