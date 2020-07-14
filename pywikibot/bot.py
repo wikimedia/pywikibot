@@ -58,8 +58,6 @@ used.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
@@ -86,6 +84,7 @@ __all__ = (
 
 
 import codecs
+import configparser
 import datetime
 import json
 import logging
@@ -98,19 +97,9 @@ import webbrowser
 
 from contextlib import closing
 from importlib import import_module
+from pathlib import Path
 from textwrap import fill
 from warnings import warn
-
-try:
-    import configparser
-except ImportError:  # PY2
-    import ConfigParser as configparser  # noqa: N813
-
-try:
-    from pathlib import Path
-except ImportError:  # PY2
-    from pathlib2 import Path
-
 
 import pywikibot
 from pywikibot import config2 as config
@@ -134,7 +123,7 @@ from pywikibot.logging import (
 )
 from pywikibot.logging import critical
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning, PY2,
+    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
 )
 from pywikibot.tools._logging import (
     LoggingFormatter as _LoggingFormatter,
@@ -142,8 +131,6 @@ from pywikibot.tools._logging import (
 )
 from pywikibot.tools.formatter import color_format
 
-if PY2:
-    from future_builtins import zip
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -431,10 +418,8 @@ def writelogheader():
         ver = version.get_module_version(module)
         mtime = version.get_module_mtime(module)
         if filename and ver and mtime:
-            # it's explicitly using str() to bypass unicode_literals in py2
-            # isoformat expects a char not a unicode in Python 2
-            log('  {0} {1} {2}'.format(
-                filename, ver[:7], mtime.isoformat(str(' '))))
+            log('  {0} {1} {2}'
+                .format(filename, ver[:7], mtime.isoformat(' ')))
 
     if config.log_pywiki_repo_version:
         log('PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
@@ -585,7 +570,7 @@ def input_list_choice(question, answers, default=None, force=False):
                                 force=force)
 
 
-class InteractiveReplace(object):
+class InteractiveReplace:
 
     """
     A callback class for textlib's replace_links.
@@ -782,8 +767,8 @@ def handle_args(args=None, do_help=True):
     """
     Handle standard command line arguments, and return the rest as a list.
 
-    Takes the command line arguments as Unicode strings, processes all
-    global parameters such as -lang or -log, initialises the logging layer,
+    Takes the command line arguments as strings, processes all global
+    parameters such as -lang or -log, initialises the logging layer,
     which emits startup information into log at level 'verbose'.
 
     This makes sure that global arguments are applied first,
@@ -796,7 +781,7 @@ def handle_args(args=None, do_help=True):
     @param do_help: Handle parameter '-help' to show help and invoke sys.exit
     @type do_help: bool
     @return: list of arguments not recognised globally
-    @rtype: list of unicode
+    @rtype: list of str
     """
     if pywikibot._sites:
         warn('Site objects have been created before arguments were handled',
@@ -901,7 +886,7 @@ def handle_args(args=None, do_help=True):
     writeToCommandLogFile()
 
     if config.verbose_output:
-        pywikibot.output('Python %s' % sys.version)
+        pywikibot.output('Python ' + sys.version)
 
     if do_help:
         showHelp()
@@ -931,8 +916,6 @@ def showHelp(module_name=None):
     try:
         module = import_module('%s' % module_name)
         help_text = module.__doc__
-        if PY2 and isinstance(help_text, bytes):
-            help_text = help_text.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
@@ -1030,7 +1013,7 @@ def open_webbrowser(page):
     i18n.input('pywikibot-enter-finished-browser')
 
 
-class OptionHandler(object):
+class OptionHandler:
 
     """Class to get and set options."""
 
@@ -1116,7 +1099,7 @@ class BaseBot(OptionHandler):
         if 'generator' in kwargs:
             self.generator = kwargs.pop('generator')
 
-        super(BaseBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self._treat_counter = 0
         self._save_counter = 0
@@ -1389,13 +1372,8 @@ class BaseBot(OptionHandler):
         self.setup()
 
         if not hasattr(self, 'generator'):
-            raise NotImplementedError('Variable %s.generator not set.'
-                                      % self.__class__.__name__)
-        if PY2:
-            # Python 2 does not clear previous exceptions and method `exit`
-            # relies on sys.exc_info returning exceptions occurring in `run`.
-            sys.exc_clear()
-
+            raise NotImplementedError('Variable {}.generator not set.'
+                                      .format(self.__class__.__name__))
         try:
             for item in self.generator:
                 # preprocessing of the page
@@ -1459,7 +1437,7 @@ class Bot(BaseBot):
             self._site = None
         self._sites = set([self._site] if self._site else [])
 
-        super(Bot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def site(self):
@@ -1510,13 +1488,13 @@ class Bot(BaseBot):
         else:
             log('Bot is managing the %s.site property in run()'
                 % self.__class__.__name__)
-        super(Bot, self).run()
+        super().run()
 
     def init_page(self, item):
         """Update site before calling treat."""
         # When in auto update mode, set the site when it changes,
         # so subclasses can hook onto changes to site.
-        page = super(Bot, self).init_page(item)
+        page = super().init_page(item)
         if (self._auto_update_site
                 and (not self._site or page.site != self.site)):
             self.site = page.site
@@ -1544,7 +1522,7 @@ class SingleSiteBot(BaseBot):
         if site is True:
             site = pywikibot.Site()
         self._site = site
-        super(SingleSiteBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def site(self):
@@ -1569,7 +1547,7 @@ class SingleSiteBot(BaseBot):
 
     def init_page(self, item):
         """Set site if not defined."""
-        page = super(SingleSiteBot, self).init_page(item)
+        page = super().init_page(item)
         if not self._site:
             self.site = page.site
         return page
@@ -1582,7 +1560,7 @@ class SingleSiteBot(BaseBot):
                      'The bot is on site "{site}" but the page on '
                      'site "{page.site}"'.format(site=self.site, page=page)))
             return True
-        return super(SingleSiteBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 class MultipleSitesBot(BaseBot):
@@ -1597,7 +1575,7 @@ class MultipleSitesBot(BaseBot):
     def __init__(self, **kwargs):
         """Initializer."""
         self._site = None
-        super(MultipleSitesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     @deprecated("the page's site property", since='20150615')
@@ -1615,12 +1593,12 @@ class MultipleSitesBot(BaseBot):
 
     def run(self):
         """Reset the bot's site after run."""
-        super(MultipleSitesBot, self).run()
+        super().run()
         self._site = None
 
     def init_page(self, item):
         """Define the site for this page."""
-        page = super(MultipleSitesBot, self).init_page(item)
+        page = super().init_page(item)
         self._site = page.site
         return page
 
@@ -1652,11 +1630,7 @@ class ConfigParserBot(BaseBot):
 
     def setOptions(self, **kwargs):
         """Read settings from scripts.ini file."""
-        if PY2:
-            conf = configparser.ConfigParser()
-        else:
-            conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
-
+        conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
@@ -1680,7 +1654,7 @@ class ConfigParserBot(BaseBot):
         else:
             args = kwargs
 
-        super(ConfigParserBot, self).setOptions(**args)
+        super().setOptions(**args)
 
 
 class CurrentPageBot(BaseBot):
@@ -1765,7 +1739,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
             pywikibot.log(
                 'Use automatic summary message "{0}"'.format(summary))
             kwargs['summary'] = summary
-        super(AutomaticTWSummaryBot, self).put_current(*args, **kwargs)
+        super().put_current(*args, **kwargs)
 
 
 class ExistingPageBot(CurrentPageBot):
@@ -1779,7 +1753,7 @@ class ExistingPageBot(CurrentPageBot):
                 'Page {page} does not exist on {page.site}.'
                 .format(page=page))
             return True
-        return super(ExistingPageBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 class FollowRedirectPageBot(CurrentPageBot):
@@ -1790,7 +1764,7 @@ class FollowRedirectPageBot(CurrentPageBot):
         """Treat target if page is redirect and the page otherwise."""
         if page.isRedirectPage():
             page = page.getRedirectTarget()
-        super(FollowRedirectPageBot, self).treat(page)
+        super().treat(page)
 
 
 class CreatingPageBot(CurrentPageBot):
@@ -1804,7 +1778,7 @@ class CreatingPageBot(CurrentPageBot):
                 'Page {page} does already exist on {page.site}.'
                 .format(page=page))
             return True
-        return super(CreatingPageBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 class RedirectPageBot(CurrentPageBot):
@@ -1818,7 +1792,7 @@ class RedirectPageBot(CurrentPageBot):
                 'Page {page} on {page.site} is skipped because it is '
                 'not a redirect'.format(page=page))
             return True
-        return super(RedirectPageBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 class NoRedirectPageBot(CurrentPageBot):
@@ -1832,7 +1806,7 @@ class NoRedirectPageBot(CurrentPageBot):
                 'Page {page} on {page.site} is skipped because it is '
                 'a redirect'.format(page=page))
             return True
-        return super(NoRedirectPageBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 class WikidataBot(Bot, ExistingPageBot):
@@ -1869,7 +1843,7 @@ class WikidataBot(Bot, ExistingPageBot):
     def __init__(self, **kwargs):
         """Initializer of the WikidataBot."""
         self.create_missing_item = False
-        super(WikidataBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
         if self.repo is None:
