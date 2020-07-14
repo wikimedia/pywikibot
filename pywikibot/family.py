@@ -1122,7 +1122,7 @@ class Family(object):
             return repo.code, repo.family.name
         return (None, None)
 
-    @deprecated('Site.server_time()', since='20141225')
+    @deprecated('Site.server_time()', since='20141225', future_warning=True)
     def server_time(self, code):
         """
         DEPRECATED, use Site.server_time instead.

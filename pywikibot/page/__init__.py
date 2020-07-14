@@ -911,7 +911,7 @@ class BasePage(ComparableMixin):
         """Return True if the page is a Category, False otherwise."""
         return self.namespace() == 14
 
-    @deprecated('is_categorypage', since='20140819')
+    @deprecated('is_categorypage', since='20140819', future_warning=True)
     def isCategory(self):
         """DEPRECATED: use is_categorypage instead."""
         return self.is_categorypage()
@@ -920,7 +920,7 @@ class BasePage(ComparableMixin):
         """Return True if this is an file description page, False otherwise."""
         return self.namespace() == 6
 
-    @deprecated('is_filepage', since='20140819')
+    @deprecated('is_filepage', since='20140819', future_warning=True)
     def isImage(self):
         """DEPRECATED: use is_filepage instead."""
         return self.is_filepage()
@@ -1579,7 +1579,7 @@ class BasePage(ComparableMixin):
         return ItemPage.fromPage(self)
 
     @deprecate_arg('tllimit', None)
-    @deprecated('Page.templates()', since='20140421')
+    @deprecated('Page.templates()', since='20140421', future_warning=True)
     def getTemplates(self):
         """DEPRECATED. Use templates()."""
         return self.templates()
@@ -1863,7 +1863,7 @@ class BasePage(ComparableMixin):
         cnt = self.contributors()
         return sum(cnt[username] for username in contributors)
 
-    @deprecated('oldest_revision', since='20140421')
+    @deprecated('oldest_revision', since='20140421', future_warning=True)
     def getCreator(self):
         """
         Get the first revision of the page.
@@ -2611,7 +2611,8 @@ class FilePage(Page):
         return self.latest_file_info.url.startswith(
             'https://upload.wikimedia.org/wikipedia/commons/')
 
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
+                future_warning=True)
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
         req = http.fetch(self.fileUrl())
@@ -2619,7 +2620,8 @@ class FilePage(Page):
         h.update(req.raw)
         return h.hexdigest()
 
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
+                future_warning=True)
     def getFileSHA1Sum(self):
         """Return the file's SHA1 checksum."""
         return self.latest_file_info.sha1
@@ -2634,7 +2636,8 @@ class FilePage(Page):
         return [self.oldest_file_info.user,
                 self.oldest_file_info.timestamp.isoformat()]
 
-    @deprecated('FilePage.latest_file_info.user', since='20141106')
+    @deprecated('FilePage.latest_file_info.user', since='20141106',
+                future_warning=True)
     def getLatestUploader(self) -> list:
         """
         Return a list with latest uploader of the FilePage and timestamp.
@@ -2644,7 +2647,8 @@ class FilePage(Page):
         return [self.latest_file_info.user,
                 self.latest_file_info.timestamp.isoformat()]
 
-    @deprecated('FilePage.get_file_history()', since='20141106')
+    @deprecated('FilePage.get_file_history()', since='20141106',
+                future_warning=True)
     def getFileVersionHistory(self):
         """
         Return the file's version history.
@@ -2796,10 +2800,6 @@ class FilePage(Page):
         @rtype: generator
         """
         return self.site.globalusage(self, total=total)
-
-
-wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
 
 
 class Category(Page):
@@ -3391,7 +3391,7 @@ class User(Page):
                 return True
         return False
 
-    @deprecated('send_email', since='20141218')
+    @deprecated('send_email', since='20141218', future_warning=True)
     def sendMail(self, subject, text, ccme=False):
         """
         Send an email to this user via MediaWiki's email interface.
@@ -6840,3 +6840,8 @@ def url2unicode(title, encodings='utf-8'):
                 first_exception = ex
     # Couldn't convert, raise the original exception
     raise first_exception
+
+
+wrapper = _ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924',
+                             future_warning=True)

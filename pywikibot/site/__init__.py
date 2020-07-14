@@ -1028,7 +1028,7 @@ class BaseSite(ComparableMixin):
     normalizeNamespace = redirect_func(ns_normalize,
                                        old_name='normalizeNamespace',
                                        class_name='BaseSite',
-                                       since='20141001')
+                                       since='20141001', future_warning=True)
 
     @remove_last_args(('default', ))
     def redirect(self):
@@ -1229,7 +1229,7 @@ class BaseSite(ComparableMixin):
         return api.encode_url(query)
 
     @deprecated('pywikibot.data.api.Request or pywikibot.comms.http.request',
-                since='20141225')
+                since='20141225', future_warning=True)
     @deprecated_args(compress=None, no_hostname=None, cookies_only=None,
                      refer=None, back_response=None, retry=None, sysop=None)
     def getUrl(self, path, data=None):
@@ -1247,13 +1247,13 @@ class BaseSite(ComparableMixin):
         else:
             return http.request(self, path)
 
-    @deprecated(since='20141225')
+    @deprecated(since='20141225', future_warning=True)
     @remove_last_args(['sysop', 'cookies'])
     def postForm(self, address, predata):
         """DEPRECATED."""
         return self.getUrl(address, data=predata)
 
-    @deprecated(since='20141225')
+    @deprecated(since='20141225', future_warning=True)
     @deprecated_args(contentType=None)
     @remove_last_args(['sysop', 'compress', 'cookies'])
     def postData(self, address, data):
@@ -2063,7 +2063,8 @@ class APISite(BaseSite):
 
     # alias for backward-compatibility
     forceLogin = redirect_func(login, old_name='forceLogin',
-                               class_name='APISite', since='20141001')
+                               class_name='APISite', since='20141001',
+                               future_warning=True)
 
     def _relogin(self):
         """Force a login sequence without logging out, using the current user.
@@ -2187,7 +2188,8 @@ class APISite(BaseSite):
         """
         return 'blockinfo' in self.userinfo
 
-    @deprecated('has_right() or is_blocked()', since='20141218')
+    @deprecated('has_right() or is_blocked()', since='20141218',
+                future_warning=True)
     @remove_last_args(['sysop'])
     def checkBlocks(self):
         """
@@ -2562,7 +2564,8 @@ class APISite(BaseSite):
                 self.expand_text('{{CURRENTTIMESTAMP}}'))
 
     getcurrenttime = redirect_func(server_time, old_name='getcurrenttime',
-                                   class_name='APISite', since='20141225')
+                                   class_name='APISite', since='20141225',
+                                   future_warning=True)
 
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
@@ -2654,7 +2657,7 @@ class APISite(BaseSite):
 
         return _namespaces
 
-    @deprecated('has_extension', since='20140819')
+    @deprecated('has_extension', since='20140819', future_warning=True)
     @remove_last_args(('unknown', ))
     def hasExtension(self, name, unknown=None):
         """DEPRECATED. Determine whether extension `name` is loaded."""
@@ -2926,7 +2929,7 @@ class APISite(BaseSite):
             return self.namespaces[num]
         return self.namespaces[num][0]
 
-    @deprecated('version()', since='20140612')
+    @deprecated('version()', since='20140612', future_warning=True)
     def live_version(self, force=False):
         """Return the 'real' version number found on [[Special:Version]].
 
@@ -3584,7 +3587,7 @@ class APISite(BaseSite):
 
         return user_tokens
 
-    @deprecated("the 'tokens' property", since='20140613')
+    @deprecated("the 'tokens' property", since='20140613', future_warning=True)
     def token(self, page, tokentype):
         """Return token retrieved from wiki to allow changing page content.
 
@@ -4693,7 +4696,7 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated('APISite.logevents()', since='20141225')
+    @deprecated('APISite.logevents()', since='20141225', future_warning=True)
     @deprecated_args(repeat=None)
     def logpages(self, number=50, mode=None, title=None, user=None,
                  namespace=None, start=None, end=None, tag=None, newer=False,
@@ -6728,7 +6731,8 @@ class APISite(BaseSite):
             comment = event.comment() or ''
             yield (filepage, date, user, comment)
 
-    @deprecated('APISite.logevents(logtype="upload")', since='20140808')
+    @deprecated('APISite.logevents(logtype="upload")', since='20140808',
+                future_warning=True)
     @deprecated_args(number='total', repeat=None)
     def newimages(self, *args, **kwargs):
         """
@@ -6909,7 +6913,7 @@ class APISite(BaseSite):
         """
         return self.querypage('Unusedimages', total)
 
-    @deprecated('Site().unusedfiles()', since='20140808')
+    @deprecated('Site().unusedfiles()', since='20140808', future_warning=True)
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
     def unusedimages(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
@@ -7550,9 +7554,11 @@ class APISite(BaseSite):
 
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
-                              class_name='APISite', since='20141218')
+                              class_name='APISite', since='20141218',
+                              future_warning=True)
     isAllowed = redirect_func(has_right, old_name='isAllowed',
-                              class_name='APISite', since='20141218')
+                              class_name='APISite', since='20141218',
+                              future_warning=True)
 
 
 class ClosedSite(APISite):

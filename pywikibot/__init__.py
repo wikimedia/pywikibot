@@ -108,7 +108,7 @@ __all__ += textlib_methods
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
-    wrapped_func = redirect_func(target, since='20140820')
+    wrapped_func = redirect_func(target, since='20140820', future_warning=True)
     globals()[_name] = wrapped_func
 
 
@@ -199,7 +199,8 @@ class Timestamp(datetime.datetime):
         return self.strftime(self._ISO8601Format(sep))
 
     toISOformat = redirect_func(isoformat, old_name='toISOformat',
-                                class_name='Timestamp', since='20141219')
+                                class_name='Timestamp', since='20141219',
+                                future_warning=True)
 
     def totimestampformat(self):
         """Convert object to a MediaWiki internal timestamp."""
@@ -1279,7 +1280,8 @@ from pywikibot.page import (  # noqa: E402
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
-@__deprecated('comment parameter for page saving method', since='20140604')
+@__deprecated('comment parameter for page saving method', since='20140604',
+              future_warning=True)
 def setAction(s):
     """Set a summary to use for changed page submissions."""
     config.default_edit_summary = s
@@ -1409,7 +1411,8 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924',
+                             future_warning=True)
 wrapper._add_deprecated_attr(
     'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
     since='20150921')

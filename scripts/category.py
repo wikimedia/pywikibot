@@ -892,7 +892,8 @@ class CategoryRemoveRobot(CategoryMoveRobot):
         CategoryMoveRobot without newcat param instead.
     """
 
-    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416')
+    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416',
+                future_warning=True)
     def __init__(
             self, catTitle, batchMode=False, editSummary='',
             useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
@@ -1548,4 +1549,5 @@ if __name__ == '__main__':
     main()
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918')
+wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918',
+                             future_warning=True)
