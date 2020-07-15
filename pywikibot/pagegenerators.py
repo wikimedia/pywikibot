@@ -2185,7 +2185,7 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                     break
             pywikibot.sleep(sleep_duration)
 
-        yield from reversed(filtered_generator())
+        yield from reversed(list(filtered_generator()))
 
 
 @deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=None)
