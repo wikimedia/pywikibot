@@ -115,7 +115,6 @@ class UploadRobot(BaseBot):
                                                              'commons')
         else:
             self.target_site = target_site or pywikibot.Site()
-        self.target_site.login()
 
     def read_file_content(self, file_url=None):
         """Return name of temp file in which remote file is saved."""
@@ -454,6 +453,7 @@ class UploadRobot(BaseBot):
             return
 
         # early check that user has proper rights to upload
+        self.target_site.login()
         if not self.target_site.has_right('upload'):
             pywikibot.error(
                 "User '%s' does not have upload rights on site %s."

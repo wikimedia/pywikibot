@@ -5,18 +5,16 @@ UploadRobot test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 
 from pywikibot.specialbots import UploadRobot
 
 from tests import join_images_path
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
 class TestUploadbot(TestCase):
@@ -59,6 +57,29 @@ class TestUploadbot(TestCase):
         bot = UploadRobot(url=[link], target_site=self.get_site(),
                           **self.params)
         bot.run()
+
+
+class TestDryUploadbot(DefaultSiteTestCase):
+
+    """Dry tests UploadRobot."""
+
+    net = False
+
+    params = dict(  # noqa: C408
+        description='pywikibot upload.py script test',
+        keep_filename=True,
+        aborts=set(),
+        ignore_warning=True,
+    )
+
+    def test_png_file(self):
+        """Test UploadRobot attributes and methods."""
+        bot = UploadRobot(url=['test.png'], target_site=self.site,
+                          **self.params)
+        self.assertEqual(bot.description, self.params['description'])
+        self.assertTrue(bot._handle_warning('any warning'))  # ignore_warning
+        self.assertTrue(bot.ignore_on_warn('any warning'))  # ignore_warning
+        self.assertFalse(bot.abort_on_warn('any warning'))  # aborts
 
 
 if __name__ == '__main__':  # pragma: no cover
