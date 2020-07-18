@@ -2207,11 +2207,11 @@ def PreloadingGenerator(generator, groupsize=50):
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            yield from site.preloadpages(group, groupsize)
+            yield from site.preloadpages(group, groupsize=groupsize)
 
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        yield from site.preloadpages(pages, groupsize)
+        yield from site.preloadpages(pages, groupsize=groupsize)
 
 
 @deprecated_args(step='groupsize')
