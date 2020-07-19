@@ -3002,7 +3002,7 @@ class Category(Page):
         @rtype: typing.Iterable[pywikibot.Page]
         """
         for member in self.site.categorymembers(
-                self, namespaces, total=total, content=content):
+                self, namespaces=namespaces, total=total, content=content):
             yield member
             if total is not None:
                 total -= 1
