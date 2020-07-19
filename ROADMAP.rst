@@ -1,6 +1,7 @@
 Current release
 ~~~~~~~~~~~~~~~
 
+* Wikihow family file was added (T249814)
 * Improve performance of CosmeticChangesToolkit.translateMagicWords
 * Prohibit positional arguments with Page.title()
 * Functions dealing with stars list were removed
@@ -19,7 +20,7 @@ Current release
 Future releases
 ~~~~~~~~~~~~~~~
 
-* 4.0.0: Methods deprecated for 8 years or longer will be removed
+* 4.0.0: Methods deprecated for 6 years or longer will be removed
 * 3.0.20200703: Unsupported debug parameter of UploadRobot will be removed
 * 3.0.20200703: Unported compat decode parameter of Page.title() will be removed
 * 3.0.20200703: tools.count, tools.Counter, tools.OrderedDict and ContextManagerWrapper will be removed
