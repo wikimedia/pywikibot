@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import getpass
 import logging
 import math
@@ -17,15 +15,11 @@ import threading
 import pywikibot
 from pywikibot import config2 as config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
-from pywikibot.bot_choice import (
-    Option, OutputOption, StandardOption, ChoiceException,
-    QuitKeyboardInterrupt,
-)
-from pywikibot.tools import deprecated, PY2
+from pywikibot.bot_choice import (ChoiceException, Option, OutputOption,
+                                  QuitKeyboardInterrupt, StandardOption)
+from pywikibot.tools import deprecated
 from pywikibot.userinterfaces import transliteration
 
-if PY2:
-    from future_builtins import zip
 
 transliterator = transliteration.transliterator(config.console_encoding)
 
@@ -52,11 +46,8 @@ colors = [
 _color_pat = '%s|previous' % '|'.join(colors)
 colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
 
-if __debug__ and not PY2:
-    raw_input = NotImplemented  # pyflakes workaround
 
-
-class UI(object):
+class UI:
 
     """Base for terminal user interfaces."""
 
@@ -66,8 +57,8 @@ class UI(object):
         """
         Initialize the UI.
 
-        This caches the std-streams locally so any attempts to monkey-patch the
-        streams later will not work.
+        This caches the std-streams locally so any attempts to
+        monkey-patch the streams later will not work.
         """
         self.stdin = sys.stdin
         self.stdout = sys.stdout
@@ -141,8 +132,6 @@ class UI(object):
 
     def _write(self, text, target_stream):
         """Optionally encode and write the text to the target stream."""
-        if PY2:
-            text = text.encode(self.encoding, 'replace')
         target_stream.write(text)
 
     def support_color(self, target_stream):
@@ -230,7 +219,7 @@ class UI(object):
                                           % transliterated
                     # memorize if we replaced a single letter by multiple
                     # letters.
-                    if len(transliterated) > 0:
+                    if transliterated:
                         prev = transliterated[-1]
                 else:
                     # no need to try to transliterate.
@@ -247,10 +236,8 @@ class UI(object):
         self._print(text, targetStream)
 
     def _raw_input(self):
-        if not PY2:
-            return input()
-        else:
-            return raw_input()
+        # May be overridden by subclass
+        return input()
 
     def input(self, question, password=False, default='', force=False):
         """
@@ -312,8 +299,6 @@ class UI(object):
                 text = self._raw_input()
         except KeyboardInterrupt:
             raise QuitKeyboardInterrupt()
-        if PY2:
-            text = text.decode(self.encoding)
         return text
 
     def input_choice(self, question, options, default=None,
@@ -357,7 +342,7 @@ class UI(object):
             options = [options]
         else:  # make a copy
             options = list(options)
-        if len(options) == 0:
+        if not options:
             raise ValueError('No options are given.')
         if automatic_quit:
             options += [QuitKeyboardInterrupt()]
@@ -392,12 +377,11 @@ class UI(object):
 
         if isinstance(answer, ChoiceException):
             raise answer
-        elif not return_shortcut:
+        if not return_shortcut:
             return index
-        else:
-            return answer
+        return answer
 
-    @deprecated('input_choice', since='20140825')
+    @deprecated('input_choice', since='20140825', future_warning=True)
     def inputChoice(self, question, options, hotkeys, default=None):
         """
         Ask the user a question with a predefined list of acceptable answers.
@@ -463,12 +447,8 @@ class UI(object):
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
 
     def argvu(self):
-        """Return the decoded arguments from argv."""
-        try:
-            return [s.decode(self.encoding) for s in self.argv]
-        # in python 3, self.argv is unicode and thus cannot be decoded
-        except AttributeError:
-            return list(self.argv)
+        """Return copy of argv."""
+        return list(self.argv)
 
 
 class TerminalHandler(logging.Handler):
