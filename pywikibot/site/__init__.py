@@ -3716,19 +3716,24 @@ class APISite(BaseSite):
             type such as NoneType or bool
         """
         if only_template_inclusion:
-            return self.page_embeddedin(page, filter_redirects, namespaces,
-                                        total=total, content=content)
+            return self.page_embeddedin(page,
+                                        filter_redirects=filter_redirects,
+                                        namespaces=namespaces, total=total,
+                                        content=content)
         if not with_template_inclusion:
-            return self.pagebacklinks(page, follow_redirects, filter_redirects,
-                                      namespaces, total=total, content=content)
+            return self.pagebacklinks(page, follow_redirects=follow_redirects,
+                                      filter_redirects=filter_redirects,
+                                      namespaces=namespaces, total=total,
+                                      content=content)
         return itertools.islice(
             itertools.chain(
                 self.pagebacklinks(
-                    page, follow_redirects, filter_redirects,
+                    page, follow_redirects=follow_redirects,
+                    filter_redirects=filter_redirects,
                     namespaces=namespaces, content=content),
                 self.page_embeddedin(
-                    page, filter_redirects, namespaces=namespaces,
-                    content=content)
+                    page, filter_redirects=filter_redirects,
+                    namespaces=namespaces, content=content)
             ), total)
 
     @deprecated_args(step=None)
