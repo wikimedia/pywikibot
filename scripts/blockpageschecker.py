@@ -134,7 +134,7 @@ templateNoRegex = {
 
 # Category where the bot will check
 categoryToCheck = {
-    'ar': ['تصنيف:محتويات محمية'],
+    'ar': ['تصنيف:صفحات محمية'],
     'cs': ['Kategorie:Wikipedie:Zamčené stránky',
            'Kategorie:Wikipedie:Polozamčené stránky',
            'Kategorie:Wikipedie:Dlouhodobě zamčené stránky',
