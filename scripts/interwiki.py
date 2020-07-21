@@ -385,7 +385,7 @@ class GiveUpOnPage(pywikibot.Error):
 # Pages which contain these shouldn't be changed.
 ignoreTemplates = {
     '_default': ['delete'],
-    'ar': ['قيد الاستخدام'],
+    'ar': ['تحرر', 'تحويل لين'],
     'cs': ['Pracuje_se'],
     'de': ['inuse', 'in use', 'in bearbeitung', 'inbearbeitung',
            'löschen', 'sla',
