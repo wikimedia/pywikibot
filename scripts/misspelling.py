@@ -56,6 +56,7 @@ class MisspellingRobot(DisambiguationRobot):
     # Optional: if there is a category, one can use the -start
     # parameter.
     misspellingCategory = {
+        'ar': 'تحويلات أخطاء إملائية',
         # da: only contains date redirects at the moment
         'da': 'Omdirigeringer af fejlstavninger',
         'de': ('Kategorie:Wikipedia:Falschschreibung',
