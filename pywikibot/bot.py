@@ -124,10 +124,7 @@ from pywikibot.logging import critical
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
 )
-from pywikibot.tools._logging import (
-    LoggingFormatter as _LoggingFormatter,
-    RotatingFileHandler,
-)
+from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools.formatter import color_format
 
 
@@ -212,15 +209,6 @@ class UnhandledAnswer(Exception):
     def __init__(self, stop=False):
         """Initializer."""
         self.stop = stop
-
-
-class LoggingFormatter(_LoggingFormatter):
-
-    """Logging formatter that uses config.console_encoding."""
-
-    def __init__(self, fmt=None, datefmt=None):
-        """Initializer setting underlying encoding to console_encoding."""
-        super().__init__(fmt, datefmt, config.console_encoding)
 
 
 # Initialize the handlers and formatters for the logging system.
