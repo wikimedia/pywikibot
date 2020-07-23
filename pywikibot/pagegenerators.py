@@ -26,6 +26,7 @@ import json
 import re
 import sys
 
+from collections.abc import Iterator
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
@@ -41,7 +42,6 @@ from pywikibot.tools import (
     filter_unique,
     intersect_generators,
     issue_deprecation_warning,
-    IteratorNextMixin,
     itergroup,
     ModuleDeprecationWrapper,
     redirect_func,
@@ -2779,7 +2779,7 @@ def MySQLPageGenerator(query, site=None, verbose=None):
             yield page
 
 
-class XMLDumpOldPageGenerator(IteratorNextMixin):
+class XMLDumpOldPageGenerator(Iterator):
 
     """
     Xml generator that yields Page objects with old text loaded.

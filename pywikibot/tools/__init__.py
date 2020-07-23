@@ -5,16 +5,13 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
-from distutils.version import LooseVersion
 import gzip
 import hashlib
-from importlib import import_module
 import inspect
 import itertools
 import os
+import queue
 import re
 import stat
 import subprocess
@@ -23,14 +20,13 @@ import threading
 import time
 import types
 
-try:
-    from collections.abc import Iterator, Mapping
-except ImportError:  # Python 2.7
-    from collections import Iterator, Mapping
+from collections.abc import Iterator, Mapping
 from datetime import datetime
-from distutils.version import Version
+from distutils.version import LooseVersion, Version
 from functools import wraps
+from importlib import import_module
 from ipaddress import ip_address
+from itertools import zip_longest
 from warnings import catch_warnings, showwarning, warn
 
 from pywikibot.logging import debug
@@ -39,16 +35,8 @@ from pywikibot.tools._unidata import _first_upper_exception
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 
-if not PY2:
-    from itertools import zip_longest
-    import queue
-    StringTypes = (str, bytes)
-    UnicodeType = str
-else:
-    from itertools import izip_longest as zip_longest
-    import Queue as queue  # noqa: N813
-    StringTypes = types.StringTypes
-    UnicodeType = types.UnicodeType
+StringTypes = (str, bytes)
+UnicodeType = str
 
 try:
     import bz2
@@ -154,22 +142,14 @@ def empty_iterator():
     yield
 
 
-def py2_encode_utf_8(func):
-    """Decorator to optionally encode the string result of func on Python 2."""
-    if PY2:
-        return lambda s: func(s).encode('utf-8')
-    else:
-        return func
-
-
-class classproperty(object):  # noqa: N801
+class classproperty:  # noqa: N801
 
     """
     Descriptor class to access a class method as a property.
 
     This class may be used as a decorator::
 
-        class Foo(object):
+        class Foo:
 
             _bar = 'baz'  # a class property
 
@@ -218,15 +198,15 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         self.message_match = re.compile(message, re.I).match
         self.category = category
         self.filename_match = re.compile(filename).match
-        super(suppress_warnings, self).__init__(record=True)
+        super().__init__(record=True)
 
     def __enter__(self):
         """Catch all warnings and store them in `self.log`."""
-        self.log = super(suppress_warnings, self).__enter__()
+        self.log = super().__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Stop logging warnings and show those that do not match to params."""
-        super(suppress_warnings, self).__exit__()
+        super().__exit__()
         for warning in self.log:
             if (
                 not issubclass(warning.category, self.category)
@@ -246,18 +226,8 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         return suppressed_func
 
 
-class UnicodeMixin(object):
-
-    """Mixin class to add __str__ method in Python 2 or 3."""
-
-    @py2_encode_utf_8
-    def __str__(self):
-        """Return the unicode representation as the str representation."""
-        return self.__unicode__()
-
-
 # From http://python3porting.com/preparing.html
-class ComparableMixin(object):
+class ComparableMixin:
 
     """Mixin class to allow comparing to other objects which are comparable."""
 
@@ -286,13 +256,11 @@ class ComparableMixin(object):
         return other != self._cmpkey()
 
 
-class DotReadableDict(UnicodeMixin):
+class DotReadableDict:
 
     """Parent class of Revision() and FileInfo().
 
-    Provide:
-    - __getitem__(), __unicode__() and __repr__().
-
+    Provide: __getitem__() and __repr__().
     """
 
     def __getitem__(self, key):
@@ -305,17 +273,6 @@ class DotReadableDict(UnicodeMixin):
 
         """
         return getattr(self, key)
-
-    def __unicode__(self):
-        """Return string representation."""
-        # TODO: This is more efficient if the PY2 test is done during
-        # class instantiation, and not inside the method.
-        if not PY2:
-            return repr(self.__dict__)
-        else:
-            _content = ', '.join(
-                '{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
-            return '{{{0}}}'.format(_content)
 
     def __repr__(self):
         """Return a more complete string representation."""
@@ -343,7 +300,7 @@ class FrozenDict(dict):
             args = [data]
         else:
             args = []
-        super(FrozenDict, self).__init__(*args)
+        super().__init__(*args)
         self._error = error or 'FrozenDict: not writable'
 
     def update(self, *args, **kwargs):
@@ -353,7 +310,7 @@ class FrozenDict(dict):
     __setitem__ = update
 
 
-class LazyRegex(object):
+class LazyRegex:
 
     """
     Regex object that obtains and compiles the regex on usage.
@@ -372,7 +329,7 @@ class LazyRegex(object):
         """
         self.raw = pattern
         self.flags = flags
-        super(LazyRegex, self).__init__()
+        super().__init__()
 
     @property
     def raw(self):
@@ -429,7 +386,7 @@ class DeprecatedRegex(LazyRegex):
             of the deprecated name
         @type instead: str
         """
-        super(DeprecatedRegex, self).__init__(pattern, flags)
+        super().__init__(pattern, flags)
         self._name = name or self.raw
         self._instead = instead
         self._since = since
@@ -439,7 +396,7 @@ class DeprecatedRegex(LazyRegex):
         issue_deprecation_warning(
             self._name, self._instead, warning_class=FutureWarning,
             since=self._since)
-        return super(DeprecatedRegex, self).__getattr__(attr)
+        return super().__getattr__(attr)
 
 
 def first_lower(string):
@@ -554,9 +511,6 @@ class MediaWikiVersion(Version):
         if self._dev_version < other._dev_version:
             return -1
         return 0
-
-    if PY2:
-        __cmp__ = _cmp
 
 
 class ThreadedGenerator(threading.Thread):
@@ -749,7 +703,7 @@ class ThreadList(list):
         """
         self.limit = limit
         self.wait_time = wait_time
-        super(ThreadList, self).__init__(*args)
+        super().__init__(*args)
         for item in self:
             if not isinstance(item, threading.Thread):
                 raise TypeError("Cannot add '%s' to ThreadList" % type(item))
@@ -770,7 +724,7 @@ class ThreadList(list):
             raise TypeError("Cannot append '%s' to ThreadList" % type(thd))
         while self.active_count() >= self.limit:
             time.sleep(self.wait_time)
-        super(ThreadList, self).append(thd)
+        super().append(thd)
         thd.start()
         debug("thread %d ('%s') started" % (len(self), type(thd)),
               self._logger)
@@ -974,7 +928,7 @@ class EmptyDefault(str, Mapping):
 EMPTY_DEFAULT = EmptyDefault()
 
 
-class SelfCallMixin(object):
+class SelfCallMixin:
 
     """
     Return self when called.
@@ -995,24 +949,17 @@ class SelfCallDict(SelfCallMixin, dict):
 
     """Dict with SelfCallMixin."""
 
+    pass
+
 
 class SelfCallString(SelfCallMixin, str):
 
     """Unicode string with SelfCallMixin."""
 
-
-class IteratorNextMixin(Iterator):
-
-    """Backwards compatibility for Iterators."""
-
-    if PY2:
-
-        def next(self):
-            """Python 2 next."""
-            return self.__next__()
+    pass
 
 
-class DequeGenerator(IteratorNextMixin, collections.deque):
+class DequeGenerator(Iterator, collections.deque):
 
     """A generator that allows items to be added during generating."""
 
@@ -1717,10 +1664,10 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param module: The module name or instance
         @type module: str or module
         """
-        if isinstance(module, StringTypes):
+        if isinstance(module, (str, bytes)):
             module = sys.modules[module]
-        super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
-        super(ModuleDeprecationWrapper, self).__setattr__('_module', module)
+        super().__setattr__('_deprecated', {})
+        super().__setattr__('_module', module)
         self.__dict__.update(module.__dict__)
 
         if __debug__:
@@ -1886,7 +1833,7 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-class ContextManagerWrapper(object):
+class ContextManagerWrapper:
 
     """
     DEPRECATED. Wraps an object in a context manager.
@@ -1895,7 +1842,7 @@ class ContextManagerWrapper(object):
     when used as a context manager in with-statements. In such statements the
     value set via 'as' is directly the wrapped object. For example:
 
-    >>> class Wrapper(object):
+    >>> class Wrapper:
     ...     def close(self): pass
     >>> an_object = Wrapper()
     >>> wrapped = ContextManagerWrapper(an_object)
@@ -1908,8 +1855,8 @@ class ContextManagerWrapper(object):
 
     def __init__(self, wrapped):
         """Create a new wrapper."""
-        super(ContextManagerWrapper, self).__init__()
-        super(ContextManagerWrapper, self).__setattr__('_wrapped', wrapped)
+        super().__init__()
+        super().__setattr__('_wrapped', wrapped)
 
     def __enter__(self):
         """Enter a context manager and use the wrapped object directly."""
@@ -1926,6 +1873,22 @@ class ContextManagerWrapper(object):
     def __setattr__(self, name, value):
         """Set the attribute in the wrapped object."""
         setattr(self._wrapped, name, value)
+
+
+class IteratorNextMixin(Iterator):
+
+    """DEPRECATED. Backwards compatibility for Iterators."""
+
+    pass
+
+
+class _UnicodeMixin:
+
+    """DEPRECATED. Mixin class to add __str__ method in Python 2 or 3."""
+
+    def __str__(self):
+        """Return the unicode representation as the str representation."""
+        return self.__unicode__()
 
 
 @deprecated('bot_choice.Option and its subclasses', since='20181217')
@@ -1952,6 +1915,12 @@ def concat_options(message, line_length, options):
     return '{0} ({1}):'.format(message, option_msg)
 
 
+@deprecated(since='20200723', future_warning=True)
+def py2_encode_utf_8(func):
+    """Decorator to optionally encode the string result of func on Python 2."""
+    return func
+
+
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111',
                              future_warning=True)
@@ -1961,3 +1930,8 @@ wrapper._add_deprecated_attr('count', itertools.count, since='20160111',
                              future_warning=True)
 wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='',
                              since='20180402', future_warning=True)
+wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
+                             replacement_name='',
+                             since='20200723', future_warning=True)
+wrapper._add_deprecated_attr('IteratorNextMixin', replacement_name='',
+                             since='20200723', future_warning=True)
