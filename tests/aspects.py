@@ -283,7 +283,7 @@ class TestTimerMixin(TestCaseBase):
 
     def setUp(self):
         """Set up test."""
-        super(TestTimerMixin, self).setUp()
+        super().setUp()
         self.test_start = time.time()
 
     def tearDown(self):
@@ -295,7 +295,7 @@ class TestTimerMixin(TestCaseBase):
             unittest_print(' {0:.3f}s'.format(duration), end=' ')
             sys.stdout.flush()
 
-        super(TestTimerMixin, self).tearDown()
+        super().tearDown()
 
 
 def require_modules(*required_modules):
@@ -342,11 +342,11 @@ class DisableSiteMixin(TestCaseBase):
         pywikibot.Site = lambda *args: self.fail(
             '{}: Site() not permitted'.format(self.__class__.__name__))
 
-        super(DisableSiteMixin, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down test."""
-        super(DisableSiteMixin, self).tearDown()
+        super().tearDown()
 
         pywikibot.Site = self.old_Site_lookup_method
 
@@ -362,13 +362,11 @@ class ForceCacheMixin(TestCaseBase):
     def setUp(self):
         """Set up test."""
         patch_request()
-
-        super(ForceCacheMixin, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down test."""
-        super(ForceCacheMixin, self).tearDown()
-
+        super().tearDown()
         unpatch_request()
 
 
@@ -408,11 +406,11 @@ class DisconnectedSiteMixin(TestCaseBase):
                 pywikibot.Site('commons', 'commons', interface=DrySite),
                 value))
 
-        super(DisconnectedSiteMixin, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down test."""
-        super(DisconnectedSiteMixin, self).tearDown()
+        super().tearDown()
 
         config.site_interface = self.old_config_interface
         pywikibot.data.api.Request = _original_Request
@@ -425,7 +423,7 @@ class CacheInfoMixin(TestCaseBase):
 
     def setUp(self):
         """Set up test."""
-        super(CacheInfoMixin, self).setUp()
+        super().setUp()
         self.cache_misses_start = tests.cache_misses
         self.cache_hits_start = tests.cache_hits
 
@@ -444,7 +442,7 @@ class CacheInfoMixin(TestCaseBase):
         if self.cache_misses or self.cache_hits:
             sys.stdout.flush()
 
-        super(CacheInfoMixin, self).tearDown()
+        super().tearDown()
 
 
 class CheckHostnameMixin(TestCaseBase):
@@ -460,7 +458,7 @@ class CheckHostnameMixin(TestCaseBase):
 
         Prevent tests running if the host is down.
         """
-        super(CheckHostnameMixin, cls).setUpClass()
+        super().setUpClass()
 
         if not hasattr(cls, 'sites'):
             return
@@ -554,7 +552,7 @@ class SiteWriteMixin(TestCaseBase):
                 'SiteWriteMixin and ForceCacheMixin'
                 .format(cls.__name__))
 
-        super(SiteWriteMixin, cls).setUpClass()
+        super().setUpClass()
 
         site = cls.get_site()
 
@@ -602,7 +600,7 @@ class RequireUserMixin(TestCaseBase):
         Skip the test class if the user config does not have
         a valid login to the site.
         """
-        super(RequireUserMixin, cls).setUpClass()
+        super().setUpClass()
 
         sysop = hasattr(cls, 'sysop') and cls.sysop
 
@@ -634,12 +632,12 @@ class RequireUserMixin(TestCaseBase):
 
         Login to the site if it is not logged in.
         """
-        super(RequireUserMixin, self).setUp()
+        super().setUp()
         self._reset_login()
 
     def tearDown(self):
         """Log back into the site."""
-        super(RequireUserMixin, self).tearDown()
+        super().tearDown()
         self._reset_login()
 
     def _reset_login(self):
@@ -721,7 +719,7 @@ class MetaTestCaseClass(type):
 
         # Bail out if it is the abstract class.
         if dct['abstract_class']:
-            return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
+            return super().__new__(cls, name, bases, dct)
 
         # Inherit superclass attributes
         for base in bases:
@@ -802,7 +800,7 @@ class MetaTestCaseClass(type):
             if not dct['net']:
                 del dct['net']
 
-            return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
+            return super().__new__(cls, name, bases, dct)
 
         # The following section is only processed if the test uses sites.
 
@@ -861,7 +859,7 @@ class MetaTestCaseClass(type):
 
             del dct[test]
 
-        return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
     @staticmethod
     def add_base(bases, subclass):
@@ -898,7 +896,7 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
         Prefetch the Site object for each of the sites the test
         class has declared are needed.
         """
-        super(TestCase, cls).setUpClass()
+        super().setUpClass()
 
         if not hasattr(cls, 'sites'):
             return
@@ -987,7 +985,7 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(TestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if not hasattr(self, 'sites'):
             return
@@ -1102,7 +1100,7 @@ class CapturingTestCase(TestCase):
 
     def __getattribute__(self, attr):
         """Patch assertions if enabled."""
-        result = super(CapturingTestCase, self).__getattribute__(attr)
+        result = super().__getattribute__(attr)
         if attr.startswith('assert') and not self._patched:
             return self.patch_assert(result)
         else:
@@ -1132,7 +1130,7 @@ class PatchingTestCase(TestCase):
 
     def setUp(self):
         """Set up the test by initializing the patched list."""
-        super(TestCaseBase, self).setUp()
+        super().setUp()
         self._patched_instances = []
         for attribute in dir(self):
             attribute = getattr(self, attribute)
@@ -1144,7 +1142,7 @@ class PatchingTestCase(TestCase):
         """Tear down the test by unpatching the patched."""
         for patched in self._patched_instances:
             setattr(*patched)
-        super(TestCaseBase, self).tearDown()
+        super().tearDown()
 
 
 class SiteAttributeTestCase(TestCase):
@@ -1154,7 +1152,7 @@ class SiteAttributeTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Add each initialized site as an attribute to cls."""
-        super(SiteAttributeTestCase, cls).setUpClass()
+        super().setUpClass()
         for site in cls.sites:
             if 'site' in cls.sites[site]:
                 setattr(cls, site, cls.sites[site]['site'])
@@ -1200,13 +1198,13 @@ class AlteredDefaultSiteTestCase(TestCase):
         """Prepare the environment for running main() in a script."""
         self.original_family = pywikibot.config.family
         self.original_code = pywikibot.config.mylang
-        super(AlteredDefaultSiteTestCase, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Restore the environment."""
         pywikibot.config.family = self.original_family
         pywikibot.config.mylang = self.original_code
-        super(AlteredDefaultSiteTestCase, self).tearDown()
+        super().tearDown()
 
 
 class ScenarioDefinedDefaultSiteTestCase(AlteredDefaultSiteTestCase):
@@ -1215,7 +1213,7 @@ class ScenarioDefinedDefaultSiteTestCase(AlteredDefaultSiteTestCase):
 
     def setUp(self):
         """Prepare the environment for running main() in a script."""
-        super(ScenarioDefinedDefaultSiteTestCase, self).setUp()
+        super().setUp()
         site = self.get_site()
         pywikibot.config.family = site.family
         pywikibot.config.mylang = site.code
@@ -1247,14 +1245,12 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
         Check that the default site is a Wikimedia site.
         Use en.wikipedia.org as a fallback.
         """
-        super(WikimediaDefaultSiteTestCase, cls).setUpClass()
+        super().setUpClass()
 
         assert hasattr(cls, 'site') and hasattr(cls, 'sites')
-
         assert len(cls.sites) == 1
 
         site = cls.get_site()
-
         if not isinstance(site.family, WikimediaFamily):
             cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
@@ -1274,7 +1270,7 @@ class WikibaseTestCase(TestCase):
         with Site.has_data_repository() returning True, and all sites
         use the same data repository.
         """
-        super(WikibaseTestCase, cls).setUpClass()
+        super().setUpClass()
 
         with cls._uncached():
             for data in cls.sites.values():
@@ -1302,7 +1298,7 @@ class WikibaseTestCase(TestCase):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(WikibaseTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if not hasattr(self, 'sites'):
             return
@@ -1323,7 +1319,7 @@ class WikibaseClientTestCase(WikibaseTestCase):
         Checks that all sites are configured as a Wikibase client,
         with Site.has_data_repository returning True.
         """
-        super(WikibaseClientTestCase, cls).setUpClass()
+        super().setUpClass()
 
         for site in cls.sites.values():
             if not site['site'].has_data_repository:
@@ -1361,7 +1357,7 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
 
         Require the data repository is wikidata.org.
         """
-        super(WikibaseClientTestCase, cls).setUpClass()
+        super().setUpClass()
 
         if str(cls.get_repo()) != 'wikidata:wikidata':
             raise unittest.SkipTest(
@@ -1398,7 +1394,7 @@ class PwbTestCase(TestCase):
 
     def setUp(self):
         """Prepare the environment for running the pwb.py script."""
-        super(PwbTestCase, self).setUp()
+        super().setUp()
         self.orig_pywikibot_dir = None
         if 'PYWIKIBOT_DIR' in os.environ:
             self.orig_pywikibot_dir = os.environ['PYWIKIBOT_DIR']
@@ -1407,7 +1403,7 @@ class PwbTestCase(TestCase):
 
     def tearDown(self):
         """Restore the environment after running the pwb.py script."""
-        super(PwbTestCase, self).tearDown()
+        super().tearDown()
         del os.environ['PYWIKIBOT_DIR']
         if self.orig_pywikibot_dir:
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
@@ -1436,7 +1432,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
         if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
             raise unittest.SkipTest('RecentChanges tests disabled.')
 
-        super(RecentChangesTestCase, cls).setUpClass()
+        super().setUpClass()
 
         if cls.get_site().code == 'test':
             cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
@@ -1453,7 +1449,7 @@ class DebugOnlyTestCase(TestCase):
             raise unittest.SkipTest(
                 '{} is disabled when __debug__ is disabled.'
                 .format(cls.__name__))
-        super(DebugOnlyTestCase, cls).setUpClass()
+        super().setUpClass()
 
 
 class DeprecationTestCase(DebugOnlyTestCase, TestCase):
@@ -1481,7 +1477,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(DeprecationTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.warning_log = []
 
         self.expect_warning_filename = inspect.getfile(self.__class__)
@@ -1617,7 +1613,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(DeprecationTestCase, self).setUp()
+        super().setUp()
 
         self.warning_log = self.context_manager.__enter__()
         warnings.simplefilter('always')
@@ -1628,7 +1624,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         """Tear down unit test."""
         self.context_manager.__exit__()
 
-        super(DeprecationTestCase, self).tearDown()
+        super().tearDown()
 
 
 class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
@@ -1642,7 +1638,7 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
 
     def after_assert(self, assertion, *args, **kwargs):
         """Handle assertion and call C{assertOneDeprecation} after it."""
-        super(AutoDeprecationTestCase, self).after_assert(
+        super().after_assert(
             assertion, *args, **kwargs)
         self.assertOneDeprecation()
 
