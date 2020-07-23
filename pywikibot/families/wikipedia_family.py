@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 
 
@@ -31,34 +29,34 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'ceb', 'sv', 'de', 'fr', 'nl', 'ru', 'it', 'es', 'pl', 'war',
-        'vi', 'ja', 'zh', 'ar', 'pt', 'uk', 'arz', 'fa', 'ca', 'sr', 'no',
-        'id', 'ko', 'fi', 'hu', 'cs', 'sh', 'ro', 'zh-min-nan', 'eu', 'tr',
+        'vi', 'ja', 'zh', 'ar', 'pt', 'uk', 'arz', 'fa', 'ca', 'sr', 'id',
+        'no', 'ko', 'fi', 'hu', 'cs', 'sh', 'ro', 'zh-min-nan', 'eu', 'tr',
         'ms', 'eo', 'ce', 'hy', 'he', 'bg', 'da', 'azb', 'sk', 'kk', 'min',
         'hr', 'et', 'lt', 'be', 'el', 'sl', 'simple', 'gl', 'az', 'ur', 'nn',
         'hi', 'th', 'ka', 'uz', 'la', 'cy', 'ta', 'vo', 'tt', 'ast', 'mk',
         'lv', 'tg', 'mg', 'af', 'bn', 'zh-yue', 'oc', 'bs', 'sq', 'ky', 'new',
-        'tl', 'be-tarask', 'te', 'ml', 'nds', 'br', 'pms', 'su', 'sw', 'ht',
-        'lb', 'vec', 'jv', 'mr', 'sco', 'pnb', 'ga', 'ba', 'szl', 'is', 'my',
+        'tl', 'be-tarask', 'nds', 'te', 'ml', 'br', 'pms', 'su', 'sw', 'ht',
+        'lb', 'vec', 'mr', 'jv', 'sco', 'pnb', 'ga', 'ba', 'szl', 'is', 'my',
         'fy', 'cv', 'lmo', 'an', 'wuu', 'pa', 'ne', 'yo', 'bar', 'ku', 'io',
-        'gu', 'als', 'ckb', 'kn', 'scn', 'bpy', 'ia', 'qu', 'diq', 'mn',
-        'bat-smg', 'or', 'si', 'nv', 'cdo', 'ilo', 'yi', 'gd', 'am', 'nap',
+        'gu', 'als', 'ckb', 'kn', 'scn', 'diq', 'bpy', 'ia', 'qu', 'mn',
+        'bat-smg', 'or', 'nv', 'si', 'cdo', 'ilo', 'yi', 'gd', 'am', 'nap',
         'bug', 'xmf', 'wa', 'sd', 'hsb', 'mai', 'map-bms', 'fo', 'mzn', 'li',
         'sah', 'eml', 'os', 'ps', 'sa', 'frr', 'bcl', 'zh-classical', 'ace',
-        'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'nso', 'km', 'hyw',
-        'se', 'rue', 'crh', 'bh', 'shn', 'vls', 'gor', 'mi', 'nds-nl', 'as',
+        'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'hyw', 'nso', 'km',
+        'rue', 'se', 'crh', 'gor', 'bh', 'shn', 'vls', 'mi', 'as', 'nds-nl',
         'nah', 'sc', 'vep', 'gan', 'myv', 'ab', 'glk', 'bo', 'co', 'so', 'tk',
         'sn', 'fiu-vro', 'lrc', 'csb', 'kv', 'ha', 'gv', 'ie', 'udm', 'ay',
-        'pcd', 'zea', 'kab', 'nrm', 'ug', 'lez', 'kw', 'stq', 'haw', 'frp',
-        'lij', 'lfn', 'mwl', 'gn', 'gom', 'rm', 'sat', 'mt', 'lad', 'lo',
-        'koi', 'fur', 'olo', 'dty', 'ang', 'dsb', 'ext', 'ln', 'bjn', 'ban',
-        'cbk-zam', 'dv', 'ksh', 'gag', 'zu', 'pfl', 'tyv', 'pag', 'pi', 'av',
-        'awa', 'bxr', 'xal', 'krc', 'pap', 'za', 'pdc', 'kaa', 'rw', 'arc',
-        'szy', 'to', 'nov', 'jam', 'tpi', 'kbp', 'kbd', 'ig', 'na', 'tet',
-        'wo', 'tcy', 'ki', 'inh', 'jbo', 'atj', 'bi', 'roa-rup', 'lbe', 'kg',
+        'pcd', 'zea', 'kab', 'nrm', 'ug', 'kw', 'lez', 'lij', 'stq', 'haw',
+        'frp', 'sat', 'lfn', 'mwl', 'gn', 'gom', 'rm', 'mt', 'lo', 'lad',
+        'koi', 'fur', 'olo', 'ang', 'dty', 'dsb', 'zu', 'bjn', 'ext', 'ln',
+        'ban', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'tyv', 'pag', 'pi', 'av',
+        'awa', 'bxr', 'xal', 'krc', 'pap', 'za', 'pdc', 'kaa', 'rw', 'szy',
+        'arc', 'to', 'nov', 'jam', 'tpi', 'kbp', 'kbd', 'ig', 'na', 'tet',
+        'inh', 'wo', 'tcy', 'ki', 'jbo', 'atj', 'roa-rup', 'bi', 'lbe', 'kg',
         'ty', 'mdf', 'lg', 'srn', 'xh', 'gcr', 'fj', 'ltg', 'chr', 'sm', 'ak',
-        'got', 'kl', 'pih', 'om', 'cu', 'tn', 'tw', 'st', 'ts', 'ny', 'rmy',
-        'bm', 'nqo', 'chy', 'rn', 'mnw', 'tum', 'ss', 'ch', 'pnt', 'iu', 'ady',
-        'ks', 've', 'ee', 'ik', 'sg', 'ff', 'ti', 'dz', 'din', 'cr', 'ary',
+        'got', 'kl', 'pih', 'om', 'cu', 'ny', 'tn', 'tw', 'st', 'ts', 'rmy',
+        'bm', 'nqo', 'chy', 'rn', 'mnw', 'tum', 'ss', 'ch', 'iu', 'pnt', 'ady',
+        'ks', 've', 'ee', 'ik', 'sg', 'ff', 'ti', 'dz', 'cr', 'din', 'ary',
     ]
 
     # Sites we want to edit but not count as real languages
@@ -244,4 +242,4 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             return 'utf-8', 'iso8859-5'
         if code in self.latin1old:
             return 'utf-8', 'iso-8859-1'
-        return super(Family, self).encodings(code)
+        return super().encodings(code)

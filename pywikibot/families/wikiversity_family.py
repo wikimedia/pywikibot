@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikiversity."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -19,7 +17,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiversity'
 
     languages_by_size = [
-        'de', 'en', 'fr', 'zh', 'ru', 'it', 'cs', 'pt', 'es', 'sv', 'sl', 'fi',
+        'de', 'en', 'fr', 'ru', 'zh', 'it', 'cs', 'pt', 'es', 'sv', 'sl', 'fi',
         'ar', 'el', 'hi', 'ko', 'ja',
     ]
 
@@ -27,7 +25,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     @classproperty
     def code_aliases(cls):
-        cls.code_aliases = super(Family, cls).code_aliases.copy()
+        cls.code_aliases = super().code_aliases.copy()
         cls.code_aliases['mul'] = 'beta'
         return cls.code_aliases
 
