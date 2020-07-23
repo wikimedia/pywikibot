@@ -42,9 +42,8 @@ The following generators and filters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
+import http.client as httplib
 import os
 import re
 import socket
@@ -52,6 +51,9 @@ import subprocess
 import tempfile
 
 from functools import partial
+from urllib.error import URLError
+
+from requests import codes
 
 import pywikibot
 
@@ -60,18 +62,10 @@ from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools.formatter import color_format, PY2
-
-from requests import codes
+from pywikibot.tools.formatter import color_format
 
 from scripts import noreferences
 
-if not PY2:
-    import http.client as httplib
-    from urllib.error import URLError
-else:
-    import httplib
-    from urllib2 import URLError
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -196,7 +190,7 @@ XmlDumpPageGenerator = partial(
     _XMLDumpPageGenerator, text_predicate=linksInRef.search)
 
 
-class RefLink(object):
+class RefLink:
 
     """Container to handle a single bare reference."""
 
@@ -238,7 +232,7 @@ class RefLink(object):
         self.title = re.sub(r'-+', '-', self.title)
         # remove formatting, i.e long useless strings
         self.title = re.sub(r'[\.+\-=]{4,}', ' ', self.title)
-        # remove \n and \r and Unicode spaces from titles
+        # remove \n and \r and unicode spaces from titles
         self.title = re.sub(r'(?u)\s', ' ', self.title)
         self.title = re.sub(r'[\n\r\t]', ' ', self.title)
         # remove extra whitespaces
@@ -272,11 +266,11 @@ class RefLink(object):
                 nb_letter += 1
             if letter.isdigit():
                 return
-        if nb_upper / (nb_letter + 1) > .70:
+        if nb_upper / (nb_letter + 1) > 0.7:
             self.title = self.title.title()
 
 
-class DuplicateReferences(object):
+class DuplicateReferences:
 
     """Helper to de-duplicate references in text.
 
@@ -407,7 +401,7 @@ class ReferencesRobot(Bot):
             'summary': None,
         })
 
-        super(ReferencesRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
         self.site = pywikibot.Site()
         self._use_fake_user_agent = config.fake_user_agent_default.get(
@@ -760,7 +754,7 @@ class ReferencesRobot(Bot):
                     actual_rev = self.stop_page.latest_revision_id
                     if actual_rev != self.stop_page_rev_id:
                         pywikibot.output(
-                            '{0} has been edited : Someone wants us to stop.'
+                            '{} has been edited: Someone wants us to stop.'
                             .format(self.stop_page.title(as_link=True)))
                         return
 
@@ -786,10 +780,8 @@ def main(*args):
     for arg in local_args:
         if arg.startswith('-summary:'):
             options['summary'] = arg[9:]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-ignorepdf':
-            options['ignorepdf'] = True
+        elif arg in ('-always', '-ignorepdf'):
+            options[arg[1:]] = True
         elif arg.startswith('-limit:'):
             options['limit'] = int(arg[7:])
         elif arg.startswith('-xmlstart'):
