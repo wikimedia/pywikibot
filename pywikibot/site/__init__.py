@@ -122,7 +122,8 @@ class LoginStatus(IntEnum):
 Family = redirect_func(pywikibot.family.Family.load,
                        target_module='pywikibot.family.Family',
                        old_name='Family',
-                       since='20141001')
+                       since='20141001',
+                       future_warning=True)
 
 
 class Namespace(Iterable, ComparableMixin):
@@ -2500,7 +2501,8 @@ class APISite(BaseSite):
     getExpandedString = redirect_func(expand_text,
                                       old_name='getExpandedString',
                                       class_name='APISite',
-                                      since='20170504')
+                                      since='20170504',
+                                      future_warning=True)
 
     def getcurrenttimestamp(self):
         """
