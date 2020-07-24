@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
 
 from pywikibot import i18n, bot, plural
-from pywikibot.tools import StringTypes
 
 from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, PwbTestCase,
@@ -33,7 +32,7 @@ class TestTranslate(TestCase):
                                    'nl': 'test-semi-localized NL'}
         self.msg_non_localized = {'en': 'test-non-localized EN'}
         self.msg_no_english = {'ja': 'test-no-english JA'}
-        super(TestTranslate, self).setUp()
+        super().setUp()
 
     def test_localized(self):
         """Test fully localized translations."""
@@ -76,14 +75,14 @@ class UserInterfaceLangTestCase(TestCase):
 
     def setUp(self):
         """Change the userinterface language to the site's code."""
-        super(UserInterfaceLangTestCase, self).setUp()
+        super().setUp()
         self.orig_userinterface_lang = pywikibot.config.userinterface_lang
         pywikibot.config.userinterface_lang = self.get_site().code
 
     def tearDown(self):
         """Reset the userinterface language."""
         pywikibot.config.userinterface_lang = self.orig_userinterface_lang
-        super(UserInterfaceLangTestCase, self).tearDown()
+        super().tearDown()
 
 
 class TWNSetMessagePackageBase(TestCase):
@@ -96,11 +95,11 @@ class TWNSetMessagePackageBase(TestCase):
         """Load the test translations."""
         self.orig_messages_package_name = i18n._messages_package_name
         i18n.set_messages_package(self.message_package)
-        super(TWNSetMessagePackageBase, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Load the original translations back."""
-        super(TWNSetMessagePackageBase, self).tearDown()
+        super().tearDown()
         i18n.set_messages_package(self.orig_messages_package_name)
 
 
@@ -111,7 +110,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
     @classmethod
     def setUpClass(cls):
         """Verify that the test translations are not empty."""
-        if not isinstance(cls.message_package, StringTypes):
+        if not isinstance(cls.message_package, str):
             raise TypeError('{}.message_package must be a package name'
                             .format(cls.__name__))
         # The call to set_messages_package below exists only to confirm
@@ -124,7 +123,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
         if not has_messages:
             raise unittest.SkipTest("i18n messages package '{}' not available."
                                     .format(cls.message_package))
-        super(TWNTestCaseBase, cls).setUpClass()
+        super().setUpClass()
 
 
 class TestTWTranslate(TWNTestCaseBase):
@@ -350,7 +349,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     @classmethod
     def setUpClass(cls):
         """Verify that a translation does not yet exist."""
-        super(InputTestCase, cls).setUpClass()
+        super().setUpClass()
 
         if cls.code in i18n.twget_keys(cls.message):
             raise unittest.SkipTest(
@@ -378,7 +377,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
 
     def setUp(self):
         """Patch the output and input methods."""
-        super(MissingPackageTestCase, self).setUp()
+        super().setUp()
         self.output_text = ''
         self.orig_raw_input = bot.ui._raw_input
         self.orig_output = bot.ui.output
@@ -389,7 +388,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         """Restore the output and input methods."""
         bot.ui._raw_input = self.orig_raw_input
         bot.ui.output = self.orig_output
-        super(MissingPackageTestCase, self).tearDown()
+        super().tearDown()
 
     def test_pagegen_i18n_input(self):
         """Test i18n.input falls back with missing message package."""
@@ -472,7 +471,5 @@ class TestExtractPlural(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

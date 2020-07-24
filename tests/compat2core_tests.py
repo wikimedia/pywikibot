@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 """compat2core.py tests."""
 #
-# (C) Pywikibot team, 2019
+# (C) Pywikibot team, 2019-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from pywikibot.tools import StringTypes
-
 import scripts.maintenance.compat2core as c2c
 
 from tests.aspects import unittest, TestCase
@@ -24,15 +20,15 @@ class Compat2CoreTests(TestCase):
         """Test compat2core replacements."""
         for item in c2c.replacements:
             self.assertLength(item, 2)
-            self.assertIsInstance(item[0], StringTypes)
-            self.assertIsInstance(item[1], StringTypes)
+            self.assertIsInstance(item[0], str)
+            self.assertIsInstance(item[1], str)
 
     def test_warnings(self):
         """Test compat2core warnings."""
         for item in c2c.warnings:
             self.assertLength(item, 2)
-            self.assertIsInstance(item[0], StringTypes)
-            self.assertIsInstance(item[1], StringTypes)
+            self.assertIsInstance(item[0], str)
+            self.assertIsInstance(item[1], str)
 
     def test_bot(self):
         """Test compat2core bot."""

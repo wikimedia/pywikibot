@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,11 +15,7 @@ import subprocess
 
 import pywikibot
 
-from pywikibot.tools import (
-    deprecated, deprecated_args,
-    StringTypes,
-    UnicodeType,
-)
+from pywikibot.tools import deprecated, deprecated_args
 
 
 def _call_cmd(args, lib='djvulibre'):
@@ -27,7 +23,7 @@ def _call_cmd(args, lib='djvulibre'):
     Tiny wrapper around subprocess.Popen().
 
     @param args: same as Popen()
-    @type args: typing.Sequence[string]
+    @type args: str or typing.Sequence[string]
 
     @param library: library to be logged in logging messages
     @type library: str
@@ -39,10 +35,9 @@ def _call_cmd(args, lib='djvulibre'):
     @return: returns a tuple (res, stdoutdata), where
         res is True if dp.returncode != 0 else False
     """
-    if not isinstance(args, StringTypes):
-        # upcast if any param in sequence args is not in StringTypes
-        args = [str(a) if not isinstance(a, StringTypes) else a for a in args]
-        cmd = ' '.join(args)
+    if not isinstance(args, str):
+        # upcast any param in sequence args to str
+        cmd = ' '.join(str(a) for a in args)
     else:
         cmd = args
 
@@ -59,7 +54,7 @@ def _call_cmd(args, lib='djvulibre'):
     return (True, stdoutdata)
 
 
-class DjVuFile(object):
+class DjVuFile:
 
     """Wrapper around djvulibre to access djvu files properties and content.
 
@@ -72,12 +67,11 @@ class DjVuFile(object):
     """
 
     @deprecated_args(file_djvu='file')
-    def __init__(self, file):
+    def __init__(self, file: str):
         """
         Initializer.
 
         @param file: filename (including path) to djvu file
-        @type file: str
         """
         self._filename = file
         filename = os.path.expanduser(file)
@@ -93,28 +87,15 @@ class DjVuFile(object):
         self._pat_info = re.compile(
             r'DjVu.*?(?P<size>\d+x\d+).*?(?P<dpi>\d+) dpi')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a more complete string representation."""
-        filename = self._filename
-        if not isinstance(filename, str):
-            filename = self._filename.encode('utf-8')
         return str("{0}.{1}('{2}')").format(self.__module__,
                                             self.__class__.__name__,
-                                            filename)
+                                            self._filename)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation."""
-        filename = self._filename
-        if not isinstance(filename, str):
-            filename = self._filename.encode('utf-8')
-        return str("{0}('{1}')").format(self.__class__.__name__, filename)
-
-    def __unicode__(self):
-        """Return a unicode representation."""
-        _str = self.__str__()
-        if not isinstance(_str, UnicodeType):
-            _str = _str.decode('utf-8')
-        return _str
+        return str("{}('{}')").format(self.__class__.__name__, self._filename)
 
     @property
     @deprecated('DjVuFile.file', since='2010222', future_warning=True)

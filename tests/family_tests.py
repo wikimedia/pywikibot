@@ -5,13 +5,13 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot.site
 
 from pywikibot.exceptions import UnknownFamily
 from pywikibot.family import Family, SingleSiteFamily
-from pywikibot.tools import StringTypes as basestring, suppress_warnings
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     unittest,
@@ -43,11 +43,11 @@ class TestFamily(TestCase):
                 self.assertTrue(f.langs)
                 self.assertTrue(f.codes)
                 self.assertTrue(iter(f.codes))
-                self.assertIsInstance(next(iter(f.codes)), basestring)
+                self.assertIsInstance(next(iter(f.codes)), str)
                 self.assertTrue(f.domains)
                 self.assertTrue(iter(f.domains))
                 for domain in f.domains:
-                    self.assertIsInstance(domain, basestring)
+                    self.assertIsInstance(domain, str)
                     if domain.split(':', 1)[0] != 'localhost':
                         self.assertIn('.', domain)
 
@@ -187,7 +187,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
 
     def setUp(self):
         """Setup default article path."""
-        super(TestFamilyUrlRegex, self).setUp()
+        super().setUp()
         self.article_path = '/wiki/$1'
 
     def test_from_url_wikipedia_extra(self):
@@ -304,7 +304,5 @@ class TestOldFamilyMethod(DeprecationTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
