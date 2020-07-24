@@ -81,6 +81,9 @@ from pywikibot.tools import (
 )
 from pywikibot.tools import is_IP
 
+__all__ = ('APISite', 'DataSite', 'Family', 'LoginStatus', 'Namespace',
+           'NamespacesDict', 'NonMWAPISite', 'PageInUse', 'RemovedSite',
+           'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
 
