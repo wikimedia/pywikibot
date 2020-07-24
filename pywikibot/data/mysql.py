@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from contextlib import closing
 
 import pywikibot
@@ -18,11 +16,11 @@ except ImportError:
 
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated_args, UnicodeType
+from pywikibot.tools import deprecated_args
 
 
 @deprecated_args(encoding=None)
-def mysql_query(query, params=None, dbname=None, verbose=None):
+def mysql_query(query: str, params=None, dbname=None, verbose=None):
     """Yield rows from a MySQL query.
 
     An example query that yields all ns0 pages might look like::
@@ -37,7 +35,6 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     Cursor charset is utf8.
 
     @param query: MySQL query to execute
-    @type query: str (unicode in py2)
     @param params: input parameters for the query, if needed
         if list or tuple, %s shall be used as placeholder in the query string.
         if a dict, %(key)s shall be used as placeholder in the query string.
@@ -69,14 +66,12 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
         if verbose:
             _query = cursor.mogrify(query, params)
 
-            if not isinstance(_query, UnicodeType):
-                _query = UnicodeType(_query, encoding='utf-8')
+            if not isinstance(_query, str):
+                _query = str(_query, encoding='utf-8')
             _query = _query.strip()
             _query = '\n'.join('    {0}'.format(line)
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
 
         cursor.execute(query, params)
-
-        for row in cursor:
-            yield row
+        yield from cursor

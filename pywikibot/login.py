@@ -2,36 +2,35 @@
 # -*- coding: utf-8 -*-
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import os
 import webbrowser
 
-from pywikibot.tools import file_mode_checker
-
 from warnings import warn
+
+import pywikibot
+
+from pywikibot import config, __url__
+from pywikibot.exceptions import NoUsername
+from pywikibot.tools import (
+    deprecated_args, file_mode_checker, normalize_username, remove_last_args,
+)
 
 try:
     import mwoauth
 except ImportError as e:
     mwoauth = e
 
-import pywikibot
-
-from pywikibot import config, __url__
-from pywikibot.exceptions import NoUsername
-from pywikibot.tools import (deprecated_args, remove_last_args,
-                             normalize_username, UnicodeType)
-
 
 class OAuthImpossible(ImportError):
 
     """OAuth authentication is not possible on your system."""
+
+    pass
 
 
 class _PasswordFileWarning(UserWarning):
@@ -55,7 +54,7 @@ botList = {
 }
 
 
-class LoginManager(object):
+class LoginManager:
 
     """Site login manager."""
 
@@ -122,16 +121,15 @@ class LoginManager(object):
             user = next(iter(data))
         except pywikibot.data.api.APIError as e:
             if e.code == 'readapidenied':
-                pywikibot.warning('Could not check user %s exists on %s'
-                                  % (main_username, self.site))
+                pywikibot.warning("Could not check user '{}' exists on {}"
+                                  .format(main_username, self.site))
                 return
-            else:
-                raise
+            raise
 
         if user['name'] != main_username:
             # Report the same error as server error code NotExists
-            raise NoUsername("Username '%s' does not exist on %s"
-                             % (main_username, self.site))
+            raise NoUsername("Username '{}' does not exist on {}"
+                             .format(main_username, self.site))
 
     def botAllowed(self):
         """
@@ -139,10 +137,9 @@ class LoginManager(object):
 
         This allows bots to comply with the policy on the respective wiki.
         """
-        if self.site.family.name in botList \
-                and self.site.code in botList[self.site.family.name]:
-            botlist_pagetitle, bot_template_title = botList[
-                self.site.family.name][self.site.code]
+        code, fam = self.site.code, self.site.family.name
+        if code in botList.get(fam, []):
+            botlist_pagetitle, bot_template_title = botList[fam][code]
             botlist_page = pywikibot.Page(self.site, botlist_pagetitle)
             if bot_template_title:
                 for template, params in botlist_page.templatesWithParams():
@@ -154,9 +151,9 @@ class LoginManager(object):
                     if linked_page.title(with_ns=False) == self.username:
                         return True
             return False
-        else:
-            # No bot policies on other sites
-            return True
+
+        # No bot policies on other sites
+        return True
 
     @remove_last_args(['remember', 'captcha'])
     def getCookie(self):
@@ -181,8 +178,7 @@ class LoginManager(object):
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')
-        pywikibot.debug('Storing cookies to %s' % filename,
-                        _logger)
+        pywikibot.debug('Storing cookies to {}'.format(filename), _logger)
         with open(filename, 'w') as f:
             f.write(data)
 
@@ -228,6 +224,7 @@ class LoginManager(object):
             line_nr -= 1
             if not line.strip() or line.startswith('#'):
                 continue
+
             try:
                 entry = eval(line)
             except SyntaxError:
@@ -248,15 +245,16 @@ class LoginManager(object):
             if (normalize_username(username) == self.username
                     and family == self.site.family.name
                     and code == self.site.code):
-                if isinstance(password, UnicodeType):
+                if isinstance(password, str):
                     self.password = password
                     break
-                elif isinstance(password, BotPassword):
+
+                if isinstance(password, BotPassword):
                     self.password = password.password
                     self.login_name = password.login_name(self.username)
                     break
-                else:
-                    warn('Invalid password format', _PasswordFileWarning)
+
+                warn('Invalid password format', _PasswordFileWarning)
 
     _api_error = {
         'NotExists': 'does not exist',
@@ -266,7 +264,7 @@ class LoginManager(object):
         'FAIL': 'does not have read permissions',
     }
 
-    def login(self, retry=False, autocreate=False):
+    def login(self, retry=False, autocreate=False) -> bool:
         """
         Attempt to log into the server.
 
@@ -291,12 +289,12 @@ class LoginManager(object):
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                'Password for user %(name)s on %(site)s (no characters will '
-                'be shown):' % {'name': self.login_name, 'site': self.site},
+                'Password for user {name} on {site} (no characters will be '
+                'shown):'.format(name=self.login_name, site=self.site),
                 password=True)
 
-        pywikibot.output('Logging in to %(site)s as %(name)s'
-                         % {'name': self.login_name, 'site': self.site})
+        pywikibot.output('Logging in to {site} as {name}'
+                         .format(name=self.login_name, site=self.site))
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError as e:
@@ -320,11 +318,11 @@ class LoginManager(object):
         return True
 
 
-class BotPassword(object):
+class BotPassword:
 
     """BotPassword object for storage in password file."""
 
-    def __init__(self, suffix, password):
+    def __init__(self, suffix: str, password: str):
         """
         Initializer.
 
@@ -332,9 +330,7 @@ class BotPassword(object):
         suffixed username of the form <username>@<suffix>.
 
         @param suffix: Suffix of the login name
-        @type suffix: basestring
         @param password: bot password
-        @type password: basestring
 
         @raises _PasswordFileWarning: suffix improperly specified
         """
@@ -344,13 +340,11 @@ class BotPassword(object):
         self.suffix = suffix
         self.password = password
 
-    def login_name(self, username):
+    def login_name(self, username: str) -> str:
         """
         Construct the login name from the username and suffix.
 
         @param user: username (without suffix)
-        @type user: basestring
-        @rtype: basestring
         """
         return '{0}@{1}'.format(username, self.suffix)
 
@@ -372,9 +366,9 @@ class OauthLoginManager(LoginManager):
         @param site: Site object to log into
         @type site: BaseSite
         @param user: consumer key
-        @type user: basestring
+        @type user: str
         @param password: consumer secret
-        @type password: basestring
+        @type password: str
 
         @raises pywikibot.exceptions.NoUsername: No username is configured
             for the requested site.
@@ -383,12 +377,12 @@ class OauthLoginManager(LoginManager):
         if isinstance(mwoauth, ImportError):
             raise OAuthImpossible('mwoauth is not installed: %s.' % mwoauth)
         assert password is not None and user is not None
-        super(OauthLoginManager, self).__init__(password=None, site=site,
-                                                user=None)
+        super().__init__(password=None, site=site, user=None)
         if self.password:
-            pywikibot.warn('Password exists in password file for %s:%s.'
-                           'Password is unnecessary and should be removed '
-                           'when OAuth enabled.' % (self.site, self.username))
+            pywikibot.warn('Password exists in password file for {login.site}:'
+                           '{login.username}. Password is unnecessary and '
+                           'should be removed if OAuth enabled.'
+                           .format(login=self))
         self._consumer_token = (user, password)
         self._access_token = None
 
@@ -406,10 +400,9 @@ class OauthLoginManager(LoginManager):
         """
         if self.access_token is None or force:
             pywikibot.output(
-                'Logging in to %(site)s via OAuth consumer %(key)s'
-                % {'key': self.consumer_token[0], 'site': self.site})
-            consumer_token = mwoauth.ConsumerToken(self.consumer_token[0],
-                                                   self.consumer_token[1])
+                'Logging in to {site} via OAuth consumer {key}'
+                .format(key=self.consumer_token[0], site=self.site))
+            consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
             handshaker = mwoauth.Handshaker(
                 self.site.base_url(self.site.path()), consumer_token)
             try:
@@ -417,20 +410,19 @@ class OauthLoginManager(LoginManager):
                 pywikibot.stdout('Authenticate via web browser..')
                 webbrowser.open(redirect)
                 pywikibot.stdout('If your web browser does not open '
-                                 'automatically, please point it to: %s'
-                                 % redirect)
+                                 'automatically, please point it to: {}'
+                                 .format(redirect))
                 request_qs = pywikibot.input('Response query string: ')
-                access_token = handshaker.complete(request_token,
-                                                   request_qs)
+                access_token = handshaker.complete(request_token, request_qs)
                 self._access_token = (access_token.key, access_token.secret)
             except Exception as e:
                 pywikibot.error(e)
                 if retry:
                     self.login(retry=True, force=force)
         else:
-            pywikibot.output('Logged in to %(site)s via consumer %(key)s'
-                             % {'key': self.consumer_token[0],
-                                'site': self.site})
+            pywikibot.output('Logged in to {site} via consumer {key}'
+                             .format(key=self.consumer_token[0],
+                                     site=self.site))
 
     @property
     def consumer_token(self):
@@ -464,10 +456,9 @@ class OauthLoginManager(LoginManager):
         if self.access_token is None:
             pywikibot.error('Access token not set')
             return None
-        consumer_token = mwoauth.ConsumerToken(self.consumer_token[0],
-                                               self.consumer_token[1])
-        access_token = mwoauth.AccessToken(self.access_token[0],
-                                           self.access_token[1])
+
+        consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
+        access_token = mwoauth.AccessToken(*self.access_token)
         try:
             identity = mwoauth.identify(self.site.base_url(self.site.path()),
                                         consumer_token, access_token)
