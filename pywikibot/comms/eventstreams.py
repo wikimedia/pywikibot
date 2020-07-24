@@ -13,8 +13,6 @@ This module requires sseclient to be installed::
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from distutils.version import LooseVersion
 from functools import partial
 import json
@@ -30,7 +28,7 @@ except ImportError as e:
     EventSource = e
 
 from pywikibot import config, debug, Timestamp, Site, warning
-from pywikibot.tools import deprecated_args, StringTypes
+from pywikibot.tools import deprecated_args
 
 if LooseVersion(requests_version) < LooseVersion('2.20.1'):
     raise ImportError(
@@ -41,7 +39,7 @@ if LooseVersion(requests_version) < LooseVersion('2.20.1'):
 _logger = 'pywikibot.eventstreams'
 
 
-class EventStreams(object):
+class EventStreams:
 
     """Basic EventStreams iterator class for Server-Sent Events (SSE) protocol.
 
@@ -109,16 +107,15 @@ class EventStreams(object):
         self._site = kwargs.pop('site', Site())
 
         self._streams = kwargs.pop('streams', None)
-        if self._streams and not isinstance(self._streams, StringTypes):
+        if self._streams and not isinstance(self._streams, str):
             self._streams = ','.join(self._streams)
 
         self._since = kwargs.pop('since', None)
         if self._since:
             # assume this is a mw timestamp, convert it to a Timestamp object
-            if isinstance(self._streams, StringTypes) \
-               and '-' not in self._since:
+            if isinstance(self._since, str) and '-' not in self._since:
                 self._since = Timestamp.fromtimestampformat(self._since)
-            if isinstance(self._streams, Timestamp):
+            if isinstance(self._since, Timestamp):
                 self._since = self._since.isoformat
 
         self._url = kwargs.get('url') or self.url
@@ -258,7 +255,7 @@ class EventStreams(object):
             if isinstance(value, (bool, type(None))):
                 self.filter[ftype].append(partial(_is, key=key, value=value))
             # append function for a single value
-            elif isinstance(value, (StringTypes, int)):
+            elif isinstance(value, (str, int)):
                 self.filter[ftype].append(partial(_eq, key=key, value=value))
             # append function for an iterable as value
             else:
