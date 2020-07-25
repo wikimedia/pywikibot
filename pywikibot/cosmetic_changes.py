@@ -56,25 +56,23 @@ or by adding a list to the given one:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
-
-try:
-    import stdnum.isbn as stdnum_isbn
-except ImportError:
-    stdnum_isbn = None
 
 import pywikibot
 
 from pywikibot.page import url2unicode
 from pywikibot import textlib
-from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
-                               _get_regexes)
+from pywikibot.textlib import (
+    _get_regexes, _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+)
 from pywikibot.tools import (
     deprecated, deprecated_args, first_lower, first_upper
 )
 
+try:
+    import stdnum.isbn as stdnum_isbn
+except ImportError:
+    stdnum_isbn = None
 
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
@@ -200,7 +198,7 @@ def _reformat_ISBNs(text, strict=True):
         text, lambda match: _format_isbn_match(match, strict=strict))
 
 
-class CosmeticChangesToolkit(object):
+class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
@@ -932,7 +930,7 @@ class CosmeticChangesToolkit(object):
                                      site=self.site)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
-        pattern = re.compile('«.*?»', re.UNICODE)
+        pattern = re.compile('«.*?»')
         exceptions.append(pattern)
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
                                      r'\1&nbsp;°\2', exceptions,
