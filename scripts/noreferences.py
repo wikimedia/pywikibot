@@ -527,23 +527,23 @@ class NoReferencesBot(Bot):
             if self.getOption('verbose'):
                 pywikibot.output('No changes necessary: references tag found.')
             return False
-        elif self.referencesTemplates:
+
+        if self.referencesTemplates:
             templateR = '{{(' + '|'.join(self.referencesTemplates) + ')'
-            if re.search(
-                templateR, oldTextCleaned, re.IGNORECASE | re.UNICODE
-            ):
+            if re.search(templateR, oldTextCleaned, re.IGNORECASE):
                 if self.getOption('verbose'):
                     pywikibot.output(
                         'No changes necessary: references template found.')
                 return False
+
         if not self.refR.search(oldTextCleaned):
             if self.getOption('verbose'):
                 pywikibot.output('No changes necessary: no ref tags found.')
             return False
-        else:
-            if self.getOption('verbose'):
-                pywikibot.output('Found ref without references.')
-            return True
+
+        if self.getOption('verbose'):
+            pywikibot.output('Found ref without references.')
+        return True
 
     def addReferences(self, oldText) -> str:
         """

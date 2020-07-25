@@ -31,16 +31,13 @@ and override its `callback` method. Here is a sample:
             if 'top' in item:
                 page = pywikibot.Page(self.site, item['title'])
                 text = page.get(get_redirect=True)
-                pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
+                pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]')
                 return bool(pattern.search(text))
             return False
 
 """
 #
 # (C) Pywikibot team, 2008-2020
-#
-# Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
-# for Google Code-In 2013
 #
 # Distributed under the terms of the MIT license.
 #

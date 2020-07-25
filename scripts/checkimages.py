@@ -454,7 +454,7 @@ SETTINGS_REGEX = re.compile(r"""
 \*[Hh]ead\ ?=\ ?['"](.*?)['"]\n
 \*[Tt]ext\ ?=\ ?['"](.*?)['"]\n
 \*[Mm]ex\ ?=\ ?['"]?([^\n]*?)['"]?\n
-""", re.UNICODE | re.DOTALL | re.VERBOSE)
+""", re.DOTALL | re.VERBOSE)
 
 
 class LogIsFull(pywikibot.Error):
@@ -714,7 +714,7 @@ class checkImagesBot:
     def regexGenerator(self, regexp, textrun) -> Generator[pywikibot.FilePage,
                                                            None, None]:
         """Find page to yield using regex to parse text."""
-        regex = re.compile(r'{}'.format(regexp), re.UNICODE | re.DOTALL)
+        regex = re.compile(r'{}'.format(regexp), re.DOTALL)
         results = regex.findall(textrun)
         for image in results:
             yield pywikibot.FilePage(self.site, image)
@@ -1263,7 +1263,7 @@ class checkImagesBot:
         # I search with a regex how many user have not the talk page
         # and i put them in a list (i find it more easy and secure)
         regl = r"(\"|\')(.*?)\1(?:,|\])"
-        pl = re.compile(regl, re.UNICODE)
+        pl = re.compile(regl)
         for xl in pl.finditer(raw):
             word = xl.group(2).replace('\\\\', '\\')
             if word not in list_loaded:
