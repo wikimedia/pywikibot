@@ -1833,48 +1833,6 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-class ContextManagerWrapper:
-
-    """
-    DEPRECATED. Wraps an object in a context manager.
-
-    It is redirecting all access to the wrapped object and executes 'close'
-    when used as a context manager in with-statements. In such statements the
-    value set via 'as' is directly the wrapped object. For example:
-
-    >>> class Wrapper:
-    ...     def close(self): pass
-    >>> an_object = Wrapper()
-    >>> wrapped = ContextManagerWrapper(an_object)
-    >>> with wrapped as another_object:
-    ...      assert another_object is an_object
-
-    It does not subclass the object though, so isinstance checks will fail
-    outside a with-statement.
-    """
-
-    def __init__(self, wrapped):
-        """Create a new wrapper."""
-        super().__init__()
-        super().__setattr__('_wrapped', wrapped)
-
-    def __enter__(self):
-        """Enter a context manager and use the wrapped object directly."""
-        return self._wrapped
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Call close on the wrapped object when exiting a context manager."""
-        self._wrapped.close()
-
-    def __getattr__(self, name):
-        """Get the attribute from the wrapped object."""
-        return getattr(self._wrapped, name)
-
-    def __setattr__(self, name, value):
-        """Set the attribute in the wrapped object."""
-        setattr(self._wrapped, name, value)
-
-
 class IteratorNextMixin(Iterator):
 
     """DEPRECATED. Backwards compatibility for Iterators."""
@@ -1922,14 +1880,6 @@ def py2_encode_utf_8(func):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111',
-                             future_warning=True)
-wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict,
-                             since='20160111', future_warning=True)
-wrapper._add_deprecated_attr('count', itertools.count, since='20160111',
-                             future_warning=True)
-wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='',
-                             since='20180402', future_warning=True)
 wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
                              replacement_name='',
                              since='20200723', future_warning=True)
