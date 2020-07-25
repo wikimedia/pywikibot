@@ -37,8 +37,8 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(uploadByUrl=True, urlEncoding='url_encoding',
-                     useFilename='use_filename', keepFilename='keep_filename',
+    @deprecated_args(urlEncoding='url_encoding', useFilename='use_filename',
+                     keepFilename='keep_filename',
                      verifyDescription='verify_description',
                      ignoreWarning='ignore_warning', targetSite='target_site')
     def __init__(self, url, url_encoding=None, description='',
@@ -393,7 +393,6 @@ class UploadRobot(BaseBot):
         """Upload image."""
         return self.upload_file(self.url)
 
-    @deprecated_args(debug=True)
     def upload_file(self, file_url, _file_key=None, _offset=0):
         """
         Upload the image at file_url to the target wiki.
