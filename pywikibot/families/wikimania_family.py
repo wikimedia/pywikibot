@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikimania wikis."""
 #
-# (C) Pywikibot team, 2017-2019
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -32,7 +30,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        cls.langs = super(Family, cls).langs
+        cls.langs = super().langs
         for lang, url in cls.langs.items():
             if not url.startswith(cls.name):
                 cls.langs[lang] = cls.name + url

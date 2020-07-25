@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 
 
@@ -19,12 +17,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay',
-        'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'gn', 'got',
-        'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
-        'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm',
-        'se', 'simple', 'su', 'sw', 'tk', 'ug', 'uz',
-        'vo', 'wa', 'xh', 'yo', 'za', 'zh-min-nan', 'zu',
+        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch',
+        'co', 'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv',
+        'mi', 'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple',
+        'su', 'sw', 'tk', 'ug', 'uz', 'vo', 'wa', 'xh', 'yo', 'za',
+        'zh-min-nan', 'zu',
     ]
 
     removed_wikis = [
@@ -35,7 +32,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'en', 'hu', 'de', 'fr', 'pt', 'ja', 'it', 'es', 'nl', 'pl', 'id', 'he',
         'fi', 'zh', 'sq', 'az', 'fa', 'vi', 'ru', 'ca', 'eu', 'da', 'ko', 'sv',
-        'th', 'gl', 'sr', 'cs', 'ba', 'hi', 'hr', 'ar', 'no', 'tr', 'sa', 'ta',
+        'th', 'gl', 'ba', 'sr', 'cs', 'hi', 'hr', 'ar', 'no', 'tr', 'sa', 'ta',
         'uk', 'eo', 'sk', 'is', 'ro', 'bn', 'si', 'mk', 'ka', 'bg', 'ms', 'tt',
         'lt', 'el', 'li', 'ur', 'sl', 'km', 'tl', 'la', 'et', 'be', 'kk', 'ia',
         'ml', 'oc', 'ne', 'hy', 'tg', 'cv', 'pa', 'ku', 'fy', 'bs', 'cy', 'af',
