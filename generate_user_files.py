@@ -6,20 +6,16 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
-from collections import namedtuple
 import os
 import re
 import sys
 
+from collections import namedtuple
 from textwrap import fill
 
 from generate_family_file import _import_with_no_user_config
 
-if sys.version_info[0] == 2:
-    from future_builtins import filter
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {'USER INTERFACE SETTINGS',  # uses sys
@@ -135,7 +131,7 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
     else:
         known_langs = []
 
-    if len(known_langs) == 0:
+    if not known_langs:
         pywikibot.output('There were no known languages found in {}.'
                          .format(fam.name))
         default_lang = None
