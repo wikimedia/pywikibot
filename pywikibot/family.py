@@ -5,18 +5,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
-from importlib import import_module
-from itertools import chain
 import logging
-from os.path import basename, dirname, splitext
 import re
 import string
 import sys
+import urllib.parse as urlparse
 import warnings
-from warnings import warn
+
+from importlib import import_module
+from itertools import chain
+from os.path import basename, dirname, splitext
 
 import pywikibot
 from pywikibot.comms.http import fetch
@@ -24,13 +23,8 @@ from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
-    ModuleDeprecationWrapper, FrozenDict, classproperty, PY2
+    ModuleDeprecationWrapper, FrozenDict, classproperty,
 )
-
-if not PY2:
-    import urllib.parse as urlparse
-else:
-    import urlparse
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -42,7 +36,7 @@ NAME_CHARACTERS = string.ascii_letters + string.digits
 CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
-class Family(object):
+class Family:
 
     """Parent singleton class for all wiki families."""
 
@@ -55,7 +49,7 @@ class Family(object):
                 'subclass it instead'.format(cls.__name__))
 
         # Override classproperty
-        cls.instance = super(Family, cls).__new__(cls)
+        cls.instance = super().__new__(cls)
         # staticmethod is because python 2.7 binds the lambda to the class
         cls.__new__ = staticmethod(lambda cls: cls.instance)  # shortcut
 
@@ -675,7 +669,7 @@ class Family(object):
             issue_deprecation_warning('shared_data_repository',
                                       'APISite.data_repository()',
                                       since='20151023')
-        return super(Family, self).__getattribute__(name)
+        return super().__getattribute__(name)
 
     @staticmethod
     @deprecated_args(fatal=None)
@@ -718,17 +712,18 @@ class Family(object):
             raise UnknownFamily('Family %s does not exist' % fam)
         cls = mod.Family.instance
         if cls.name != fam:
-            warn('Family name %s does not match family module name %s'
-                 % (cls.name, fam), FamilyMaintenanceWarning)
+            warnings.warn('Family name {} does not match family module name {}'
+                          .format(cls.name, fam), FamilyMaintenanceWarning)
         # Family 'name' and the 'langs' codes must be ascii, and the
         # codes must be lower-case due to the Site loading algorithm.
         if not all(x in NAME_CHARACTERS for x in cls.name):
-            warn('Family name %s contains non-ascii characters' % cls.name,
-                 FamilyMaintenanceWarning)
+            warnings.warn('Family name {} contains non-ascii characters'
+                          .format(cls.name), FamilyMaintenanceWarning)
         for code in cls.langs.keys():
             if not all(x in CODE_CHARACTERS for x in code):
-                warn('Family %s code %s contains non-ascii characters' %
-                     (cls.name, code), FamilyMaintenanceWarning)
+                warnings.warn('Family {} code {} contains non-ascii characters'
+                              .format(cls.name, code),
+                              FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
 
@@ -752,12 +747,13 @@ class Family(object):
         """
         if code in self.linktrails:
             return self.linktrails[code]
-        elif fallback:
+
+        if fallback:
             return self.linktrails[fallback]
-        else:
-            raise KeyError(
-                'ERROR: linktrail in language %(language_code)s unknown'
-                % {'language_code': code})
+
+        raise KeyError(
+            'ERROR: linktrail in language {language_code} unknown'
+            .format(language_code=code))
 
     def category_redirects(self, code, fallback='_default'):
         """Return list of category redirect templates."""
@@ -808,12 +804,13 @@ class Family(object):
         """Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
-        elif fallback:
+
+        if fallback:
             return self.disambiguationTemplates[fallback]
-        else:
-            raise KeyError(
-                'ERROR: title for disambig template in language %s unknown'
-                % code)
+
+        raise KeyError(
+            'ERROR: title for disambig template in language {} unknown'
+            .format(code))
 
     # Methods
     def protocol(self, code):
@@ -1214,7 +1211,7 @@ class SingleSiteFamily(Family):
 
         cls.langs = {cls.code: cls.domain}
 
-        return super(SingleSiteFamily, cls).__new__(cls)
+        return super().__new__(cls)
 
     @classproperty
     def domains(cls):
@@ -1233,7 +1230,7 @@ class SubdomainFamily(Family):
     def __new__(cls):
         """Initializer."""
         assert cls.domain
-        return super(SubdomainFamily, cls).__new__(cls)
+        return super().__new__(cls)
 
     @classproperty
     def langs(cls):
@@ -1462,9 +1459,9 @@ def AutoFamily(name, url):
         """Extract the script path from the URL."""
         if self.url.path.endswith('/api.php'):
             return self.url.path[0:-8]
-        else:
-            # AutoFamily refers to the variable set below, not the function
-            return super(AutoFamily, self).scriptpath(code)
+
+        # AutoFamily refers to the variable set below, not the function
+        return super().scriptpath(code)
 
     # str() used because py2 can't accept a unicode as the name of a class
     AutoFamily = type(str('AutoFamily'), (SingleSiteFamily,), locals())
