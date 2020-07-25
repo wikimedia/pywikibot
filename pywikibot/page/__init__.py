@@ -441,9 +441,9 @@ class BasePage(ComparableMixin):
         return self.autoFormat()[0] is not None
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=None,
-                     change_edit_time=None,
-                     expandtemplates=None)
+    @deprecated_args(throttle=True,
+                     change_edit_time=True,
+                     expandtemplates=True)
     def get(self, force=False, get_redirect=False):
         """
         Return the wiki-text of the page.
@@ -508,7 +508,7 @@ class BasePage(ComparableMixin):
             raise self._getexception
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=None, change_edit_time=None)
+    @deprecated_args(throttle=True, change_edit_time=True)
     def getOldVersion(self, oldid, force=False, get_redirect=False):
         """
         Return text of an old revision of this page; same options as get().
@@ -987,7 +987,7 @@ class BasePage(ComparableMixin):
         return self.namespace() != 10 and len(disambig_in_page) > 0
 
     @deprecated_args(
-        step=None, withTemplateInclusion='with_template_inclusion',
+        step=True, withTemplateInclusion='with_template_inclusion',
         onlyTemplateInclusion='only_template_inclusion',
         redirectsOnly='filter_redirects')
     def getReferences(
@@ -1030,7 +1030,7 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=None, followRedirects='follow_redirects',
+    @deprecated_args(step=True, followRedirects='follow_redirects',
                      filterRedirects='filter_redirects')
     def backlinks(self, follow_redirects=True, filter_redirects=None,
                   namespaces=None, total=None, content=False):
@@ -1055,7 +1055,7 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def embeddedin(self, filter_redirects=None, namespaces=None,
                    total=None, content=False):
         """
@@ -1245,7 +1245,7 @@ class BasePage(ComparableMixin):
         return True
 
     @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary', sysop=None)
+    @deprecated_args(comment='summary', sysop=True)
     def save(self, summary=None, watch=None, minor=True, botflag=None,
              force=False, asynchronous=False, callback=None,
              apply_cosmetic_changes=None, quiet=False, **kwargs):
@@ -1462,9 +1462,8 @@ class BasePage(ComparableMixin):
         else:
             raise pywikibot.NoPage(self)
 
-    @deprecated_args(step=None)
-    def linkedPages(self, namespaces=None, total=None,
-                    content=False):
+    @deprecated_args(step=True)
+    def linkedPages(self, namespaces=None, total=None, content=False):
         """
         Iterate Pages that this Page links to.
 
@@ -1546,7 +1545,7 @@ class BasePage(ComparableMixin):
         else:
             return [i for i in self._langlinks if not i.site.obsolete]
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def iterlanglinks(self, total=None, include_obsolete=False):
         """
         Iterate all inter-language links on this page.
@@ -1582,7 +1581,7 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Use templates()."""
         return self.templates()
 
-    @deprecate_arg('get_redirect', None)
+    @deprecated_args(get_redirect=True)
     def templates(self, content=False):
         """
         Return a list of Page objects for templates used on this Page.
@@ -1601,7 +1600,7 @@ class BasePage(ComparableMixin):
 
         return self._templates
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def itertemplates(self, total=None, content=False):
         """
         Iterate Page objects for templates used on this Page.
@@ -1619,7 +1618,7 @@ class BasePage(ComparableMixin):
             return iter(self._templates)
         return self.site.pagetemplates(self, total=total, content=content)
 
-    @deprecated_args(followRedirects=None, loose=None, step=None)
+    @deprecated_args(followRedirects=True, loose=True, step=True)
     def imagelinks(self, total=None, content=False):
         """
         Iterate FilePage objects for images displayed on this Page.
@@ -1631,7 +1630,7 @@ class BasePage(ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(nofollow_redirects=None, get_redirect=None, step=None,
+    @deprecated_args(nofollow_redirects=True, get_redirect=True, step=True,
                      withSortKey='with_sort_key')
     def categories(self, with_sort_key=False, total=None, content=False):
         """
@@ -1650,7 +1649,7 @@ class BasePage(ComparableMixin):
 
         return self.site.pagecategories(self, total=total, content=content)
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def extlinks(self, total=None):
         """
         Iterate all external URLs (not interwiki links) from this page.
@@ -1745,8 +1744,8 @@ class BasePage(ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse', step=None,
-                     rollback=None)
+    @deprecated_args(getText='content', reverseOrder='reverse', step=True,
+                     rollback=True)
     def revisions(self, reverse=False, total=None, content=False,
                   starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
@@ -1770,8 +1769,8 @@ class BasePage(ComparableMixin):
     #
     # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
     @deprecated('Page.revisions()', since='20150206', future_warning=True)
-    @deprecated_args(forceReload=None, revCount='total', step=None,
-                     getAll=None, reverseOrder='reverse')
+    @deprecated_args(forceReload=True, revCount='total', step=True,
+                     getAll=True, reverseOrder='reverse')
     def getVersionHistory(self, reverse=False, total=None):
         """
         Load the version history page and return history information.
@@ -1791,7 +1790,7 @@ class BasePage(ComparableMixin):
             ]
         return revisions
 
-    @deprecated_args(forceReload=None, reverseOrder='reverse', step=None)
+    @deprecated_args(forceReload=True, reverseOrder='reverse', step=True)
     def getVersionHistoryTable(self, reverse=False, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
@@ -1805,7 +1804,7 @@ class BasePage(ComparableMixin):
 
     @deprecated('Page.revisions(content=True)', since='20150206',
                 future_warning=True)
-    @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
+    @deprecated_args(reverseOrder='reverse', rollback=True, step=True)
     def fullVersionHistory(self, reverse=False, total=None):
         """Return previous versions including content."""
         with suppress_warnings(
@@ -1817,7 +1816,7 @@ class BasePage(ComparableMixin):
             ]
         return revisions
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def contributors(self, total=None, starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
@@ -1834,7 +1833,7 @@ class BasePage(ComparableMixin):
                                       starttime=starttime, endtime=endtime))
 
     @deprecated('contributors()', since='20150206')
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def contributingUsers(self, total=None):
         """
         Return a set of usernames (or IPs) of users who edited this page.
@@ -1908,7 +1907,7 @@ class BasePage(ComparableMixin):
         self.site.merge_history(self, dest, timestamp, reason)
 
     @deprecated_args(
-        throttle=None, deleteAndMove='noredirect', movetalkpage='movetalk')
+        throttle=True, deleteAndMove='noredirect', movetalkpage='movetalk')
     @remove_last_args(['safe'])
     def move(self, newtitle, reason=None, movetalk=True, noredirect=False):
         """
@@ -1928,7 +1927,7 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    @deprecate_arg('throttle', None)
+    @deprecated_args(throttle=True)
     def delete(self, reason=None, prompt=True, mark=False, quit=False):
         """
         Delete the page from the wiki. Requires administrator status.
@@ -1986,7 +1985,7 @@ class BasePage(ComparableMixin):
                     self.text = template + self.text
                     self.save(summary=reason)
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def loadDeletedRevisions(self, total=None):
         """
         Retrieve deleted revisions for this Page.
@@ -2044,7 +2043,7 @@ class BasePage(ComparableMixin):
                 'Timestamp %d is not a deleted revision' % timestamp)
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecated_args(comment='reason', throttle=None)
+    @deprecated_args(comment='reason', throttle=True)
     def undelete(self, reason=None):
         """
         Undelete revisions based on the markers set by previous calls.
@@ -2081,7 +2080,7 @@ class BasePage(ComparableMixin):
                 'Please enter a reason for the undeletion:')
         self.site.undelete_page(self, reason, undelete_revs)
 
-    @deprecate_arg('throttle', None)
+    @deprecated_args(throttle=True)
     def protect(self, edit=False, move=False, create=None, upload=None,
                 unprotect=False, reason=None, prompt=None, protections=None,
                 **kwargs):
@@ -2308,7 +2307,7 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecated_args(defaultNamespace='ns', insite=None)
+    @deprecated_args(defaultNamespace='ns', insite=True)
     def __init__(self, source, title='', ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
@@ -2336,7 +2335,7 @@ class Page(BasePage):
 
         return self._raw_extracted_templates
 
-    @deprecate_arg('get_redirect', None)
+    @deprecated_args(get_redirect=True)
     def templatesWithParams(self):
         """
         Return templates used on this Page.
@@ -2462,7 +2461,7 @@ class FilePage(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    @deprecate_arg('insite', None)
+    @deprecated_args(insite=True)
     def __init__(self, source, title=''):
         """Initializer."""
         self._file_revisions = {}  # dictionary to cache File history.
@@ -2673,7 +2672,7 @@ class FilePage(Page):
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
                 '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def usingPages(self, total=None, content=False):
         """
         Yield Pages on which the file is displayed.
@@ -2804,7 +2803,7 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecated_args(insite=None, sortKey='sort_key')
+    @deprecated_args(insite=True, sortKey='sort_key')
     def __init__(self, source, title='', sort_key=None):
         """
         Initializer.
@@ -2818,7 +2817,7 @@ class Category(Page):
                              % title)
 
     @deprecated_args(
-        forceInterwiki=None, textlink=None, noInterwiki=None,
+        forceInterwiki=True, textlink=True, noInterwiki=True,
         sortKey='sort_key')
     def aslink(self, sort_key=None) -> str:
         """
@@ -2838,7 +2837,7 @@ class Category(Page):
             title_with_sort_key = self.title(with_section=False)
         return '[[%s]]' % title_with_sort_key
 
-    @deprecated_args(startFrom=None, cacheResults=None, step=None)
+    @deprecated_args(startFrom=True, cacheResults=True, step=True)
     def subcategories(self, recurse=False, total=None, content=False):
         """
         Iterate all subcategories of the current category.
@@ -2890,7 +2889,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', step=None)
+    @deprecated_args(startFrom='startprefix', step=True)
     def articles(self, recurse=False, total=None,
                  content=False, namespaces=None, sortby=None,
                  reverse=False, starttime=None, endtime=None,
@@ -2992,7 +2991,7 @@ class Category(Page):
                         if total == 0:
                             return
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def members(self, recurse=False, namespaces=None, total=None,
                 content=False):
         """Yield all category contents (subcats, pages, and files).
@@ -6805,7 +6804,7 @@ def unicode2html(x, encoding):
     return x
 
 
-@deprecated_args(site2=None, site='encodings')
+@deprecated_args(site2=True, site='encodings')
 def url2unicode(title, encodings='utf-8'):
     """
     Convert URL-encoded text to unicode using several encoding.
