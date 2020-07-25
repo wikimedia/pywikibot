@@ -5,9 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
+
 from urllib.parse import quote
 
 from requests.exceptions import Timeout
@@ -92,7 +91,7 @@ class SparqlQuery:
         """
         return self.last_response
 
-    def select(self, query, full_data=False, headers=DEFAULT_HEADERS):
+    def select(self, query: str, full_data=False, headers=DEFAULT_HEADERS):
         """
         Run SPARQL query and return the result.
 
@@ -100,7 +99,6 @@ class SparqlQuery:
         https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
         @param query: Query text
-        @type query: str
         @param full_data: Whether return full data objects or only values
         @type full_data: bool
         @return: List of query results or None if query failed
@@ -128,12 +126,11 @@ class SparqlQuery:
             return result
         return None
 
-    def query(self, query, headers=DEFAULT_HEADERS):
+    def query(self, query: str, headers=DEFAULT_HEADERS):
         """
         Run SPARQL query and return parsed JSON result.
 
         @param query: Query text
-        @type query: str
         """
         url = '{0}?query={1}'.format(self.endpoint, quote(query))
         while True:
@@ -159,13 +156,11 @@ class SparqlQuery:
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
-    def ask(self, query, headers=DEFAULT_HEADERS):
+    def ask(self, query: str, headers=DEFAULT_HEADERS) -> bool:
         """
         Run SPARQL ASK query and return boolean result.
 
         @param query: Query text
-        @type query: str
-        @rtype: bool
         """
         data = self.query(query, headers=headers)
         return data['boolean']
