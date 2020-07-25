@@ -1071,12 +1071,12 @@ class Family:
         return (self.encoding(code), )
 
     # aliases
-    @deprecated('Site().encoding()', since='20200218')
+    @deprecated('Site().encoding()', since='20200218', future_warning=True)
     def code2encoding(self, code):
         """Return the encoding for a specific language wiki."""
         return self.encoding(code)
 
-    @deprecated('Site().encodings()', since='20200218')
+    @deprecated('Site().encodings()', since='20200218', future_warning=True)
     def code2encodings(self, code):
         """Return list of historical encodings for a specific language wiki."""
         return self.encodings(code)
