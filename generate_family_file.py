@@ -6,25 +6,15 @@
 #
 # Distributed under the terms of the MIT license
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
-# system imports
 import codecs
 import os
 import sys
 
 from os import environ, getenv
-
-# creating & retrieving urls
-if sys.version_info[0] > 2:
-    from urllib.parse import urlparse
-else:  # Python 2
-    input = raw_input  # noqa: F821
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 
-class FamilyFileGenerator(object):
+class FamilyFileGenerator:
 
     """Family file creator."""
 
@@ -170,8 +160,6 @@ Configuration parameters:
 
 Please do not commit this to the Git repository!
 \"\"\"
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import deprecated
 
