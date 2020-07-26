@@ -18,64 +18,12 @@ from contextlib import suppress
 from importlib import import_module
 
 from pywikibot import tools
-from pywikibot.tools import classproperty, suppress_warnings
+from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path, mock
 from tests.aspects import (
     unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
 )
-
-
-class ContextManagerWrapperTestCase(TestCase):
-
-    """Test that ContextManagerWrapper is working correctly."""
-
-    class DummyClass(object):
-
-        """A dummy class which has some values and a close method."""
-
-        class_var = 42
-
-        def __init__(self):
-            """Create instance with dummy values."""
-            self.instance_var = 1337
-            self.closed = False
-
-        def close(self):
-            """Just store that it has been closed."""
-            self.closed = True
-
-    net = False
-
-    def test_wrapper(self):
-        """Create a test instance and verify the wrapper redirects."""
-        obj = self.DummyClass()
-        with suppress_warnings(
-                'pywikibot.tools.ContextManagerWrapper is deprecated.'):
-            wrapped = tools.ContextManagerWrapper(obj)
-        self.assertIs(wrapped.class_var, obj.class_var)
-        self.assertIs(wrapped.instance_var, obj.instance_var)
-        self.assertIs(wrapped._wrapped, obj)
-        self.assertFalse(obj.closed)
-        with wrapped as unwrapped:
-            self.assertFalse(obj.closed)
-            self.assertIs(unwrapped, obj)
-            unwrapped.class_var = 47
-        self.assertTrue(obj.closed)
-        self.assertEqual(wrapped.class_var, 47)
-
-    def test_exec_wrapper(self):
-        """Check that the wrapper permits exceptions."""
-        with suppress_warnings(
-                'pywikibot.tools.ContextManagerWrapper is deprecated.'):
-            wrapper = tools.ContextManagerWrapper(self.DummyClass())
-        self.assertFalse(wrapper.closed)
-        with self.assertRaisesRegex(
-                ZeroDivisionError,
-                '(integer division or modulo by zero|division by zero)'):
-            with wrapper:
-                1 / 0
-        self.assertTrue(wrapper.closed)
 
 
 class OpenArchiveTestCase(TestCase):
@@ -94,7 +42,7 @@ class OpenArchiveTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Define base_file and original_content."""
-        super(OpenArchiveTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read().replace(b'\r\n', b'\n')
@@ -226,7 +174,7 @@ class OpenArchiveWriteTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Define base_file and original_content."""
-        super(OpenArchiveWriteTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read().replace(b'\r\n', b'\n')
@@ -442,8 +390,8 @@ class SkipList(set):
         """Override to not process some items."""
         if item in self.skip_list:
             return True
-        else:
-            return super(SkipList, self).__contains__(item)
+
+        return super().__contains__(item)
 
 
 class ProcessAgainList(set):
@@ -456,8 +404,8 @@ class ProcessAgainList(set):
         """Override to not add some items."""
         if item in self.process_again_list:
             return
-        else:
-            return super(ProcessAgainList, self).add(item)
+
+        return super().add(item)
 
 
 class ContainsStopList(set):
@@ -470,8 +418,8 @@ class ContainsStopList(set):
         """Override to stop on encountering items."""
         if item in self.stop_list:
             raise StopIteration
-        else:
-            return super(ContainsStopList, self).__contains__(item)
+
+        return super().__contains__(item)
 
 
 class AddStopList(set):
@@ -484,8 +432,8 @@ class AddStopList(set):
         """Override to not continue on encountering items."""
         if item in self.stop_list:
             raise StopIteration
-        else:
-            super(AddStopList, self).add(item)
+
+        super().add(item)
 
 
 class TestFilterUnique(TestCase):
@@ -623,14 +571,6 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.strs, container=deduped, key=hash)
         self._test_dedup_str(deduped, deduper, hash)
 
-    @unittest.skipIf(not tools.PY2,
-                     'str in Py3 behave like objects and id as key fails')
-    def test_str_id(self):
-        """Test str using id as key."""
-        deduped = set()
-        deduper = tools.filter_unique(self.strs, container=deduped, key=id)
-        self._test_dedup_str(deduped, deduper, id)
-
     def test_for_resumable(self):
         """Test filter_unique is resumable after a for loop."""
         gen2 = tools.filter_unique(self.ints)
@@ -708,7 +648,7 @@ class MetaTestArgSpec(MetaTestCaseClass):
                                doc_suffix='on {0}'.format(suffix))
 
         dct['net'] = False
-        return super(MetaTestArgSpec, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestArgSpec(DeprecationTestCase, metaclass=MetaTestArgSpec):
@@ -770,7 +710,7 @@ class TestFileModeChecker(TestCase):
 
     def setUp(self):
         """Patch a variety of dependencies."""
-        super(TestFileModeChecker, self).setUp()
+        super().setUp()
         self.stat = self.patch('os.stat')
         self.chmod = self.patch('os.chmod')
         self.file = '~FakeFile'
@@ -812,7 +752,7 @@ class TestFileShaCalculator(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestFileShaCalculator, self).setUp()
+        super().setUp()
 
     def test_md5_complete_calculation(self):
         """Test md5 of complete file."""
