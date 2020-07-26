@@ -109,6 +109,7 @@ library_test_modules = {
     'plural',
     'proofreadpage',
     'site',
+    'site_decorators',
     'site_detect',
     'sparql',
     'tests',
