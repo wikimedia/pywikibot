@@ -65,7 +65,7 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    UnicodeMixin,
+    _UnicodeMixin as UnicodeMixin,
 )
 from pywikibot.tools.formatter import color_format
 
@@ -1429,3 +1429,5 @@ wrapper._add_deprecated_attr(
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')
+wrapper._add_deprecated_attr('UnicodeMixin', replacement_name='',
+                             since='20200723', future_warning=True)
