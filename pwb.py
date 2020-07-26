@@ -18,15 +18,15 @@ to set the default site (see T216825):
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import print_function
+
+import os
+import sys
+import types
 
 from difflib import get_close_matches
 from importlib import import_module
-import os
-import sys
 from time import sleep
-import types
-
 from warnings import warn
 
 
