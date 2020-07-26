@@ -1207,7 +1207,7 @@ class AlteredDefaultSiteTestCase(TestCase):
         super().tearDown()
 
 
-class ScenarioDefinedDefaultSiteTestCase(AlteredDefaultSiteTestCase):
+class ScriptMainTestCase(AlteredDefaultSiteTestCase):
 
     """Tests that depend on the default site being set to the test site."""
 
@@ -1363,13 +1363,6 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
             raise unittest.SkipTest(
                 '{}: {} is not connected to Wikidata.'
                 .format(cls.__name__, cls.get_site()))
-
-
-class ScriptMainTestCase(ScenarioDefinedDefaultSiteTestCase):
-
-    """Test running a script main()."""
-
-    pass
 
 
 class PwbTestCase(TestCase):
