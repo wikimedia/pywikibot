@@ -105,6 +105,7 @@ library_test_modules = {
     'site',
     'site_decorators',
     'site_detect',
+    'siteinfo',
     'sparql',
     'tests',
     'textlib',
