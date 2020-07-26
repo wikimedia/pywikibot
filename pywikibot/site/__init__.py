@@ -90,6 +90,9 @@ from pywikibot.tools import (
     SelfCallString,
 )
 
+__all__ = ('APISite', 'DataSite', 'Family', 'LoginStatus', 'Namespace',
+           'NamespacesDict', 'NonMWAPISite', 'PageInUse', 'RemovedSite',
+           'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
 
