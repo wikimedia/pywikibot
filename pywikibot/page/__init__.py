@@ -5871,12 +5871,8 @@ class Revision(DotReadableDict):
             None and does not cache anything.
         @rtype: str or None
         """
-        if self._sha1 is None:
-            if self.text is None:
-                # No text? No sha1 then.
-                return None
+        if self._sha1 is None and self.text is not None:
             self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
-
         return self._sha1
 
     @deprecated(since='20200329', future_warning=True)
