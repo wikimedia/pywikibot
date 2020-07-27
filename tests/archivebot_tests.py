@@ -164,8 +164,6 @@ class TestArchiveBot(TestCase):
         for thread in talk.threads:
             self.assertIsInstance(thread, archivebot.DiscussionThread)
             self.assertIsInstance(thread.title, str)
-            self.assertIsInstance(thread.now, datetime)
-            self.assertEqual(thread.now, talk.now)
             self.assertIsInstance(thread.ts, TimeStripper)
             self.assertEqual(thread.ts, talk.timestripper)
             self.assertIsInstance(thread.code, str)
@@ -230,8 +228,6 @@ class TestArchiveBotAfterDateUpdate(TestCase):
         for thread in talk.threads:
             self.assertIsInstance(thread, archivebot.DiscussionThread)
             self.assertIsInstance(thread.title, str)
-            self.assertIsInstance(thread.now, datetime)
-            self.assertEqual(thread.now, talk.now)
             self.assertIsInstance(thread.ts, TimeStripper)
             self.assertEqual(thread.ts, talk.timestripper)
             self.assertIsInstance(thread.code, str)

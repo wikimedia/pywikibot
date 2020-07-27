@@ -112,7 +112,7 @@ from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
-from pywikibot.tools import issue_deprecation_warning, FrozenDict
+from pywikibot.tools import issue_deprecation_warning, FrozenDict, deprecated
 
 
 ShouldArchive = Optional[Tuple[str, str]]
@@ -337,10 +337,15 @@ class DiscussionThread:
     :Reply, etc. ~~~~
     """
 
-    def __init__(self, title, now, timestripper) -> None:
+    def __init__(self, title, _now=None, timestripper=None) -> None:
         """Initializer."""
+        if _now is not None:
+            issue_deprecation_warning(
+                'Argument "now" in DiscussionThread.__init__()',
+                warning_class=FutureWarning,
+                since='20200727')
+        assert timestripper is not None
         self.title = title
-        self.now = now
         self.ts = timestripper
         self.code = self.ts.site.code
         self.content = ''
@@ -374,25 +379,11 @@ class DiscussionThread:
         """Return wikitext discussion thread."""
         return '== {} ==\n\n{}'.format(self.title, self.content)
 
+    @deprecated('PageArchiver.should_archive_thread(thread)', since='20200727',
+                future_warning=True)
     def should_be_archived(self, archiver) -> ShouldArchive:
-        """
-        Check whether thread has to be archived.
-
-        @return: the archivation reason as a tuple of localization args
-        """
-        # Archived by timestamp
-        algo = archiver.get_attr('algo')
-        re_t = re.search(r'^old\((.*)\)$', algo)
-        if re_t:
-            if not self.timestamp:
-                return None
-            # TODO: handle unsigned
-            maxage = str2time(re_t.group(1), self.timestamp)
-            if self.now - self.timestamp > maxage:
-                duration = str2localized_duration(archiver.site, re_t.group(1))
-                return ('duration', duration)
-        # TODO: handle marked with template
-        return None
+        """Check whether thread has to be archived."""
+        return archiver.should_archive_thread(self)
 
 
 class DiscussionPage(pywikibot.Page):
@@ -419,7 +410,6 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.timestripper = self.archiver.timestripper
         self.params = params
-        self.now = datetime.datetime.utcnow().replace(tzinfo=TZoneUTC())
         try:
             self.load_page()
         except pywikibot.NoPage:
@@ -451,8 +441,8 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.header = header + footer
         for thread_heading, thread_content in threads:
-            cur_thread = DiscussionThread(thread_heading.strip('= '), self.now,
-                                          self.timestripper)
+            cur_thread = DiscussionThread(
+                thread_heading.strip('= '), timestripper=self.timestripper)
             lines = thread_content.replace(marker, '').splitlines()
             lines = lines[1:]  # remove heading line
             for line in lines:
@@ -531,6 +521,7 @@ class PageArchiver:
         self.comment_params = {
             'from': self.page.title(),
         }
+        self.now = datetime.datetime.utcnow().replace(tzinfo=TZoneUTC())
         self.archives = {}
         self.archived_threads = 0
         self.month_num2orig_names = {}
@@ -585,6 +576,26 @@ class PageArchiver:
         if not self.get_attr('archive', ''):
             raise MissingConfigError('Missing argument "archive" in template')
 
+    def should_archive_thread(self, thread) -> ShouldArchive:
+        """
+        Check whether a thread has to be archived.
+
+        @return: the archivation reason as a tuple of localization args
+        """
+        # Archived by timestamp
+        algo = self.get_attr('algo')
+        re_t = re.fullmatch(r'old\((.*)\)', algo)
+        if re_t:
+            if not thread.timestamp:
+                return None
+            # TODO: handle unsigned
+            maxage = str2time(re_t.group(1), thread.timestamp)
+            if self.now - thread.timestamp > maxage:
+                duration = str2localized_duration(self.site, re_t.group(1))
+                return ('duration', duration)
+        # TODO: handle marked with template
+        return None
+
     def feed_archive(self, archive, thread, max_archive_size, params=None
                      ) -> bool:
         """
@@ -619,7 +630,7 @@ class PageArchiver:
                 continue  # Because there's too little threads left.
             # TODO: Make an option so that unstamped (unsigned) posts get
             # archived.
-            why = thread.should_be_archived(self)
+            why = self.should_archive_thread(thread)
             if why:
                 archive = self.get_attr('archive')
                 lang = self.site.lang
