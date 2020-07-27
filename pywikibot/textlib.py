@@ -11,12 +11,12 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 import re
 
+from collections.abc import Sequence
 from collections import OrderedDict, namedtuple
+from html.parser import HTMLParser
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -25,19 +25,8 @@ from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     DeprecatedRegex,
-    StringTypes,
-    UnicodeType,
     issue_deprecation_warning,
-    PY2,
 )
-
-if not PY2:
-    from collections.abc import Sequence
-    from html.parser import HTMLParser
-else:
-    from collections import Sequence
-    from future_builtins import zip
-    from HTMLParser import HTMLParser
 
 try:
     import mwparserfromhell
@@ -203,7 +192,7 @@ class _MultiTemplateMatchBuilder(object):
             else:
                 raise ValueError(
                     '{0} is not a template Page object'.format(template))
-        elif isinstance(template, StringTypes):
+        elif isinstance(template, str):
             old = template
         else:
             raise ValueError(
@@ -311,7 +300,7 @@ def _get_regexes(keys, site):
     result = []
 
     for exc in keys:
-        if isinstance(exc, UnicodeType):
+        if isinstance(exc, str):
             # assume the string is a reference to a standard regex above,
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
@@ -373,11 +362,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     @type count: int
     """
     # if we got a string, compile it as a regular expression
-    if isinstance(old, UnicodeType):
-        if caseInsensitive:
-            old = re.compile(old, re.IGNORECASE | re.UNICODE)
-        else:
-            old = re.compile(old)
+    if isinstance(old, str):
+        old = re.compile(old, flags=re.IGNORECASE if caseInsensitive else 0)
 
     # early termination if not relevant
     if not old.search(text):
@@ -660,7 +646,7 @@ def replace_links(text, replace, site=None):
         """Return the link from source when it's a Page otherwise itself."""
         if isinstance(source, pywikibot.Page):
             return source._link
-        elif isinstance(source, UnicodeType):
+        elif isinstance(source, str):
             return pywikibot.Link(source, site)
         else:
             return source
@@ -694,7 +680,7 @@ def replace_links(text, replace, site=None):
                 'The original value must be either basestring, Link or Page '
                 'but is "{0}"'.format(type(replace_list[0])))
         if replace_list[1] is not False and replace_list[1] is not None:
-            if isinstance(replace_list[1], UnicodeType):
+            if isinstance(replace_list[1], str):
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
             check_classes(replace_list[0])
         replace = replace_callable
@@ -778,10 +764,10 @@ def replace_links(text, replace, site=None):
 
         if new_link is False:
             # unlink - we remove the section if there's any
-            assert isinstance(new_label, UnicodeType), \
-                'link text must be unicode.'
+            assert isinstance(new_label, str), \
+                'link text must be str.'
             new_link = new_label
-        if isinstance(new_link, UnicodeType):
+        if isinstance(new_link, str):
             # Nothing good can come out of the fact that bytes is returned so
             # force unicode
             text = text[:start] + new_link + text[end:]
@@ -1550,7 +1536,7 @@ def categoryFormat(categories, insite=None):
 
     catLinks = []
     for category in categories:
-        if isinstance(category, UnicodeType):
+        if isinstance(category, str):
             category, separator, sortKey = category.strip('[]').partition('|')
             sortKey = sortKey if separator else None
             # whole word if no ":" is present
@@ -1698,14 +1684,14 @@ def extract_templates_and_params_mwpfh(text, strip=False):
                 if not implicit_parameter:
                     value = param.value.strip()
                 else:
-                    value = UnicodeType(param.value)
+                    value = str(param.value)
             else:
-                key = UnicodeType(param.name)
-                value = UnicodeType(param.value)
+                key = str(param.name)
+                value = str(param.value)
 
             params[key] = value
 
-        result.append((UnicodeType(template.name.strip()), params))
+        result.append((template.name.strip(), params))
     return result
 
 
@@ -1831,7 +1817,7 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
                         param_name, param_val = param.split('=', 1)
                         implicit_parameter = False
                     else:
-                        param_name = UnicodeType(numbered_param)
+                        param_name = str(numbered_param)
                         param_val = param
                         numbered_param += 1
                         implicit_parameter = True

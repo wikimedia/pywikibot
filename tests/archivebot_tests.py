@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from datetime import datetime, timedelta
 
 import pywikibot
 import pywikibot.page
 
 from pywikibot.textlib import TimeStripper
-from pywikibot.tools import suppress_warnings, StringTypes as basestring
+from pywikibot.tools import suppress_warnings
 
 from scripts import archivebot
 
@@ -139,7 +138,7 @@ class TestArchiveBot(TestCase):
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
         self.assertTrue(talk.archiver is None)
-        self.assertIsInstance(talk.header, basestring)
+        self.assertIsInstance(talk.header, str)
         self.assertIsInstance(talk.timestripper, TimeStripper)
 
         self.assertIsInstance(talk.threads, list)
@@ -150,14 +149,14 @@ class TestArchiveBot(TestCase):
 
         for thread in talk.threads:
             self.assertIsInstance(thread, archivebot.DiscussionThread)
-            self.assertIsInstance(thread.title, basestring)
+            self.assertIsInstance(thread.title, str)
             self.assertIsInstance(thread.now, datetime)
             self.assertEqual(thread.now, talk.now)
             self.assertIsInstance(thread.ts, TimeStripper)
             self.assertEqual(thread.ts, talk.timestripper)
-            self.assertIsInstance(thread.code, basestring)
+            self.assertIsInstance(thread.code, str)
             self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertIsInstance(thread.content, basestring)
+            self.assertIsInstance(thread.content, str)
             try:
                 self.assertIsInstance(thread.timestamp, datetime)
             except AssertionError:
@@ -204,7 +203,7 @@ class TestArchiveBotAfterDateUpdate(TestCase):
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
         self.assertTrue(talk.archiver is None)
-        self.assertIsInstance(talk.header, basestring)
+        self.assertIsInstance(talk.header, str)
         self.assertIsInstance(talk.timestripper, TimeStripper)
 
         self.assertIsInstance(talk.threads, list)
@@ -216,14 +215,14 @@ class TestArchiveBotAfterDateUpdate(TestCase):
 
         for thread in talk.threads:
             self.assertIsInstance(thread, archivebot.DiscussionThread)
-            self.assertIsInstance(thread.title, basestring)
+            self.assertIsInstance(thread.title, str)
             self.assertIsInstance(thread.now, datetime)
             self.assertEqual(thread.now, talk.now)
             self.assertIsInstance(thread.ts, TimeStripper)
             self.assertEqual(thread.ts, talk.timestripper)
-            self.assertIsInstance(thread.code, basestring)
+            self.assertIsInstance(thread.code, str)
             self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertIsInstance(thread.content, basestring)
+            self.assertIsInstance(thread.content, str)
             try:
                 self.assertIsInstance(thread.timestamp, datetime)
             except AssertionError:
@@ -363,7 +362,5 @@ class TestPageArchiverObject(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
