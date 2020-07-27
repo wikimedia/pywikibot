@@ -115,7 +115,7 @@ from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
 from pywikibot.tools import issue_deprecation_warning, FrozenDict, deprecated
 
 
-ShouldArchive = Optional[Tuple[str, str]]
+ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]
 
 ZERO = datetime.timedelta(0)
@@ -389,7 +389,7 @@ class DiscussionThread:
 
     @deprecated('PageArchiver.should_archive_thread(thread)', since='20200727',
                 future_warning=True)
-    def should_be_archived(self, archiver) -> ShouldArchive:
+    def should_be_archived(self, archiver) -> Optional[ShouldArchive]:
         """Check whether thread has to be archived."""
         return archiver.should_archive_thread(self)
 
@@ -589,7 +589,7 @@ class PageArchiver:
         if not self.get_attr('archive', ''):
             raise MissingConfigError('Missing argument "archive" in template')
 
-    def should_archive_thread(self, thread) -> ShouldArchive:
+    def should_archive_thread(self, thread) -> Optional[ShouldArchive]:
         """
         Check whether a thread has to be archived.
 
