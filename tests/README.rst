@@ -266,7 +266,7 @@ Require that the given list of modules can be imported.
   @require_modules(['important1', 'musthave2'])
   def test_require_modules(self):
 
-@(unittest.)mock.patch
+@unittest.mock.patch
 -----------------------
 Replaces `target` with object specified in `new`. Refer to mock's documentation.
 This is especially useful in tests, where requests to third-parties should be
