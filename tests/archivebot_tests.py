@@ -114,8 +114,22 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(archivebot.str2size('4 K'), (4096, 'B'))
         self.assertEqual(archivebot.str2size('1 M'), (1048576, 'B'))
         self.assertEqual(archivebot.str2size('2T'), (2, 'T'))
-        # TODO: should probably be recognized 2000?
-        self.assertEqual(archivebot.str2size('2 000'), (2, 'B'))
+        self.assertEqual(archivebot.str2size('2 000'), (2000, 'B'))
+        self.assertEqual(archivebot.str2size('2 000B'), (2000, 'B'))
+        self.assertEqual(archivebot.str2size('2 000 B'), (2000, 'B'))
+
+    def test_str2size_failures(self):
+        """Test for rejecting of invalid shorthand notation of sizes."""
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
+                          '4 KK')
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
+                          'K4')
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
+                          '4X')
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
+                          '1 234 56')
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
+                          '1234 567')
 
 
 class TestArchiveBot(TestCase):

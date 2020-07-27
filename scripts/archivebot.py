@@ -256,10 +256,10 @@ def str2size(string) -> Tuple[int, str]:
     Returns a tuple (size,unit), where size is an integer and unit is
     'B' (bytes) or 'T' (threads).
     """
-    match = re.search(r'(\d+) *([BkKMT]?)', string)
+    match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
     if not match:
         raise MalformedConfigError("Couldn't parse size: {}".format(string))
-    val, unit = (int(match.group(1)), match.group(2))
+    val, unit = (int(match.group(1).replace(' ', '')), match.group(2))
     if unit == 'M':
         val *= 1024
         unit = 'K'
