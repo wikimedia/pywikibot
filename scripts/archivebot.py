@@ -233,7 +233,6 @@ def checkstr(string) -> Tuple[str, str]:
     @type string: str
     @return: key and duration extracted form the string
     """
-    key = string[-1]
     if string.isdigit():
         key = 's'
         duration = string
@@ -241,6 +240,7 @@ def checkstr(string) -> Tuple[str, str]:
                                   string + key, 1, UserWarning,
                                   since='20161009')
     else:
+        key = string[-1]
         duration = string[:-1]
     return key, duration
 
@@ -256,10 +256,10 @@ def str2size(string) -> Tuple[int, str]:
     Returns a tuple (size,unit), where size is an integer and unit is
     'B' (bytes) or 'T' (threads).
     """
-    r = re.search(r'(\d+) *([BkKMT]?)', string)
-    if not r:
+    match = re.search(r'(\d+) *([BkKMT]?)', string)
+    if not match:
         raise MalformedConfigError("Couldn't parse size: {}".format(string))
-    val, unit = (int(r.group(1)), r.group(2))
+    val, unit = (int(match.group(1)), match.group(2))
     if unit == 'M':
         val *= 1024
         unit = 'K'
@@ -534,8 +534,8 @@ class PageArchiver:
         self.archives = {}
         self.archived_threads = 0
         self.month_num2orig_names = {}
-        for n, (_long, _short) in enumerate(self.site.months_names):
-            self.month_num2orig_names[n + 1] = {'long': _long, 'short': _short}
+        for n, (long, short) in enumerate(self.site.months_names, start=1):
+            self.month_num2orig_names[n] = {'long': long, 'short': short}
 
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
@@ -612,45 +612,45 @@ class PageArchiver:
         self.page.threads = []
         whys = set()
         pywikibot.output('Processing {} threads'.format(len(oldthreads)))
-        for t in oldthreads:
-            if len(oldthreads) - self.archived_threads \
-               <= int(self.get_attr('minthreadsleft', 5)):
-                self.page.threads.append(t)
+        for thread in oldthreads:
+            threads_left = len(oldthreads) - self.archived_threads
+            if threads_left <= int(self.get_attr('minthreadsleft', 5)):
+                self.page.threads.append(thread)
                 continue  # Because there's too little threads left.
             # TODO: Make an option so that unstamped (unsigned) posts get
             # archived.
-            why = t.should_be_archived(self)
+            why = thread.should_be_archived(self)
             if why:
                 archive = self.get_attr('archive')
                 lang = self.site.lang
+                timestamp = thread.timestamp
                 params = {
                     'counter': to_local_digits(arch_counter, lang),
-                    'year': to_local_digits(t.timestamp.year, lang),
-                    'isoyear': to_local_digits(t.timestamp.isocalendar()[0],
+                    'year': to_local_digits(timestamp.year, lang),
+                    'isoyear': to_local_digits(timestamp.isocalendar()[0],
                                                lang),
-                    'isoweek': to_local_digits(t.timestamp.isocalendar()[1],
+                    'isoweek': to_local_digits(timestamp.isocalendar()[1],
                                                lang),
-                    'semester': to_local_digits(
-                        int(ceil(float(t.timestamp.month) / 6)), lang),
-                    'quarter': to_local_digits(
-                        int(ceil(float(t.timestamp.month) / 3)), lang),
-                    'month': to_local_digits(t.timestamp.month, lang),
+                    'semester': to_local_digits(int(ceil(timestamp.month / 6)),
+                                                lang),
+                    'quarter': to_local_digits(int(ceil(timestamp.month / 3)),
+                                               lang),
+                    'month': to_local_digits(timestamp.month, lang),
                     'monthname': self.month_num2orig_names[
-                        t.timestamp.month]['long'],
+                        timestamp.month]['long'],
                     'monthnameshort': self.month_num2orig_names[
-                        t.timestamp.month]['short'],
+                        timestamp.month]['short'],
                     'week': to_local_digits(
-                        int(time.strftime('%W',
-                                          t.timestamp.timetuple())), lang),
+                        int(time.strftime('%W', timestamp.timetuple())), lang),
                 }
                 archive = pywikibot.Page(self.site, archive % params)
-                if self.feed_archive(archive, t, max_arch_size, params):
+                if self.feed_archive(archive, thread, max_arch_size, params):
                     arch_counter += 1
                     self.set_attr('counter', str(arch_counter))
                 whys.add(why)
                 self.archived_threads += 1
             else:
-                self.page.threads.append(t)
+                self.page.threads.append(thread)
         return whys
 
     def run(self) -> None:
