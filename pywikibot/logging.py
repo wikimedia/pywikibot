@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import logging
 import os
 import sys
@@ -17,9 +15,6 @@ from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL, StreamHandler
 STDOUT = 16
 VERBOSE = 18
 INPUT = 25
-
-if sys.version_info[0] > 2:
-    unicode = str
 
 _init_routines = []
 _inited_routines = set()
@@ -43,8 +38,8 @@ def _init():
 
 # User output/logging functions
 
-# Six output functions are defined. Each requires a unicode or string
-# argument. All of these functions generate a message to the log file if
+# Six output functions are defined. Each requires a string argument
+# All of these functions generate a message to the log file if
 # logging is enabled ("-log" or "-debug" command line arguments).
 
 # The functions output(), stdout(), warning(), and error() all display a
@@ -94,17 +89,16 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger='',
 
     if decoder:
         text = text.decode(decoder)
-    elif not isinstance(text, unicode):
-        if not isinstance(text, str):
-            # looks like text is a non-text object.
-            # Maybe it has a __unicode__ builtin ?
-            # (allows to print Page, Site...)
-            text = unicode(text)
-        else:
-            try:
-                text = text.decode('utf-8')
-            except UnicodeDecodeError:
-                text = text.decode('iso8859-1')
+    elif isinstance(text, bytes):
+        try:
+            text = text.decode('utf-8')
+        except UnicodeDecodeError:
+            text = text.decode('iso8859-1')
+    else:
+        # looks like text is a non-text object.
+        # Maybe it has a __str__ builtin ?
+        # (allows to print Page, Site...)
+        text = str(text)
 
     logger.log(_level, text, extra=context, **kwargs)
 
@@ -210,8 +204,8 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
         exc_info = 1
     else:
         exc_info = sys.exc_info()
-        msg = '%s: %s' % (
-            repr(exc_info[1]).split('(')[0], unicode(exc_info[1]).strip())
+        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],
+                              str(exc_info[1]).strip())
     if tb:
         kwargs['exc_info'] = exc_info
     logoutput(msg, decoder, newline, ERROR, **kwargs)

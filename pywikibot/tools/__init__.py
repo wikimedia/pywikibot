@@ -954,7 +954,7 @@ class SelfCallDict(SelfCallMixin, dict):
 
 class SelfCallString(SelfCallMixin, str):
 
-    """Unicode string with SelfCallMixin."""
+    """String with SelfCallMixin."""
 
     pass
 
@@ -1089,7 +1089,7 @@ def merge_unique_dicts(*args, **kwargs):
         result.update(arg)
     if conflicts:
         raise ValueError('Multiple dicts contain the same keys: {0}'
-                         .format(', '.join(sorted(UnicodeType(key)
+                         .format(', '.join(sorted(str(key)
                                                   for key in conflicts))))
     return result
 
