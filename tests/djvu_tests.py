@@ -55,12 +55,6 @@ class TestDjVuFile(TestCase):
         expected = "DjVuFile('{}')".format(self.file_djvu)
         self.assertEqual(str(djvu), expected)
 
-    def test_unicode_method(self):
-        """Test __unicode__() method."""
-        djvu = DjVuFile(self.file_djvu)
-        expected = "DjVuFile('{}')".format(self.file_djvu)
-        self.assertEqual(djvu.__unicode__(), expected)
-
     def test_file_existence(self):
         """Test file existence checks."""
         djvu = DjVuFile(self.file_djvu)
