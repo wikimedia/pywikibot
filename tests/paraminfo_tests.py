@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
@@ -137,8 +135,13 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if 'CollaborationKit' in extensions:
             base.append('text/x-collabkit')
 
-        self._check_param_values(self.site, 'edit', 'contentformat', base)
-        self._check_param_values(self.site, 'parse', 'contentformat', base)
+        for module in ('edit', 'parse'):
+            args = self.site, module, 'contentformat', base
+            with self.subTest(module=module):
+                if self.site.code == 'test':  # T259100: ignore experimentals
+                    self._check_param_subset(*args)
+                else:
+                    self._check_param_values(*args)
 
     def test_content_model(self):
         """Test content model."""
