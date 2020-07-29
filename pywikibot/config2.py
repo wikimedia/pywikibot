@@ -36,8 +36,6 @@ build paths relative to base_dir:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 import copy
 import os
@@ -56,15 +54,12 @@ from warnings import warn
 
 from pywikibot import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import PY2, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 
 OSWIN32 = (sys.platform == 'win32')
 
 if OSWIN32:
-    if not PY2:
-        import winreg
-    else:
-        import _winreg as winreg
+    import winreg
 
 
 # Normalize old PYWIKIBOT2 environment variables and issue a deprecation warn.
@@ -417,16 +412,10 @@ ignore_bot_templates = False
 # be 'cp850' ('cp437' for older versions). Linux users might try 'iso-8859-1'
 # or 'utf-8'.
 # This default code should work fine, so you don't have to think about it.
+# When using pywikibot inside a daemonized twisted application, we get
+# "StdioOnnaStick instance has no attribute 'encoding'"; assign None instead.
 # TODO: consider getting rid of this config variable.
-try:
-    if not PY2 or not sys.stdout.encoding:
-        console_encoding = sys.stdout.encoding
-    else:
-        console_encoding = sys.stdout.encoding.decode('ascii')
-except AttributeError:
-    # When using pywikibot inside a daemonized twisted application,
-    # we get "StdioOnnaStick instance has no attribute 'encoding'"
-    console_encoding = None
+console_encoding = getattr(sys.stdout, 'encoding', None)
 
 # The encoding the user would like to see text transliterated to. This can be
 # set to a charset (e.g. 'ascii', 'iso-8859-1' or 'cp850'), and we will output
