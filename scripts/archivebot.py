@@ -164,7 +164,7 @@ class ArchiveSecurityError(ArchiveBotSiteConfigError):
     """
 
 
-def str2localized_duration(site, string) -> str:
+def str2localized_duration(site, string: str) -> str:
     """
     Localise a shorthand duration.
 
@@ -181,7 +181,7 @@ def str2localized_duration(site, string) -> str:
         return to_local_digits(string, site.code)
 
 
-def str2time(string, timestamp=None) -> datetime.timedelta:
+def str2time(string: str, timestamp=None) -> datetime.timedelta:
     """
     Return a timedelta for a shorthand duration.
 
@@ -221,7 +221,7 @@ def str2time(string, timestamp=None) -> datetime.timedelta:
         return datetime.timedelta(days=days)
 
 
-def checkstr(string) -> Tuple[str, str]:
+def checkstr(string: str) -> Tuple[str, str]:
     """
     Return the key and duration extracted from the string.
 
@@ -246,7 +246,7 @@ def checkstr(string) -> Tuple[str, str]:
     return key, duration
 
 
-def str2size(string) -> Size:
+def str2size(string: str) -> Size:
     """
     Return a size for a shorthand size.
 
@@ -271,7 +271,7 @@ def str2size(string) -> Size:
     return val, unit
 
 
-def template_title_regex(tpl_page) -> Pattern:
+def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
     """
     Return a regex that matches to variations of the template title.
 
@@ -338,7 +338,7 @@ class DiscussionThread:
     :Reply, etc. ~~~~
     """
 
-    def __init__(self, title, _now=None, timestripper=None) -> None:
+    def __init__(self, title: str, _now=None, timestripper=None) -> None:
         """Initializer."""
         if _now is not None:
             issue_deprecation_warning(
@@ -357,7 +357,7 @@ class DiscussionThread:
         return '{}("{}",{} bytes)'.format(self.__class__.__name__, self.title,
                                           len(self.content.encode('utf-8')))
 
-    def feed_line(self, line) -> None:
+    def feed_line(self, line: str) -> None:
         """Add a line to the content and find the newest timestamp."""
         if not self.content and not line:
             return
@@ -404,7 +404,7 @@ class DiscussionPage(pywikibot.Page):
 
     def __init__(self, source, archiver, params=None) -> None:
         """Initializer."""
-        super(DiscussionPage, self).__init__(source)
+        super().__init__(source)
         self.threads = []
         self.full = False
         self.archiver = archiver
@@ -451,8 +451,8 @@ class DiscussionPage(pywikibot.Page):
         for thread_heading, thread_content in threads:
             cur_thread = DiscussionThread(
                 thread_heading.strip('= '), timestripper=self.timestripper)
-            lines = thread_content.replace(marker, '').splitlines()
-            lines = lines[1:]  # remove heading line
+            # remove heading line
+            _, *lines = thread_content.replace(marker, '').splitlines()
             for line in lines:
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
@@ -481,7 +481,13 @@ class DiscussionPage(pywikibot.Page):
         return self.is_full(max_archive_size)
 
     def size(self) -> int:
-        """Return size of talk page threads."""
+        """
+        Return size of talk page threads.
+
+        Note that this method counts bytes, rather than codepoints
+        (characters). This corresponds to MediaWiki's definition
+        of page size.
+        """
         return len(self.header.encode('utf-8')) + sum(t.size()
                                                       for t in self.threads)
 
@@ -589,7 +595,8 @@ class PageArchiver:
         if not self.get_attr('archive', ''):
             raise MissingConfigError('Missing argument "archive" in template')
 
-    def should_archive_thread(self, thread) -> Optional[ShouldArchive]:
+    def should_archive_thread(self, thread: DiscussionThread
+                              ) -> Optional[ShouldArchive]:
         """
         Check whether a thread has to be archived.
 
@@ -831,17 +838,16 @@ def main(*args) -> None:
             else:
                 ns = []
             pywikibot.output('Fetching template transclusions...')
-            for pg in tmpl.getReferences(only_template_inclusion=True,
-                                         follow_redirects=False,
-                                         namespaces=ns):
-                pagelist.append(pg)
+            pagelist.extend(tmpl.getReferences(only_template_inclusion=True,
+                                               follow_redirects=False,
+                                               namespaces=ns))
         if filename:
             for pg in open(filename, 'r').readlines():
                 pagelist.append(pywikibot.Page(site, pg, ns=10))
         if pagename:
             pagelist.append(pywikibot.Page(site, pagename, ns=3))
-        pagelist = sorted(pagelist)
-        for pg in iter(pagelist):
+        pagelist.sort()
+        for pg in pagelist:
             pywikibot.output('Processing {}'.format(pg))
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
