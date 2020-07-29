@@ -101,7 +101,7 @@ import os
 import re
 import time
 
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from hashlib import md5
 from math import ceil
 from typing import Any, List, Optional, Pattern, Set, Tuple
@@ -671,39 +671,89 @@ class PageArchiver:
         max_arch_size = str2size(self.get_attr('maxarchivesize'))
         counter = int(self.get_attr('counter', '1'))
         pattern = self.get_attr('archive')
-        oldthreads = self.page.threads
-        self.page.threads = []
+
+        keep_threads = []
+        threads_per_archive = defaultdict(list)
         whys = set()
-        pywikibot.output('Processing {} threads'.format(len(oldthreads)))
-        for thread in oldthreads:
-            threads_left = len(oldthreads) - self.archived_threads
-            if threads_left <= int(self.get_attr('minthreadsleft', 5)):
-                self.page.threads.append(thread)
-                continue  # Because there's too little threads left.
+        pywikibot.output('Processing {} threads'
+                         .format(len(self.page.threads)))
+        for i, thread in enumerate(self.page.threads):
             # TODO: Make an option so that unstamped (unsigned) posts get
             # archived.
             why = self.should_archive_thread(thread)
             if not why or why[0] != 'duration':
-                self.page.threads.append(thread)
+                keep_threads.append(i)
                 continue
-
             params = self.get_params(thread.timestamp, counter)
-            archive = self.get_archive_page(pattern % params, params)
+            # this is actually just a dummy key to group the threads by
+            # "era" regardless of the counter and deal with it later
+            key = pattern % params
+            threads_per_archive[key].append((i, thread))
+            whys.add(why)  # xxx: we don't now if we ever archive anything
 
-            aux_params = self.get_params(thread.timestamp, counter + 1)
-            counter_matters = (pattern % params) != (pattern % aux_params)
-            del aux_params
-            while counter_matters and archive.is_full(max_arch_size):
-                counter += 1
+        # we need to start with the oldest archive since that is
+        # the one the saved counter applies to, so sort the groups
+        # by the oldest timestamp
+        groups = sorted(threads_per_archive.values(),
+                        key=lambda group: min(t.timestamp for _, t in group))
+
+        era_change = False
+        for group in groups:
+            # We will reset counter IFF:
+            # 1. it matters (AND)
+            # 2. "era" (year, month, etc.) changes (AND)
+            # 3. there is something to put to the new archive.
+            counter_matters = False
+            for i, thread in group:
+                threads_left = len(self.page.threads) - self.archived_threads
+                if threads_left <= int(self.get_attr('minthreadsleft', 5)):
+                    keep_threads.append(i)
+                    continue  # Because there's too little threads left.
+
+                if era_change:
+                    era_change = False
+                    counter = 1
+
                 params = self.get_params(thread.timestamp, counter)
                 archive = self.get_archive_page(pattern % params, params)
 
-            archive.feed_thread(thread, max_arch_size)
-            whys.add(why)
-            self.archived_threads += 1
+                aux_params = self.get_params(thread.timestamp, counter + 1)
+                # TODO: this variable does not change, figure out a way
+                # to only compute it once
+                counter_matters = (pattern % params) != (pattern % aux_params)
+                del aux_params
+                if counter_matters:
+                    while counter > 1 and not archive.exists():
+                        # This may happen when either:
+                        # 1. a previous version of the bot run and reset
+                        #    the counter without archiving anything
+                        #    (number #3 above)
+                        # 2. era changed between runs.
+                        # Decrease the counter.
+                        # TODO: This can be VERY slow, use preloading
+                        # or binary search.
+                        counter -= 1
+                        params = self.get_params(thread.timestamp, counter)
+                        archive = self.get_archive_page(
+                            pattern % params, params)
+                    while archive.is_full(max_arch_size):
+                        counter += 1
+                        params = self.get_params(thread.timestamp, counter)
+                        archive = self.get_archive_page(
+                            pattern % params, params)
 
-        self.set_attr('counter', str(counter))
-        return whys
+                archive.feed_thread(thread, max_arch_size)
+                self.archived_threads += 1
+            if counter_matters:
+                era_change = True
+
+        if self.archived_threads:
+            self.page.threads = [self.page.threads[i]
+                                 for i in sorted(keep_threads)]
+            self.set_attr('counter', str(counter))
+            return whys
+        else:
+            return set()
 
     def run(self) -> None:
         """Process a single DiscussionPage object."""
@@ -730,13 +780,15 @@ class PageArchiver:
             pywikibot.output('Archiving {0} thread(s).'
                              .format(self.archived_threads))
             # Save the archives first (so that bugs don't cause a loss of data)
-            for a in sorted(self.archives.keys()):
-                self.comment_params['count'] = self.archives[
-                    a].archived_threads
+            for title, archive in sorted(self.archives.items()):
+                count = archive.archived_threads
+                if count == 0:
+                    continue
+                self.comment_params['count'] = count
                 comment = i18n.twtranslate(self.site.code,
                                            'archivebot-archive-summary',
                                            self.comment_params)
-                self.archives[a].update(comment)
+                archive.update(comment)
 
             # Save the page itself
             self.page.header = rx.sub(self.attr2text(), self.page.header)
