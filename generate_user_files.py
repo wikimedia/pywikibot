@@ -167,8 +167,6 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
 
 
 EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
 # This is an automatically generated file. You can find more configuration
 # parameters in 'config.py' file.
 

@@ -110,6 +110,7 @@ _deprecated_variables = {
     'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
     'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
 }
+_future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -1062,7 +1063,7 @@ def _check_user_config_types(user_config, default_values, skipped):
             if name in _deprecated_variables:
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
-            else:
+            elif name not in _future_variables:
                 warn('\n'
                      + fill('Configuration variable "{0}" is defined in your '
                             'user-config.py but unknown. It can be a '
