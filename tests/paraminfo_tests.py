@@ -138,7 +138,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         for module in ('edit', 'parse'):
             args = self.site, module, 'contentformat', base
             with self.subTest(module=module):
-                if self.site.code == 'test':  # T259100: ignore experimentals
+                if self.site.family.name in ('wpbeta', 'wsbeta') \
+                   or self.site.code == 'test':
+                    # T259100: ignore experimentals
                     self._check_param_subset(*args)
                 else:
                     self._check_param_values(*args)
