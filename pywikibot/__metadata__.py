@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
-
 __name__ = 'pywikibot'
 __version__ = '4.0.0.dev0'
 __description__ = 'Python MediaWiki Bot Framework'

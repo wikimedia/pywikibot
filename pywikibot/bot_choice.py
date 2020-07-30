@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 """Choices for input_choice."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 from textwrap import fill
 
 import pywikibot
 
 
-class Option(object):
+class Option:
 
     """
     A basic option for input_choice.
@@ -23,30 +21,28 @@ class Option(object):
     * result(value)
     * test(value)
 
-    The methods C{test} and C{handled} are in such a relationship that when
-    C{handled} returns itself that C{test} must return True for that value. So
-    if C{test} returns False C{handled} may not return itself but it may return
-    not None.
+    The methods C{test} and C{handled} are in such a relationship that
+    when C{handled} returns itself that C{test} must return True for
+    that value. So if C{test} returns False C{handled} may not return
+    itself but it may return not None.
 
     Also C{result} only returns a sensible value when C{test} returns True for
     the same value.
     """
 
-    def __init__(self, stop=True):
+    def __init__(self, stop=True) -> None:
         """Initializer."""
         self._stop = stop
 
     @staticmethod
-    def formatted(text, options, default=None):
+    def formatted(text: str, options, default=None) -> str:
         """
         Create a text with the options formatted into it.
 
         @param text: Text into which options are to be formatted
-        @type text: str
         @param options: Option instances to be formatted
         @type options: Iterable
         @return: Text with the options formatted into it
-        @rtype: str
         """
         formatted_options = []
         for option in options:
@@ -58,7 +54,7 @@ class Option(object):
         return fill(re.sub(pattern, '{}', text), width=77).format(*highlights)
 
     @property
-    def stop(self):
+    def stop(self) -> bool:
         """Return whether this option stops asking."""
         return self._stop
 
@@ -110,20 +106,19 @@ class StandardOption(Option):
 
     """An option with a description and shortcut and returning the shortcut."""
 
-    def __init__(self, option, shortcut, **kwargs):
+    def __init__(self, option: str, shortcut, **kwargs):
         """
         Initializer.
 
         @param option: option string
-        @type option: str
         @param shortcut: Shortcut of the option
         @type shortcut: str
         """
-        super(StandardOption, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.option = option
         self.shortcut = shortcut.lower()
 
-    def format(self, default=None):
+    def format(self, default=None) -> str:
         """Return a formatted string for that option."""
         index = self.option.lower().find(self.shortcut)
         shortcut = self.shortcut
@@ -140,7 +135,7 @@ class StandardOption(Option):
         """Return the lowercased shortcut."""
         return self.shortcut
 
-    def test(self, value):
+    def test(self, value) -> bool:
         """Return True whether this option applies."""
         return (self.shortcut.lower() == value.lower()
                 or self.option.lower() == value.lower())
@@ -152,7 +147,7 @@ class OutputProxyOption(OutputOption, StandardOption):
 
     def __init__(self, option, shortcut, output, **kwargs):
         """Create a new option for the given sequence."""
-        super(OutputProxyOption, self).__init__(option, shortcut, **kwargs)
+        super().__init__(option, shortcut, **kwargs)
         self._outputter = output
 
     def output(self):
@@ -171,14 +166,14 @@ class NestedOption(OutputOption, StandardOption):
 
     def __init__(self, option, shortcut, description, options):
         """Initializer."""
-        super(NestedOption, self).__init__(option, shortcut, stop=False)
+        super().__init__(option, shortcut, stop=False)
         self.description = description
         self.options = options
 
     def format(self, default=None):
         """Return a formatted string for that option."""
         self._output = Option.formatted(self.description, self.options)
-        return super(NestedOption, self).format(default=default)
+        return super().format(default=default)
 
     def handled(self, value):
         """Return itself if it applies or the applying sub option."""
@@ -187,7 +182,7 @@ class NestedOption(OutputOption, StandardOption):
             if handled is not None:
                 return handled
         else:
-            return super(NestedOption, self).handled(value)
+            return super().handled(value)
 
     def output(self):
         """Output the suboptions."""
@@ -202,7 +197,7 @@ class ContextOption(OutputOption, StandardOption):
         self, option, shortcut, text, context, delta=100, start=0, end=0
     ):
         """Initializer."""
-        super(ContextOption, self).__init__(option, shortcut, stop=False)
+        super().__init__(option, shortcut, stop=False)
         self.text = text
         self.context = context
         self.delta = delta
@@ -212,7 +207,7 @@ class ContextOption(OutputOption, StandardOption):
     def result(self, value):
         """Add the delta to the context and output it."""
         self.context += self.delta
-        super(ContextOption, self).result(value)
+        super().result(value)
 
     def output(self):
         """Output the context."""
@@ -231,7 +226,7 @@ class Choice(StandardOption):
 
     def __init__(self, option, shortcut, replacer):
         """Initializer."""
-        super(Choice, self).__init__(option, shortcut)
+        super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
@@ -254,7 +249,7 @@ class StaticChoice(Choice):
 
     def __init__(self, option, shortcut, result):
         """Create instance with replacer set to None."""
-        super(StaticChoice, self).__init__(option, shortcut, None)
+        super().__init__(option, shortcut, None)
         self._result = result
 
     def handle(self):
@@ -269,7 +264,7 @@ class LinkChoice(Choice):
     def __init__(self, option, shortcut, replacer, replace_section,
                  replace_label):
         """Initializer."""
-        super(LinkChoice, self).__init__(option, shortcut, replacer)
+        super().__init__(option, shortcut, replacer)
         self._section = replace_section
         self._label = replace_label
 
@@ -306,7 +301,7 @@ class AlwaysChoice(Choice):
 
     def __init__(self, replacer, option='always', shortcut='a'):
         """Initializer."""
-        super(AlwaysChoice, self).__init__(option, shortcut, replacer)
+        super().__init__(option, shortcut, replacer)
         self.always = False
 
     def handle(self):
@@ -330,7 +325,7 @@ class IntegerOption(Option):
 
     def __init__(self, minimum=1, maximum=None, prefix='', **kwargs):
         """Initializer."""
-        super(IntegerOption, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if not ((minimum is None or isinstance(minimum, int))
                 and (maximum is None or isinstance(maximum, int))):
             raise ValueError(
@@ -341,7 +336,7 @@ class IntegerOption(Option):
         self._max = maximum
         self.prefix = prefix
 
-    def test(self, value):
+    def test(self, value) -> bool:
         """Return whether the value is an int and in the specified range."""
         try:
             value = self.parse(value)
@@ -361,7 +356,7 @@ class IntegerOption(Option):
         """Return the upper bound of the range of allowed values."""
         return self._max
 
-    def format(self, default=None):
+    def format(self, default=None) -> str:
         """Return a formatted string showing the range."""
         if default is not None and self.test(default):
             value = self.parse(default)
@@ -389,7 +384,7 @@ class IntegerOption(Option):
             rng = 'any' + default
         return '{0}<number> [{1}]'.format(self.prefix, rng)
 
-    def parse(self, value):
+    def parse(self, value) -> int:
         """Return integer from value with prefix removed."""
         if value.lower().startswith(self.prefix.lower()):
             return int(value[len(self.prefix):])
@@ -409,7 +404,7 @@ class ListOption(IntegerOption):
         """Initializer."""
         self._list = sequence
         try:
-            super(ListOption, self).__init__(1, self.maximum, prefix, **kwargs)
+            super().__init__(1, self.maximum, prefix, **kwargs)
         except ValueError:
             raise ValueError('The sequence is empty.')
         del self._max
@@ -419,10 +414,10 @@ class ListOption(IntegerOption):
         if not self._list:
             raise ValueError('The sequence is empty.')
         else:
-            return super(ListOption, self).format(default=default)
+            return super().format(default=default)
 
     @property
-    def maximum(self):
+    def maximum(self) -> int:
         """Return the maximum value."""
         return len(self._list)
 
@@ -445,7 +440,7 @@ class ShowingListOption(ListOption, OutputOption):
         @param post: Additional comment printed after the list.
         @type post: str
         """
-        super(ShowingListOption, self).__init__(sequence, prefix, **kwargs)
+        super().__init__(sequence, prefix, **kwargs)
         self.pre = pre
         self.post = post
 
@@ -469,7 +464,7 @@ class MultipleChoiceList(ListOption):
 
     """An option to select multiple items from a list."""
 
-    def test(self, value):
+    def test(self, value) -> bool:
         """Return whether the values are int and in the specified range."""
         try:
             values = [self.parse(val) for val in value.split(',')]
@@ -526,4 +521,4 @@ class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):
 
     def __init__(self):
         """Constructor using the 'quit' ('q') in input_choice."""
-        super(QuitKeyboardInterrupt, self).__init__('quit', 'q')
+        super().__init__('quit', 'q')
