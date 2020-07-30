@@ -12,12 +12,10 @@ Syntax:
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import sys
 
@@ -60,7 +58,7 @@ findday = re.compile(r'\[\[(Wikipedia:Categories for '
                      re.IGNORECASE)
 
 
-class ReCheck(object):
+class ReCheck:
 
     """Helper class."""
 
