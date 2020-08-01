@@ -3000,9 +3000,14 @@ class PropertyGenerator(QueryGenerator):
         for data_dict in super(PropertyGenerator, self)._extract_results(
             resultdata
         ):
-            d = self._previous_dicts.setdefault(data_dict['title'], data_dict)
-            if d is not data_dict:
-                self._update_old_result_dict(d, data_dict)
+            if 'title' in data_dict:
+                d = self._previous_dicts.setdefault(data_dict['title'],
+                                                    data_dict)
+                if d is not data_dict:
+                    self._update_old_result_dict(d, data_dict)
+            else:
+                pywikibot.warn('Skipping result without title: '
+                               + str(data_dict))
 
     def _fully_retrieved_data_dicts(self, resultdata):
         """Yield items of self._previous_dicts that are not in resultdata."""
