@@ -3921,7 +3921,7 @@ class SiteLinkCollection(MutableMapping):
                     raise ValueError(
                         "Couldn't determine the site and title of the value: "
                         '{!r}'.format(json))
-                db_name = obj['site']
+                db_name = json['site']
                 norm_data[db_name] = json
         return norm_data
 
