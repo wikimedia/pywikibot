@@ -38,9 +38,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'af', 'zh-min-nan', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'min', 'sl', 'lb', 'nds', 'bs',
         'nah', 'sa', 'kk', 'ms', 'km', 'vec', 'tk', 'sm', 'be', 'mk', 'hsb',
-        'yue', 'gd', 'ga', 'an', 'wo', 'ang', 'gom', 'shy', 'ia', 'tt', 'mt',
-        'sd', 'gn', 'mr', 'ie', 'so', 'csb', 'ug', 'fo', 'st', 'roa-rup', 'si',
-        'hif', 'kl', 'zu', 'su', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',
+        'yue', 'gd', 'ga', 'an', 'wo', 'gom', 'shy', 'ang', 'ia', 'tt', 'mt',
+        'sd', 'gn', 'mr', 'ie', 'so', 'fo', 'csb', 'ug', 'st', 'roa-rup', 'si',
+        'hif', 'zu', 'kl', 'su', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',
         'gv', 'kw', 'tpi', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu',
         'am', 'dv', 'sg', 'ti', 'tn', 'ks', 'shn',
     ]
