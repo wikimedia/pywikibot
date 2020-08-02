@@ -3089,8 +3089,6 @@ class APISite(BaseSite):
         if pageprops:
             props += '|pageprops'
 
-        rvprop = ['ids', 'flags', 'timestamp', 'user', 'comment', 'content']
-
         parameter = self._paraminfo.parameter('query+info', 'prop')
         if self.logged_in() and self.has_right('apihighlimits'):
             max_ids = int(parameter['highlimit'])
@@ -3120,7 +3118,7 @@ class APISite(BaseSite):
                 rvgen.request['pageids'] = set(pageids)
             else:
                 rvgen.request['titles'] = list(cache.keys())
-            rvgen.request['rvprop'] = rvprop
+            rvgen.request['rvprop'] = self._rvprops(content=True)
             pywikibot.output('Retrieving %s pages from %s.'
                              % (len(cache), self))
 
@@ -3724,12 +3722,24 @@ class APISite(BaseSite):
         yield from self._generator(api.PageGenerator, namespaces=namespaces,
                                    total=total, g_content=content, **cmargs)
 
+    def _rvprops(self, content=False) -> list:
+        """Setup rvprop items for loadrevisions and preloadpages.
+
+        @return: rvprop items
+        """
+        props = ['comment', 'ids', 'flags', 'parsedcomment', 'sha1', 'size',
+                 'tags', 'timestamp', 'user', 'userid']
+        if content:
+            props.append('content')
+        if self.mw_version >= '1.21':
+            props.append('contentmodel')
+        if self.mw_version >= '1.32':
+            props.append('roles')
+        return props
+
     @deprecated_args(getText='content', sysop=None)
     @remove_last_args(['rollback'])
-    def loadrevisions(self, page, *, content=False, revids=None,
-                      startid=None, endid=None, starttime=None,
-                      endtime=None, rvdir=None, user=None, excludeuser=None,
-                      section=None, step=None, total=None):
+    def loadrevisions(self, page, *, content=False, section=None, **kwargs):
         """Retrieve revision information and store it in page object.
 
         By default, retrieves the last (current) revision of the page,
@@ -3753,61 +3763,60 @@ class APISite(BaseSite):
             (content must be True); section must be given by number (top of
             the article is section 0), not name
         @type section: int
-        @param revids: retrieve only the specified revision ids (raise
+        @keyword revids: retrieve only the specified revision ids (raise
             Exception if any of revids does not correspond to page)
         @type revids: an int, a str or a list of ints or strings
-        @param startid: retrieve revisions starting with this revid
-        @param endid: stop upon retrieving this revid
-        @param starttime: retrieve revisions starting at this Timestamp
-        @param endtime: stop upon reaching this Timestamp
-        @param rvdir: if false, retrieve newest revisions first (default);
+        @keyword startid: retrieve revisions starting with this revid
+        @keyword endid: stop upon retrieving this revid
+        @keyword starttime: retrieve revisions starting at this Timestamp
+        @keyword endtime: stop upon reaching this Timestamp
+        @keyword rvdir: if false, retrieve newest revisions first (default);
             if true, retrieve earliest first
-        @param user: retrieve only revisions authored by this user
-        @param excludeuser: retrieve all revisions not authored by this user
+        @keyword user: retrieve only revisions authored by this user
+        @keyword excludeuser: retrieve all revisions not authored by this user
         @raises ValueError: invalid startid/endid or starttime/endtime values
         @raises pywikibot.Error: revids belonging to a different page
         """
-        latest = (revids is None
-                  and startid is None
-                  and endid is None
-                  and starttime is None
-                  and endtime is None
-                  and rvdir is None
-                  and user is None
-                  and excludeuser is None
-                  and step is None
-                  and total is None)  # if True, retrieving current revision
+        latest = all(val is None for val in kwargs.values())
+
+        revids = kwargs.get('revids')
+        startid = kwargs.get('startid')
+        starttime = kwargs.get('starttime')
+        endid = kwargs.get('endid')
+        endtime = kwargs.get('endtime')
+        rvdir = kwargs.get('rvdir')
+        user = kwargs.get('user')
+        step = kwargs.get('step')
 
         # check for invalid argument combinations
-        if (startid is not None or endid is not None) and \
-                (starttime is not None or endtime is not None):
+        if (startid is not None or endid is not None) \
+           and (starttime is not None or endtime is not None):
             raise ValueError(
                 'loadrevisions: startid/endid combined with starttime/endtime')
+
         if starttime is not None and endtime is not None:
             if rvdir and starttime >= endtime:
                 raise ValueError(
                     'loadrevisions: starttime > endtime with rvdir=True')
-            if (not rvdir) and endtime >= starttime:
+
+            if not rvdir and endtime >= starttime:
                 raise ValueError(
                     'loadrevisions: endtime > starttime with rvdir=False')
+
         if startid is not None and endid is not None:
             if rvdir and startid >= endid:
                 raise ValueError(
                     'loadrevisions: startid > endid with rvdir=True')
-            if (not rvdir) and endid >= startid:
+            if not rvdir and endid >= startid:
                 raise ValueError(
                     'loadrevisions: endid > startid with rvdir=False')
 
         rvargs = {'type_arg': 'info|revisions'}
+        rvargs['rvprop'] = self._rvprops(content=content)
 
-        rvargs['rvprop'] = ['comment', 'flags', 'ids', 'sha1', 'timestamp',
-                            'user']
-        if self.mw_version >= '1.21':
-            rvargs['rvprop'].append('contentmodel')
-        if content:
-            rvargs['rvprop'].append('content')
-            if section is not None:
-                rvargs['rvsection'] = str(section)
+        if content and section is not None:
+            rvargs['rvsection'] = str(section)
+
         if revids is None:
             rvtitle = page.title(with_section=False).encode(self.encoding())
             rvargs['titles'] = rvtitle
@@ -3822,6 +3831,7 @@ class APISite(BaseSite):
             rvargs['rvdir'] = 'newer'
         elif rvdir is not None:
             rvargs['rvdir'] = 'older'
+
         if startid:
             rvargs['rvstartid'] = startid
         if endid:
@@ -3830,13 +3840,16 @@ class APISite(BaseSite):
             rvargs['rvstart'] = starttime
         if endtime:
             rvargs['rvend'] = endtime
+
         if user:
             rvargs['rvuser'] = user
-        elif excludeuser:
-            rvargs['rvexcludeuser'] = excludeuser
+        else:
+            rvargs['rvexcludeuser'] = kwargs.get('excludeuser')
 
         # assemble API request
-        rvgen = self._generator(api.PropertyGenerator, total=total, **rvargs)
+        rvgen = self._generator(api.PropertyGenerator,
+                                total=kwargs.get('total'), **rvargs)
+
         if step:
             rvgen.set_query_increment = step
 

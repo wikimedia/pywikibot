@@ -16,7 +16,6 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
-import hashlib
 import logging
 import os.path
 import re
@@ -44,6 +43,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.family import Family
+from pywikibot.page._revision import Revision
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
     add_full_name,
@@ -5482,139 +5482,6 @@ class Claim(Property):
             'value': self._formatValue(),
             'type': self.value_types.get(self.type, self.type)
         }
-
-
-class Revision(DotReadableDict):
-
-    """A structure holding information about a single revision of a Page."""
-
-    def __init__(self, revid, timestamp, user, anon=False, comment='',
-                 text=None, minor=False, rollbacktoken=None, parentid=None,
-                 contentmodel=None, sha1=None, slots=None):
-        """
-        Initializer.
-
-        All parameters correspond to object attributes (e.g., revid
-        parameter is stored as self.revid)
-
-        @param revid: Revision id number
-        @type revid: int
-        @param text: Revision wikitext.
-        @type text: str, or None if text not yet retrieved
-        @param timestamp: Revision time stamp
-        @type timestamp: pywikibot.Timestamp
-        @param user: user who edited this revision
-        @type user: str
-        @param anon: user is unregistered
-        @type anon: bool
-        @param comment: edit comment text
-        @type comment: str
-        @param minor: edit flagged as minor
-        @type minor: bool
-        @param rollbacktoken: rollback token
-        @type rollbacktoken: str
-        @param parentid: id of parent Revision
-        @type parentid: int
-        @param contentmodel: content model label (v1.21+)
-        @type contentmodel: str
-        @param sha1: sha1 of revision text
-        @type sha1: str
-        @param slots: revision slots (v1.32+)
-        @type slots: dict
-        """
-        self.revid = revid
-        self._text = text
-        self.timestamp = timestamp
-        self.user = user
-        self.anon = anon
-        self.comment = comment
-        self.minor = minor
-        self.rollbacktoken = rollbacktoken
-        self._parent_id = parentid
-        self._content_model = contentmodel
-        self._sha1 = sha1
-        self.slots = slots
-
-    @property
-    def parent_id(self) -> int:
-        """
-        Return id of parent/previous revision.
-
-        Returns 0 if there is no previous revision
-
-        @return: id of parent/previous revision
-        @raises AssertionError: parent id not supplied to the constructor
-        """
-        assert self._parent_id is not None, (
-            'Revision {0} was instantiated without a parent id'
-            .format(self.revid))
-
-        return self._parent_id
-
-    @property
-    def text(self) -> Optional[str]:
-        """
-        Return text of this revision.
-
-        This is meant for compatibility with older MW version which
-        didn't support revisions with slots. For newer MW versions,
-        this returns the contents of the main slot.
-
-        @return: text of the revision
-        """
-        if self.slots is not None:
-            return self.slots.get('main', {}).get('*')
-        return self._text
-
-    @property
-    def content_model(self) -> str:
-        """
-        Return content model of the revision.
-
-        This is meant for compatibility with older MW version which
-        didn't support revisions with slots. For newer MW versions,
-        this returns the content model of the main slot.
-
-        @return: content model
-        @raises AssertionError: content model not supplied to the constructor
-            which always occurs for MediaWiki versions lower than 1.21.
-        """
-        if self._content_model is None and self.slots is not None:
-            self._content_model = self.slots.get('main', {}).get(
-                'contentmodel')
-        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
-        assert self._content_model is not None, (
-            'Revision {0} was instantiated without a content model'
-            .format(self.revid))
-
-        return self._content_model
-
-    @property
-    def sha1(self) -> Optional[str]:
-        """
-        Return and cache SHA1 checksum of the text.
-
-        @return: if the SHA1 checksum is cached it'll be returned which is the
-            case when it was requested from the API. Otherwise it'll use the
-            revision's text to calculate the checksum (encoding it using UTF8
-            first). That calculated checksum will be cached too and returned on
-            future calls. If the text is None (not queried) it will just return
-            None and does not cache anything.
-        """
-        if self._sha1 is None and self.text is not None:
-            self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
-        return self._sha1
-
-    @staticmethod
-    def _thank(revid, site, source='pywikibot'):
-        """Thank a user for this revision.
-
-        @param site: The Site object for this revision.
-        @type site: Site
-        @param source: An optional source to pass to the API.
-        @type source: str
-        """
-        site.thank_revision(revid, source)
 
 
 class FileInfo(DotReadableDict):
