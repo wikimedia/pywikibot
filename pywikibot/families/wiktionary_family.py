@@ -47,6 +47,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
+        'ar': ('تحويل تصنيف',),
         'zh': ('分类重定向',),
     }
 
