@@ -128,6 +128,14 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         ]
         if self.site.mw_version >= '1.24':
             base.append('application/json')
+        if self.site.mw_version >= '1.36.0-wmf.2':
+            base.extend([
+                'application/octet-stream',
+                'application/unknown',
+                'application/x-binary',
+                'text/unknown',
+                'unknown/unknown',
+            ])
         if isinstance(self.site, DataSite):
             # It is not clear when this format has been added, see T129281.
             base.append('application/vnd.php.serialized')
@@ -138,12 +146,7 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         for module in ('edit', 'parse'):
             args = self.site, module, 'contentformat', base
             with self.subTest(module=module):
-                if self.site.family.name in ('wpbeta', 'wsbeta') \
-                   or self.site.code == 'test':
-                    # T259100: ignore experimentals
-                    self._check_param_subset(*args)
-                else:
-                    self._check_param_values(*args)
+                self._check_param_values(*args)
 
     def test_content_model(self):
         """Test content model."""
