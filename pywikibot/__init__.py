@@ -23,7 +23,7 @@ from pywikibot.__metadata__ import (
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
-    input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui,
+    input, input_choice, input_yn, handle_args, showHelp, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
     # the following are flagged as deprecated on usage
     handleArgs,
