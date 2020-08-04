@@ -36,8 +36,6 @@ build paths relative to base_dir:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 import copy
 import os
@@ -50,22 +48,18 @@ import types
 from distutils.version import StrictVersion
 from locale import getdefaultlocale
 from os import getenv, environ
+from requests import __version__ as requests_version
 from textwrap import fill
 from warnings import warn
 
-from requests import __version__ as requests_version
-
 from pywikibot import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import PY2, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 
 OSWIN32 = (sys.platform == 'win32')
 
 if OSWIN32:
-    if not PY2:
-        import winreg
-    else:
-        import _winreg as winreg
+    import winreg
 
 
 # Normalize old PYWIKIBOT2 environment variables and issue a deprecation warn.
@@ -116,6 +110,7 @@ _deprecated_variables = {
     'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
     'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
 }
+_future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -313,7 +308,7 @@ def get_base_dir(test_directory=None):
 
     base_dir = ''
     for arg in sys.argv[1:]:
-        if arg.startswith(str('-dir:')):
+        if arg.startswith('-dir:'):
             base_dir = arg[5:]
             base_dir = os.path.expanduser(base_dir)
             break
@@ -378,7 +373,7 @@ def get_base_dir(test_directory=None):
 base_dir = get_base_dir()
 
 for arg in sys.argv[1:]:
-    if arg.startswith(str('-verbose')) or arg == str('-v'):
+    if arg.startswith('-verbose') or arg == '-v':
         output('The base directory is ' + base_dir)
         break
 family_files = {}
@@ -418,16 +413,10 @@ ignore_bot_templates = False
 # be 'cp850' ('cp437' for older versions). Linux users might try 'iso-8859-1'
 # or 'utf-8'.
 # This default code should work fine, so you don't have to think about it.
+# When using pywikibot inside a daemonized twisted application, we get
+# "StdioOnnaStick instance has no attribute 'encoding'"; assign None instead.
 # TODO: consider getting rid of this config variable.
-try:
-    if not PY2 or not sys.stdout.encoding:
-        console_encoding = sys.stdout.encoding
-    else:
-        console_encoding = sys.stdout.encoding.decode('ascii')
-except AttributeError:
-    # When using pywikibot inside a daemonized twisted application,
-    # we get "StdioOnnaStick instance has no attribute 'encoding'"
-    console_encoding = None
+console_encoding = getattr(sys.stdout, 'encoding', None)
 
 # The encoding the user would like to see text transliterated to. This can be
 # set to a charset (e.g. 'ascii', 'iso-8859-1' or 'cp850'), and we will output
@@ -706,7 +695,7 @@ db_name_format = '{0}'
 db_connect_file = user_home_path('.my.cnf')
 # local port for mysql server
 # ssh -L 4711:enwiki.analytics.db.svc.eqiad.wmflabs:3306 \
-#     user@login.tools.wmflabs.org
+#     user@login.toolforge.org
 db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############
@@ -1074,7 +1063,7 @@ def _check_user_config_types(user_config, default_values, skipped):
             if name in _deprecated_variables:
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
-            else:
+            elif name not in _future_variables:
                 warn('\n'
                      + fill('Configuration variable "{0}" is defined in your '
                             'user-config.py but unknown. It can be a '
@@ -1170,9 +1159,7 @@ if __name__ == '__main__':
             _all = False
         else:
             warning('Unknown arg {0} ignored'.format(_arg))
-    _k = list(globals().keys())
-    _k.sort()
-    for _name in _k:
+    for _name in sorted(globals().keys()):
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:

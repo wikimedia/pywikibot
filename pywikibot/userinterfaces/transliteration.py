@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 _trans = {
     'À': 'A', 'Á': 'A', 'Â': 'A', 'Ầ': 'A', 'Ấ': 'A', 'Ẫ': 'A', 'Ẩ': 'A',
     'Ậ': 'A', 'Ã': 'A', 'Ā': 'A', 'Ă': 'A', 'Ằ': 'A', 'Ắ': 'A', 'Ẵ': 'A',
@@ -1089,17 +1087,16 @@ _trans = {
 }
 
 
-class transliterator(object):
+class transliterator:
 
     """Class to transliterating text."""
 
-    def __init__(self, encoding):
+    def __init__(self, encoding: str):
         """
         Initialize the transliteration mapping.
 
         @param encoding: the encoding available. Any transliterated character
             which can't be mapped, will be removed from the mapping.
-        @type encoding: str
         """
         trans = _trans.copy()
         for char, value in trans.items():
@@ -1113,12 +1110,11 @@ class transliterator(object):
             trans[char] = value
         self.trans = trans
 
-    def transliterate(self, char, default='?', prev='-', next='-'):
+    def transliterate(self, char: str, default='?', prev='-', next='-') -> str:
         """
         Transliterate the character.
 
         @param char: The character to transliterate.
-        @type char: str
         @param default: The character used when there is no transliteration.
         @type default: str
         @param prev: The previous character
@@ -1126,7 +1122,6 @@ class transliterator(object):
         @param next: The next character
         @type next: str
         @return: The transliterated character which may be an empty string
-        @rtype: str
         """
         if char in self.trans:
             return self.trans[char]

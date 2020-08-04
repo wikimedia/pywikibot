@@ -274,7 +274,7 @@ class ImageTransferBot(object):
                         break
                     todo = int(todo)
                 if 0 <= todo < len(imagelist):
-                    if (imagelist[todo].fileIsShared()
+                    if (imagelist[todo].file_is_shared()
                             and imagelist[todo].site.image_repository()
                             == self.targetSite.image_repository()):
                         pywikibot.output(

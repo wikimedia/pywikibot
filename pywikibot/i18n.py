@@ -21,18 +21,13 @@ messages. See L{twtranslate} for more information on the messages.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
 import os
 import pkgutil
 import re
 
+from collections.abc import Mapping
 from collections import defaultdict
-try:
-    from collections.abc import Mapping
-except ImportError:  # Python 2.7
-    from collections import Mapping
 from textwrap import fill
 from warnings import warn
 
@@ -43,7 +38,7 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning, StringTypes)
+    deprecated, deprecated_args, issue_deprecation_warning)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -526,9 +521,10 @@ class _PluralMappingAlias(Mapping):
     """
 
     def __init__(self, source):
-        if isinstance(source, StringTypes):
-            source = int(source)
-        self.source = source
+        if isinstance(source, str):
+            self.source = int(source)
+        else:
+            self.source = source
         self.index = -1
         super(_PluralMappingAlias, self).__init__()
 
@@ -536,13 +532,13 @@ class _PluralMappingAlias(Mapping):
         self.index += 1
         if isinstance(self.source, dict):
             return int(self.source[key])
-        elif isinstance(self.source, (tuple, list)):
+
+        if isinstance(self.source, (tuple, list)):
             if self.index < len(self.source):
                 return int(self.source[self.index])
             raise ValueError('Length of parameter does not match PLURAL '
                              'occurrences.')
-        else:
-            return self.source
+        return self.source
 
     def __iter__(self):
         raise NotImplementedError
@@ -608,7 +604,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         if fallback is True:
             codes += _altlang(code) + ['_default', 'en']
         elif fallback is not False:
-            codes += list(fallback)
+            codes.extend(fallback)
         for code in codes:
             if code in xdict:
                 trans = xdict[code]

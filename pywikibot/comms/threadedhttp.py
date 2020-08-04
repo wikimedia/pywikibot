@@ -1,37 +1,31 @@
 # -*- coding: utf-8 -*-
 """Http backend layer, formerly providing a httplib2 wrapper."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-
 __docformat__ = 'epytext'
 
 # standard python libraries
 import codecs
 import re
 
-import pywikibot
-from pywikibot.tools import deprecated, PY2, UnicodeMixin
+from urllib.parse import urlparse
 
-if not PY2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
+import pywikibot
+from pywikibot.tools import deprecated
 
 
 _logger = 'comm.threadedhttp'
 
 
-class HttpRequest(UnicodeMixin):
+class HttpRequest:
 
     """Object wrapper for HTTP requests that need to block origin thread.
 
     self.data will be either:
-    * a tuple of (dict, unicode) if the request was successful
+    * a tuple of (dict, str) if the request was successful
     * an exception
     """
 
@@ -200,7 +194,7 @@ class HttpRequest(UnicodeMixin):
         """Return the response decoded by the detected encoding."""
         return self.decode(self.encoding)
 
-    def __unicode__(self):
+    def __str__(self):
         """Return the response decoded by the detected encoding."""
         return self.text
 

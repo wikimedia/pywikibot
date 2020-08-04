@@ -210,6 +210,8 @@ GLOBAL OPTIONS
 -simulate         Disables writing to the server. Useful for testing and
                   debugging of new code (if given, doesn't do any real
                   changes, but only shows what would have been changed).
+                  An integer or float value may be given to simulate a
+                  processing time; the bot just waits for given seconds.
 
 -<config var>:n   You may use all given numeric config variables as option and
                   modify it with command line.
@@ -505,7 +507,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
                            automatic_quit=automatic_quit, force=force)
 
 
-@deprecated('input_choice', since='20140825')
+@deprecated('input_choice', since='20140825', future_warning=True)
 def inputChoice(question, answers, hotkeys, default=None):
     """Ask the user a question with several options, return the user's choice.
 
@@ -805,17 +807,16 @@ def handle_args(args=None, do_help=True):
         # it's the version in pywikibot.__init__ that is changed by scripts,
         # not the one in pywikibot.bot.
         args = pywikibot.argvu[1:]
+
     # get the name of the module calling this function. This is
     # required because the -help option loads the module's docstring and
     # because the module name will be used for the filename of the log.
-    module_name = calledModuleName()
-    if not module_name:
-        module_name = 'terminal-interface'
+    module_name = calledModuleName() or 'terminal-interface'
     non_global_args = []
     username = None
     do_help = None if do_help else False
     for arg in args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         if do_help is not False and option == '-help':
             do_help = True
         elif option == '-dir':
@@ -840,7 +841,7 @@ def handle_args(args=None, do_help=True):
             output('NOTE: option cosmetic_changes is %s\n'
                    % config.cosmetic_changes)
         elif option == '-simulate':
-            config.simulate = True
+            config.simulate = value or True
         #
         #  DEBUG control:
         #
@@ -869,15 +870,12 @@ def handle_args(args=None, do_help=True):
         elif option == '-debug':
             if module_name not in config.log:
                 config.log.append(module_name)
-            if value:
-                if value not in config.debug_log:
-                    config.debug_log.append(value)
-            elif '' not in config.debug_log:
-                config.debug_log.append('')
+            if value not in config.debug_log:
+                config.debug_log.append(value)  # may be empty string
         elif option in ('-verbose', '-v'):
             config.verbose_output += 1
         elif option == '-daemonize':
-            redirect_std = value if value else None
+            redirect_std = value or None
             daemonize.daemonize(redirect_std=redirect_std)
         else:
             # the argument depends on numerical config settings

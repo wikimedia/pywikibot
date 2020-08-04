@@ -100,6 +100,7 @@ stop_page = {
 }
 
 deadLinkTag = {
+    'ar': '[%s] {{وصلة مكسورة}}',
     'fr': '[%s] {{lien mort}}',
     'da': '[%s] {{dødt link}}',
     'fa': '[%s] {{پیوند مرده}}',

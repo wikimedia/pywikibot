@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 
 
@@ -31,11 +29,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'it', 'pl', 'ru', 'cs', 'fa', 'de', 'pt', 'es', 'fr', 'uk', 'he',
-        'sk', 'bs', 'ca', 'fi', 'tr', 'sl', 'lt', 'az', 'eo', 'zh', 'bg', 'hr',
+        'sk', 'bs', 'tr', 'ca', 'fi', 'sl', 'az', 'lt', 'eo', 'zh', 'bg', 'hr',
         'hy', 'el', 'su', 'id', 'nn', 'ar', 'et', 'sv', 'li', 'hu', 'ko', 'th',
         'nl', 'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'ur', 'te', 'be',
-        'cy', 'no', 'ml', 'kn', 'sq', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'da',
-        'sa', 'is', 'vi', 'br', 'mr', 'af', 'ky', 'wo',
+        'cy', 'no', 'ml', 'sq', 'kn', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'da',
+        'sa', 'is', 'vi', 'br', 'mr', 'af', 'wo', 'ky',
     ]
 
     category_redirect_templates = {
@@ -80,4 +78,4 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             return 'utf-8', 'iso8859-2'
         if code == 'ru':
             return 'utf-8', 'iso8859-5'
-        return super(Family, self).encodings(code)
+        return super().encodings(code)

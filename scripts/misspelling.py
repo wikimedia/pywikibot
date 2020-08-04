@@ -21,18 +21,16 @@ Command line options:
    -main       only check pages in the main namespace, not in the talk,
                wikipedia, user, etc. namespaces.
 """
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from itertools import chain
+from typing import Generator
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-
 from pywikibot.tools import UnicodeType
 
 from scripts.solve_disambiguation import DisambiguationRobot
@@ -58,6 +56,7 @@ class MisspellingRobot(DisambiguationRobot):
     # Optional: if there is a category, one can use the -start
     # parameter.
     misspellingCategory = {
+        'ar': 'تحويلات أخطاء إملائية',
         # da: only contains date redirects at the moment
         'da': 'Omdirigeringer af fejlstavninger',
         'de': ('Kategorie:Wikipedia:Falschschreibung',
@@ -67,18 +66,14 @@ class MisspellingRobot(DisambiguationRobot):
         'nl': 'Categorie:Wikipedia:Redirect voor spelfout',
     }
 
-    def __init__(self, always, firstPageTitle, main_only):
+    def __init__(self, always, firstPageTitle, main_only) -> None:
         """Initializer."""
-        super(MisspellingRobot, self).__init__(
-            always, [], True, False, None, False, main_only)
+        super().__init__(always, [], True, False, None, False, main_only)
         self.generator = self.createPageGenerator(firstPageTitle)
 
-    def createPageGenerator(self, firstPageTitle):
-        """
-        Generator to retrieve misspelling pages or misspelling redirects.
-
-        @rtype: generator
-        """
+    def createPageGenerator(self, firstPageTitle) -> Generator[pywikibot.Page,
+                                                               None, None]:
+        """Generator to retrieve misspelling pages or misspelling redirects."""
         mycode = self.site.code
         if mycode in self.misspellingCategory:
             categories = self.misspellingCategory[mycode]
@@ -111,14 +106,13 @@ class MisspellingRobot(DisambiguationRobot):
         preloadingGen = pagegenerators.PreloadingGenerator(generator)
         return preloadingGen
 
-    def findAlternatives(self, disambPage):
+    def findAlternatives(self, disambPage) -> bool:
         """
         Append link target to a list of alternative links.
 
         Overrides the DisambiguationRobot method.
 
         @return: True if alternate link was appended
-        @rtype: bool or None
         """
         if disambPage.isRedirectPage():
             self.alternatives.append(disambPage.getRedirectTarget().title())
@@ -142,8 +136,9 @@ class MisspellingRobot(DisambiguationRobot):
                         # only one correct spelling.
                         self.alternatives.append(correctSpelling)
                     return True
+        return False
 
-    def setSummaryMessage(self, disambPage, *args, **kwargs):
+    def setSummaryMessage(self, disambPage, *args, **kwargs) -> None:
         """
         Setup the summary message.
 
@@ -155,7 +150,7 @@ class MisspellingRobot(DisambiguationRobot):
                                         {'page': disambPage.title()})
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 

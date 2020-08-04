@@ -34,18 +34,14 @@ a list of affected articles
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 from functools import partial
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, textlib, Bot
-from pywikibot.pagegenerators import (
-    XMLDumpPageGenerator,
-)
+from pywikibot import Bot, i18n, pagegenerators, textlib
+from pywikibot.pagegenerators import XMLDumpPageGenerator
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -484,7 +480,7 @@ _ref_regex = re.compile('</ref>', re.IGNORECASE)
 _references_regex = re.compile('<references.*?/>', re.IGNORECASE)
 
 
-def _match_xml_page_text(text):
+def _match_xml_page_text(text) -> bool:
     """Match page text."""
     text = textlib.removeDisabledParts(text)
     return _ref_regex.search(text) and not _references_regex.search(text)
@@ -498,12 +494,12 @@ class NoReferencesBot(Bot):
 
     """References section bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
         self.availableOptions.update({
             'verbose': True,
         })
-        super(NoReferencesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = pagegenerators.PreloadingGenerator(generator)
         self.site = pywikibot.Site()
@@ -523,7 +519,7 @@ class NoReferencesBot(Bot):
         except KeyError:
             self.referencesText = '<references />'
 
-    def lacksReferences(self, text):
+    def lacksReferences(self, text) -> bool:
         """Check whether or not the page is lacking a references tag."""
         oldTextCleaned = textlib.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
@@ -531,25 +527,25 @@ class NoReferencesBot(Bot):
             if self.getOption('verbose'):
                 pywikibot.output('No changes necessary: references tag found.')
             return False
-        elif self.referencesTemplates:
+
+        if self.referencesTemplates:
             templateR = '{{(' + '|'.join(self.referencesTemplates) + ')'
-            if re.search(
-                templateR, oldTextCleaned, re.IGNORECASE | re.UNICODE
-            ):
+            if re.search(templateR, oldTextCleaned, re.IGNORECASE):
                 if self.getOption('verbose'):
                     pywikibot.output(
                         'No changes necessary: references template found.')
                 return False
+
         if not self.refR.search(oldTextCleaned):
             if self.getOption('verbose'):
                 pywikibot.output('No changes necessary: no ref tags found.')
             return False
-        else:
-            if self.getOption('verbose'):
-                pywikibot.output('Found ref without references.')
-            return True
 
-    def addReferences(self, oldText):
+        if self.getOption('verbose'):
+            pywikibot.output('Found ref without references.')
+        return True
+
+    def addReferences(self, oldText) -> str:
         """
         Add a references tag into an existing section where it fits into.
 
@@ -560,7 +556,6 @@ class NoReferencesBot(Bot):
         @param oldText: page text to be modified
         @type oldText: str
         @return: The modified pagetext
-        @rtype: str
         """
         # Do we have a malformed <reference> tag which could be repaired?
         # Set the edit summary for this case
@@ -670,7 +665,7 @@ class NoReferencesBot(Bot):
         index = len(tmpText)
         return self.createReferenceSection(oldText, index)
 
-    def createReferenceSection(self, oldText, index, ident='=='):
+    def createReferenceSection(self, oldText, index, ident='==') -> str:
         """Create a reference section and insert it into the given text.
 
         @param oldText: page text that is going to be be amended
@@ -682,7 +677,6 @@ class NoReferencesBot(Bot):
             title
         @type ident: str
         @return: the amended page text with reference section added
-        @rtype: str
         """
         if self.site.code in noTitleRequired:
             ref_section = '\n\n%s\n' % self.referencesText
@@ -692,7 +686,7 @@ class NoReferencesBot(Bot):
                 ident=ident, text=self.referencesText)
         return oldText[:index].rstrip() + ref_section + oldText[index:]
 
-    def run(self):
+    def run(self) -> None:
         """Run the bot."""
         for page in self.generator:
             self.current_page = page
@@ -736,7 +730,7 @@ class NoReferencesBot(Bot):
                                       .format(page.title(as_link=True)))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 

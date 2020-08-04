@@ -5,11 +5,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from collections import defaultdict
 import datetime
 import types
+
+from collections import defaultdict
+from contextlib import suppress
+from urllib.parse import unquote_to_bytes
 
 import pywikibot.data.api as api
 import pywikibot.family
@@ -18,11 +19,7 @@ import pywikibot.page
 import pywikibot.site
 
 from pywikibot.throttle import Throttle
-from pywikibot.tools import (
-    suppress_warnings,
-    PY2,
-    UnicodeType,
-)
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     unittest,
@@ -32,12 +29,6 @@ from tests.aspects import (
 )
 from tests import patch
 from tests.utils import FakeLoginManager, PatchedHttp
-
-if not PY2:
-    from urllib.parse import unquote_to_bytes
-else:
-    from future_builtins import zip
-    from urllib import unquote_plus as unquote_to_bytes
 
 
 class TestAPIMWException(DefaultSiteTestCase):
@@ -78,7 +69,7 @@ class TestAPIMWException(DefaultSiteTestCase):
             for param, value in self.assert_parameters.items():
                 self.assertIn(param, parameters)
                 if value is not None:
-                    if isinstance(value, UnicodeType):
+                    if isinstance(value, str):
                         value = value.split('|')
                     self.assertLessEqual(set(value), parameters[param])
         return self.data
@@ -1110,11 +1101,8 @@ class TestUrlEncoding(TestCase):
 
     def test_url_encoding_from_basestring(self):
         """Test encoding basestring values."""
-        if PY2:
-            query = {'token': str('test\xe2\x80\x94test'.encode('utf-8'))}
-        else:
-            query = {'token': 'test\xe2\x80\x94test'}
-        expect = str('token=test%C3%A2%C2%80%C2%94test')
+        query = {'token': 'test\xe2\x80\x94test'}
+        expect = 'token=test%C3%A2%C2%80%C2%94test'
         result = api.encode_url(query)
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
@@ -1187,7 +1175,5 @@ class TestLagpattern(DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikivoyage."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
 # The new wikivoyage family that is hosted at wikimedia
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 
 
@@ -19,7 +17,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'de', 'pl', 'it', 'fa', 'fr', 'ru', 'zh', 'nl', 'pt', 'es', 'he',
-        'vi', 'fi', 'sv', 'el', 'uk', 'ro', 'bn', 'ps', 'hi',
+        'vi', 'fi', 'sv', 'el', 'ro', 'uk', 'bn', 'ps', 'hi',
     ]
 
     category_redirect_templates = {

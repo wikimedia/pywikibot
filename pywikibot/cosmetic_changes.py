@@ -56,25 +56,23 @@ or by adding a list to the given one:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
-
-try:
-    import stdnum.isbn as stdnum_isbn
-except ImportError:
-    stdnum_isbn = None
 
 import pywikibot
 
 from pywikibot.page import url2unicode
 from pywikibot import textlib
-from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
-                               _get_regexes)
+from pywikibot.textlib import (
+    _get_regexes, _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+)
 from pywikibot.tools import (
     deprecated, deprecated_args, first_lower, first_upper
 )
 
+try:
+    import stdnum.isbn as stdnum_isbn
+except ImportError:
+    stdnum_isbn = None
 
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
@@ -200,7 +198,7 @@ def _reformat_ISBNs(text, strict=True):
         text, lambda match: _format_isbn_match(match, strict=strict))
 
 
-class CosmeticChangesToolkit(object):
+class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
@@ -442,31 +440,45 @@ class CosmeticChangesToolkit(object):
         # not wanted at ru
         # arz uses english stylish codes
         # no need to run on English wikis
-        if self.site.code not in ['arz', 'en', 'ru']:
-            def replace_magicword(match):
-                split = match.group().split('|')
-                # push ']]' out and re-add below
-                split[-1] = split[-1][:-2]
-                for magicword in ['img_thumbnail', 'img_left', 'img_center',
-                                  'img_right', 'img_none', 'img_framed',
-                                  'img_frameless', 'img_border', 'img_upright',
-                                  ]:
-                    aliases = list(self.site.getmagicwords(magicword))
-                    preferred = aliases.pop(0)
-                    if not aliases:
-                        continue
-                    split[1:] = list(map(
-                        lambda x: preferred if x.strip() in aliases else x,
-                        split[1:]))
-                return '|'.join(split) + ']]'
+        if self.site.code in ['arz', 'en', 'ru']:
+            return text
 
-            exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
-            regex = re.compile(
-                FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-                flags=re.X)
-            text = textlib.replaceExcept(text, regex, replace_magicword,
-                                         exceptions)
-        return text
+        def init_cache():
+            for magicword in ('img_thumbnail', 'img_left', 'img_center',
+                              'img_right', 'img_none', 'img_framed',
+                              'img_frameless', 'img_border', 'img_upright',
+                              'img_baseline', 'img_sub', 'img_super',
+                              'img_top', 'img_text_top', 'img_middle',
+                              'img_bottom', 'img_text_bottom'):
+                aliases = self.site.getmagicwords(magicword)
+                if len(aliases) > 1:
+                    cache.update((alias, aliases[0]) for alias in aliases[1:]
+                                 if '$1' not in alias)
+            if not cache:
+                cache[False] = True  # signal there is nothing to replace
+
+        def replace_magicword(match):
+            if cache.get(False):
+                return match.group()
+            split = match.group().split('|')
+            if len(split) == 1:
+                return match.group()
+
+            if not cache:
+                init_cache()
+
+            # push ']]' out and re-add below
+            split[-1] = split[-1][:-2]
+            return '{}|{}]]'.format(
+                split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
+
+        cache = {}
+        exceptions = ['nowiki', 'comment', 'pre', 'source']
+        regex = re.compile(
+            FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
+            flags=re.X)
+        return textlib.replaceExcept(
+            text, regex, replace_magicword, exceptions)
 
     def cleanUpLinks(self, text):
         """Tidy up wikilinks found in a string.
@@ -646,7 +658,10 @@ class CosmeticChangesToolkit(object):
         if self.template:
             ignore += [32]  # Space ( )
             ignore += [58]  # Colon (:)
-        text = pywikibot.html2unicode(text, ignore=ignore, exceptions=['code'])
+        # TODO: T254350 - what other extension tags should be avoided?
+        # (graph, math, score, timeline, etc.)
+        text = pywikibot.html2unicode(
+            text, ignore=ignore, exceptions=['comment', 'source'])
         return text
 
     def removeEmptySections(self, text):
@@ -915,7 +930,7 @@ class CosmeticChangesToolkit(object):
                                      site=self.site)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
-        pattern = re.compile('«.*?»', re.UNICODE)
+        pattern = re.compile('«.*?»')
         exceptions.append(pattern)
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
                                      r'\1&nbsp;°\2', exceptions,

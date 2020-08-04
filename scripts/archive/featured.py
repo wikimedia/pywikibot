@@ -54,12 +54,10 @@ Option commands:
 
 """
 #
-# (C) Pywikibot team, 2005-2019
+# (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pickle
 import re
 
@@ -69,20 +67,15 @@ from pywikibot import i18n, textlib, config
 
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning, PY2
-
-if not PY2:
-    unichr = chr
+from pywikibot.tools import issue_deprecation_warning
 
 
 def CAT(site, name, hide):
     name = site.namespace(14) + ':' + name
     cat = pywikibot.Category(site, name)
-    for article in cat.articles(endsort=hide):
-        yield article
+    yield from cat.articles(endsort=hide)
     if hide:
-        for article in cat.articles(startFrom=unichr(ord(hide) + 1)):
-            yield article
+        yield from cat.articles(startFrom=chr(ord(hide) + 1))
 
 
 def BACK(site, name, hide):
@@ -100,11 +93,9 @@ def DATA(site, name, hide):
     cat = pywikibot.Category(site, title)
     if isinstance(hide, dict):
         hide = hide.get(site.code)
-    for article in cat.articles(endsort=hide):
-        yield article
+    yield from cat.articles(endsort=hide)
     if hide:
-        for article in cat.articles(startsort=unichr(ord(hide) + 1)):
-            yield article
+        yield from cat.articles(startsort=chr(ord(hide) + 1))
 
 
 # not implemented yet
@@ -231,7 +222,7 @@ class FeaturedBot(pywikibot.Bot):
             'interactive': False,
         })
 
-        super(FeaturedBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.cache = {}
         self.filename = None
         self.site = pywikibot.Site()

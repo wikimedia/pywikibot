@@ -5,10 +5,9 @@
 # (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot.diff import cherry_pick, html_comparator, PatchManager
-from pywikibot.tools import PY2
 
 from tests import join_html_data_path, patch
 from tests.aspects import TestCase, require_modules, unittest
@@ -84,8 +83,7 @@ class TestHTMLComparator(TestCase):
         self.assertLength(output['deleted-context'], 1)
 
 
-@patch('{0}.__import__'.format('__builtin__' if PY2 else 'builtins'),
-       side_effect=ImportError, autospec=True)
+@patch('builtins.__import__', side_effect=ImportError, autospec=True)
 class TestNoBeautifulSoup(TestCase):
 
     """Test functions when BeautifulSoup is not installed."""
@@ -278,7 +276,5 @@ class TestCherryPick(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

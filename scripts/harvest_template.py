@@ -92,11 +92,12 @@ will not add duplicate claims for the same member:
 #
 # Distributed under the terms of MIT License.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import signal
 
+from typing import Any, List, Optional
+
 import pywikibot
+
 from pywikibot import pagegenerators as pg, textlib
 from pywikibot.bot import WikidataBot, OptionHandler
 
@@ -104,7 +105,7 @@ from pywikibot.bot import WikidataBot, OptionHandler
 willstop = False
 
 
-def _signal_handler(signal, frame):
+def _signal_handler(signal, frame) -> None:
     global willstop
     if not willstop:
         willstop = True
@@ -134,7 +135,7 @@ class HarvestRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
-    def __init__(self, generator, template_title, fields, **kwargs):
+    def __init__(self, generator, template_title, fields, **kwargs) -> None:
         """
         Initializer.
 
@@ -162,7 +163,7 @@ class HarvestRobot(WikidataBot):
             'islink': False,
             'multi': False,
         })
-        super(HarvestRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
         # TODO: Make it a list including the redirects to the template
         self.fields = {}
@@ -177,7 +178,7 @@ class HarvestRobot(WikidataBot):
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.getOption('create')
 
-    def getTemplateSynonyms(self, title):
+    def getTemplateSynonyms(self, title) -> List[str]:
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
         if not temp.exists():
@@ -196,7 +197,8 @@ class HarvestRobot(WikidataBot):
         titles.append(temp.title(with_ns=False))
         return titles
 
-    def _template_link_target(self, item, link_text):
+    def _template_link_target(self, item, link_text
+                              ) -> Optional[pywikibot.ItemPage]:
         link = pywikibot.Link(link_text)
         linked_page = pywikibot.Page(link)
         try:
@@ -231,7 +233,7 @@ class HarvestRobot(WikidataBot):
 
         return linked_item
 
-    def _get_option_with_fallback(self, handler, option):
+    def _get_option_with_fallback(self, handler, option) -> Any:
         """
         Compare bot's (global) and provided (local) options.
 
@@ -244,7 +246,7 @@ class HarvestRobot(WikidataBot):
         else:
             return local or default
 
-    def treat_page_and_item(self, page, item):
+    def treat_page_and_item(self, page, item) -> None:
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
@@ -349,7 +351,7 @@ class HarvestRobot(WikidataBot):
                     item, claim, exists_arg, page.site, pywikibot.output)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -409,7 +411,7 @@ def main(*args):
         fields[current_args[0]] = (current_args[1], handler)
     elif len(current_args) == 1:
         pywikibot.error('Incomplete command line param-property pair.')
-        return False
+        return
 
     if not template_title:
         pywikibot.error(

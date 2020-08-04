@@ -4,27 +4,15 @@
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
+import csv
 
 from io import BytesIO, StringIO
 
 import pywikibot
 from pywikibot.comms import http
-from pywikibot.tools import PY2, UnicodeType
-
-if not PY2:
-    import csv
-else:
-    try:
-        import unicodecsv as csv
-    except ImportError:
-        pywikibot.warning(
-            'WikiStats: unicodecsv package required for using csv in Python 2;'
-            ' falling back to using the larger XML datasets.')
-        csv = None
 
 
-class WikiStats(object):
+class WikiStats:
 
     """
     Light wrapper around WikiStats data, caching responses and data.
@@ -83,18 +71,17 @@ class WikiStats(object):
 
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
 
-    def __init__(self, url='https://wikistats.wmflabs.org/'):
+    def __init__(self, url='https://wikistats.wmflabs.org/') -> None:
         """Initializer."""
         self.url = url
         self._raw = {}
         self._data = {}
 
-    def fetch(self, table, format='xml'):
+    def fetch(self, table: str, format='xml'):
         """
         Fetch data from WikiStats.
 
         @param table: table of data to fetch
-        @type table: basestring
         @param format: Format of data to use
         @type format: 'xml' or 'csv'.
         @rtype: bytes
@@ -114,13 +101,12 @@ class WikiStats(object):
         r = http.fetch(url.format(table=table, format=format))
         return r.raw
 
-    def raw_cached(self, table, format):
+    def raw_cached(self, table: str, format):
         """
         Cache raw data.
 
         @param table: table of data to fetch
-        @type table: basestring
-        @param format: Format of data to use
+        @param format: format of data to use
         @type format: 'xml' or 'csv'.
         @rtype: bytes
         """
@@ -134,12 +120,11 @@ class WikiStats(object):
         self._raw[format][table] = data
         return data
 
-    def csv(self, table):
+    def csv(self, table: str):
         """
         Fetch and parse CSV for a table.
 
         @param table: table of data to fetch
-        @type table: basestring
         @rtype: list
         """
         if table in self._data.setdefault('csv', {}):
@@ -147,10 +132,7 @@ class WikiStats(object):
 
         data = self.raw_cached(table, 'csv')
 
-        if not PY2:
-            f = StringIO(data.decode('utf8'))
-        else:
-            f = BytesIO(data)
+        f = StringIO(data.decode('utf8'))
 
         reader = csv.DictReader(f)
         data = list(reader)
@@ -158,12 +140,11 @@ class WikiStats(object):
 
         return data
 
-    def xml(self, table):
+    def xml(self, table: str):
         """
         Fetch and parse XML for a table.
 
         @param table: table of data to fetch
-        @type table: basestring
         @rtype: list
         """
         if table in self._data.setdefault('xml', {}):
@@ -182,8 +163,8 @@ class WikiStats(object):
             site = {}
 
             for field in row.findall('field'):
-                name = UnicodeType(field.get('name'))
-                site[name] = UnicodeType(field.text)
+                name = str(field.get('name'))
+                site[name] = str(field.text)
 
             data.append(site)
 
@@ -191,32 +172,29 @@ class WikiStats(object):
 
         return data
 
-    def get(self, table, format=None):
-        """
-        Get a list of a table of data using format.
+    def get(self, table: str, format='csv'):
+        """Get a list of a table of data.
 
         @param table: table of data to fetch
-        @type table: basestring
-        @param format: Format of data to use
-        @type format: 'xml' or 'csv', or None to autoselect.
         @rtype: list
         """
-        if csv or format == 'csv':
-            data = self.csv(table)
-        else:
-            data = self.xml(table)
-        return data
+        try:
+            func = getattr(self, format)
+        except AttributeError:
+            raise NotImplementedError('Format "{}" is not supported'
+                                      .format(format))
+        return func(table)
 
-    def get_dict(self, table, format=None):
-        """
-        Get dictionary of a table of data using format.
+    def get_dict(self, table: str, format='csv'):
+        """Get dictionary of a table of data using format.
 
         @param table: table of data to fetch
-        @type table: basestring
-        @param format: Format of data to use
+        @param format: format of data to use
         @type format: 'xml' or 'csv', or None to autoselect.
         @rtype: dict
         """
+        if format is None:  # old autoselect
+            format = 'csv'
         return {data['prefix']: data for data in self.get(table, format)}
 
     def sorted(self, table, key):
@@ -230,7 +208,7 @@ class WikiStats(object):
                       key=lambda d: int(d[key]),
                       reverse=True)
 
-    def languages_by_size(self, table):
+    def languages_by_size(self, table: str):
         """Return ordered list of languages by size from WikiStats."""
         # This assumes they appear in order of size in the WikiStats dump.
         return [d['prefix'] for d in self.get(table)]

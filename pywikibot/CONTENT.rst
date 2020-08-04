@@ -7,6 +7,8 @@ The contents of the package
     | __init__.py                | Initialization of the pywikibot framework,           |
     |                            | basic classes and methods                            |
     +----------------------------+------------------------------------------------------+
+    | __metadata__.py            | pywikibot framework metadata file                    |
+    +----------------------------+------------------------------------------------------+
     | _wbtypes.py                | Wikibase data type classes                           |
     +----------------------------+------------------------------------------------------+
     | bot.py                     | User-interface related functions for building bots   |
@@ -108,6 +110,8 @@ The contents of the package
     | site                       | Module with classes for MediaWiki sites              |
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
+    +----------------------------+------------------------------------------------------+
+    | _decorators.py             | Decorators used by site models.                      |
     +----------------------------+------------------------------------------------------+
 
 

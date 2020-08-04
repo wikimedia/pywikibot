@@ -50,8 +50,6 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot.bot import suggest_help
 from pywikibot import pagegenerators
@@ -59,7 +57,7 @@ from pywikibot import pagegenerators
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 

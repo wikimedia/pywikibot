@@ -46,10 +46,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | #censure.py            | Bad word checker bot.                                   |
     +------------------------+---------------------------------------------------------+
-    | cfd.py                 | Processes the categories for discussion working page.   |
-    |                        | It parses out the actions that need to be taken as a    |
-    |                        | result of CFD discussions and performs them.            |
-    +------------------------+---------------------------------------------------------+
     | checkimages.py         | Check recently uploaded files. Checks if a file         |
     |                        | description is present and if there are other problems  |
     |                        | in the image's description.                             |
@@ -262,6 +258,10 @@ The contents of the package
     +----------------------------------------------------------------------------------+
     | archive                | Scripts no longer maintained.                           |
     +========================+=========================================================+
+    | cfd.py                 | Processes the categories for discussion working page.   |
+    |                        | It parses out the actions that need to be taken as a    |
+    |                        | result of CFD discussions and performs them.            |
+    +------------------------+---------------------------------------------------------+
     | featured.py            | A robot to check feature articles.                      |
     +------------------------+---------------------------------------------------------+
 

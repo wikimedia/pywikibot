@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 
+from contextlib import suppress
+
 import pywikibot
-from pywikibot.tools import PY2
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
 if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':
-    if not PY2:
-        import tkinter
-    else:
-        import Tkinter as tkinter  # noqa: N813
+    import tkinter
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 
@@ -53,7 +49,7 @@ class TestTkinter(DefaultSiteTestCase):
         myapp = EditBoxWindow(root)
         myapp.bind('<Control-d>', myapp.debug)
         v = myapp.edit(content, highlight=page.title())
-        assert v is None
+        self.assertIsNone(v)
 
 
 def setUpModule():  # noqa: N802
@@ -63,7 +59,5 @@ def setUpModule():  # noqa: N802
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

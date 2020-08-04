@@ -5,17 +5,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import calendar
-from collections import defaultdict
 import datetime
 import re
+
+from collections import defaultdict
+from contextlib import suppress
 from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper, deprecated, UnicodeType
+from pywikibot.tools import first_lower, first_upper, deprecated
 
 #
 # Different collections of well known formats
@@ -54,7 +54,7 @@ def multi(value, tuplst):
     When the 2nd function evaluates to true, the 1st function is used.
 
     """
-    if isinstance(value, UnicodeType):
+    if isinstance(value, str):
         # Try all functions, and test result against predicates
         for func, pred in tuplst:
             try:
@@ -209,10 +209,7 @@ def slh(value, lst):
         formats['MonthName']['en']('anything else') => raise ValueError
 
     """
-    if isinstance(value, UnicodeType):
-        return lst.index(value) + 1
-    else:
-        return lst[value - 1]
+    return lst.index(value) + 1 if isinstance(value, str) else lst[value - 1]
 
 
 def dh_singVal(value, match):
@@ -226,7 +223,7 @@ def dh_constVal(value, ind, match):
     formats['CurrEvents']['en'](ind) => 'Current Events'
     formats['CurrEvents']['en']('Current Events') => ind
     """
-    if isinstance(value, UnicodeType):
+    if isinstance(value, str):
         if value == match:
             return ind
     elif value == ind:
@@ -254,33 +251,33 @@ def monthName(lang, ind):
 
 # Helper for KN: digits representation
 _knDigits = NON_LATIN_DIGITS['kn']
-_knDigitsToLocal = {ord(UnicodeType(i)): _knDigits[i] for i in range(10)}
-_knLocalToDigits = {ord(_knDigits[i]): UnicodeType(i) for i in range(10)}
+_knDigitsToLocal = {ord(str(i)): _knDigits[i] for i in range(10)}
+_knLocalToDigits = {ord(_knDigits[i]): str(i) for i in range(10)}
 
 # Helper for Urdu/Persian languages
 _faDigits = NON_LATIN_DIGITS['fa']
-_faDigitsToLocal = {ord(UnicodeType(i)): _faDigits[i] for i in range(10)}
-_faLocalToDigits = {ord(_faDigits[i]): UnicodeType(i) for i in range(10)}
+_faDigitsToLocal = {ord(str(i)): _faDigits[i] for i in range(10)}
+_faLocalToDigits = {ord(_faDigits[i]): str(i) for i in range(10)}
 
 # Helper for HI:, MR:
 _hiDigits = NON_LATIN_DIGITS['hi']
-_hiDigitsToLocal = {ord(UnicodeType(i)): _hiDigits[i] for i in range(10)}
-_hiLocalToDigits = {ord(_hiDigits[i]): UnicodeType(i) for i in range(10)}
+_hiDigitsToLocal = {ord(str(i)): _hiDigits[i] for i in range(10)}
+_hiLocalToDigits = {ord(_hiDigits[i]): str(i) for i in range(10)}
 
 # Helper for BN:
 _bnDigits = NON_LATIN_DIGITS['bn']
-_bnDigitsToLocal = {ord(UnicodeType(i)): _bnDigits[i] for i in range(10)}
-_bnLocalToDigits = {ord(_bnDigits[i]): UnicodeType(i) for i in range(10)}
+_bnDigitsToLocal = {ord(str(i)): _bnDigits[i] for i in range(10)}
+_bnLocalToDigits = {ord(_bnDigits[i]): str(i) for i in range(10)}
 
 # Helper for GU:
 _guDigits = NON_LATIN_DIGITS['gu']
-_guDigitsToLocal = {ord(UnicodeType(i)): _guDigits[i] for i in range(10)}
-_guLocalToDigits = {ord(_guDigits[i]): UnicodeType(i) for i in range(10)}
+_guDigitsToLocal = {ord(str(i)): _guDigits[i] for i in range(10)}
+_guLocalToDigits = {ord(_guDigits[i]): str(i) for i in range(10)}
 
 
 def intToLocalDigitsStr(value, digitsToLocalDict):
     """Encode an integer value into a textual form."""
-    return UnicodeType(value).translate(digitsToLocalDict)
+    return str(value).translate(digitsToLocalDict)
 
 
 def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
@@ -318,7 +315,7 @@ _digitDecoders = {
     # %% is a %
     '%': '%',
     # %d is a decimal
-    'd': (_decimalDigits, UnicodeType, int),
+    'd': (_decimalDigits, str, int),
     # %R is a roman numeral. This allows for only the simplest linear
     # conversions based on a list of numbers
     'R': ('IVX', intToRomanNum, romanNumToInt),
@@ -343,7 +340,7 @@ _digitDecoders = {
           lambda v: localDigitsStrToInt(v, _guDigitsToLocal,
                                         _guLocalToDigits)),
     # %T is a year in TH: -- all years are shifted: 2005 => 'พ.ศ. 2548'
-    'T': (_decimalDigits, lambda v: UnicodeType(v + 543),
+    'T': (_decimalDigits, lambda v: str(v + 543),
           lambda v: int(v) - 543),
 }
 
@@ -375,7 +372,7 @@ def escapePattern2(pattern):
                     and (len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
-                if isinstance(dec, UnicodeType):
+                if isinstance(dec, str):
                     # Special case for strings that are replaced instead of
                     # decoded
                     assert len(s) < 3, (
@@ -436,7 +433,7 @@ def dh(value, pattern, encf, decf, filter=None):
 
     """
     compPattern, strPattern, decoders = escapePattern2(pattern)
-    if isinstance(value, UnicodeType):
+    if isinstance(value, str):
         m = compPattern.match(value)
         if m:
             # decode each found value using provided decoder
@@ -444,7 +441,7 @@ def dh(value, pattern, encf, decf, filter=None):
                       for i, decoder in enumerate(decoders)]
             decValue = decf(values)
 
-            assert not isinstance(decValue, UnicodeType), \
+            assert not isinstance(decValue, str), \
                 'Decoder must not return a string!'
 
             # recursive call to re-encode and see if we get the original
@@ -2187,29 +2184,25 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     @return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
     @rtype: tuple
     """
-    for dictName, dict in formats.items():
-        try:
-            year = dict[lang](title)
-            return dictName, year
-        except Exception:
-            pass
+    for dict_name, dictionary in formats.items():
+        with suppress(Exception):
+            year = dictionary[lang](title)
+            return dict_name, year
     # sometimes the title may begin with an upper case while its listed as
     # lower case, or the other way around
     # change case of the first character to the opposite, and try again
     if ignoreFirstLetterCase:
-        try:
+        with suppress(Exception):
             if title[0].isupper():
                 title = first_lower(title)
             else:
                 title = first_upper(title)
             return getAutoFormat(lang, title, ignoreFirstLetterCase=False)
-        except Exception:
-            pass
     return None, None
 
 
 @deprecated('date.format_date', since='20190526')
-class FormatDate(object):
+class FormatDate:
 
     """DEPRECATED. Format a date."""
 

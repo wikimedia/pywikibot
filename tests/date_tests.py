@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from datetime import datetime
 
 from pywikibot import date
 
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
-from tests.utils import add_metaclass
 
 
 class TestDateMeta(MetaTestCaseClass):
@@ -55,14 +53,41 @@ class TestDateMeta(MetaTestCaseClass):
         return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestDate(TestCase):
+class TestDate(TestCase, metaclass=TestDateMeta):
 
     """Test cases for date library processed by unittest."""
 
-    __metaclass__ = TestDateMeta
-
     net = False
+
+
+class TestMonthName(TestCase):
+
+    """Test MonthName format."""
+
+    net = True
+
+    def test_month_name_formats(self):
+        """Test MonthName format."""
+        formatname = 'MonthName'
+        for code in date.formats['Cat_BirthsAD']:
+            try:
+                convert = date.formats[formatname][code]
+            except KeyError:  # Not all month names are available yet
+                continue
+            predicate, start, stop = date.formatLimits[formatname]
+            for value in range(start, stop):
+                with self.subTest(code=code, month=value):
+                    self.assertTrue(
+                        predicate(value),
+                        "date.formats['{}']['{}']:\ninvalid value {}"
+                        .format(formatname, code, value))
+
+                    new_value = convert(convert(value))
+                    self.assertEqual(
+                        new_value, value,
+                        "date.formats['{}']['{}']:\n"
+                        'value {} does not match {}'
+                        .format(formatname, code, new_value, value))
 
 
 class TestMonthDelta(TestCase):
@@ -108,7 +133,5 @@ class TestMonthDelta(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

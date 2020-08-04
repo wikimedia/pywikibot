@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 """Test tools.chars package."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, division, unicode_literals
-
 import unicodedata
 
-from distutils.version import StrictVersion
+from contextlib import suppress
 
 from pywikibot.tools import chars
 
@@ -42,14 +40,9 @@ class CharsTestCase(TestCase):
             cat = unicodedata.category(char)
             if cat not in ('Cf', 'Cn'):
                 invalid[char] = cat
-        if StrictVersion(unicodedata.unidata_version) < StrictVersion('6.3'):
-            # This category has changed with Unicode 6.3 to Cf
-            self.assertEqual(invalid.pop('\u180e'), 'Zs')
         self.assertCountEqual(invalid.items(), [])
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

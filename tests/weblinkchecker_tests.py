@@ -1,24 +1,18 @@
 # -*- coding: utf-8 -*-
 """weblinkchecker test module."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
+from contextlib import suppress
 from requests.exceptions import ConnectionError as RequestsConnectionError
+from urllib.parse import urlparse
 
-from pywikibot.tools import PY2
 from scripts import weblinkchecker
 from tests.aspects import unittest, require_modules, TestCase
-
-if not PY2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 @require_modules('memento_client')
@@ -82,7 +76,5 @@ class TestMementoDefault(MementoTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

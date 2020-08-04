@@ -1,11 +1,7 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
-pytest < 5 ; python_version < '3'
-pytest-cov >= 2.6.1 ; python_version < '3'
-pytest < 5 ; python_version == '3.4'
-pytest-cov >= 2.6.1, < 2.9 ; python_version == '3.4'
-pytest ; python_version >= '3.5'
-pytest-cov >= 2.6.1 ; python_version >= '3.5'
+pytest
+pytest-cov >= 2.6.1
 pytest-timeout
 pytest-runner
 pytest-attrib>=0.1.3
@@ -14,8 +10,6 @@ pytest-attrib>=0.1.3
 # github vulnerable depedency suggests werkzeug >= 0.15.3
 werkzeug>=0.15.5
 pytest-httpbin
-
-six
 
 nose
 git+https://github.com/jayvdb/nosetrim@py3
@@ -27,7 +21,6 @@ flake8-docstrings>=0.2.6
 flake8-mock>=0.3
 codecov
 coverage
-mock ; python_version < '3'
 
 # pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
 # excluded from this file as they are quite expensive to install, and they

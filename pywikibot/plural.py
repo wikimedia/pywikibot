@@ -5,9 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-
 plural_rules = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},
     'ar': {'nplurals': 6, 'plural': lambda n:
@@ -78,7 +75,7 @@ plural_rules = {
     'sl': {'nplurals': 4, 'plural': lambda n:
            0 if (n % 100 == 1) else
            1 if (n % 100 == 2) else
-           2 if (n % 100 == 3 or n % 100 == 4) else
+           2 if n % 100 in (3, 4) else
            3},
 }
 

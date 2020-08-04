@@ -80,21 +80,22 @@ To complete a move of a page, one can use:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
-from itertools import chain
 import os
 import re
 
+from contextlib import suppress
+from itertools import chain
+from typing import Generator, List, Optional
+
 import pywikibot
+from pywikibot import config
 from pywikibot import editor as editarticle
-from pywikibot.tools import first_lower, first_upper as firstcap
-from pywikibot import pagegenerators, config, i18n
-from pywikibot.bot import (
-    SingleSiteBot,
-    StandardOption, HighlightContextOption, ListOption, OutputProxyOption,
-)
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import (HighlightContextOption, ListOption,
+                           OutputProxyOption, SingleSiteBot, StandardOption)
+from pywikibot.tools import first_lower
+from pywikibot.tools import first_upper as firstcap
 from pywikibot.tools.formatter import SequenceOutputter
 
 # Disambiguation Needed template
@@ -362,7 +363,7 @@ ignore_title = {
 }
 
 
-def correctcap(link, text):
+def correctcap(link, text) -> str:
     """Return the link capitalized/uncapitalized according to the text.
 
     @param link: link page
@@ -371,8 +372,6 @@ def correctcap(link, text):
     @type text: str
     @return: uncapitalized title of the link if the text links to the link
         with an uncapitalized title, else capitalized
-    @rtype: str
-
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
@@ -382,19 +381,18 @@ def correctcap(link, text):
         return linkupper
 
 
-class ReferringPageGeneratorWithIgnore(object):
+class ReferringPageGeneratorWithIgnore:
 
     """Referring Page generator, with an ignore manager."""
 
-    def __init__(self, disambPage, primary=False, minimum=0, main_only=False):
+    def __init__(self, disambPage, primary=False, minimum=0, main_only=False
+                 ) -> None:
         """Initializer.
 
         @type disambPage: pywikibot.Page
         @type primary: bool
         @type minimum: int
         @type main_only: bool
-        @rtype: None
-
         """
         self.disambPage = disambPage
         # if run with the -primary argument, enable the ignore manager
@@ -403,7 +401,7 @@ class ReferringPageGeneratorWithIgnore(object):
         self.minimum = minimum
         self.main_only = main_only
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[pywikibot.Page, None, None]:
         """Yield pages."""
         # TODO: start yielding before all referring pages have been found
         refs = list(self.disambPage.getReferences(
@@ -427,11 +425,10 @@ class ReferringPageGeneratorWithIgnore(object):
                              .format(len(refs)))
             return
         pywikibot.output('Will work on {} pages.'.format(len(refs)))
-        for ref in refs:
-            yield ref
+        yield from refs
 
 
-class PrimaryIgnoreManager(object):
+class PrimaryIgnoreManager:
 
     """
     Primary ignore manager.
@@ -442,7 +439,7 @@ class PrimaryIgnoreManager(object):
 
     """
 
-    def __init__(self, disambPage, enabled=False):
+    def __init__(self, disambPage, enabled=False) -> None:
         """Initializer.
 
         @type disambPage: pywikibot.Page
@@ -458,16 +455,14 @@ class PrimaryIgnoreManager(object):
         if os.path.exists(folder):
             self._read_ignorelist(folder)
 
-    def _read_ignorelist(self, folder):
+    def _read_ignorelist(self, folder) -> None:
         """Read pages to be ignored from file.
 
         @type folder: str
-        @rtype: None
-
         """
         filename = os.path.join(
             folder, self.disambPage.title(as_filename=True) + '.txt')
-        try:
+        with suppress(IOError):
             # The file is stored in the disambiguation/ subdir.
             # Create if necessary.
             with codecs.open(filename, 'r', 'utf-8') as f:
@@ -477,15 +472,11 @@ class PrimaryIgnoreManager(object):
                     # skip empty lines
                     if line:
                         self.ignorelist.add(line)
-        except IOError:
-            pass
 
-    def isIgnored(self, refPage):
+    def isIgnored(self, refPage) -> bool:
         """Return if refPage is to be ignored.
 
         @type refPage: pywikibot.Page
-        @rtype: bool
-
         """
         return self.enabled and refPage.title(as_url=True) in self.ignorelist
 
@@ -501,30 +492,28 @@ class PrimaryIgnoreManager(object):
             filename = config.datafilepath(
                 'disambiguations',
                 self.disambPage.title(as_url=True) + '.txt')
-            try:
+            with suppress(IOError):
                 # Open file for appending. If none exists, create a new one.
                 with codecs.open(filename, 'a', 'utf-8') as f:
                     f.write(refPage.title(as_url=True) + '\n')
-            except IOError:
-                pass
 
 
 class AddAlternativeOption(OutputProxyOption):
 
     """Add a new alternative."""
 
-    def result(self, value):
+    def result(self, value) -> None:
         """Add the alternative and then list them."""
         newAlternative = pywikibot.input('New alternative:')
         self._outputter.sequence.append(newAlternative)
-        super(AddAlternativeOption, self).result(value)
+        super().result(value)
 
 
 class EditOption(StandardOption):
 
     """Edit the text."""
 
-    def __init__(self, option, shortcut, text, start, title):
+    def __init__(self, option, shortcut, text, start, title) -> None:
         """Initializer.
 
         @type option: str
@@ -532,44 +521,38 @@ class EditOption(StandardOption):
         @type text: str
         @type start: int
         @type title: str
-        @rtype: None
-
         """
-        super(EditOption, self).__init__(option, shortcut)
+        super().__init__(option, shortcut)
         self._text = text
         self._start = start
         self._title = title
 
     @property
-    def stop(self):
-        """Return whether if user didn't press cancel and changed it.
-
-        @rtype: bool
-
-        """
+    def stop(self) -> bool:
+        """Return whether if user didn't press cancel and changed it."""
         return self.new_text and self.new_text != self._text
 
-    def result(self, value):
+    def result(self, value) -> str:
         """Open a text editor and let the user change it."""
         editor = editarticle.TextEditor()
         self.new_text = editor.edit(self._text, jumpIndex=self._start,
                                     highlight=self._title)
-        return super(EditOption, self).result(value)
+        return super().result(value)
 
 
 class ShowPageOption(StandardOption):
 
     """Show the page's contents in an editor."""
 
-    def __init__(self, option, shortcut, start, page):
+    def __init__(self, option, shortcut, start, page) -> None:
         """Initializer."""
-        super(ShowPageOption, self).__init__(option, shortcut, stop=False)
+        super().__init__(option, shortcut, stop=False)
         self._start = start
         if page.isRedirectPage():
             page = page.getRedirectTarget()
         self._page = page
 
-    def result(self, value):
+    def result(self, value) -> None:
         """Open a text editor and show the text."""
         editor = editarticle.TextEditor()
         editor.edit(self._page.text,
@@ -581,15 +564,14 @@ class AliasOption(StandardOption):
 
     """An option allowing multiple aliases which also select it."""
 
-    def __init__(self, option, shortcuts, stop=True):
+    def __init__(self, option, shortcuts, stop=True) -> None:
         """Initializer."""
-        super(AliasOption, self).__init__(option, shortcuts[0], stop=stop)
+        super().__init__(option, shortcuts[0], stop=stop)
         self._aliases = frozenset(s.lower() for s in shortcuts[1:])
 
-    def test(self, value):
+    def test(self, value) -> bool:
         """Test aliases and combine it with the original test."""
-        return value.lower() in self._aliases or super(AliasOption,
-                                                       self).test(value)
+        return value.lower() in self._aliases or super().test(value)
 
 
 class DisambiguationRobot(SingleSiteBot):
@@ -619,9 +601,10 @@ class DisambiguationRobot(SingleSiteBot):
     }
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
-                 generator, primary, main_only, first_only=False, minimum=0):
+                 generator, primary, main_only, first_only=False, minimum=0
+                 ) -> None:
         """Initializer."""
-        super(DisambiguationRobot, self).__init__()
+        super().__init__()
         self.always = always
         self.alternatives = alternatives
         self.getAlternatives = getAlternatives
@@ -640,7 +623,7 @@ class DisambiguationRobot(SingleSiteBot):
 
         self.setupRegexes()
 
-    def checkContents(self, text):
+    def checkContents(self, text) -> Optional[str]:
         """
         Check if the text matches any of the ignore regexes.
 
@@ -649,7 +632,6 @@ class DisambiguationRobot(SingleSiteBot):
         @return: None if none of the regular expressions
             given in the dictionary at the top of this class matches
             a substring of the text, otherwise the matched substring
-        @rtype: str or None
         """
         for ig in self.ignore_contents_regexes:
             match = ig.search(text)
@@ -657,7 +639,7 @@ class DisambiguationRobot(SingleSiteBot):
                 return match.group()
         return None
 
-    def makeAlternativesUnique(self):
+    def makeAlternativesUnique(self) -> None:
         """Remove duplicate items from self.alternatives.
 
         Preserve the order of alternatives.
@@ -669,7 +651,7 @@ class DisambiguationRobot(SingleSiteBot):
             i for i in self.alternatives if i not in seen and not seen.add(i)
         ]
 
-    def setupRegexes(self):
+    def setupRegexes(self) -> None:
         """Compile regular expressions."""
         self.ignore_contents_regexes = []
         if self.mylang in self.ignore_contents:
@@ -696,7 +678,7 @@ class DisambiguationRobot(SingleSiteBot):
             (?P<linktrail>{})""".format(linktrail), flags=re.X)
 
     @staticmethod
-    def firstlinks(page):
+    def firstlinks(page) -> Generator[str, None, None]:
         """Return a list of first links of every line beginning with `*`.
 
         When a disambpage is full of unnecessary links, this may be useful
@@ -712,7 +694,7 @@ class DisambiguationRobot(SingleSiteBot):
             if found:
                 yield found.group(1)
 
-    def firstize(self, page, links):
+    def firstize(self, page, links) -> List[pywikibot.Page]:
         """Call firstlinks and remove extra links.
 
         This will remove a lot of silly redundant links from overdecorated
@@ -726,7 +708,7 @@ class DisambiguationRobot(SingleSiteBot):
                 links.remove(link)
         return links
 
-    def treat_links(self, refPage, disambPage):
+    def treat_links(self, refPage, disambPage) -> bool:
         """Resolve the links to disambPage or its redirects.
 
         @param disambPage: the disambiguation page or redirect we don't want
@@ -736,8 +718,6 @@ class DisambiguationRobot(SingleSiteBot):
         @type refPage: pywikibot.Page
         @return: Return whether continue with next page (True)
             or next disambig (False)
-        @rtype: bool
-
         """
         nochange = True
 
@@ -756,7 +736,7 @@ class DisambiguationRobot(SingleSiteBot):
             pywikibot.output('No changes necessary in ' + refPage.title())
         return True
 
-    def treat_disamb_only(self, refPage, disambPage):
+    def treat_disamb_only(self, refPage, disambPage) -> str:
         """Resolve the links to disambPage but don't look for its redirects.
 
         @param disambPage: the disambiguation page or redirect we don't want
@@ -767,8 +747,6 @@ class DisambiguationRobot(SingleSiteBot):
         @return: "nextpage" if the user enters "n" to skip this page,
             "nochange" if the page needs no change, and
             "done" if the page is processed successfully
-        @rtype: str
-
         """
         # TODO: break this function up into subroutines!
 
@@ -1030,14 +1008,12 @@ class DisambiguationRobot(SingleSiteBot):
                     pywikibot.output('Page not saved: {0}'.format(error.args))
         return 'done'
 
-    def findAlternatives(self, disambPage):
+    def findAlternatives(self, disambPage) -> bool:
         """Extend self.alternatives using correctcap of disambPage.linkedPages.
 
         @param disambPage: the disambiguation page
         @type disambPage: pywikibot.Page
         @return: True if everything goes fine, False otherwise
-        @rtype: bool
-
         """
         if disambPage.isRedirectPage() and not self.primary:
             primary = i18n.translate(disambPage.site,
@@ -1124,7 +1100,7 @@ or press enter to quit:""")
         return True
 
     def setSummaryMessage(self, disambPage, new_targets=[], unlink_counter=0,
-                          dn=False):
+                          dn=False) -> None:
         """Setup i18n summary message."""
         # make list of new targets
         comma = self.mysite.mediawiki_message('comma-separator')
@@ -1188,7 +1164,7 @@ or press enter to quit:""")
                      'to': targets,
                      'count': len(new_targets)})
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Work on a single disambiguation page."""
         self.primaryIgnoreManager = PrimaryIgnoreManager(
             page, enabled=self.primary)
@@ -1221,7 +1197,7 @@ or press enter to quit:""")
         self.alternatives = []
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 

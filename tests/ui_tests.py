@@ -24,8 +24,6 @@
 #     pip install -U pywinauto
 #
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import inspect
 import io
 import logging
@@ -35,13 +33,10 @@ import sys
 import time
 import warnings
 
+
 import pywikibot
 from pywikibot.bot import (
     ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
-)
-from pywikibot.tools import (
-    PY2,
-    UnicodeType as unicode,
 )
 from pywikibot.userinterfaces import (
     terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
@@ -83,7 +78,7 @@ class Stream(object):
             the patched stream.
         @type patched_streams: dict
         """
-        self._stream = io.StringIO() if not PY2 else io.BytesIO()
+        self._stream = io.StringIO()
         self._name = 'std{0}'.format(name)
         self._original = getattr(sys, self._name)
         patched_streams[self._original] = self._stream
@@ -129,7 +124,7 @@ if os.name == 'nt':
             setattr(pywikibot.ui, key, value)
 
         def cls(self):
-            os.system('cls')
+            subprocess.run('cls', shell=True)
 
     class pywikibotManager(BaseManager):
 
@@ -137,7 +132,7 @@ if os.name == 'nt':
 
         pass
 
-    pywikibotManager.register(str('pywikibot'), pywikibotWrapper)
+    pywikibotManager.register('pywikibot', pywikibotWrapper)
     _manager = pywikibotManager(
         address=('127.0.0.1', 47228),
         authkey=b'4DJSchgwy5L5JxueZEWbxyeG')
@@ -169,19 +164,6 @@ strin = Stream('in', {})
 newstdout = strout._stream
 newstderr = strerr._stream
 newstdin = strin._stream
-
-if PY2:
-    # In Python 2 the sys.std* streams use bytes instead of unicode
-    # But this module is using unicode_literals so '…' will generate unicode
-    # So it'll convert those back into bytes
-    original_write = newstdin.write
-
-    def encoded_write(text):
-        if isinstance(text, unicode):
-            text = text.encode('utf8')
-        original_write(text)
-
-    newstdin.write = encoded_write
 
 org_print = ui._print
 org_input = ui._raw_input
@@ -227,12 +209,6 @@ class UITestCase(TestCaseBase):
     def tearDown(self):
         super(UITestCase, self).tearDown()
         unpatch()
-
-    def _encode(self, string, encoding='utf-8'):
-        if not PY2:
-            return string
-        else:
-            return string.encode(encoding)
 
 
 class TestTerminalOutput(UITestCase):
@@ -375,7 +351,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'question: ')
 
-        self.assertIsInstance(returned, unicode)
+        self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'input to read')
 
     def _call_input_choice(self):
@@ -388,9 +364,7 @@ class TestTerminalInput(UITestCase):
             automatic_quit=False)
 
         self.assertEqual(newstdout.getvalue(), '')
-
-        self.assertIsInstance(rv, unicode)
-
+        self.assertIsInstance(rv, str)
         return rv
 
     def testInputChoiceDefault(self):
@@ -478,22 +452,19 @@ class TestTerminalUnicodeUnix(UITestCase):
     def testOutputUnicodeText(self):
         pywikibot.output('Заглавная_страница')
         self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(
-            newstderr.getvalue(),
-            self._encode('Заглавная_страница\n', 'utf-8'))
+        self.assertEqual(newstderr.getvalue(), 'Заглавная_страница\n')
 
     def testInputUnicodeText(self):
-        newstdin.write(self._encode('Заглавная_страница\n', 'utf-8'))
+        newstdin.write('Заглавная_страница\n')
         newstdin.seek(0)
 
         returned = pywikibot.input('Википедию? ')
 
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
-            newstderr.getvalue(),
-            self._encode('Википедию? ', 'utf-8'))
+            newstderr.getvalue(), 'Википедию? ')
 
-        self.assertIsInstance(returned, unicode)
+        self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'Заглавная_страница')
 
 
@@ -596,8 +567,7 @@ class WindowsTerminalTestCase(UITestCase):
 
     def setclip(self, text):
         win32clipboard.OpenClipboard()
-        win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT,
-                                        unicode(text))
+        win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, text)
         win32clipboard.CloseClipboard()
 
     def getclip(self):
@@ -683,7 +653,9 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
 
     def testOutputUnicodeText_no_transliterate(self):
         self.sendstdin(
-            "python -c \"import os, pywikibot; os.system('cls'); "
+            'python -c \"'
+            'import subprocess, pywikibot; '
+            "subprocess.run('cls', shell=True); "
             "pywikibot.output('\\n'.join(pywikibot.handleArgs()))\" "
             'Alpha Bετα Гамма دلتا\n')
         lines = []
@@ -717,10 +689,7 @@ class FakeUITest(TestCase):
     def setUp(self):
         """Create dummy instances for the test and patch encounter_color."""
         super(FakeUITest, self).setUp()
-        if PY2:
-            self.stream = io.BytesIO()
-        else:
-            self.stream = io.StringIO()
+        self.stream = io.StringIO()
         self.ui_obj = self.ui_class()
         self._orig_encounter_color = self.ui_obj.encounter_color
         self.ui_obj.encounter_color = self._encounter_color
@@ -735,10 +704,7 @@ class FakeUITest(TestCase):
 
     def _getvalue(self):
         """Get the value of the stream and also decode it on Python 2."""
-        value = self.stream.getvalue()
-        if PY2:
-            value = value.decode(self.ui_obj.encoding)
-        return value
+        return self.stream.getvalue()
 
     def _encounter_color(self, color, target_stream):
         """Patched encounter_color method."""

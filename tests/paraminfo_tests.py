@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
@@ -130,6 +128,14 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         ]
         if self.site.mw_version >= '1.24':
             base.append('application/json')
+        if self.site.mw_version >= '1.36.0-wmf.2':
+            base.extend([
+                'application/octet-stream',
+                'application/unknown',
+                'application/x-binary',
+                'text/unknown',
+                'unknown/unknown',
+            ])
         if isinstance(self.site, DataSite):
             # It is not clear when this format has been added, see T129281.
             base.append('application/vnd.php.serialized')
@@ -137,8 +143,10 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if 'CollaborationKit' in extensions:
             base.append('text/x-collabkit')
 
-        self._check_param_values(self.site, 'edit', 'contentformat', base)
-        self._check_param_values(self.site, 'parse', 'contentformat', base)
+        for module in ('edit', 'parse'):
+            args = self.site, module, 'contentformat', base
+            with self.subTest(module=module):
+                self._check_param_values(*args)
 
     def test_content_model(self):
         """Test content model."""

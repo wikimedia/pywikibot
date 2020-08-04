@@ -28,8 +28,6 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, editor
 from pywikibot.bot import SingleSiteBot, CurrentPageBot, QuitKeyboardInterrupt
 
-__metaclass__ = type
-
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -465,8 +463,8 @@ What is it? """
                 pywikibot.output('Page correct! Proceeding with next pages.')
                 return
             # Check user input:
-            if answer[0] == '':
-                # Answer entered as an utf8 string
+            if answer[0] == 'u':
+                # Answer entered as string
                 answer = answer[1:]
             try:
                 choices = answer.split(',')

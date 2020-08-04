@@ -37,8 +37,8 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(uploadByUrl=True, urlEncoding='url_encoding',
-                     useFilename='use_filename', keepFilename='keep_filename',
+    @deprecated_args(urlEncoding='url_encoding', useFilename='use_filename',
+                     keepFilename='keep_filename',
                      verifyDescription='verify_description',
                      ignoreWarning='ignore_warning', targetSite='target_site')
     def __init__(self, url, url_encoding=None, description='',
@@ -115,7 +115,6 @@ class UploadRobot(BaseBot):
                                                              'commons')
         else:
             self.target_site = target_site or pywikibot.Site()
-        self.target_site.login()
 
     def read_file_content(self, file_url=None):
         """Return name of temp file in which remote file is saved."""
@@ -318,7 +317,7 @@ class UploadRobot(BaseBot):
                     continue
             else:
                 try:
-                    if potential_file_page.fileIsShared():
+                    if potential_file_page.file_is_shared():
                         pywikibot.output(
                             'File with name %s already exists in shared '
                             'repository and cannot be overwritten.' % filename)
@@ -387,13 +386,13 @@ class UploadRobot(BaseBot):
         else:
             return warn_code in self.ignore_warning
 
-    @deprecated('UploadRobot.upload_file()', since='20141211')
+    @deprecated('UploadRobot.upload_file()', since='20141211',
+                future_warning=True)
     @deprecated_args(debug=True)
     def upload_image(self):
         """Upload image."""
         return self.upload_file(self.url)
 
-    @deprecated_args(debug=True)
     def upload_file(self, file_url, _file_key=None, _offset=0):
         """
         Upload the image at file_url to the target wiki.
@@ -453,6 +452,7 @@ class UploadRobot(BaseBot):
             return
 
         # early check that user has proper rights to upload
+        self.target_site.login()
         if not self.target_site.has_right('upload'):
             pywikibot.error(
                 "User '%s' does not have upload rights on site %s."

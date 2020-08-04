@@ -117,7 +117,6 @@ This will move all pages in the category US to the category United States.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
 
 import codecs
 import math
@@ -126,6 +125,7 @@ import pickle
 import re
 
 from operator import methodcaller
+from typing import Optional, Set
 
 import pywikibot
 
@@ -139,7 +139,6 @@ from pywikibot.bot import (
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import (
     deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive,
-    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
@@ -178,14 +177,13 @@ class CategoryPreprocess(BaseBot):
         self.edit_redirects = edit_redirects
         self.create = create
 
-    def determine_type_target(self, page):
+    def determine_type_target(self, page) -> Optional[pywikibot.Page]:
         """
         Return page to be categorized by type.
 
         @param page: Existing, missing or redirect page to be processed.
         @type page: pywikibot.Page
         @return: Page to be categorized.
-        @rtype: pywikibot.Page or None
         """
         if page.exists():
             if page.isRedirectPage():
@@ -222,7 +220,7 @@ class CategoryPreprocess(BaseBot):
                           .format(page.title(as_link=True)))
         return None
 
-    def determine_template_target(self, page):
+    def determine_template_target(self, page) -> pywikibot.Page:
         """
         Return template page to be categorized.
 
@@ -236,7 +234,6 @@ class CategoryPreprocess(BaseBot):
         @param page: Page to be processed.
         @type page: pywikibot.Page
         @return: Page to be categorized.
-        @rtype: pywikibot.Page
         """
         includeonly = []
         if page.namespace() == page.site.namespaces.TEMPLATE:
@@ -268,14 +265,14 @@ class CategoryPreprocess(BaseBot):
         return page
 
 
-class CategoryDatabase(object):
+class CategoryDatabase:
 
     """Temporary database saving pages and subcategories for each category.
 
     This prevents loading the category pages over and over again.
     """
 
-    def __init__(self, rebuild=False, filename='category.dump.bz2'):
+    def __init__(self, rebuild=False, filename='category.dump.bz2') -> None:
         """Initializer."""
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
@@ -284,11 +281,11 @@ class CategoryDatabase(object):
             self.rebuild()
 
     @property
-    def is_loaded(self):
+    def is_loaded(self) -> bool:
         """Return whether the contents have been loaded."""
         return hasattr(self, 'catContentDB') and hasattr(self, 'superclassDB')
 
-    def _load(self):
+    def _load(self) -> None:
         if not self.is_loaded:
             try:
                 if config.verbose_output:
@@ -306,12 +303,12 @@ class CategoryDatabase(object):
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
 
-    def rebuild(self):
+    def rebuild(self) -> None:
         """Rebuild the dabatase."""
         self.catContentDB = {}
         self.superclassDB = {}
 
-    def getSubcats(self, supercat):
+    def getSubcats(self, supercat) -> Set[pywikibot.Category]:
         """Return the list of subcategories for a given supercategory.
 
         Saves this list in a temporary database so that it won't be loaded
@@ -328,7 +325,7 @@ class CategoryDatabase(object):
             self.catContentDB[supercat] = (subcatset, articleset)
             return subcatset
 
-    def getArticles(self, cat):
+    def getArticles(self, cat) -> Set[pywikibot.Page]:
         """Return the list of pages for a given category.
 
         Saves this list in a temporary database so that it won't be loaded
@@ -345,7 +342,7 @@ class CategoryDatabase(object):
             self.catContentDB[cat] = (subcatset, articleset)
             return articleset
 
-    def getSupercats(self, subcat):
+    def getSupercats(self, subcat) -> Set[pywikibot.Category]:
         """Return the supercategory (or a set of) for a given subcategory."""
         self._load()
         # if we already know which subcategories exist here.
@@ -357,7 +354,7 @@ class CategoryDatabase(object):
             self.superclassDB[subcat] = supercatset
             return supercatset
 
-    def dump(self, filename=None):
+    def dump(self, filename=None) -> None:
         """Save the dictionaries to disk if not empty.
 
         Pickle the contents of the dictionaries superclassDB and catContentDB
@@ -399,9 +396,9 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
 
     @deprecated_args(editSummary='comment', dry=None)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
-                 create=False, comment='', follow_redirects=False):
+                 create=False, comment='', follow_redirects=False) -> None:
         """Initializer."""
-        super(CategoryAddBot, self).__init__()
+        super().__init__()
         self.generator = generator
         self.newcat = newcat
         self.sort = sort_by_last_name
@@ -410,7 +407,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         self.always = False
         self.comment = comment
 
-    def sorted_by_last_name(self, catlink, pagelink):
+    def sorted_by_last_name(self, catlink, pagelink) -> pywikibot.Page:
         """Return a Category with key that sorts persons by their last name.
 
         Parameters: catlink - The Category to be linked.
@@ -441,7 +438,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         else:
             return pywikibot.Page(site, catlink.title())
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process one page."""
         # find correct categorization target
         page = self.determine_type_target(page)
@@ -531,7 +528,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                  deletion_comment=DELETION_COMMENT_AUTOMATIC,
                  move_comment=None,
                  wikibase=True, allow_split=False, move_together=False,
-                 keep_sortkey=None):
+                 keep_sortkey=None) -> None:
         """Store all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -621,7 +618,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                             'category-removing',
                                             template_vars)
         # Set deletion reason for category page and talkpage.
-        if isinstance(deletion_comment, UnicodeType):
+        if isinstance(deletion_comment, str):
             # Deletion comment is set to given string.
             self.deletion_comment = deletion_comment
         elif deletion_comment == self.DELETION_COMMENT_SAME_AS_EDIT_COMMENT:
@@ -640,7 +637,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                     self.site, 'category-was-disbanded')
         self.move_comment = move_comment if move_comment else self.comment
 
-    def run(self):
+    def run(self) -> None:
         """
         The main bot function that does all the work.
 
@@ -704,7 +701,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                 ((self.newcat and self.move_oldcat) or not self.newcat):
             self._delete(can_move_page, can_move_talk)
 
-    def _delete(self, moved_page, moved_talk):
+    def _delete(self, moved_page, moved_talk) -> None:
         """Private function to delete the category page and its talk page.
 
         Do not use this function from outside the class. Automatically marks
@@ -723,7 +720,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             self.oldtalk.delete(self.deletion_comment, not self.batch,
                                 mark=True)
 
-    def _change(self, gen):
+    def _change(self, gen) -> None:
         """
         Private function to move category contents.
 
@@ -751,7 +748,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                              sort_key=self.keep_sortkey)
 
     @staticmethod
-    def check_move(name, old_page, new_page):
+    def check_move(name, old_page, new_page) -> bool:
         """Return if the old page can be safely moved to the new page.
 
         @param name: Title of the new page
@@ -762,8 +759,6 @@ class CategoryMoveRobot(CategoryPreprocess):
         @type new_page: pywikibot.page.BasePage
         @return: True if possible to move page, False if not page move
             not possible
-        @rtype: bool
-
         """
         move_possible = True
         if new_page and new_page.exists():
@@ -779,7 +774,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             move_possible = False
         return move_possible
 
-    def _movecat(self):
+    def _movecat(self) -> None:
         """Private function to move the category page by copying its contents.
 
         Note that this method of moving category pages by copying over the raw
@@ -800,7 +795,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.newcat.text = self.oldcat.text
         self._strip_cfd_templates(summary)
 
-    def _strip_cfd_templates(self, summary=None, commit=True):
+    def _strip_cfd_templates(self, summary=None, commit=True) -> None:
         """Private function to strip out CFD templates from the new category.
 
         The new category is saved.
@@ -826,7 +821,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         if commit:
             self.newcat.save(summary=summary)
 
-    def _movetalk(self):
+    def _movetalk(self) -> None:
         """Private function to move the category talk page.
 
         Do not use this function from outside the class.
@@ -837,7 +832,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                     'title': cat_name_only})
         self.oldtalk.move(self.newtalk.title(), comment)
 
-    def _update_wikibase_item(self):
+    def _update_wikibase_item(self) -> None:
         """Private function to update the Wikibase item for the category.
 
         Do not use this function from outside the class.
@@ -854,7 +849,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                             'title': cat_name_only})
                 item.setSitelink(self.newcat, summary=comment)
 
-    def _hist(self):
+    def _hist(self) -> None:
         """Private function to copy the history of the to-be-deleted category.
 
         Do not use this function from outside the class. It adds a table with
@@ -869,7 +864,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                    {'oldcat': self.oldcat.title()})
         self.newtalk.save(comment)
 
-    def _makecat(self, var):
+    def _makecat(self, var) -> pywikibot.Category:
         """Private helper function to get a Category object.
 
         Checks if the instance given is a Category object and returns it.
@@ -897,13 +892,14 @@ class CategoryRemoveRobot(CategoryMoveRobot):
         CategoryMoveRobot without newcat param instead.
     """
 
-    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416')
+    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416',
+                future_warning=True)
     def __init__(
             self, catTitle, batchMode=False, editSummary='',
             useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
-            titleRegex=None, inPlace=False, pagesonly=False):
+            titleRegex=None, inPlace=False, pagesonly=False) -> None:
         """Initializer."""
-        super(CategoryRemoveRobot, self).__init__(
+        super().__init__(
             oldcat=catTitle,
             batch=batchMode,
             comment=editSummary,
@@ -913,13 +909,13 @@ class CategoryRemoveRobot(CategoryMoveRobot):
             pagesonly=pagesonly)
 
 
-class CategoryListifyRobot(object):
+class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
 
     def __init__(self, catTitle, listTitle, editSummary, append=False,
                  overwrite=False, showImages=False, subCats=False,
-                 talkPages=False, recurse=False, prefix='*'):
+                 talkPages=False, recurse=False, prefix='*') -> None:
         """Initializer."""
         self.editSummary = editSummary
         self.append = append
@@ -933,7 +929,7 @@ class CategoryListifyRobot(object):
         self.recurse = recurse
         self.prefix = prefix
 
-    def run(self):
+    def run(self) -> None:
         """Start bot."""
         setOfArticles = set(self.cat.articles(recurse=self.recurse))
         if self.subCats:
@@ -1010,7 +1006,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     @type: str
     """
 
-    def __init__(self, cat_title, cat_db, namespaces=None, comment=None):
+    def __init__(self, cat_title, cat_db, namespaces=None, comment=None
+                 ) -> None:
         """Initializer."""
         self.cat_title = cat_title
         self.cat_db = cat_db
@@ -1025,7 +1022,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 self.cat.articles(namespaces=namespaces)))
 
     @deprecated_args(article='member')
-    def move_to_category(self, member, original_cat, current_cat):
+    def move_to_category(self, member, original_cat, current_cat) -> None:
         """
         Ask whether to move it to one of the sub- or super-categories.
 
@@ -1047,7 +1044,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
 
-            def output_range(self, start, end):
+            def output_range(self, start, end) -> None:
                 """Output a section and categories from the text."""
                 pywikibot.output(self.text[start:end] + '...')
 
@@ -1064,7 +1061,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""
 
-            def list_categories(self, cat_list, prefix=''):
+            def list_categories(self, cat_list, prefix='') -> None:
                 """
                 Output categories in one or two columns.
 
@@ -1241,19 +1238,19 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 self.move_to_category(member, original_cat,
                                       subcatlist[choice[1]])
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Cleanups after run operation."""
         if self._generator_completed and not self._treat_counter:
             pywikibot.output('There are no pages or files in category {}.'
                              .format(self.cat_title))
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process page."""
         pywikibot.output('')
         self.move_to_category(page, self.cat, self.cat)
 
 
-class CategoryTreeRobot(object):
+class CategoryTreeRobot:
 
     """Robot to create tree overviews of the category structure.
 
@@ -1267,7 +1264,7 @@ class CategoryTreeRobot(object):
                      the tree to stdout.
     """
 
-    def __init__(self, catTitle, catDB, filename=None, maxDepth=10):
+    def __init__(self, catTitle, catDB, filename=None, maxDepth=10) -> None:
         """Initializer."""
         self.catTitle = catTitle
         self.catDB = catDB
@@ -1277,7 +1274,7 @@ class CategoryTreeRobot(object):
         self.maxDepth = maxDepth
         self.site = pywikibot.Site()
 
-    def treeview(self, cat, currentDepth=0, parent=None):
+    def treeview(self, cat, currentDepth=0, parent=None) -> str:
         """Return a tree view of all subcategories of cat.
 
         The multi-line string contains a tree view of all subcategories of cat,
@@ -1322,7 +1319,7 @@ class CategoryTreeRobot(object):
             result += '#' * (currentDepth + 1) + ' [...]\n'
         return result
 
-    def run(self):
+    def run(self) -> None:
         """Handle the multi-line string generated by treeview.
 
         After string was generated by treeview it is either printed to the
@@ -1340,7 +1337,7 @@ class CategoryTreeRobot(object):
             pywikibot.stdout(tree)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -1552,4 +1549,5 @@ if __name__ == '__main__':
     main()
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918')
+wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918',
+                             future_warning=True)

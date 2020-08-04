@@ -1,20 +1,14 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+import ctypes
 
 from pywikibot.tools import ModuleDeprecationWrapper
-
-from pywikibot.userinterfaces import (
-    terminal_interface_base,
-    win32_unicode,
-)
-
-import ctypes
+from pywikibot.userinterfaces import terminal_interface_base, win32_unicode
 
 windowsColors = {
     'default':     7,
@@ -39,21 +33,21 @@ windowsColors = {
 
 class Win32BaseUI(terminal_interface_base.UI):
 
-    """DEPRECATED. User interface for Win32 terminals without ctypes."""
+    """DEPRECATED. User interface for Win32 terminals."""
 
     def __init__(self):
         """Initializer."""
-        super(Win32BaseUI, self).__init__()
+        super().__init__()
         self.encoding = 'ascii'
 
 
 class Win32UI(terminal_interface_base.UI):
 
-    """User interface for Win32 terminals using ctypes."""
+    """User interface for Win32 terminals."""
 
     def __init__(self):
         """Initializer."""
-        super(Win32CtypesUI, self).__init__()
+        super().__init__()
         (stdin, stdout, stderr, argv) = win32_unicode.get_unicode_console()
         self.stdin = stdin
         self.stdout = stdout
@@ -77,9 +71,7 @@ class Win32UI(terminal_interface_base.UI):
 
     def _raw_input(self):
         data = self.stdin.readline()
-        # data is in both Python versions str but '\x1a' is unicode in Python 2
-        # so explicitly convert into str as it otherwise tries to decode data
-        if str('\x1a') in data:
+        if '\x1a' in data:
             raise EOFError()
         return data.strip()
 
@@ -89,7 +81,7 @@ Win32CtypesUI = Win32UI
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Win32CtypesUI',
                              replacement_name='Win32UI',
-                             since='20190217')
+                             since='20190217', future_warning=True)
 wrapper._add_deprecated_attr('Win32BaseUI',
                              replacement_name='Win32UI',
-                             since='20190217')
+                             since='20190217', future_warning=True)

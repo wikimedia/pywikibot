@@ -31,12 +31,10 @@ The following generators and filters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import pipes
 import tempfile
@@ -46,7 +44,6 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (MultipleSitesBot, ExistingPageBot,
                            NoRedirectPageBot, AutomaticTWSummaryBot)
-from pywikibot.tools import UnicodeType
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -71,38 +68,34 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         self.availableOptions.update({
             'filters': [],
         })
-        super(PiperBot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
     @property
-    def summary_parameters(self):
+    def summary_parameters(self) -> dict:
         """Return the filter parameter."""
         return {'filters': ', '.join(self.getOption('filters'))}
 
-    def pipe(self, program, text):
+    def pipe(self, program: str, text: str) -> str:
         """Pipe a given text through a given program.
 
         @return: processed text after piping
-        @rtype: str
         """
-        if not isinstance(text, str):  # py2-py3 compatibility
-            text = text.encode('utf-8')
         pipe = pipes.Template()
-        pipe.append(str(program), '--')  # py2-py3 compatibility
+        pipe.append(program, '--')
 
         # Create a temporary filename to save the piped stuff to
-        temp_filename = '%s.%s' % (tempfile.mktemp(), 'txt')
+        file, temp_filename = tempfile.mkstemp(suffix='.txt')
+        file.close()
         with pipe.open(temp_filename, 'w') as file:
             file.write(text)
 
         # Now retrieve the munged text
         with open(temp_filename, 'r') as file:
-            unicode_text = file.read()
-        if not isinstance(unicode_text, UnicodeType):  # py2-py3 compatibility
-            unicode_text = unicode_text.decode('utf-8')
+            text = file.read()
 
         # clean up
         os.unlink(temp_filename)
-        return unicode_text
+        return text
 
     def treat_page(self):
         """Load the given page, do some changes, and save it."""

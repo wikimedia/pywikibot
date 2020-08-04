@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
 
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUser
-from pywikibot.tools import StringTypes, suppress_warnings
+from pywikibot.tools import suppress_warnings
 
 from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
@@ -183,7 +183,7 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertIsInstance(p, Page)
             self.assertIsInstance(i, int)
             self.assertIsInstance(t, Timestamp)
-            self.assertIsInstance(c, StringTypes)
+            self.assertIsInstance(c, str)
         self.assertEqual(last, user.last_edit)
 
     def test_logevents(self):
@@ -201,7 +201,5 @@ class TestUserMethods(DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

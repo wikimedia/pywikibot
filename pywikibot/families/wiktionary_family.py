@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -40,15 +38,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'af', 'zh-min-nan', 'he', 'scn', 'tl', 'pa', 'sw', 'fy', 'nn', 'bn',
         'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'min', 'sl', 'lb', 'nds', 'bs',
         'nah', 'sa', 'kk', 'ms', 'km', 'vec', 'tk', 'sm', 'be', 'mk', 'hsb',
-        'yue', 'gd', 'ga', 'an', 'wo', 'ang', 'shy', 'ia', 'tt', 'mt', 'sd',
-        'gn', 'mr', 'ie', 'so', 'csb', 'ug', 'fo', 'st', 'roa-rup', 'si',
-        'hif', 'kl', 'su', 'ay', 'mi', 'zu', 'jbo', 'ln', 'yi', 'gu', 'na',
+        'yue', 'gd', 'ga', 'an', 'wo', 'gom', 'shy', 'ang', 'ia', 'tt', 'mt',
+        'sd', 'gn', 'mr', 'ie', 'so', 'fo', 'csb', 'ug', 'st', 'roa-rup', 'si',
+        'hif', 'zu', 'kl', 'su', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',
         'gv', 'kw', 'tpi', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu',
-        'am', 'dv', 'sg', 'ti', 'tn', 'gom', 'ks',
+        'am', 'dv', 'sg', 'ti', 'tn', 'ks', 'shn',
     ]
 
     category_redirect_templates = {
         '_default': (),
+        'ar': ('تحويل تصنيف',),
         'zh': ('分类重定向',),
     }
 
@@ -100,7 +99,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha', 'ps', 'dv', 'ks', 'ne', 'pi',
         'bh', 'mr', 'sa', 'hi', 'as', 'bn', 'pa', 'pnb', 'gu', 'or', 'ta',
         'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz', 'ka', 'ti', 'am', 'chr',
-        'iu', 'km', 'zh', 'ja', 'ko'
+        'iu', 'km', 'zh', 'ja', 'ko', 'shn',
     ]
 
     @classproperty

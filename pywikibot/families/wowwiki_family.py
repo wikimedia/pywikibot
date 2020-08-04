@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import deprecated, classproperty
 
@@ -39,12 +37,12 @@ class Family(family.FandomFamily):
         """Return the version for this family."""
         if code == 'es':
             return '1.33.1'
-        return super(Family, self).version(code)
+        return super().version(code)
 
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        cls.langs = super(Family, cls).langs
+        cls.langs = super().langs
         # override deviations
         for i, lang in enumerate(['es', 'et', 'sv'], start=1):
             cls.langs[lang] = cls.domains[i]
@@ -54,8 +52,7 @@ class Family(family.FandomFamily):
     @classproperty
     def disambiguationTemplates(cls):  # noqa: N802
         """Property listing disambiguation templates."""
-        cls.disambiguationTemplates = \
-            super(Family, cls).disambiguationTemplates
+        cls.disambiguationTemplates = super().disambiguationTemplates
         cls.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
                                              'disambig/quest2',
                                              'disambig/achievement2']
@@ -64,7 +61,7 @@ class Family(family.FandomFamily):
     @classproperty
     def disambcatname(cls):
         """Property listing disambiguation category name."""
-        cls.disambcatname = super(Family, cls).disambcatname
+        cls.disambcatname = super().disambcatname
         cls.disambcatname['en'] = 'Disambiguations'
         return cls.disambcatname
 
@@ -86,4 +83,4 @@ class Family(family.FandomFamily):
         """Return the script path for this family."""
         if code == 'es':
             return ''
-        return super(Family, self).scriptpath(code)
+        return super().scriptpath(code)

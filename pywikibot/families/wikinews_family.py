@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 
 
@@ -23,7 +21,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'sr', 'ru', 'fr', 'en', 'pl', 'pt', 'de', 'zh', 'es', 'it', 'ar', 'cs',
+        'sr', 'ru', 'fr', 'en', 'pt', 'pl', 'de', 'zh', 'es', 'it', 'ar', 'cs',
         'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'fi', 'ro', 'li', 'tr', 'ja',
         'eo', 'sq', 'no', 'ko', 'bg', 'bs', 'he',
     ]

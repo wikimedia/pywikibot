@@ -5,21 +5,21 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-__version__ = __release__ = '3.1.dev0'
-__url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
-
 import atexit
 import datetime
-from decimal import Decimal
 import math
 import re
-import sys
 import threading
 import time
 
+from contextlib import suppress
+from decimal import Decimal
+from queue import Queue
 from warnings import warn
+
+from pywikibot.__metadata__ import (
+    __copyright__, __description__, __download_url__, __license__,
+    __maintainer__, __maintainer_email__, __name__, __url__, __version__)
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
@@ -65,17 +65,9 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PY2, PYTHON_VERSION,
-    UnicodeMixin,
-    UnicodeType
+    _UnicodeMixin as UnicodeMixin,
 )
 from pywikibot.tools.formatter import color_format
-
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue
 
 
 textlib_methods = (
@@ -89,6 +81,9 @@ textlib_methods = (
 )
 
 __all__ = (
+    '__copyright__', '__description__', '__download_url__', '__license__',
+    '__maintainer__', '__maintainer_email__', '__name__', '__release__',
+    '__url__', '__version__',
     'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
@@ -110,23 +105,10 @@ __all__ = (
 )
 __all__ += textlib_methods
 
-if PY2:
-    # T111615: Python 2 requires __all__ is bytes
-    globals()['__all__'] = tuple(bytes(item) for item in __all__)
-
-if PY2 or PYTHON_VERSION < (3, 5, 0):
-    warn("""
-
-Python {version} will be dropped soon.
-It is recommended to use Python 3.5 or above.
-See {what} for further information.
-""".format(version=sys.version.split(None, 1)[0],
-           what='T213287' if PY2 else 'T239542'),
-         FutureWarning)  # probably adjust the line no in utils.execute()
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
-    wrapped_func = redirect_func(target, since='20140820')
+    wrapped_func = redirect_func(target, since='20140820', future_warning=True)
     globals()[_name] = wrapped_func
 
 
@@ -217,7 +199,8 @@ class Timestamp(datetime.datetime):
         return self.strftime(self._ISO8601Format(sep))
 
     toISOformat = redirect_func(isoformat, old_name='toISOformat',
-                                class_name='Timestamp', since='20141219')
+                                class_name='Timestamp', since='20141219',
+                                future_warning=True)
 
     def totimestampformat(self):
         """Convert object to a MediaWiki internal timestamp."""
@@ -791,7 +774,7 @@ class WbQuantity(_WbRepresentation):
         self.site = site or Site().data_repository()
 
         # also allow entity URIs to be provided via unit parameter
-        if isinstance(unit, UnicodeType) and \
+        if isinstance(unit, str) and \
                 unit.partition('://')[0] not in ('http', 'https'):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
@@ -833,7 +816,7 @@ class WbQuantity(_WbRepresentation):
         @type lazy_load: bool
         @return: pywikibot.ItemPage
         """
-        if not isinstance(self._unit, UnicodeType):
+        if not isinstance(self._unit, str):
             return self._unit
 
         repo = repo or self.site
@@ -1250,8 +1233,6 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
-        if PY2:  # Must not be unicode in Python 2
-            interface = str(interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
@@ -1299,7 +1280,8 @@ from pywikibot.page import (  # noqa: E402
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
-@__deprecated('comment parameter for page saving method', since='20140604')
+@__deprecated('comment parameter for page saving method', since='20140604',
+              future_warning=True)
 def setAction(s):
     """Set a summary to use for changed page submissions."""
     config.default_edit_summary = s
@@ -1385,11 +1367,9 @@ def _flush(stop=True):
                 return
 
     # only need one drop() call because all throttles use the same global pid
-    try:
+    with suppress(IndexError):
         list(_sites.values())[0].throttle.drop()
         log('Dropped throttle(s).')
-    except IndexError:
-        pass
 
 
 atexit.register(_flush)
@@ -1413,10 +1393,8 @@ def async_request(request, *args, **kwargs):
     if not _putthread.is_alive():
         try:
             page_put_queue.mutex.acquire()
-            try:
+            with suppress(AssertionError, RuntimeError):
                 _putthread.start()
-            except (AssertionError, RuntimeError):
-                pass
         finally:
             page_put_queue.mutex.release()
     page_put_queue.put((request, args, kwargs))
@@ -1433,7 +1411,8 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924',
+                             future_warning=True)
 wrapper._add_deprecated_attr(
     'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
     since='20150921')
@@ -1447,3 +1426,8 @@ wrapper._add_deprecated_attr(
     warning_message='pywikibot.MediaWikiVersion is deprecated; '
                     'use pywikibot.tools.MediaWikiVersion instead.',
     since='20180827')
+wrapper._add_deprecated_attr('__release__', __version__,
+                             replacement_name='pywikibot.__version__',
+                             since='20200707')
+wrapper._add_deprecated_attr('UnicodeMixin', replacement_name='',
+                             since='20200723', future_warning=True)

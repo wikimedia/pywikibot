@@ -5,20 +5,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pickle
 import random
 import re
-import sys
+import threading
 import time
 
-try:
-    from collections.abc import Iterable, Mapping
-except ImportError:  # Python 2.7
-    from collections import Iterable, Mapping
+from collections.abc import Iterable, Mapping
+from contextlib import suppress
 from datetime import datetime
-import threading
 
 import pywikibot
 
@@ -26,12 +21,7 @@ from pywikibot import async_request, config, page_put_queue
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
-from pywikibot.tools import (
-    PY2,
-    StringTypes as basestring,
-    suppress_warnings,
-    UnicodeType as unicode,
-)
+from pywikibot.tools import suppress_warnings
 
 from tests import patch, unittest_print, MagicMock
 from tests.aspects import (
@@ -47,9 +37,6 @@ from tests.aspects import (
 from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
 from tests.utils import entered_loop
 
-if not PY2:
-    long = int  # Must be global: T159700
-
 
 class TokenTestBase(TestCaseBase):
 
@@ -64,7 +51,7 @@ class TokenTestBase(TestCaseBase):
             token = mysite.tokens[ttype]
         except pywikibot.Error as error_msg:
             self.assertRegex(
-                unicode(error_msg),
+                str(error_msg),
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
             self.assertNotIn(self.token_type, self.site.tokens)
             self.skipTest(error_msg)
@@ -103,7 +90,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         ver = mysite.live_version()
         self.assertIsInstance(ver, tuple)
         self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertIsInstance(ver[2], basestring)
+        self.assertIsInstance(ver[2], str)
         self.assertOneDeprecation()
 
     def test_getcurrenttime(self):
@@ -267,12 +254,12 @@ class TestSiteObject(DefaultSiteTestCase):
         code = self.site.family.obsolete.get(self.code) or self.code
         self.assertEqual(mysite.family.name, self.family)
         self.assertEqual(mysite.code, code)
-        self.assertIsInstance(mysite.lang, basestring)
+        self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
-        self.assertIsInstance(mysite.user(), (basestring, type(None)))
+        self.assertIsInstance(mysite.user(), (str, type(None)))
         self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
-        self.assertIsInstance(mysite.linktrail(), basestring)
-        self.assertIsInstance(mysite.redirect(), basestring)
+        self.assertIsInstance(mysite.linktrail(), str)
+        self.assertIsInstance(mysite.redirect(), str)
         try:
             dabcat = mysite.disambcategory()
         except pywikibot.Error as e:
@@ -288,14 +275,14 @@ class TestSiteObject(DefaultSiteTestCase):
         else:
             self.assertIsInstance(dabcat, pywikibot.Category)
 
-        foo = unicode(pywikibot.Link('foo', source=mysite))
+        foo = str(pywikibot.Link('foo', source=mysite))
         if self.site.namespaces[0].case == 'case-sensitive':
             self.assertEqual(foo, '[[foo]]')
         else:
             self.assertEqual(foo, '[[Foo]]')
 
         self.assertFalse(mysite.isInterwikiLink('foo'))
-        self.assertIsInstance(mysite.redirectRegex().pattern, basestring)
+        self.assertIsInstance(mysite.redirectRegex().pattern, str)
         self.assertIsInstance(mysite.category_on_one_line(), bool)
         self.assertTrue(mysite.sametitle('Template:Test', 'Template:Test'))
         self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))
@@ -359,19 +346,19 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(ns, Mapping)
         self.assertTrue(all(x in ns for x in range(0, 16)))
         # built-in namespaces always present
-        self.assertIsInstance(mysite.ns_normalize('project'), basestring)
+        self.assertIsInstance(mysite.ns_normalize('project'), str)
         self.assertTrue(all(isinstance(key, int)
                             for key in ns))
         self.assertTrue(all(isinstance(val, Iterable)
                             for val in ns.values()))
-        self.assertTrue(all(isinstance(name, basestring)
+        self.assertTrue(all(isinstance(name, str)
                             for val in ns.values()
                             for name in val))
-        self.assertTrue(all(isinstance(mysite.namespace(key), basestring)
+        self.assertTrue(all(isinstance(mysite.namespace(key), str)
                             for key in ns))
         self.assertTrue(all(isinstance(mysite.namespace(key, True), Iterable)
                             for key in ns))
-        self.assertTrue(all(isinstance(item, basestring)
+        self.assertTrue(all(isinstance(item, str)
                             for key in ns
                             for item in mysite.namespace(key, True)))
 
@@ -388,8 +375,7 @@ class TestSiteObject(DefaultSiteTestCase):
         for msg in ('about', 'aboutpage', 'aboutsite', 'accesskey-n-portal'):
             with self.subTest(message=msg, lang=mysite.lang):
                 self.assertTrue(mysite.has_mediawiki_message(msg))
-                self.assertIsInstance(mysite.mediawiki_message(msg),
-                                      basestring)
+                self.assertIsInstance(mysite.mediawiki_message(msg), str)
                 self.assertEqual(
                     mysite.mediawiki_message(msg),
                     mysite.mediawiki_message(msg, lang=mysite.lang))
@@ -397,7 +383,7 @@ class TestSiteObject(DefaultSiteTestCase):
             with self.subTest(message=msg, lang='de'):
                 self.assertTrue(mysite.has_mediawiki_message(msg, lang='de'))
                 self.assertIsInstance(mysite.mediawiki_message(msg, lang='de'),
-                                      basestring)
+                                      str)
 
         with self.subTest(message='nosuchmessage'):
             self.assertFalse(mysite.has_mediawiki_message('nosuchmessage'))
@@ -433,7 +419,7 @@ class TestSiteObject(DefaultSiteTestCase):
         with self.subTest(test='server_time'):
             self.assertIsInstance(mysite.server_time(), pywikibot.Timestamp)
             ts = mysite.getcurrenttimestamp()
-            self.assertIsInstance(ts, basestring)
+            self.assertIsInstance(ts, str)
             self.assertRegex(
                 ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
 
@@ -616,7 +602,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_page_extlinks(self):
         """Test Site.extlinks."""
         for el in self.site.page_extlinks(self.mainpage):
-            self.assertIsInstance(el, basestring)
+            self.assertIsInstance(el, str)
 
     def test_pagelinks(self):
         """Test Site.pagelinks."""
@@ -831,8 +817,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
                             for tup in the_list))
         self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp)
                             for tup in the_list))
-        self.assertTrue(all(isinstance(tup[2], unicode) for tup in the_list))
-        self.assertTrue(all(isinstance(tup[3], unicode) for tup in the_list))
+        self.assertTrue(all(isinstance(tup[2], str) for tup in the_list))
+        self.assertTrue(all(isinstance(tup[3], str) for tup in the_list))
 
     def test_querypage(self):
         """Test the site.querypage() method."""
@@ -1420,10 +1406,9 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
             self.assertIsInstance(entry, tuple)
             if not isinstance(entry[0], int):  # autoblock removal entry
                 self.assertIsInstance(entry[0], pywikibot.Page)
-            self.assertIsInstance(entry[1], basestring)
-            self.assertIsInstance(
-                entry[2], long if PY2 and entry[2] > sys.maxint else int)
-            self.assertIsInstance(entry[3], basestring)
+            self.assertIsInstance(entry[1], str)
+            self.assertIsInstance(entry[2], int)
+            self.assertIsInstance(entry[3], str)
 
     def test_list_namespace(self):
         """Test the deprecated site.logpages() when namespace is a list."""
@@ -2337,17 +2322,17 @@ class TestSiteTokens(DefaultSiteTestCase):
             except pywikibot.Error as error_msg:
                 if tokentype:
                     self.assertRegex(
-                        unicode(error_msg),
+                        str(error_msg),
                         "Action '[a-z]+' is not allowed "
                         'for user .* on .* wiki.')
                     # test __contains__
                     self.assertNotIn(tokentype[0], self.mysite.tokens)
                 else:
                     self.assertRegex(
-                        unicode(error_msg),
+                        str(error_msg),
                         "Requested token '[a-z]+' is invalid on .* wiki.")
             else:
-                self.assertIsInstance(token, basestring)
+                self.assertIsInstance(token, str)
                 self.assertEqual(token, self.mysite.tokens[ttype])
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
@@ -2426,7 +2411,7 @@ class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
             self.assertOneDeprecation()
         except pywikibot.Error as error_msg:
             self.assertRegex(
-                unicode(error_msg),
+                str(error_msg),
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
             # test __contains__
             self.assertNotIn('patrol', self.mysite.tokens)
@@ -2560,13 +2545,6 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertNotIn(not_exists, mysite.siteinfo)
         self.assertIsEmpty(mysite.siteinfo.get(not_exists))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
-        if PY2:
-            self.assertFalse(
-                entered_loop(mysite.siteinfo.get(not_exists).iteritems()))
-            self.assertFalse(
-                entered_loop(mysite.siteinfo.get(not_exists).itervalues()))
-            self.assertFalse(
-                entered_loop(mysite.siteinfo.get(not_exists).iterkeys()))
         self.assertFalse(
             entered_loop(mysite.siteinfo.get(not_exists).items()))
         self.assertFalse(
@@ -2749,23 +2727,6 @@ class TestSiteLoadRevisions(TestCase):
                              for rev in revs))
 
         # TODO test other optional arguments
-
-
-class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
-
-    """Test cases for Site.loadrevision() method."""
-
-    sysop = True
-
-    def test_rollback(self):
-        """Test the site.loadrevisions() method with rollback."""
-        mainpage = self.get_mainpage()
-        self.site.loadrevisions(mainpage, total=12, rollback=True)
-        self.assertIsNotEmpty(mainpage._revisions)
-        self.assertLessEqual(len(mainpage._revisions), 12)
-        if self.site.has_right('rollback'):
-            self.assertTrue(all(rev.rollbacktoken is not None
-                                for rev in mainpage._revisions.values()))
 
 
 class TestBacklinks(TestCase):
@@ -3889,7 +3850,5 @@ class TestClearCookies(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

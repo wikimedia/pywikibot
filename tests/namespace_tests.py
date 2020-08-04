@@ -5,19 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-try:
-    from collections.abc import Iterable
-except ImportError:  # Python 2.7
-    from collections import Iterable
+from collections.abc import Iterable
+from contextlib import suppress
 
 from pywikibot.site import Namespace, NamespacesDict
-from pywikibot.tools import (
-    PY2,
-    StringTypes as basestring,
-    UnicodeType as unicode,
-)
 
 from tests.aspects import (CapturingTestCase, DeprecationTestCase,
                            TestCase, unittest)
@@ -73,7 +64,7 @@ class TestNamespaceObject(TestCase):
                             for key in ns))
         self.assertTrue(all(isinstance(val, Iterable)
                             for val in ns.values()))
-        self.assertTrue(all(isinstance(name, basestring)
+        self.assertTrue(all(isinstance(name, str)
                             for val in ns.values()
                             for name in val))
 
@@ -115,24 +106,18 @@ class TestNamespaceObject(TestCase):
         self.assertIn('Immagine', y)
 
     def testNamespaceToString(self):
-        """Test Namespace __str__ and __unicode__."""
+        """Test Namespace __str__."""
         ns = Namespace.builtin_namespaces()
 
         self.assertEqual(str(ns[0]), ':')
         self.assertEqual(str(ns[1]), 'Talk:')
         self.assertEqual(str(ns[6]), ':File:')
 
-        self.assertEqual(unicode(ns[0]), ':')
-        self.assertEqual(unicode(ns[1]), 'Talk:')
-        self.assertEqual(unicode(ns[6]), ':File:')
-
         kwargs = {'case': 'first-letter'}
         y = Namespace(id=6, custom_name='ملف', canonical_name='File',
                       aliases=['Image', 'Immagine'], **kwargs)
 
         self.assertEqual(str(y), ':File:')
-        if PY2:
-            self.assertEqual(unicode(y), ':ملف:')
         self.assertEqual(y.canonical_prefix(), ':File:')
         self.assertEqual(y.custom_prefix(), ':ملف:')
 
@@ -208,23 +193,22 @@ class TestNamespaceObject(TestCase):
         """Test Namespace.__repr__."""
         a = Namespace(id=0, canonical_name='Foo')
         s = repr(a)
-        r = 'Namespace(id=0, custom_name={!r}, canonical_name={!r}, ' \
-            'aliases=[])'.format(unicode('Foo'), unicode('Foo'))
+        r = 'Namespace(id=0, custom_name={foo!r}, canonical_name={foo!r}, ' \
+            'aliases=[])'.format(foo='Foo')
         self.assertEqual(s, r)
 
         a.defaultcontentmodel = 'bar'
         s = repr(a)
-        r = ('Namespace(id=0, custom_name={!r}, canonical_name={!r}, '
-             'aliases=[], defaultcontentmodel={!r})'
-             .format(unicode('Foo'), unicode('Foo'), unicode('bar')))
+        r = ('Namespace(id=0, custom_name={foo!r}, canonical_name={foo!r}, '
+             'aliases=[], defaultcontentmodel={bar!r})'
+             .format(foo='Foo', bar='bar'))
         self.assertEqual(s, r)
 
         a.case = 'upper'
         s = repr(a)
-        r = ('Namespace(id=0, custom_name={!r}, canonical_name={!r}, '
-             'aliases=[], case={!r}, defaultcontentmodel={!r})'
-             .format(unicode('Foo'), unicode('Foo'), unicode('upper'),
-                     unicode('bar')))
+        r = ('Namespace(id=0, custom_name={foo!r}, canonical_name={foo!r}, '
+             'aliases=[], case={case!r}, defaultcontentmodel={bar!r})'
+             .format(foo='Foo', case='upper', bar='bar'))
         self.assertEqual(s, r)
 
         b = eval(repr(a))
@@ -486,7 +470,5 @@ class TestNamespacesDictGetItem(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

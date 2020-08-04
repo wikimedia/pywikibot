@@ -11,15 +11,12 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from collections import OrderedDict, namedtuple
-try:
-    from collections.abc import Sequence
-except ImportError:  # Python 2.7
-    from collections import Sequence
 import datetime
 import re
+
+from collections.abc import Sequence
+from collections import OrderedDict, namedtuple
+from html.parser import HTMLParser
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -28,17 +25,8 @@ from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     DeprecatedRegex,
-    StringTypes,
-    UnicodeType,
     issue_deprecation_warning,
-    PY2,
 )
-
-if not PY2:
-    from html.parser import HTMLParser
-else:
-    from future_builtins import zip
-    from HTMLParser import HTMLParser
 
 try:
     import mwparserfromhell
@@ -204,7 +192,7 @@ class _MultiTemplateMatchBuilder(object):
             else:
                 raise ValueError(
                     '{0} is not a template Page object'.format(template))
-        elif isinstance(template, StringTypes):
+        elif isinstance(template, str):
             old = template
         else:
             raise ValueError(
@@ -312,7 +300,7 @@ def _get_regexes(keys, site):
     result = []
 
     for exc in keys:
-        if isinstance(exc, UnicodeType):
+        if isinstance(exc, str):
             # assume the string is a reference to a standard regex above,
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
@@ -374,11 +362,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     @type count: int
     """
     # if we got a string, compile it as a regular expression
-    if isinstance(old, UnicodeType):
-        if caseInsensitive:
-            old = re.compile(old, re.IGNORECASE | re.UNICODE)
-        else:
-            old = re.compile(old)
+    if isinstance(old, str):
+        old = re.compile(old, flags=re.IGNORECASE if caseInsensitive else 0)
 
     # early termination if not relevant
     if not old.search(text):
@@ -515,27 +500,42 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
     # thanks to:
     # https://www.hellboundhackers.org/articles/read-article.php?article_id=841
     parser = _GetDataHTML()
-    parser.keeptags = keeptags
-    parser.feed(text)
-    parser.close()
+    with parser:
+        parser.keeptags = keeptags
+        parser.feed(text)
     return parser.textdata
 
 
 # thanks to https://docs.python.org/3/library/html.parser.html
 class _GetDataHTML(HTMLParser):
+
+    """HTML parser which removes html tags except they are listed in keeptags.
+
+    This class is also a context manager which closes itself at exit time.
+    """
+
     textdata = ''
     keeptags = []
 
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *exc_info):
+        self.close()
+
     def handle_data(self, data):
+        """Add data to text."""
         self.textdata += data
 
     def handle_starttag(self, tag, attrs):
+        """Add start tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '<%s>' % tag
+            self.textdata += '<{}>'.format(tag)
 
     def handle_endtag(self, tag):
+        """Add end tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '</%s>' % tag
+            self.textdata += '</{}>'.format(tag)
 
 
 def isDisabled(text, index, tags=None):
@@ -646,7 +646,7 @@ def replace_links(text, replace, site=None):
         """Return the link from source when it's a Page otherwise itself."""
         if isinstance(source, pywikibot.Page):
             return source._link
-        elif isinstance(source, UnicodeType):
+        elif isinstance(source, str):
             return pywikibot.Link(source, site)
         else:
             return source
@@ -680,7 +680,7 @@ def replace_links(text, replace, site=None):
                 'The original value must be either basestring, Link or Page '
                 'but is "{0}"'.format(type(replace_list[0])))
         if replace_list[1] is not False and replace_list[1] is not None:
-            if isinstance(replace_list[1], UnicodeType):
+            if isinstance(replace_list[1], str):
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
             check_classes(replace_list[0])
         replace = replace_callable
@@ -764,10 +764,10 @@ def replace_links(text, replace, site=None):
 
         if new_link is False:
             # unlink - we remove the section if there's any
-            assert isinstance(new_label, UnicodeType), \
-                'link text must be unicode.'
+            assert isinstance(new_label, str), \
+                'link text must be str.'
             new_link = new_label
-        if isinstance(new_link, UnicodeType):
+        if isinstance(new_link, str):
             # Nothing good can come out of the fact that bytes is returned so
             # force unicode
             text = text[:start] + new_link + text[end:]
@@ -984,7 +984,7 @@ def getLanguageLinks(text, insite=None, template_subpage=False):
         # language, or if it's e.g. a category tag or an internal link
         if lang in fam.obsolete:
             lang = fam.obsolete[lang]
-        if lang in list(fam.langs.keys()):
+        if lang in fam.langs:
             if '|' in pagetitle:
                 # ignore text after the pipe
                 pagetitle = pagetitle[:pagetitle.index('|')]
@@ -1536,7 +1536,7 @@ def categoryFormat(categories, insite=None):
 
     catLinks = []
     for category in categories:
-        if isinstance(category, UnicodeType):
+        if isinstance(category, str):
             category, separator, sortKey = category.strip('[]').partition('|')
             sortKey = sortKey if separator else None
             # whole word if no ":" is present
@@ -1684,14 +1684,14 @@ def extract_templates_and_params_mwpfh(text, strip=False):
                 if not implicit_parameter:
                     value = param.value.strip()
                 else:
-                    value = UnicodeType(param.value)
+                    value = str(param.value)
             else:
-                key = UnicodeType(param.name)
-                value = UnicodeType(param.value)
+                key = str(param.name)
+                value = str(param.value)
 
             params[key] = value
 
-        result.append((UnicodeType(template.name.strip()), params))
+        result.append((template.name.strip(), params))
     return result
 
 
@@ -1817,7 +1817,7 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
                         param_name, param_val = param.split('=', 1)
                         implicit_parameter = False
                     else:
-                        param_name = UnicodeType(numbered_param)
+                        param_name = str(numbered_param)
                         param_val = param
                         numbered_param += 1
                         implicit_parameter = True
@@ -1904,111 +1904,6 @@ def glue_template_and_params(template_and_params):
         text += '|%s=%s\n' % (item, params[item])
 
     return '{{%s\n%s}}' % (template, text)
-
-
-# ----------------------------------------------
-# functions dealing with stars list (deprecated)
-# ----------------------------------------------
-
-starsList = [
-    'bueno',
-    'bom interwiki',
-    'cyswllt[ _]erthygl[ _]ddethol', 'dolen[ _]ed',
-    'destacado', 'destaca[tu]',
-    'enllaç[ _]ad',
-    'enllaz[ _]ad',
-    'leam[ _]vdc',
-    'legătură[ _]a[bcf]',
-    'liamm[ _]pub',
-    'lien[ _]adq',
-    'lien[ _]ba',
-    'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
-    'liên[ _]kết[ _]chọn[ _]lọc',
-    'ligam[ _]adq',
-    'ligazón[ _]a[bd]',
-    'ligoelstara',
-    'ligoleginda',
-    'link[ _][afgu]a', 'link[ _]adq', 'link[ _]f[lm]', 'link[ _]km',
-    'link[ _]sm', 'linkfa',
-    'na[ _]lotura',
-    'nasc[ _]ar',
-    'tengill[ _][úg]g',
-    'ua',
-    'yüm yg',
-    'רא',
-    'وصلة مقالة جيدة',
-    'وصلة مقالة مختارة',
-]
-
-
-@deprecated(future_warning=True, since='20200324')
-def get_stars(text):
-    """
-    Extract stars templates from wikitext.
-
-    @param text: a wiki text
-    @type text: str
-    @return: list of stars templates
-    @rtype: list
-    """
-    allstars = []
-    starstext = removeDisabledParts(text)
-    for star in starsList:
-        regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
-                           % star, re.I)
-        found = regex.findall(starstext)
-        if found:
-            allstars += found
-    return allstars
-
-
-@deprecated(future_warning=True, since='20200324')
-def remove_stars(text, stars_list):
-    """
-    Remove stars templates from text.
-
-    @param text: a wiki text
-    @type text: str
-    @param start_list: list of stars templates previously found in text
-    @return: modified text
-    @rtype: str
-    """
-    for star in stars_list:
-        text = text.replace(star, '')
-    return text
-
-
-@deprecated(future_warning=True, since='20200324')
-def append_stars(text, stars_list, site=None):
-    """
-    Remove stars templates from text.
-
-    @param text: a wiki text
-    @type text: str
-    @param stars_list: list of stars templates previously found in text
-    @type stars_list: list
-    @param site: a site where the given text is used.
-        interwiki_text_separator is used when a site object is given.
-        Otherwise two line separators are used to separate stars list.
-    @type site: BaseSite
-    @return: modified text
-    @rtype: str
-    """
-    LS = '\n\n' if not site else site.family.interwiki_text_separator
-    text = text.strip() + LS
-    stars = stars_list[:]
-    stars.sort()
-    for element in stars:
-        text += element.strip() + '\n'
-    return text
-
-
-@deprecated(future_warning=True, since='20200324')
-def standardize_stars(text):
-    """Make sure that star templates are in the right order."""
-    allstars = get_stars(text)
-    text = remove_stars(text, allstars)
-    return append_stars(text, allstars)
 
 
 # --------------------------

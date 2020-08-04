@@ -5,16 +5,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import inspect
 import json
 import os
 import sys
 import warnings
 
+from collections.abc import Mapping
 from contextlib import contextmanager
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, TimeoutExpired
 from types import ModuleType
 
 try:
@@ -29,21 +28,7 @@ from pywikibot import config
 from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.site import Namespace
-from pywikibot.tools import (
-    PY2, PYTHON_VERSION,
-    UnicodeType as unicode,
-)
-
 from tests import _pwb_py, unittest
-
-if not PY2:
-    from collections.abc import Mapping
-    import six
-    from subprocess import TimeoutExpired
-else:
-    from collections import Mapping
-    from threading import Timer
-    ResourceWarning = None
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -69,20 +54,10 @@ def expected_failure_if(expect):
         return lambda orig: orig
 
 
-def add_metaclass(cls):
-    """Call six's add_metaclass with the site's __metaclass__ in Python 3."""
-    if not PY2:
-        return six.add_metaclass(cls.__metaclass__)(cls)
-    else:
-        assert cls.__metaclass__
-        return cls
-
-
 def fixed_generator(iterable):
     """Return a dummy generator ignoring all parameters."""
     def gen(*args, **kwargs):
-        for item in iterable:
-            yield item
+        yield from iterable
 
     return gen
 
@@ -171,20 +146,18 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
             # The following for-loop will adjust the warn_msg only if the
             # warning does not match the skip_list.
-            for (_, frame_filename, frame_lineno, _, _, _) in inspect.stack():
+            for _, frame_filename, frame_lineno, *_ in inspect.stack():
                 if any(start <= frame_lineno <= end
                        for (_, skip_filename, start, end) in self.skip_list
                        if skip_filename == frame_filename):
                     # this frame matches to one of the items in the skip_list
                     if a_frame_has_matched_warn_msg:
                         continue
-                    else:
-                        skip_frames += 1
 
-                if (
-                    frame_filename == warn_msg.filename
-                    and frame_lineno == warn_msg.lineno
-                ):
+                    skip_frames += 1
+
+                if frame_filename == warn_msg.filename \
+                   and frame_lineno == warn_msg.lineno:
                     if not skip_frames:
                         break
                     a_frame_has_matched_warn_msg = True
@@ -195,16 +168,14 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                         warn_msg.filename = frame_filename
                         warn_msg.lineno = frame_lineno
                         break
-                    else:
-                        skip_frames -= 1
+
+                    skip_frames -= 1
 
             # Ignore socket IO warnings (T183696, T184996)
-            if (not PY2
-                    and issubclass(warn_msg.category, ResourceWarning)
-                    and str(warn_msg.message).startswith(
-                        ('unclosed <ssl.SSLSocket',
-                         'unclosed <socket.socket'))):
-                return
+            if issubclass(warn_msg.category, ResourceWarning) \
+               and str(warn_msg.message).startswith(
+                   ('unclosed <ssl.SSLSocket', 'unclosed <socket.socket')):
+                return None
 
             log.append(warn_msg)
 
@@ -309,15 +280,16 @@ class DummySiteinfo(object):
             loaded = self._cache[key]
             if not loaded[1] and not get_default:
                 raise KeyError(key)
-            else:
-                return loaded[0]
-        elif get_default:
+
+            return loaded[0]
+
+        if get_default:
             default = pywikibot.site.Siteinfo._get_default(key)
             if cache:
                 self._cache[key] = (default, False)
             return default
-        else:
-            raise KeyError(key)
+
+        raise KeyError(key)
 
     def __contains__(self, key):
         """Return False."""
@@ -493,7 +465,7 @@ class DummyHttp(object):
             result = self.__wrapper._old_http.request(*args, **kwargs)
         elif isinstance(result, Mapping):
             result = json.dumps(result)
-        elif not isinstance(result, unicode):
+        elif not isinstance(result, str):
             raise ValueError('The result is not a valid type '
                              '"{0}"'.format(type(result)))
         response = self.__wrapper.after_request(result, *args, **kwargs)
@@ -532,7 +504,7 @@ class PatchedHttp(object):
     Even though L{http.request} is calling L{http.fetch}, it won't call the
     patched method.
 
-    The data returned for C{request} may either be C{False}, a C{unicode} or a
+    The data returned for C{request} may either be C{False}, a C{str} or a
     C{Mapping} which is converted into a json string. The data returned for
     C{fetch} can only be C{False} or a L{threadedhttp.HttpRequest}. For both
     variants any other types are not allowed and if it is False it'll use the
@@ -561,10 +533,11 @@ class PatchedHttp(object):
         """Return the data after it may have been called."""
         if self.data is None:
             raise ValueError('No handler is defined.')
-        elif callable(self.data):
+
+        if callable(self.data):
             return self.data(*args, **kwargs)
-        else:
-            return self.data
+
+        return self.data
 
     def before_request(self, *args, **kwargs):
         """Return the value which should is returned by request."""
@@ -598,77 +571,44 @@ def execute(command, data_in=None, timeout=None, error=None):
     Execute a command and capture outputs.
 
     @param command: executable to run and arguments to use
-    @type command: list of unicode
+    @type command: list of str
     """
-    if PY2 or PYTHON_VERSION < (3, 5, 0):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:125')
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
-    # Any environment variables added on Windows must be of type
-    # str() on Python 2.
-    if OSWIN32 and PY2:
-        env = {str(k): str(v) for k, v in os.environ.items()}
-    else:
-        env = os.environ.copy()
+
+    env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'
-    env[str('PYWIKIBOT_TEST_QUIET')] = str('1')
+    env['PYWIKIBOT_TEST_QUIET'] = '1'
 
     # sys.path may have been modified by the test runner to load dependencies.
     pythonpath = os.pathsep.join(sys.path)
-    if OSWIN32 and PY2:
-        pythonpath = str(pythonpath)
-    env[str('PYTHONPATH')] = pythonpath
-    env[str('PYTHONIOENCODING')] = str(config.console_encoding)
+
+    env['PYTHONPATH'] = pythonpath
+    env['PYTHONIOENCODING'] = config.console_encoding
 
     # PYWIKIBOT_USERINTERFACE_LANG will be assigned to
     # config.userinterface_lang
     if pywikibot.config.userinterface_lang:
-        env[str('PYWIKIBOT_USERINTERFACE_LANG')] = \
-            str(pywikibot.config.userinterface_lang)
+        env['PYWIKIBOT_USERINTERFACE_LANG'] \
+            = pywikibot.config.userinterface_lang
 
     # Set EDITOR to an executable that ignores all arguments and does nothing.
-    env[str('EDITOR')] = str('break' if OSWIN32 else 'true')
-    try:
-        p = Popen(
-            command, env=env, stdout=PIPE, stderr=PIPE,
-            stdin=PIPE if data_in is not None else None)
-    except TypeError as e:
-        # Generate a more informative error
-        if OSWIN32 and PY2:
-            unicode_env = [(k, v) for k, v in os.environ.items()
-                           if not isinstance(k, str)
-                           or not isinstance(v, str)]
-            if unicode_env:
-                raise TypeError(
-                    '{}: unicode in os.environ: {!r}'.format(e, unicode_env))
+    env['EDITOR'] = 'break' if OSWIN32 else 'true'
 
-            child_unicode_env = [(k, v) for k, v in env.items()
-                                 if not isinstance(k, str)
-                                 or not isinstance(v, str)]
-            if child_unicode_env:
-                raise TypeError(
-                    '{}: unicode in child env: {!r}'
-                    .format(e, child_unicode_env))
-        raise
+    p = Popen(command, env=env, stdout=PIPE, stderr=PIPE,
+              stdin=PIPE if data_in is not None else None)
 
     if data_in is not None:
         p.stdin.write(data_in.encode(config.console_encoding))
         p.stdin.flush()  # _communicate() otherwise has a broken pipe
 
-    if PY2:   # subprocess.communicate does not support timeout
-        timer = Timer(timeout, p.kill)
-        timer.start()
-        try:
-            stdout_data, stderr_data = p.communicate()
-        finally:
-            timer.cancel()
-    else:
-        try:
-            stdout_data, stderr_data = p.communicate(timeout=timeout)
-        except TimeoutExpired:
-            p.kill()
-            stdout_data, stderr_data = p.communicate()
+    try:
+        stdout_data, stderr_data = p.communicate(timeout=timeout)
+    except TimeoutExpired:
+        p.kill()
+        stdout_data, stderr_data = p.communicate()
+
     return {'exit_code': p.returncode,
             'stdout': stdout_data.decode(config.console_encoding),
             'stderr': stderr_data.decode(config.console_encoding)}
@@ -679,7 +619,7 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
     Execute the pwb.py script and capture outputs.
 
     @param args: list of arguments for pwb.py
-    @type args: typing.Sequence[unicode]
+    @type args: typing.Sequence[str]
     @param overrides: mapping of pywikibot symbols to test replacements
     @type overrides: dict
     """

@@ -18,47 +18,19 @@ to set the default site (see T216825):
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+from __future__ import print_function
+
+import os
+import sys
+import types
 
 from difflib import get_close_matches
 from importlib import import_module
-import os
-import sys
 from time import sleep
-import types
-
 from warnings import warn
 
-PYTHON_VERSION = sys.version_info[:3]
-PY2 = (PYTHON_VERSION[0] == 2)
-
-if not PY2:
-    from pathlib import Path
-else:
-    from pathlib2 import Path
-
-
-VERSIONS_REQUIRED_MESSAGE = """
-Pywikibot is not available on:
-{version}
-
-This version of Pywikibot only supports Python 2.7.4+ or 3.4+.
-"""
-
-
-def python_is_supported():
-    """Check that Python is supported."""
-    # Any change to this must be copied to setup.py
-    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 4)
-
-
-if not python_is_supported():
-    print(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
-    sys.exit(1)
 
 pwb = None
-
 
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with python 3 support [2] added later,
@@ -70,6 +42,7 @@ pwb = None
 # [3]
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
+
 def run_python_file(filename, argv, argvu, package=None):
     """Run a python file as if it were the main program on the command line.
 
@@ -79,17 +52,12 @@ def run_python_file(filename, argv, argvu, package=None):
     """
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
-    # it's explicitly using str() to bypass unicode_literals in Python 2
-    main_mod = types.ModuleType(str('__main__'))
+    main_mod = types.ModuleType('__main__')
     sys.modules['__main__'] = main_mod
     main_mod.__file__ = filename
-    if not PY2:
-        main_mod.__builtins__ = sys.modules['builtins']
-    else:
-        main_mod.__builtins__ = sys.modules['__builtin__']
+    main_mod.__builtins__ = sys.modules['builtins']
     if package:
-        # it's explicitly using str() to bypass unicode_literals in Python 2
-        main_mod.__package__ = str(package)
+        main_mod.__package__ = package
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
@@ -163,7 +131,16 @@ def _print_requirements(requirements, script, variant):
 
 
 def check_modules(script=None):
-    """Check whether mandatory modules are present."""
+    """Check whether mandatory modules are present.
+
+    This also checks Python version when importing deptendencies from setup.py
+
+    @param script: The script name to be checked for dependencies
+    @type script: str or None
+    @return: True if all dependencies are installed
+    @rtype: bool
+    @raise RuntimeError: wrong Python version found in setup.py
+    """
     import pkg_resources
     if script:
         from setup import script_deps
@@ -201,8 +178,14 @@ def check_modules(script=None):
     return not missing_requirements
 
 
-if not check_modules():
+try:
+    if not check_modules():
+        raise RuntimeError('')  # no further output needed
+except RuntimeError as e:
+    print(e)
     sys.exit()
+
+from pathlib import Path  # noqa: E402
 
 filename, script_args, global_args = handle_args(*sys.argv)
 
@@ -211,8 +194,6 @@ filename, script_args, global_args = handle_args(*sys.argv)
 # directories. See config2.py for details on search order.
 # Use env var to communicate to config2.py pwb.py location (bug T74918).
 _pwb_dir = os.path.split(__file__)[0]
-if sys.platform == 'win32' and PY2:
-    _pwb_dir = str(_pwb_dir)
 os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:
     import pywikibot as pwb

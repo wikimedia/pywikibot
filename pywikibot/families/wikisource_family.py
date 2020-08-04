@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -28,13 +26,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs', 'pt',
-        'mul', 'gu', 'uk', 'fa', 'sr', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
+        'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
+        'mul', 'pt', 'gu', 'fa', 'sr', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
         'hy', 'sl', 'te', 'el', 'ta', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
-        'az', 'la', 'br', 'ca', 'tr', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
-        'vec', 'pms', 'et', 'be', 'da', 'mk', 'id', 'yi', 'bg', 'mr', 'as',
-        'li', 'hi', 'lt', 'or', 'eu', 'pa', 'gl', 'bs', 'sah', 'sk', 'cy',
-        'zh-min-nan', 'fo',
+        'az', 'br', 'la', 'tr', 'ca', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
+        'vec', 'pms', 'et', 'be', 'da', 'id', 'mk', 'yi', 'bg', 'mr', 'as',
+        'hi', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'bs', 'sah', 'sk', 'cy',
+        'zh-min-nan', 'fo', 'lij',
     ]
 
     # Sites we want to edit but not count as real languages

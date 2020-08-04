@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
+
+from contextlib import suppress
 
 import pywikibot
 from pywikibot import i18n
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
-from tests.utils import add_metaclass
 
 PACKAGES = (
     'redirect-broken-redirect-template',  # speedy deletion template
@@ -85,12 +84,9 @@ class TestValidTemplateMeta(MetaTestCaseClass):
         return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)
 
 
-@add_metaclass
-class TestValidTemplate(TestCase):
+class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
 
     """Test cases L10N message templates processed by unittest."""
-
-    __metaclass__ = TestValidTemplateMeta
 
     family = 'wikipedia'
     code = 'en'
@@ -133,7 +129,5 @@ def setUpModule():  # noqa: N802
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

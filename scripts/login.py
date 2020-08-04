@@ -57,19 +57,17 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from os.path import join
+from typing import Tuple
 
 import pywikibot
 
 from pywikibot import config
-
 from pywikibot.exceptions import SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
 
-def _get_consumer_token(site):
+def _get_consumer_token(site) -> Tuple[str, str]:
     key_msg = 'OAuth consumer key on {0}:{1}'.format(site.code, site.family)
     key = pywikibot.input(key_msg)
     secret_msg = 'OAuth consumer secret for consumer {0}'.format(key)
@@ -77,7 +75,7 @@ def _get_consumer_token(site):
     return key, secret
 
 
-def _oauth_login(site):
+def _oauth_login(site) -> None:
     consumer_key, consumer_secret = _get_consumer_token(site)
     login_manager = OauthLoginManager(consumer_secret, site, consumer_key)
     login_manager.login()
@@ -105,7 +103,7 @@ def _oauth_login(site):
                           'oauth_token': oauth_token})
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 

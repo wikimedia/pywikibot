@@ -47,12 +47,10 @@ but 'p' must be included.
 
 """
 #
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 
@@ -67,7 +65,7 @@ class ClaimRobot(WikidataBot):
 
     use_from_page = None
 
-    def __init__(self, generator, claims, exists_arg=''):
+    def __init__(self, generator, claims, exists_arg='') -> None:
         """
         Initializer.
 
@@ -79,7 +77,7 @@ class ClaimRobot(WikidataBot):
         @type exists_arg: str
         """
         self.availableOptions['always'] = True
-        super(ClaimRobot, self).__init__()
+        super().__init__()
         self.generator = generator
         self.claims = claims
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
@@ -88,7 +86,7 @@ class ClaimRobot(WikidataBot):
             pywikibot.output("'exists' argument set to '{}'"
                              .format(self.exists_arg))
 
-    def treat_page_and_item(self, page, item):
+    def treat_page_and_item(self, page, item) -> None:
         """Treat each page."""
         for claim in self.claims:
             # The generator might yield pages from multiple sites
@@ -97,7 +95,7 @@ class ClaimRobot(WikidataBot):
                 item, claim.copy(), self.exists_arg, site)
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -105,7 +103,6 @@ def main(*args):
 
     @param args: command line arguments
     @type args: str
-    @rtype: bool
     """
     exists_arg = ''
     commandline_claims = []
@@ -125,7 +122,7 @@ def main(*args):
         commandline_claims.append(arg)
     if len(commandline_claims) % 2:
         pywikibot.error('Incomplete command line property-value pair.')
-        return False
+        return
 
     claims = []
     repo = pywikibot.Site().data_repository()

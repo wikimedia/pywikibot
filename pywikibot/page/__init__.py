@@ -16,8 +16,6 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import hashlib
 import logging
 import os.path
@@ -26,11 +24,10 @@ import sys
 import unicodedata
 
 from collections import Counter, defaultdict, namedtuple, OrderedDict
-try:
-    from collections.abc import MutableMapping
-except ImportError:
-    from collections import MutableMapping
+from collections.abc import MutableMapping
+from html.entities import name2codepoint
 from itertools import chain
+from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
 import pywikibot
@@ -47,26 +44,13 @@ from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
     classproperty, compute_file_hash,
-    UnicodeMixin, ComparableMixin, DotReadableDict,
+    ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping, suppress_warnings,
-    ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
-    first_upper, redirect_func, remove_last_args, UnicodeType,
-    StringTypes
+    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
+    first_upper, redirect_func, remove_last_args
 )
 from pywikibot.tools import is_IP
-
-if not PY2:
-    from html.entities import name2codepoint
-    from urllib.parse import quote_from_bytes, unquote_to_bytes
-else:
-    if __debug__ and not PY2:
-        unichr = NotImplemented  # pyflakes workaround
-
-    chr = unichr
-
-    from htmlentitydefs import name2codepoint
-    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'
@@ -144,7 +128,7 @@ def allow_asynchronous(func):
 # Page objects (defined here) represent the page itself, including its
 # contents.
 
-class BasePage(UnicodeMixin, ComparableMixin):
+class BasePage(ComparableMixin):
 
     """
     BasePage: Base object for a MediaWiki page.
@@ -295,15 +279,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self._pageid
 
     @deprecated_args(
-        decode=True, savetitle='as_url', withNamespace='with_ns',
+        savetitle='as_url', withNamespace='with_ns',
         withSection='with_section', forceInterwiki='force_interwiki',
         asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
-    def title(self, underscore=False, with_ns=True,
+    def title(self, *, underscore=False, with_ns=True,
               with_section=True, as_url=False, as_link=False,
               allow_interwiki=True, force_interwiki=False, textlink=False,
-              as_filename=False, insite=None, without_brackets=False):
+              as_filename=False, insite=None, without_brackets=False) -> str:
         """
-        Return the title of this Page, as a Unicode string.
+        Return the title of this Page, as a string.
 
         @param underscore: (not used with as_link) if true, replace all ' '
             characters with '_'
@@ -373,7 +357,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = title.replace(' ', '_')
         if as_url:
             encoded_title = title.encode(self.site.encoding())
-            title = quote_from_bytes(encoded_title, safe=str(''))
+            title = quote_from_bytes(encoded_title, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems, but still are valid in MediaWiki titles:
@@ -401,21 +385,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
             section = None
         return section
 
-    def __unicode__(self):
-        """Return a unicode string representation."""
+    def __str__(self):
+        """Return a string representation."""
         return self.title(as_link=True, force_interwiki=True)
 
     def __repr__(self):
         """Return a more complete string representation."""
-        if not PY2:
-            title = repr(self.title())
-        else:
-            try:
-                title = self.title().encode(config.console_encoding)
-            except UnicodeEncodeError:
-                # okay console encoding didn't work, at least try something
-                title = self.title().encode('unicode_escape')
-        return str('{0}({1})').format(self.__class__.__name__, title)
+        return '{}({!r})'.format(self.__class__.__name__, self.title())
 
     def _cmpkey(self):
         """
@@ -465,9 +441,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.autoFormat()[0] is not None
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=None,
-                     change_edit_time=None,
-                     expandtemplates=None)
+    @deprecated_args(throttle=True,
+                     change_edit_time=True,
+                     expandtemplates=True)
     def get(self, force=False, get_redirect=False):
         """
         Return the wiki-text of the page.
@@ -532,7 +508,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise self._getexception
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=None, change_edit_time=None)
+    @deprecated_args(throttle=True, change_edit_time=True)
     def getOldVersion(self, oldid, force=False, get_redirect=False):
         """
         Return text of an old revision of this page; same options as get().
@@ -649,7 +625,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param value: New value or None
         @type value: basestring
         """
-        self._text = None if value is None else UnicodeType(value)
+        self._text = None if value is None else str(value)
         if hasattr(self, '_raw_extracted_templates'):
             del self._raw_extracted_templates
 
@@ -708,14 +684,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.properties(force=force).get('defaultsort')
 
     @deprecate_arg('refresh', 'force')
-    def expand_text(self, force=False, includecomments=False):
+    def expand_text(self, force=False, includecomments=False) -> str:
         """Return the page text with all templates and parser words expanded.
 
         @param force: force updating from the live site
         @param includecomments: Also strip comments if includecomments
             parameter is not True.
-
-        @rtype unicode or None
         """
         if not hasattr(self, '_expanded_text') or (
                 self._expanded_text is None) or force:
@@ -926,24 +900,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         ns = self.namespace()
         if ns < 0:  # Special page
-            return
-        if self.isTalkPage():
-            if self.namespace() == 1:
-                return Page(self.site, self.title(with_ns=False))
-            else:
-                return Page(self.site,
-                            '%s:%s' % (self.site.namespace(ns - 1),
-                                       self.title(with_ns=False)))
-        else:
-            return Page(self.site,
-                        '%s:%s' % (self.site.namespace(ns + 1),
-                                   self.title(with_ns=False)))
+            return None
+
+        title = self.title(with_ns=False)
+        new_ns = ns + (1, -1)[self.isTalkPage()]
+        return Page(self.site,
+                    '{}:{}'.format(self.site.namespace(new_ns), title))
 
     def is_categorypage(self):
         """Return True if the page is a Category, False otherwise."""
         return self.namespace() == 14
 
-    @deprecated('is_categorypage', since='20140819')
+    @deprecated('is_categorypage', since='20140819', future_warning=True)
     def isCategory(self):
         """DEPRECATED: use is_categorypage instead."""
         return self.is_categorypage()
@@ -952,7 +920,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if this is an file description page, False otherwise."""
         return self.namespace() == 6
 
-    @deprecated('is_filepage', since='20140819')
+    @deprecated('is_filepage', since='20140819', future_warning=True)
     def isImage(self):
         """DEPRECATED: use is_filepage instead."""
         return self.is_filepage()
@@ -1019,7 +987,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.namespace() != 10 and len(disambig_in_page) > 0
 
     @deprecated_args(
-        step=None, withTemplateInclusion='with_template_inclusion',
+        step=True, withTemplateInclusion='with_template_inclusion',
         onlyTemplateInclusion='only_template_inclusion',
         redirectsOnly='filter_redirects')
     def getReferences(
@@ -1062,7 +1030,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=None, followRedirects='follow_redirects',
+    @deprecated_args(step=True, followRedirects='follow_redirects',
                      filterRedirects='filter_redirects')
     def backlinks(self, follow_redirects=True, filter_redirects=None,
                   namespaces=None, total=None, content=False):
@@ -1087,7 +1055,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def embeddedin(self, filter_redirects=None, namespaces=None,
                    total=None, content=False):
         """
@@ -1116,7 +1084,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.page_restrictions(self)
 
-    def applicable_protections(self):
+    def applicable_protections(self) -> set:
         """
         Return the protection types allowed for that page.
 
@@ -1127,8 +1095,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         It is possible, that it returns an empty set, but only if original
         protection types were removed.
 
-        @return: set of unicode
-        @rtype: set
+        @return: set of str
         """
         # New API since commit 32083235eb332c419df2063cf966b3400be7ee8a
         if self.site.mw_version >= '1.25wmf14':
@@ -1186,7 +1153,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if config.ignore_bot_templates:  # Check the "master ignore switch"
             return True
 
-        username = self.site.user()
+        username = self.site.username()
         try:
             templates = self.templatesWithParams()
         except (pywikibot.NoPage,
@@ -1278,7 +1245,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return True
 
     @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary', sysop=None)
+    @deprecated_args(comment='summary', sysop=True)
     def save(self, summary=None, watch=None, minor=True, botflag=None,
              force=False, asynchronous=False, callback=None,
              apply_cosmetic_changes=None, quiet=False, **kwargs):
@@ -1342,7 +1309,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
               cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
-        if cc or cc is None and config.cosmetic_changes:
+        if cc or (cc is None and config.cosmetic_changes):
             summary = self._cosmetic_changes_hook(summary)
 
         done = self.site.editpage(self, summary=summary, minor=minor,
@@ -1363,20 +1330,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
             else the old edit summary.
         @rtype: str
         """
-        if self.isTalkPage() or \
+        if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return summary
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
-            cc = ((family == config.family
-                   and self.site.lang == config.mylang)
-                  or family in list(config.cosmetic_changes_enable.keys())
-                  and self.site.lang in config.cosmetic_changes_enable[family])
+            cc = ((family == config.family and self.site.lang == config.mylang)
+                  or self.site.lang in config.cosmetic_changes_enable.get(
+                      family, []))
         else:
             cc = True
-        cc = (cc and not
-              (family in list(config.cosmetic_changes_disable.keys())
-               and self.site.lang in config.cosmetic_changes_disable[family]))
+        cc = cc and self.site.lang not in config.cosmetic_changes_disable.get(
+            family, [])
         if not cc:
             return summary
 
@@ -1497,9 +1462,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             raise pywikibot.NoPage(self)
 
-    @deprecated_args(step=None)
-    def linkedPages(self, namespaces=None, total=None,
-                    content=False):
+    @deprecated_args(step=True)
+    def linkedPages(self, namespaces=None, total=None, content=False):
         """
         Iterate Pages that this Page links to.
 
@@ -1581,7 +1545,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return [i for i in self._langlinks if not i.site.obsolete]
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def iterlanglinks(self, total=None, include_obsolete=False):
         """
         Iterate all inter-language links on this page.
@@ -1612,12 +1576,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return ItemPage.fromPage(self)
 
     @deprecate_arg('tllimit', None)
-    @deprecated('Page.templates()', since='20140421')
+    @deprecated('Page.templates()', since='20140421', future_warning=True)
     def getTemplates(self):
         """DEPRECATED. Use templates()."""
         return self.templates()
 
-    @deprecate_arg('get_redirect', None)
+    @deprecated_args(get_redirect=True)
     def templates(self, content=False):
         """
         Return a list of Page objects for templates used on this Page.
@@ -1636,7 +1600,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         return self._templates
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def itertemplates(self, total=None, content=False):
         """
         Iterate Page objects for templates used on this Page.
@@ -1654,7 +1618,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return iter(self._templates)
         return self.site.pagetemplates(self, total=total, content=content)
 
-    @deprecated_args(followRedirects=None, loose=None, step=None)
+    @deprecated_args(followRedirects=True, loose=True, step=True)
     def imagelinks(self, total=None, content=False):
         """
         Iterate FilePage objects for images displayed on this Page.
@@ -1666,7 +1630,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(nofollow_redirects=None, get_redirect=None, step=None,
+    @deprecated_args(nofollow_redirects=True, get_redirect=True, step=True,
                      withSortKey='with_sort_key')
     def categories(self, with_sort_key=False, total=None, content=False):
         """
@@ -1685,13 +1649,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         return self.site.pagecategories(self, total=total, content=content)
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def extlinks(self, total=None):
         """
         Iterate all external URLs (not interwiki links) from this page.
 
         @param total: iterate no more than this number of pages in total
-        @return: a generator that yields unicode objects containing URLs.
+        @return: a generator that yields str objects containing URLs.
         @rtype: generator
         """
         return self.site.page_extlinks(self, total=total)
@@ -1780,14 +1744,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse', step=None)
+    @deprecated_args(getText='content', reverseOrder='reverse', step=True,
+                     rollback=True)
     def revisions(self, reverse=False, total=None, content=False,
-                  rollback=False, starttime=None, endtime=None):
+                  starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
         self.site.loadrevisions(self, content=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
-                                total=total, rollback=rollback)
+                                total=total)
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
@@ -1804,8 +1769,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
     #
     # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
     @deprecated('Page.revisions()', since='20150206', future_warning=True)
-    @deprecated_args(forceReload=None, revCount='total', step=None,
-                     getAll=None, reverseOrder='reverse')
+    @deprecated_args(forceReload=True, revCount='total', step=True,
+                     getAll=True, reverseOrder='reverse')
     def getVersionHistory(self, reverse=False, total=None):
         """
         Load the version history page and return history information.
@@ -1825,7 +1790,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             ]
         return revisions
 
-    @deprecated_args(forceReload=None, reverseOrder='reverse', step=None)
+    @deprecated_args(forceReload=True, reverseOrder='reverse', step=True)
     def getVersionHistoryTable(self, reverse=False, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
@@ -1839,7 +1804,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @deprecated('Page.revisions(content=True)', since='20150206',
                 future_warning=True)
-    @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
+    @deprecated_args(reverseOrder='reverse', rollback=True, step=True)
     def fullVersionHistory(self, reverse=False, total=None):
         """Return previous versions including content."""
         with suppress_warnings(
@@ -1851,7 +1816,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             ]
         return revisions
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def contributors(self, total=None, starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
@@ -1868,7 +1833,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                                       starttime=starttime, endtime=endtime))
 
     @deprecated('contributors()', since='20150206')
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def contributingUsers(self, total=None):
         """
         Return a set of usernames (or IPs) of users who edited this page.
@@ -1895,21 +1860,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
         cnt = self.contributors()
         return sum(cnt[username] for username in contributors)
 
-    @deprecated('oldest_revision', since='20140421')
+    @deprecated('oldest_revision', since='20140421', future_warning=True)
     def getCreator(self):
         """
         Get the first revision of the page.
 
         DEPRECATED: Use Page.oldest_revision.
 
-        @rtype: tuple(username, Timestamp)
+        @return: tuple of username and timestamp in isoformat
+        @rtype: tuple[str]
         """
         result = self.oldest_revision
-        return result.user, UnicodeType(result.timestamp.isoformat())
+        return result.user, result.timestamp.isoformat()
 
     @deprecated('contributors() or revisions()', since='20150206')
     @deprecated_args(limit='total')
-    def getLatestEditors(self, total=1):
+    def getLatestEditors(self, total=1) -> list:
         """
         Get a list of revision information of the last total edits.
 
@@ -1917,11 +1883,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param total: iterate no more than this number of revisions in total
         @return: list of dict, each dict containing the username and Timestamp
-        @rtype: list
         """
         return [
             {'user': rev.user,
-             'timestamp': UnicodeType(rev.timestamp.isoformat())}
+             'timestamp': rev.timestamp.isoformat()}
             for rev in self.revisions(total=total)]
 
     def merge_history(self, dest, timestamp=None, reason=None):
@@ -1942,7 +1907,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         self.site.merge_history(self, dest, timestamp, reason)
 
     @deprecated_args(
-        throttle=None, deleteAndMove='noredirect', movetalkpage='movetalk')
+        throttle=True, deleteAndMove='noredirect', movetalkpage='movetalk')
     @remove_last_args(['safe'])
     def move(self, newtitle, reason=None, movetalk=True, noredirect=False):
         """
@@ -1962,7 +1927,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    @deprecate_arg('throttle', None)
+    @deprecated_args(throttle=True)
     def delete(self, reason=None, prompt=True, mark=False, quit=False):
         """
         Delete the page from the wiki. Requires administrator status.
@@ -1992,7 +1957,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                return self.site.deletepage(self, reason)
+                self.site.deletepage(self, reason)
+                return
+
         else:  # Otherwise mark it for deletion
             if mark or hasattr(self.site, '_noMarkDeletePrompt'):
                 answer = 'y'
@@ -2018,7 +1985,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     self.text = template + self.text
                     self.save(summary=reason)
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def loadDeletedRevisions(self, total=None):
         """
         Retrieve deleted revisions for this Page.
@@ -2045,7 +2012,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @return: a list of [date, editor, comment, text, restoration
             marker]. text will be None, unless content is True (or has
             been retrieved earlier). If timestamp is not found, returns
-            None.
+            empty list.
         @rtype: list
         """
         if hasattr(self, '_deletedRevs'):
@@ -2053,12 +2020,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     not content
                     or 'content' in self._deletedRevs[timestamp]):
                 return self._deletedRevs[timestamp]
+
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1):
             # should only be one item with one revision
             if item['title'] == self.title:
                 if 'revisions' in item:
                     return item['revisions'][0]
+        return []
 
     def markDeletedRevision(self, timestamp, undelete=True):
         """
@@ -2074,7 +2043,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 'Timestamp %d is not a deleted revision' % timestamp)
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecated_args(comment='reason', throttle=None)
+    @deprecated_args(comment='reason', throttle=True)
     def undelete(self, reason=None):
         """
         Undelete revisions based on the markers set by previous calls.
@@ -2111,7 +2080,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 'Please enter a reason for the undeletion:')
         self.site.undelete_page(self, reason, undelete_revs)
 
-    @deprecate_arg('throttle', None)
+    @deprecated_args(throttle=True)
     def protect(self, edit=False, move=False, create=None, upload=None,
                 unprotect=False, reason=None, prompt=None, protections=None,
                 **kwargs):
@@ -2185,7 +2154,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 answer = 'y'
                 self.site._noProtectPrompt = True
         if answer == 'y':
-            return self.site.protect(self, protections, reason, **kwargs)
+            self.site.protect(self, protections, reason, **kwargs)
 
     @deprecated_args(
         comment='summary', oldCat='old_cat', newCat='new_cat',
@@ -2327,50 +2296,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
 # ####### DEPRECATED METHODS ########
 
-    @deprecated('Site.encoding()', since='20090307', future_warning=True)
-    def encoding(self):
-        """DEPRECATED: use self.site.encoding instead."""
-        return self.site.encoding()
-
-    @deprecated('Page.title(with_ns=False)', since='20090307',
-                future_warning=True)
-    def titleWithoutNamespace(self, underscore=False):
-        """DEPRECATED: use self.title(with_ns=False) instead."""
-        return self.title(underscore=underscore, with_ns=False,
-                          with_section=False)
-
-    @deprecated('Page.title(as_filename=True)', since='20090307',
-                future_warning=True)
-    def titleForFilename(self):
-        """DEPRECATED: use self.title(as_filename=True) instead."""
-        return self.title(as_filename=True)
-
-    @deprecated('Page.title(with_section=False)', since='20090307',
-                future_warning=True)
-    def sectionFreeTitle(self, underscore=False):
-        """DEPRECATED: use self.title(with_section=False) instead."""
-        return self.title(underscore=underscore, with_section=False)
-
-    @deprecated('Page.title(as_link=True)', since='20090307',
-                future_warning=True)
-    @deprecated_args(
-        forceInterwiki='force_interwiki', noInterwiki='no_interwiki')
-    def aslink(
-        self, force_interwiki=False, textlink=False, no_interwiki=False
-    ):
-        """DEPRECATED: use self.title(as_link=True) instead."""
-        return self.title(as_link=True, force_interwiki=force_interwiki,
-                          allow_interwiki=not no_interwiki, textlink=textlink)
-
-    @deprecated('Page.title(as_url=True)', since='20090307',
-                future_warning=True)
-    def urlname(self):
-        """Return the Page title encoded for use in an URL.
-
-        DEPRECATED: use self.title(as_url=True) instead.
-        """
-        return self.title(as_url=True)
-
     @deprecated('Page.protection()', since='20150725')
     def getRestrictions(self):
         """DEPRECATED. Use self.protection() instead."""
@@ -2382,14 +2307,14 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecated_args(defaultNamespace='ns', insite=None)
+    @deprecated_args(defaultNamespace='ns', insite=True)
     def __init__(self, source, title='', ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
             if not title:
                 raise ValueError('Title must be specified and not empty '
                                  'if source is a Site.')
-        super(Page, self).__init__(source, title, ns)
+        super().__init__(source, title, ns)
 
     @property
     def raw_extracted_templates(self):
@@ -2410,7 +2335,7 @@ class Page(BasePage):
 
         return self._raw_extracted_templates
 
-    @deprecate_arg('get_redirect', None)
+    @deprecated_args(get_redirect=True)
     def templatesWithParams(self):
         """
         Return templates used on this Page.
@@ -2491,7 +2416,7 @@ class Page(BasePage):
         @param kwargs: Arguments which are used for saving the page directly
             afterwards, like 'summary' for edit summary.
         """
-        if isinstance(target_page, UnicodeType):
+        if isinstance(target_page, str):
             target_page = pywikibot.Page(self.site, target_page)
         elif self.site != target_page.site:
             raise pywikibot.InterwikiRedirectPage(self, target_page)
@@ -2536,11 +2461,11 @@ class FilePage(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    @deprecate_arg('insite', None)
+    @deprecated_args(insite=True)
     def __init__(self, source, title=''):
         """Initializer."""
         self._file_revisions = {}  # dictionary to cache File history.
-        super(FilePage, self).__init__(source, title, 6)
+        super().__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError("'%s' is not in the file namespace!" % title)
 
@@ -2600,7 +2525,7 @@ class FilePage(Page):
 
     def getImagePageHtml(self):
         """
-        Download the file page, and return the HTML, as a unicode string.
+        Download the file page, and return the HTML, as a string.
 
         Caches the HTML code, so that if you run this method twice on the
         same FilePage object, the page will only be downloaded once.
@@ -2647,16 +2572,25 @@ class FilePage(Page):
                                 url_param=url_param)
         return self.latest_file_info.thumburl
 
-    @deprecated('fileIsShared', since='20121101')
+    @deprecated('file_is_shared', since='20121101', future_warning=True)
     def fileIsOnCommons(self):
         """
         DEPRECATED. Check if the image is stored on Wikimedia Commons.
 
         @rtype: bool
         """
-        return self.fileIsShared()
+        return self.file_is_shared()
 
+    @deprecated('file_is_shared', since='20200618')
     def fileIsShared(self):
+        """
+        DEPRECATED. Check if the image is stored on Wikimedia Commons.
+
+        @rtype: bool
+        """
+        return self.file_is_shared()
+
+    def file_is_shared(self):
         """
         Check if the file is stored on any known shared repository.
 
@@ -2666,14 +2600,16 @@ class FilePage(Page):
         # TODO: put the URLs to family file
         if not self.site.has_image_repository:
             return False
-        elif 'wikitravel_shared' in self.site.shared_image_repository():
+
+        if 'wikitravel_shared' in self.site.shared_image_repository():
             return self.latest_file_info.url.startswith(
                 'https://wikitravel.org/upload/shared/')
-        else:
-            return self.latest_file_info.url.startswith(
-                'https://upload.wikimedia.org/wikipedia/commons/')
+        # default to commons
+        return self.latest_file_info.url.startswith(
+            'https://upload.wikimedia.org/wikipedia/commons/')
 
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
+                future_warning=True)
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
         req = http.fetch(self.fileUrl())
@@ -2681,32 +2617,35 @@ class FilePage(Page):
         h.update(req.raw)
         return h.hexdigest()
 
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
+                future_warning=True)
     def getFileSHA1Sum(self):
         """Return the file's SHA1 checksum."""
         return self.latest_file_info.sha1
 
     @deprecated('FilePage.oldest_file_info.user', since='20150206')
-    def getFirstUploader(self):
+    def getFirstUploader(self) -> list:
         """
         Return a list with first uploader of the FilePage and timestamp.
 
         For compatibility with compat only.
         """
         return [self.oldest_file_info.user,
-                UnicodeType(self.oldest_file_info.timestamp.isoformat())]
+                self.oldest_file_info.timestamp.isoformat()]
 
-    @deprecated('FilePage.latest_file_info.user', since='20141106')
-    def getLatestUploader(self):
+    @deprecated('FilePage.latest_file_info.user', since='20141106',
+                future_warning=True)
+    def getLatestUploader(self) -> list:
         """
         Return a list with latest uploader of the FilePage and timestamp.
 
         For compatibility with compat only.
         """
         return [self.latest_file_info.user,
-                UnicodeType(self.latest_file_info.timestamp.isoformat())]
+                self.latest_file_info.timestamp.isoformat()]
 
-    @deprecated('FilePage.get_file_history()', since='20141106')
+    @deprecated('FilePage.get_file_history()', since='20141106',
+                future_warning=True)
     def getFileVersionHistory(self):
         """
         Return the file's version history.
@@ -2733,7 +2672,7 @@ class FilePage(Page):
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
                 '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def usingPages(self, total=None, content=False):
         """
         Yield Pages on which the file is displayed.
@@ -2860,15 +2799,11 @@ class FilePage(Page):
         return self.site.globalusage(self, total=total)
 
 
-wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
-
-
 class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecated_args(insite=None, sortKey='sort_key')
+    @deprecated_args(insite=True, sortKey='sort_key')
     def __init__(self, source, title='', sort_key=None):
         """
         Initializer.
@@ -2882,9 +2817,9 @@ class Category(Page):
                              % title)
 
     @deprecated_args(
-        forceInterwiki=None, textlink=None, noInterwiki=None,
+        forceInterwiki=True, textlink=True, noInterwiki=True,
         sortKey='sort_key')
-    def aslink(self, sort_key=None):
+    def aslink(self, sort_key=None) -> str:
         """
         Return a link to place a page in this Category.
 
@@ -2893,7 +2828,7 @@ class Category(Page):
 
         @param sort_key: The sort key for the article to be placed in this
             Category; if omitted, default sort key is used.
-        @type sort_key: (optional) unicode
+        @type sort_key: (optional) str
         """
         key = sort_key or self.sortKey
         if key is not None:
@@ -2902,7 +2837,7 @@ class Category(Page):
             title_with_sort_key = self.title(with_section=False)
         return '[[%s]]' % title_with_sort_key
 
-    @deprecated_args(startFrom=None, cacheResults=None, step=None)
+    @deprecated_args(startFrom=True, cacheResults=True, step=True)
     def subcategories(self, recurse=False, total=None, content=False):
         """
         Iterate all subcategories of the current category.
@@ -2954,7 +2889,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', step=None)
+    @deprecated_args(startFrom='startprefix', step=True)
     def articles(self, recurse=False, total=None,
                  content=False, namespaces=None, sortby=None,
                  reverse=False, starttime=None, endtime=None,
@@ -3056,7 +2991,7 @@ class Category(Page):
                         if total == 0:
                             return
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def members(self, recurse=False, namespaces=None, total=None,
                 content=False):
         """Yield all category contents (subcats, pages, and files).
@@ -3064,7 +2999,7 @@ class Category(Page):
         @rtype: typing.Iterable[pywikibot.Page]
         """
         for member in self.site.categorymembers(
-                self, namespaces, total=total, content=content):
+                self, namespaces=namespaces, total=total, content=content):
             yield member
             if total is not None:
                 total -= 1
@@ -3185,31 +3120,6 @@ class Category(Page):
             for cached_page in check_cache(pywikibot.Timestamp.min):
                 yield cached_page
 
-# ### DEPRECATED METHODS ####
-    @deprecated('list(Category.subcategories(...))', since='20090307',
-                future_warning=True)
-    def subcategoriesList(self, recurse=False):
-        """DEPRECATED: Equivalent to list(self.subcategories(...))."""
-        return sorted(set(self.subcategories(recurse)))
-
-    @deprecated('list(Category.articles(...))', since='20090307',
-                future_warning=True)
-    def articlesList(self, recurse=False):
-        """DEPRECATED: equivalent to list(self.articles(...))."""
-        return sorted(set(self.articles(recurse)))
-
-    @deprecated('Category.categories()', since='20090307',
-                future_warning=True)
-    def supercategories(self):
-        """DEPRECATED: equivalent to self.categories()."""
-        return self.categories()
-
-    @deprecated('list(Category.categories(...))', since='20090307',
-                future_warning=True)
-    def supercategoriesList(self):
-        """DEPRECATED: equivalent to list(self.categories(...))."""
-        return sorted(set(self.categories()))
-
 
 class User(Page):
 
@@ -3316,22 +3226,6 @@ class User(Page):
                     self._userprops['blockreason'] = r[0]['reason']
         return self._userprops
 
-    @deprecated('User.registration()', since='20100609', future_warning=True)
-    def registrationTime(self, force=False):
-        """
-        DEPRECATED. Fetch registration date for this user.
-
-        @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @return: int (MediaWiki's internal timestamp format) or 0
-        @rtype: int
-        """
-        if self.registration():
-            return int(self.registration().strftime('%Y%m%d%H%M%S'))
-        else:
-            return 0
-
     def registration(self, force=False):
         """
         Fetch registration date for this user.
@@ -3341,11 +3235,11 @@ class User(Page):
 
         @rtype: pywikibot.Timestamp or None
         """
-        if self.isAnonymous():
-            return None
-        reg = self.getprops(force).get('registration')
-        if reg:
-            return pywikibot.Timestamp.fromISOformat(reg)
+        if not self.isAnonymous():
+            reg = self.getprops(force).get('registration')
+            if reg:
+                return pywikibot.Timestamp.fromISOformat(reg)
+        return None
 
     def editCount(self, force=False):
         """
@@ -3494,7 +3388,7 @@ class User(Page):
                 return True
         return False
 
-    @deprecated('send_email', since='20141218')
+    @deprecated('send_email', since='20141218', future_warning=True)
     def sendMail(self, subject, text, ccme=False):
         """
         Send an email to this user via MediaWiki's email interface.
@@ -3576,21 +3470,6 @@ class User(Page):
         """
         return next(iter(self.logevents(total=1)), None)
 
-    @deprecated('contributions', since='20091130', future_warning=True)
-    @deprecate_arg('limit', 'total')  # To be consistent with rest of framework
-    def editedPages(self, total=500):
-        """
-        DEPRECATED. Use contributions().
-
-        Yields pywikibot.Page objects that this user has
-        edited, with an upper bound of 'total'. Pages returned are not
-        guaranteed to be unique.
-
-        @param total: limit result to this number of pages.
-        @type total: int.
-        """
-        return (item[0] for item in self.contributions(total=total))
-
     @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total=500, **kwargs):
         """
@@ -3598,7 +3477,7 @@ class User(Page):
 
         Each tuple is composed of a pywikibot.Page object,
         the revision id (int), the edit timestamp (as a pywikibot.Timestamp
-        object), and the comment (unicode).
+        object), and the comment (str).
         Pages returned are not guaranteed to be unique.
 
         @param total: limit result to this number of pages
@@ -3651,7 +3530,7 @@ class User(Page):
         Yield tuples describing files uploaded by this user.
 
         Each tuple is composed of a pywikibot.Page, the timestamp (str in
-        ISO8601 format), comment (unicode) and a bool for pageid > 0.
+        ISO8601 format), comment (str) and a bool for pageid > 0.
         Pages returned are not guaranteed to be unique.
 
         @param total: limit result to this number of pages
@@ -3661,10 +3540,9 @@ class User(Page):
             return
         for item in self.logevents(logtype='upload', total=total):
             yield (item.page(),
-                   UnicodeType(item.timestamp()),
+                   str(item.timestamp()),
                    item.comment(),
-                   item.pageid() > 0
-                   )
+                   item.pageid() > 0)
 
     @property
     def is_thankable(self):
@@ -3691,7 +3569,7 @@ class LanguageDict(MutableMapping):
     """
 
     def __init__(self, data=None):
-        super(LanguageDict, self).__init__()
+        super().__init__()
         self._data = {}
         if data:
             self.update(data)
@@ -3738,7 +3616,7 @@ class LanguageDict(MutableMapping):
     def normalizeData(cls, data):
         norm_data = {}
         for key, value in data.items():
-            if isinstance(value, UnicodeType):
+            if isinstance(value, str):
                 norm_data[key] = {'language': key, 'value': value}
             else:
                 norm_data[key] = value
@@ -3770,7 +3648,7 @@ class AliasesDict(MutableMapping):
     """
 
     def __init__(self, data=None):
-        super(AliasesDict, self).__init__()
+        super().__init__()
         self._data = {}
         if data:
             self.update(data)
@@ -3811,7 +3689,7 @@ class AliasesDict(MutableMapping):
             if isinstance(values, list):
                 strings = []
                 for value in values:
-                    if isinstance(value, UnicodeType):
+                    if isinstance(value, str):
                         strings.append({'language': key, 'value': value})
                     else:
                         strings.append(value)
@@ -3841,7 +3719,7 @@ class ClaimCollection(MutableMapping):
     """A structure holding claims for a Wikibase entity."""
 
     def __init__(self, repo):
-        super(ClaimCollection, self).__init__()
+        super().__init__()
         self.repo = repo
         self._data = {}
 
@@ -3935,7 +3813,7 @@ class SiteLinkCollection(MutableMapping):
         @param repo: the Wikibase site on which badges are defined
         @type repo: pywikibot.site.DataSite
         """
-        super(SiteLinkCollection, self).__init__()
+        super().__init__()
         self.repo = repo
         self._data = {}
         if data:
@@ -3974,7 +3852,7 @@ class SiteLinkCollection(MutableMapping):
         @type val: dict or str
         @rtype: pywikibot.page.SiteLink
         """
-        if isinstance(val, UnicodeType):
+        if isinstance(val, str):
             val = SiteLink(val, key)
         else:
             val = SiteLink.fromJSON(val, self.repo)
@@ -4043,7 +3921,7 @@ class SiteLinkCollection(MutableMapping):
                     raise ValueError(
                         "Couldn't determine the site and title of the value: "
                         '{!r}'.format(json))
-                db_name = obj['site']
+                db_name = json['site']
                 norm_data[db_name] = json
         return norm_data
 
@@ -4090,7 +3968,7 @@ class SiteLinkCollection(MutableMapping):
         return data
 
 
-class WikibaseEntity(object):
+class WikibaseEntity:
 
     """
     The base interface for Wikibase entities.
@@ -4433,7 +4311,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             name = '_revid'
-        return super(WikibasePage, self).__getattribute__(name)
+        return super().__getattribute__(name)
 
     def __setattr__(self, attr, value):
         """Attribute setter. Deprecates lastrevid."""
@@ -4442,7 +4320,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             attr = '_revid'
-        return super(WikibasePage, self).__setattr__(attr, value)
+        return super().__setattr__(attr, value)
 
     def __delattr__(self, attr):
         """Attribute deleter. Deprecates lastrevid."""
@@ -4451,7 +4329,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             attr = '_revid'
-        return super(WikibasePage, self).__delattr__(attr)
+        return super().__delattr__(attr)
 
     def namespace(self):
         """
@@ -4579,8 +4457,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         else:
             baserevid = None
 
-        super(WikibasePage, self).editEntity(
-            data, baserevid=baserevid, **kwargs)
+        super().editEntity(data, baserevid=baserevid, **kwargs)
 
     def editLabels(self, labels, **kwargs):
         """
@@ -4711,7 +4588,7 @@ class ItemPage(WikibasePage):
             ns = site.item_namespace
         # Special case for empty item.
         if title is None or title == '-1':
-            super(ItemPage, self).__init__(site, '-1', ns=ns)
+            super().__init__(site, '-1', ns=ns)
             assert self.id == '-1'
             return
 
@@ -4719,7 +4596,7 @@ class ItemPage(WikibasePage):
         if not title:
             raise pywikibot.InvalidTitle("Item's title cannot be empty")
 
-        super(ItemPage, self).__init__(site, title, ns=ns)
+        super().__init__(site, title, ns=ns)
 
         assert self.id == self._link.title
 
@@ -4805,7 +4682,7 @@ class ItemPage(WikibasePage):
                 del self._title
                 del self._site
 
-        return super(ItemPage, self).title(**kwargs)
+        return super().title(**kwargs)
 
     def getID(self, numeric=False, force=False):
         """
@@ -4818,7 +4695,7 @@ class ItemPage(WikibasePage):
         """
         if not hasattr(self, 'id') or force:
             self.get(force=force)
-        return super(WikibasePage, self).getID(numeric=numeric)
+        return super().getID(numeric=numeric)
 
     @classmethod
     def fromPage(cls, page, lazy_load=False):
@@ -4912,7 +4789,7 @@ class ItemPage(WikibasePage):
             entity and their modifying may indirectly cause unwanted change to
             the live content
         """
-        data = super(ItemPage, self).get(force, *args, **kwargs)
+        data = super().get(force, *args, **kwargs)
 
         if self.isRedirectPage() and not get_redirect:
             raise pywikibot.IsRedirectPage(self)
@@ -4921,7 +4798,7 @@ class ItemPage(WikibasePage):
 
     def getRedirectTarget(self):
         """Return the redirect target for this page."""
-        target = super(ItemPage, self).getRedirectTarget()
+        target = super().getRedirectTarget()
         cmodel = target.content_model
         if cmodel != 'wikibase-item':
             raise pywikibot.Error('%s has redirect target %s with content '
@@ -5038,7 +4915,7 @@ class ItemPage(WikibasePage):
             is not redirect.
         @type force: bool
         """
-        if isinstance(target_page, UnicodeType):
+        if isinstance(target_page, str):
             target_page = pywikibot.ItemPage(self.repo, target_page)
         elif self.repo != target_page.repo:
             raise pywikibot.InterwikiRedirectPage(self, target_page)
@@ -5059,7 +4936,7 @@ class ItemPage(WikibasePage):
         if hasattr(self, '_content') and not hasattr(self, '_isredir'):
             self._isredir = self.id != self._content.get('id', self.id)
             return self._isredir
-        return super(ItemPage, self).isRedirectPage()
+        return super().isRedirectPage()
 
 
 # alias for backwards compatibility
@@ -5068,7 +4945,7 @@ ItemPage.concept_url = redirect_func(
     since='20170222')
 
 
-class Property(object):
+class Property:
 
     """
     A Wikibase property.
@@ -5084,15 +4961,15 @@ class Property(object):
 
     types = {'wikibase-item': ItemPage,
              # 'wikibase-property': PropertyPage, must be declared first
-             'string': UnicodeType,
+             'string': str,
              'commonsMedia': FilePage,
              'globe-coordinate': pywikibot.Coordinate,
-             'url': UnicodeType,
+             'url': str,
              'time': pywikibot.WbTime,
              'quantity': pywikibot.WbQuantity,
              'monolingualtext': pywikibot.WbMonolingualText,
-             'math': UnicodeType,
-             'external-id': UnicodeType,
+             'math': str,
+             'external-id': str,
              'geo-shape': pywikibot.WbGeoShape,
              'tabular-data': pywikibot.WbTabularData,
              }
@@ -5766,7 +5643,7 @@ class Claim(Property):
         @rtype: bool
         """
         if (isinstance(self.target, WikibasePage)
-                and isinstance(value, UnicodeType)):
+                and isinstance(value, str)):
             return self.target.id == value
 
         if (isinstance(self.target, pywikibot.WbTime)
@@ -5774,7 +5651,7 @@ class Claim(Property):
             return self.target.year == int(value)
 
         if (isinstance(self.target, pywikibot.Coordinate)
-                and isinstance(value, UnicodeType)):
+                and isinstance(value, str)):
             coord_args = [float(x) for x in value.split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
@@ -5790,7 +5667,7 @@ class Claim(Property):
                     and abs(self.target.lon - coord_args[1]) <= precision)
 
         if (isinstance(self.target, pywikibot.WbMonolingualText)
-                and isinstance(value, UnicodeType)):
+                and isinstance(value, str)):
             return self.target.text == value
 
         return self.target == value
@@ -5994,12 +5871,8 @@ class Revision(DotReadableDict):
             None and does not cache anything.
         @rtype: str or None
         """
-        if self._sha1 is None:
-            if self.text is None:
-                # No text? No sha1 then.
-                return None
+        if self._sha1 is None and self.text is not None:
             self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
-
         return self._sha1
 
     @deprecated(since='20200329', future_warning=True)
@@ -6060,14 +5933,14 @@ class FileInfo(DotReadableDict):
         return self.__dict__ == other.__dict__
 
 
-class BaseLink(UnicodeMixin, ComparableMixin):
+class BaseLink(ComparableMixin):
 
     """
     A MediaWiki link (local or interwiki).
 
     Has the following attributes:
 
-      - title: The title of the page linked to (unicode); does not include
+      - title: The title of the page linked to (str); does not include
         namespace or section
       - namespace: The Namespace object of the page linked to
       - site: The Site object for the wiki linked to
@@ -6076,13 +5949,12 @@ class BaseLink(UnicodeMixin, ComparableMixin):
     # Components used for __repr__
     _items = ('title', 'namespace', '_sitekey')
 
-    def __init__(self, title, namespace=None, site=None):
+    def __init__(self, title: str, namespace=None, site=None):
         """
         Initializer.
 
-        @param title: the title of the page linked to (unicode); does not
+        @param title: the title of the page linked to (str); does not
             include namespace or section
-        @type title: unicode
         @param namespace: the namespace of the page linked to. Can be provided
             as either an int, a Namespace instance or a str, defaults to the
             MAIN namespace.
@@ -6109,7 +5981,7 @@ class BaseLink(UnicodeMixin, ComparableMixin):
     def __repr__(self):
         """Return a more complete string representation."""
         assert isinstance(self._items, tuple)
-        assert all(isinstance(item, StringTypes) for item in self._items)
+        assert all(isinstance(item, (bytes, str)) for item in self._items)
 
         attrs = ('{0!r}'.format(getattr(self, attr)) for attr in self._items)
         return 'pywikibot.page.{0}({1})'.format(
@@ -6124,7 +5996,7 @@ class BaseLink(UnicodeMixin, ComparableMixin):
         default_nskey = Namespace.MAIN
         self._nskey = self._nskey or default_nskey
 
-        if isinstance(self._nskey, UnicodeType):
+        if isinstance(self._nskey, str):
             ns = self.site.namespaces.lookup_name(self._nskey)
             if ns:
                 return ns
@@ -6137,6 +6009,10 @@ class BaseLink(UnicodeMixin, ComparableMixin):
             except KeyError:
                 ns = self.site.namespaces[default_nskey]
             return ns
+
+        raise TypeError(
+            'Invalid type "{}" for Page._nskey. Must be int or str.'
+            .format(type(self._nskey)))
 
     @property
     def site(self):
@@ -6233,12 +6109,8 @@ class BaseLink(UnicodeMixin, ComparableMixin):
         """
         return (self.site, self.namespace, self.title)
 
-    def __unicode__(self):
-        """
-        Return a unicode string representation.
-
-        @rtype: str
-        """
+    def __str__(self) -> str:
+        """Return a str string representation."""
         return self.astext()
 
     def __hash__(self):
@@ -6271,9 +6143,9 @@ class Link(BaseLink):
 
     Extends BaseLink by the following attributes:
 
-      - section: The section of the page linked to (unicode or None); this
+      - section: The section of the page linked to (str or None); this
         contains any text following a '#' character in the title
-      - anchor: The anchor text (unicode or None); this contains any text
+      - anchor: The anchor text (str or None); this contains any text
         following a '|' character inside the link
     """
 
@@ -6590,7 +6462,7 @@ class Link(BaseLink):
         """
         if onsite is None:
             onsite = self._source
-        text = super(Link, self).astext(onsite)
+        text = super().astext(onsite)
         if self.section:
             text = '{0}#{1}]]'.format(text.rstrip(']'), self.section)
 
@@ -6736,7 +6608,7 @@ class SiteLink(BaseLink):
         if ':' in title:
             site, namespace, title = SiteLink._parse_namespace(title, site)
 
-        super(SiteLink, self).__init__(title, namespace, site)
+        super().__init__(title, namespace, site)
 
         badges = badges or []
         self._badges = set(badges)
@@ -6928,7 +6800,7 @@ def unicode2html(x, encoding):
     return x
 
 
-@deprecated_args(site2=None, site='encodings')
+@deprecated_args(site2=True, site='encodings')
 def url2unicode(title, encodings='utf-8'):
     """
     Convert URL-encoded text to unicode using several encoding.
@@ -6943,7 +6815,7 @@ def url2unicode(title, encodings='utf-8'):
 
     @raise UnicodeError: Could not convert using any encoding.
     """
-    if isinstance(encodings, UnicodeType):
+    if isinstance(encodings, str):
         encodings = [encodings]
     elif isinstance(encodings, pywikibot.site.BaseSite):
         # create a list of all possible encodings for both hint sites
@@ -6961,3 +6833,8 @@ def url2unicode(title, encodings='utf-8'):
                 first_exception = ex
     # Couldn't convert, raise the original exception
     raise first_exception
+
+
+wrapper = _ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924',
+                             future_warning=True)

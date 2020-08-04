@@ -28,12 +28,10 @@ The following generators and filters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import config, cosmetic_changes, i18n, pagegenerators
@@ -56,18 +54,18 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     """Cosmetic changes bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
         self.availableOptions.update({
             'async': False,
             'summary': 'Robot: Cosmetic changes',
             'ignore': cosmetic_changes.CANCEL_ALL,
         })
-        super(CosmeticChangesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = generator
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit."""
         cc_toolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
             self.current_page, ignore=self.getOption('ignore'))
@@ -78,7 +76,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
                              asynchronous=self.getOption('async'))
 
 
-def main(*args):
+def main(*args) -> None:
     """
     Process command line arguments and invoke bot.
 
