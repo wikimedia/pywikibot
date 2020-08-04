@@ -1,6 +1,33 @@
 Release history
 ===============
 
+4.0.0
+-----
+
+* Read correct object in SiteLinkCollection.normalizeData (T259426)
+* tools.count and tools classes Counter, OrderedDict and ContextManagerWrapper were removed
+* Deprecate UnicodeMixin and IteratorNextMixin
+* Restrict site module interface
+* EventStreams "since" parameter settings has been fixed
+* Unsupported debug and uploadByUrl parameters of UploadRobot were removed
+* Unported compat decode parameter of Page.title() has been removed
+* Wikihow family file was added (T249814)
+* Improve performance of CosmeticChangesToolkit.translateMagicWords
+* Prohibit positional arguments with Page.title()
+* Functions dealing with stars list were removed
+* Some pagegenerators functions were deprecated which should be replaced by site generators
+* LogEntry became a UserDict; all content can be accessed by its key
+* URLs for new toolforge.org domain were updated
+* pywikibot.__release__ was deprecated
+* Use one central point for framework version (T106121, T171886, T197936, T253719)
+* rvtoken parameter of Site.loadrevisions() and Page.revisions() has been dropped (T74763)
+* getFilesFromAnHash and getImagesFromAnHash Site methods have been removed
+* Site and Page methods deprecated for 10 years or longer have been removed
+* Support for Python 2 and 3.4 has been dropped (T213287, T239542)
+* Bugfixes and improvements
+* Localisation updates
+
+
 3.0.20200703
 ------------
 
