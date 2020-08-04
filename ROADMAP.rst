@@ -1,6 +1,10 @@
 Current release
 ~~~~~~~~~~~~~~~
 
+* Read correct object in SiteLinkCollection.normalizeData (T259426)
+* tools.count and tools classes Counter, OrderedDict and ContextManagerWrapper were removed
+* Deprecate UnicodeMixin and IteratorNextMixin
+* Restrict site module interface
 * EventStreams "since" parameter settings has been fixed
 * Unsupported debug and uploadByUrl parameters of UploadRobot were removed
 * Unported compat decode parameter of Page.title() has been removed
@@ -23,11 +27,11 @@ Current release
 Future releases
 ~~~~~~~~~~~~~~~
 
+* 4.0.0: Deprecate tools.UnicodeMixin and tools.IteratorNextMixin will be removed
 * 4.0.0: Site.Family() function will be removed in favour of Family.load() method
 * 4.0.0: Site.getExpandedString method will be removed in favour of expand_text
 * 4.0.0: Unused parameters of page methods like forceReload, insite, throttle, step will be removed
 * 4.0.0: site/family methods code2encodings and code2encoding will be removed in favour of encoding/endcodings methods
 * 4.0.0: Methods deprecated for 6 years or longer will be removed
-* 3.0.20200703: tools.count, tools.Counter, tools.OrderedDict and ContextManagerWrapper will be removed
 * 3.0.20200508: Page.getVersionHistory and Page.fullVersionHistory() methods will be removed (T136513, T151110)
 * 3.0.20200306: Support of MediaWiki releases below 1.19 will be dropped (T245350)
