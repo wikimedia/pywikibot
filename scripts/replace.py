@@ -654,7 +654,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         return new_text
 
-    @deprecated('apply_replacements', since='20160816')
+    @deprecated('apply_replacements', since='20160816', future_warning=True)
     def doReplacements(self, original_text, page=None):
         """Apply replacements to the given text and page."""
         if page is None:
