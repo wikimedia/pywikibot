@@ -30,7 +30,7 @@ from contextlib import suppress
 from enum import IntEnum
 from itertools import zip_longest
 from textwrap import fill
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlparse
 from warnings import warn
 
 import pywikibot
@@ -66,7 +66,6 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtension,
     UnknownSite,
-    UserBlocked,
 )
 from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.throttle import Throttle
@@ -85,7 +84,6 @@ from pywikibot.tools import (
     merge_unique_dicts,
     normalize_username,
     remove_last_args,
-    redirect_func,
     SelfCallMixin,
     SelfCallString,
 )
@@ -1012,12 +1010,6 @@ class BaseSite(ComparableMixin):
         index = self.namespaces.lookup_name(value)
         return self.namespace(index)
 
-    # for backwards-compatibility
-    normalizeNamespace = redirect_func(ns_normalize,
-                                       old_name='normalizeNamespace',
-                                       class_name='BaseSite',
-                                       since='20141001', future_warning=True)
-
     @remove_last_args(('default', ))
     def redirect(self):
         """Return list of localized redirect tags for the site."""
@@ -1214,38 +1206,6 @@ class BaseSite(ComparableMixin):
     def urlEncode(self, query):
         """DEPRECATED."""
         return api.encode_url(query)
-
-    @deprecated('pywikibot.data.api.Request or pywikibot.comms.http.request',
-                since='20141225', future_warning=True)
-    @deprecated_args(compress=None, no_hostname=None, cookies_only=None,
-                     refer=None, back_response=None, retry=None, sysop=None)
-    def getUrl(self, path, data=None):
-        """DEPRECATED.
-
-        Retained for compatibility only. All arguments except path and data
-        are ignored.
-
-        """
-        from pywikibot.comms import http
-        if data:
-            if not isinstance(data, str):
-                data = urlencode(data)
-            return http.request(self, path, method='PUT', body=data)
-        else:
-            return http.request(self, path)
-
-    @deprecated(since='20141225', future_warning=True)
-    @remove_last_args(['sysop', 'cookies'])
-    def postForm(self, address, predata):
-        """DEPRECATED."""
-        return self.getUrl(address, data=predata)
-
-    @deprecated(since='20141225', future_warning=True)
-    @deprecated_args(contentType=None)
-    @remove_last_args(['sysop', 'compress', 'cookies'])
-    def postData(self, address, data):
-        """DEPRECATED."""
-        return self.getUrl(address, data=data)
 
 
 class Siteinfo(Container):
@@ -1928,11 +1888,6 @@ class APISite(BaseSite):
         else:
             self._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
 
-    # alias for backward-compatibility
-    forceLogin = redirect_func(login, old_name='forceLogin',
-                               class_name='APISite', since='20141001',
-                               future_warning=True)
-
     def _relogin(self):
         """Force a login sequence without logging out, using the current user.
 
@@ -2052,19 +2007,6 @@ class APISite(BaseSite):
         @rtype: bool
         """
         return 'blockinfo' in self.userinfo
-
-    @deprecated('has_right() or is_blocked()', since='20141218',
-                future_warning=True)
-    @remove_last_args(['sysop'])
-    def checkBlocks(self):
-        """
-        Raise an exception when the user is blocked. DEPRECATED.
-
-        @raises pywikibot.exceptions.UserBlocked: The logged in user account
-            is blocked.
-        """
-        if self.is_blocked():
-            raise UserBlocked('User is blocked in site %s' % self)
 
     def get_searched_namespaces(self, force=False):
         """
@@ -2414,10 +2356,6 @@ class APISite(BaseSite):
             return pywikibot.Timestamp.fromtimestampformat(
                 self.expand_text('{{CURRENTTIMESTAMP}}'))
 
-    getcurrenttime = redirect_func(server_time, old_name='getcurrenttime',
-                                   class_name='APISite', since='20141225',
-                                   future_warning=True)
-
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, '_magicwords'):
@@ -2507,12 +2445,6 @@ class APISite(BaseSite):
                 namespace.aliases.append(item['*'])
 
         return _namespaces
-
-    @deprecated('has_extension', since='20140819', future_warning=True)
-    @remove_last_args(('unknown', ))
-    def hasExtension(self, name, unknown=None):
-        """DEPRECATED. Determine whether extension `name` is loaded."""
-        return self.has_extension(name)
 
     def has_extension(self, name):
         """Determine whether extension `name` is loaded.
@@ -2781,29 +2713,6 @@ class APISite(BaseSite):
         if all:
             return self.namespaces[num]
         return self.namespaces[num][0]
-
-    @deprecated('version()', since='20140612', future_warning=True)
-    def live_version(self, force=False):
-        """Return the 'real' version number found on [[Special:Version]].
-
-        By default the version number is cached for one day.
-
-        @param force: If the version should be read always from the server and
-            never from the cache.
-        @type force: bool
-        @return: A tuple containing the major, minor version number and any
-            text after that. If an error occurred (0, 0, 0) is returned.
-        @rtype: int, int, str
-        """
-        try:
-            versionstring = self.siteinfo.get('generator',
-                                              expiry=0 if force else 1)
-            m = re.match(r'MediaWiki ([0-9]+)\.([0-9]+)(.*)$', versionstring)
-            if m:
-                return (int(m.group(1)), int(m.group(2)), m.group(3))
-        # May occur if you are not logged in (no API read permissions).
-        except api.APIError:
-            return (0, 0, 0)
 
     def _update_page(self, page, query):
         for pageitem in query:
@@ -3439,16 +3348,6 @@ class APISite(BaseSite):
                                if val != '+\\'}
 
         return user_tokens
-
-    @deprecated("the 'tokens' property", since='20140613', future_warning=True)
-    def token(self, page, tokentype):
-        """Return token retrieved from wiki to allow changing page content.
-
-        @param page: the Page for which a token should be retrieved
-        @param tokentype: the type of token (e.g., "edit", "move", "delete");
-            see API documentation for full list of types
-        """
-        return self.tokens[tokentype]
 
     @deprecated("the 'tokens' property", since='20150218')
     @remove_last_args(['sysop'])
@@ -4549,38 +4448,6 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated('APISite.logevents()', since='20141225', future_warning=True)
-    @deprecated_args(repeat=None)
-    def logpages(self, number=50, mode=None, title=None, user=None,
-                 namespace=None, start=None, end=None, tag=None, newer=False,
-                 dump=False, offset=None):
-        """
-        Iterate log pages. DEPRECATED.
-
-        When dump is enabled, the raw API dict is returned.
-
-        @rtype: tuple of Page, str, int, str
-        """
-        if offset:
-            assert not start
-            assert isinstance(offset, int)
-            offset = datetime.timedelta(hours=offset)
-            start = pywikibot.Timestamp.utcnow() - offset
-
-        gen = self.logevents(logtype=mode, page=title, tag=tag,
-                             user=user, namespace=namespace,
-                             start=start, end=end, reverse=newer,
-                             total=number)
-
-        for entry in gen:
-            if dump:
-                yield entry.data
-            else:
-                yield (entry.page(),
-                       entry.user(),
-                       int(entry.timestamp().totimestampformat()),
-                       entry.comment())
-
     @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
                      rctype='changetype', revision=None, repeat=None,
                      rcstart='start', rcend='end', rcdir=None, step=None,
@@ -4986,27 +4853,6 @@ class APISite(BaseSite):
             'users', site=self, parameters={
                 'ususers': usernames, 'usprop': usprop})
         return usgen
-
-    @deprecated('Site.randompages(total=1)', since='20130828',
-                future_warning=True)
-    def randompage(self, redirect=False):
-        """
-        DEPRECATED.
-
-        @param redirect: Return a random redirect page
-        @rtype: pywikibot.Page
-        """
-        return self.randompages(total=1, redirects=redirect)
-
-    @deprecated('Site.randompages(total=1, redirects=True)', since='20130828',
-                future_warning=True)
-    def randomredirectpage(self):
-        """
-        DEPRECATED: Use Site.randompages() instead.
-
-        @return: Return a random redirect page
-        """
-        return self.randompages(total=1, redirects=True)
 
     @deprecated_args(step=None)
     def randompages(self, total=None, namespaces=None,
@@ -6574,17 +6420,6 @@ class APISite(BaseSite):
             comment = event.comment() or ''
             yield (filepage, date, user, comment)
 
-    @deprecated('APISite.logevents(logtype="upload")', since='20140808',
-                future_warning=True)
-    @deprecated_args(number='total', repeat=None)
-    def newimages(self, *args, **kwargs):
-        """
-        Yield information about newly uploaded files.
-
-        DEPRECATED: Use logevents(logtype='upload') instead.
-        """
-        return self.newfiles(*args, **kwargs)
-
     def querypage(self, special_page, total=None):
         """Yield Page objects retrieved from Special:{special_page}.
 
@@ -6755,15 +6590,6 @@ class APISite(BaseSite):
         @param total: number of pages to return
         """
         return self.querypage('Unusedimages', total)
-
-    @deprecated('Site().unusedfiles()', since='20140808', future_warning=True)
-    @deprecated_args(extension=None, number='total', step=None, repeat=None)
-    def unusedimages(self, total=None):
-        """Yield FilePage objects from Special:Unusedimages.
-
-        DEPRECATED: Use L{APISite.unusedfiles} instead.
-        """
-        return self.unusedfiles(total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def withoutinterwiki(self, total=None):
@@ -7393,14 +7219,6 @@ class APISite(BaseSite):
         req = self._simple_request(action='shortenurl', url=url)
         data = req.submit()
         return data['shortenurl']['shorturl']
-
-    # aliases for backwards compatibility
-    isBlocked = redirect_func(is_blocked, old_name='isBlocked',
-                              class_name='APISite', since='20141218',
-                              future_warning=True)
-    isAllowed = redirect_func(has_right, old_name='isAllowed',
-                              class_name='APISite', since='20141218',
-                              future_warning=True)
 
 
 class ClosedSite(APISite):

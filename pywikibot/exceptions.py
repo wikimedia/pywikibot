@@ -472,16 +472,6 @@ class BadTitle(Error):
     pass
 
 
-# UserBlocked exceptions should in general not be caught. If the bot has
-# been blocked, the bot operator should address the reason for the block
-# before continuing.
-class UserBlocked(Error):
-
-    """Your username or IP has been blocked."""
-
-    pass
-
-
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
@@ -571,5 +561,15 @@ class TimeoutError(Error):
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
+
+    pass
+
+# DEPRECATED exceptions which will be removed ##########################
+
+
+# UserBlocked exceptions is not used by the framework.
+class UserBlocked(Error):
+
+    """DEPRECATED. Your username or IP has been blocked."""
 
     pass
