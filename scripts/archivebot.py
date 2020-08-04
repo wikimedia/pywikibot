@@ -794,9 +794,10 @@ class PageArchiver:
             self.page.header = rx.sub(self.attr2text(), self.page.header)
             self.comment_params['count'] = self.archived_threads
             comma = self.site.mediawiki_message('comma-separator')
-            self.comment_params['archives'] \
-                = comma.join(a.title(as_link=True)
-                             for a in self.archives.values())
+            self.comment_params['archives'] = comma.join(
+                a.title(as_link=True) for a in self.archives.values()
+                if a.archived_threads > 0
+            )
             # Find out the reasons and return them localized
             translated_whys = set()
             for why, arg in whys:
