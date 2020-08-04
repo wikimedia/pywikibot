@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 r"""
 A generic bot to do data ingestion (batch uploading) of photos or other files.
 
@@ -99,31 +98,23 @@ Warning! Put it in one line, otherwise it won't work correctly.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import base64
 import codecs
+import csv
 import hashlib
 import io
 import os
 import posixpath
+
+from urllib.parse import urlparse
 from warnings import warn
 
 import pywikibot
+
 from pywikibot.comms.http import fetch
 from pywikibot import pagegenerators
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated, deprecated_args, PY2
-
-if not PY2:
-    import csv
-    from urllib.parse import urlparse
-else:
-    try:
-        import unicodecsv as csv
-    except ImportError as e:
-        csv = e
-    from urlparse import urlparse
+from pywikibot.tools import deprecated, deprecated_args
 
 
 class Photo(pywikibot.FilePage):
@@ -157,8 +148,7 @@ class Photo(pywikibot.FilePage):
             site = pywikibot.Site('commons', 'commons')
 
         # default title
-        super(Photo, self).__init__(site,
-                                    self.getTitle('%(_filename)s.%(_ext)s'))
+        super().__init__(site, self.getTitle('%(_filename)s.%(_ext)s'))
 
     def downloadPhoto(self):
         """
@@ -256,19 +246,19 @@ class DataIngestionBot(pywikibot.Bot):
                  'please specify a site or use site=None',
                  DeprecationWarning, 2)
             site = pywikibot.Site('commons', 'commons')
-        super(DataIngestionBot, self).__init__(generator=reader, site=site)
+        super().__init__(generator=reader, site=site)
 
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
     @property
-    @deprecated('generator', since='20150508')
+    @deprecated('generator', since='20150508', future_warning=True)
     def reader(self):
         """Deprecated generator."""
         return self.generator
 
     @reader.setter
-    @deprecated('generator', since='20150508')
+    @deprecated('generator', since='20150508', future_warning=True)
     def reader(self, value):
         self.generator = value
 
@@ -301,7 +291,7 @@ class DataIngestionBot(pywikibot.Bot):
 
         return title
 
-    @deprecated('treat()', since='20150118')
+    @deprecated('treat()', since='20150118', future_warning=True)
     def doSingle(self):
         """Process one page."""
         return self.treat(next(self.reader))
@@ -362,15 +352,9 @@ def main(*args):
 
     config_generator = genFactory.getCombinedGenerator()
 
-    if isinstance(csv, ImportError):
-        missing_dependencies = ('unicodecsv',)
-    else:
-        missing_dependencies = None
-
     if pywikibot.bot.suggest_help(
             missing_parameters=[] if csv_dir else ['-csvdir'],
-            missing_generator=not config_generator,
-            missing_dependencies=missing_dependencies):
+            missing_generator=not config_generator):
         return
 
     for config_page in config_generator:
