@@ -106,7 +106,7 @@ user talk pages (namespace #3):
 
 """
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -125,7 +125,7 @@ from pywikibot.tools import deprecated, filter_unique
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
-@deprecated('XMLDumpPageGenerator', since='20151109')
+@deprecated('XMLDumpPageGenerator', since='20151109', future_warning=True)
 class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
 
     """
