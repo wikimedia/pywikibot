@@ -535,12 +535,6 @@ class Family:
     # family.
     interwiki_forward = None
 
-    # Some families, e. g. wikipedia, receive forwarded interlanguage
-    # links from other families, e. g. incubator, commons, or meta.
-    # These families can set this variable to the names of their source
-    # families.
-    interwiki_forwarded_from = {}
-
     # Which language codes no longer exist and by which language code
     # should they be replaced. If for example the language with code xx:
     # now should get code yy:, add {'xx':'yy'} to obsolete.

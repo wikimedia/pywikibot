@@ -110,18 +110,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'zh-yue': ('分類彈去',),
     }
 
-    # families that redirect their interlanguage links here.
-    interwiki_forwarded_from = [
-        'commons',
-        'incubator',
-        'mediawiki',
-        'meta',
-        'outreach',
-        'species',
-        'test',
-        'wikimania'
-    ]
-
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
