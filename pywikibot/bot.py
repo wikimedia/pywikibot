@@ -1270,9 +1270,11 @@ class BaseBot(OptionHandler):
             return True
         return False
 
+    @deprecated('generator.close()', since='20200804')
     def stop(self):
         """Stop iterating."""
-        raise GeneratorExit
+        pywikibot.output('Generator has been stopped.')
+        self.generator.close()
 
     def quit(self):
         """Cleanup and quit processing."""
@@ -1418,8 +1420,6 @@ class BaseBot(OptionHandler):
                 self._treat_counter += 1
             else:
                 self._generator_completed = True
-        except GeneratorExit:
-            pywikibot.output('Generator has been stopped.')
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit %s bot run...' %
                              self.__class__.__name__)
