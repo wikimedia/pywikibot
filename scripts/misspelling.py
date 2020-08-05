@@ -31,7 +31,6 @@ from typing import Generator
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.tools import UnicodeType
 
 from scripts.solve_disambiguation import DisambiguationRobot
 
@@ -77,7 +76,7 @@ class MisspellingRobot(DisambiguationRobot):
         mycode = self.site.code
         if mycode in self.misspellingCategory:
             categories = self.misspellingCategory[mycode]
-            if isinstance(categories, UnicodeType):
+            if isinstance(categories, str):
                 categories = (categories, )
             generators = (
                 pagegenerators.CategorizedPageGenerator(
@@ -86,7 +85,7 @@ class MisspellingRobot(DisambiguationRobot):
                 for misspellingCategoryTitle in categories)
         elif mycode in self.misspellingTemplate:
             templates = self.misspellingTemplate[mycode]
-            if isinstance(templates, UnicodeType):
+            if isinstance(templates, str):
                 templates = (templates, )
             generators = (
                 pagegenerators.ReferringPageGenerator(
@@ -119,7 +118,7 @@ class MisspellingRobot(DisambiguationRobot):
             return True
         if self.misspellingTemplate.get(disambPage.site.code) is not None:
             templates = self.misspellingTemplate[disambPage.site.code]
-            if isinstance(templates, UnicodeType):
+            if isinstance(templates, str):
                 templates = (templates, )
             for template, params in disambPage.templatesWithParams():
                 if template.title(with_ns=False) in templates:

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
 import re
 import warnings
+
+from contextlib import suppress
 
 import requests
 
@@ -17,11 +17,7 @@ import pywikibot
 
 from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    suppress_warnings,
-    UnicodeType as unicode,
-)
+from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 
 from tests import join_images_path, patch
 from tests.aspects import (
@@ -49,7 +45,7 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
         self.assertIn('<html lang="mul"', r.text)
-        self.assertIsInstance(r.text, unicode)
+        self.assertIsInstance(r.text, str)
         self.assertIsInstance(r.raw, bytes)
 
     def test_fetch(self):
@@ -58,7 +54,7 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
         self.assertIn('<html lang="mul"', r.text)
-        self.assertIsInstance(r.text, unicode)
+        self.assertIsInstance(r.text, str)
         with suppress_warnings(r'.*HttpRequest\.content is deprecated'):
             self.assertEqual(r.content, r.text)
         self.assertIsInstance(r.raw, bytes)
@@ -80,7 +76,7 @@ class HttpRequestURI(DeprecationTestCase):
     def test_http(self):
         """Test http.request using http://www.wikipedia.org/."""
         r = http.request(site=None, uri='http://www.wikipedia.org/')
-        self.assertIsInstance(r, unicode)
+        self.assertIsInstance(r, str)
         self.assertIn('<html lang="mul"', r)
         self.assertOneDeprecationParts(
             'Invoking http.request without argument site', 'http.fetch()')
@@ -88,7 +84,7 @@ class HttpRequestURI(DeprecationTestCase):
     def test_https(self):
         """Test http.request using https://www.wikiquote.org/."""
         r = http.request(site=None, uri='https://www.wikiquote.org/')
-        self.assertIsInstance(r, unicode)
+        self.assertIsInstance(r, str)
         self.assertIn('<html lang="mul"', r)
         self.assertOneDeprecationParts(
             'Invoking http.request without argument site', 'http.fetch()')
@@ -102,7 +98,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def setUp(self):
         """Set up test by configuring config.authenticate."""
-        super(TestGetAuthenticationConfig, self).setUp()
+        super().setUp()
         self._authenticate = config.authenticate
         config.authenticate = {
             'zh.wikipedia.beta.wmflabs.org': ('1', '2'),
@@ -113,7 +109,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def tearDown(self):
         """Tear down test by resetting config.authenticate."""
-        super(TestGetAuthenticationConfig, self).tearDown()
+        super().tearDown()
         config.authenticate = self._authenticate
 
     def test_url_based_authentication(self):
@@ -153,7 +149,7 @@ class HttpsCertificateTestCase(TestCase):
                 uri='https://testssl-expire-r2i2.disig.sk/index.en.html',
                 disable_ssl_certificate_validation=True)
         r = response.text
-        self.assertIsInstance(r, unicode)
+        self.assertIsInstance(r, str)
         self.assertTrue(re.search(r'<title>.*</title>', r))
         http.session.close()  # clear the connection
 
@@ -282,7 +278,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(DefaultUserAgentTestCase, self).setUp()
+        super().setUp()
         self.orig_format = config.user_agent_format
         config.user_agent_format = ('{script_product} ({script_comments}) '
                                     '{pwb} ({revision}) {http_backend} '
@@ -290,7 +286,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     def tearDown(self):
         """Tear down unit test."""
-        super(DefaultUserAgentTestCase, self).tearDown()
+        super().tearDown()
         config.user_agent_format = self.orig_format
 
     def test_default_user_agent(self):
@@ -314,13 +310,13 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         """Set up the unit test."""
         self.orig_fake_user_agent_exceptions = (
             config.fake_user_agent_exceptions)
-        super(LiveFakeUserAgentTestCase, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down unit test."""
         config.fake_user_agent_exceptions = (
             self.orig_fake_user_agent_exceptions)
-        super(LiveFakeUserAgentTestCase, self).tearDown()
+        super().tearDown()
 
     def _test_fetch_use_fake_user_agent(self):
         """Test `use_fake_user_agent` argument of http.fetch."""
@@ -364,12 +360,12 @@ class GetFakeUserAgentTestCase(TestCase):
     def setUp(self):
         """Set up unit test."""
         self.orig_fake_user_agent = config.fake_user_agent
-        super(GetFakeUserAgentTestCase, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down unit test."""
         config.fake_user_agent = self.orig_fake_user_agent
-        super(GetFakeUserAgentTestCase, self).tearDown()
+        super().tearDown()
 
     def _test_config_settings(self):
         """Test if method honours configuration toggle."""
@@ -562,7 +558,7 @@ class BinaryTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
-        super(BinaryTestCase, cls).setUpClass()
+        super().setUpClass()
 
         with open(join_images_path('MP_sounds.png'), 'rb') as f:
             cls.png = f.read()
@@ -612,7 +608,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
     def setUp(self):
         """Set up tests."""
-        super(QueryStringParamsTestCase, self).setUp()
+        super().setUp()
         self.url = self.get_httpbin_url('/get')
 
     def test_no_params(self):
@@ -689,7 +685,5 @@ class DataBodyParameterTestCase(HttpbinTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

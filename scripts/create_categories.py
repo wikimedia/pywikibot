@@ -29,20 +29,16 @@ Example:
 The page 'User:Multichill/Wallonia' on commons contains
 category links like [[Category:Hensies]], causing this script
 to create [[Category:Cultural heritage monuments in Hensies]].
-
 """
 #
-# (c) Pywikibot team, 2011-2019
+# (c) Pywikibot team, 2011-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
 from pywikibot import pagegenerators
 from pywikibot.site import Namespace
-from pywikibot.tools import UnicodeType
 
 
 class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
@@ -58,11 +54,11 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
             'parent': None,
             'overwrite': False,
         })
-        super(CreateCategoriesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def init_page(self, item):
         """Create a category to be processed with the given page title."""
-        page = super(CreateCategoriesBot, self).init_page(item)
+        page = super().init_page(item)
         title = page.title(with_ns=False)
         if page.namespace() != Namespace.CATEGORY:
             # return the page title to be skipped later within skip_page
@@ -71,11 +67,11 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         category = pywikibot.Category(
             page.site, '{} {}'.format(self.getOption('basename'), title))
 
-        text = ('[[{namespace}:{parent}|{title}]]\n{category}\n'
-                .format(namespace=page.site.namespace(Namespace.CATEGORY),
-                        parent=self.getOption('parent'),
-                        title=title,
-                        category=page.title(as_link=True)))
+        text = '[[{namespace}:{parent}|{title}]]\n{category}\n'.format(
+            namespace=page.site.namespace(Namespace.CATEGORY),
+            parent=self.getOption('parent'),
+            title=title,
+            category=page)
         category.text = text
         return category
 
@@ -87,13 +83,13 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
 
     def skip_page(self, page):
         """Skip page if it is not overwritten."""
-        if isinstance(page, UnicodeType):
+        if isinstance(page, str):
             pywikibot.warning(page + ' is not a category, skipping')
             return True
         if page.exists() and not self.getOption('overwrite'):
             pywikibot.warning('{} already exists, skipping'.format(page))
             return True
-        return super(CreateCategoriesBot, self).skip_page(page)
+        return super().skip_page(page)
 
 
 def main(*args):

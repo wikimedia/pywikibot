@@ -14,7 +14,6 @@ import pywikibot
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.logentries import (
     LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
-from pywikibot.tools import UnicodeType
 
 from tests import unittest_print
 from tests.aspects import (
@@ -75,10 +74,10 @@ class TestLogentriesBase(TestCase):
         else:
             self.assertNotIn(logentry.type(), logentry.data)
 
-        self.assertIsInstance(logentry.action(), UnicodeType)
+        self.assertIsInstance(logentry.action(), str)
 
         try:
-            self.assertIsInstance(logentry.comment(), UnicodeType)
+            self.assertIsInstance(logentry.comment(), str)
         except HiddenKeyError as e:
             self.assertRegex(
                 str(e),
@@ -115,7 +114,7 @@ class TestLogentriesBase(TestCase):
             self.assertRaises(KeyError, logentry.page)
 
         self.assertEqual(logentry.type(), logtype)
-        self.assertIsInstance(logentry.user(), UnicodeType)
+        self.assertIsInstance(logentry.user(), str)
         self.assertGreaterEqual(logentry.logid(), 0)
 
         # test new UserDict style
@@ -144,7 +143,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
             cls.add_method(dct, 'test_{}Entry'.format(logtype.title()),
                            test_method(logtype))
 
-        return super(TestLogentriesMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
@@ -212,7 +211,7 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
         self.assertEqual(logentry.target_page.namespace(),
                          logentry.target_ns.id)
-        self.assertIsInstance(logentry.target_title, UnicodeType)
+        self.assertIsInstance(logentry.target_title, str)
         self.assertIsInstance(logentry.target_page, pywikibot.Page)
         self.assertIsInstance(logentry.suppressedredirect(), bool)
 

@@ -5,12 +5,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import sys
 
 from pywikibot.data.wikistats import WikiStats, csv
-from pywikibot.tools import UnicodeType
 
 from tests.aspects import unittest, TestCase
 
@@ -35,13 +32,13 @@ class WikiStatsTestCase(TestCase):
                 self.assertIn(key, top)
                 self.assertIn(key, bottom)
 
-        self.assertTrue(all(isinstance(key, UnicodeType)
+        self.assertTrue(all(isinstance(key, str)
                             for key in top.keys()
                             if key is not None))
-        self.assertIsInstance(top['good'], UnicodeType)
-        self.assertIsInstance(top['total'], UnicodeType)
-        self.assertIsInstance(bottom['good'], UnicodeType)
-        self.assertIsInstance(bottom['total'], UnicodeType)
+        self.assertIsInstance(top['good'], str)
+        self.assertIsInstance(top['total'], str)
+        self.assertIsInstance(bottom['good'], str)
+        self.assertIsInstance(bottom['total'], str)
 
         self.assertGreater(int(top['total']), int(bottom['good']))
         self.assertGreater(int(top['good']), int(bottom['good']))
@@ -74,10 +71,10 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('ht', data)
         self.assertGreater(int(data['en']['total']), int(data['en']['good']))
         data = data['en']
-        self.assertTrue(all(isinstance(key, UnicodeType)
+        self.assertTrue(all(isinstance(key, str)
                             for key in data.keys()
                             if key is not None))
-        self.assertIsInstance(data['total'], UnicodeType)
+        self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)
 
@@ -90,10 +87,10 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('id', data)
         self.assertGreater(int(data['fr']['total']), int(data['fr']['good']))
         data = data['fr']
-        self.assertTrue(all(isinstance(key, UnicodeType)
+        self.assertTrue(all(isinstance(key, str)
                             for key in data.keys()
                             if key is not None))
-        self.assertIsInstance(data['total'], UnicodeType)
+        self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)
 

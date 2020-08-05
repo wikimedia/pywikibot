@@ -5,14 +5,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import re
 
-import pywikibot
+from contextlib import suppress
 
-from pywikibot.tools import UnicodeType as unicode
+import pywikibot
 
 from tests import join_images_path
 
@@ -210,7 +208,7 @@ class TestFilePageLatestFileInfo(TestCase):
 
     def setUp(self):
         """Create File page."""
-        super(TestCase, self).setUp()
+        super().setUp()
         self.image = pywikibot.FilePage(self.site, self.file_name)
 
     def test_get_file_url(self):
@@ -272,8 +270,6 @@ class TestDeprecatedFilePage(DeprecationTestCase):
         first = page.getFirstUploader()
         self.assertOneDeprecation()
         self.assertEqual(first, ['Herbizid', '2011-03-18T10:04:48Z'])
-        self.assertIsInstance(first[0], unicode)
-        self.assertIsInstance(first[1], unicode)
 
     def test_getLatestUploader(self):
         """Test getLatestUploader."""
@@ -281,8 +277,8 @@ class TestDeprecatedFilePage(DeprecationTestCase):
         latest = page.getLatestUploader()
         self.assertOneDeprecation()
         self.assertLength(latest, 2)
-        self.assertIsInstance(latest[0], unicode)
-        self.assertIsInstance(latest[1], unicode)
+        for item in latest:
+            self.assertIsInstance(item, str)
 
 
 class TestFilePageDownload(TestCase):
@@ -316,7 +312,5 @@ class TestFilePageDownload(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
