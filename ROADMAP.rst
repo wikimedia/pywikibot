@@ -1,7 +1,9 @@
 Current release
 ~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
+* Escape bot password correctly (T259488)
+
 
 Future releases
 ~~~~~~~~~~~~~~~
