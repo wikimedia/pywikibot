@@ -691,6 +691,11 @@ class PageArchiver:
             threads_per_archive[key].append((i, thread))
             whys.add(why)  # xxx: we don't now if we ever archive anything
 
+        params = self.get_params(self.now, counter)
+        aux_params = self.get_params(self.now, counter + 1)
+        counter_matters = (pattern % params) != (pattern % aux_params)
+        del params, aux_params
+
         # we need to start with the oldest archive since that is
         # the one the saved counter applies to, so sort the groups
         # by the oldest timestamp
@@ -703,7 +708,6 @@ class PageArchiver:
             # 1. it matters (AND)
             # 2. "era" (year, month, etc.) changes (AND)
             # 3. there is something to put to the new archive.
-            counter_matters = False
             for i, thread in group:
                 threads_left = len(self.page.threads) - self.archived_threads
                 if threads_left <= int(self.get_attr('minthreadsleft', 5)):
@@ -717,11 +721,6 @@ class PageArchiver:
                 params = self.get_params(thread.timestamp, counter)
                 archive = self.get_archive_page(pattern % params, params)
 
-                aux_params = self.get_params(thread.timestamp, counter + 1)
-                # TODO: this variable does not change, figure out a way
-                # to only compute it once
-                counter_matters = (pattern % params) != (pattern % aux_params)
-                del aux_params
                 if counter_matters:
                     while counter > 1 and not archive.exists():
                         # This may happen when either:
