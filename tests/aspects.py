@@ -1427,7 +1427,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
 
         super().setUpClass()
 
-        if cls.get_site().code == 'test':
+        if cls.get_site().code in ('test', 'test2'):
             cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
 
