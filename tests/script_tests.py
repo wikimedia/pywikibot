@@ -228,7 +228,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 test_overrides = {}
                 if not hasattr(self, 'net') or not self.net:
-                    test_overrides['pywikibot.Site'] = 'None'
+                    test_overrides['pywikibot.Site'] = 'lambda *a, **k: None'
 
                 # run the script
                 result = execute_pwb(cmd, data_in, timeout=timeout,
