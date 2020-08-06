@@ -22,17 +22,13 @@
 # Licensed under both CC-BY-SA and the MIT license.
 #
 ################################################
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
 import codecs
 import sys
 
-from ctypes import Structure, byref, c_int, create_unicode_buffer, sizeof
+from contextlib import suppress
+from ctypes import Structure, byref, create_unicode_buffer, sizeof
 from ctypes import c_void_p as LPVOID
 from io import IOBase, UnsupportedOperation
-
-from pywikibot.tools import PY2, UnicodeType
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -45,7 +41,7 @@ original_stderr = sys.stderr
 
 if OSWIN32:
     from ctypes import WINFUNCTYPE, windll, POINTER, WinError
-    from ctypes.wintypes import (BOOL, DWORD, HANDLE, LPCWSTR, LPWSTR,
+    from ctypes.wintypes import (BOOL, DWORD, HANDLE, LPWSTR,
                                  SHORT, ULONG, UINT, WCHAR)
 
 try:
@@ -77,11 +73,7 @@ class UnicodeInput(IOBase):
                               byref(numrecv), None)
         if not result:
             raise Exception('stdin failure')
-        data = self.buffer.value[:numrecv.value]
-        if PY2:
-            return data.encode(self.encoding)
-        else:
-            return data
+        return self.buffer.value[:numrecv.value]
 
 
 class UnicodeOutput(IOBase):
@@ -117,11 +109,9 @@ class UnicodeOutput(IOBase):
         """Write the text to the output."""
         try:
             if self._hConsole is None:
-                if PY2 and isinstance(text, UnicodeType):
-                    text = text.encode('utf-8')
                 self._stream.write(text)
             else:
-                if not isinstance(text, UnicodeType):
+                if not isinstance(text, str):
                     text = bytes(text).decode('utf-8')
                 remaining = len(text)
                 while remaining > 0:
@@ -159,10 +149,9 @@ def old_fileno(std_name):
     # handle those like std streams which don't have fileno at all
     std = getattr(sys, 'std{0}'.format(std_name))
     if hasattr(std, 'fileno'):
-        try:
+        with suppress(UnsupportedOperation):
             return std.fileno()
-        except UnsupportedOperation:
-            pass
+    return None
 
 
 # If any exception occurs in this code, try to print it on stderr,
@@ -331,45 +320,6 @@ def get_unicode_console():
     except Exception as e:
         _complain('exception {!r} while fixing up sys.stdout and sys.stderr'
                   .format(e))
-
-    if not PY2:
-        # no need to work around issue2128 since it's a Python 2 only issue
-        return stdin, stdout, stderr, argv
-
-    # While we're at it, let's unmangle the command-line arguments:
-
-    # This works around <http://bugs.python.org/issue2128>.
-    GetCommandLineW = WINFUNCTYPE(LPWSTR)(('GetCommandLineW', windll.kernel32))
-    CommandLineToArgvW = (WINFUNCTYPE(POINTER(LPWSTR), LPCWSTR, POINTER(c_int))
-                          (('CommandLineToArgvW', windll.shell32)))
-
-    argc = c_int(0)
-    argv_unicode = CommandLineToArgvW(GetCommandLineW(), byref(argc))
-
-    argv = [argv_unicode[i].encode('utf-8') for i in range(0, argc.value)]
-
-    if not hasattr(sys, 'frozen'):
-        # If this is an executable produced by py2exe or bbfreeze, then it will
-        # have been invoked directly. Otherwise, unicode_argv[0] is the Python
-        # interpreter, so skip that.
-        argv = argv[1:]
-
-        # Also skip option arguments to the Python interpreter.
-        while len(argv) > 0:
-            arg = argv[0]
-            if not arg.startswith(b'-') or arg == '-':
-                break
-            argv = argv[1:]
-            if arg == '-m':
-                # sys.argv[0] should really be the absolute path of the module
-                # source, but never mind
-                break
-            if arg == '-c':
-                argv[0] = '-c'
-                break
-
-    if argv == []:
-        argv = ['']
 
     return stdin, stdout, stderr, argv
 
