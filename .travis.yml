@@ -164,7 +164,7 @@ matrix:
     - python: '3.8'
       env: LANGUAGE=en FAMILY=btrfswiki
     - python: '3.9-dev'
-      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
+      env: LANGUAGE=test2 FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
     - python: '3.10-dev'
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
   allow_failures:
