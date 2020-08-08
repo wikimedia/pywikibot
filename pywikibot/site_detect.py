@@ -5,10 +5,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
 import re
+
+from contextlib import suppress
+from html.parser import HTMLParser
+from urllib.parse import urljoin, urlparse
 
 from requests.exceptions import RequestException
 
@@ -16,14 +18,7 @@ import pywikibot
 
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ServerError
-from pywikibot.tools import MediaWikiVersion, PY2
-
-if not PY2:
-    from html.parser import HTMLParser
-    from urllib.parse import urljoin, urlparse
-else:
-    from HTMLParser import HTMLParser
-    from urlparse import urljoin, urlparse
+from pywikibot.tools import MediaWikiVersion
 
 
 SERVER_DB_ERROR_MSG = \
@@ -130,11 +125,9 @@ class MWSite(object):
             pywikibot.log(
                 'wgEnableApi is not enabled in HTML of %s'
                 % self.fromurl)
-        try:
+        with suppress(AttributeError):
             self.version = MediaWikiVersion(
                 self.REwgVersion.search(data).group(1))
-        except AttributeError:
-            pass
 
         self.server = self.REwgServer.search(data).groups()[0]
         self.scriptpath = self.REwgScriptPath.search(data).groups()[0]
@@ -228,10 +221,7 @@ class WikiHTMLPageParser(HTMLParser):
 
     def __init__(self, url):
         """Initializer."""
-        if PY2:
-            HTMLParser.__init__(self)
-        else:
-            super().__init__(convert_charrefs=True)
+        super().__init__(convert_charrefs=True)
         self.url = urlparse(url)
         self.generator = None
         self.version = None
@@ -298,11 +288,9 @@ class WikiHTMLPageParser(HTMLParser):
         if tag == 'meta':
             if attrs.get('name') == 'generator':
                 self.generator = attrs['content']
-                try:
+                with suppress(ValueError):
                     self.version = MediaWikiVersion.from_generator(
                         self.generator)
-                except ValueError:
-                    pass
         elif tag == 'link' and 'rel' in attrs and 'href' in attrs:
             if attrs['rel'] in ('EditURI', 'stylesheet', 'search'):
                 self.set_api_url(attrs['href'])
