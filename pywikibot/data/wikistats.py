@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 import csv
 
+from collections import defaultdict
 from io import BytesIO, StringIO
 
 import pywikibot
@@ -74,8 +75,8 @@ class WikiStats:
     def __init__(self, url='https://wikistats.wmflabs.org/') -> None:
         """Initializer."""
         self.url = url
-        self._raw = {}
-        self._data = {}
+        self._raw = defaultdict(dict)
+        self._data = defaultdict(dict)
 
     def fetch(self, table: str, format='xml'):
         """
@@ -110,13 +111,10 @@ class WikiStats:
         @type format: 'xml' or 'csv'.
         @rtype: bytes
         """
-        if format not in self._raw:
-            self._raw[format] = {}
         if table in self._raw[format]:
             return self._raw[format][table]
 
         data = self.fetch(table, format)
-
         self._raw[format][table] = data
         return data
 
@@ -127,13 +125,11 @@ class WikiStats:
         @param table: table of data to fetch
         @rtype: list
         """
-        if table in self._data.setdefault('csv', {}):
+        if table in self._data['csv']:
             return self._data['csv'][table]
 
-        data = self.raw_cached(table, 'csv')
-
-        f = StringIO(data.decode('utf8'))
-
+        raw = self.raw_cached(table, 'csv')
+        f = StringIO(raw.decode('utf8'))
         reader = csv.DictReader(f)
         data = list(reader)
         self._data['csv'][table] = data
@@ -147,18 +143,16 @@ class WikiStats:
         @param table: table of data to fetch
         @rtype: list
         """
-        if table in self._data.setdefault('xml', {}):
+        if table in self._data['xml']:
             return self._data['xml'][table]
 
         from xml.etree import ElementTree
 
-        data = self.raw_cached(table, 'xml')
-
-        f = BytesIO(data)
+        raw = self.raw_cached(table, 'xml')
+        f = BytesIO(raw)
         tree = ElementTree.parse(f)
 
         data = []
-
         for row in tree.findall('row'):
             site = {}
 
@@ -169,7 +163,6 @@ class WikiStats:
             data.append(site)
 
         self._data['xml'][table] = data
-
         return data
 
     def get(self, table: str, format='csv'):
