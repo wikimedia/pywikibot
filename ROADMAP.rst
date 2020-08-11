@@ -1,12 +1,12 @@
-Current release
-~~~~~~~~~~~~~~~
+Current release changes
+~~~~~~~~~~~~~~~~~~~~~~~
 
 * BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
 * Escape bot password correctly (T259488)
 
 
-Future releases
-~~~~~~~~~~~~~~~
+Future release notes
+~~~~~~~~~~~~~~~~~~~~
 
 * 4.0.0: Deprecate tools.UnicodeMixin and tools.IteratorNextMixin will be removed
 * 4.0.0: Site.Family() function will be removed in favour of Family.load() method
