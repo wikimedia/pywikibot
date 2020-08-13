@@ -5352,17 +5352,17 @@ class APISite(BaseSite):
             raise NoPage(source,
                          'Cannot merge revisions from source {source} because '
                          'it does not exist on {site}'
-                         .format(**errdata))
+                         .format_map(errdata))
         if not dest.exists():
             raise NoPage(dest,
                          'Cannot merge revisions to destination {dest} '
                          'because it does not exist on {site}'
-                         .format(**errdata))
+                         .format_map(errdata))
 
         if source == dest:  # Same pages
             raise PageSaveRelatedError(
                 'Cannot merge revisions of {source} to itself'
-                .format(**errdata))
+                .format_map(errdata))
 
         # Send the merge API request
         token = self.tokens['csrf']
@@ -5385,7 +5385,7 @@ class APISite(BaseSite):
         except api.APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
-                raise Error(on_error.format(**errdata))
+                raise Error(on_error.format_map(errdata))
             else:
                 pywikibot.debug(
                     "mergehistory: Unexpected error code '{code}' received"

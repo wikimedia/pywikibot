@@ -51,7 +51,7 @@ class EventStreams:
     >>> stream = EventStreams(streams='recentchange')
     >>> stream.register_filter(type='edit', wiki='wikidatawiki')
     >>> change = next(iter(stream))
-    >>> print('{type} on page {title} by {user}.'.format(**change))
+    >>> print('{type} on page {title} by {user}.'.format_map(change))
     edit on page Q32857263 by XXN-bot.
     >>> change
     {'comment': '/* wbcreateclaim-create:1| */ [[Property:P31]]: [[Q4167836]]',

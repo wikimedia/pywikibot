@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Test generate_user_files script."""
 #
-# (C) Pywikibot team, 2018
+# (C) Pywikibot team, 2018-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 from tests.aspects import unittest, TestCase
@@ -35,11 +33,11 @@ class TestGenerateUserFiles(TestCase):
         """Test config text strings."""
         args = {'main_family': '', 'main_code': '', 'usernames': '',
                 'botpasswords': ''}
-        config_text = guf.SMALL_CONFIG.format(**args)
+        config_text = guf.SMALL_CONFIG.format_map(args)
         self.assertEqual(config_text,
                          re.sub('{[a-z_]+}', '', guf.SMALL_CONFIG))
         args['config_text'] = ''
-        config_text = guf.EXTENDED_CONFIG.format(**args)
+        config_text = guf.EXTENDED_CONFIG.format_map(args)
         self.assertEqual(config_text,
                          re.sub('{[a-z_]+}', '', guf.EXTENDED_CONFIG))
         config_text = guf.PASSFILE_CONFIG.format(botpasswords='')
