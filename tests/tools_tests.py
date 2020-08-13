@@ -368,9 +368,10 @@ class TestIsSliceWithEllipsis(TestCase):
 
     def test_accept_only_keyword_marker(self):
         """Test that the only kwargs accepted is 'marker'."""
-        self.assertRaisesRegex(TypeError,
-                               "'generator' object is not callable",
-                               tools.islice_with_ellipsis(self.it, 1, t=''))
+        with self.assertRaisesRegex(TypeError,
+                                    r'islice_with_ellipsis\(\) got an '
+                                    "unexpected keyword argument 't'"):
+            tools.islice_with_ellipsis(self.it, 1, t='')
 
 
 def passthrough(x):
