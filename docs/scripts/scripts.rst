@@ -121,6 +121,11 @@ scripts.djvutext script
 
 .. automodule:: scripts.djvutext
 
+scripts.download\_dump script
+-----------------------------
+
+.. automodule:: scripts.download_dump
+
 scripts.editarticle script
 --------------------------
 
