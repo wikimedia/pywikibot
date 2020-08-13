@@ -35,7 +35,6 @@ from pywikibot.tools._unidata import _first_upper_exception
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
-StringTypes = (str, bytes)
 
 try:
     import bz2
@@ -467,7 +466,7 @@ class MediaWikiVersion(Version):
         return '.'.join(str(v) for v in self.version) + self.suffix
 
     def _cmp(self, other):
-        if isinstance(other, StringTypes):
+        if isinstance(other, str):
             other = MediaWikiVersion(other)
 
         if self.version > other.version:
@@ -1839,6 +1838,9 @@ wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('UnicodeType', str,
+                             since='20200813', future_warning=True)
+wrapper._add_deprecated_attr('StringTypes', (str, bytes),
+                             replacement_name='(str, bytes)',
                              since='20200813', future_warning=True)
 wrapper._add_deprecated_attr('signature', inspect.signature,
                              since='20200813', future_warning=True)
