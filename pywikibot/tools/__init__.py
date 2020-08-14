@@ -1727,12 +1727,6 @@ class ModuleDeprecationWrapper(types.ModuleType):
         return getattr(self._module, attr)
 
 
-@deprecated('open_archive()', since='20150915')
-def open_compressed(filename, use_extension=False):
-    """DEPRECATED: Open a file and uncompress it if needed."""
-    return open_archive(filename, use_extension=use_extension)
-
-
 def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
     """Check file mode and update it, if needed.
 
@@ -1799,6 +1793,12 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
     return sha.hexdigest()
 
 # deprecated parts ############################################################
+
+
+@deprecated('open_archive()', since='20150915', future_warning=True)
+def open_compressed(filename, use_extension=False):
+    """DEPRECATED: Open a file and uncompress it if needed."""
+    return open_archive(filename, use_extension=use_extension)
 
 
 class IteratorNextMixin(Iterator):
