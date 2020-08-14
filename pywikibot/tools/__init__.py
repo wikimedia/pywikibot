@@ -1080,24 +1080,6 @@ def merge_unique_dicts(*args, **kwargs):
 # a deprecator without any arguments.
 
 
-def signature(obj):
-    """
-    Safely return function Signature object (PEP 362).
-
-    inspect.signature was introduced in 3.3, however backports are available.
-
-    Any exception calling inspect.signature is ignored and None is returned.
-
-    @param obj: Function to inspect
-    @type obj: callable
-    @rtype: inpect.Signature or None
-    """
-    try:
-        return inspect.signature(obj)
-    except (AttributeError, ValueError):
-        return None
-
-
 def add_decorated_full_name(obj, stacklevel=1):
     """Extract full object name, including class, and store in __full_name__.
 
@@ -1129,7 +1111,7 @@ def manage_wrapping(wrapper, obj):
     wrapper.__doc__ = obj.__doc__
     wrapper.__name__ = obj.__name__
     wrapper.__module__ = obj.__module__
-    wrapper.__signature__ = signature(obj)
+    wrapper.__signature__ = inspect.signature(obj)
 
     if not hasattr(obj, '__full_name__'):
         add_decorated_full_name(obj, 2)
@@ -1197,7 +1179,7 @@ def add_full_name(obj):
         inner_wrapper.__doc__ = obj.__doc__
         inner_wrapper.__name__ = obj.__name__
         inner_wrapper.__module__ = obj.__module__
-        inner_wrapper.__signature__ = signature(obj)
+        inner_wrapper.__signature__ = inspect.signature(obj)
 
         # The decorator being decorated may have args, so both
         # syntax need to be supported.
@@ -1473,7 +1455,6 @@ def deprecated_args(**arg_pairs):
 
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
-            # __signature__ is only available in Python 3 which has OrderedDict
             params = collections.OrderedDict()
             for param in wrapper.__signature__.parameters.values():
                 params[param.name] = param.replace()
@@ -1858,4 +1839,6 @@ wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('UnicodeType', str,
+                             since='20200813', future_warning=True)
+wrapper._add_deprecated_attr('signature', inspect.signature,
                              since='20200813', future_warning=True)
