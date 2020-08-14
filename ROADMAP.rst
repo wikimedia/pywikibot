@@ -8,7 +8,8 @@ Current release changes
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
-* 4.0.0: Deprecate tools.UnicodeMixin and tools.IteratorNextMixin will be removed
+* 4.1.0: comms.PywikibotCookieJar and comms.mode_check_decorator will be removed
+* 4.0.0: Deprecated tools.UnicodeMixin and tools.IteratorNextMixin will be removed
 * 4.0.0: Site.Family() function will be removed in favour of Family.load() method
 * 4.0.0: Site.getExpandedString method will be removed in favour of expand_text
 * 4.0.0: Unused parameters of page methods like forceReload, insite, throttle, step will be removed
