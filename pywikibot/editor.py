@@ -6,14 +6,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import os
 import subprocess
 import tempfile
 
 from sys import platform
+from textwrap import fill
+from typing import Optional
 
 import pywikibot
 
@@ -26,7 +26,7 @@ except ImportError as e:
     gui = e
 
 
-class TextEditor(object):
+class TextEditor:
 
     """Text editor."""
 
@@ -72,59 +72,56 @@ class TextEditor(object):
                         for part in command)
 
     @deprecated('_command (should not be used from the outside)',
-                since='20150111')
+                since='20150111', future_warning=True)
     def command(self, tempFilename, text, jumpIndex=None):
         """Return editor selected in user-config.py."""
         return TextEditor._concat(self._command(tempFilename, text, jumpIndex))
 
-    def edit(self, text, jumpIndex=None, highlight=None):
+    def edit(self, text: str, jumpIndex=None, highlight=None) -> Optional[str]:
         """
         Call the editor and thus allows the user to change the text.
 
         Halts the thread's operation until the editor is closed.
 
         @param text: the text to be edited
-        @type text: str
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
         @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
-        @rtype: str or None
         """
         if config.editor:
             handle, tempFilename = tempfile.mkstemp()
-            tempFilename = '%s.%s' % (tempFilename,
-                                      config.editor_filename_extension)
+            tempFilename = '{}.{}'.format(tempFilename,
+                                          config.editor_filename_extension)
             try:
                 with codecs.open(tempFilename, 'w',
                                  encoding=config.editor_encoding) as tempFile:
                     tempFile.write(text)
                 creationDate = os.stat(tempFilename).st_mtime
                 cmd = self._command(tempFilename, text, jumpIndex)
-                subprocess.call(cmd, shell=platform == 'win32')
+                subprocess.run(cmd, shell=platform == 'win32')
                 lastChangeDate = os.stat(tempFilename).st_mtime
                 if lastChangeDate == creationDate:
                     # Nothing changed
                     return None
-                else:
-                    with codecs.open(
-                        tempFilename, 'r', encoding=config.editor_encoding
-                    ) as temp_file:
-                        newcontent = temp_file.read()
-                    return newcontent
+
+                with codecs.open(tempFilename, 'r',
+                                 encoding=config.editor_encoding) as temp_file:
+                    newcontent = temp_file.read()
+                return newcontent
             finally:
                 os.close(handle)
                 os.unlink(tempFilename)
 
         if isinstance(gui, ImportError):
-            raise ImportError(
-                'Could not load GUI modules: %s\nNo editor available.\n'
+            raise ImportError(fill(
+                'Could not load GUI modules: {}. No editor available. '
                 'Set your favourite editor in user-config.py "editor", '
                 'or install python packages tkinter and idlelib, which '
                 'are typically part of Python but may be packaged separately '
-                'on your platform.\n' % gui)
+                'on your platform.'.format(gui)) + '\n')
 
-        return pywikibot.ui.editText(
-            text, jumpIndex=jumpIndex, highlight=highlight)
+        return pywikibot.ui.editText(text, jumpIndex=jumpIndex,
+                                     highlight=highlight)
