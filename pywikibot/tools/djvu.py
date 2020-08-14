@@ -6,31 +6,26 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from collections import Counter
 import os
 import re
 import subprocess
+
+from collections import Counter
 
 import pywikibot
 
 from pywikibot.tools import deprecated, deprecated_args
 
 
-def _call_cmd(args, lib='djvulibre'):
+def _call_cmd(args, lib='djvulibre') -> tuple:
     """
     Tiny wrapper around subprocess.Popen().
 
     @param args: same as Popen()
     @type args: str or typing.Sequence[string]
 
-    @param library: library to be logged in logging messages
-    @type library: str
-
-    @param log: log process output; errors are always logged.
-    @type library: bool
-
+    @param lib: library to be logged in logging messages
+    @type lib: str
 
     @return: returns a tuple (res, stdoutdata), where
         res is True if dp.returncode != 0 else False

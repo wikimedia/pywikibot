@@ -13,14 +13,11 @@ XmlEntry objects which can be used by other bots.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import threading
+import xml.sax
 
 from xml.etree.ElementTree import iterparse
-
-import xml.sax
 
 from pywikibot.tools import open_archive
 

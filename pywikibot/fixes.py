@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os.path
 
 from pywikibot import config
@@ -37,7 +35,7 @@ parameter_help = """
                                   syntax.
 """
 
-__doc__ = __doc__ + parameter_help
+__doc__ += parameter_help
 
 fixes = {
     # These replacements will convert HTML to wiki syntax where possible, and
@@ -684,13 +682,10 @@ def _load_file(filename):
         with open(filename, 'rb') as f:
             exec(compile(f.read(), filename, 'exec'), globals())
         return True
-    else:
-        return False
+
+    return False
 
 
 # Load the user fixes file.
 filename = config.datafilepath('user-fixes.py')
-if _load_file(filename):
-    user_fixes_loaded = True
-else:
-    user_fixes_loaded = False
+user_fixes_loaded = _load_file(filename)
