@@ -137,7 +137,7 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated, PY2, UnicodeType
+from pywikibot.tools import deprecated, PY2
 from pywikibot.tools.formatter import color_format
 
 import requests
@@ -399,9 +399,8 @@ class LinkChecker(object):
             self.query.encode('ascii')
         except UnicodeEncodeError:
             encoding = self.getEncodingUsedByServer()
-            self.path = UnicodeType(urllib.quote(self.path.encode(encoding)))
-            self.query = UnicodeType(urllib.quote(self.query.encode(encoding),
-                                                  '=&'))
+            self.path = urllib.quote(self.path.encode(encoding))
+            self.query = urllib.quote(self.query.encode(encoding), '=&')
 
     def resolveRedirect(self, useHEAD=False):
         """
@@ -488,7 +487,7 @@ class LinkChecker(object):
             # wrong or a pair (errno, string) representing an error
             # returned by a system call, similar to the value
             # accompanying os.error
-            if isinstance(error, UnicodeType):
+            if isinstance(error, str):
                 msg = error
             else:
                 try:

@@ -353,7 +353,7 @@ from pywikibot import titletranslate
 
 from pywikibot.bot import ListOption, StandardOption
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import first_upper, UnicodeType
+from pywikibot.tools import first_upper
 from pywikibot.tools.formatter import color_format
 
 docuReplacements = {
@@ -1155,7 +1155,7 @@ class Subject(interwiki_graph.Subject):
             # todo list.
 
             if not page.exists():
-                self.conf.remove.append(UnicodeType(page))
+                self.conf.remove.append(str(page))
                 self.conf.note('{} does not exist. Skipping.'.format(page))
                 if page == self.originPage:
                     # The page we are working on is the page that does not
@@ -1214,7 +1214,7 @@ class Subject(interwiki_graph.Subject):
             # must be behind the page.isRedirectPage() part
             # otherwise a redirect error would be raised
             elif page_empty_check(page):
-                self.conf.remove.append(UnicodeType(page))
+                self.conf.remove.append(str(page))
                 self.conf.note('{} is empty. Skipping.'.format(page))
                 if page == self.originPage:
                     for site, count in self.todo.siteCounts():
@@ -1359,7 +1359,7 @@ class Subject(interwiki_graph.Subject):
             if page2 is None:
                 pywikibot.output(' ' * indent + 'Given as a hint.')
             else:
-                pywikibot.output(' ' * indent + UnicodeType(page2))
+                pywikibot.output(' ' * indent + str(page2))
 
     def assemble(self):
         """Assemble language links."""
@@ -1694,7 +1694,7 @@ class Subject(interwiki_graph.Subject):
                 # put it to new means don't delete it
                 if (
                     not self.conf.cleanup
-                    or UnicodeType(rmPage) not in self.conf.remove
+                    or str(rmPage) not in self.conf.remove
                 ):
                     new[rmsite] = rmPage
                     pywikibot.warning(
@@ -2173,7 +2173,7 @@ def compareLanguages(old, new, insite, summary):
         # Use an extended format for the string linking to all added pages.
 
         def fmt(d, site):
-            return UnicodeType(d[site])
+            return str(d[site])
     else:
         # Use short format, just the language code
 
@@ -2358,7 +2358,7 @@ def main(*args):
         elif len(namespaces) == 1:
             ns = namespaces[0]
             if ns != 'all':
-                if isinstance(ns, UnicodeType) or isinstance(ns, str):
+                if isinstance(ns, str):
                     index = site.namespaces.lookup_name(ns)
                     if index is None:
                         raise ValueError('Unknown namespace: ' + ns)

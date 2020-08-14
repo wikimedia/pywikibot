@@ -36,7 +36,6 @@ from pywikibot.tools._unidata import _first_upper_exception
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 StringTypes = (str, bytes)
-UnicodeType = str
 
 try:
     import bz2
@@ -1858,3 +1857,5 @@ wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
                              since='20200712', future_warning=True)
+wrapper._add_deprecated_attr('UnicodeType', str,
+                             since='20200813', future_warning=True)
