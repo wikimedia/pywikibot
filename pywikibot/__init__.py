@@ -65,7 +65,6 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    _UnicodeMixin as UnicodeMixin,
 )
 from pywikibot.tools.formatter import color_format
 
@@ -93,15 +92,15 @@ __all__ = (
     'InvalidTitle', 'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link',
     'LockedNoPage', 'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget',
     'NoPage', 'NoSuchSite', 'NoUsername', 'NoWikibaseEntity',
-    'OtherPageSaveError', 'output',
-    'Page', 'PageCreatedConflict', 'PageDeletedConflict', 'PageNotSaved',
-    'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
-    'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink',
-    'SpamblacklistError', 'stdout', 'TitleblacklistError', 'translate', 'ui',
-    'unicode2html', 'UnicodeMixin', 'UnknownExtension', 'UnknownFamily',
-    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
-    'UserBlocked', 'warning', 'WikiBaseError', 'WikidataBot',
+    'OtherPageSaveError', 'output', 'Page', 'PageCreatedConflict',
+    'PageDeletedConflict', 'PageNotSaved', 'PageRelatedError',
+    'PageSaveRelatedError', 'PropertyPage', 'QuitKeyboardInterrupt',
+    'SectionError', 'Server504Error', 'ServerError', 'showHelp', 'Site',
+    'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
+    'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
+    'UploadWarning', 'url2unicode', 'User', 'UserBlocked', 'warning',
+    'WikiBaseError', 'WikidataBot',
 )
 __all__ += textlib_methods
 
@@ -1429,5 +1428,3 @@ wrapper._add_deprecated_attr(
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')
-wrapper._add_deprecated_attr('UnicodeMixin', replacement_name='',
-                             since='20200723', future_warning=True)
