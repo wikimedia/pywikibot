@@ -13,12 +13,7 @@ from pywikibot.exceptions import UnknownFamily
 from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.tools import suppress_warnings
 
-from tests.aspects import (
-    unittest,
-    TestCase,
-    DeprecationTestCase,
-    PatchingTestCase,
-)
+from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 
 
@@ -252,55 +247,6 @@ class TestFamilyUrlRegex(PatchingTestCase):
                     # Families can switch off if they want to be detected using
                     # URL. This applies for test:test (there is test:wikipedia)
                     self.assertEqual(family.from_url(url), code)
-
-
-class TestOldFamilyMethod(DeprecationTestCase):
-
-    """Test cases for old site.Family method."""
-
-    UNKNOWNFAMILY_RE = 'Family unknown does not exist'
-    net = False
-
-    def test_old_site_family_function(self):
-        """Test deprecated Family function with valid families."""
-        f = pywikibot.site.Family('species')
-        self.assertEqual(f.name, 'species')
-        f = pywikibot.site.Family('osm')
-        self.assertEqual(f.name, 'osm')
-        self.assertOneDeprecationParts('pywikibot.site.Family',
-                                       'pywikibot.family.Family.load', 2)
-
-        # @deprecated warning occurs within redirect_func's call
-        # invoking the method instead of this test module.
-        self._do_test_warning_filename = False
-
-        f = pywikibot.site.Family('i18n', fatal=False)
-        self.assertEqual(f.name, 'i18n')
-        self.assertDeprecationParts('pywikibot.site.Family',
-                                    'pywikibot.family.Family.load')
-        self.assertDeprecationParts(
-            'fatal argument of pywikibot.family.Family.load')
-
-    def test_old_site_family_function_invalid(self):
-        """Test that an invalid family raised UnknownFamily exception."""
-        # As assertRaises calls the method, unittest is the module
-        # invoking the method instead of this test module.
-        self._do_test_warning_filename = False
-        self.assertRaisesRegex(
-            UnknownFamily,
-            self.UNKNOWNFAMILY_RE,
-            pywikibot.site.Family,
-            'unknown',
-            fatal=False)
-        self.assertRaisesRegex(
-            UnknownFamily,
-            self.UNKNOWNFAMILY_RE,
-            pywikibot.site.Family,
-            'unknown')
-        self.assertDeprecationParts('pywikibot.site.Family',
-                                    'pywikibot.family.Family.load')
-        self.assertDeprecationParts(
-            'fatal argument of pywikibot.family.Family.load')
 
 
 if __name__ == '__main__':  # pragma: no cover
