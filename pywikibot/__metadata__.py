@@ -6,7 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 __name__ = 'pywikibot'
-__version__ = '4.1.0'
+__version__ = '4.1.1.dev0'
 __description__ = 'Python MediaWiki Bot Framework'
 __maintainer__ = 'The Pywikibot team'
 __maintainer_email__ = 'pywikibot@lists.wikimedia.org'
