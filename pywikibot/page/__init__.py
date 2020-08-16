@@ -1309,7 +1309,7 @@ class BasePage(ComparableMixin):
               cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
-        if cc or (cc is None and config.cosmetic_changes):
+        if cc or cc is None and config.cosmetic_changes:
             summary = self._cosmetic_changes_hook(summary)
 
         done = self.site.editpage(self, summary=summary, minor=minor,
@@ -1330,18 +1330,20 @@ class BasePage(ComparableMixin):
             else the old edit summary.
         @rtype: str
         """
-        if self.isTalkPage() or self.content_model != 'wikitext' or \
+        if self.isTalkPage() or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return summary
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
-            cc = ((family == config.family and self.site.lang == config.mylang)
-                  or self.site.lang in config.cosmetic_changes_enable.get(
-                      family, []))
+            cc = ((family == config.family
+                   and self.site.lang == config.mylang)
+                  or family in config.cosmetic_changes_enable
+                  and self.site.lang in config.cosmetic_changes_enable[family])
         else:
             cc = True
-        cc = cc and self.site.lang not in config.cosmetic_changes_disable.get(
-            family, [])
+        cc = (cc and not
+              (family in config.cosmetic_changes_disable
+               and self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return summary
 
