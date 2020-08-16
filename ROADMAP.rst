@@ -1,7 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-*  (no changes yet)
+* Add wikispore family (T260049)
 
 
 Future release notes
