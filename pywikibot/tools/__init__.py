@@ -25,6 +25,7 @@ from datetime import datetime
 from distutils.version import LooseVersion, Version
 from functools import wraps
 from importlib import import_module
+from inspect import getfullargspec
 from ipaddress import ip_address
 from itertools import zip_longest
 from warnings import catch_warnings, showwarning, warn
@@ -34,9 +35,7 @@ from pywikibot.tools._unidata import _first_upper_exception
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
-
 StringTypes = (str, bytes)
-UnicodeType = str
 
 try:
     import bz2
@@ -52,37 +51,6 @@ try:
     import lzma
 except ImportError as lzma_import_error:
     lzma = lzma_import_error
-
-
-if PYTHON_VERSION < (3, 5):
-    # although deprecated in 3 completely no message was emitted until 3.5
-    ArgSpec = inspect.ArgSpec
-    getargspec = inspect.getargspec
-else:
-    ArgSpec = collections.namedtuple('ArgSpec', ['args', 'varargs', 'keywords',
-                                                 'defaults'])
-
-    def getargspec(func):
-        """Python 3 implementation using inspect.signature."""
-        sig = inspect.signature(func)
-        args = []
-        defaults = []
-        varargs = None
-        kwargs = None
-        for p in sig.parameters.values():
-            if p.kind == inspect.Parameter.VAR_POSITIONAL:
-                varargs = p.name
-            elif p.kind == inspect.Parameter.VAR_KEYWORD:
-                kwargs = p.name
-            else:
-                args += [p.name]
-                if p.default != inspect.Parameter.empty:
-                    defaults += [p.default]
-        if defaults:
-            defaults = tuple(defaults)
-        else:
-            defaults = None
-        return ArgSpec(args, varargs, kwargs, defaults)
 
 
 _logger = 'tools'
@@ -1112,24 +1080,6 @@ def merge_unique_dicts(*args, **kwargs):
 # a deprecator without any arguments.
 
 
-def signature(obj):
-    """
-    Safely return function Signature object (PEP 362).
-
-    inspect.signature was introduced in 3.3, however backports are available.
-
-    Any exception calling inspect.signature is ignored and None is returned.
-
-    @param obj: Function to inspect
-    @type obj: callable
-    @rtype: inpect.Signature or None
-    """
-    try:
-        return inspect.signature(obj)
-    except (AttributeError, ValueError):
-        return None
-
-
 def add_decorated_full_name(obj, stacklevel=1):
     """Extract full object name, including class, and store in __full_name__.
 
@@ -1161,7 +1111,7 @@ def manage_wrapping(wrapper, obj):
     wrapper.__doc__ = obj.__doc__
     wrapper.__name__ = obj.__name__
     wrapper.__module__ = obj.__module__
-    wrapper.__signature__ = signature(obj)
+    wrapper.__signature__ = inspect.signature(obj)
 
     if not hasattr(obj, '__full_name__'):
         add_decorated_full_name(obj, 2)
@@ -1229,7 +1179,7 @@ def add_full_name(obj):
         inner_wrapper.__doc__ = obj.__doc__
         inner_wrapper.__name__ = obj.__name__
         inner_wrapper.__module__ = obj.__module__
-        inner_wrapper.__signature__ = signature(obj)
+        inner_wrapper.__signature__ = inspect.signature(obj)
 
         # The decorator being decorated may have args, so both
         # syntax need to be supported.
@@ -1505,7 +1455,6 @@ def deprecated_args(**arg_pairs):
 
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
-            # __signature__ is only available in Python 3 which has OrderedDict
             params = collections.OrderedDict()
             for param in wrapper.__signature__.parameters.values():
                 params[param.name] = param.replace()
@@ -1559,7 +1508,7 @@ def remove_last_args(arg_names):
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
-            args, varargs, kwargs, _ = getargspec(wrapper.__wrapped__)
+            args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
                 raise ValueError('{0} may not have * or ** args.'.format(
                     name))
@@ -1759,12 +1708,6 @@ class ModuleDeprecationWrapper(types.ModuleType):
         return getattr(self._module, attr)
 
 
-@deprecated('open_archive()', since='20150915')
-def open_compressed(filename, use_extension=False):
-    """DEPRECATED: Open a file and uncompress it if needed."""
-    return open_archive(filename, use_extension=use_extension)
-
-
 def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
     """Check file mode and update it, if needed.
 
@@ -1833,6 +1776,12 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
+@deprecated('open_archive()', since='20150915', future_warning=True)
+def open_compressed(filename, use_extension=False):
+    """DEPRECATED: Open a file and uncompress it if needed."""
+    return open_archive(filename, use_extension=use_extension)
+
+
 class IteratorNextMixin(Iterator):
 
     """DEPRECATED. Backwards compatibility for Iterators."""
@@ -1885,3 +1834,11 @@ wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
                              since='20200723', future_warning=True)
 wrapper._add_deprecated_attr('IteratorNextMixin', replacement_name='',
                              since='20200723', future_warning=True)
+wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
+                             since='20200712', future_warning=True)
+wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
+                             since='20200712', future_warning=True)
+wrapper._add_deprecated_attr('UnicodeType', str,
+                             since='20200813', future_warning=True)
+wrapper._add_deprecated_attr('signature', inspect.signature,
+                             since='20200813', future_warning=True)

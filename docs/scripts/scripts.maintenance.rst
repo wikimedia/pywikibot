@@ -22,11 +22,6 @@ scripts.maintenance.compat2core script
 
 .. automodule:: scripts.maintenance.compat2core
 
-scripts.maintenance.download\_dump script
------------------------------------------
-
-.. automodule:: scripts.maintenance.download_dump
-
 scripts.maintenance.make\_i18n\_dict script
 -------------------------------------------
 

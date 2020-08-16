@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """Edit tests for the flow module."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot.exceptions import LockedPage
 from pywikibot.flow import Board, Topic, Post
-from pywikibot.tools import UnicodeType as unicode
 
 from tests.aspects import TestCase
 from tests import unittest
@@ -34,7 +33,7 @@ class TestFlowCreateTopic(TestCase):
         wikitext = first_post.get(format='wikitext')
         self.assertIn('wikitext', first_post._content)
         self.assertNotIn('html', first_post._content)
-        self.assertIsInstance(wikitext, unicode)
+        self.assertIsInstance(wikitext, str)
         self.assertEqual(wikitext, content)
 
 
@@ -51,7 +50,7 @@ class TestFlowReply(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up class."""
-        super(TestFlowReply, cls).setUpClass()
+        super().setUpClass()
         cls._topic_title = 'Topic:Stf56oxx0sd4dkj1'
 
     def test_reply_to_topic(self):
@@ -66,7 +65,7 @@ class TestFlowReply(TestCase):
         wikitext = reply_post.get(format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
-        self.assertIsInstance(wikitext, unicode)
+        self.assertIsInstance(wikitext, str)
         self.assertEqual(wikitext, content)
         # Test reply list in topic
         new_replies = topic.replies(force=True)
@@ -86,7 +85,7 @@ class TestFlowReply(TestCase):
         wikitext = reply_post.get(format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
-        self.assertIsInstance(wikitext, unicode)
+        self.assertIsInstance(wikitext, str)
         self.assertEqual(wikitext, content)
         # Test reply list in topic
         new_replies = topic_root.replies(force=True)
@@ -105,7 +104,7 @@ class TestFlowReply(TestCase):
         wikitext = reply_post.get(format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
-        self.assertIsInstance(wikitext, unicode)
+        self.assertIsInstance(wikitext, str)
         self.assertEqual(wikitext, content)
         # Test reply list in topic
         new_replies = root_post.replies(force=True)
@@ -126,7 +125,7 @@ class TestFlowReply(TestCase):
         first_wikitext = first_reply_post.get(format='wikitext')
         self.assertIn('wikitext', first_reply_post._content)
         self.assertNotIn('html', first_reply_post._content)
-        self.assertIsInstance(first_wikitext, unicode)
+        self.assertIsInstance(first_wikitext, str)
         self.assertEqual(first_wikitext, first_content)
         # Test reply list in topic
         new_root_replies = topic_root.replies(force=True)
@@ -141,7 +140,7 @@ class TestFlowReply(TestCase):
         second_wikitext = second_reply_post.get(format='wikitext')
         self.assertIn('wikitext', second_reply_post._content)
         self.assertNotIn('html', second_reply_post._content)
-        self.assertIsInstance(second_wikitext, unicode)
+        self.assertIsInstance(second_wikitext, str)
         self.assertEqual(second_wikitext, second_content)
 
         # Test reply list in first reply
@@ -326,7 +325,5 @@ class TestFlowEditFailure(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

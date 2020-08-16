@@ -9,12 +9,12 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 import tempfile
 
 from contextlib import closing
+from urllib.parse import urlparse
+from urllib.request import URLopener
 
 import pywikibot
 import pywikibot.data.api
@@ -22,15 +22,8 @@ import pywikibot.data.api
 from pywikibot import config
 
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot.tools import PY2, deprecated, deprecated_args, UnicodeType
+from pywikibot.tools import deprecated, deprecated_args
 from pywikibot.tools.formatter import color_format
-
-if not PY2:
-    from urllib.parse import urlparse
-    from urllib.request import URLopener
-else:
-    from urllib import URLopener
-    from urlparse import urlparse
 
 
 class UploadRobot(BaseBot):
@@ -41,7 +34,7 @@ class UploadRobot(BaseBot):
                      keepFilename='keep_filename',
                      verifyDescription='verify_description',
                      ignoreWarning='ignore_warning', targetSite='target_site')
-    def __init__(self, url, url_encoding=None, description='',
+    def __init__(self, url: list, url_encoding=None, description='',
                  use_filename=None, keep_filename=False,
                  verify_description=True, ignore_warning=False,
                  target_site=None, aborts=[], chunk_size=0, summary=None,
@@ -51,7 +44,6 @@ class UploadRobot(BaseBot):
 
         @param url: path to url or local file (deprecated), or list of urls or
             paths to local files.
-        @type url: str (deprecated) or list
         @param description: Description of file for its page. If multiple files
             are uploading the same description is used for every file.
         @type description: str
@@ -88,7 +80,7 @@ class UploadRobot(BaseBot):
             overwrites verify_description to False and keep_filename to True.
         @type always: bool
         """
-        super(UploadRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         always = self.getOption('always')
         if (always and ignore_warning is not True and aborts is not True):
             raise ValueError('When always is set to True, either '
@@ -97,7 +89,7 @@ class UploadRobot(BaseBot):
             raise ValueError('When always is set to True, the description '
                              'must be set.')
         self.url = url
-        if isinstance(self.url, UnicodeType):
+        if isinstance(self.url, str):
             pywikibot.warning('url as string is deprecated. '
                               'Use an iterable instead.')
         self.url_encoding = url_encoding
@@ -122,7 +114,7 @@ class UploadRobot(BaseBot):
             file_url = self.url
             pywikibot.warning('file_url is not given. '
                               'Set to self.url by default.')
-        pywikibot.output('Reading file %s' % file_url)
+        pywikibot.output('Reading file {}'.format(file_url))
         resume = False
         rlen = 0
         _contents = None
@@ -133,15 +125,12 @@ class UploadRobot(BaseBot):
         while not retrieved:
             if resume:
                 pywikibot.output('Resume download...')
-                uo.addheader('Range', 'bytes=%s-' % rlen)
+                uo.addheader('Range', 'bytes={}-'.format(rlen))
 
             with closing(uo.open(file_url)) as infile:
                 info = infile.info()
 
-                if PY2:
-                    info_get = info.getheader
-                else:
-                    info_get = info.get
+                info_get = info.get
                 content_type = info_get('Content-Type')
                 content_len = info_get('Content-Length')
                 accept_ranges = info_get('Accept-Ranges')
@@ -166,11 +155,11 @@ class UploadRobot(BaseBot):
                 if rlen < content_len:
                     retrieved = False
                     pywikibot.output(
-                        'Connection closed at byte %s (%s left)'
-                        % (rlen, content_len))
+                        'Connection closed at byte {} ({} left)'
+                        .format(rlen, content_len))
                     if valid_ranges and rlen > 0:
                         resume = True
-                    pywikibot.output('Sleeping for %d seconds...' % dt)
+                    pywikibot.output('Sleeping for {} seconds...'.format(dt))
                     pywikibot.sleep(dt)
                     if dt <= 60:
                         dt += 15
@@ -460,7 +449,7 @@ class UploadRobot(BaseBot):
             return
 
         try:
-            if isinstance(self.url, UnicodeType):
+            if isinstance(self.url, str):
                 self._treat_counter = 1
                 return self.upload_file(self.url)
             for file_url in self.url:

@@ -43,8 +43,6 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import sys
 
 from argparse import ArgumentParser
@@ -56,7 +54,7 @@ from pywikibot import config, Page
 from pywikibot.tools import deprecated
 
 
-@deprecated('BaseSite.namespaces', since='20150515')
+@deprecated('BaseSite.namespaces', since='20150515', future_warning=True)
 def namespaces(site):
     """Return a dictionary from namespace number to prefix."""
     return {n.id: n.custom_name for n in site.namespaces}
@@ -69,7 +67,7 @@ def multiple_replace(text, word_dict):
     return text
 
 
-class SyncSites(object):
+class SyncSites:
 
     """Work is done in here."""
 
@@ -211,10 +209,7 @@ class SyncSites(object):
             else:
                 page2 = Page(site, pagename)
 
-            if page2.exists():
-                txt2 = page2.text
-            else:
-                txt2 = ''
+            txt2 = page2.text
 
             if str(site) in config.replicate_replace:
                 txt_new = multiple_replace(txt1,

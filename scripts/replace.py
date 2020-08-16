@@ -140,15 +140,13 @@ the top of the help.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
-try:
-    from collections.abc import Sequence
-except ImportError:  # Python 2.7
-    from collections import Sequence
 import re
 import warnings
+
+from collections.abc import Sequence
+from contextlib import suppress
+from queue import Queue
 
 import pywikibot
 from pywikibot import editor
@@ -162,14 +160,7 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    PY2,
-    UnicodeType
 )
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue
 
 
 # This is required for the text that is shown when you run this script
@@ -199,7 +190,7 @@ def _get_text_exceptions(exceptions):
     return exceptions.get('inside-tags', []) + exceptions.get('inside', [])
 
 
-class ReplacementBase(object):
+class ReplacementBase:
 
     """The replacement instructions."""
 
@@ -212,12 +203,12 @@ class ReplacementBase(object):
         self.default_summary = default_summary
 
     @property
-    def edit_summary(self):
+    def edit_summary(self) -> str:
         """Return the edit summary for this fix."""
         return self._edit_summary
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Description of the changes that this replacement applies.
 
         This description is used as the default summary of the replacement. If
@@ -253,8 +244,6 @@ class ReplacementBase(object):
     def compile(self, use_regex, flags):
         """Compile the search text."""
         # Set the regular expression flags
-        flags |= re.UNICODE
-
         if self.case_insensitive is False:
             flags &= ~re.IGNORECASE
         elif self.case_insensitive:
@@ -273,8 +262,7 @@ class Replacement(ReplacementBase):
                  case_insensitive=None, edit_summary=None,
                  default_summary=True):
         """Create a single replacement entry unrelated to a fix."""
-        super(Replacement, self).__init__(old, new, edit_summary,
-                                          default_summary)
+        super().__init__(old, new, edit_summary, default_summary)
         self._use_regex = use_regex
         self.exceptions = exceptions
         self._case_insensitive = case_insensitive
@@ -300,7 +288,7 @@ class Replacement(ReplacementBase):
 
     def _compile(self, use_regex, flags):
         """Compile the search regex and exceptions."""
-        super(Replacement, self)._compile(use_regex, flags)
+        super()._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
 
     def get_inside_exceptions(self):
@@ -325,7 +313,7 @@ class ReplacementList(list):
     def __init__(self, use_regex, exceptions, case_insensitive, edit_summary,
                  name):
         """Create a fix list which can contain multiple replacements."""
-        super(ReplacementList, self).__init__()
+        super().__init__()
         self.use_regex = use_regex
         self._exceptions = exceptions
         self.exceptions = None
@@ -347,8 +335,7 @@ class ReplacementListEntry(ReplacementBase):
     def __init__(self, old, new, fix_set, edit_summary=None,
                  default_summary=True):
         """Create a replacement entry inside a fix set."""
-        super(ReplacementListEntry, self).__init__(old, new, edit_summary,
-                                                   default_summary)
+        super().__init__(old, new, edit_summary, default_summary)
         self.fix_set = fix_set
 
     @property
@@ -389,7 +376,7 @@ class ReplacementListEntry(ReplacementBase):
 
     def _compile(self, use_regex, flags):
         """Compile the search regex and the fix's exceptions."""
-        super(ReplacementListEntry, self)._compile(use_regex, flags)
+        super()._compile(use_regex, flags)
         self.fix_set._compile_exceptions(use_regex, flags)
 
     def get_inside_exceptions(self):
@@ -460,13 +447,11 @@ class XmlDumpReplacePageGenerator(object):
                     yield pywikibot.Page(self.site, entry.title)
 
         except KeyboardInterrupt:
-            try:
+            with suppress(NameError):
                 if not self.skipping:
                     pywikibot.output(
                         'To resume, use "-xmlstart:{0}" on the command line.'
                         .format(entry.title))
-            except NameError:
-                pass
 
     def isTitleExcepted(self, title):
         """
@@ -557,7 +542,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             'sleep': 0.0,
             'summary': None,
         })
-        super(ReplaceRobot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
         for i, replacement in enumerate(replacements):
             if isinstance(replacement, Sequence):
@@ -575,17 +560,13 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         self.summary = self.getOption('summary')
 
         self.addcat = self.getOption('addcat')
-        if self.addcat and isinstance(self.addcat, UnicodeType):
+        if self.addcat and isinstance(self.addcat, str):
             self.addcat = pywikibot.Category(self.site, self.addcat)
 
         self._pending_processed_titles = Queue()
 
-    def isTitleExcepted(self, title, exceptions=None):
-        """
-        Return True iff one of the exceptions applies for the given title.
-
-        @rtype: bool
-        """
+    def isTitleExcepted(self, title, exceptions=None) -> bool:
+        """Return True if one of the exceptions applies for the given title."""
         if exceptions is None:
             exceptions = self.exceptions
         if 'title' in exceptions:
@@ -598,12 +579,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     return True
         return False
 
-    def isTextExcepted(self, original_text):
-        """
-        Return True iff one of the exceptions applies for the given text.
-
-        @rtype: bool
-        """
+    def isTextExcepted(self, original_text) -> bool:
+        """Return True iff one of the exceptions applies for the given text."""
         if 'text-contains' in self.exceptions:
             for exc in self.exceptions['text-contains']:
                 if exc.search(original_text):
@@ -654,7 +631,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         return new_text
 
-    @deprecated('apply_replacements', since='20160816')
+    @deprecated('apply_replacements', since='20160816', future_warning=True)
     def doReplacements(self, original_text, page=None):
         """Apply replacements to the given text and page."""
         if page is None:
@@ -725,7 +702,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             pywikibot.warning("You can't edit page {}".format(page))
             return True
 
-        return super(ReplaceRobot, self).skip_page(page)
+        return super().skip_page(page)
 
     def treat(self, page):
         """Work on each page retrieved from generator."""
@@ -888,7 +865,7 @@ def main(*args):
     useSql = False
     sql_query = None
     # Set the default regular expression flags
-    flags = re.UNICODE
+    flags = 0
     # Request manual replacements even if replacements are already defined
     manual_input = False
     # Replacements loaded from a file
@@ -1041,7 +1018,7 @@ def main(*args):
                               '"{0}"'.format(fix_name))
             continue
         if 'msg' in fix:
-            if isinstance(fix['msg'], UnicodeType):
+            if isinstance(fix['msg'], str):
                 set_summary = i18n.twtranslate(site, str(fix['msg']))
             else:
                 set_summary = i18n.translate(site, fix['msg'], fallback=True)
@@ -1049,7 +1026,7 @@ def main(*args):
             set_summary = None
         if not generators_given and 'generator' in fix:
             gen_args = fix['generator']
-            if isinstance(gen_args, UnicodeType):
+            if isinstance(gen_args, str):
                 gen_args = [gen_args]
             for gen_arg in gen_args:
                 genFactory.handleArg(gen_arg)

@@ -600,11 +600,11 @@ def execute(command, data_in=None, timeout=None, error=None):
               stdin=PIPE if data_in is not None else None)
 
     if data_in is not None:
-        p.stdin.write(data_in.encode(config.console_encoding))
-        p.stdin.flush()  # _communicate() otherwise has a broken pipe
+        data_in = data_in.encode(config.console_encoding)
 
     try:
-        stdout_data, stderr_data = p.communicate(timeout=timeout)
+        stdout_data, stderr_data = p.communicate(input=data_in,
+                                                 timeout=timeout)
     except TimeoutExpired:
         p.kill()
         stdout_data, stderr_data = p.communicate()

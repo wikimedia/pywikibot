@@ -16,15 +16,14 @@ This module is responsible for
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-
 __docformat__ = 'epytext'
 
 import atexit
 import sys
 
+from http import cookiejar
 from string import Formatter
+from urllib.parse import quote, urlparse
 from warnings import warn
 
 import requests
@@ -41,8 +40,7 @@ from pywikibot.tools import (
     deprecate_arg,
     file_mode_checker,
     issue_deprecation_warning,
-    PY2,
-    StringTypes,
+    ModuleDeprecationWrapper,
 )
 import pywikibot.version
 
@@ -51,14 +49,6 @@ try:
 except ImportError as e:
     requests_oauthlib = e
 
-if not PY2:
-    from http import cookiejar as cookielib
-    from urllib.parse import quote, urlparse
-else:
-    import cookielib
-    from urllib2 import quote
-    from urlparse import urlparse
-
 
 # The error message for failed SSL certificate verification
 # 'certificate verify failed' is a commonly detectable string
@@ -66,48 +56,12 @@ SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
 _logger = 'comm.http'
 
-
-# Should be marked as deprecated after PywikibotCookieJar is removed.
-def mode_check_decorator(func):
-    """Decorate load()/save() CookieJar methods."""
-    def wrapper(cls, **kwargs):
-        try:
-            filename = kwargs['filename']
-        except KeyError:
-            filename = cls.filename
-        res = func(cls, **kwargs)
-        file_mode_checker(filename, mode=0o600)
-        return res
-    return wrapper
-
-
-# in PY2 cookielib.LWPCookieJar is not a new-style class.
-class PywikibotCookieJar(cookielib.LWPCookieJar, object):
-
-    """DEPRECATED. CookieJar which checks file permissions."""
-
-    @deprecated(since='20181007')
-    def __init__(self, *args, **kwargs):
-        """Initialize the class."""
-        super(PywikibotCookieJar, self).__init__(*args, **kwargs)
-
-    @mode_check_decorator
-    def load(self, **kwargs):
-        """Load cookies from file."""
-        super(PywikibotCookieJar, self).load()
-
-    @mode_check_decorator
-    def save(self, **kwargs):
-        """Save cookies to file."""
-        super(PywikibotCookieJar, self).save()
-
-
 cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
-cookie_jar = cookielib.LWPCookieJar(cookie_file_path)
+cookie_jar = cookiejar.LWPCookieJar(cookie_file_path)
 try:
     cookie_jar.load()
-except cookielib.LoadError:
+except cookiejar.LoadError:
     debug('Loading cookies failed.', _logger)
 else:
     debug('Loaded cookies from file.', _logger)
@@ -240,7 +194,7 @@ def get_fake_user_agent():
 
     @rtype: str
     """
-    if isinstance(config.fake_user_agent, StringTypes):
+    if isinstance(config.fake_user_agent, str):
         return config.fake_user_agent
     if config.fake_user_agent is False:
         return user_agent()
@@ -356,8 +310,6 @@ def _http_process(session, http_request):
     params = http_request.params
     body = http_request.body
     headers = http_request.headers
-    if PY2 and headers:
-        headers = {key: str(value) for key, value in headers.items()}
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
@@ -501,9 +453,8 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         use_fake_user_agent = config.fake_user_agent_exceptions.get(
             uri_domain, use_fake_user_agent)
 
-        if use_fake_user_agent and isinstance(
-                use_fake_user_agent, StringTypes):  # Custom UA.
-            headers['user-agent'] = use_fake_user_agent
+        if use_fake_user_agent and isinstance(use_fake_user_agent, str):
+            headers['user-agent'] = use_fake_user_agent  # Custom UA.
         elif use_fake_user_agent is True:
             headers['user-agent'] = fake_user_agent()
 
@@ -515,3 +466,45 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     if default_error_handling:
         error_handling_callback(request)
     return request
+
+# Deprecated parts ############################################################
+
+
+def _mode_check_decorator(func):
+    """DEPRECATED. Decorate load()/save() CookieJar methods."""
+    def wrapper(cls, **kwargs):
+        try:
+            filename = kwargs['filename']
+        except KeyError:
+            filename = cls.filename
+        res = func(cls, **kwargs)
+        file_mode_checker(filename, mode=0o600)
+        return res
+    return wrapper
+
+
+class PywikibotCookieJar(cookiejar.LWPCookieJar):
+
+    """DEPRECATED. CookieJar which checks file permissions."""
+
+    @deprecated(since='20181007', future_warning=True)
+    def __init__(self, *args, **kwargs):
+        """Initialize the class."""
+        super().__init__(*args, **kwargs)
+
+    @_mode_check_decorator
+    def load(self, **kwargs):
+        """Load cookies from file."""
+        super().load()
+
+    @_mode_check_decorator
+    def save(self, **kwargs):
+        """Save cookies to file."""
+        super().save()
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('PywikibotCookieJar', replacement_name='',
+                             since='20181007', future_warning=True)
+wrapper._add_deprecated_attr('mode_check_decorator', _mode_check_decorator,
+                             since='20200724', future_warning=True)

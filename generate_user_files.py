@@ -216,7 +216,6 @@ mylang = '{main_code}'
 {config_text}"""
 
 SMALL_CONFIG = """# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
 family = '{main_family}'
 mylang = '{main_code}'
 {usernames}
@@ -234,7 +233,6 @@ PASSFILE_CONFIG = """# -*- coding: utf-8 -*-
 #
 # See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords for more
 # information.
-from __future__ import absolute_import, division, unicode_literals
 {botpasswords}"""
 
 
@@ -343,7 +341,7 @@ def create_user_config(main_family, main_code, main_username, force=False):
         # Arbitrarily use the first key as default settings
         main_family, main_code = userlist[0].family, userlist[0].code
     botpasswords = '\n'.join(
-        "('{0}', BotPassword('{1}', '{2}'))".format(*botpassword)
+        "('{}', BotPassword('{}', {!r}))".format(*botpassword)
         for botpassword in botpasswords)
 
     config_text = copy_sections()

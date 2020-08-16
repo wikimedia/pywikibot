@@ -20,7 +20,6 @@ This script supports the following command line parameters:
 #
 import binascii
 import os.path
-import sys
 
 from os import remove, replace, symlink, urandom
 
@@ -33,7 +32,7 @@ class DownloadDumpBot(Bot):
 
     """Download dump bot."""
 
-    availableOptions = {
+    availableOptions = {  # noqa: N815
         'wikiname': '',
         'filename': '',
         'storepath': './',
@@ -191,7 +190,7 @@ def main(*args):
 
     local_args = pywikibot.handle_args(args)
     for arg in local_args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         if option.startswith('-'):
             option = option[1:]
             if option == 'filename':
@@ -225,4 +224,4 @@ def main(*args):
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    main()

@@ -1,33 +1,21 @@
-Current release
-~~~~~~~~~~~~~~~
+Current release changes
+~~~~~~~~~~~~~~~~~~~~~~~
 
-* Read correct object in SiteLinkCollection.normalizeData (T259426)
-* tools.count and tools classes Counter, OrderedDict and ContextManagerWrapper were removed
-* Deprecate UnicodeMixin and IteratorNextMixin
-* Restrict site module interface
-* EventStreams "since" parameter settings has been fixed
-* Unsupported debug and uploadByUrl parameters of UploadRobot were removed
-* Unported compat decode parameter of Page.title() has been removed
-* Wikihow family file was added (T249814)
-* Improve performance of CosmeticChangesToolkit.translateMagicWords
-* Prohibit positional arguments with Page.title()
-* Functions dealing with stars list were removed
-* Some pagegenerators functions were deprecated which should be replaced by site generators
-* LogEntry became a UserDict; all content can be accessed by its key
-* URLs for new toolforge.org domain were updated
-* pywikibot.__release__ was deprecated
-* Use one central point for framework version (T106121, T171886, T197936, T253719)
-* rvtoken parameter of Site.loadrevisions() and Page.revisions() has been dropped (T74763)
-* getFilesFromAnHash and getImagesFromAnHash Site methods have been removed
-* Site and Page methods deprecated for 10 years or longer have been removed
-* Support for Python 2 and 3.4 has been dropped (T213287, T239542)
+* APISite.loadpageinfo does not discard changes to page content when information was not loaded (T260472)
+* tools.UnicodeType and tools.signature are deprecated
+* BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
+* Escape bot password correctly (T259488)
 * Bugfixes and improvements
 * Localisation updates
 
-Future releases
-~~~~~~~~~~~~~~~
 
-* 4.0.0: Deprecate tools.UnicodeMixin and tools.IteratorNextMixin will be removed
+Future release notes
+~~~~~~~~~~~~~~~~~~~~
+
+* 4.1.0: Deprecated editor.command will be removed
+* 4.1.0: tools.open_compressed, tools.UnicodeType and tools.signature will be removed
+* 4.1.0: comms.PywikibotCookieJar and comms.mode_check_decorator will be removed
+* 4.0.0: Deprecated tools.UnicodeMixin and tools.IteratorNextMixin will be removed
 * 4.0.0: Site.Family() function will be removed in favour of Family.load() method
 * 4.0.0: Site.getExpandedString method will be removed in favour of expand_text
 * 4.0.0: Unused parameters of page methods like forceReload, insite, throttle, step will be removed

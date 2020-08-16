@@ -85,6 +85,8 @@ The contents of the package
     | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
     |                        | pages in the "Page" namespace on Wikisource.            |
     +------------------------+---------------------------------------------------------+
+    | download_dump.py       | Downloads dumps from dumps.wikimedia.org                |
+    +------------------------+---------------------------------------------------------+
     | editarticle.py         | Edit a Wikipedia article with your favourite editor     |
     +------------------------+---------------------------------------------------------+
     | fixing_redirects.py    | Correct all redirect links of processed pages.          |

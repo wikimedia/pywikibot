@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for the flow module."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot.exceptions import NoPage
 from pywikibot.flow import Board, Topic, Post
-from pywikibot.tools import UnicodeType as unicode
 
 from tests import unittest
 from tests.aspects import (
@@ -32,7 +31,7 @@ class TestMediaWikiFlowSandbox(TestCase):
         """Set up unit test."""
         self._page = Board(self.site,
                            'Project talk:Sandbox/Structured_Discussions_test')
-        super(TestMediaWikiFlowSandbox, self).setUp()
+        super().setUp()
 
 
 class TestBoardBasePageMethods(BasePageMethodsTestBase,
@@ -61,7 +60,7 @@ class TestTopicBasePageMethods(BasePageMethodsTestBase):
     def setUp(self):
         """Set up unit test."""
         self._page = Topic(self.site, 'Topic:Sh6wgo5tu3qui1w2')
-        super(TestTopicBasePageMethods, self).setUp()
+        super().setUp()
 
     def test_basepage_methods(self):
         """Test basic Page methods on a Flow topic page."""
@@ -122,24 +121,24 @@ class TestFlowLoading(TestMediaWikiFlowSandbox):
         wikitext = post.get(format='wikitext')
         self.assertIn('wikitext', post._content)
         self.assertNotIn('html', post._content)
-        self.assertIsInstance(wikitext, unicode)
+        self.assertIsInstance(wikitext, str)
         self.assertNotEqual(wikitext, '')
         # HTML
         html = post.get(format='html')
         self.assertIn('html', post._content)
         self.assertIn('wikitext', post._content)
-        self.assertIsInstance(html, unicode)
+        self.assertIsInstance(html, str)
         self.assertNotEqual(html, '')
         # Caching (hit)
         post._content['html'] = 'something'
         html = post.get(format='html')
-        self.assertIsInstance(html, unicode)
+        self.assertIsInstance(html, str)
         self.assertEqual(html, 'something')
         self.assertIn('html', post._content)
         # Caching (reload)
         post._content['html'] = 'something'
         html = post.get(format='html', force=True)
-        self.assertIsInstance(html, unicode)
+        self.assertIsInstance(html, str)
         self.assertNotEqual(html, 'something')
         self.assertIn('html', post._content)
 
@@ -247,7 +246,5 @@ class TestFlowTopic(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
