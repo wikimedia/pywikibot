@@ -609,13 +609,13 @@ class BasePage(ComparableMixin):
         @return: text of the page
         @rtype: str
         """
-        if not hasattr(self, '_text') or self._text is None:
-            try:
-                self._text = self.get(get_redirect=True)
-            except pywikibot.NoPage:
-                # TODO: what other exceptions might be returned?
-                self._text = ''
-        return self._text
+        if getattr(self, '_text', None) is not None:
+            return self._text
+        try:
+            return self.get(get_redirect=True)
+        except pywikibot.NoPage:
+            # TODO: what other exceptions might be returned?
+            return ''
 
     @text.setter
     def text(self, value):
@@ -625,9 +625,8 @@ class BasePage(ComparableMixin):
         @param value: New value or None
         @type value: basestring
         """
+        del self.text
         self._text = None if value is None else str(value)
-        if hasattr(self, '_raw_extracted_templates'):
-            del self._raw_extracted_templates
 
     @text.deleter
     def text(self):
@@ -1452,6 +1451,8 @@ class BasePage(ComparableMixin):
 
         minor and botflag parameters are set to False which prevents hiding
         the edit when it becomes a real edit due to a bug.
+
+        @note: This discards content saved to self.text.
         """
         if self.exists():
             # ensure always get the page text and not to change it.
