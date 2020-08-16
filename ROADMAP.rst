@@ -1,13 +1,19 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* APISite.loadpageinfo does not discard changes to page content when information was not loaded (T260472)
+* tools.UnicodeType and tools.signature are deprecated
 * BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
 * Escape bot password correctly (T259488)
+* Bugfixes and improvements
+* Localisation updates
 
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 4.1.0: Deprecated editor.command will be removed
+* 4.1.0: tools.open_compressed, tools.UnicodeType and tools.signature will be removed
 * 4.1.0: comms.PywikibotCookieJar and comms.mode_check_decorator will be removed
 * 4.0.0: Deprecated tools.UnicodeMixin and tools.IteratorNextMixin will be removed
 * 4.0.0: Site.Family() function will be removed in favour of Family.load() method
