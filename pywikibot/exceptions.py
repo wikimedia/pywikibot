@@ -225,16 +225,12 @@ class UnsupportedPage(PageRelatedError):
     # namespaces < 0 aren't supported (T169213)
     message = 'Page %s is not supported due to namespace restriction.'
 
-    pass
-
 
 class NoMoveTarget(PageRelatedError):
 
     """Expected move target page not found."""
 
     message = 'Move target page of %s not found.'
-
-    pass
 
 
 class PageLoadRelatedError(PageRelatedError):
@@ -301,16 +297,12 @@ class IsRedirectPage(PageRelatedError):
 
     message = 'Page %s is a redirect page.'
 
-    pass
-
 
 class IsNotRedirectPage(PageRelatedError):
 
     """Page is not a redirect page."""
 
     message = 'Page %s is not a redirect page.'
-
-    pass
 
 
 class CircularRedirect(PageRelatedError):
@@ -363,8 +355,6 @@ class LockedPage(PageSaveRelatedError):
 
     message = 'Page %s is locked.'
 
-    pass
-
 
 class LockedNoPage(LockedPage):
 
@@ -372,16 +362,12 @@ class LockedNoPage(LockedPage):
 
     message = 'Page %s does not exist and is locked preventing creation.'
 
-    pass
-
 
 class CascadeLockedPage(LockedPage):
 
     """Page is locked due to cascading protection."""
 
     message = 'Page %s is locked due to cascading protection.'
-
-    pass
 
 
 class SectionError(Error):
@@ -400,16 +386,12 @@ class NoCreateError(PageSaveRelatedError):
 
     message = 'Page %s could not be created due to parameter nocreate'
 
-    pass
-
 
 class EditConflict(PageSaveRelatedError):
 
     """There has been an edit conflict while uploading the page."""
 
     message = 'Page %s could not be saved due to an edit conflict'
-
-    pass
 
 
 class PageDeletedConflict(EditConflict):
@@ -418,16 +400,12 @@ class PageDeletedConflict(EditConflict):
 
     message = 'Page %s has been deleted since last retrieved.'
 
-    pass
-
 
 class PageCreatedConflict(EditConflict):
 
     """Page was created by another user."""
 
     message = 'Page %s has been created since last retrieved.'
-
-    pass
 
 
 class ArticleExistsConflict(EditConflict):
@@ -436,8 +414,6 @@ class ArticleExistsConflict(EditConflict):
 
     message = ('Destination article %s already exists and is not a redirect '
                'to the source article')
-
-    pass
 
 
 class SpamblacklistError(PageSaveRelatedError):
@@ -458,8 +434,6 @@ class TitleblacklistError(PageSaveRelatedError):
     """Page save failed because MediaWiki detected a blacklisted page title."""
 
     message = 'Page %s is title-blacklisted.'
-
-    pass
 
 
 class ServerError(Error):
