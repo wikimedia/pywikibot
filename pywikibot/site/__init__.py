@@ -2587,13 +2587,15 @@ class APISite(BaseSite):
 
         if MediaWikiVersion(version) < MediaWikiVersion('1.19'):
             warn('\n'
-                 + fill('Support of MediaWiki {version} will be dropped. '
+                 + fill('Support of MediaWiki {mw_version} will be dropped. '
                         'It is recommended to use MediaWiki 1.19 or above. '
-                        'You may use every Pywikibot 3.0.X release from '
-                        'pypi index or the "python2" release from the '
+                        'You may use every Pywikibot 3.0.X release, Pywikibot '
+                        '"{py_version}" or the "python2" release from the '
                         'repository for older MediaWiki versions. '
                         'See T245350 for further information.'
-                        .format(version=version)), FutureWarning)
+                        .format(mw_version=version,
+                                py_version=pywikibot.__version__)),
+                 FutureWarning)
 
         return version
 
