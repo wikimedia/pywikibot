@@ -1232,7 +1232,7 @@ ignoreTemplates = ['1000Bit',
                    'Zh-hk',
                    'Zh-min-nan',
                    'Zh-sg',
-                   'Zh-tw'
+                   'Zh-tw',
                    'Zh-yue',
                    'Zlib',
                    'Zu',

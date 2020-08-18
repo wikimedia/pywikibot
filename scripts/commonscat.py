@@ -204,7 +204,7 @@ ignoreTemplates = {
     'zh': ['Category redirect', 'cr', 'Commons',
            'Sisterlinks', 'Sisterlinkswp',
            'Tracking category', 'Trackingcatu',
-           'Template category', 'Wikipedia category'
+           'Template category', 'Wikipedia category',
            '分类重定向', '追蹤分類', '共享資源', '追蹤分類'],
 }
 

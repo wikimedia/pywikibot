@@ -302,7 +302,7 @@ def getversion_git(path=None):
         tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
     dp = subprocess.Popen([cmd, '--no-pager',
                            'log', '-1',
-                           '--pretty=format:"%ad|%an|%h|%H|%d"'
+                           '--pretty=format:"%ad|%an|%h|%H|%d"',
                            '--abbrev-commit',
                            '--date=iso'],
                           cwd=_program_dir,

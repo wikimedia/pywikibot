@@ -1,6 +1,17 @@
 Release history
 ===============
 
+4.1.0
+-----
+
+* APISite.loadpageinfo does not discard changes to page content when information was not loaded (T260472)
+* tools.UnicodeType and tools.signature are deprecated
+* BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
+* Escape bot password correctly (T259488)
+* Bugfixes and improvements
+* Localisation updates
+
+
 4.0.0
 -----
 
