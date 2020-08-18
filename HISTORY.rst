@@ -1,6 +1,13 @@
 Release history
 ===============
 
+4.1.1
+-----
+
+* Add support for lldwiki to Pywikibot
+* Fix getversion_git subprocess command
+
+
 4.1.0
 -----
 

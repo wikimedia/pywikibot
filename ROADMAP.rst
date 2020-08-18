@@ -1,8 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Add support for lldwiki to Pywikibot
-* Fix getversion_git subprocess command
+*  (no changes yet)
 
 
 Future release notes
