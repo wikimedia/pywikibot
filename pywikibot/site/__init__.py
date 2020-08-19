@@ -2383,12 +2383,6 @@ class APISite(BaseSite):
             key = '*'
         return req.submit()['expandtemplates'][key]
 
-    getExpandedString = redirect_func(expand_text,
-                                      old_name='getExpandedString',
-                                      class_name='APISite',
-                                      since='20170504',
-                                      future_warning=True)
-
     def getcurrenttimestamp(self):
         """
         Return the server time as a MediaWiki timestamp string.
