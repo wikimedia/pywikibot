@@ -1,14 +1,15 @@
-FROM python:3.8-slim
+FROM python:3.8
 
 WORKDIR /code
 
 COPY requirements.txt .
+COPY dev-requirements.txt .
 RUN pip install -r requirements.txt
+RUN pip install -r dev-requirements.txt
 
 COPY . .
 RUN pip3 install .
 
 ENV PYTHONPATH=/code:/code/scripts
-
 ENTRYPOINT ["python", "/code/pwb.py"]
 CMD ["version"]
