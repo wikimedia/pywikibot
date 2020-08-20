@@ -756,8 +756,8 @@ class GeneratorFactory:
             for a, b in zip_longest(pages[::2], pages[1::2], fillvalue=''):
                 txt += '    {a:<{max_w}}{b}\n'.format(a=a, b=b, max_w=max_w)
             txt += ('\nMaximum number of pages to return is {max} '
-                    '({highmax} for bots).\n'.format(**limit))
-            pywikibot.output('%s' % txt)
+                    '({highmax} for bots).\n'.format_map(limit))
+            pywikibot.output(txt)
             sys.exit(0)
 
         return self.site.querypage(value)

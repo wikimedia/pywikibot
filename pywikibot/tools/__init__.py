@@ -1409,14 +1409,14 @@ def deprecated_args(**arg_pairs):
                     if new_arg in __kw:
                         warn('{new_arg} argument of {name} '
                              'replaces {old_arg}; cannot use both.'
-                             .format(**output_args),
+                             .format_map(output_args),
                              RuntimeWarning, depth)
                     else:
                         # If the value is positionally given this will
                         # cause a TypeError, which is intentional
                         warn('{old_arg} argument of {name} '
                              'is deprecated; use {new_arg} instead.'
-                             .format(**output_args),
+                             .format_map(output_args),
                              DeprecationWarning, depth)
                         __kw[new_arg] = __kw[old_arg]
                 elif new_arg == '':
@@ -1429,7 +1429,7 @@ def deprecated_args(**arg_pairs):
                     else:  # new_arg is None
                         cls = DeprecationWarning
                     warn('{old_arg} argument of {name} is deprecated.'
-                         .format(**output_args),
+                         .format_map(output_args),
                          cls, depth)
                 del __kw[old_arg]
 
