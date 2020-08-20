@@ -21,6 +21,7 @@ import time
 import types
 
 from collections.abc import Iterator, Mapping
+from contextlib import suppress
 from datetime import datetime
 from distutils.version import LooseVersion, Version
 from functools import wraps
@@ -28,6 +29,7 @@ from importlib import import_module
 from inspect import getfullargspec
 from ipaddress import ip_address
 from itertools import zip_longest
+from typing import Optional
 from warnings import catch_warnings, showwarning, warn
 
 from pywikibot.logging import debug
@@ -62,21 +64,17 @@ class _NotImplementedWarning(RuntimeWarning):
     pass
 
 
-def is_IP(IP):  # noqa N802, N803
+def is_IP(IP: str) -> bool:  # noqa N802, N803
     """Verify the IP address provided is valid.
 
     No logging is performed. Use ip_address instead to catch errors.
 
     @param IP: IP address
-    @type IP: str
-    @rtype: bool
     """
-    try:
+    with suppress(ValueError):
         ip_address(IP)
-    except ValueError:
-        pass
-    else:
         return True
+
     return False
 
 
@@ -366,7 +364,7 @@ class DeprecatedRegex(LazyRegex):
         return super().__getattr__(attr)
 
 
-def first_lower(string):
+def first_lower(string: str) -> str:
     """
     Return a string with the first character uncapitalized.
 
@@ -375,7 +373,7 @@ def first_lower(string):
     return string[:1].lower() + string[1:]
 
 
-def first_upper(string):
+def first_upper(string: str) -> str:
     """
     Return a string with the first character capitalized.
 
@@ -389,7 +387,7 @@ def first_upper(string):
     return (_first_upper_exception(first) or first.upper()) + string[1:]
 
 
-def normalize_username(username):
+def normalize_username(username) -> Optional[str]:
     """Normalize the username."""
     if not username:
         return None
@@ -426,7 +424,7 @@ class MediaWikiVersion(Version):
     def from_generator(cls, generator):
         """Create instance using the generator string."""
         if not generator.startswith('MediaWiki '):
-            raise ValueError('Generator string ({0!r}) must start with '
+            raise ValueError('Generator string ({!r}) must start with '
                              '"MediaWiki "'.format(generator))
         return cls(generator[len('MediaWiki '):])
 
@@ -434,7 +432,7 @@ class MediaWikiVersion(Version):
         """Parse version string."""
         version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
         if not version_match:
-            raise ValueError('Invalid version number "{0}"'.format(vstring))
+            raise ValueError('Invalid version number "{}"'.format(vstring))
         components = [int(n) for n in version_match.group(1).split('.')]
         # The _dev_version numbering scheme might change. E.g. if a stage
         # between 'alpha' and 'beta' is added, 'beta', 'rc' and stable releases
@@ -451,11 +449,11 @@ class MediaWikiVersion(Version):
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
                 # if any of those pops up here our parser has failed
                 assert handled not in version_match.group(2), \
-                    'Found "{0}" in "{1}"'.format(handled,
-                                                  version_match.group(2))
+                    'Found "{}" in "{}"'.format(handled,
+                                                version_match.group(2))
             if version_match.group(2):
                 debug('Additional unused version part '
-                      '"{0}"'.format(version_match.group(2)),
+                      '"{}"'.format(version_match.group(2)),
                       _logger)
             self._dev_version = (4, )
         self.suffix = version_match.group(2) or ''
@@ -568,7 +566,7 @@ class ThreadedGenerator(threading.Thread):
         self.stop()
 
 
-def itergroup(iterable, size):
+def itergroup(iterable, size: int):
     """Make an iterator that returns lists of (up to) size items from iterable.
 
     Example:
@@ -584,7 +582,6 @@ def itergroup(iterable, size):
     Traceback (most recent call last):
      ...
     StopIteration
-
     """
     group = []
     for item in iterable:
@@ -596,7 +593,7 @@ def itergroup(iterable, size):
         yield group
 
 
-def islice_with_ellipsis(iterable, *args, **kwargs):
+def islice_with_ellipsis(iterable, *args, marker='…'):
     """
     Generator which yields the first n elements of the iterable.
 
@@ -611,31 +608,16 @@ def islice_with_ellipsis(iterable, *args, **kwargs):
     @param args: same args as:
         - C{itertools.islice(iterable, stop)}
         - C{itertools.islice(iterable, start, stop[, step])}
-    @keyword marker: element to yield if iterable still contains elements
-        after showing the required number.
-        Default value: '…'
-        No other kwargs are considered.
+    @param marker: element to yield if iterable still contains elements
+        after showing the required number. Default value: '…'
     @type marker: str
     """
     s = slice(*args)
-    marker = kwargs.pop('marker', '…')
-    try:
-        k, v = kwargs.popitem()
-        raise TypeError(
-            "islice_with_ellipsis() take only 'marker' as keyword arg, not %s"
-            % k)
-    except KeyError:
-        pass
-
     _iterable = iter(iterable)
-    for el in itertools.islice(_iterable, *args):
-        yield el
+    yield from itertools.islice(_iterable, *args)
     if marker and s.stop is not None:
-        try:
+        with suppress(StopIteration):
             next(_iterable)
-        except StopIteration:
-            pass
-        else:
             yield marker
 
 
@@ -673,7 +655,8 @@ class ThreadList(list):
         super().__init__(*args)
         for item in self:
             if not isinstance(item, threading.Thread):
-                raise TypeError("Cannot add '%s' to ThreadList" % type(item))
+                raise TypeError("Cannot add '{}' to ThreadList"
+                                .format(type(item)))
 
     def active_count(self):
         """Return the number of alive threads and delete all non-alive ones."""
@@ -688,22 +671,25 @@ class ThreadList(list):
     def append(self, thd):
         """Add a thread to the pool and start it."""
         if not isinstance(thd, threading.Thread):
-            raise TypeError("Cannot append '%s' to ThreadList" % type(thd))
+            raise TypeError("Cannot append '{}' to ThreadList"
+                            .format(type(thd)))
+
         while self.active_count() >= self.limit:
             time.sleep(self.wait_time)
+
         super().append(thd)
         thd.start()
-        debug("thread %d ('%s') started" % (len(self), type(thd)),
+        debug("thread {} ('{}') started".format(len(self), type(thd)),
               self._logger)
 
     def stop_all(self):
         """Stop all threads the pool."""
         if self:
-            debug('EARLY QUIT: Threads: %d' % len(self), self._logger)
+            debug('EARLY QUIT: Threads: {}'.format(len(self)), self._logger)
         for thd in self:
             thd.stop()
-            debug('EARLY QUIT: Queue size left in %s: %s'
-                  % (thd, thd.queue.qsize()), self._logger)
+            debug('EARLY QUIT: Queue size left in {}: {}'
+                  .format(thd, thd.queue.qsize()), self._logger)
 
 
 def intersect_generators(genlist):
@@ -725,7 +711,7 @@ def intersect_generators(genlist):
     # If any generator is empty, no pages are going to be returned
     for source in genlist:
         if not source:
-            debug('At least one generator ({0!r}) is empty and execution was '
+            debug('At least one generator ({!r}) is empty and execution was '
                   'skipped immediately.'.format(source), 'intersect')
             return
 
@@ -907,7 +893,7 @@ class SelfCallMixin:
     def __call__(self):
         """Do nothing and just return itself."""
         if hasattr(self, '_own_desc'):
-            issue_deprecation_warning('Calling {0}'.format(self._own_desc),
+            issue_deprecation_warning('Calling {}'.format(self._own_desc),
                                       'it directly', since='20150515')
         return self
 
@@ -976,10 +962,19 @@ def open_archive(filename, mode='rb', use_extension=True):
     @return: A file-like object returning the uncompressed data in binary mode.
     @rtype: file-like object
     """
+    # extension_map maps magic_number to extension.
+    # Unfortunately, legacy LZMA container has no magic number
+    extension_map = {
+        b'BZh': 'bz2',
+        b'\x1F\x8B\x08': 'gz',
+        b"7z\xBC\xAF'\x1C": '7z',
+        b'\xFD7zXZ\x00': 'xz',
+    }
+
     if mode in ('r', 'a', 'w'):
         mode += 'b'
     elif mode not in ('rb', 'ab', 'wb'):
-        raise ValueError('Invalid mode: "{0}"'.format(mode))
+        raise ValueError('Invalid mode: "{}"'.format(mode))
 
     if use_extension:
         # if '.' not in filename, it'll be 1 character long but otherwise
@@ -990,15 +985,11 @@ def open_archive(filename, mode='rb', use_extension=True):
             raise ValueError('Magic number detection only when reading')
         with open(filename, 'rb') as f:
             magic_number = f.read(8)
-        if magic_number.startswith(b'BZh'):
-            extension = 'bz2'
-        elif magic_number.startswith(b'\x1F\x8B\x08'):
-            extension = 'gz'
-        elif magic_number.startswith(b"7z\xBC\xAF'\x1C"):
-            extension = '7z'
-        # Unfortunately, legacy LZMA container format has no magic number
-        elif magic_number.startswith(b'\xFD7zXZ\x00'):
-            extension = 'xz'
+
+        for pattern in extension_map:
+            if magic_number.startswith(pattern):
+                extension = extension_map[pattern]
+                break
         else:
             extension = ''
 
@@ -1006,8 +997,10 @@ def open_archive(filename, mode='rb', use_extension=True):
         if isinstance(bz2, ImportError):
             raise bz2
         return bz2.BZ2File(filename, mode)
+
     if extension == 'gz':
         return gzip.open(filename, mode)
+
     if extension == '7z':
         if mode != 'rb':
             raise NotImplementedError('It is not possible to write a 7z file.')
@@ -1019,24 +1012,22 @@ def open_archive(filename, mode='rb', use_extension=True):
                                        bufsize=65535)
         except OSError:
             raise ValueError('7za is not installed or cannot '
-                             'uncompress "{0}"'.format(filename))
+                             'uncompress "{}"'.format(filename))
         else:
             stderr = process.stderr.read()
             process.stderr.close()
             if stderr != b'':
                 process.stdout.close()
                 raise OSError(
-                    'Unexpected STDERR output from 7za {0}'.format(stderr))
-            else:
-                return process.stdout
-    if extension == 'lzma':
+                    'Unexpected STDERR output from 7za {}'.format(stderr))
+            return process.stdout
+
+    if extension in ('lzma', 'xz'):
         if isinstance(lzma, ImportError):
             raise lzma
-        return lzma.open(filename, mode, format=lzma.FORMAT_ALONE)
-    if extension == 'xz':
-        if isinstance(lzma, ImportError):
-            raise lzma
-        return lzma.open(filename, mode, format=lzma.FORMAT_XZ)
+        lzma_fmts = {'lzma': lzma.FORMAT_ALONE, 'xz': lzma.FORMAT_XZ}
+        return lzma.open(filename, mode, format=lzma_fmts[extension])
+
     # assume it's an uncompressed file
     return open(filename, 'rb')
 
@@ -1055,7 +1046,7 @@ def merge_unique_dicts(*args, **kwargs):
         conflicts |= set(arg.keys()) & set(result.keys())
         result.update(arg)
     if conflicts:
-        raise ValueError('Multiple dicts contain the same keys: {0}'
+        raise ValueError('Multiple dicts contain the same keys: {}'
                          .format(', '.join(sorted(str(key)
                                                   for key in conflicts))))
     return result
@@ -1098,11 +1089,10 @@ def add_decorated_full_name(obj, stacklevel=1):
     frame = sys._getframe(stacklevel + 1)
     class_name = frame.f_code.co_name
     if class_name and class_name != '<module>':
-        obj.__full_name__ = '{}.{}.{}'.format(
-            obj.__module__, class_name, obj.__name__)
+        obj.__full_name__ = '{}.{}.{}'.format(obj.__module__,
+                                              class_name, obj.__name__)
     else:
-        obj.__full_name__ = '{}.{}'.format(
-            obj.__module__, obj.__name__)
+        obj.__full_name__ = '{}.{}'.format(obj.__module__, obj.__name__)
 
 
 def manage_wrapping(wrapper, obj):
@@ -1182,7 +1172,7 @@ def add_full_name(obj):
 
         # The decorator being decorated may have args, so both
         # syntax need to be supported.
-        if (len(outer_args) == 1 and len(outer_kwargs) == 0
+        if (len(outer_args) == 1 and not outer_kwargs
                 and callable(outer_args[0])):
             add_decorated_full_name(outer_args[0])
             return obj(outer_args[0])
@@ -1212,17 +1202,17 @@ def _build_msg_string(instead, since):
             years = 0
             months += 12
         if years:
-            year_str = '{0} years'.format(years)
+            year_str = '{} years'.format(years)
         else:
-            day_str = '{0} day{1}'.format(days, 's' if days != 1 else '')
+            day_str = '{} day{}'.format(days, 's' if days != 1 else '')
         if months:
-            month_str = '{0} month{1}'.format(
+            month_str = '{} month{}'.format(
                 months, 's' if months != 1 else '')
         if year_str and month_str:
             year_str += ' and '
         if month_str and day_str:
             month_str += ' and '
-        since = ' for {0}{1}{2}'.format(year_str, month_str, day_str)
+        since = ' for {}{}{}'.format(year_str, month_str, day_str)
     if instead:
         msg = '{{0}} is deprecated{since}; use {{1}} instead.'
     else:
@@ -1230,12 +1220,11 @@ def _build_msg_string(instead, since):
     return msg.format(since=since)
 
 
-def issue_deprecation_warning(name, instead=None, depth=2, warning_class=None,
-                              since=None):
+def issue_deprecation_warning(name: str, instead=None, depth=2,
+                              warning_class=None, since=None):
     """Issue a deprecation warning.
 
     @param name: the name of the deprecated object
-    @type name: str
     @param instead: suggested replacement for the deprecated object
     @type instead: str or None
     @param depth: depth + 1 will be used as stacklevel for the warnings
@@ -1344,12 +1333,12 @@ def deprecated(*args, **kwargs):
             return args[0]
 
         return decorator(args[0])
+
     # Otherwise return a decorator, which returns a replacement function
-    else:
-        return decorator
+    return decorator
 
 
-def deprecate_arg(old_arg, new_arg):
+def deprecate_arg(old_arg: str, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg.
 
     Usage:
@@ -1367,7 +1356,6 @@ def deprecate_arg(old_arg, new_arg):
     a reserved word in future Python releases and to prevent syntax errors.
 
     @param old_arg: old keyword
-    @type old_arg: str
     @param new_arg: new keyword
     @type new_arg: str or None or bool
     """
@@ -1509,8 +1497,8 @@ def remove_last_args(arg_names):
             depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
-                raise ValueError('{0} may not have * or ** args.'.format(
-                    name))
+                raise ValueError('{} may not have * or ** args.'
+                                 .format(name))
             deprecated = set(__kw) & set(arg_names)
             if len(__args) > len(args):
                 deprecated.update(arg_names[:len(__args) - len(args)])
@@ -1523,11 +1511,10 @@ def remove_last_args(arg_names):
             if deprecated:
                 # sort them according to arg_names
                 deprecated = [arg for arg in arg_names if arg in deprecated]
-                warn("The trailing arguments ('{0}') of {1} are deprecated. "
-                     "The value(s) provided for '{2}' have been dropped.".
-                     format("', '".join(arg_names),
-                            name,
-                            "', '".join(deprecated)),
+                warn("The trailing arguments ('{}') of {} are deprecated. "
+                     "The value(s) provided for '{}' have been dropped."
+                     .format("', '".join(arg_names), name,
+                             "', '".join(deprecated)),
                      DeprecationWarning, depth)
             return obj(*new_args, **new_kwargs)
 
@@ -1621,7 +1608,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         if __debug__:
             sys.modules[module.__name__] = self
 
-    def _add_deprecated_attr(self, name, replacement=None,
+    def _add_deprecated_attr(self, name: str, replacement=None,
                              replacement_name=None, warning_message=None,
                              since=None, future_warning=False):
         """
@@ -1629,7 +1616,6 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
         @param name: The name of the deprecated class or variable. It may not
             be already deprecated.
-        @type name: str
         @param replacement: The replacement value which should be returned
             instead. If the name is already an attribute of that module this
             must be None. If None it'll return the attribute of the module.
@@ -1650,13 +1636,13 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @type future_warning: bool
         """
         if '.' in name:
-            raise ValueError('Deprecated name "{0}" may not contain '
+            raise ValueError('Deprecated name "{}" may not contain '
                              '".".'.format(name))
         if name in self._deprecated:
-            raise ValueError('Name "{0}" is already deprecated.'.format(name))
+            raise ValueError('Name "{}" is already deprecated.'.format(name))
         if replacement is not None and hasattr(self._module, name):
             raise ValueError('Module has already an attribute named '
-                             '"{0}".'.format(name))
+                             '"{}".'.format(name))
 
         if replacement_name is None:
             if hasattr(replacement, '__name__'):
@@ -1691,10 +1677,12 @@ class ModuleDeprecationWrapper(types.ModuleType):
             warning_message = message
             warn(warning_message.format(self._module.__name__, attr, name),
                  FutureWarning if future else DeprecationWarning, 2)
+
             if repl:
                 return repl
-            elif '.' in name:
-                try:
+
+            if '.' in name:
+                with suppress(Exception):
                     package_name = name.split('.', 1)[0]
                     module = import_module(package_name)
                     context = {package_name: module}
@@ -1702,16 +1690,14 @@ class ModuleDeprecationWrapper(types.ModuleType):
                     self._deprecated[attr] = (
                         name, replacement, message, future)
                     return replacement
-                except Exception:
-                    pass
+
         return getattr(self._module, attr)
 
 
-def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
+def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
     """Check file mode and update it, if needed.
 
     @param filename: filename path
-    @type filename: basestring
     @param mode: requested file mode
     @type mode: int
     @param quiet: warn about file mode change if False.
@@ -1727,6 +1713,7 @@ def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
             raise
         os.close(os.open(filename, os.O_CREAT | os.O_EXCL, mode))
         return
+
     warn_str = 'File {0} had {1:o} mode; converted to {2:o} mode.'
     if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode):
         os.chmod(filename, mode)
@@ -1735,19 +1722,16 @@ def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
+def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
     """Compute file hash.
 
     Result is expressed as hexdigest().
 
     @param filename: filename path
-    @type filename: basestring
-
-    @param func: hashing function among the following in hashlib:
+    @param sha: hashing function among the following in hashlib:
         md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
         function name shall be passed as string, e.g. 'sha1'.
-    @type filename: basestring
-
+    @type sha: str
     @param bytes_to_read: only the first bytes_to_read will be considered;
         if file size is smaller, the whole file will be considered.
     @type bytes_to_read: None or int
@@ -1818,7 +1802,7 @@ def concat_options(message, line_length, options):
         if option_msg:
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
-    return '{0} ({1}):'.format(message, option_msg)
+    return '{} ({}):'.format(message, option_msg)
 
 
 @deprecated(since='20200723', future_warning=True)
