@@ -2214,6 +2214,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         if mysite.mw_version >= '1.22':
             params['revid'] = [0, 1]
 
+        raised = False
         try:
             # no such rcid, revid or too old revid
             list(mysite.patrol(**params))
@@ -2222,7 +2223,8 @@ class PatrolTestCase(TokenTestBase, TestCase):
                 self.skipTest(error)
         except pywikibot.Error:
             # expected result
-            pass
+            raised = True
+        self.assertTrue(raised, msg='pywikibot.Error not raised')
 
 
 class SiteRandomTestCase(DefaultSiteTestCase):
