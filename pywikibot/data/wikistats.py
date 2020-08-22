@@ -4,10 +4,10 @@
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
-import csv
-
 from collections import defaultdict
+from csv import DictReader
 from io import BytesIO, StringIO
+from xml.etree import ElementTree
 
 import pywikibot
 from pywikibot.comms import http
@@ -130,7 +130,7 @@ class WikiStats:
 
         raw = self.raw_cached(table, 'csv')
         f = StringIO(raw.decode('utf8'))
-        reader = csv.DictReader(f)
+        reader = DictReader(f)
         data = list(reader)
         self._data['csv'][table] = data
 
@@ -145,8 +145,6 @@ class WikiStats:
         """
         if table in self._data['xml']:
             return self._data['xml'][table]
-
-        from xml.etree import ElementTree
 
         raw = self.raw_cached(table, 'xml')
         f = BytesIO(raw)
