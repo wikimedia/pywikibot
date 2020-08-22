@@ -6,11 +6,12 @@
 # Distributed under the terms of the MIT license.
 from collections import defaultdict
 from csv import DictReader
-from io import BytesIO, StringIO
-from xml.etree import ElementTree
+from io import StringIO
 
 import pywikibot
+
 from pywikibot.comms import http
+from pywikibot.tools import deprecated, remove_last_args
 
 
 class WikiStats:
@@ -76,16 +77,16 @@ class WikiStats:
         """Initializer."""
         self.url = url
         self._raw = defaultdict(dict)
-        self._data = defaultdict(dict)
+        self._data = {}
 
-    def fetch(self, table: str, format='xml'):
+    @deprecated('get', since='20201017', future_warning=True)
+    def fetch(self, table: str, format='xml') -> bytes:
         """
-        Fetch data from WikiStats.
+        DEPRECATED. Fetch data from WikiStats.
 
         @param table: table of data to fetch
         @param format: Format of data to use
         @type format: 'xml' or 'csv'.
-        @rtype: bytes
         """
         if format == 'xml':
             path = '/{format}/{table}.{format}'
@@ -102,14 +103,14 @@ class WikiStats:
         r = http.fetch(url.format(table=table, format=format))
         return r.raw
 
-    def raw_cached(self, table: str, format):
+    @deprecated('get', since='20201017', future_warning=True)
+    def raw_cached(self, table: str, format='csv') -> bytes:
         """
-        Cache raw data.
+        DEPRECATED. Cache raw data.
 
         @param table: table of data to fetch
         @param format: format of data to use
         @type format: 'xml' or 'csv'.
-        @rtype: bytes
         """
         if table in self._raw[format]:
             return self._raw[format][table]
@@ -118,82 +119,56 @@ class WikiStats:
         self._raw[format][table] = data
         return data
 
+    @deprecated('get', since='20201017', future_warning=True)
     def csv(self, table: str) -> list:
         """
-        Fetch and parse CSV for a table.
+        DEPRECATED. Get a list of a table of data.
 
         @param table: table of data to fetch
         """
-        if table in self._data['csv']:
-            return self._data['csv'][table]
+        return self.get(table)
 
-        raw = self.raw_cached(table, 'csv')
-        f = StringIO(raw.decode('utf8'))
-        reader = DictReader(f)
-        data = list(reader)
-        self._data['csv'][table] = data
-
-        return data
-
+    @deprecated('get', since='20201017', future_warning=True)
     def xml(self, table: str) -> list:
         """
-        Fetch and parse XML for a table.
+        DEPRECATED. Get a list of a table of data.
 
         @param table: table of data to fetch
         """
-        if table in self._data['xml']:
-            return self._data['xml'][table]
+        return self.get(table)
 
-        raw = self.raw_cached(table, 'xml')
-        f = BytesIO(raw)
-        tree = ElementTree.parse(f)
-
-        data = []
-        for row in tree.findall('row'):
-            site = {}
-
-            for field in row.findall('field'):
-                name = str(field.get('name'))
-                site[name] = str(field.text)
-
-            data.append(site)
-
-        self._data['xml'][table] = data
-        return data
-
-    def get(self, table: str, format='csv') -> list:
+    @remove_last_args(['format'])
+    def get(self, table: str) -> list:
         """Get a list of a table of data.
 
         @param table: table of data to fetch
         """
-        try:
-            func = getattr(self, format)
-        except AttributeError:
-            raise NotImplementedError('Format "{}" is not supported'
-                                      .format(format))
-        return func(table)
+        if table in self._data:
+            return self._data[table]
 
-    def get_dict(self, table: str, format='csv') -> dict:
-        """Get dictionary of a table of data using format.
+        raw = self.raw_cached(table)
+        f = StringIO(raw.decode('utf8'))
+        reader = DictReader(f)
+        data = list(reader)
+        self._data[table] = data
+        return data
+
+    @remove_last_args(['format'])
+    def get_dict(self, table: str) -> dict:
+        """Get dictionary of a table of data.
 
         @param table: table of data to fetch
-        @param format: format of data to use
-        @type format: 'xml' or 'csv', or None to autoselect.
         """
-        if format is None:  # old autoselect
-            format = 'csv'
-        return {data['prefix']: data for data in self.get(table, format)}
+        return {data['prefix']: data for data in self.get(table)}
 
-    def sorted(self, table, key):
+    def sorted(self, table, key) -> list:
         """
         Reverse numerical sort of data.
 
         @param table: name of table of data
         @param key: numerical key, such as id, total, good
         """
-        return sorted(self.get(table),
-                      key=lambda d: int(d[key]),
-                      reverse=True)
+        return sorted(self.get(table), key=lambda d: int(d[key]), reverse=True)
 
     def languages_by_size(self, table: str):
         """Return ordered list of languages by size from WikiStats."""
