@@ -11,6 +11,7 @@ Release history
 4.1.0
 -----
 
+* Enable Pywikibot for Python 3.9
 * APISite.loadpageinfo does not discard changes to page content when information was not loaded (T260472)
 * tools.UnicodeType and tools.signature are deprecated
 * BaseBot.stop() method is deprecated in favour of BaseBot.generator.close()
