@@ -3705,12 +3705,13 @@ class TestPropertyNames(DefaultSiteTestCase):
         pnames = mysite.get_property_names()
         self.assertIsInstance(pnames, list)
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
-                     'forcetoc', 'graph_specs', 'hiddencat', 'newsectionlink',
+                     'forcetoc', 'hiddencat', 'index', 'newsectionlink',
                      'noeditsection', 'noexternallanglinks', 'nogallery',
                      'noindex', 'nonewsectionlink', 'notoc', 'score',
                      'templatedata', 'wikibase-badge-Q17437796',
-                     'wikibase_item'):
-            self.assertIn(item, pnames)
+                     'wikibase-badge-Q17437798', 'wikibase_item'):
+            with self.subTest(item=item):
+                self.assertIn(item, pnames)
 
 
 class TestPageFromWikibase(DefaultSiteTestCase):
