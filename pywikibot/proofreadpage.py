@@ -460,30 +460,30 @@ class ProofreadPage(pywikibot.Page):
                                       .format(title))
 
         # Property force page text loading.
-        if not (hasattr(self, '_text') or self.text):
+        text = self.text
+        if not text:
             self._create_empty_page()
             return
 
         _title = self.title(as_link=True)
 
-        open_queue = list(self.p_open.finditer(self._text))
-        close_queue = list(self.p_close.finditer(self._text))
+        open_queue = list(self.p_open.finditer(text))
+        close_queue = list(self.p_close.finditer(text))
         _assert_len(len(open_queue), len(close_queue), _title)
 
         f_open, f_close = open_queue[0], close_queue[0]
-        self._full_header = FullHeader(
-            self._text[f_open.end():f_close.start()])
+        self._full_header = FullHeader(text[f_open.end():f_close.start()])
 
         # check version of page format and in case recompute last match,
         # in order not to include </div>.
         if not self._full_header._has_div:
-            close_queue = list(self.p_close_no_div.finditer(self._text))
+            close_queue = list(self.p_close_no_div.finditer(text))
             _assert_len(len(open_queue), len(close_queue), _title)
 
         l_open, l_close = open_queue[-1], close_queue[-1]
-        self._footer = self._text[l_open.end():l_close.start()]
+        self._footer = text[l_open.end():l_close.start()]
 
-        self._body = self._text[f_close.end():l_open.start()]
+        self._body = text[f_close.end():l_open.start()]
 
     def _compose_page(self):
         """Compose Proofread Page text from header, body and footer."""
