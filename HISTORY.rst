@@ -4,12 +4,16 @@ Release history
 4.1.1
 -----
 
+*18 August 2020*
+
 * Add support for lldwiki to Pywikibot
 * Fix getversion_git subprocess command
 
 
 4.1.0
 -----
+
+*16 August 2020*
 
 * Enable Pywikibot for Python 3.9
 * APISite.loadpageinfo does not discard changes to page content when information was not loaded (T260472)
@@ -22,6 +26,8 @@ Release history
 
 4.0.0
 -----
+
+*4 August 2020*
 
 * Read correct object in SiteLinkCollection.normalizeData (T259426)
 * tools.count and tools classes Counter, OrderedDict and ContextManagerWrapper were removed
@@ -866,7 +872,7 @@ Major changes include:
 1.0
 ---
 
-*Sep 26, 2005*
+*26 September 2005*
 
 * First PyWikipediaBot framework release
 * scripts and libraries for standardizing content
