@@ -8250,21 +8250,21 @@ class DataSite(APISite):
         return pywikibot.ItemPage(self, result['entity']['id'])
 
     @deprecated_args(limit='total')
-    def search_entities(self, search, language, total=None, **kwargs):
+    def search_entities(self, search: str, language: str, total=None,
+                        **kwargs):
         """
         Search for pages or properties that contain the given text.
 
         @param search: Text to find.
-        @type search: str
         @param language: Language to search in.
-        @type language: str
         @param total: Maximum number of pages to retrieve in total, or None in
             case of no limit.
         @type total: int or None
         @return: 'search' list from API output.
         @rtype: api.APIGenerator
         """
-        lang_codes = [lang['code'] for lang in self._siteinfo.get('languages')]
+        lang_codes = self._paraminfo.parameter('wbsearchentities',
+                                               'language')['type']
         if language not in lang_codes:
             raise ValueError('Data site used does not support provided '
                              'language.')

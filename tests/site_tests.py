@@ -3415,15 +3415,6 @@ class TestDataSiteSearchEntities(WikidataTestCase):
         pages_continue = datasite.search_entities('Rembrandt', 'en', **kwargs)
         self.assertNotEqual(list(pages), list(pages_continue))
 
-    def test_language_lists(self):
-        """Test that languages returned by paraminfo and MW are the same."""
-        site = self.get_site()
-        lang_codes = site._paraminfo.parameter('wbsearchentities',
-                                               'language')['type']
-        lang_codes2 = [lang['code']
-                       for lang in site._siteinfo.get('languages')]
-        self.assertEqual(lang_codes, lang_codes2)
-
     def test_invalid_language(self):
         """Test behavior of search_entities with invalid language provided."""
         datasite = self.get_repo()
