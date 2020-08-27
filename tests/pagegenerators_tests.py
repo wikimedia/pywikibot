@@ -71,7 +71,7 @@ class TestDryPageGenerators(TestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestDryPageGenerators, self).setUp()
+        super().setUp()
         self.site = self.get_site()
 
     def assertFunction(self, obj):
@@ -188,52 +188,47 @@ class TestDryPageGenerators(TestCase):
         self.assertLength(tuple(gen), 9)
 
 
-class TestPagesFromPageidGenerator(TestCase):
+class BasetitleTestCase(TestCase):
 
-    """Test PagesFromPageidGenerator method."""
+    """Class providing base_title attribute."""
 
     family = 'wikisource'
     code = 'en'
 
     base_title = ('Page:06-24-1920 -The Story of the Jones County '
-                  'Calf Case.pdf/%s')
+                  'Calf Case.pdf/{}')
 
     def setUp(self):
         """Setup tests."""
-        super(TestPagesFromPageidGenerator, self).setUp()
+        super().setUp()
         self.site = self.get_site()
-        self.titles = [self.base_title % i for i in range(1, 11)]
+        self.titles = [self.base_title.format(i) for i in range(1, 11)]
+
+
+class TestPagesFromPageidGenerator(BasetitleTestCase):
+
+    """Test PagesFromPageidGenerator method."""
 
     def test_PagesFromPageidGenerator(self):
         """Test PagesFromPageidGenerator."""
         gen_pages = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                             self.site)
-        pageids = []
-        for page in gen_pages:
-            pageids.append(page.pageid)
-
+        pageids = [page.pageid for page in gen_pages]
         gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
         self.assertPageTitlesEqual(gen, self.titles)
 
 
-class TestCategoryFilterPageGenerator(TestCase):
+class TestCategoryFilterPageGenerator(BasetitleTestCase):
 
     """Test CategoryFilterPageGenerator method."""
 
-    family = 'wikisource'
-    code = 'en'
-
-    base_title = ('Page:06-24-1920 -The Story of the Jones County '
-                  'Calf Case.pdf/%s')
     category_list = ['Category:Validated']
 
     def setUp(self):
         """Setup tests."""
-        super(TestCategoryFilterPageGenerator, self).setUp()
-        self.site = self.get_site()
-        self.titles = [self.base_title % i for i in range(1, 11)]
-        self.catfilter_list = [pywikibot.Category(
-            self.site, cat) for cat in self.category_list]
+        super().setUp()
+        self.catfilter_list = [pywikibot.Category(self.site, cat)
+                               for cat in self.category_list]
 
     def test_CategoryFilterPageGenerator(self):
         """Test CategoryFilterPageGenerator."""
@@ -244,22 +239,13 @@ class TestCategoryFilterPageGenerator(TestCase):
         self.assertLength(tuple(gen), 10)
 
 
-class TestQualityFilterPageGenerator(TestCase):
+class TestQualityFilterPageGenerator(BasetitleTestCase):
 
     """Test QualityFilterPageGenerator methods."""
 
-    family = 'wikisource'
-    code = 'en'
-
     cached = True
 
-    base_title = 'Page:Popular Science Monthly Volume 1.djvu/%s'
-
-    def setUp(self):
-        """Setup tests."""
-        super(TestQualityFilterPageGenerator, self).setUp()
-        self.site = self.get_site()
-        self.titles = [self.base_title % i for i in range(1, 11)]
+    base_title = 'Page:Popular Science Monthly Volume 1.djvu/{}'
 
     def test_QualityFilterPageGenerator(self):
         """Test QualityFilterPageGenerator."""
@@ -486,12 +472,6 @@ class TestYearPageGenerator(DefaultSiteTestCase):
 class TestDayPageGenerator(DefaultSiteTestCase):
 
     """Test the day page generator."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Setup class for tests."""
-        super(TestDayPageGenerator, cls).setUpClass()
-        cls.site = cls.get_site()
 
     def _run_test(self, start_month=1, end_month=12, year=2000):
         """Test method for DayPageGenerator."""
@@ -1323,7 +1303,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestWantedFactoryGenerator, self).setUp()
+        super().setUp()
         self.gf = pagegenerators.GeneratorFactory(site=self.site)
 
     def _generator_with_tests(self):
@@ -1446,7 +1426,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(TestLogeventsFactoryGenerator, cls).setUpClass()
+        super().setUpClass()
         site = pywikibot.Site()
         newuser_logevents = list(site.logevents(logtype='newusers', total=1))
         if len(newuser_logevents) == 0:
@@ -1549,7 +1529,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(EventStreamsPageGeneratorTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
             raise unittest.SkipTest('{0} is not available'.format(cls.client))
@@ -1633,7 +1613,7 @@ class TestLinksearchPageGenerator(TestCase):
 
         for search, expected in cases:
             gf = pagegenerators.GeneratorFactory(site=self.site)
-            gf.handleArg('-weblink:%s' % search)
+            gf.handleArg('-weblink:{}'.format(search))
             gf.handleArg('-ns:2')
             gf.handleArg('-limit:1')
             gen = gf.getCombinedGenerator()
@@ -1658,7 +1638,7 @@ class TestLinksearchPageGenerator(TestCase):
                                                      site=self.site,
                                                      total=1)
         self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
-        self.assertEqual(len(list(gen)), 1)
+        self.assertLength(list(gen), 1)
 
 
 if __name__ == '__main__':  # pragma: no cover
