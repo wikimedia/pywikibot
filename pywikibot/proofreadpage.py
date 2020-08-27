@@ -412,15 +412,16 @@ class ProofreadPage(pywikibot.Page):
         pages.
         """
         # Text is already cached.
-        if hasattr(self, '_text'):
+        if getattr(self, '_text', None) is not None:
             return self._text
-        # If page does not exist, preload it.
+
         if self.exists():
             # If page exists, load it.
-            super().text
-        else:
-            self._text = self.preloadText()
-            self.user = self.site.username()  # Fill user field in empty header
+            return super().text
+
+        # If page does not exist, preload it.
+        self._text = self.preloadText()
+        self.user = self.site.username()  # Fill user field in empty header
         return self._text
 
     @text.setter
