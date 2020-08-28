@@ -23,6 +23,7 @@ import sys
 
 from http import cookiejar
 from string import Formatter
+from typing import Optional, Tuple, Union
 from urllib.parse import quote, urlparse
 from warnings import warn
 
@@ -132,7 +133,7 @@ def user_agent_username(username=None):
     return username
 
 
-def user_agent(site=None, format_string=None):
+def user_agent(site=None, format_string: str = None) -> str:
     """
     Generate the user agent string for a given site and format.
 
@@ -140,9 +141,7 @@ def user_agent(site=None, format_string=None):
     @type site: BaseSite
     @param format_string: The string to which the values will be added using
         str.format. Is using config.user_agent_format when it is None.
-    @type format_string: basestring
     @return: The formatted user agent
-    @rtype: str
     """
     values = USER_AGENT_PRODUCTS.copy()
 
@@ -201,12 +200,8 @@ def get_fake_user_agent():
     return fake_user_agent()
 
 
-def fake_user_agent():
-    """
-    Return a fake user agent.
-
-    @rtype: str
-    """
+def fake_user_agent() -> str:
+    """Return a fake user agent."""
     try:
         from fake_useragent import UserAgent
     except ImportError:
@@ -216,8 +211,8 @@ def fake_user_agent():
 
 
 @deprecate_arg('ssl', None)
-def request(site=None, uri=None, method='GET', params=None, body=None,
-            headers=None, data=None, **kwargs):
+def request(site=None, uri: Optional[str] = None, method='GET', params=None,
+            body=None, headers=None, data=None, **kwargs) -> str:
     """
     Request to Site with default error handling and response decoding.
 
@@ -231,13 +226,11 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
     @param site: The Site to connect to
     @type site: L{pywikibot.site.BaseSite}
     @param uri: the URI to retrieve
-    @type uri: str
     @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
     @return: The received data
-    @rtype: a unicode string
     """
     # body and data parameters both map to the data parameter of
     # requests.Session.request.
@@ -269,14 +262,12 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
     return r.text
 
 
-def get_authentication(uri):
+def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
     """
     Retrieve authentication token.
 
     @param uri: the URI to access
-    @type uri: str
     @return: authentication token
-    @rtype: None or tuple of two str
     """
     parsed_uri = requests.utils.urlparse(uri)
     netloc_parts = parsed_uri.netloc.split('.')
@@ -294,7 +285,7 @@ def get_authentication(uri):
     return None
 
 
-def _http_process(session, http_request):
+def _http_process(session, http_request) -> None:
     """
     Process an `threadedhttp.HttpRequest` instance.
 
@@ -302,8 +293,6 @@ def _http_process(session, http_request):
     @type session: L{requests.Session}
     @param http_request: Request that will be processed.
     @type http_request: L{threadedhttp.HttpRequest}
-    @return: None
-    @rtype: None
     """
     method = http_request.method
     uri = http_request.uri
@@ -356,7 +345,7 @@ def error_handling_callback(request):
 
     if isinstance(request.data, Exception):
         error('An error occurred for uri ' + request.uri)
-        raise request.data
+        raise request.data from None
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
@@ -420,8 +409,9 @@ def _enqueue(uri, method='GET', params=None, body=None, headers=None,
 
 
 def fetch(uri, method='GET', params=None, body=None, headers=None,
-          default_error_handling=True, use_fake_user_agent=False, data=None,
-          **kwargs):
+          default_error_handling: bool = True,
+          use_fake_user_agent: Union[bool, str] = False,
+          data=None, **kwargs):
     """
     Blocking HTTP request.
 
@@ -431,8 +421,6 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     See L{requests.Session.request} for parameters.
 
     @param default_error_handling: Use default error handling
-    @type default_error_handling: bool
-    @type use_fake_user_agent: bool, str
     @param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
