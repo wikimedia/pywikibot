@@ -867,15 +867,13 @@ class EmptyDefault(str, Mapping):
         """Initialise the default as an empty string."""
         str.__init__(self)
 
-    def _empty_iter(self):
+    def __iter__(self):
         """An iterator which does nothing and drops the argument."""
         return empty_iterator()
 
     def __getitem__(self, key):
         """Raise always a L{CombinedError}."""
         raise CombinedError(key)
-
-    iteritems = itervalues = iterkeys = __iter__ = _empty_iter
 
 
 EMPTY_DEFAULT = EmptyDefault()
