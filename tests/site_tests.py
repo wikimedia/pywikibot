@@ -25,16 +25,18 @@ from pywikibot.tools import suppress_warnings
 
 from tests import patch, unittest_print, MagicMock
 from tests.aspects import (
-    unittest, TestCase, DeprecationTestCase,
-    TestCaseBase,
-    DefaultSiteTestCase,
+    AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
+    DefaultSiteTestCase,
+    DefaultWikidataClientTestCase,
+    DeprecationTestCase,
+    TestCase,
+    TestCaseBase,
+    unittest,
     WikimediaDefaultSiteTestCase,
     WikidataTestCase,
-    DefaultWikidataClientTestCase,
-    AlteredDefaultSiteTestCase,
 )
-from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
+from tests.basepage import BasePageLoadRevisionsCachingTestBase
 from tests.utils import entered_loop
 
 
@@ -44,7 +46,7 @@ class TokenTestBase(TestCaseBase):
 
     def setUp(self):
         """Skip test if user does not have token and clear site wallet."""
-        super(TokenTestBase, self).setUp()
+        super().setUp()
         mysite = self.get_site()
         ttype = self.token_type
         try:
@@ -63,7 +65,7 @@ class TokenTestBase(TestCaseBase):
     def tearDown(self):
         """Restore site tokens."""
         self.site.tokens = self._orig_wallet
-        super(TokenTestBase, self).tearDown()
+        super().tearDown()
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
@@ -476,7 +478,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def setUp(self):
         """Initialize self.site and self.mainpage."""
-        super(TestSiteGenerators, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         self.mainpage = self.get_mainpage()
 
@@ -1129,7 +1131,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
 
     def setUp(self):
         """Initialize self.site and self.mainpage."""
-        super(TestSiteGeneratorsUsers, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         self.mainpage = self.get_mainpage()
 
@@ -1197,7 +1199,7 @@ class TestLinterPages(DefaultSiteTestCase):
 
     def setUp(self):
         """Skip tests if Linter extension is missing."""
-        super(TestLinterPages, self).setUp()
+        super().setUp()
         if not self.site.has_extension('Linter'):
             self.skipTest(
                 'The site {0} does not use Linter extension'.format(self.site))
@@ -1444,7 +1446,7 @@ class TestRecentChanges(DefaultSiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Test up test class."""
-        super(TestRecentChanges, cls).setUpClass()
+        super().setUpClass()
         mysite = cls.get_site()
         try:
             # 1st image on main page
@@ -2293,14 +2295,14 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def setUp(self):
         """Store version."""
-        super(TestSiteTokens, self).setUp()
+        super().setUp()
         self.mysite = self.get_site()
         self._version = self.mysite.mw_version
         self.orig_version = self.mysite.version
 
     def tearDown(self):
         """Restore version."""
-        super(TestSiteTokens, self).tearDown()
+        super().tearDown()
         self.mysite.version = self.orig_version
 
     def _test_tokens(self, version, test_version, additional_token):
@@ -2591,7 +2593,7 @@ class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     def setUp(self):
         """Setup tests."""
         self._page = self.get_mainpage(force=True)
-        super(TestSiteLoadRevisionsCaching, self).setUp()
+        super().setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -2611,7 +2613,7 @@ class TestSiteLoadRevisions(TestCase):
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
         """Setup tests."""
-        super(TestSiteLoadRevisions, self).setUp()
+        super().setUp()
         self.mysite = self.get_site()
         self.mainpage = pywikibot.Page(pywikibot.Link('Main Page',
                                                       self.mysite))
@@ -2742,7 +2744,7 @@ class TestBacklinks(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestBacklinks, self).setUp()
+        super().setUp()
         self.page = pywikibot.Page(self.site, 'File:BoA – Woman.png')
         self.backlinks = list(self.page.backlinks(follow_redirects=False,
                                                   filter_redirects=True,
@@ -2959,7 +2961,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestLoadPagesFromPageids, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         mainpage = self.get_mainpage()
         self.links = [

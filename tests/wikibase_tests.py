@@ -5,11 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import copy
 import json
 
+from contextlib import suppress
 from decimal import Decimal
 
 import pywikibot
@@ -23,12 +22,13 @@ from pywikibot.tools import MediaWikiVersion, suppress_warnings
 
 from tests import join_pages_path, mock
 from tests.aspects import (
-    unittest, TestCase,
-    WikidataTestCase,
     DeprecationTestCase,
+    TestCase,
+    unittest,
+    WikidataTestCase,
 )
 
-from tests.basepage_tests import (
+from tests.basepage import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
 )
@@ -49,10 +49,6 @@ class WbRepresentationTestCase(WikidataTestCase):
 
     """Test methods inherited or extended from _WbRepresentation."""
 
-    def setUp(self):
-        """Setup tests."""
-        super(WbRepresentationTestCase, self).setUp()
-
     def _test_hashable(self, representation):
         """Test that the representation is hashable."""
         list_of_dupes = [representation, representation]
@@ -67,7 +63,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     def setUp(self):
         """Setup test."""
         self._page = ItemPage(self.get_repo(), 'Q60')
-        super(TestLoadRevisionsCaching, self).setUp()
+        super().setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -115,7 +111,7 @@ class TestGeneral(WikidataTestCase):
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(TestGeneral, cls).setUpClass()
+        super().setUpClass()
         enwiki = pywikibot.Site('en', 'wikipedia')
         cls.mainpage = pywikibot.Page(pywikibot.page.Link('Main Page', enwiki))
 
@@ -511,7 +507,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def setUp(self):
         """Override setup to store repo and it's version."""
-        super(WikidataTestCase, self).setUp()
+        super().setUp()
         self.repo = self.get_repo()
         self.version = self.repo.mw_version
 
@@ -678,7 +674,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         """Setup tests."""
         self.commons = pywikibot.Site('commons', 'commons')
         self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
-        super(TestWbGeoShapeNonDry, self).setUp()
+        super().setUp()
 
     def test_WbGeoShape_WbRepresentation_methods(self):
         """Test inherited or extended methods from _WbRepresentation."""
@@ -754,7 +750,7 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         """Setup tests."""
         self.commons = pywikibot.Site('commons', 'commons')
         self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')
-        super(TestWbTabularDataNonDry, self).setUp()
+        super().setUp()
 
     def test_WbTabularData_WbRepresentation_methods(self):
         """Test inherited or extended methods from _WbRepresentation."""
@@ -858,7 +854,7 @@ class TestLoadUnknownType(WikidataTestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestLoadUnknownType, self).setUp()
+        super().setUp()
         wikidata = self.get_repo()
         self.wdp = ItemPage(wikidata, 'Q60')
         self.wdp.id = 'Q60'
@@ -928,12 +924,12 @@ class TestItemLoad(WikidataTestCase):
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(TestItemLoad, cls).setUpClass()
+        super().setUpClass()
         cls.site = cls.get_site('enwiki')
 
     def setUp(self):
         """Setup test."""
-        super(TestItemLoad, self).setUp()
+        super().setUp()
         self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
                                                       self.site))
 
@@ -1690,7 +1686,7 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
     def setUp(self):
         """Setup tests."""
         self._page = ItemPage(self.get_repo(), 'Q60')
-        super(TestItemBasePageMethods, self).setUp()
+        super().setUp()
 
     def test_basepage_methods(self):
         """Test ItemPage methods inherited from superclass BasePage."""
@@ -1710,7 +1706,7 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
     def setUp(self):
         """Setup tests."""
         self._page = pywikibot.Page(self.site, 'Q60')
-        super(TestPageMethodsWithItemTitle, self).setUp()
+        super().setUp()
 
     def test_basepage_methods(self):
         """Test Page methods inherited from superclass BasePage with Q60."""
@@ -1740,7 +1736,7 @@ class TestLinks(WikidataTestCase):
 
     def setUp(self):
         """Setup Tests."""
-        super(TestLinks, self).setUp()
+        super().setUp()
         self.wdp = ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
         with open(join_pages_path('Q60_only_sitelinks.wd')) as f:
@@ -1773,7 +1769,7 @@ class TestLanguageDict(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestLanguageDict, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': 'foo'}
 
@@ -1848,7 +1844,7 @@ class TestAliasesDict(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestAliasesDict, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': ['foo', 'bar']}
 
@@ -1944,7 +1940,7 @@ class TestWriteNormalizeData(TestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestWriteNormalizeData, self).setUp()
+        super().setUp()
         self.data_out = {
             'labels': {'en': {'language': 'en', 'value': 'Foo'}},
             'descriptions': {'en': {'language': 'en', 'value': 'Desc'}},
@@ -2133,7 +2129,7 @@ class TestAlternateNamespaces(WikidataTestCase):
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(TestAlternateNamespaces, cls).setUpClass()
+        super().setUpClass()
 
         cls.get_repo()._namespaces = NamespacesDict({
             90: Namespace(id=90,
@@ -2264,7 +2260,7 @@ class TestJSON(WikidataTestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestJSON, self).setUp()
+        super().setUp()
         wikidata = self.get_repo()
         self.wdp = ItemPage(wikidata, 'Q60')
         self.wdp.id = 'Q60'
@@ -2387,7 +2383,5 @@ class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

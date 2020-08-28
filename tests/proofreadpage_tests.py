@@ -5,10 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import difflib
 import json
+
+from contextlib import suppress
 
 import pywikibot
 
@@ -18,7 +18,7 @@ from pywikibot.tools import has_module
 
 from tests import unittest_print
 from tests.aspects import unittest, require_modules, TestCase
-from tests.basepage_tests import (
+from tests.basepage import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
 )
@@ -50,7 +50,7 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super(TestBasePageMethodsProofreadPage, self).setUp()
+        super().setUp()
 
     def test_basepage_methods(self):
         """Test ProofreadPage methods inherited from superclass BasePage."""
@@ -70,7 +70,7 @@ class TestLoadRevisionsCachingProofreadPage(
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super(TestLoadRevisionsCachingProofreadPage, self).setUp()
+        super().setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -124,11 +124,6 @@ class TestProofreadPageParseTitle(TestCase):
             'tuple': ('Test jpg', '', None),
         },
     }
-
-    @classmethod
-    def setUpClass(cls):
-        """Prepare get_page dataset for tests."""
-        super(TestProofreadPageParseTitle, cls).setUpClass()
 
     def test_parse_title(self, key):
         """Test ProofreadPage_parse_title() function."""
@@ -353,7 +348,7 @@ class BS4TestCase(TestCase):
                 .format(module=__name__, doc=cls.__doc__, name=cls.__name__),
                 end='\n')
             cls.skipTest(cls, 'bs4 not installed')
-        super(BS4TestCase, cls).setUpClass()
+        super().setUpClass()
 
 
 class TestPageOCR(BS4TestCase):
@@ -385,7 +380,7 @@ class TestPageOCR(BS4TestCase):
         site = self.get_site()
         title = self.data['title']
         self.page = ProofreadPage(site, title)
-        super(TestPageOCR, self).setUp()
+        super().setUp()
 
     def test_ocr_exceptions(self):
         """Test page.ocr() exceptions."""
@@ -562,7 +557,7 @@ class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
         """Set up test case."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super(TestBasePageMethodsIndexPage, self).setUp()
+        super().setUp()
 
     def test_basepage_methods(self):
         """Test IndexPage methods inherited from superclass BasePage."""
@@ -582,7 +577,7 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
         """Set up test case."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super(TestLoadRevisionsCachingIndexPage, self).setUp()
+        super().setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -645,7 +640,7 @@ class TestIndexPageMappings(BS4TestCase):
     @classmethod
     def setUpClass(cls):
         """Prepare get_page dataset for tests."""
-        super(TestIndexPageMappings, cls).setUpClass()
+        super().setUpClass()
         for key, site_def in cls.sites.items():
             site = cls.get_site(name=key)
             base_title = site_def['page']
@@ -780,7 +775,7 @@ class TestIndexPageMappingsRedlinks(BS4TestCase):
     @classmethod
     def setUpClass(cls):
         """Prepare tests by creating page instances."""
-        super(TestIndexPageMappingsRedlinks, cls).setUpClass()
+        super().setUpClass()
         cls.index = IndexPage(cls.site, cls.index_name)
         cls.pages = [ProofreadPage(cls.site, page) for page in cls.page_names]
         cls.missing = ProofreadPage(cls.site, cls.missing_name)
@@ -820,7 +815,7 @@ class TestIndexPageHasValidContent(BS4TestCase):
     @classmethod
     def setUpClass(cls):
         """Prepare tests by creating an IndexPage instance."""
-        super(TestIndexPageHasValidContent, cls).setUpClass()
+        super().setUpClass()
         cls.index = IndexPage(cls.site, cls.index_name)
 
     def test_has_valid_content_empty(self):
@@ -881,7 +876,5 @@ class TestIndexPageHasValidContent(BS4TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

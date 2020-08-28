@@ -13,7 +13,7 @@ from pywikibot.flow import Board, Topic, Post
 from tests import unittest
 
 from tests.aspects import TestCase
-from tests.basepage_tests import (
+from tests.basepage import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
 )
