@@ -1,6 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Add support for ja.wikivoyage (T261450)
 * Only run cosmetic changes on wikitext pages (T260489)
 * Leave a script gracefully for wrong -lang and -family option (T259756)
 * Change meaning of BasePage.text (T260472)
