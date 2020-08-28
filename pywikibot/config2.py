@@ -48,6 +48,7 @@ import types
 from locale import getdefaultlocale
 from os import getenv, environ
 from textwrap import fill
+from typing import Dict, List, Tuple
 from warnings import warn
 
 from pywikibot import __version__ as pwb_version
@@ -133,7 +134,7 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-usernames = collections.defaultdict(dict)
+usernames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
 disambiguation_comment = collections.defaultdict(dict)
 
 # User agent format.
@@ -441,7 +442,7 @@ userinterface = 'terminal'
 # this can be used to pass variables to the UI init function
 # useful for e.g.
 # userinterface_init_kwargs = {'default_stream': 'stdout'}
-userinterface_init_kwargs = {}
+userinterface_init_kwargs = {}  # type: Dict[str, str]
 
 # i18n setting for user interface language
 # default is obtained from L{locale.getdefaultlocale}
@@ -552,7 +553,7 @@ debug_log = []
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
-user_script_paths = []
+user_script_paths = []  # type: List[str]
 
 # ############# INTERWIKI SETTINGS ##############
 
@@ -807,7 +808,7 @@ cosmetic_changes_mylang_only = True
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user-config.py:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_enable = {}
+cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
@@ -815,7 +816,7 @@ cosmetic_changes_enable = {}
 # language. This also overrides the settings in the cosmetic_changes_enable
 # dictionary. Please set your dict by adding such lines to your user-config.py:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_disable = {}
+cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
@@ -837,7 +838,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #
 # to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
-replicate_replace = {}
+replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 
 # ############# FURTHER SETTINGS ##############
 
@@ -847,7 +848,7 @@ replicate_replace = {}
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
 # in user-config.py for wikis with extra write actions.
-actions_to_block = []
+actions_to_block = []  # type: List[str]
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
@@ -1117,7 +1118,7 @@ if OSWIN32 and editor:
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
         or getdefaultlocale()[0]
-    if userinterface_lang in [None, 'C']:
+    if userinterface_lang is None or userinterface_lang == 'C':
         userinterface_lang = 'en'
     else:
         userinterface_lang = userinterface_lang.split('_')[0]

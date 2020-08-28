@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
+from typing import Optional
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
@@ -29,7 +30,7 @@ class LogEntry(UserDict):
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overridden in subclasses.
-    _expected_type = None
+    _expected_type = None  # type: Optional[str]
 
     def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""

@@ -87,6 +87,8 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Optional
+
 from pywikibot.tools import _NotImplementedWarning
 
 
@@ -133,12 +135,11 @@ class PageRelatedError(Error):
     Page, and when a generic message can be written once for all.
     """
 
-    # Preformatted UNICODE message where the page title will be inserted
+    # Preformatted message where the page title will be inserted.
     # Override this in subclasses.
-    # 'Oh noes! Page %s is too funky, we should not delete it ;('
-    message = None
+    message = ''
 
-    def __init__(self, page, message=None):
+    def __init__(self, page, message: Optional[str] = None):
         """
         Initializer.
 

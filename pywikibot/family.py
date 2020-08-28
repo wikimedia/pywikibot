@@ -16,6 +16,7 @@ import warnings
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
+from typing import Dict, List, Optional, Tuple
 
 import pywikibot
 from pywikibot.comms.http import fetch
@@ -78,7 +79,7 @@ class Family:
 
     name = None
 
-    langs = {}
+    langs = {}  # type: Dict[str, str]
 
     # For interwiki sorting order see
     # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
@@ -471,12 +472,12 @@ class Family:
 
     # A dict of tuples for different sites with names of templates
     # that indicate an edit should be avoided
-    edit_restricted_templates = {}
+    edit_restricted_templates = {}  # type: Dict[str, Tuple[str, ...]]
 
     # A dict of tuples for different sites with names of archive
     # templates that indicate an edit of non-archive bots
     # should be avoided
-    archived_page_templates = {}
+    archived_page_templates = {}  # type: Dict[str, Tuple[str, ...]]
 
     # A list of projects that share cross-project sessions.
     cross_projects = []
@@ -489,38 +490,38 @@ class Family:
     cross_projects_cookie_username = 'centralauth_User'
 
     # A list with the name in the cross-language flag permissions
-    cross_allowed = []
+    cross_allowed = []  # type: List[str]
 
     # A dict with the name of the category containing disambiguation
     # pages for the various languages. Only one category per language,
     # and without the namespace, so add things like:
     # 'en': "Disambiguation"
-    disambcatname = {}
+    disambcatname = {}  # type: Dict[str, str]
 
     # DEPRECATED, stores the code of the site which have a case sensitive
     # main namespace. Use the Namespace given from the Site instead
-    nocapitalize = []
+    nocapitalize = []  # type: List[str]
 
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
-    interwiki_attop = []
+    interwiki_attop = []  # type: List[str]
     # on_one_line is a list of languages that want the interwiki links
     # one-after-another on a single line
-    interwiki_on_one_line = []
+    interwiki_on_one_line = []  # type: List[str]
     # String used as separator between interwiki links and the text
     interwiki_text_separator = '\n\n'
 
     # Similar for category
-    category_attop = []
+    category_attop = []  # type: List[str]
     # on_one_line is a list of languages that want the category links
     # one-after-another on a single line
-    category_on_one_line = []
+    category_on_one_line = []  # type: List[str]
     # String used as separator between category links and the text
     category_text_separator = '\n\n'
     # When both at the bottom should categories come after interwikilinks?
     # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
     # extension which puts categories last on all sites. TO BE DEPRECATED!
-    categories_last = []
+    categories_last = []  # type: List[str]
 
     # Which languages have a special order for putting interlanguage
     # links, and what order is it? If a language is not in
@@ -546,15 +547,15 @@ class Family:
     # Which language codes no longer exist and by which language code
     # should they be replaced. If for example the language with code xx:
     # now should get code yy:, add {'xx':'yy'} to obsolete.
-    interwiki_replacements = {}
+    interwiki_replacements = {}  # type: Dict[str, str]
 
     # Codes that should be removed, usually because the site has been
     # taken down.
-    interwiki_removals = []
+    interwiki_removals = []  # type: List[str]
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
-    languages_by_size = []
+    languages_by_size = []  # type: List[str]
 
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
@@ -646,7 +647,7 @@ class Family:
 
     # Some wiki farms have UrlShortener extension enabled only on the main
     # site. This value can specify this last one with (lang, family) tuple.
-    shared_urlshortner_wiki = None
+    shared_urlshortner_wiki = None  # type: Optional[Tuple[str, str]]
 
     _families = {}
 
@@ -1364,9 +1365,9 @@ class WikimediaFamily(Family):
     }
 
     # Not open for edits; stewards can still edit.
-    closed_wikis = []
+    closed_wikis = []  # type: List[str]
     # Completely removed
-    removed_wikis = []
+    removed_wikis = []  # type: List[str]
 
     # WikimediaFamily uses wikibase for the category name containing
     # disambiguation pages for the various languages. We need the

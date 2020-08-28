@@ -27,7 +27,7 @@ from collections import Counter, defaultdict, namedtuple, OrderedDict
 from collections.abc import MutableMapping
 from html.entities import name2codepoint
 from itertools import chain
-from typing import List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
@@ -3855,7 +3855,6 @@ class WikibaseEntity:
     @cvar DATA_ATTRIBUTES: dictionary which maps data attributes (eg. 'labels',
         'claims') to appropriate collection classes (eg. LanguageDict,
         ClaimsCollection)
-    @type DATA_ATTRIBUTES: dict
 
     @cvar entity_type: entity type identifier
     @type entity_type: str
@@ -3865,7 +3864,7 @@ class WikibaseEntity:
     @type title_pattern: str
     """
 
-    DATA_ATTRIBUTES = {}
+    DATA_ATTRIBUTES = {}  # type: Dict[str, Any]
 
     def __init__(self, repo, id_=None):
         """

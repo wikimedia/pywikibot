@@ -99,6 +99,7 @@ from contextlib import closing
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
+from typing import Any, Dict
 from warnings import warn
 
 import pywikibot
@@ -1024,7 +1025,7 @@ class OptionHandler:
     # The values are the default values
     # Overwrite this in subclasses!
 
-    availableOptions = {}
+    availableOptions = {}  # type: Dict[str, Any]
 
     def __init__(self, **kwargs):
         """
