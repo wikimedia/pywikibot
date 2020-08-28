@@ -131,13 +131,6 @@ class LoginStatus(IntEnum):
         return 'LoginStatus({})'.format(self)
 
 
-Family = redirect_func(pywikibot.family.Family.load,
-                       target_module='pywikibot.family.Family',
-                       old_name='Family',
-                       since='20141001',
-                       future_warning=True)
-
-
 class Namespace(Iterable, ComparableMixin):
 
     """
@@ -2389,12 +2382,6 @@ class APISite(BaseSite):
         else:
             key = '*'
         return req.submit()['expandtemplates'][key]
-
-    getExpandedString = redirect_func(expand_text,
-                                      old_name='getExpandedString',
-                                      class_name='APISite',
-                                      since='20170504',
-                                      future_warning=True)
 
     def getcurrenttimestamp(self):
         """
@@ -5365,17 +5352,17 @@ class APISite(BaseSite):
             raise NoPage(source,
                          'Cannot merge revisions from source {source} because '
                          'it does not exist on {site}'
-                         .format(**errdata))
+                         .format_map(errdata))
         if not dest.exists():
             raise NoPage(dest,
                          'Cannot merge revisions to destination {dest} '
                          'because it does not exist on {site}'
-                         .format(**errdata))
+                         .format_map(errdata))
 
         if source == dest:  # Same pages
             raise PageSaveRelatedError(
                 'Cannot merge revisions of {source} to itself'
-                .format(**errdata))
+                .format_map(errdata))
 
         # Send the merge API request
         token = self.tokens['csrf']
@@ -5398,7 +5385,7 @@ class APISite(BaseSite):
         except api.APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
-                raise Error(on_error.format(**errdata))
+                raise Error(on_error.format_map(errdata))
             else:
                 pywikibot.debug(
                     "mergehistory: Unexpected error code '{code}' received"
@@ -8263,21 +8250,21 @@ class DataSite(APISite):
         return pywikibot.ItemPage(self, result['entity']['id'])
 
     @deprecated_args(limit='total')
-    def search_entities(self, search, language, total=None, **kwargs):
+    def search_entities(self, search: str, language: str, total=None,
+                        **kwargs):
         """
         Search for pages or properties that contain the given text.
 
         @param search: Text to find.
-        @type search: str
         @param language: Language to search in.
-        @type language: str
         @param total: Maximum number of pages to retrieve in total, or None in
             case of no limit.
         @type total: int or None
         @return: 'search' list from API output.
         @rtype: api.APIGenerator
         """
-        lang_codes = [lang['code'] for lang in self._siteinfo.get('languages')]
+        lang_codes = self._paraminfo.parameter('wbsearchentities',
+                                               'language')['type']
         if language not in lang_codes:
             raise ValueError('Data site used does not support provided '
                              'language.')

@@ -72,7 +72,7 @@ def getversion(online=True):
                 'OUTDATED' if hsh1 not in (hsh2, hsh3) else 'ok')
 
     data['hsh'] = data['hsh'][:7]  # make short hash from full hash
-    return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format(**data)
+    return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format_map(data)
 
 
 def getversiondict():

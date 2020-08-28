@@ -113,9 +113,8 @@ from pywikibot.bot_choice import (
     ChoiceException, QuitKeyboardInterrupt,
     Choice, StaticChoice, LinkChoice, AlwaysChoice
 )
-from pywikibot.logging import (
-    CRITICAL, ERROR, INFO, WARNING,
-)
+from pywikibot.exceptions import UnknownFamily, UnknownSite
+from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING
 from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
 from pywikibot.logging import (
     add_init_routine,
@@ -874,6 +873,12 @@ def handle_args(args=None, do_help=True):
             except (ValueError, TypeError, AttributeError):
                 # argument not global -> specific bot script will take care
                 non_global_args.append(arg)
+
+    try:
+        pywikibot.Site()
+    except (UnknownFamily, UnknownSite):
+        pywikibot.exception()
+        sys.exit(1)
 
     if username:
         config.usernames[config.family][config.mylang] = username

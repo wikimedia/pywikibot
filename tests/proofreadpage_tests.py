@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,6 +75,14 @@ class TestLoadRevisionsCachingProofreadPage(
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
+
+    @property
+    def custom_text(self):
+        """Return a dummy text for testing."""
+        cls_pagetext, div = TestProofreadPageValidSite.class_pagetext_fmt[True]
+        return TestProofreadPageValidSite.fmt.format(
+            user=self.site.username(), class_pagetext=cls_pagetext,
+            references='<references/>', div_end=div)
 
 
 class TestProofreadPageParseTitle(TestCase):
@@ -579,6 +587,14 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
+
+    @property
+    def custom_text(self):
+        """Return a dummy text for testing."""
+        cls_pagetext, div = TestProofreadPageValidSite.class_pagetext_fmt[True]
+        return TestProofreadPageValidSite.fmt.format(
+            user=self.site.username(), class_pagetext=cls_pagetext,
+            references='<references/>', div_end=div)
 
 
 @unittest.skip('T193637 and T114318')

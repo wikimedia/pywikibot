@@ -3394,7 +3394,6 @@ def update_page(page, pagedict, props=[]):
 
     if 'lastrevid' in pagedict:
         page.latest_revision_id = pagedict['lastrevid']
-        del page.text
 
     if 'imageinfo' in pagedict:
         assert(isinstance(page, pywikibot.FilePage))

@@ -2214,6 +2214,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         if mysite.mw_version >= '1.22':
             params['revid'] = [0, 1]
 
+        raised = False
         try:
             # no such rcid, revid or too old revid
             list(mysite.patrol(**params))
@@ -2222,7 +2223,8 @@ class PatrolTestCase(TokenTestBase, TestCase):
                 self.skipTest(error)
         except pywikibot.Error:
             # expected result
-            pass
+            raised = True
+        self.assertTrue(raised, msg='pywikibot.Error not raised')
 
 
 class SiteRandomTestCase(DefaultSiteTestCase):
@@ -3413,15 +3415,6 @@ class TestDataSiteSearchEntities(WikidataTestCase):
         pages_continue = datasite.search_entities('Rembrandt', 'en', **kwargs)
         self.assertNotEqual(list(pages), list(pages_continue))
 
-    def test_language_lists(self):
-        """Test that languages returned by paraminfo and MW are the same."""
-        site = self.get_site()
-        lang_codes = site._paraminfo.parameter('wbsearchentities',
-                                               'language')['type']
-        lang_codes2 = [lang['code']
-                       for lang in site._siteinfo.get('languages')]
-        self.assertEqual(lang_codes, lang_codes2)
-
     def test_invalid_language(self):
         """Test behavior of search_entities with invalid language provided."""
         datasite = self.get_repo()
@@ -3705,12 +3698,13 @@ class TestPropertyNames(DefaultSiteTestCase):
         pnames = mysite.get_property_names()
         self.assertIsInstance(pnames, list)
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
-                     'forcetoc', 'graph_specs', 'hiddencat', 'newsectionlink',
+                     'forcetoc', 'hiddencat', 'index', 'newsectionlink',
                      'noeditsection', 'noexternallanglinks', 'nogallery',
                      'noindex', 'nonewsectionlink', 'notoc', 'score',
                      'templatedata', 'wikibase-badge-Q17437796',
-                     'wikibase_item'):
-            self.assertIn(item, pnames)
+                     'wikibase-badge-Q17437798', 'wikibase_item'):
+            with self.subTest(item=item):
+                self.assertIn(item, pnames)
 
 
 class TestPageFromWikibase(DefaultSiteTestCase):

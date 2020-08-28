@@ -410,19 +410,19 @@ class Family:
         'wikiconference', 'wikidata', 'wikif1', 'wikifur', 'wikihow',
         'wikiindex', 'wikilemon', 'wikilivres', 'wikimac-de', 'wikimedia',
         'wikinews', 'wikinfo', 'wikinvest', 'wikipapers', 'wikipedia',
-        'wikiquote', 'wikisource', 'wikispecies', 'wikispot', 'labsconsole',
-        'wikiti', 'wikiversity', 'wikivoyage', 'wikiwikiweb', 'wiktionary',
-        'wipipedia', 'wlug', 'wmam', 'wmar', 'wmat', 'wmau', 'wmbd', 'wmbe',
-        'wmbr', 'wmca', 'wmch', 'wmcl', 'wmcn', 'wmco', 'wmcz', 'wmdc',
-        'securewikidc', 'wmdk', 'wmee', 'wmec', 'wmes', 'wmet', 'wmfdashboard',
-        'wmfi', 'wmfr', 'wmhi', 'wmhk', 'wmid', 'wmil', 'wmin', 'wmit', 'wmke',
-        'wmmk', 'wmmx', 'wmnl', 'wmnyc', 'wmno', 'wmpa-us', 'wmph', 'wmpl',
-        'wmpt', 'wmpunjabi', 'wmromd', 'wmrs', 'wmru', 'wmse', 'wmsk', 'wmtr',
-        'wmtw', 'wmua', 'wmuk', 'wmve', 'wmza', 'wm2005', 'wm2006', 'wm2007',
-        'wm2008', 'wm2009', 'wm2010', 'wm2011', 'wm2012', 'wm2013', 'wm2014',
-        'wm2015', 'wm2016', 'wm2017', 'wm2018', 'wikimania', 'wmteam', 'wmf',
-        'wookieepedia', 'wowwiki', 'wqy', 'wurmpedia', 'viaf', 'zrhwiki',
-        'zum', 'zwiki',
+        'wikiquote', 'wikisource', 'wikispecies', 'wikispore', 'wikispot',
+        'labsconsole', 'wikiti', 'wikiversity', 'wikivoyage', 'wikiwikiweb',
+        'wiktionary', 'wipipedia', 'wlug', 'wmam', 'wmar', 'wmat', 'wmau',
+        'wmbd', 'wmbe', 'wmbr', 'wmca', 'wmch', 'wmcl', 'wmcn', 'wmco', 'wmcz',
+        'wmdc', 'securewikidc', 'wmdk', 'wmee', 'wmec', 'wmes', 'wmet',
+        'wmfdashboard', 'wmfi', 'wmfr', 'wmhi', 'wmhk', 'wmid', 'wmil', 'wmin',
+        'wmit', 'wmke', 'wmmk', 'wmmx', 'wmnl', 'wmnyc', 'wmno', 'wmpa-us',
+        'wmph', 'wmpl', 'wmpt', 'wmpunjabi', 'wmromd', 'wmrs', 'wmru', 'wmse',
+        'wmsk', 'wmtr', 'wmtw', 'wmua', 'wmuk', 'wmve', 'wmza', 'wm2005',
+        'wm2006', 'wm2007', 'wm2008', 'wm2009', 'wm2010', 'wm2011', 'wm2012',
+        'wm2013', 'wm2014', 'wm2015', 'wm2016', 'wm2017', 'wm2018',
+        'wikimania', 'wmteam', 'wmf', 'wookieepedia', 'wowwiki', 'wqy',
+        'wurmpedia', 'viaf', 'zrhwiki', 'zum', 'zwiki',
     )}
 
     known_families.update({
@@ -1071,17 +1071,6 @@ class Family:
     def encodings(self, code):
         """Return list of historical encodings for a specific language wiki."""
         return (self.encoding(code), )
-
-    # aliases
-    @deprecated('Site().encoding()', since='20200218', future_warning=True)
-    def code2encoding(self, code):
-        """Return the encoding for a specific language wiki."""
-        return self.encoding(code)
-
-    @deprecated('Site().encodings()', since='20200218', future_warning=True)
-    def code2encodings(self, code):
-        """Return list of historical encodings for a specific language wiki."""
-        return self.encodings(code)
 
     def __eq__(self, other):
         """Compare self with other.

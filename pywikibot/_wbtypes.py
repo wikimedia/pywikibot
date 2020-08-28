@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
 
-from pywikibot.tools import StringTypes
 
-
-class WbRepresentation(object):
+class WbRepresentation:
 
     """Abstract class for Wikibase representations."""
 
@@ -35,7 +31,7 @@ class WbRepresentation(object):
 
     def __repr__(self):
         assert isinstance(self._items, tuple)
-        assert all(isinstance(item, StringTypes) for item in self._items)
+        assert all(isinstance(item, str) for item in self._items)
 
         values = ((attr, getattr(self, attr)) for attr in self._items)
         attrs = ', '.join('{0}={1}'.format(attr, value)

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Title translate module."""
 #
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import date
 
@@ -16,7 +14,7 @@ from pywikibot.tools import deprecated_args
 
 @deprecated_args(family=None)
 def translate(page=None, hints=(), auto=True, removebrackets=False,
-              site=None):
+              site=None) -> list:
     """
     Return a list of links to pages on other sites based on hints.
 
@@ -31,8 +29,7 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
 
     assert page or site
 
-    if site is None:
-        site = page.site
+    site = site or page.site
 
     for h in hints:
         # argument may be given as -hint:xy where xy is a language code
@@ -74,8 +71,8 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
         dict_name, value = date.getAutoFormat(sitelang, page.title())
         if dict_name:
             pywikibot.output(
-                'TitleTranslate: %s was recognized as %s with value %d'
-                % (page.title(), dict_name, value))
+                'TitleTranslate: {} was recognized as {} with value {}'
+                .format(page.title(), dict_name, value))
             for entry_lang, entry in date.formats[dict_name].items():
                 if entry_lang not in site.languages():
                     continue

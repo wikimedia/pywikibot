@@ -5,17 +5,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import math
 import threading
 import time
+
+from contextlib import suppress
 
 import pywikibot
 from pywikibot import config
 from pywikibot.tools import deprecated
 
 _logger = 'wiki.throttle'
+
+FORMAT_LINE = '{pid} {time} {site}\n'
 
 # global process identifier
 #
@@ -25,7 +27,7 @@ _logger = 'wiki.throttle'
 pid = False
 
 
-class Throttle(object):
+class Throttle:
 
     """Control rate of access to wiki server.
 
@@ -76,7 +78,7 @@ class Throttle(object):
         self.setDelays()
 
     @property
-    @deprecated(since='20180423')
+    @deprecated(since='20180423', future_warning=True)
     def lastwait(self):
         """DEPRECATED property."""
         return 0.0
@@ -85,7 +87,7 @@ class Throttle(object):
         """Count running processes for site and set process_multiplicity."""
         global pid
         mysite = self.mysite
-        pywikibot.debug('Checking multiplicity: pid = %(pid)s' % globals(),
+        pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid),
                         _logger)
         with self.lock:
             processes = []
@@ -130,18 +132,12 @@ class Throttle(object):
                               'time': self.checktime,
                               'site': mysite})
             processes.sort(key=lambda p: (p['pid'], p['site']))
-            try:
-                f = open(self.ctrlfilename, 'w')
+            with suppress(IOError), open(self.ctrlfilename, 'w') as f:
                 for p in processes:
-                    f.write('%(pid)s %(time)s %(site)s\n' % p)
-            except IOError:
-                pass
-            else:
-                f.close()
+                    f.write(FORMAT_LINE.format_map(p))
             self.process_multiplicity = count
-            pywikibot.log(
-                'Found {0} {1} processes running, including this one.'.format(
-                    count, mysite))
+            pywikibot.log('Found {} {} processes running, including this one.'
+                          .format(count, mysite))
 
     def setDelays(self, delay=None, writedelay=None, absolute=False):
         """Set the nominal delays in seconds. Defaults to config values."""
@@ -189,15 +185,8 @@ class Throttle(object):
         # delay this time
         thisdelay = self.getDelay(write=write)
         now = time.time()
-        if write:
-            ago = now - self.last_write
-        else:
-            ago = now - self.last_read
-        if ago < thisdelay:
-            delta = thisdelay - ago
-            return delta
-        else:
-            return 0.0
+        ago = now - (self.last_write if write else self.last_read)
+        return max(0.0, thisdelay - ago)
 
     def drop(self):
         """Remove me from the list of running bot processes."""
@@ -227,27 +216,23 @@ class Throttle(object):
                                   'site': this_site})
 
         processes.sort(key=lambda p: p['pid'])
-        try:
-            with open(self.ctrlfilename, 'w') as f:
-                for p in processes:
-                    f.write('%(pid)s %(time)s %(site)s\n' % p)
-        except IOError:
-            return
+        with suppress(IOError), open(self.ctrlfilename, 'w') as f:
+            for p in processes:
+                f.write(FORMAT_LINE.format_map(p))
 
     def wait(self, seconds):
         """Wait for seconds seconds.
 
         Announce the delay if it exceeds a preset limit.
-
         """
         if seconds <= 0:
             return
 
-        message = ('Sleeping for %(seconds).1f seconds, %(now)s' % {
-            'seconds': seconds,
-            'now': time.strftime('%Y-%m-%d %H:%M:%S',
-                                 time.localtime())
-        })
+        message = 'Sleeping for {seconds:.1f} seconds, {now}' \
+                  .format_map({
+                      'seconds': seconds,
+                      'now': time.strftime('%Y-%m-%d %H:%M:%S',
+                                           time.localtime())})
         if seconds > config.noisysleep:
             pywikibot.output(message)
         else:

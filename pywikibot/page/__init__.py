@@ -609,13 +609,13 @@ class BasePage(ComparableMixin):
         @return: text of the page
         @rtype: str
         """
-        if not hasattr(self, '_text') or self._text is None:
-            try:
-                self._text = self.get(get_redirect=True)
-            except pywikibot.NoPage:
-                # TODO: what other exceptions might be returned?
-                self._text = ''
-        return self._text
+        if getattr(self, '_text', None) is not None:
+            return self._text
+        try:
+            return self.get(get_redirect=True)
+        except pywikibot.NoPage:
+            # TODO: what other exceptions might be returned?
+            return ''
 
     @text.setter
     def text(self, value):
@@ -625,9 +625,8 @@ class BasePage(ComparableMixin):
         @param value: New value or None
         @type value: basestring
         """
+        del self.text
         self._text = None if value is None else str(value)
-        if hasattr(self, '_raw_extracted_templates'):
-            del self._raw_extracted_templates
 
     @text.deleter
     def text(self):
@@ -1309,7 +1308,7 @@ class BasePage(ComparableMixin):
               cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
-        if cc or cc is None and config.cosmetic_changes:
+        if cc or (cc is None and config.cosmetic_changes):
             summary = self._cosmetic_changes_hook(summary)
 
         done = self.site.editpage(self, summary=summary, minor=minor,
@@ -1330,20 +1329,18 @@ class BasePage(ComparableMixin):
             else the old edit summary.
         @rtype: str
         """
-        if self.isTalkPage() or \
+        if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return summary
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
-            cc = ((family == config.family
-                   and self.site.lang == config.mylang)
-                  or family in config.cosmetic_changes_enable
-                  and self.site.lang in config.cosmetic_changes_enable[family])
+            cc = ((family == config.family and self.site.lang == config.mylang)
+                  or self.site.lang in config.cosmetic_changes_enable.get(
+                      family, []))
         else:
             cc = True
-        cc = (cc and not
-              (family in config.cosmetic_changes_disable
-               and self.site.lang in config.cosmetic_changes_disable[family]))
+        cc = cc and self.site.lang not in config.cosmetic_changes_disable.get(
+            family, [])
         if not cc:
             return summary
 
@@ -1452,6 +1449,8 @@ class BasePage(ComparableMixin):
 
         minor and botflag parameters are set to False which prevents hiding
         the edit when it becomes a real edit due to a bug.
+
+        @note: This discards content saved to self.text.
         """
         if self.exists():
             # ensure always get the page text and not to change it.
