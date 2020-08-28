@@ -1,6 +1,21 @@
 Release history
 ===============
 
+4.2.0
+-----
+
+*28 August 2020*
+
+* Add support for ja.wikivoyage (T261450)
+* Only run cosmetic changes on wikitext pages (T260489)
+* Leave a script gracefully for wrong -lang and -family option (T259756)
+* Change meaning of BasePage.text (T260472)
+* site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/endcodings() methods
+* Site.getExpandedString() method was removed in favour of expand_text
+* Site.Family() function was removed in favour of Family.load() method
+* Add wikispore family (T260049)
+
+
 4.1.1
 -----
 
