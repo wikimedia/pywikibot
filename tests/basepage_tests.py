@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for BasePage subclasses."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,6 +38,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
     """
 
     cached = False
+    custom_text = 'foobar'
 
     def setUp(self):
         """Set up test."""
@@ -55,7 +56,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
 
         # verify that initializing the page content
         # does not discard the custom text
-        custom_text = 'foobar'
+        custom_text = self.custom_text
         page.text = custom_text
 
         self.site.loadrevisions(page, total=1)
