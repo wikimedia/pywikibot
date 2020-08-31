@@ -4771,19 +4771,25 @@ class APISite(BaseSite):
                         old_props.append('token')
             return old_props
 
+        # set default properties
+        prop = kwargs.pop('prop',
+                          ['ids', 'user', 'comment', 'flags', 'timestamp'])
+        if content:
+            prop.append('content')
+
         if start and end:
             self.assert_valid_iter_params('deletedrevs', start, end, reverse)
-
-        if not self.logged_in():
-            self.login()
 
         err = ('deletedrevs: User:{} not authorized to '
                .format(self.user()))
         if not self.has_right('deletedhistory'):
-            raise Error(err + 'access deleted revisions.')
-        if content:
-            if not self.has_right('undelete'):
-                raise Error(err + 'view deleted content.')
+            if self.mw_version < '1.34':
+                raise Error(err + 'access deleted revisions.')
+            if 'comment' in prop or 'parsedcomment' in prop:
+                raise Error(err + 'access comments of deleted revisions.')
+        if ('content' in prop and not (self.has_right('deletedtext')
+                                       or self.has_right('undelete'))):
+            raise Error(err + 'view deleted content.')
 
         revids = kwargs.pop('revids', None)
         if not (bool(titles) ^ (revids is not None)):
@@ -4809,14 +4815,7 @@ class APISite(BaseSite):
 
         gen.request[pre + 'start'] = start
         gen.request[pre + 'end'] = end
-
-        # handle properties
-        prop = kwargs.pop('prop',
-                          ['ids', 'user', 'comment', 'flags', 'timestamp'])
-        if content:
-            prop.append('content')
-        prop = handle_props(prop)
-        gen.request[pre + 'prop'] = prop
+        gen.request[pre + 'prop'] = handle_props(prop)
 
         # handle other parameters like user
         for k, v in kwargs.items():
