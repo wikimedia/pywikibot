@@ -1869,8 +1869,15 @@ class BasePage(ComparableMixin):
                     self.text = template + self.text
                     self.save(summary=reason)
 
+    def has_deleted_revisions(self) -> bool:
+        """Return True if the page has deleted revisions."""
+        if not hasattr(self, '_has_deleted_revisions'):
+            gen = self.site.deletedrevs(self, total=1, prop=['ids'])
+            self._has_deleted_revisions = bool(list(gen))
+        return self._has_deleted_revisions
+
     @deprecated_args(step=True)
-    def loadDeletedRevisions(self, total=None):
+    def loadDeletedRevisions(self, total=None, **kwargs):
         """
         Retrieve deleted revisions for this Page.
 
@@ -1883,13 +1890,13 @@ class BasePage(ComparableMixin):
         """
         if not hasattr(self, '_deletedRevs'):
             self._deletedRevs = {}
-        for item in self.site.deletedrevs(self, total=total):
+        for item in self.site.deletedrevs(self, total=total, **kwargs):
             for rev in item.get('revisions', []):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
 
     @deprecated_args(retrieveText='content')
-    def getDeletedRevision(self, timestamp, content=False) -> list:
+    def getDeletedRevision(self, timestamp, content=False, **kwargs) -> List:
         """
         Return a particular deleted revision by timestamp.
 
@@ -1905,7 +1912,7 @@ class BasePage(ComparableMixin):
                 return self._deletedRevs[timestamp]
 
         for item in self.site.deletedrevs(self, start=timestamp,
-                                          content=content, total=1):
+                                          content=content, total=1, **kwargs):
             # should only be one item with one revision
             if item['title'] == self.title:
                 if 'revisions' in item:
