@@ -874,11 +874,12 @@ def handle_args(args=None, do_help=True):
                 # argument not global -> specific bot script will take care
                 non_global_args.append(arg)
 
-    try:
-        pywikibot.Site()
-    except (UnknownFamily, UnknownSite):
-        pywikibot.exception()
-        sys.exit(1)
+    if calledModuleName() != 'generate_user_files':  # T261771
+        try:
+            pywikibot.Site()
+        except (UnknownFamily, UnknownSite):
+            pywikibot.exception()
+            sys.exit(1)
 
     if username:
         config.usernames[config.family][config.mylang] = username
