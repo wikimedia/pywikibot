@@ -5,13 +5,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot.page import BasePage
 
-from tests.aspects import (
-    unittest, TestCase,
-)
+from tests.aspects import unittest, TestCase
 
 
 class BasePageTestBase(TestCase):
@@ -22,7 +20,7 @@ class BasePageTestBase(TestCase):
 
     def setUp(self):
         """Set up test."""
-        super(BasePageTestBase, self).setUp()
+        super().setUp()
         assert self._page, 'setUp() must create an empty BasePage in _page'
         assert isinstance(self._page, BasePage)
 
@@ -42,10 +40,10 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
 
     def setUp(self):
         """Set up test."""
-        super(BasePageLoadRevisionsCachingTestBase, self).setUp()
+        super().setUp()
         assert self.cached is False, 'Tests do not support caching'
 
-    def _test_page_text(self):
+    def _test_page_text(self, get_text=True):
         """Test site.loadrevisions() with .text."""
         page = self._page
 
@@ -89,16 +87,23 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         loadrevisions = self.site.loadrevisions
         try:
             self.site.loadrevisions = None
-            loaded_text = page.text
+            if get_text:
+                loaded_text = page.text
+            else:  # T107537
+                with self.assertRaises(NotImplementedError):
+                    page.text
+                loaded_text = ''
             self.assertIsNotNone(loaded_text)
             self.assertFalse(hasattr(page, '_text'))
             page.text = custom_text
-            self.assertEqual(page.get(), loaded_text)
+            if get_text:
+                self.assertEqual(page.get(), loaded_text)
             self.assertEqual(page._text, custom_text)
             self.assertEqual(page.text, page._text)
             del page.text
             self.assertFalse(hasattr(page, '_text'))
-            self.assertEqual(page.text, loaded_text)
+            if get_text:
+                self.assertEqual(page.text, loaded_text)
         finally:
             self.site.loadrevisions = loadrevisions
 
@@ -136,7 +141,5 @@ class BasePageMethodsTestBase(BasePageTestBase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

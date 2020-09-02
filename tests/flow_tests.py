@@ -11,10 +11,9 @@ from pywikibot.exceptions import NoPage
 from pywikibot.flow import Board, Topic, Post
 
 from tests import unittest
-from tests.aspects import (
-    TestCase,
-)
-from tests.basepage_tests import (
+
+from tests.aspects import TestCase
+from tests.basepage import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
 )
@@ -81,8 +80,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
-        self.skipTest('See T107537')
-        self._test_page_text()
+        self._test_page_text(get_text=False)  # See T107537
 
 
 class TestFlowLoading(TestMediaWikiFlowSandbox):

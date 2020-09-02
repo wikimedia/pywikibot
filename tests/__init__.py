@@ -73,7 +73,6 @@ _pwb_py = join_root_path('pwb.py')
 
 library_test_modules = {
     'api',
-    'basepage',
     'bot',
     'category',
     'cosmetic_changes',

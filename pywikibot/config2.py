@@ -45,10 +45,8 @@ import stat
 import sys
 import types
 
-from distutils.version import StrictVersion
 from locale import getdefaultlocale
 from os import getenv, environ
-from requests import __version__ as requests_version
 from textwrap import fill
 from warnings import warn
 
@@ -784,7 +782,7 @@ persistent_http = False
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your
 # script.
 # You may assign either a tuple of two int or float values for connection and
-# read timeout, or a single value for both in a tuple (since requests 2.4.0).
+# read timeout, or a single value for both in a tuple.
 socket_timeout = (6.05, 45)
 
 
@@ -1130,13 +1128,6 @@ if family == 'wikipedia' and mylang == 'language':
         warning('family and mylang are not set.\n'
                 "Defaulting to family='wikipedia' and mylang='test'.")
     mylang = 'test'
-
-# Fix up socket_timeout
-# Older requests library expect a single value whereas newer versions also
-# accept a tuple (connect timeout, read timeout).
-if (isinstance(socket_timeout, tuple)
-        and StrictVersion(requests_version) < StrictVersion('2.4.0')):
-    socket_timeout = max(socket_timeout)
 
 # SECURITY WARNINGS
 if (not ignore_file_security_warnings

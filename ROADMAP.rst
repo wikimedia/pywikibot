@@ -1,14 +1,10 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Add support for ja.wikivoyage (T261450)
-* Only run cosmetic changes on wikitext pages (T260489)
-* Leave a script gracefully for wrong -lang and -family option (T259756)
-* Change meaning of BasePage.text (T260472)
-* site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/endcodings() methods
-* Site.getExpandedString() method was removed in favour of expand_text
-* Site.Family() function was removed in favour of Family.load() method
-* Add wikispore family (T260049)
+* Don't check for valid Family/Site if running generate_user_files.py (T261771)
+* Remove socket_timeout fix in config2.py introduced with T103069
+* Prevent huge traceback from underlying python libraries (T253236)
+* Localisation updates
 
 
 Future release notes
