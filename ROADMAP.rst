@@ -1,7 +1,10 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* Don't check for valid Family/Site if running generate_user_files.py (T261771)
+* Remove socket_timeout fix in config2.py introduced with T103069
+* Prevent huge traceback from underlying python libraries (T253236)
+* Localisation updates
 
 
 Future release notes
