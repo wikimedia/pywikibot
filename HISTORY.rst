@@ -1,6 +1,17 @@
 Release history
 ===============
 
+4.3.0
+-----
+
+*2 September 2020*
+
+* Don't check for valid Family/Site if running generate_user_files.py (T261771)
+* Remove socket_timeout fix in config2.py introduced with T103069
+* Prevent huge traceback from underlying python libraries (T253236)
+* Localisation updates
+
+
 4.2.0
 -----
 
