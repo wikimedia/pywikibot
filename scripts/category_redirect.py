@@ -354,7 +354,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 # make sure every redirect has a record entry
                 record[cat_title] = {today: None}
                 try:
-                    newredirs.append('*# {} -> {}'.format(
+                    newredirs.append('*# {} → {}'.format(
                         cat.title(as_link=True, textlink=True),
                         cat.getCategoryRedirectTarget().title(
                             as_link=True, textlink=True)))
