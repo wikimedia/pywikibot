@@ -932,6 +932,12 @@ class TestPageHistory(DefaultSiteTestCase):
         cnt = mp.contributors()
         self.assertEqual(rev_count, sum(cnt.values()))
 
+        user, count = cnt.most_common(1)[0]
+        self.assertEqual(mp.revision_count([user]), count)
+        self.assertEqual(mp.revision_count(user), count)
+        self.assertEqual(mp.revision_count(pywikibot.User(self.site, user)),
+                         count)
+
         top_two = cnt.most_common(2)
         self.assertIsInstance(top_two, list)
         self.assertLength(top_two, 2)

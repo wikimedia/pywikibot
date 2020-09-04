@@ -1833,7 +1833,7 @@ class BasePage(ComparableMixin):
                        self.revisions(total=total,
                                       starttime=starttime, endtime=endtime))
 
-    @deprecated('contributors()', since='20150206')
+    @deprecated('contributors().keys()', since='20150206', future_warning=True)
     @deprecated_args(step=True)
     def contributingUsers(self, total=None):
         """
@@ -1841,25 +1841,31 @@ class BasePage(ComparableMixin):
 
         @param total: iterate no more than this number of revisions in total
 
-        @rtype: set
+        @rtype: dict_keys
         """
         return self.contributors(total=total).keys()
 
-    def revision_count(self, contributors=None):
-        """
-        Determine number of edits from a set of contributors.
+    def revision_count(self, contributors=None) -> int:
+        """Determine number of edits from contributors.
 
         @param contributors: contributor usernames
-        @type contributors: iterable of str
-
+        @type contributors: iterable of str or pywikibot.User,
+            a single pywikibot.User, a str or None
         @return: number of edits for all provided usernames
-        @rtype: int
         """
-        if not contributors:
-            return len(list(self.revisions()))
-
         cnt = self.contributors()
-        return sum(cnt[username] for username in contributors)
+
+        if not contributors:
+            return sum(cnt.values())
+
+        if isinstance(contributors, User):
+            contributors = contributors.username
+
+        if isinstance(contributors, str):
+            return cnt[contributors]
+
+        return sum(cnt[user.username] if isinstance(user, User) else cnt[user]
+                   for user in contributors)
 
     @deprecated('oldest_revision', since='20140421', future_warning=True)
     def getCreator(self):
