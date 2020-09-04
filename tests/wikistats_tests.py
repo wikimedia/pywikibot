@@ -7,7 +7,9 @@
 #
 import sys
 
-from pywikibot.data.wikistats import WikiStats, csv
+from contextlib import suppress
+
+from pywikibot.data.wikistats import WikiStats
 
 from tests.aspects import unittest, TestCase
 
@@ -62,8 +64,6 @@ class WikiStatsTestCase(TestCase):
 
     def test_csv(self):
         """Test CSV."""
-        if not csv:
-            self.skipTest('unicodecsv not installed.')
         ws = WikiStats()
         data = ws.get_dict('wikipedia', 'csv')
         self.assertIsInstance(data, dict)
@@ -72,8 +72,7 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(data['en']['total']), int(data['en']['good']))
         data = data['en']
         self.assertTrue(all(isinstance(key, str)
-                            for key in data.keys()
-                            if key is not None))
+                            for key in data.keys() if key is not None))
         self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)
@@ -88,15 +87,12 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(data['fr']['total']), int(data['fr']['good']))
         data = data['fr']
         self.assertTrue(all(isinstance(key, str)
-                            for key in data.keys()
-                            if key is not None))
+                            for key in data.keys() if key is not None))
         self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
