@@ -1763,22 +1763,6 @@ def open_compressed(filename, use_extension=False):
     return open_archive(filename, use_extension=use_extension)
 
 
-class IteratorNextMixin(Iterator):
-
-    """DEPRECATED. Backwards compatibility for Iterators."""
-
-    pass
-
-
-class _UnicodeMixin:
-
-    """DEPRECATED. Mixin class to add __str__ method in Python 2 or 3."""
-
-    def __str__(self):
-        """Return the unicode representation as the str representation."""
-        return self.__unicode__()
-
-
 @deprecated('bot_choice.Option and its subclasses', since='20181217')
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
@@ -1803,18 +1787,7 @@ def concat_options(message, line_length, options):
     return '{} ({}):'.format(message, option_msg)
 
 
-@deprecated(since='20200723', future_warning=True)
-def py2_encode_utf_8(func):
-    """Decorator to optionally encode the string result of func on Python 2."""
-    return func
-
-
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
-                             replacement_name='',
-                             since='20200723', future_warning=True)
-wrapper._add_deprecated_attr('IteratorNextMixin', replacement_name='',
-                             since='20200723', future_warning=True)
 wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
