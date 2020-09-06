@@ -81,7 +81,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
             record.args = (msg,)
 
-        text = logging.handlers.RotatingFileHandler.format(self, record)
+        text = super().format(record)
         return text.rstrip()
 
 
@@ -97,7 +97,7 @@ class LoggingFormatter(logging.Formatter):
 
     def __init__(self, fmt=None, datefmt=None, encoding=None):
         """Initializer with additional encoding parameter."""
-        logging.Formatter.__init__(self, fmt, datefmt)
+        super().__init__(fmt, datefmt)
         self._encoding = encoding
 
     def formatException(self, ei):
@@ -113,7 +113,7 @@ class LoggingFormatter(logging.Formatter):
 
         Formatter.formatException also strips the trailing \n, which we need.
         """
-        exception_string = logging.Formatter.formatException(self, ei)
+        exception_string = super().formatException(ei)
 
         if PY2 and isinstance(exception_string, bytes):
             return exception_string.decode(self._encoding) + '\n'

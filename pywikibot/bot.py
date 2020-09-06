@@ -220,7 +220,7 @@ class LoggingFormatter(_LoggingFormatter):
 
     def __init__(self, fmt=None, datefmt=None):
         """Initializer setting underlying encoding to console_encoding."""
-        _LoggingFormatter.__init__(self, fmt, datefmt, config.console_encoding)
+        super().__init__(fmt, datefmt, config.console_encoding)
 
 
 # Initialize the handlers and formatters for the logging system.

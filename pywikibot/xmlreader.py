@@ -82,7 +82,7 @@ class XmlParserThread(threading.Thread):
 
     def __init__(self, filename, handler):
         """Initializer."""
-        threading.Thread.__init__(self)
+        super().__init__()
         self.filename = filename
         self.handler = handler
 

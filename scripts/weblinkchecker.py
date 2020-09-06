@@ -573,7 +573,7 @@ class LinkCheckThread(threading.Thread):
 
     def __init__(self, page, url, history, HTTPignore, day):
         """Initializer."""
-        threading.Thread.__init__(self)
+        super().__init__()
         self.page = page
         self.url = url
         self.history = history
@@ -763,7 +763,7 @@ class DeadLinkReportThread(threading.Thread):
 
     def __init__(self):
         """Initializer."""
-        threading.Thread.__init__(self)
+        super().__init__()
         self.semaphore = threading.Semaphore()
         self.queue = []
         self.finishing = False

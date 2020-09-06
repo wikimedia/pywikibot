@@ -472,7 +472,7 @@ class TerminalHandler(logging.Handler):
         If strm is not specified, sys.stderr is used.
 
         """
-        logging.Handler.__init__(self)
+        super().__init__()
         # replace Handler's instance-specific lock with the shared class lock
         # to ensure that only one instance of this handler can write to
         # the console at a time
