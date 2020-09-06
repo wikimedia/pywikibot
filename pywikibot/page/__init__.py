@@ -27,6 +27,7 @@ from collections import Counter, defaultdict, namedtuple, OrderedDict
 from collections.abc import MutableMapping
 from html.entities import name2codepoint
 from itertools import chain
+from typing import List, Optional, Tuple, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
@@ -267,12 +268,11 @@ class BasePage(ComparableMixin):
         return self._depth
 
     @property
-    def pageid(self):
+    def pageid(self) -> int:
         """
         Return pageid of the page.
 
         @return: pageid or 0 if page does not exist
-        @rtype: int
         """
         if not hasattr(self, '_pageid'):
             self.site.loadpageinfo(self)
@@ -370,14 +370,12 @@ class BasePage(ComparableMixin):
         return title
 
     @remove_last_args(('decode', 'underscore'))
-    def section(self):
+    def section(self) -> Optional[str]:
         """
         Return the name of the section this Page refers to.
 
         The section is the part of the title following a '#' character, if
         any. If no section is present, return None.
-
-        @rtype: str or None
         """
         try:
             section = self._link.section
@@ -385,11 +383,11 @@ class BasePage(ComparableMixin):
             section = None
         return section
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation."""
         return self.title(as_link=True, force_interwiki=True)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a more complete string representation."""
         return '{}({!r})'.format(self.__class__.__name__, self.title())
 
@@ -444,7 +442,7 @@ class BasePage(ComparableMixin):
     @deprecated_args(throttle=True,
                      change_edit_time=True,
                      expandtemplates=True)
-    def get(self, force=False, get_redirect=False):
+    def get(self, force=False, get_redirect=False) -> str:
         """
         Return the wiki-text of the page.
 
@@ -462,7 +460,6 @@ class BasePage(ComparableMixin):
         @param force:           reload all page attributes, including errors.
         @param get_redirect:    return the redirect text, do not follow the
                                 redirect, do not raise an exception.
-        @rtype: str
         """
         if force:
             del self.latest_revision_id
@@ -509,12 +506,11 @@ class BasePage(ComparableMixin):
 
     @remove_last_args(['sysop'])
     @deprecated_args(throttle=True, change_edit_time=True)
-    def getOldVersion(self, oldid, force=False, get_redirect=False):
+    def getOldVersion(self, oldid, force=False, get_redirect=False) -> str:
         """
         Return text of an old revision of this page; same options as get().
 
         @param oldid: The revid of the revision desired.
-        @rtype: str
         """
         if force or oldid not in self._revisions \
                 or self._revisions[oldid].text is None:
@@ -524,7 +520,8 @@ class BasePage(ComparableMixin):
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
-    def permalink(self, oldid=None, percent_encoded=True, with_protocol=False):
+    def permalink(self, oldid=None, percent_encoded: bool = True,
+                  with_protocol: bool = False) -> str:
         """Return the permalink URL of an old revision of this page.
 
         @param oldid: The revid of the revision desired.
@@ -532,7 +529,6 @@ class BasePage(ComparableMixin):
             without title uncoded.
         @param with_protocol: if true, http or https prefixes will be
             included before the double slash.
-        @rtype: str
         """
         if percent_encoded:
             title = self.title(as_url=True)
@@ -602,12 +598,11 @@ class BasePage(ComparableMixin):
         return next(self.revisions(content=True, total=1))
 
     @property
-    def text(self):
+    def text(self) -> str:
         """
         Return the current (edited) wikitext, loading it if necessary.
 
         @return: text of the page
-        @rtype: str
         """
         if getattr(self, '_text', None) is not None:
             return self._text
@@ -638,7 +633,7 @@ class BasePage(ComparableMixin):
         if hasattr(self, '_raw_extracted_templates'):
             del self._raw_extracted_templates
 
-    def preloadText(self):
+    def preloadText(self) -> str:
         """
         The text returned by EditFormPreloadText.
 
@@ -646,8 +641,6 @@ class BasePage(ComparableMixin):
 
         Application: on Wikisource wikis, text can be preloaded even if
         a page does not exist, if an Index page is present.
-
-        @rtype: str
         """
         self.site.loadpageinfo(self, preload=True)
         return self._preloadedtext
@@ -659,26 +652,22 @@ class BasePage(ComparableMixin):
             self._parsed_text = self.site.get_parsed_page(self)
         return self._parsed_text
 
-    def properties(self, force=False):
+    def properties(self, force=False) -> dict:
         """
         Return the properties of the page.
 
         @param force: force updating from the live site
-
-        @rtype: dict
         """
         if not hasattr(self, '_pageprops') or force:
             self._pageprops = {}  # page may not have pageprops (see T56868)
             self.site.loadpageprops(self)
         return self._pageprops
 
-    def defaultsort(self, force=False):
+    def defaultsort(self, force=False) -> Optional[str]:
         """
         Extract value of the {{DEFAULTSORT:}} magic word from the page.
 
         @param force: force updating from the live site
-
-        @rtype: str or None
         """
         return self.properties(force=force).get('defaultsort')
 
@@ -702,20 +691,12 @@ class BasePage(ComparableMixin):
                 includecomments=includecomments)
         return self._expanded_text
 
-    def userName(self):
-        """
-        Return name or IP address of last user to edit page.
-
-        @rtype: str
-        """
+    def userName(self) -> str:
+        """Return name or IP address of last user to edit page."""
         return self.latest_revision.user
 
-    def isIpEdit(self):
-        """
-        Return True if last editor was unregistered.
-
-        @rtype: bool
-        """
+    def isIpEdit(self) -> bool:
+        """Return True if last editor was unregistered."""
         return self.latest_revision.anon
 
     def lastNonBotUser(self):
@@ -753,13 +734,11 @@ class BasePage(ComparableMixin):
     @property
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609')
-    def previous_revision_id(self):
+    def previous_revision_id(self) -> int:
         """
         Return the revision id for the previous revision of this Page.
 
         If the page has only one revision, it shall return -1.
-
-        @rtype: int
 
         @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
@@ -767,25 +746,21 @@ class BasePage(ComparableMixin):
 
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609')
-    def previousRevision(self):
+    def previousRevision(self) -> int:
         """
         Return the revision id for the previous revision.
 
         DEPRECATED: Use latest_revision.parent_id instead.
 
-        @rtype: int
-
         @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
         return self.latest_revision.parent_id or -1
 
-    def exists(self):
+    def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 
         If the title includes a section, return False if this section isn't
         found.
-
-        @rtype: bool
         """
         return self.pageid > 0
 
@@ -802,17 +777,14 @@ class BasePage(ComparableMixin):
         """Return True if this is a redirect, False if not or not existing."""
         return self.site.page_isredirect(self)
 
-    def isStaticRedirect(self, force=False):
+    def isStaticRedirect(self, force: bool = False) -> bool:
         """
         Determine whether the page is a static redirect.
 
-        A static redirect must be a valid redirect, and contain the magic word
-        __STATICREDIRECT__.
+        A static redirect must be a valid redirect, and contain the magic
+        word __STATICREDIRECT__.
 
         @param force: Bypass local caching
-        @type force: bool
-
-        @rtype: bool
         """
         found = False
         if self.isRedirectPage():
@@ -825,12 +797,8 @@ class BasePage(ComparableMixin):
                         break
         return found
 
-    def isCategoryRedirect(self):
-        """
-        Return True if this is a category redirect page, False otherwise.
-
-        @rtype: bool
-        """
+    def isCategoryRedirect(self) -> bool:
+        """Return True if this is a category redirect page, False otherwise."""
         if not self.is_categorypage():
             return False
         if not hasattr(self, '_catredirect'):
@@ -867,14 +835,12 @@ class BasePage(ComparableMixin):
         raise pywikibot.IsNotRedirectPage(self)
 
     @deprecated(since='20151207')
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         """
         Return True if the page text has less than 4 characters.
 
         Character count ignores language links and category links.
         Can raise the same exceptions as get().
-
-        @rtype: bool
         """
         txt = self.get()
         txt = textlib.removeLanguageLinks(txt, site=self.site)
@@ -924,8 +890,8 @@ class BasePage(ComparableMixin):
         """DEPRECATED: use is_filepage instead."""
         return self.is_filepage()
 
-    @remove_last_args(('get_Index', ))
-    def isDisambig(self):
+    @remove_last_args(['get_Index'])
+    def isDisambig(self) -> bool:
         """
         Return True if this is a disambiguation page, False otherwise.
 
@@ -941,8 +907,6 @@ class BasePage(ComparableMixin):
         exist, take the MediaWiki message. 'Template:Disambig' is always
         assumed to be default, and will be appended regardless of its
         existence.
-
-        @rtype: bool
         """
         if self.site.has_extension('Disambiguator'):
             # If the Disambiguator extension is loaded, use it
@@ -1075,12 +1039,8 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    def protection(self):
-        """
-        Return a dictionary reflecting page protections.
-
-        @rtype: dict
-        """
+    def protection(self) -> dict:
+        """Return a dictionary reflecting page protections."""
         return self.site.page_restrictions(self)
 
     def applicable_protections(self) -> set:
@@ -1110,16 +1070,13 @@ class BasePage(ComparableMixin):
                 p_types.remove('upload')
             return p_types
 
-    def has_permission(self, action='edit'):
+    def has_permission(self, action: str = 'edit') -> bool:
         """Determine whether the page can be modified.
 
         Return True if the bot has the permission of needed restriction level
         for the given action type.
 
         @param action: a valid restriction type like 'edit', 'move'
-        @type action: str
-        @rtype: bool
-
         @raises ValueError: invalid action parameter
         """
         return self.site.page_can_be_edited(self, action)
@@ -1129,7 +1086,7 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
-    def botMayEdit(self):
+    def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
 
@@ -1143,8 +1100,6 @@ class BasePage(ComparableMixin):
         The framework enforces this restriction by default. It is possible
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
-
-        @rtype: bool
         """
         if not hasattr(self, 'templatesWithParams'):
             return True
@@ -1320,14 +1275,12 @@ class BasePage(ComparableMixin):
         if not quiet:
             pywikibot.output('Page %s saved' % link)
 
-    def _cosmetic_changes_hook(self, summary):
+    def _cosmetic_changes_hook(self, summary: str) -> str:
         """The cosmetic changes hook.
 
         @param summary: The current edit summary.
-        @type summary: str
         @return: Modified edit summary if cosmetic changes has been done,
             else the old edit summary.
-        @rtype: str
         """
         if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
@@ -1396,15 +1349,12 @@ class BasePage(ComparableMixin):
                  minor=minor, botflag=botflag, force=force,
                  asynchronous=True, callback=callback, **kwargs)
 
-    def watch(self, unwatch=False):
+    def watch(self, unwatch: bool = False) -> bool:
         """
         Add or remove this page to/from bot account's watchlist.
 
         @param unwatch: True to unwatch, False (default) to watch.
-        @type unwatch: bool
-
         @return: True if successful, False otherwise.
-        @rtype: bool
         """
         return self.site.watch(self, unwatch)
 
@@ -1417,7 +1367,7 @@ class BasePage(ComparableMixin):
             except AttributeError:
                 pass
 
-    def purge(self, **kwargs):
+    def purge(self, **kwargs) -> bool:
         """
         Purge the server's cache for this page.
 
@@ -1432,7 +1382,6 @@ class BasePage(ComparableMixin):
         @keyword forcerecursivelinkupdate: Update the links table, and update
             the links tables for any page that uses this page as a template.
         @type forcerecursivelinkupdate: bool
-        @rtype: bool
         """
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
@@ -1523,7 +1472,7 @@ class BasePage(ComparableMixin):
                 # ignore any links with invalid contents
                 continue
 
-    def langlinks(self, include_obsolete=False):
+    def langlinks(self, include_obsolete=False) -> list:
         """
         Return a list of all inter-language Links on this page.
 
@@ -1532,7 +1481,6 @@ class BasePage(ComparableMixin):
         @type include_obsolete: bool
 
         @return: list of Link objects.
-        @rtype: list
         """
         # Note: We preload a list of *all* langlinks, including links to
         # obsolete sites, and store that in self._langlinks. We then filter
@@ -1868,14 +1816,13 @@ class BasePage(ComparableMixin):
                    for user in contributors)
 
     @deprecated('oldest_revision', since='20140421', future_warning=True)
-    def getCreator(self):
+    def getCreator(self) -> Tuple[str, str]:
         """
         Get the first revision of the page.
 
         DEPRECATED: Use Page.oldest_revision.
 
         @return: tuple of username and timestamp in isoformat
-        @rtype: tuple[str]
         """
         result = self.oldest_revision
         return result.user, result.timestamp.isoformat()
@@ -2012,7 +1959,7 @@ class BasePage(ComparableMixin):
                 yield rev['timestamp']
 
     @deprecated_args(retrieveText='content')
-    def getDeletedRevision(self, timestamp, content=False):
+    def getDeletedRevision(self, timestamp, content=False) -> list:
         """
         Return a particular deleted revision by timestamp.
 
@@ -2020,7 +1967,6 @@ class BasePage(ComparableMixin):
             marker]. text will be None, unless content is True (or has
             been retrieved earlier). If timestamp is not found, returns
             empty list.
-        @rtype: list
         """
         if hasattr(self, '_deletedRevs'):
             if timestamp in self._deletedRevs and (
@@ -2169,7 +2115,7 @@ class BasePage(ComparableMixin):
     def change_category(
         self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
         include=[]
-    ):
+    ) -> bool:
         """
         Remove page from oldCat and add it to newCat.
 
@@ -2192,7 +2138,6 @@ class BasePage(ComparableMixin):
         @type include: list
 
         @return: True if page was saved changed, otherwise False.
-        @rtype: bool
         """
         # get list of Category objects the article is in and remove possible
         # duplicates
@@ -2262,15 +2207,13 @@ class BasePage(ComparableMixin):
         """DEPRECATED: use self.is_flow_page instead."""
         return self.is_flow_page()
 
-    def is_flow_page(self):
-        """
-        Whether a page is a Flow page.
-
-        @rtype: bool
-        """
+    def is_flow_page(self) -> bool:
+        """Whether a page is a Flow page."""
         return self.content_model == 'flow-board'
 
-    def create_short_link(self, permalink=False, with_protocol=True):
+    def create_short_link(self,
+                          permalink: bool = False,
+                          with_protocol: bool = True) -> str:
         """
         Return a shortened link that points to that page.
 
@@ -2279,13 +2222,10 @@ class BasePage(ComparableMixin):
 
         @param permalink: If true, the link will point to the actual revision
             of the page.
-        @type permalink: bool
         @param with_protocol: If true, and if it's not already included,
             the link will have http(s) protocol prepended. On Wikimedia wikis
             the protocol is already present.
-        @type with_protocol: bool
         @return: The reduced link.
-        @rtype: str
         """
         wiki = self.site
         if self.site.family.shared_urlshortner_wiki:
@@ -2517,14 +2457,13 @@ class FilePage(Page):
         oldest_ts = min(self._file_revisions)
         return self._file_revisions[oldest_ts]
 
-    def get_file_history(self):
+    def get_file_history(self) -> dict:
         """
         Return the file's version history.
 
         @return: dictionary with:
             key: timestamp of the entry
             value: instance of FileInfo()
-        @rtype: dict
         """
         if not len(self._file_revisions):
             self.site.loadimageinfo(self, history=True)
@@ -2548,7 +2487,8 @@ class FilePage(Page):
         """Return the URL for the file described on this page."""
         return self.latest_file_info.url
 
-    def get_file_url(self, url_width=None, url_height=None, url_param=None):
+    def get_file_url(self, url_width=None, url_height=None,
+                     url_param=None) -> str:
         """
         Return the url or the thumburl of the file described on this page.
 
@@ -2567,7 +2507,6 @@ class FilePage(Page):
         @param url_height: see iiurlheigth in [1]
         @param url_param: see iiurlparam in [1]
         @return: latest file url or thumburl
-        @rtype: str
         """
         # Plain url is requested.
         if url_width is None and url_height is None and url_param is None:
@@ -2580,29 +2519,17 @@ class FilePage(Page):
         return self.latest_file_info.thumburl
 
     @deprecated('file_is_shared', since='20121101', future_warning=True)
-    def fileIsOnCommons(self):
-        """
-        DEPRECATED. Check if the image is stored on Wikimedia Commons.
-
-        @rtype: bool
-        """
+    def fileIsOnCommons(self) -> bool:
+        """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
         return self.file_is_shared()
 
     @deprecated('file_is_shared', since='20200618')
-    def fileIsShared(self):
-        """
-        DEPRECATED. Check if the image is stored on Wikimedia Commons.
-
-        @rtype: bool
-        """
+    def fileIsShared(self) -> bool:
+        """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
         return self.file_is_shared()
 
-    def file_is_shared(self):
-        """
-        Check if the file is stored on any known shared repository.
-
-        @rtype: bool
-        """
+    def file_is_shared(self) -> bool:
+        """Check if the file is stored on any known shared repository."""
         # as of now, the only known repositories are commons and wikitravel
         # TODO: put the URLs to family file
         if not self.site.has_image_repository:
@@ -2653,7 +2580,7 @@ class FilePage(Page):
 
     @deprecated('FilePage.get_file_history()', since='20141106',
                 future_warning=True)
-    def getFileVersionHistory(self):
+    def getFileVersionHistory(self) -> list:
         """
         Return the file's version history.
 
@@ -2661,7 +2588,6 @@ class FilePage(Page):
 
             [comment, sha1, url, timestamp, metadata,
              height, width, mime, user, descriptionurl, size]
-        @rtype: list
         """
         return self.site.loadimageinfo(self, history=True)
 
@@ -2690,14 +2616,13 @@ class FilePage(Page):
         """
         return self.site.imageusage(self, total=total, content=content)
 
-    def upload(self, source, **kwargs):
+    def upload(self, source: str, **kwargs) -> bool:
         """
         Upload this file to the wiki.
 
         keyword arguments are from site.upload() method.
 
         @param source: Path or URL to the file to be uploaded.
-        @type source: str
 
         @keyword comment: Edit summary; if this is not provided, then
             filepage.text will be used. An empty summary is not permitted.
@@ -2741,7 +2666,6 @@ class FilePage(Page):
             otherwise. If it's True or None ignore_warnings must be a bool.
         @return: It returns True if the upload was successful and False
             otherwise.
-        @rtype: bool
         """
         filename = url = None
         if '://' in source:
@@ -2897,11 +2821,16 @@ class Category(Page):
                                 return
 
     @deprecated_args(startFrom='startprefix', step=True)
-    def articles(self, recurse=False, total=None,
-                 content=False, namespaces=None, sortby=None,
+    def articles(self,
+                 recurse: Union[int, bool] = False,
+                 total=None, content=False,
+                 namespaces: Union[int, List[int]] = None,
+                 sortby: str = None,
                  reverse=False, starttime=None, endtime=None,
-                 startsort=None, endsort=None,
-                 startprefix=None, endprefix=None,
+                 startsort: Optional[str] = None,
+                 endsort: Optional[str] = None,
+                 startprefix: Optional[str] = None,
+                 endprefix: Optional[str] = None,
                  ):
         """
         Yield all articles in the current category.
@@ -2913,18 +2842,15 @@ class Category(Page):
             subcategories. If an int, limit recursion to this number of
             levels. (Example: recurse=1 will iterate articles in first-level
             subcats, but no deeper.)
-        @type recurse: int or bool
         @param total: iterate no more than this number of pages in
             total (at all levels)
         @param namespaces: only yield pages in the specified namespaces
-        @type namespaces: int or list of ints
         @param content: if True, retrieve the content of the current version
             of each page (default False)
         @param sortby: determines the order in which results are generated,
             valid values are "sortkey" (default, results ordered by category
             sort key) or "timestamp" (results ordered by time page was
             added to the category). This applies recursively.
-        @type sortby: str
         @param reverse: if True, generate results in reverse order
             (default False)
         @param starttime: if provided, only generate pages added after this
@@ -2936,19 +2862,15 @@ class Category(Page):
         @param startsort: if provided, only generate pages that have a
             sortkey >= startsort; not valid if sortby="timestamp"
             (Deprecated in MW 1.24)
-        @type startsort: str
         @param endsort: if provided, only generate pages that have a
             sortkey <= endsort; not valid if sortby="timestamp"
             (Deprecated in MW 1.24)
-        @type endsort: str
         @param startprefix: if provided, only generate pages >= this title
             lexically; not valid if sortby="timestamp"; overrides "startsort"
             (requires MW 1.18+)
-        @type startprefix: str
         @param endprefix: if provided, only generate pages < this title
             lexically; not valid if sortby="timestamp"; overrides "endsort"
             (requires MW 1.18+)
-        @type endprefix: str
         @rtype: typing.Iterable[pywikibot.Page]
         """
         seen = set()
@@ -3024,33 +2946,23 @@ class Category(Page):
                         if total == 0:
                             return
 
-    def isEmptyCategory(self):
-        """
-        Return True if category has no members (including subcategories).
-
-        @rtype: bool
-        """
+    def isEmptyCategory(self) -> bool:
+        """Return True if category has no members (including subcategories)."""
         ci = self.categoryinfo
         return sum(ci[k] for k in ['files', 'pages', 'subcats']) == 0
 
-    def isHiddenCategory(self):
-        """
-        Return True if the category is hidden.
-
-        @rtype: bool
-        """
+    def isHiddenCategory(self) -> bool:
+        """Return True if the category is hidden."""
         return 'hiddencat' in self.properties()
 
     @property
-    def categoryinfo(self):
+    def categoryinfo(self) -> dict:
         """
         Return a dict containing information about the category.
 
         The dict contains values for:
 
         Numbers of pages, subcategories, files, and total contents.
-
-        @rtype: dict
         """
         return self.site.categoryinfo(self)
 
@@ -3161,32 +3073,28 @@ class User(Page):
                 'This is an autoblock ID, you can only use to unblock it.')
 
     @deprecated('User.username', since='20160504')
-    def name(self):
+    def name(self) -> str:
         """
         The username.
 
         DEPRECATED: use username instead.
-
-        @rtype: str
         """
         return self.username
 
     @property
-    def username(self):
+    def username(self) -> str:
         """
         The username.
 
         Convenience method that returns the title of the page with
         namespace prefix omitted, which is the username.
-
-        @rtype: str
         """
         if self._isAutoblock:
             return '#' + self.title(with_ns=False)
         else:
             return self.title(with_ns=False)
 
-    def isRegistered(self, force=False):
+    def isRegistered(self, force: bool = False) -> bool:
         """
         Determine if the user is registered on the site.
 
@@ -3197,30 +3105,20 @@ class User(Page):
         True.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @rtype: bool
         """
         # T135828: the registration timestamp may be None but the key exists
         return (not self.isAnonymous()
                 and 'registration' in self.getprops(force))
 
-    def isAnonymous(self):
-        """
-        Determine if the user is editing as an IP address.
-
-        @rtype: bool
-        """
+    def isAnonymous(self) -> bool:
+        """Determine if the user is editing as an IP address."""
         return is_IP(self.username)
 
-    def getprops(self, force=False):
+    def getprops(self, force: bool = False) -> dict:
         """
         Return a properties about the user.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @rtype: dict
         """
         if force and hasattr(self, '_userprops'):
             del self._userprops
@@ -3248,73 +3146,58 @@ class User(Page):
                 return pywikibot.Timestamp.fromISOformat(reg)
         return None
 
-    def editCount(self, force=False):
+    def editCount(self, force: bool = False) -> int:
         """
         Return edit count for a registered user.
 
         Always returns 0 for 'anonymous' users.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @rtype: int
         """
         return self.getprops(force).get('editcount', 0)
 
-    def isBlocked(self, force=False):
+    def isBlocked(self, force: bool = False) -> bool:
         """
         Determine whether the user is currently blocked.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @rtype: bool
         """
         return 'blockedby' in self.getprops(force)
 
-    def isEmailable(self, force=False):
+    def isEmailable(self, force: bool = False) -> bool:
         """
         Determine whether emails may be send to this user through MediaWiki.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
-
-        @rtype: bool
         """
         return (not self.isAnonymous() and 'emailable' in self.getprops(force))
 
-    def groups(self, force=False):
+    def groups(self, force: bool = False) -> list:
         """
         Return a list of groups to which this user belongs.
 
         The list of groups may be empty.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
         @return: groups property
-        @rtype: list
         """
         return self.getprops(force).get('groups', [])
 
-    def gender(self, force=False):
+    def gender(self, force: bool = False) -> str:
         """Return the gender of the user.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
         @return: return 'male', 'female', or 'unknown'
-        @rtype: str
         """
         if self.isAnonymous():
             return 'unknown'
         return self.getprops(force).get('gender', 'unknown')
 
-    def rights(self, force=False):
+    def rights(self, force: bool = False) -> list:
         """Return user rights.
 
         @param force: if True, forces reloading the data from API
-        @type force: bool
         @return: return user rights
-        @rtype: list
         """
         return self.getprops(force).get('rights', [])
 
@@ -3357,20 +3240,16 @@ class User(Page):
         return Page(Link(self.username + subpage,
                          self.site, default_namespace=3))
 
-    def send_email(self, subject, text, ccme=False):
+    def send_email(self, subject: str, text: str, ccme: bool = False) -> bool:
         """
         Send an email to this user via MediaWiki's email interface.
 
         @param subject: the subject header of the mail
-        @type subject: str
         @param text: mail body
-        @type text: str
         @param ccme: if True, sends a copy of this email to the bot
-        @type ccme: bool
         @raises NotEmailableError: the user of this User is not emailable
         @raises UserRightsError: logged in user does not have 'sendemail' right
         @return: operation successful indicator
-        @rtype: bool
         """
         if not self.isEmailable():
             raise NotEmailableError(self)
@@ -3552,7 +3431,7 @@ class User(Page):
                    item.pageid() > 0)
 
     @property
-    def is_thankable(self):
+    def is_thankable(self) -> bool:
         """
         Determine if the user has thanks notifications enabled.
 
@@ -3560,8 +3439,6 @@ class User(Page):
               Privacy of thanks preferences is under discussion, please see
               https://phabricator.wikimedia.org/T57401#2216861, and
               https://phabricator.wikimedia.org/T120753#1863894
-
-        @rtype: bool
         """
         return self.isRegistered() and 'bot' not in self.groups()
 
@@ -3609,12 +3486,8 @@ class LanguageDict(MutableMapping):
         return key in self._data
 
     @staticmethod
-    def normalizeKey(key):
-        """
-        Helper function to replace site objects with their language codes.
-
-        @rtype: str
-        """
+    def normalizeKey(key) -> str:
+        """Helper function to return language codes of a site object."""
         if isinstance(key, pywikibot.site.BaseSite):
             key = key.lang
         return key
@@ -3899,7 +3772,7 @@ class SiteLinkCollection(MutableMapping):
             return obj
 
     @classmethod
-    def normalizeData(cls, data):
+    def normalizeData(cls, data) -> dict:
         """
         Helper function to expand data into the Wikibase API structure.
 
@@ -3907,7 +3780,6 @@ class SiteLinkCollection(MutableMapping):
         @type data: list or dict
 
         @return: The dict with normalized data
-        @rtype: dict
         """
         norm_data = {}
         if isinstance(data, dict):
@@ -3932,7 +3804,7 @@ class SiteLinkCollection(MutableMapping):
                 norm_data[db_name] = json
         return norm_data
 
-    def toJSON(self, diffto=None):
+    def toJSON(self, diffto: Optional[dict] = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -3940,9 +3812,6 @@ class SiteLinkCollection(MutableMapping):
         to the provided data is created.
 
         @param diffto: JSON containing entity data
-        @type diffto: dict
-
-        @rtype: dict
         """
         data = {dbname: sitelink.toJSON()
                 for (dbname, sitelink) in self.items()}
@@ -4023,14 +3892,11 @@ class WikibaseEntity:
                 self.__class__.__name__, self.repo)
 
     @classmethod
-    def is_valid_id(cls, entity_id):
+    def is_valid_id(cls, entity_id: str) -> bool:
         """
         Whether the string can be a valid id of the entity type.
 
         @param entity_id: The ID to test.
-        @type entity_id: basestring
-
-        @rtype: bool
         """
         if not hasattr(cls, 'title_pattern'):
             return True
@@ -4038,7 +3904,7 @@ class WikibaseEntity:
         # todo: use re.fullmatch when Python 3.4+ required
         return bool(re.match(cls.title_pattern + '$', entity_id))
 
-    def _defined_by(self, singular=False):
+    def _defined_by(self, singular: bool = False) -> dict:
         """
         Internal function to provide the API parameters to identify the entity.
 
@@ -4046,9 +3912,7 @@ class WikibaseEntity:
 
         @param singular: Whether the parameter names should use the singular
                          form
-        @type singular: bool
         @return: API parameters
-        @rtype: dict
         """
         params = {}
         if self.id != '-1':
@@ -4070,17 +3934,15 @@ class WikibaseEntity:
         else:
             return self.id
 
-    def get_data_for_new_entity(self):
+    def get_data_for_new_entity(self) -> dict:
         """
         Return data required for creation of a new entity.
 
         Override it if you need.
-
-        @rtype: dict
         """
         return {}
 
-    def toJSON(self, diffto=None):
+    def toJSON(self, diffto: Optional[dict] = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -4088,9 +3950,6 @@ class WikibaseEntity:
         to the provided data is created.
 
         @param diffto: JSON containing entity data
-        @type diffto: dict
-
-        @rtype: dict
         """
         data = {}
         for key in self.DATA_ATTRIBUTES:
@@ -4106,15 +3965,12 @@ class WikibaseEntity:
         return data
 
     @classmethod
-    def _normalizeData(cls, data):
+    def _normalizeData(cls, data: dict) -> dict:
         """
         Helper function to expand data into the Wikibase API structure.
 
         @param data: The dict to normalize
-        @type data: dict
-
         @return: The dict with normalized data
-        @rtype: dict
         """
         norm_data = {}
         for key, attr in cls.DATA_ATTRIBUTES.items():
@@ -4122,12 +3978,8 @@ class WikibaseEntity:
                 norm_data[key] = attr.normalizeData(data[key])
         return norm_data
 
-    def exists(self):
-        """
-        Determine if an entity exists in the data repository.
-
-        @rtype: bool
-        """
+    def exists(self) -> bool:
+        """Determine if an entity exists in the data repository."""
         if not hasattr(self, '_content'):
             try:
                 self.get()
@@ -4136,15 +3988,13 @@ class WikibaseEntity:
                 return False
         return 'missing' not in self._content
 
-    def get(self, force=False):
+    def get(self, force: bool = False) -> dict:
         """
         Fetch all entity data and cache it.
 
         @param force: override caching
-        @type force: bool
         @raise NoWikibaseEntity: if this entity doesn't exist
         @return: actual data which entity holds
-        @rtype: dict
         """
         if force or not hasattr(self, '_content'):
             identification = self._defined_by()
@@ -4338,21 +4188,16 @@ class WikibasePage(BasePage, WikibaseEntity):
             attr = '_revid'
         return super().__delattr__(attr)
 
-    def namespace(self):
+    def namespace(self) -> int:
         """
         Return the number of the namespace of the entity.
 
         @return: Namespace id
-        @rtype: int
         """
         return self._namespace.id
 
-    def exists(self):
-        """
-        Determine if an entity exists in the data repository.
-
-        @rtype: bool
-        """
+    def exists(self) -> bool:
+        """Determine if an entity exists in the data repository."""
         if not hasattr(self, '_content'):
             try:
                 self.get(get_redirect=True)
@@ -4361,7 +4206,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 return False
         return 'missing' not in self._content
 
-    def botMayEdit(self):
+    def botMayEdit(self) -> bool:
         """
         Return whether bots may edit this page.
 
@@ -4371,22 +4216,19 @@ class WikibasePage(BasePage, WikibaseEntity):
         template) doesn't apply.
 
         @return: True
-        @rtype: bool
         """
         return True
 
-    def get(self, force=False, *args, **kwargs):
+    def get(self, force: bool = False, *args, **kwargs) -> dict:
         """
         Fetch all page data, and cache it.
 
         @param force: override caching
-        @type force: bool
         @raise NotImplementedError: a value in args or kwargs
         @return: actual data which entity holds
-        @rtype: dict
-        @note: dicts returned by this method are references to content of this
-            entity and their modifying may indirectly cause unwanted change to
-            the live content
+        @note: dicts returned by this method are references to content
+            of this entity and their modifying may indirectly cause
+            unwanted change to the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -4418,12 +4260,8 @@ class WikibasePage(BasePage, WikibaseEntity):
         return data
 
     @property
-    def latest_revision_id(self):
-        """
-        Get the revision identifier for the most recent revision of the entity.
-
-        @rtype: int
-        """
+    def latest_revision_id(self) -> int:
+        """Get revision identifier for the most recent revision of entity."""
         if not hasattr(self, '_revid'):
             self.get()
         return self._revid
@@ -4607,7 +4445,7 @@ class ItemPage(WikibasePage):
 
         assert self.id == self._link.title
 
-    def _defined_by(self, singular=False):
+    def _defined_by(self, singular: bool = False) -> dict:
         """
         Internal function to provide the API parameters to identify the item.
 
@@ -4621,11 +4459,9 @@ class ItemPage(WikibasePage):
         An empty dict is returned if the ItemPage is instantiated without
         either ID (internally it has id = '-1') or site&title.
 
-        @param singular: Whether the parameter names should use the singular
-                         form
-        @type singular: bool
+        @param singular: Whether the parameter names should use the
+            singular form
         @return: API parameters
-        @rtype: dict
         """
         params = {}
         if singular:
@@ -4780,7 +4616,7 @@ class ItemPage(WikibasePage):
 
         return item
 
-    def get(self, force=False, get_redirect=False, *args, **kwargs):
+    def get(self, force=False, get_redirect=False, *args, **kwargs) -> dict:
         """
         Fetch all item data, and cache it.
 
@@ -4791,7 +4627,6 @@ class ItemPage(WikibasePage):
         @type get_redirect: bool
         @raise NotImplementedError: a value in args or kwargs
         @return: actual data which entity holds
-        @rtype: dict
         @note: dicts returned by this method are references to content of this
             entity and their modifying may indirectly cause unwanted change to
             the live content
@@ -4833,7 +4668,7 @@ class ItemPage(WikibasePage):
                 pg._item = self
                 yield pg
 
-    def getSitelink(self, site, force=False):
+    def getSitelink(self, site, force=False) -> str:
         """
         Return the title for the specific site.
 
@@ -4842,8 +4677,6 @@ class ItemPage(WikibasePage):
         @param site: Site to find the linked page of.
         @type site: pywikibot.Site or database name
         @param force: override caching
-
-        @rtype: str
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
@@ -5102,15 +4935,13 @@ class PropertyPage(WikibasePage, Property):
                                   ns=source.property_namespace)
             Property.__init__(self, source, self.id)
 
-    def get(self, force=False, *args, **kwargs):
+    def get(self, force: bool = False, *args, **kwargs) -> dict:
         """
         Fetch the property entity, and cache it.
 
         @param force: override caching
-        @type force: bool
         @raise NotImplementedError: a value in args or kwargs
         @return: actual data which entity holds
-        @rtype: dict
         @note: dicts returned by this method are references to content of this
             entity and their modifying may indirectly cause unwanted change to
             the live content
@@ -5344,15 +5175,12 @@ class Claim(Property):
         return claim
 
     @classmethod
-    def referenceFromJSON(cls, site, data):
+    def referenceFromJSON(cls, site, data) -> dict:
         """
         Create a dict of claims from reference JSON returned in the API call.
 
-        Reference objects are represented a
-        bit differently, and require some
-        more handling.
-
-        @rtype: dict
+        Reference objects are represented a bit differently, and require
+        some more handling.
         """
         source = OrderedDict()
 
@@ -5389,12 +5217,8 @@ class Claim(Property):
         claim.isQualifier = True
         return claim
 
-    def toJSON(self):
-        """
-        Create dict suitable for the MediaWiki API.
-
-        @rtype: dict
-        """
+    def toJSON(self) -> dict:
+        """Create dict suitable for the MediaWiki API."""
         data = {
             'mainsnak': {
                 'snaktype': self.snaktype,
@@ -5483,12 +5307,11 @@ class Claim(Property):
         """
         return self.target
 
-    def getSnakType(self):
+    def getSnakType(self) -> str:
         """
         Return the type of snak.
 
         @return: str ('value', 'somevalue' or 'novalue')
-        @rtype: str
         """
         return self.snaktype
 
@@ -5528,12 +5351,8 @@ class Claim(Property):
             self.setSnakType(value)
         self.changeTarget(snaktype=self.getSnakType(), **kwargs)
 
-    def getSources(self):
-        """
-        Return a list of sources, each being a list of Claims.
-
-        @rtype: list
-        """
+    def getSources(self) -> list:
+        """Return a list of sources, each being a list of Claims."""
         return self.sources
 
     def addSource(self, claim, **kwargs):
@@ -5632,7 +5451,7 @@ class Claim(Property):
             self.qualifiers[qualifier.getID()].remove(qualifier)
             qualifier.on_item = None
 
-    def target_equals(self, value):
+    def target_equals(self, value) -> bool:
         """
         Check whether the Claim's target is equal to specified value.
 
@@ -5647,7 +5466,6 @@ class Claim(Property):
         @param value: the value to compare with
         @return: true if the Claim's target is equal to the value provided,
             false otherwise
-        @rtype: bool
         """
         if (isinstance(self.target, WikibasePage)
                 and isinstance(value, str)):
@@ -5679,15 +5497,13 @@ class Claim(Property):
 
         return self.target == value
 
-    def has_qualifier(self, qualifier_id, target):
+    def has_qualifier(self, qualifier_id: str, target) -> bool:
         """
         Check whether Claim contains specified qualifier.
 
         @param qualifier_id: id of the qualifier
-        @type qualifier_id: str
         @param target: qualifier target to check presence of
         @return: true if the qualifier was found, false otherwise
-        @rtype: bool
         """
         if self.isQualifier or self.isReference:
             raise ValueError('Qualifiers and references cannot have '
@@ -5698,12 +5514,11 @@ class Claim(Property):
                 return True
         return False
 
-    def _formatValue(self):
+    def _formatValue(self) -> dict:
         """
         Format the target into the proper JSON value that Wikibase wants.
 
         @return: JSON value
-        @rtype: dict
         """
         if self.type in ('wikibase-item', 'wikibase-property'):
             value = {'entity-type': self.getTarget().entity_type,
@@ -5722,16 +5537,16 @@ class Claim(Property):
             value = self.getTarget().toWikibase()
         return value
 
-    def _formatDataValue(self):
+    def _formatDataValue(self) -> dict:
         """
         Format the target into the proper JSON datavalue that Wikibase wants.
 
         @return: Wikibase API representation with type and value.
-        @rtype: dict
         """
-        return {'value': self._formatValue(),
-                'type': self.value_types.get(self.type, self.type)
-                }
+        return {
+            'value': self._formatValue(),
+            'type': self.value_types.get(self.type, self.type)
+        }
 
 
 class Revision(DotReadableDict):
@@ -5809,14 +5624,13 @@ class Revision(DotReadableDict):
         return cls._FullHistEntry
 
     @property
-    def parent_id(self):
+    def parent_id(self) -> int:
         """
         Return id of parent/previous revision.
 
         Returns 0 if there is no previous revision
 
         @return: id of parent/previous revision
-        @rtype: int
         @raises AssertionError: parent id not supplied to the constructor
         """
         assert self._parent_id is not None, (
@@ -5826,7 +5640,7 @@ class Revision(DotReadableDict):
         return self._parent_id
 
     @property
-    def text(self):
+    def text(self) -> Optional[str]:
         """
         Return text of this revision.
 
@@ -5835,14 +5649,13 @@ class Revision(DotReadableDict):
         this returns the contents of the main slot.
 
         @return: text of the revision
-        @rtype: str or None if text not yet retrieved
         """
         if self.slots is not None:
             return self.slots.get('main', {}).get('*')
         return self._text
 
     @property
-    def content_model(self):
+    def content_model(self) -> str:
         """
         Return content model of the revision.
 
@@ -5851,7 +5664,6 @@ class Revision(DotReadableDict):
         this returns the content model of the main slot.
 
         @return: content model
-        @rtype: str
         @raises AssertionError: content model not supplied to the constructor
             which always occurs for MediaWiki versions lower than 1.21.
         """
@@ -5866,7 +5678,7 @@ class Revision(DotReadableDict):
         return self._content_model
 
     @property
-    def sha1(self):
+    def sha1(self) -> Optional[str]:
         """
         Return and cache SHA1 checksum of the text.
 
@@ -5876,7 +5688,6 @@ class Revision(DotReadableDict):
             first). That calculated checksum will be cached too and returned on
             future calls. If the text is None (not queried) it will just return
             None and does not cache anything.
-        @rtype: str or None
         """
         if self._sha1 is None and self.text is not None:
             self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
@@ -6427,34 +6238,22 @@ class Link(BaseLink):
         return self._namespace
 
     @property
-    def title(self):
-        """
-        Return the title of the link.
-
-        @rtype: str
-        """
+    def title(self) -> str:
+        """Return the title of the link."""
         if not hasattr(self, '_title'):
             self.parse()
         return self._title
 
     @property
-    def section(self):
-        """
-        Return the section of the link.
-
-        @rtype: str
-        """
+    def section(self) -> str:
+        """Return the section of the link."""
         if not hasattr(self, '_section'):
             self.parse()
         return self._section
 
     @property
-    def anchor(self):
-        """
-        Return the anchor of the link.
-
-        @rtype: str
-        """
+    def anchor(self) -> str:
+        """Return the anchor of the link."""
         if not hasattr(self, '_anchor'):
             self.parse()
         return self._anchor
@@ -6658,12 +6457,11 @@ class SiteLink(BaseLink):
         return list(self._badges)
 
     @classmethod
-    def fromJSON(cls, data, site=None):
+    def fromJSON(cls, data: dict, site=None):
         """
         Create a SiteLink object from JSON returned in the API call.
 
         @param data: JSON containing SiteLink data
-        @type data: dict
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
 
@@ -6675,12 +6473,11 @@ class SiteLink(BaseLink):
             sl._badges.add(pywikibot.ItemPage(repo, badge))
         return sl
 
-    def toJSON(self):
+    def toJSON(self) -> dict:
         """
         Convert the SiteLink to a JSON object for the Wikibase API.
 
         @return: Wikibase JSON
-        @rtype: dict
         """
         json = {
             'site': self._sitekey,
@@ -6729,14 +6526,12 @@ _ILLEGAL_HTML_ENTITIES_MAPPING = {
 }
 
 
-def html2unicode(text, ignore=None, exceptions=None):
+def html2unicode(text: str, ignore=None, exceptions=None) -> str:
     """
     Replace HTML entities with equivalent unicode.
 
     @param ignore: HTML entities to ignore
     @param ignore: list of int
-
-    @rtype: str
     """
     if ignore is None:
         ignore = []
@@ -6773,19 +6568,19 @@ def html2unicode(text, ignore=None, exceptions=None):
     return _ENTITY_SUB(handle_entity, text)
 
 
-def UnicodeToAsciiHtml(s):
+def UnicodeToAsciiHtml(string) -> str:
     """Convert unicode to a str using HTML entities."""
     html = []
-    for c in s:
+    for c in string:
         cord = ord(c)
         if 31 < cord < 127:
             html.append(c)
         else:
-            html.append('&#%d;' % cord)
+            html.append('&#{};'.format(cord))
     return ''.join(html)
 
 
-def unicode2html(x, encoding):
+def unicode2html(string: str, encoding: str) -> str:
     """
     Convert unicode string to requested HTML encoding.
 
@@ -6793,32 +6588,26 @@ def unicode2html(x, encoding):
     string into the desired format; if that doesn't work, encode the unicode
     into HTML &#; entities. If it does work, return it unchanged.
 
-    @param x: String to update
-    @type x: str
+    @param string: String to update
     @param encoding: Encoding to use
-    @type encoding: str
-
-    @rtype: str
     """
     try:
-        x.encode(encoding)
+        string.encode(encoding)
     except UnicodeError:
-        x = UnicodeToAsciiHtml(x)
-    return x
+        string = UnicodeToAsciiHtml(string)
+    return string
 
 
 @deprecated_args(site2=True, site='encodings')
-def url2unicode(title, encodings='utf-8'):
+def url2unicode(title: str, encodings='utf-8') -> str:
     """
     Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error.
 
     @param title: URL-encoded character data to convert
-    @type title: str
     @param encodings: Encodings to attempt to use during conversion.
     @type encodings: str, list or Site
-    @rtype: str
 
     @raise UnicodeError: Could not convert using any encoding.
     """
