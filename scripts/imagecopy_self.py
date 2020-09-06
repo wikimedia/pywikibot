@@ -858,7 +858,7 @@ class uploader(threading.Thread):
         """Initializer."""
         self.uploadQueue = uploadQueue
         self.checktemplate = True
-        threading.Thread.__init__(self)
+        super().__init__()
 
     def run(self):
         """Run uploader."""

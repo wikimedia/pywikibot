@@ -2742,7 +2742,7 @@ class Category(Page):
         All parameters are the same as for Page() Initializer.
         """
         self.sortKey = sort_key
-        Page.__init__(self, source, title, ns=14)
+        super().__init__(source, title, ns=14)
         if self.namespace() != 14:
             raise ValueError("'%s' is not in the category namespace!"
                              % title)
@@ -3062,7 +3062,7 @@ class User(Page):
             title = title.replace(':#', ':')
         else:
             self._isAutoblock = False
-        Page.__init__(self, source, title, ns=2)
+        super().__init__(source, title, ns=2)
         if self.namespace() != 2:
             raise ValueError("'%s' is not in the user namespace!"
                              % title)

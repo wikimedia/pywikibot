@@ -521,7 +521,7 @@ class ThreadedGenerator(threading.Thread):
         if not hasattr(self, 'generator'):
             raise RuntimeError('No generator for ThreadedGenerator to run.')
         self.args, self.kwargs = args, kwargs
-        threading.Thread.__init__(self, group=group, name=name)
+        super().__init__(group=group, name=name)
         self.queue = queue.Queue(qsize)
         self.finished = threading.Event()
 

@@ -2908,7 +2908,7 @@ class PageGenerator(QueryGenerator):
                      'timestamp|user|comment|url|size|sha1|metadata')
         appendParams(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.resultkey = 'pages'  # element to look for in result
         self.props = self.request['prop']
 
@@ -2975,7 +2975,7 @@ class PropertyGenerator(QueryGenerator):
 
         """
         kwargs = self._clean_kwargs(kwargs, prop=prop)
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self._props = frozenset(prop.split('|'))
         self.resultkey = 'pages'
 
@@ -3058,7 +3058,7 @@ class ListGenerator(QueryGenerator):
 
         """
         kwargs = self._clean_kwargs(kwargs, list=listaction)
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
 
 class LogEntryListGenerator(ListGenerator):
@@ -3071,7 +3071,7 @@ class LogEntryListGenerator(ListGenerator):
 
     def __init__(self, logtype=None, **kwargs):
         """Initializer."""
-        ListGenerator.__init__(self, 'logevents', **kwargs)
+        super().__init__('logevents', **kwargs)
 
         from pywikibot import logentries
         self.entryFactory = logentries.LogEntryFactory(self.site, logtype)

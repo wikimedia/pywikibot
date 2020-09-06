@@ -240,7 +240,7 @@ class imageTransfer(threading.Thread):
         self.newname = newname
         self.category = category
         self.delete_after_done = delete_after_done
-        threading.Thread.__init__(self)
+        super().__init__()
 
     def run(self):
         """Run the bot."""

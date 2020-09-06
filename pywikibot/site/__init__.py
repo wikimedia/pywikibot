@@ -1702,7 +1702,7 @@ class APISite(BaseSite):
     @remove_last_args(['sysop'])
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
-        BaseSite.__init__(self, code, fam, user)
+        super().__init__(code, fam, user)
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
@@ -2459,7 +2459,7 @@ class APISite(BaseSite):
         except KeyError:
             # no localized keyword for redirects
             pattern = None
-        return BaseSite.redirectRegex(self, pattern)
+        return super().redirectRegex(pattern)
 
     @remove_last_args(('default', ))
     def pagenamecodes(self):
