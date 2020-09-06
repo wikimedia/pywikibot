@@ -25,7 +25,7 @@ SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
 
-class MWSite(object):
+class MWSite:
 
     """Minimal wiki site class."""
 
