@@ -23,11 +23,11 @@ import re
 import sys
 import unicodedata
 
-from collections import Counter, defaultdict, namedtuple, OrderedDict
+from collections import Counter, defaultdict, OrderedDict
 from collections.abc import MutableMapping
 from html.entities import name2codepoint
 from itertools import chain
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
@@ -44,12 +44,18 @@ from pywikibot.exceptions import (
 from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
-    classproperty, compute_file_hash,
-    ComparableMixin, DotReadableDict,
-    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    add_full_name, manage_wrapping, suppress_warnings,
-    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    first_upper, redirect_func, remove_last_args
+    add_full_name,
+    compute_file_hash,
+    ComparableMixin,
+    deprecated,
+    deprecate_arg,
+    deprecated_args,
+    DotReadableDict,
+    first_upper,
+    issue_deprecation_warning,
+    manage_wrapping,
+    redirect_func,
+    remove_last_args,
 )
 from pywikibot.tools import is_IP
 
@@ -876,19 +882,9 @@ class BasePage(ComparableMixin):
         """Return True if the page is a Category, False otherwise."""
         return self.namespace() == 14
 
-    @deprecated('is_categorypage', since='20140819', future_warning=True)
-    def isCategory(self):
-        """DEPRECATED: use is_categorypage instead."""
-        return self.is_categorypage()
-
     def is_filepage(self):
         """Return True if this is an file description page, False otherwise."""
         return self.namespace() == 6
-
-    @deprecated('is_filepage', since='20140819', future_warning=True)
-    def isImage(self):
-        """DEPRECATED: use is_filepage instead."""
-        return self.is_filepage()
 
     @remove_last_args(['get_Index'])
     def isDisambig(self) -> bool:
@@ -1524,12 +1520,6 @@ class BasePage(ComparableMixin):
         """
         return ItemPage.fromPage(self)
 
-    @deprecate_arg('tllimit', None)
-    @deprecated('Page.templates()', since='20140421', future_warning=True)
-    def getTemplates(self):
-        """DEPRECATED. Use templates()."""
-        return self.templates()
-
     @deprecated_args(get_redirect=True)
     def templates(self, content=False):
         """
@@ -1705,40 +1695,6 @@ class BasePage(ComparableMixin):
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
-    # BREAKING CHANGES:
-    #
-    # in old framework, default value for getVersionHistory returned no more
-    # than 500 revisions; now, it returns a list of all revisions unless
-    # 'total' argument is used.
-    #
-    # in new framework each list entry is a tuple of 4 items:
-    # (revid, timestamp, user, comment)
-    # whereas old framework had a tuple of 6 items:
-    # (revid, timestamp, user, comment, size, tags)
-    #
-    # timestamp is a pywikibot.Timestamp, not a MediaWiki timestamp string
-    @deprecated('Page.revisions()', since='20150206', future_warning=True)
-    @deprecated_args(forceReload=True, revCount='total', step=True,
-                     getAll=True, reverseOrder='reverse')
-    def getVersionHistory(self, reverse=False, total=None):
-        """
-        Load the version history page and return history information.
-
-        Return value is a list of tuples, where each tuple represents one
-        edit and is built of revision id, edit date/time, user name, and
-        edit summary. Starts with the most current revision, unless
-        reverse is True.
-
-        @param total: iterate no more than this number of revisions in total
-        """
-        with suppress_warnings(
-                'pywikibot.page.Revision.hist_entry is deprecated'):
-            revisions = [
-                rev.hist_entry()
-                for rev in self.revisions(reverse=reverse, total=total)
-            ]
-        return revisions
-
     @deprecated_args(forceReload=True, reverseOrder='reverse', step=True)
     def getVersionHistoryTable(self, reverse=False, total=None):
         """Return the version history as a wiki table."""
@@ -1750,20 +1706,6 @@ class BasePage(ComparableMixin):
                        '<nowiki>{r.comment}</nowiki>\n'.format(r=entry))
         result += '|}\n'
         return result
-
-    @deprecated('Page.revisions(content=True)', since='20150206',
-                future_warning=True)
-    @deprecated_args(reverseOrder='reverse', rollback=True, step=True)
-    def fullVersionHistory(self, reverse=False, total=None):
-        """Return previous versions including content."""
-        with suppress_warnings(
-                'pywikibot.page.Revision.full_hist_entry is deprecated'):
-            revisions = [
-                rev.full_hist_entry()
-                for rev in self.revisions(content=True, reverse=reverse,
-                                          total=total)
-            ]
-        return revisions
 
     @deprecated_args(step=True)
     def contributors(self, total=None, starttime=None, endtime=None):
@@ -1814,18 +1756,6 @@ class BasePage(ComparableMixin):
 
         return sum(cnt[user.username] if isinstance(user, User) else cnt[user]
                    for user in contributors)
-
-    @deprecated('oldest_revision', since='20140421', future_warning=True)
-    def getCreator(self) -> Tuple[str, str]:
-        """
-        Get the first revision of the page.
-
-        DEPRECATED: Use Page.oldest_revision.
-
-        @return: tuple of username and timestamp in isoformat
-        """
-        result = self.oldest_revision
-        return result.user, result.timestamp.isoformat()
 
     @deprecated('contributors() or revisions()', since='20150206')
     @deprecated_args(limit='total')
@@ -2518,11 +2448,6 @@ class FilePage(Page):
                                 url_param=url_param)
         return self.latest_file_info.thumburl
 
-    @deprecated('file_is_shared', since='20121101', future_warning=True)
-    def fileIsOnCommons(self) -> bool:
-        """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
-        return self.file_is_shared()
-
     @deprecated('file_is_shared', since='20200618')
     def fileIsShared(self) -> bool:
         """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
@@ -2541,55 +2466,6 @@ class FilePage(Page):
         # default to commons
         return self.latest_file_info.url.startswith(
             'https://upload.wikimedia.org/wikipedia/commons/')
-
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
-                future_warning=True)
-    def getFileMd5Sum(self):
-        """Return image file's MD5 checksum."""
-        req = http.fetch(self.fileUrl())
-        h = hashlib.md5()
-        h.update(req.raw)
-        return h.hexdigest()
-
-    @deprecated('FilePage.latest_file_info.sha1', since='20141106',
-                future_warning=True)
-    def getFileSHA1Sum(self):
-        """Return the file's SHA1 checksum."""
-        return self.latest_file_info.sha1
-
-    @deprecated('FilePage.oldest_file_info.user', since='20150206')
-    def getFirstUploader(self) -> list:
-        """
-        Return a list with first uploader of the FilePage and timestamp.
-
-        For compatibility with compat only.
-        """
-        return [self.oldest_file_info.user,
-                self.oldest_file_info.timestamp.isoformat()]
-
-    @deprecated('FilePage.latest_file_info.user', since='20141106',
-                future_warning=True)
-    def getLatestUploader(self) -> list:
-        """
-        Return a list with latest uploader of the FilePage and timestamp.
-
-        For compatibility with compat only.
-        """
-        return [self.latest_file_info.user,
-                self.latest_file_info.timestamp.isoformat()]
-
-    @deprecated('FilePage.get_file_history()', since='20141106',
-                future_warning=True)
-    def getFileVersionHistory(self) -> list:
-        """
-        Return the file's version history.
-
-        @return: A list of dictionaries with the following keys:
-
-            [comment, sha1, url, timestamp, metadata,
-             height, width, mime, user, descriptionurl, size]
-        """
-        return self.site.loadimageinfo(self, history=True)
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
@@ -3272,29 +3148,6 @@ class User(Page):
         if 'emailuser' in maildata:
             if maildata['emailuser']['result'] == 'Success':
                 return True
-        return False
-
-    @deprecated('send_email', since='20141218', future_warning=True)
-    def sendMail(self, subject, text, ccme=False):
-        """
-        Send an email to this user via MediaWiki's email interface.
-
-        Outputs 'Email sent' if the email was sent.
-
-        @param subject: the subject header of the mail
-        @type subject: str
-        @param text: mail body
-        @type text: str
-        @param ccme: if True, sends a copy of this email to the bot
-        @type ccme: bool
-        @raises NotEmailableError: the user of this User is not emailable
-        @raises UserRightsError: logged in user does not have 'sendemail' right
-        @return: operation successful indicator
-        @rtype: bool
-        """
-        if self.send_email(subject, text, ccme=ccme):
-            pywikibot.output('Email sent.')
-            return True
         return False
 
     def block(self, *args, **kwargs):
@@ -5552,17 +5405,6 @@ class Revision(DotReadableDict):
 
     """A structure holding information about a single revision of a Page."""
 
-    _HistEntry = namedtuple('HistEntry', ['revid',
-                                          'timestamp',
-                                          'user',
-                                          'comment'])
-
-    _FullHistEntry = namedtuple('FullHistEntry', ['revid',
-                                                  'timestamp',
-                                                  'user',
-                                                  'text',
-                                                  'rollbacktoken'])
-
     def __init__(self, revid, timestamp, user, anon=False, comment='',
                  text=None, minor=False, rollbacktoken=None, parentid=None,
                  contentmodel=None, sha1=None, slots=None):
@@ -5609,18 +5451,6 @@ class Revision(DotReadableDict):
         self._content_model = contentmodel
         self._sha1 = sha1
         self.slots = slots
-
-    @classproperty
-    @deprecated(since='20200329', future_warning=True)
-    def HistEntry(cls):
-        """Class property which returns deprecated class attribute."""
-        return cls._HistEntry
-
-    @classproperty
-    @deprecated(since='20200329', future_warning=True)
-    def FullHistEntry(cls):
-        """Class property which returns deprecated FullHistEntry attribute."""
-        return cls._FullHistEntry
 
     @property
     def parent_id(self) -> int:
@@ -5691,25 +5521,6 @@ class Revision(DotReadableDict):
         if self._sha1 is None and self.text is not None:
             self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
         return self._sha1
-
-    @deprecated(since='20200329', future_warning=True)
-    def hist_entry(self):
-        """Return a namedtuple with a Page history record."""
-        with suppress_warnings(
-                'pywikibot.page.Revision.HistEntry is deprecated'):
-            entry = Revision.HistEntry(self.revid, self.timestamp, self.user,
-                                       self.comment)
-        return entry
-
-    @deprecated(since='20200329', future_warning=True)
-    def full_hist_entry(self):
-        """Return a namedtuple with a Page full history record."""
-        with suppress_warnings(
-                'pywikibot.page.Revision.FullHistEntry is deprecated'):
-            entry = Revision.FullHistEntry(self.revid, self.timestamp,
-                                           self.user, self.text,
-                                           self.rollbacktoken)
-        return entry
 
     @staticmethod
     def _thank(revid, site, source='pywikibot'):
@@ -6628,8 +6439,3 @@ def url2unicode(title: str, encodings='utf-8') -> str:
                 first_exception = ex
     # Couldn't convert, raise the original exception
     raise first_exception
-
-
-wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924',
-                             future_warning=True)

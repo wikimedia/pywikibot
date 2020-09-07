@@ -95,12 +95,9 @@ warnings = (
     ('.replaceImage(',
      'Page.replaceImage() is deprecated and does not work at core'),
     ('.getVersionHistory(',
-     'Page.getVersionHistory() returns a pywikibot.Timestamp object instead\n'
-     'of a MediaWiki one. It also returns a tuple of 4 items instead of 6:\n'
-     'size and tags items are missing. Use Page.revisions() instead.'),
+     'Page.getVersionHistory() was removed. Use Page.revisions() instead.'),
     ('.fullVersionHistory(',
-     'Page.fullVersionHistory() has different behaviour in core\n'
-     'use Page.revisions() instead.'),
+     'Page.fullVersionHistory() was removed. Use Page.revisions() instead.'),
     ('.contributions(',
      'User.contributions() returns a pywikibot.Timestamp object instead of a\n'
      'MediaWiki one'),
