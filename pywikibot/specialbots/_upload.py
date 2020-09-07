@@ -22,7 +22,7 @@ import pywikibot.data.api
 from pywikibot import config
 
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
 
 
@@ -374,13 +374,6 @@ class UploadRobot(BaseBot):
             return True
         else:
             return warn_code in self.ignore_warning
-
-    @deprecated('UploadRobot.upload_file()', since='20141211',
-                future_warning=True)
-    @deprecated_args(debug=True)
-    def upload_image(self):
-        """Upload image."""
-        return self.upload_file(self.url)
 
     def upload_file(self, file_url, _file_key=None, _offset=0):
         """

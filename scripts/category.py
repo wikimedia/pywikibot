@@ -137,9 +137,7 @@ from pywikibot.bot import (
     BaseBot, Bot, MultipleSitesBot,
 )
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import (
-    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive,
-)
+from pywikibot.tools import deprecated_args, open_archive
 from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
@@ -877,38 +875,6 @@ class CategoryMoveRobot(CategoryPreprocess):
         return var
 
 
-class CategoryRemoveRobot(CategoryMoveRobot):
-
-    """Removes the category tag for a given category.
-
-    It always removes the category tag for all pages in that given category.
-
-    If pagesonly parameter is False it removes also the category from all
-    subcategories, without prompting. If the category is empty, it will be
-    tagged for deleting. Does not remove category tags pointing at
-    subcategories.
-
-    @deprecated: Using CategoryRemoveRobot is deprecated, use
-        CategoryMoveRobot without newcat param instead.
-    """
-
-    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416',
-                future_warning=True)
-    def __init__(
-            self, catTitle, batchMode=False, editSummary='',
-            useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
-            titleRegex=None, inPlace=False, pagesonly=False) -> None:
-        """Initializer."""
-        super().__init__(
-            oldcat=catTitle,
-            batch=batchMode,
-            comment=editSummary,
-            deletion_comment=useSummaryForDeletion,
-            title_regex=titleRegex,
-            inplace=inPlace,
-            pagesonly=pagesonly)
-
-
 class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
@@ -1547,7 +1513,3 @@ def main(*args) -> None:
 
 if __name__ == '__main__':
     main()
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918',
-                             future_warning=True)
