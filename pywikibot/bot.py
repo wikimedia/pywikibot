@@ -63,7 +63,7 @@ __all__ = (
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
     'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
     'init_handlers', 'writelogheader',
-    'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
+    'input', 'input_choice', 'input_yn', 'input_list_choice',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
@@ -490,30 +490,6 @@ def input_choice(question, answers, default=None, return_shortcut=True,
 
     return ui.input_choice(question, answers, default, return_shortcut,
                            automatic_quit=automatic_quit, force=force)
-
-
-@deprecated('input_choice', since='20140825', future_warning=True)
-def inputChoice(question, answers, hotkeys, default=None):
-    """Ask the user a question with several options, return the user's choice.
-
-    DEPRECATED: Use L{input_choice} instead!
-
-    The user's input will be case-insensitive, so the hotkeys should be
-    distinctive case-insensitively.
-
-    @param question: a string that will be shown to the user. Don't add a
-        space after the question mark/colon, this method will do this for you.
-    @type question: basestring
-    @param answers: a list of strings that represent the options.
-    @type answers: list of basestring
-    @param hotkeys: a list of one-letter strings, one for each answer.
-    @param default: an element of hotkeys, or None. The default choice that
-        will be returned when the user just presses Enter.
-    @return: a one-letter string in lowercase.
-    @rtype: str
-    """
-    return input_choice(question, zip(answers, hotkeys), default=default,
-                        automatic_quit=False)
 
 
 def input_yn(question, default=None, automatic_quit=True, force=False):

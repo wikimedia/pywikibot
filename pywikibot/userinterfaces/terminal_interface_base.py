@@ -17,7 +17,6 @@ from pywikibot import config2 as config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.bot_choice import (ChoiceException, Option, OutputOption,
                                   QuitKeyboardInterrupt, StandardOption)
-from pywikibot.tools import deprecated
 from pywikibot.userinterfaces import transliteration
 
 
@@ -380,22 +379,6 @@ class UI:
         if not return_shortcut:
             return index
         return answer
-
-    @deprecated('input_choice', since='20140825', future_warning=True)
-    def inputChoice(self, question, options, hotkeys, default=None):
-        """
-        Ask the user a question with a predefined list of acceptable answers.
-
-        DEPRECATED: Use L{input_choice} instead!
-
-        Directly calls L{input_choice} with the options and hotkeys zipped
-        into a tuple list. It always returns the hotkeys and throws no
-        L{QuitKeyboardInterrupt} if quit was selected.
-        """
-        return self.input_choice(question=question, options=zip(options,
-                                                                hotkeys),
-                                 default=default, return_shortcut=True,
-                                 automatic_quit=False)
 
     def input_list_choice(self, question, answers, default=None, force=False):
         """Ask the user to select one entry from a list of entries."""
