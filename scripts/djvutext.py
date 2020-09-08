@@ -28,12 +28,10 @@ The following parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os.path
 
 import pywikibot
@@ -68,7 +66,7 @@ class DjVuTextBot(SingleSiteBot):
             'force': False,
             'summary': None
         })
-        super(DjVuTextBot, self).__init__(site=index.site, **kwargs)
+        super().__init__(site=index.site, **kwargs)
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(with_ns=False)
@@ -92,8 +90,7 @@ class DjVuTextBot(SingleSiteBot):
         for start, end in sorted(self._pages):
             start = max(last, start)
             last = end + 1
-            for page_number in range(start, last):
-                yield page_number
+            yield from range(start, last)
 
     def gen(self):
         """Generate pages from specified page interval."""
@@ -174,8 +171,7 @@ def main(*args):
     djvu = DjVuFile(djvu_path)
 
     if not djvu.has_text():
-        pywikibot.error('No text layer in djvu file {}'
-                        .format(djvu.file_djvu))
+        pywikibot.error('No text layer in djvu file {}'.format(djvu.file))
         return
 
     # Parse pages param.
@@ -201,7 +197,7 @@ def main(*args):
         raise pywikibot.NoPage(index)
 
     pywikibot.output('uploading text from {} to {}'
-                     .format(djvu.file_djvu, index_page.title(as_link=True)))
+                     .format(djvu.file, index_page.title(as_link=True)))
 
     bot = DjVuTextBot(djvu, index_page, pages, **options)
     bot.run()

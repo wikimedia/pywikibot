@@ -34,7 +34,7 @@ class TestDjVuFile(TestCase):
     @classmethod
     def setUpClass(cls):
         """Setup tests."""
-        super(TestDjVuFile, cls).setUpClass()
+        super().setUpClass()
         try:
             dp = subprocess.Popen(['djvudump'],
                                   stdout=subprocess.PIPE,
