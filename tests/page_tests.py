@@ -13,14 +13,12 @@ from contextlib import suppress
 import pywikibot
 import pywikibot.page
 
-from pywikibot import config
-from pywikibot import InvalidTitle
-
+from pywikibot import config, InvalidTitle
 from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
-    unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
-    DefaultDrySiteTestCase, DeprecationTestCase,
+    DefaultDrySiteTestCase, DefaultSiteTestCase, SiteAttributeTestCase,
+    TestCase, unittest,
 )
 from tests import mock
 
@@ -623,30 +621,6 @@ class TestPageCoordinates(TestCase):
             coord = page.coordinates(primary_only=True)
             self.assertIsInstance(coord, pywikibot.Coordinate)
             self.assertTrue(coord.primary)
-
-
-class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test deprecation of Page attributes."""
-
-    def test_creator(self):
-        """Test getCreator."""
-        mainpage = self.get_mainpage()
-        creator = mainpage.getCreator()
-        self.assertEqual(creator,
-                         (mainpage.oldest_revision.user,
-                          mainpage.oldest_revision.timestamp.isoformat()))
-        self.assertIsInstance(creator[0], str)
-        self.assertIsInstance(creator[1], str)
-        self._ignore_unknown_warning_packages = True  # T163175
-        self.assertDeprecation()
-
-        self._reset_messages()
-        if self.site.mw_version >= '1.16':
-            self.assertIsInstance(mainpage.previous_revision_id, int)
-            self.assertEqual(mainpage.previous_revision_id,
-                             mainpage.latest_revision.parent_id)
-            self.assertDeprecation()
 
 
 class TestPageBaseUnicode(DefaultDrySiteTestCase):

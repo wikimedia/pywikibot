@@ -86,20 +86,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
             'pywikibot.site.BaseSite.nocapitalize',
             "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
 
-    def test_live_version(self):
-        """Test live_version."""
-        mysite = self.get_site()
-        ver = mysite.live_version()
-        self.assertIsInstance(ver, tuple)
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertIsInstance(ver[2], str)
-        self.assertOneDeprecation()
-
-    def test_getcurrenttime(self):
-        """Test live_version."""
-        self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
-        self.assertOneDeprecation()
-
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
         if self.site.mw_version < '1.16':
@@ -1395,50 +1381,6 @@ class TestLogEvents(DefaultSiteTestCase):
                           reverse=True, total=5)
 
 
-class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test logpages methods."""
-
-    def test_logpages(self):
-        """Test the deprecated site.logpages() method."""
-        le = list(self.site.logpages(number=10))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(le), 10)
-        for entry in le:
-            self.assertIsInstance(entry, tuple)
-            if not isinstance(entry[0], int):  # autoblock removal entry
-                self.assertIsInstance(entry[0], pywikibot.Page)
-            self.assertIsInstance(entry[1], str)
-            self.assertIsInstance(entry[2], int)
-            self.assertIsInstance(entry[3], str)
-
-    def test_list_namespace(self):
-        """Test the deprecated site.logpages() when namespace is a list."""
-        if self.site.mw_version <= '1.19.24':  # T217664
-            self.skipTest(
-                'logevents does not support namespace parameter with MediaWiki'
-                ' {}.'.format(self.site.mw_version))
-        le = list(self.site.logpages(namespace=[2, 3], number=10))
-        for entry in le:
-            if isinstance(entry[0], int):  # autoblock removal entry
-                continue
-            try:
-                self.assertIn(entry[0].namespace(), [2, 3])
-            except HiddenKeyError as e:
-                self.skipTest(
-                    'Log entry {entry} is hidden:\n{entry.data}\n{error!r}'
-                    .format(entry=entry, error=e))
-
-    def test_logpages_dump(self):
-        """Test the deprecated site.logpages() method using dump mode."""
-        le = list(self.site.logpages(number=10, dump=True))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(le), 10)
-        for entry in le:
-            self.assertIsInstance(entry, dict)
-            self.assertIn('title', entry)
-
-
 class TestRecentChanges(DefaultSiteTestCase):
 
     """Test recentchanges method."""
@@ -2380,16 +2322,6 @@ class TestDeprecatedEditTokenFunctions(TokenTestBase,
     cached = True
     user = True
     token_type = 'edit'
-
-    def test_token(self):
-        """Test ability to get page tokens using site.tokens."""
-        token = self.token
-        mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        ttype = 'edit'
-        self.assertEqual(token, mysite.token(mainpage, ttype))
-        self.assertOneDeprecationParts('pywikibot.site.APISite.token',
-                                       "the 'tokens' property")
 
     def test_getToken(self):
         """Test ability to get page tokens using site.getToken."""
