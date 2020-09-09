@@ -116,7 +116,7 @@ class EventStreams:
             if isinstance(self._since, str) and '-' not in self._since:
                 self._since = Timestamp.fromtimestampformat(self._since)
             if isinstance(self._since, Timestamp):
-                self._since = self._since.isoformat
+                self._since = self._since.isoformat()
 
         self._url = kwargs.get('url') or self.url
         kwargs.setdefault('url', self._url)
