@@ -55,23 +55,31 @@ def get_toolforge_hostname():
     return None
 
 
-def getversion(online=True):
+def getversion(online: bool = True) -> str:
     """Return a pywikibot version string.
 
-    @param online: (optional) Include information obtained online
+    @param online: Include information obtained online
     """
+    branches = {
+        'master': 'branches/master',
+        'stable': 'branches/stable',
+    }
     data = dict(getversiondict())  # copy dict to prevent changes in 'cache'
     data['cmp_ver'] = 'n/a'
+    local_hsh = data.get('hsh', '')
+    hsh = {}
 
     if online:
-        with suppress(Exception):
-            hsh3 = getversion_onlinerepo('tags/stable')
-            hsh2 = getversion_onlinerepo()
-            hsh1 = data['hsh']
-            data['cmp_ver'] = 'UNKNOWN' if not hsh1 else (
-                'OUTDATED' if hsh1 not in (hsh2, hsh3) else 'ok')
+        if not local_hsh:
+            data['cmp_ver'] = 'UNKNOWN'
+        else:
+            for branch, path in branches.items():
+                with suppress(Exception):
+                    hsh[getversion_onlinerepo(path)] = branch
+            if hsh:
+                data['cmp_ver'] = hsh.get(local_hsh, 'OUTDATED')
 
-    data['hsh'] = data['hsh'][:7]  # make short hash from full hash
+    data['hsh'] = local_hsh[:7]  # make short hash from full hash
     return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format_map(data)
 
 
