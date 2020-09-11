@@ -3858,6 +3858,29 @@ class WikibaseEntity:
                 norm_data[key] = attr.normalizeData(data[key])
         return norm_data
 
+    @property
+    def latest_revision_id(self) -> Optional[int]:
+        """
+        Get the revision identifier for the most recent revision of the entity.
+
+        @rtype: int or None if it cannot be determined
+        @raise NoWikibaseEntity: if the entity doesn't exist
+        """
+        if not hasattr(self, '_revid'):
+            # fixme: unlike BasePage.latest_revision_id, this raises
+            # exception when entity is redirect, cannot use get_redirect
+            self.get()
+        return self._revid
+
+    @latest_revision_id.setter
+    def latest_revision_id(self, value: Optional[int]) -> None:
+        self._revid = value
+
+    @latest_revision_id.deleter
+    def latest_revision_id(self) -> None:
+        if hasattr(self, '_revid'):
+            del self._revid
+
     def exists(self) -> bool:
         """Determine if an entity exists in the data repository."""
         if not hasattr(self, '_content'):
@@ -3893,6 +3916,8 @@ class WikibaseEntity:
         if 'missing' in self._content:
             raise pywikibot.NoWikibaseEntity(self)
 
+        self.latest_revision_id = self._content.get('lastrevid')
+
         data = {}
         # todo: this initializes all data,
         # make use of lazy initialization (T245809)
@@ -3914,7 +3939,10 @@ class WikibaseEntity:
         else:
             data = self._normalizeData(data)
 
-        updates = self.repo.editEntity(self, data, **kwargs)
+        baserevid = getattr(self, '_revid', None)
+
+        updates = self.repo.editEntity(
+            self, data, baserevid=baserevid, **kwargs)
 
         # the attribute may have been unset in ItemPage
         if getattr(self, 'id', '-1') == '-1':
@@ -4129,9 +4157,6 @@ class WikibasePage(BasePage, WikibaseEntity):
                 # todo: raise a nicer exception here (T87345)
             raise pywikibot.NoPage(self)
 
-        if 'lastrevid' in self._content:
-            self.latest_revision_id = self._content['lastrevid']
-
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
 
@@ -4143,7 +4168,12 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     @property
     def latest_revision_id(self) -> int:
-        """Get revision identifier for the most recent revision of entity."""
+        """
+        Get the revision identifier for the most recent revision of the entity.
+
+        @rtype: int
+        @raise pywikibot.exceptions.NoPage: if the entity doesn't exist
+        """
         if not hasattr(self, '_revid'):
             self.get()
         return self._revid
@@ -4154,6 +4184,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     @latest_revision_id.deleter
     def latest_revision_id(self):
+        # fixme: this seems too destructive in comparison to the parent
         self.clear_cache()
 
     @allow_asynchronous
@@ -4179,12 +4210,8 @@ class WikibasePage(BasePage, WikibaseEntity):
             by bots that need to keep track of which saves were successful.
         @type callback: callable
         """
-        if hasattr(self, '_revid'):
-            baserevid = self.latest_revision_id
-        else:
-            baserevid = None
-
-        super().editEntity(data, baserevid=baserevid, **kwargs)
+        # kept for the decorator
+        super().editEntity(data, **kwargs)
 
     def editLabels(self, labels, **kwargs):
         """
