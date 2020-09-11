@@ -1491,7 +1491,7 @@ def LanguageLinksPageGenerator(page, total=None):
     return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
 
 
-@deprecated('Page.getReferences()', since='20200515')
+@deprecated('Page.getReferences(follow_redirects=False)', since='20200515')
 @deprecated_args(step=None)
 def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
