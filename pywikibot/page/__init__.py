@@ -3316,6 +3316,10 @@ class LanguageDict(MutableMapping):
         this = cls({key: value['value'] for key, value in data.items()})
         return this
 
+    @classmethod
+    def new_empty(cls, repo):
+        return cls()
+
     def __getitem__(self, key):
         key = self.normalizeKey(key)
         return self._data[key]
@@ -3393,6 +3397,10 @@ class AliasesDict(MutableMapping):
             this[key] = [val['value'] for val in value]
         return this
 
+    @classmethod
+    def new_empty(cls, repo):
+        return cls()
+
     def __getitem__(self, key):
         key = LanguageDict.normalizeKey(key)
         return self._data[key]
@@ -3462,6 +3470,10 @@ class ClaimCollection(MutableMapping):
         for key, claims in data.items():
             this[key] = [Claim.fromJSON(repo, claim) for claim in claims]
         return this
+
+    @classmethod
+    def new_empty(cls, repo):
+        return cls(repo)
 
     def __getitem__(self, key):
         return self._data[key]
@@ -3552,6 +3564,16 @@ class SiteLinkCollection(MutableMapping):
         if data:
             self.update(data)
 
+    @classmethod
+    def new_empty(cls, repo):
+        """Construct a new empty SiteLinkCollection."""
+        return cls(repo)
+
+    @classmethod
+    def fromJSON(cls, data, repo):
+        """Construct a new SiteLinkCollection from JSON."""
+        return cls(repo, data)
+
     @staticmethod
     def getdbName(site):
         """
@@ -3605,11 +3627,6 @@ class SiteLinkCollection(MutableMapping):
     def __contains__(self, key):
         key = self.getdbName(key)
         return key in self._data
-
-    @classmethod
-    def fromJSON(cls, data, repo):
-        """Construct a new SiteLinkCollection from JSON."""
-        return cls(repo, data)
 
     @classmethod
     def _extract_JSON(cls, obj):
@@ -3756,6 +3773,17 @@ class WikibaseEntity:
         # todo: use re.fullmatch when Python 3.4+ required
         return bool(re.match(cls.title_pattern + '$', entity_id))
 
+    def __getattr__(self, name):
+        if name in self.DATA_ATTRIBUTES:
+            if self.getID() == '-1':
+                for key, cls in self.DATA_ATTRIBUTES.items():
+                    setattr(self, key, cls.new_empty(self.repo))
+                return getattr(self, name)
+            else:
+                return self.get()[name]
+
+        return super().__getattr__(name)
+
     def _defined_by(self, singular: bool = False) -> dict:
         """
         Internal function to provide the API parameters to identify the entity.
@@ -3866,6 +3894,8 @@ class WikibaseEntity:
             raise pywikibot.NoWikibaseEntity(self)
 
         data = {}
+        # todo: this initializes all data,
+        # make use of lazy initialization (T245809)
         for key, cls in self.DATA_ATTRIBUTES.items():
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
