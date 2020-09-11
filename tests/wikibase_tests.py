@@ -55,6 +55,19 @@ class WbRepresentationTestCase(WikidataTestCase):
         self.assertLength(set(list_of_dupes), 1)
 
 
+class DataCollectionTestCase(WikidataTestCase):
+
+    """Test case for a Wikibase collection class."""
+
+    collection_class = None
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        cls = self.collection_class
+        result = cls.new_empty(self.get_repo())
+        self.assertLength(result, 0)
+
+
 class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
                                WikidataTestCase):
 
@@ -949,6 +962,19 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(hasattr(item, '_content'))
 
+    def test_item_lazy_initialization(self):
+        """Test that Wikibase items are properly initialized lazily."""
+        wikidata = self.get_repo()
+        item = ItemPage(wikidata, 'Q60')
+        attrs = ['_content', 'labels', 'descriptions', 'aliases',
+                 'claims', 'sitelinks']
+        for attr in attrs:
+            self.assertFalse(hasattr(item, attr))
+
+        item.labels  # trigger loading
+        for attr in attrs:
+            self.assertTrue(hasattr(item, attr))
+
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
         wikidata = self.get_repo()
@@ -1001,6 +1027,11 @@ class TestItemLoad(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata)
         self.assertEqual(item._link._title, '-1')
+        self.assertLength(item.labels, 0)
+        self.assertLength(item.descriptions, 0)
+        self.assertLength(item.aliases, 0)
+        self.assertLength(item.claims, 0)
+        self.assertLength(item.sitelinks, 0)
 
     def test_item_invalid_titles(self):
         """Test invalid titles of wikibase items."""
@@ -1758,9 +1789,11 @@ class TestLinks(WikidataTestCase):
         self.assertLength(wvlinks, 2)
 
 
-class TestLanguageDict(TestCase):
+class TestLanguageDict(DataCollectionTestCase):
 
     """Test cases covering LanguageDict methods."""
+
+    collection_class = LanguageDict
 
     family = 'wikipedia'
     code = 'en'
@@ -1833,9 +1866,11 @@ class TestLanguageDict(TestCase):
             {'en': {'language': 'en', 'value': 'foo'}})
 
 
-class TestAliasesDict(TestCase):
+class TestAliasesDict(DataCollectionTestCase):
 
     """Test cases covering AliasesDict methods."""
+
+    collection_class = AliasesDict
 
     family = 'wikipedia'
     code = 'en'
