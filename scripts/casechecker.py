@@ -194,8 +194,10 @@ class CaseChecker(object):
                                       .format(ascii=ascii_letters,
                                               local=self.localLtr,
                                               bad=badPtrnStr))
+        self.get_whitelist()
 
-        # Get whitelist
+    def get_whitelist(self):
+        """Get whitelist."""
         self.knownWords = set()
         self.seenUnresolvedLinks = set()
 
