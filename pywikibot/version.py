@@ -224,10 +224,7 @@ def getversion_svn_setuptools(path=None):
         - hash (git hash for the Subversion revision)
     @rtype: C{tuple} of three C{str} and a C{time.struct_time}
     """
-    try:
-        from setuptools import svn_utils
-    except ImportError:
-        from setuptools_svn import svn_utils
+    from setuptools_svn import svn_utils
 
     tag = 'pywikibot-core'
     _program_dir = path or _get_program_dir()
