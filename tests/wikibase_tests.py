@@ -2022,11 +2022,10 @@ class TestPreloadingEntityGenerator(TestCase):
     }
 
     def test_non_item_gen(self):
-        """Test PreloadingEntityGenerator with ReferringPageGenerator."""
+        """Test PreloadingEntityGenerator with getReferences()."""
         site = self.get_site('wikidata')
-        instance_of_page = pywikibot.Page(site, 'Property:P31')
-        ref_gen = pagegenerators.ReferringPageGenerator(
-            instance_of_page, total=5)
+        page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
         self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
 
