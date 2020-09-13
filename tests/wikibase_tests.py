@@ -16,6 +16,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import (
     WikibasePage, ItemPage, PropertyPage, Page, LanguageDict, AliasesDict,
+    ClaimCollection, SiteLinkCollection,
 )
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
@@ -1968,6 +1969,28 @@ class TestAliasesDict(DataCollectionTestCase):
             {'language': 'en', 'value': 'baz', 'remove': ''},
         ]}
         self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
+
+
+class TestClaimCollection(DataCollectionTestCase):
+
+    """Test cases covering ClaimCollection methods."""
+
+    collection_class = ClaimCollection
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
+
+
+class TestSiteLinkCollection(DataCollectionTestCase):
+
+    """Test cases covering SiteLinkCollection methods."""
+
+    collection_class = SiteLinkCollection
 
     def test_new_empty(self):
         """Test that new_empty method returns empty collection."""
