@@ -2882,22 +2882,6 @@ class PageGenerator(QueryGenerator):
         return p
 
 
-@deprecated('PageGenerator', since='20141106', future_warning=True)
-class CategoryPageGenerator(PageGenerator):
-
-    """Like PageGenerator, but yields Category objects instead of Pages."""
-
-    pass
-
-
-@deprecated('PageGenerator', since='20141106', future_warning=True)
-class ImagePageGenerator(PageGenerator):
-
-    """Like PageGenerator, but yields FilePage objects instead of Pages."""
-
-    pass
-
-
 class PropertyGenerator(QueryGenerator):
 
     """Iterator for queries of type action=query&prop=foo.

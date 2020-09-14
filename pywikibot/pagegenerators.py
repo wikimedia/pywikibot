@@ -1328,32 +1328,6 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
             pywikibot.exception(e)
 
 
-@deprecated('LogeventsPageGenerator', since='20141210', future_warning=True)
-@deprecated_args(number='total', mode='logtype', repeat=None)
-def LogpagesPageGenerator(total=500, logtype='', user=None,
-                          site=None, namespace=[]):
-    """
-    Generate Pages for specified modes of logevents.
-
-    This is the backwards compatible one.
-    See LogeventsPageGenerator
-
-    @param mode: Mode of logs to retrieve
-    @type mode: basestring
-    @param user: User of logs retrieved
-    @type user: basestring
-    @param site: Site for generator results
-    @type site: L{pywikibot.site.BaseSite}
-    @param namespace: Namespace to retrieve logs from
-    @type namespace: int
-    @param total: Maximum number of pages to retrieve in total
-    @type total: int
-    """
-    return LogeventsPageGenerator(total=total, logtype=logtype, user=user,
-                                  site=site,
-                                  namespace=namespace)  # pragma: no cover
-
-
 @deprecated_args(number='total', step=None, namespace='namespaces',
                  repeat=None, get_redirect=None)
 def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
@@ -3087,16 +3061,6 @@ FileGenerator = redirect_func(
     PageClassGenerator, old_name='FileGenerator', since='20161017')
 CategoryGenerator = redirect_func(
     PageClassGenerator, old_name='CategoryGenerator', since='20161017')
-UnCategorizedTemplatesGenerator = redirect_func(
-    UnCategorizedTemplateGenerator, old_name='UnCategorizedTemplatesGenerator',
-    since='20141225', future_warning=True)
-RecentchangesPageGenerator = redirect_func(
-    RecentChangesPageGenerator, old_name='RecentchangesPageGenerator',
-    since='20141225', future_warning=True)
-# Deprecated old names from Pywikibot 2.0 beta1
-WikidataItemGenerator = redirect_func(
-    WikibaseItemGenerator, old_name='WikidataItemGenerator',
-    since='20141225', future_warning=True)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
                              since='20181128')
