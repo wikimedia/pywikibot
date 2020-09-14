@@ -1870,8 +1870,12 @@ class Request(MutableMapping):
 
     def _bad_token(self, code) -> bool:
         """Check for bad token."""
-        if (code != 'badtoken' or self.site._loginstatus
-                == pywikibot.site.LoginStatus.IN_PROGRESS):
+        if code != 'badtoken':  # Other code not handled here
+            return False
+
+        if self.site._loginstatus == pywikibot.site.LoginStatus.IN_PROGRESS:
+            pywikibot.log('Login status: {}'
+                          .format(self.site._loginstatus.name))
             return False
 
         user_tokens = self.site.tokens._tokens[self.site.user()]
@@ -1897,16 +1901,16 @@ class Request(MutableMapping):
             for name, t_type in invalid_param.items():
                 self[name] = self.site.tokens[t_type]
             return True
-        else:
-            # otherwise couldn't find any … weird there is nothing what
-            # can be done here because it doesn't know which parameters
-            # to fix
-            pywikibot.log(
-                'Bad token error for {} but no parameter is using a '
-                'token. Current tokens: {}'
-                .format(self.site.user(),
-                        ', '.join('{}: {}'.format(*e)
-                                  for e in user_tokens.items())))
+
+        # otherwise couldn't find any … weird there is nothing what
+        # can be done here because it doesn't know which parameters
+        # to fix
+        pywikibot.log(
+            'Bad token error for {} but no parameter is using a '
+            'token. Current tokens: {}'
+            .format(self.site.user(),
+                    ', '.join('{}: {}'.format(*e)
+                              for e in user_tokens.items())))
         return False
 
     def submit(self) -> dict:
