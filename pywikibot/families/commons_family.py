@@ -38,3 +38,7 @@ class Family(family.WikimediaFamily):
     doc_subpages = {
         '_default': (('/doc', ), ['commons']),
     }
+
+    def interface(self, code):
+        """Return 'DataSite'."""
+        return 'DataSite'

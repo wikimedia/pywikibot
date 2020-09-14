@@ -10,7 +10,11 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.exceptions import NoPageError, PageRelatedError
+from pywikibot.exceptions import (
+    NoPageError,
+    NoWikibaseEntityError,
+    PageRelatedError,
+)
 from tests import join_images_path
 from tests.aspects import TestCase
 
@@ -272,6 +276,39 @@ class TestFilePageDownload(TestCase):
                 re.escape('Page [[commons:File:Albert Einstein.jpg '
                           "notexisting]] doesn't exist.")):
             page.download(filename)
+
+
+class TestFilePageDataItem(TestCase):
+
+    """Test structured data of FilePage."""
+
+    family = 'commons'
+    code = 'commons'
+
+    cached = True
+
+    def test_data_item(self):
+        """Test associated data item."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
+        item = page.data_item()
+        self.assertIsInstance(item, pywikibot.MediaInfo)
+        self.assertTrue(page._item is item)
+        self.assertTrue(item.file is page)
+        self.assertEqual('-1', item.id)
+        item.get()
+        self.assertEqual('M14634781', item.getID())
+        self.assertIsInstance(
+            item.labels, pywikibot.page._collections.LanguageDict)
+        del item._file
+        self.assertEqual(page, item.file)
+
+    def test_data_item_not_existing(self):
+        """Test data item associated to file that does not exist."""
+        page = pywikibot.FilePage(self.site,
+                                  'File:Albert Einstein.jpg_notexisting')
+        item = page.data_item()
+        with self.assertRaises(NoWikibaseEntityError):
+            item.get()
 
 
 if __name__ == '__main__':  # pragma: no cover
