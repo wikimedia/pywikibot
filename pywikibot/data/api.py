@@ -2011,7 +2011,10 @@ class Request(MutableMapping):
                 continue
 
             # If readapidenied is returned try to login
-            if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
+            if code == 'readapidenied' \
+               and self.site._loginstatus in (
+                   pywikibot.site.LoginStatus.NOT_ATTEMPTED,
+                   pywikibot.site.LoginStatus.NOT_LOGGED_IN):
                 self.site.login()
                 continue
 
@@ -3032,7 +3035,7 @@ class LoginManager(login.LoginManager):
         return self.mapping[key][index]
 
     @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
-    def getCookie(self):
+    def getCookie(self) -> str:
         """Login to the site.
 
         Note, this doesn't actually return or do anything with cookies.
@@ -3080,7 +3083,7 @@ class LoginManager(login.LoginManager):
         if self.site.family.ldapDomain:
             login_request[self.keyword('ldap')] = self.site.family.ldapDomain
 
-        self.site._loginstatus = -2  # IN_PROGRESS
+        self.site._loginstatus = pywikibot.site.LoginStatus.IN_PROGRESS
         while True:
             # get token using meta=tokens if supported
             if not below_mw_1_27:

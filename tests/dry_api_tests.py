@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
 import pywikibot
@@ -17,6 +15,7 @@ from pywikibot.data.api import (
     QueryGenerator,
 )
 from pywikibot.family import Family
+from pywikibot.site import LoginStatus
 from pywikibot.tools import suppress_warnings
 
 from tests import join_images_path, patch
@@ -45,7 +44,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def setUp(self):
         """Initialize the fake requests."""
-        super(DryCachedRequestTests, self).setUp()
+        super().setUp()
         self.parms = {'action': 'query',
                       'meta': 'userinfo'}
         self.req = CachedRequest(expiry=1, site=self.basesite,
@@ -147,7 +146,7 @@ class MockCachedRequestKeyTests(TestCase):
 
         class MockSite(pywikibot.site.APISite):
 
-            _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
+            _loginstatus = LoginStatus.NOT_ATTEMPTED
 
             _namespaces = {2: ['User']}
 
@@ -185,7 +184,7 @@ class MockCachedRequestKeyTests(TestCase):
                 raise Exception('Attribute {!r} not defined'.format(attr))
 
         self.mocksite = MockSite()
-        super(MockCachedRequestKeyTests, self).setUp()
+        super().setUp()
 
     def test_cachefile_path_different_users(self):
         """Test and compare file paths when different usernames are used."""
@@ -194,26 +193,26 @@ class MockCachedRequestKeyTests(TestCase):
         anonpath = req._cachefile_path()
 
         self.mocksite._userinfo = {'name': 'MyUser'}
-        self.mocksite._loginstatus = 0
+        self.mocksite._loginstatus = LoginStatus.AS_USER
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
         userpath = req._cachefile_path()
 
         self.assertNotEqual(anonpath, userpath)
 
-        self.mocksite._userinfo = {'name': 'MySysop'}
-        self.mocksite._loginstatus = 1
+        self.mocksite._userinfo = {'name': 'MyOtherUser'}
+        self.mocksite._loginstatus = LoginStatus.AS_USER
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
-        sysoppath = req._cachefile_path()
+        otherpath = req._cachefile_path()
 
-        self.assertNotEqual(anonpath, sysoppath)
-        self.assertNotEqual(userpath, sysoppath)
+        self.assertNotEqual(anonpath, otherpath)
+        self.assertNotEqual(userpath, otherpath)
 
     def test_unicode(self):
         """Test caching with Unicode content."""
         self.mocksite._userinfo = {'name': 'محمد الفلسطيني'}
-        self.mocksite._loginstatus = 0
+        self.mocksite._loginstatus = LoginStatus.AS_USER
 
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -385,7 +384,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
 
     def setUp(self):
         """Add a real ParamInfo to the DrySite."""
-        super(ParamInfoDictTests, self).setUp()
+        super().setUp()
         site = self.get_site()
         site._paraminfo = ParamInfo(site)
         # Pretend that paraminfo has been loaded
