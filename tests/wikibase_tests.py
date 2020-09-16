@@ -55,19 +55,6 @@ class WbRepresentationTestCase(WikidataTestCase):
         self.assertLength(set(list_of_dupes), 1)
 
 
-class DataCollectionTestCase(WikidataTestCase):
-
-    """Test case for a Wikibase collection class."""
-
-    collection_class = None
-
-    def test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        cls = self.collection_class
-        result = cls.new_empty(self.get_repo())
-        self.assertLength(result, 0)
-
-
 class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
                                WikidataTestCase):
 
@@ -969,11 +956,14 @@ class TestItemLoad(WikidataTestCase):
         attrs = ['_content', 'labels', 'descriptions', 'aliases',
                  'claims', 'sitelinks']
         for attr in attrs:
-            self.assertFalse(hasattr(item, attr))
+            with self.subTest(attr=attr, note='before loading'):
+                # hasattr() loads the attributes; use item.__dict__ for tests
+                self.assertNotIn(attr, item.__dict__)
 
         item.labels  # trigger loading
         for attr in attrs:
-            self.assertTrue(hasattr(item, attr))
+            with self.subTest(attr=attr, note='after loading'):
+                self.assertIn(attr, item.__dict__)
 
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
@@ -1789,6 +1779,19 @@ class TestLinks(WikidataTestCase):
         self.assertLength(wvlinks, 2)
 
 
+class DataCollectionTestCase(WikidataTestCase):
+
+    """Test case for a Wikibase collection class."""
+
+    collection_class = None
+
+    def _test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        cls = self.collection_class
+        result = cls.new_empty(self.get_repo())
+        self.assertIsEmpty(result)
+
+
 class TestLanguageDict(DataCollectionTestCase):
 
     """Test cases covering LanguageDict methods."""
@@ -1864,6 +1867,10 @@ class TestLanguageDict(DataCollectionTestCase):
         self.assertEqual(
             LanguageDict.normalizeData(self.lang_out),
             {'en': {'language': 'en', 'value': 'foo'}})
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
 
 
 class TestAliasesDict(DataCollectionTestCase):
@@ -1961,6 +1968,10 @@ class TestAliasesDict(DataCollectionTestCase):
             {'language': 'en', 'value': 'baz', 'remove': ''},
         ]}
         self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
 
 
 class TestWriteNormalizeData(TestCase):
