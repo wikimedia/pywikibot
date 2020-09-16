@@ -3142,7 +3142,7 @@ class LoginManager(login.LoginManager):
 
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""
-        http.cookie_jar.save()
+        http.cookie_jar.save(ignore_discard=True)
 
     def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.

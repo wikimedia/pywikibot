@@ -61,7 +61,7 @@ cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
 cookie_jar = cookiejar.LWPCookieJar(cookie_file_path)
 try:
-    cookie_jar.load()
+    cookie_jar.load(ignore_discard=True)
 except cookiejar.LoadError:
     debug('Loading cookies failed.', _logger)
 else:
