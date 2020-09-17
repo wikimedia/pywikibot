@@ -15,8 +15,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 from os.path import abspath, dirname, join
 import re
@@ -282,13 +280,11 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                 and 'Traceback (most recent call last)' not in line):
             # Initiate code block except pagegenerator arguments follows
             for afterline in lines[index + 1:]:
-                if afterline == '':
+                if not afterline:
                     continue
-                elif afterline == '&params;':
-                    break
-                else:
+                if afterline != '&params;':
                     lines[index] = line + ':'
-                    break
+                break
 
         if line.startswith('-'):
             # Indent options
@@ -299,7 +295,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         elif length and line.startswith(' ' * length):
             # Indent descriptions of options (as options are indented)
             lines[index] = ' ' + line
-        elif line != '':
+        elif line:
             # Reset length
             length = 0
 
