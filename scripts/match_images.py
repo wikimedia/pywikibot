@@ -27,8 +27,6 @@ Expect the code to change a lot!
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import io
 
 import pywikibot
@@ -52,9 +50,8 @@ def match_image_pages(imagePageA, imagePageB):
     imageA = get_image_from_image_page(imagePageA)
     imageB = get_image_from_image_page(imagePageB)
 
-    (imA_width, imA_height) = imageA.size
-
-    imageB = imageB.resize((imA_width, imA_height))
+    imageB = imageB.resize(imageA.size)
+    imA_width, imA_height = imageA.size
 
     imageA_topleft = imageA.crop((0, 0, imA_width // 2, imA_height // 2))
     imageB_topleft = imageB.crop((0, 0, imA_width // 2, imA_height // 2))
@@ -142,25 +139,21 @@ def match_images(imageA, imageB):
 def main(*args):
     """Extracting file page information and initiate matching."""
     images = []
-    other_family = ''
-    other_lang = ''
 
     # Read commandline parameters.
     local_args = pywikibot.handle_args(args)
+    current_site = pywikibot.Site()
+    other_family = current_site.family.name
+    other_lang = current_site.code
 
     for arg in local_args:
-        if arg.startswith('-otherfamily:'):
-            if len(arg) == len('-otherfamily:'):
-                other_family = pywikibot.input(
-                    'What family do you want to use?')
-            else:
-                other_family = arg[len('-otherfamily:'):]
-        elif arg.startswith('-otherlang:'):
-            if len(arg) == len('-otherlang:'):
-                other_lang = pywikibot.input(
-                    'What language do you want to use?')
-            else:
-                other_lang = arg[len('otherlang:'):]
+        option, _, value = arg.partition(':')
+        if option == '-otherfamily':
+            other_family = value or pywikibot.input(
+                'What family do you want to use?')
+        elif option == '-otherlang':
+            other_lang = value or pywikibot.input(
+                'What language do you want to use?')
         else:
             images.append(arg)
 
@@ -174,20 +167,9 @@ def main(*args):
                     additional_text=additional_text):
         return
 
-    imagePageA = pywikibot.page.FilePage(pywikibot.Site(),
-                                         images[0])
-    if other_lang:
-        if other_family:
-            imagePageB = pywikibot.page.FilePage(pywikibot.Site(
-                                                 other_lang, other_family),
-                                                 images[1])
-        else:
-            imagePageB = pywikibot.page.FilePage(pywikibot.Site(
-                                                 other_lang),
-                                                 images[1])
-    else:
-        imagePageB = pywikibot.page.FilePage(pywikibot.Site(),
-                                             images[1])
+    other_site = pywikibot.Site(other_lang, other_family)
+    imagePageA = pywikibot.page.FilePage(current_site, images[0])
+    imagePageB = pywikibot.page.FilePage(other_site, images[1])
 
     match_image_pages(imagePageA, imagePageB)
 
