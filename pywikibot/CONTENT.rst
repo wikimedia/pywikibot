@@ -82,7 +82,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | http.py                    | Basic HTTP access interface                          |
     +----------------------------+------------------------------------------------------+
-    | threadedhttp.py            | Httplib2 threaded cookie layer extending httplib2    |
+    | threadedhttp.py            | HTTP requests wrapper                                |
     +----------------------------+------------------------------------------------------+
 
 

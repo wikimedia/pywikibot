@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Http backend layer, formerly providing a httplib2 wrapper."""
+"""Http backend layer providing a HTTP requests wrapper."""
 #
 # (C) Pywikibot team, 2007-2020
 #
@@ -8,13 +8,14 @@
 import codecs
 import re
 
+from typing import Dict, Optional
 from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot.tools import deprecated
 
 
-_logger = 'comm.threadedhttp'
+_logger = 'comms.threadedhttp'
 
 
 class HttpRequest:
@@ -28,8 +29,7 @@ class HttpRequest:
 
     def __init__(self, uri, method='GET', params=None, body=None, headers=None,
                  callbacks=None, charset=None, **kwargs):
-        """
-        Initializer.
+        """Initializer.
 
         See C{Http.request} for parameters.
         """
@@ -71,17 +71,17 @@ class HttpRequest:
                 callback(self)
 
     @property
-    def exception(self):
+    def exception(self) -> Optional[Exception]:
         """Get the exception, if any."""
         return self.data if isinstance(self.data, Exception) else None
 
     @property
-    def response_headers(self):
+    def response_headers(self) -> Optional[Dict[str, str]]:
         """Return the response headers."""
         return self.data.headers if not self.exception else None
 
     @property
-    def raw(self):
+    def raw(self) -> Optional[bytes]:
         """Return the raw response body."""
         return self.data.content if not self.exception else None
 
@@ -119,9 +119,9 @@ class HttpRequest:
                 # application/json | application/sparql-results+json
                 self._header_encoding = 'utf-8'
             elif 'xml' in content_type:
-                header = self.raw[:100].splitlines()[0]  # bytestr in py3
-                m = re.search(br'encoding=("|'
-                              br"')(?P<encoding>.+?)\1", header)
+                header = self.raw[:100].splitlines()[0]  # bytes
+                m = re.search(
+                    br'encoding=(["\'])(?P<encoding>.+?)\1', header)
                 if m:
                     self._header_encoding = m.group('encoding').decode('utf-8')
                 else:
@@ -134,63 +134,64 @@ class HttpRequest:
     def encoding(self):
         """Detect the response encoding."""
         if not hasattr(self, '_encoding'):
-            if not self.charset and not self.header_encoding:
+            if self.charset is None and self.header_encoding is None:
                 pywikibot.log("Http response doesn't contain a charset.")
                 charset = 'latin1'
             else:
                 charset = self.charset
-            lookup = codecs.lookup(charset) if charset else None
-            if (self.header_encoding
-                and (lookup is None
-                     or codecs.lookup(self.header_encoding) != lookup)):
+
+            if self.header_encoding is not None \
+               and (charset is None
+                    or codecs.lookup(self.header_encoding)
+                    != codecs.lookup(charset)):
                 if charset:
                     pywikibot.warning(
-                        'Encoding "{}" requested but "{}" '
-                        'received in the header.'
-                        .format(charset, self.header_encoding))
-                try:
-                    # TODO: Buffer decoded content, weakref does remove it too
-                    #       early (directly after this method)
-                    self.raw.decode(self.header_encoding)
-                except UnicodeError as e:
-                    self._encoding = e
-                else:
-                    self._encoding = self.header_encoding
+                        'Encoding "{}" requested but "{}" received in the '
+                        'header.'.format(charset, self.header_encoding))
+
+                # TODO: Buffer decoded content, weakref does remove it too
+                #       early (directly after this method)
+                self._encoding = self._try_decode(self.header_encoding)
             else:
                 self._encoding = None
 
             if charset and (isinstance(self._encoding, Exception)
-                            or not self._encoding):
-                try:
-                    self.raw.decode(charset)
-                except UnicodeError as e:
-                    self._encoding = e
-                else:
-                    self._encoding = charset
+                            or self._encoding is None):
+                self._encoding = self._try_decode(charset)
 
         if isinstance(self._encoding, Exception):
             raise self._encoding
         return self._encoding
 
-    def decode(self, encoding, errors='strict'):
+    def _try_decode(self, encoding):
+        """Helper function to try decoding."""
+        try:
+            self.raw.decode(encoding)
+        except UnicodeError as e:
+            result = e
+        else:
+            result = encoding
+        return result
+
+    def decode(self, encoding, errors='strict') -> str:
         """Return the decoded response."""
         return self.raw.decode(encoding, errors)
 
     @property
     @deprecated('the `text` property', since='20180321')
-    def content(self):
+    def content(self) -> str:
         """DEPRECATED. Return the response decoded by the detected encoding."""
         return self.text
 
     @property
-    def text(self):
+    def text(self) -> str:
         """Return the response decoded by the detected encoding."""
         return self.decode(self.encoding)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the response decoded by the detected encoding."""
         return self.text
 
-    def __bytes__(self):
+    def __bytes__(self) -> Optional[bytes]:
         """Return the undecoded response."""
         return self.raw
