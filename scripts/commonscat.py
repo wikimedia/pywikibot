@@ -39,8 +39,6 @@ For example to go through all categories:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 import pywikibot
@@ -307,9 +305,11 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 else:
                     textToAdd = '{{%s|%s}}' % (primaryCommonscat,
                                                commonscatLink)
-                _, _, always = add_text(page, textToAdd,
-                                        self.getOption('summary'),
-                                        always=self.getOption('always'))
+                result, _, always = add_text(page, textToAdd,
+                                             self.getOption('summary'),
+                                             always=self.getOption('always'))
+                if result is True:
+                    self._save_counter += 1
                 self.options['always'] = always
 
     def changeCommonscat(
