@@ -27,8 +27,8 @@ import uuid
 from collections import defaultdict, namedtuple
 from collections.abc import Iterable, Container, Mapping
 from contextlib import suppress
-from enum import IntEnum
 from itertools import zip_longest
+from pywikibot.login import LoginStatus as _LoginStatus
 from textwrap import fill
 from typing import Optional
 from warnings import warn
@@ -82,6 +82,7 @@ from pywikibot.tools import (
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
+    ModuleDeprecationWrapper,
     normalize_username,
     remove_last_args,
     SelfCallMixin,
@@ -98,35 +99,6 @@ _logger = 'wiki.site'
 class PageInUse(pywikibot.Error):
 
     """Page cannot be reserved for writing due to existing lock."""
-
-
-class LoginStatus(IntEnum):
-
-    """
-    Enum for Login statuses.
-
-    >>> LoginStatus.NOT_ATTEMPTED
-    LoginStatus(-3)
-    >>> LoginStatus.IN_PROGRESS.value
-    -2
-    >>> LoginStatus.NOT_LOGGED_IN.name
-    NOT_LOGGED_IN
-    >>> int(LoginStatus.AS_USER)
-    0
-    >>> LoginStatus(-3).name
-    'NOT_ATTEMPTED'
-    >>> LoginStatus(0).name
-    'AS_USER'
-    """
-
-    NOT_ATTEMPTED = -3
-    IN_PROGRESS = -2
-    NOT_LOGGED_IN = -1
-    AS_USER = 0
-
-    def __repr__(self):
-        """Return internal representation."""
-        return 'LoginStatus({})'.format(self)
 
 
 class Namespace(Iterable, ComparableMixin):
@@ -1654,7 +1626,7 @@ class APISite(BaseSite):
         """Initializer."""
         super().__init__(code, fam, user)
         self._msgcache = {}
-        self._loginstatus = LoginStatus.NOT_ATTEMPTED
+        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
         self._paraminfo = api.ParamInfo(self)
         self._interwikimap = _InterwikiMap(self)
@@ -1826,7 +1798,7 @@ class APISite(BaseSite):
         #       (below) is successful. Instead, log the problem,
         #       to be increased to 'warning' level once majority
         #       of issues are resolved.
-        if self._loginstatus == LoginStatus.IN_PROGRESS:
+        if self._loginstatus == _LoginStatus.IN_PROGRESS:
             pywikibot.log(
                 '{!r}.login() called when a previous login was in progress.'
                 .format(self))
@@ -1835,11 +1807,11 @@ class APISite(BaseSite):
         # logged_in() is False if _userinfo exists, which means this
         # will have no effect for the invocation from api.py
         if self.logged_in():
-            self._loginstatus = LoginStatus.AS_USER
+            self._loginstatus = _LoginStatus.AS_USER
             return
         # check whether a login cookie already exists for this user
         # or check user identity when OAuth enabled
-        self._loginstatus = LoginStatus.IN_PROGRESS
+        self._loginstatus = _LoginStatus.IN_PROGRESS
         try:
             self.getuserinfo(force=True)
             if self.userinfo['name'] == self.user():
@@ -1874,9 +1846,9 @@ class APISite(BaseSite):
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             self.getuserinfo(force=True)
-            self._loginstatus = LoginStatus.AS_USER
+            self._loginstatus = _LoginStatus.AS_USER
         else:
-            self._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
+            self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
 
     def _relogin(self):
         """Force a login sequence without logging out, using the current user.
@@ -1886,7 +1858,7 @@ class APISite(BaseSite):
         from the site.
         """
         del self._userinfo
-        self._loginstatus = LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
         self.login()
 
     def logout(self):
@@ -1906,7 +1878,7 @@ class APISite(BaseSite):
             req_params['token'] = self.tokens['csrf']
         uirequest = self._simple_request(**req_params)
         uirequest.submit()
-        self._loginstatus = LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
         del self._userinfo
@@ -8002,3 +7974,10 @@ class DataSite(APISite):
                                site=self, parameters=parameters)
         gen.set_maximum_items(total)
         return gen
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+# Note: use LoginStatus instead of _LoginStatus
+#       after desupport warning is removed
+wrapper._add_deprecated_attr('LoginStatus', _LoginStatus,
+                             since='20200919', future_warning=True)

@@ -10,6 +10,7 @@ import codecs
 import os
 import webbrowser
 
+from enum import IntEnum
 from warnings import warn
 
 import pywikibot
@@ -52,6 +53,35 @@ botList = {
         'simple': ['Wikipedia:Bots', '/links']
     },
 }
+
+
+class LoginStatus(IntEnum):
+
+    """
+    Enum for Login statuses.
+
+    >>> LoginStatus.NOT_ATTEMPTED
+    LoginStatus(-3)
+    >>> LoginStatus.IN_PROGRESS.value
+    -2
+    >>> LoginStatus.NOT_LOGGED_IN.name
+    NOT_LOGGED_IN
+    >>> int(LoginStatus.AS_USER)
+    0
+    >>> LoginStatus(-3).name
+    'NOT_ATTEMPTED'
+    >>> LoginStatus(0).name
+    'AS_USER'
+    """
+
+    NOT_ATTEMPTED = -3
+    IN_PROGRESS = -2
+    NOT_LOGGED_IN = -1
+    AS_USER = 0
+
+    def __repr__(self):
+        """Return internal representation."""
+        return 'LoginStatus({})'.format(self)
 
 
 class LoginManager:

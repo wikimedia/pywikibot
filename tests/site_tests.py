@@ -3688,7 +3688,7 @@ class TestLoginLogout(DefaultSiteTestCase):
     def test_login_logout(self):
         """Validate login and logout methods by toggling the state."""
         site = self.get_site()
-        loginstatus = pywikibot.site.LoginStatus
+        loginstatus = pywikibot.login.LoginStatus
 
         self.assertTrue(site.logged_in())
         self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,

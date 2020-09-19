@@ -36,6 +36,7 @@ from pywikibot.exceptions import (
     Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.family import SubdomainFamily
+from pywikibot.login import LoginStatus
 from pywikibot.tools import (
     deprecated, itergroup, PYTHON_VERSION, remove_last_args
 )
@@ -1697,8 +1698,7 @@ class Request(MutableMapping):
             # case, force a re-login.
             username = result['query']['userinfo']['name']
             if (self.site.user() is not None and self.site.user() != username
-                    and self.site._loginstatus
-                    != pywikibot.site.LoginStatus.IN_PROGRESS):
+                    and self.site._loginstatus != LoginStatus.IN_PROGRESS):
                 message = ("Logged in as '{actual}' instead of '{expected}'."
                            .format(actual=username, expected=self.site.user()))
                 self._relogin(message)
@@ -1815,7 +1815,7 @@ class Request(MutableMapping):
         if code != 'badtoken':  # Other code not handled here
             return False
 
-        if self.site._loginstatus == pywikibot.site.LoginStatus.IN_PROGRESS:
+        if self.site._loginstatus == LoginStatus.IN_PROGRESS:
             pywikibot.log('Login status: {}'
                           .format(self.site._loginstatus.name))
             return False
@@ -1954,9 +1954,8 @@ class Request(MutableMapping):
 
             # If readapidenied is returned try to login
             if code == 'readapidenied' \
-               and self.site._loginstatus in (
-                   pywikibot.site.LoginStatus.NOT_ATTEMPTED,
-                   pywikibot.site.LoginStatus.NOT_LOGGED_IN):
+               and self.site._loginstatus in (LoginStatus.NOT_ATTEMPTED,
+                                              LoginStatus.NOT_LOGGED_IN):
                 self.site.login()
                 continue
 
@@ -2075,7 +2074,7 @@ class CachedRequest(Request):
         """
         login_status = self.site._loginstatus
 
-        if login_status >= pywikibot.site.LoginStatus.AS_USER:
+        if login_status >= LoginStatus.AS_USER:
             # This uses the format of Page.__repr__, without performing
             # config.console_encoding as done by Page.__repr__.
             # The returned value can't be encoded to anything other than
@@ -2083,8 +2082,7 @@ class CachedRequest(Request):
             # tries to encode it as utf-8.
             user_key = 'User(User:{})'.format(self.site.userinfo['name'])
         else:
-            user_key = repr(pywikibot.site.LoginStatus(
-                pywikibot.site.LoginStatus.NOT_LOGGED_IN))
+            user_key = repr(LoginStatus(LoginStatus.NOT_LOGGED_IN))
 
         request_key = repr(sorted(self._encoded_items().items()))
         return repr(self.site) + user_key + request_key
@@ -3025,7 +3023,7 @@ class LoginManager(login.LoginManager):
         if self.site.family.ldapDomain:
             login_request[self.keyword('ldap')] = self.site.family.ldapDomain
 
-        self.site._loginstatus = pywikibot.site.LoginStatus.IN_PROGRESS
+        self.site._loginstatus = LoginStatus.IN_PROGRESS
         while True:
             # get token using meta=tokens if supported
             if not below_mw_1_27:
