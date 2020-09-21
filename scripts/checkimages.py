@@ -248,7 +248,7 @@ bot_list = {
     'it': ['Filbot', 'Nikbot', '.snoopyBot.'],
     'ja': ['Alexbot'],
     'ko': ['Kwjbot IV'],
-    'sr': ['ZoranBot'],
+    'sr': ['KizuleBot'],
     'ta': ['TrengarasuBOT'],
     'ur': ['Shuaib-bot', 'Tahir-bot', 'SAMI.bot'],
     'zh': ['Alexbot'],
@@ -271,7 +271,7 @@ second_message_without_license = {
 page_with_settings = {
     'commons': 'User:Filbot/Settings',
     'it': 'Progetto:Coordinamento/Immagini/Bot/Settings#Settings',
-    'sr': 'User:ZoranBot/checkimages.py/подешавања',
+    'sr': 'User:KizuleBot/checkimages.py/подешавања',
     'zh': 'User:Alexbot/cisettings#Settings',
 }
 
@@ -290,7 +290,7 @@ report_page = {
     'ja': 'User:Alexbot/report',
     'ko': 'User:Kwjbot IV/Report',
     'sd': 'واپرائيندڙ:Kaleem Bhatti/درخواست تصوير',
-    'sr': 'User:ZoranBot/checkimages.py/дневник',
+    'sr': 'User:KizuleBot/checkimages.py/дневник',
     'ta': 'User:Trengarasu/commonsimages',
     'ur': 'صارف:محمد شعیب/درخواست تصویر',
     'zh': 'User:Alexsh/checkimagereport',
@@ -335,7 +335,7 @@ PageWithHiddenTemplates = {
     'commons': 'User:Filbot/White_templates#White_templates',
     'it': 'Progetto:Coordinamento/Immagini/Bot/WhiteTemplates',
     'ko': 'User:Kwjbot_IV/whitetemplates/list',
-    'sr': 'User:ZoranBot/checkimages.py/дозвољенишаблони',
+    'sr': 'User:KizuleBot/checkimages.py/дозвољенишаблони',
 }
 
 # A page where there's a list of template to consider as licenses.
@@ -344,7 +344,7 @@ PageWithAllowedTemplates = {
     'de': 'Benutzer:Xqbot/Lizenzvorlagen',
     'it': 'Progetto:Coordinamento/Immagini/Bot/AllowedTemplates',
     'ko': 'User:Kwjbot_IV/AllowedTemplates',
-    'sr': 'User:ZoranBot/checkimages.py/дозвољенишаблони',
+    'sr': 'User:KizuleBot/checkimages.py/дозвољенишаблони',
 }
 
 # Template added when the bot finds only an hidden template and nothing else.
