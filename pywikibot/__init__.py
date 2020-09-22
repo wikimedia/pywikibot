@@ -63,10 +63,17 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
-    redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
+    PYTHON_VERSION,
+    redirect_func,
 )
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9, 0):
+    from functools import cache
+else:
+    from functools import lru_cache
+    cache = lru_cache(None)
 
 
 textlib_methods = (
@@ -1136,36 +1143,33 @@ class WbUnknown(_WbRepresentation):
 
 
 _sites = {}
-_url_cache = {}  # The code/fam pair for each URL
 
 
-def _code_fam_from_url(url):
+@cache
+def _code_fam_from_url(url: str):
     """Set url to cache and get code and family from cache.
 
     Site helper method.
     @param url: The site URL to get code and family
-    @type url: str
     @raises pywikibot.exceptions.SiteDefinitionError: Unknown URL
     """
-    if url not in _url_cache:
-        matched_sites = []
-        # Iterate through all families and look, which does apply to
-        # the given URL
-        for fam in config.family_files:
-            family = Family.load(fam)
-            code = family.from_url(url)
-            if code is not None:
-                matched_sites.append((code, family))
+    matched_sites = []
+    # Iterate through all families and look, which does apply to
+    # the given URL
+    for fam in config.family_files:
+        family = Family.load(fam)
+        code = family.from_url(url)
+        if code is not None:
+            matched_sites.append((code, family))
 
-        if not matched_sites:
-            # TODO: As soon as AutoFamily is ready, try and use an
-            #       AutoFamily
-            raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
-        if len(matched_sites) > 1:
-            warning('Found multiple matches for URL "{0}": {1} (use first)'
-                    .format(url, ', '.join(str(s) for s in matched_sites)))
-        _url_cache[url] = matched_sites[0]
-    return _url_cache[url]
+    if not matched_sites:
+        # TODO: As soon as AutoFamily is ready, try and use an
+        #       AutoFamily
+        raise SiteDefinitionError("Unknown URL '{}'.".format(url))
+    if len(matched_sites) > 1:
+        warning('Found multiple matches for URL "{}": {} (use first)'
+                .format(url, ', '.join(str(s) for s in matched_sites)))
+    return matched_sites[0]
 
 
 @_deprecate_arg('sysop', None)

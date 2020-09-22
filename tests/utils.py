@@ -641,7 +641,7 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
 
 @contextmanager
 def empty_sites():
-    """Empty pywikibot._sites and pywikibot._url_cache cache on entry point."""
+    """Empty pywikibot _sites and _code_fam_from_url cache on entry point."""
     pywikibot._sites = {}
-    pywikibot._url_cache = {}
+    pywikibot._code_fam_from_url.cache_clear()
     yield
