@@ -15,7 +15,7 @@ from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper, deprecated
+from pywikibot.tools import deprecated, first_lower, first_upper
 
 #
 # Different collections of well known formats
@@ -310,7 +310,7 @@ def romanNumToInt(v):
 
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
-# (from int to a u-string) and decoder (from u-string to an int)
+# (from int to a str) and decoder (from str to an int)
 _digitDecoders = {
     # %% is a %
     '%': '%',
@@ -485,7 +485,7 @@ def _make_parameter(decoder, param):
     return newValue
 
 
-@deprecated(since='20151014')
+@deprecated(since='20151014', future_warning=True)
 def MakeParameter(decoder, param):
     """DEPRECATED."""
     return _make_parameter(decoder, param)
