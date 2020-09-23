@@ -1353,17 +1353,18 @@ def _flush(stop=True):
             '{lightblue}Waiting for {num} pages to be put. '
             'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
-    while (_putthread.is_alive()
-           and (page_put_queue.qsize() > 0
-                or page_put_queue_busy.qsize() > 0)):
-        try:
-            _putthread.join(1)
-        except KeyboardInterrupt:
-            if input_yn('There are {} pages remaining in the queue. '
-                        'Estimated time remaining: {}\nReally exit?'
-                        .format(*remaining()),
-                        default=False, automatic_quit=False):
-                return
+    if _putthread is not threading.current_thread():
+        while (_putthread.is_alive()
+               and (page_put_queue.qsize() > 0
+                    or page_put_queue_busy.qsize() > 0)):
+            try:
+                _putthread.join(1)
+            except KeyboardInterrupt:
+                if input_yn('There are {} pages remaining in the queue. '
+                            'Estimated time remaining: {}\nReally exit?'
+                            .format(*remaining()),
+                            default=False, automatic_quit=False):
+                    break
 
     # only need one drop() call because all throttles use the same global pid
     with suppress(IndexError):
