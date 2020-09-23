@@ -38,7 +38,13 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning)
+    deprecated, deprecated_args, issue_deprecation_warning, PYTHON_VERSION)
+
+if PYTHON_VERSION >= (3, 9, 0):
+    from functools import cache
+else:
+    from functools import lru_cache
+    cache = lru_cache(None)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -49,10 +55,6 @@ PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 _messages_package_name = 'scripts.i18n'
 # Flag to indicate whether translation messages are available
 _messages_available = None
-
-# Cache of translated messages
-_cache = defaultdict(dict)
-
 
 _LANG_TO_GROUP_NAME = defaultdict(str, {
     'aa': 'aa',
@@ -421,28 +423,23 @@ class TranslationError(Error, ImportError):
     pass
 
 
+@cache
 def _get_translation(lang, twtitle):
     """
     Return message of certain twtitle if exists.
 
     For internal use, don't use it directly.
     """
-    if twtitle in _cache[lang]:
-        return _cache[lang][twtitle]
     message_bundle = twtitle.split('-')[0]
-    filename = '%s/%s.json' % (message_bundle, lang)
+    filename = '{}/{}.json'.format(message_bundle, lang)
     try:
         trans_text = pkgutil.get_data(
             _messages_package_name, filename).decode('utf-8')
     except (OSError, IOError):  # file open can cause several exceptions
-        _cache[lang][twtitle] = None
         return None
+
     transdict = json.loads(trans_text)
-    _cache[lang].update(transdict)
-    try:
-        return transdict[twtitle]
-    except KeyError:
-        return None
+    return transdict.get(twtitle)
 
 
 def _extract_plural(code, message, parameters):
