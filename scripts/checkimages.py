@@ -238,19 +238,19 @@ nothing_notification = {
 # This is a list of what bots used this script in your project.
 # NOTE: YOUR Bot username will be automatically added.
 bot_list = {
-    'commons': ['Siebot', 'CommonsDelinker', 'Filbot', 'John Bot',
-                'Sz-iwbot', 'ABFbot'],
+    'commons': ['Siebot', 'CommonsDelinker', 'Filbot', 'Sz-iwbot',
+                'ABFbot'],
     'meta': ['MABot'],
     'de': ['Xqbot'],
     'en': ['OrphanBot'],
     'fa': ['Amirobot'],
     'ga': ['AllieBot'],
-    'it': ['Filbot', 'Nikbot', '.snoopyBot.'],
+    'it': ['Filbot', 'Nikbot', '.snoopybot.'],
     'ja': ['Alexbot'],
     'ko': ['Kwjbot IV'],
     'sr': ['KizuleBot'],
     'ta': ['TrengarasuBOT'],
-    'ur': ['Shuaib-bot', 'Tahir-bot', 'SAMI.bot'],
+    'ur': ['Shuaib-bot', 'Tahir-bot', 'SAMI.Bot'],
     'zh': ['Alexbot'],
 }
 
