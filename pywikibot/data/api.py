@@ -1400,7 +1400,7 @@ class Request(MutableMapping):
         except TypeError:
             self.mime_params = {} if value else None
 
-    @deprecated('_http_param_string', since='20141006')
+    @deprecated(since='20141006', future_warning=True)
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
