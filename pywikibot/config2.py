@@ -1063,11 +1063,11 @@ def _check_user_config_types(user_config, default_values, skipped):
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
-                warn('\n'
-                     + fill('Configuration variable "{0}" is defined in your '
-                            'user-config.py but unknown. It can be a '
-                            'misspelled one or a variable that is no longer '
-                            'supported.'.format(name)), UserWarning)
+                warn('\n' + fill('Configuration variable "{0}" is defined in '
+                                 'your user-config.py but unknown. It can be '
+                                 'a misspelled one or a variable that is no '
+                                 'longer supported.'.format(name)),
+                     UserWarning)
 
 
 _check_user_config_types(_exec_globals, _public_globals, _imports)
