@@ -4770,7 +4770,7 @@ class Property:
             self._type = self.repo.getPropertyType(self)
         return self._type
 
-    @deprecated('Property.type', since='20140607')
+    @deprecated('Property.type', since='20140607', future_warning=True)
     def getType(self):
         """
         Return the type of this property.
