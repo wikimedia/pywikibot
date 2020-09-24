@@ -7448,7 +7448,7 @@ class DataSite(APISite):
             'API wbgetentities response lacks %s key' % props
         return wbdata[props]
 
-    @deprecated('pywikibot.ItemPage', since='20130307')
+    @deprecated('pywikibot.ItemPage', since='20130307', future_warning=True)
     def get_item(self, source, **params):
         """Get the data for multiple Wikibase items."""
         return self._get_item(source, **params)
