@@ -25,6 +25,7 @@ import unicodedata
 
 from collections import Counter, defaultdict, OrderedDict
 from collections.abc import MutableMapping
+from contextlib import suppress
 from html.entities import name2codepoint
 from itertools import chain
 from typing import Any, Dict, List, Optional, Union
@@ -318,7 +319,6 @@ class BasePage(ComparableMixin):
             -family and -lang option i.e. config.family and config.mylang
         @param without_brackets: (cannot be used with as_link) if true, remove
             the last pair of brackets(usually removes disambiguation brackets).
-        @rtype: str
         """
         title = self._link.canonical_title()
         label = self._link.title
@@ -706,7 +706,7 @@ class BasePage(ComparableMixin):
         """Return True if last editor was unregistered."""
         return self.latest_revision.anon
 
-    def lastNonBotUser(self):
+    def lastNonBotUser(self) -> str:
         """
         Return name or IP address of last human/non-bot user to edit page.
 
@@ -716,8 +716,6 @@ class BasePage(ComparableMixin):
         If the edit was done by a bot which is no longer flagged as 'bot',
         i.e. which is not returned by Site.botusers(), it will be returned
         as a non-bot edit.
-
-        @rtype: str
         """
         if hasattr(self, '_lastNonBotUser'):
             return self._lastNonBotUser
@@ -746,8 +744,6 @@ class BasePage(ComparableMixin):
         Return the revision id for the previous revision of this Page.
 
         If the page has only one revision, it shall return -1.
-
-        @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
         return self.latest_revision.parent_id or -1
 
@@ -758,8 +754,6 @@ class BasePage(ComparableMixin):
         Return the revision id for the previous revision.
 
         DEPRECATED: Use latest_revision.parent_id instead.
-
-        @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
         return self.latest_revision.parent_id or -1
 
@@ -793,16 +787,14 @@ class BasePage(ComparableMixin):
 
         @param force: Bypass local caching
         """
-        found = False
         if self.isRedirectPage():
             static_keys = self.site.getmagicwords('staticredirect')
             text = self.get(get_redirect=True, force=force)
             if static_keys:
                 for key in static_keys:
                     if key in text:
-                        found = True
-                        break
-        return found
+                        return True
+        return False
 
     def isCategoryRedirect(self) -> bool:
         """Return True if this is a category redirect page, False otherwise."""
@@ -1359,10 +1351,8 @@ class BasePage(ComparableMixin):
         """Clear the cached attributes of the page."""
         self._revisions = {}
         for attr in self._cache_attrs:
-            try:
+            with suppress(AttributeError):
                 delattr(self, attr)
-            except AttributeError:
-                pass
 
     def purge(self, **kwargs) -> bool:
         """
@@ -2004,7 +1994,7 @@ class BasePage(ComparableMixin):
                     protections[arg_name] = value
                     warn('"protections" argument of protect() replaces "{0}"'
                          .format(arg_name),
-                         DeprecationWarning)
+                         FutureWarning)
             else:
                 if value:
                     warn('"protections" argument of protect() replaces "{0}";'
@@ -2026,7 +2016,7 @@ class BasePage(ComparableMixin):
             reason = pywikibot.input('Please enter a reason for the action:')
         if unprotect:
             warn('"unprotect" argument of protect() is deprecated',
-                 DeprecationWarning, 2)
+                 FutureWarning, 2)
             protections = {p_type: ''
                            for p_type in self.applicable_protections()}
         answer = 'y'
@@ -2034,7 +2024,7 @@ class BasePage(ComparableMixin):
             prompt = True
         if prompt:
             warn('"prompt" argument of protect() is deprecated',
-                 DeprecationWarning, 2)
+                 FutureWarning, 2)
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.input_choice(
                 'Do you want to change the protection level of %s?'
@@ -2790,10 +2780,8 @@ class Category(Page):
             (Deprecated in MW 1.24)
         @param startprefix: if provided, only generate pages >= this title
             lexically; not valid if sortby="timestamp"; overrides "startsort"
-            (requires MW 1.18+)
         @param endprefix: if provided, only generate pages < this title
             lexically; not valid if sortby="timestamp"; overrides "endsort"
-            (requires MW 1.18+)
         @rtype: typing.Iterable[pywikibot.Page]
         """
         seen = set()
@@ -2948,8 +2936,7 @@ class Category(Page):
                 'Namespace of the page is not consistent'
             cached = check_cache(pywikibot.Timestamp.fromISOformat(
                 member['timestamp']))
-            for cached_page in cached:
-                yield cached_page
+            yield from cached
             if total is not None:
                 total -= len(cached)
                 if total <= 0:
@@ -2959,8 +2946,7 @@ class Category(Page):
             # clear cache
             assert total is None or total > 0, \
                 'As many items as given in total already returned'
-            for cached_page in check_cache(pywikibot.Timestamp.min):
-                yield cached_page
+            yield from check_cache(pywikibot.Timestamp.min)
 
 
 class User(Page):
@@ -3257,7 +3243,7 @@ class User(Page):
         return next(iter(self.logevents(total=1)), None)
 
     @deprecated_args(limit='total', namespace='namespaces')
-    def contributions(self, total=500, **kwargs):
+    def contributions(self, total=500, **kwargs) -> tuple:
         """
         Yield tuples describing this user edits.
 
@@ -3280,7 +3266,6 @@ class User(Page):
         @keyword top_only: if True, iterate only edits which are the latest
             revision (default: False)
         @return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        @rtype: tuple
         """
         for contrib in self.site.usercontribs(
                 user=self.username, total=total, **kwargs):
@@ -4800,12 +4785,8 @@ class Property:
             self._type = datatype
 
     @property
-    def type(self):
-        """
-        Return the type of this property.
-
-        @rtype: str
-        """
+    def type(self) -> str:
+        """Return the type of this property."""
         if not hasattr(self, '_type'):
             self._type = self.repo.getPropertyType(self)
         return self._type
@@ -5438,11 +5419,9 @@ class Claim(Property):
                 precision = coord_args[2]
             else:
                 precision = 0.0001  # Default value (~10 m at equator)
-            try:
+            with suppress(TypeError):
                 if self.target.precision is not None:
                     precision = max(precision, self.target.precision)
-            except TypeError:
-                pass
 
             return (abs(self.target.lat - coord_args[0]) <= precision
                     and abs(self.target.lon - coord_args[1]) <= precision)
@@ -5534,11 +5513,11 @@ class Revision(DotReadableDict):
         @type minor: bool
         @param rollbacktoken: rollback token
         @type rollbacktoken: str
-        @param parentid: id of parent Revision (v1.16+)
+        @param parentid: id of parent Revision
         @type parentid: int
         @param contentmodel: content model label (v1.21+)
         @type contentmodel: str
-        @param sha1: sha1 of revision text (v1.19+)
+        @param sha1: sha1 of revision text
         @type sha1: str
         @param slots: revision slots (v1.32+)
         @type slots: dict
@@ -5968,7 +5947,7 @@ class Link(BaseLink):
         if source_is_page:
             self._text = source.title(with_section=False) + self._text
 
-    def parse_site(self):
+    def parse_site(self) -> tuple:
         """
         Parse only enough text to determine which site the link points to.
 
@@ -5979,7 +5958,6 @@ class Link(BaseLink):
         @return: The family name and site code for the linked site. If the site
             is not supported by the configured families it returns None instead
             of a str.
-        @rtype: tuple
         """
         t = self._text
         fam = self._source.family

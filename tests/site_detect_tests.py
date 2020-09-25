@@ -58,10 +58,6 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
 
     """Test detection of MediaWiki sites."""
 
-    def test_hrwiki(self):
-        """Test detection of MediaWiki sites for www.hrwiki.org."""
-        self.assertSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
-
     def test_proofwiki(self):
         """Test detection of MediaWiki sites for www.proofwiki.org."""
         self.assertSite('http://www.proofwiki.org/wiki/$1')
@@ -105,9 +101,13 @@ class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
         self.assertSite('http://tfwiki.net/wiki/$1')
 
 
-class Pre114SiteTestCase(SiteDetectionTestCase):
+class Pre119SiteTestCase(SiteDetectionTestCase):
 
-    """Test pre 1.14 sites which should be detected as unsupported."""
+    """Test pre 1.19 sites which should be detected as unsupported."""
+
+    def test_hrwiki(self):
+        """Test detection of MediaWiki sites for www.hrwiki.org."""
+        self.assertNoSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
 
     def test_wikifon(self):
         """Test detection of MediaWiki sites for www.wikifon.org."""

@@ -74,6 +74,7 @@ try:
 except ImportError:
     stdnum_isbn = None
 
+
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
 # This is also used by interwiki.py
@@ -389,8 +390,7 @@ class CosmeticChangesToolkit:
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
             if namespace == 6 and self.site.family.name == 'wikipedia':
-                if self.site.code in ('en', 'fr') \
-                        and self.site.mw_version >= '1.14':
+                if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert 'Image' in namespaces
                     namespaces.remove('Image')
@@ -549,7 +549,7 @@ class CosmeticChangesToolkit:
                 titleWithSection = titleWithSection.rstrip()
                 hadTrailingSpaces = len(titleWithSection) != titleLength
 
-            # Convert URL-encoded characters to unicode
+            # Convert URL-encoded characters to str
             titleWithSection = url2unicode(titleWithSection,
                                            encodings=self.site)
 
@@ -637,7 +637,7 @@ class CosmeticChangesToolkit:
         return text
 
     def resolveHtmlEntities(self, text):
-        """Replace HTML entities with unicode."""
+        """Replace HTML entities with string."""
         ignore = [
             38,     # Ampersand (&amp;)
             39,     # Single quotation mark (&quot;) per T26093

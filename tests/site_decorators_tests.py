@@ -32,7 +32,7 @@ class TestMustBe(DebugOnlyTestCase):
         self._userinfo = []
         self.obsolete = False
         super(TestMustBe, self).setUp()
-        self.version = lambda: '1.14'  # lowest supported release
+        self.version = lambda: '1.19'  # lowest supported release
 
     def login(self, group):
         """Fake the log in as required user group."""

@@ -156,7 +156,7 @@ class MockCachedRequestKeyTests(TestCase):
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
-                return '1.14'  # lowest supported release
+                return '1.19'  # lowest supported release
 
             def protocol(self):
                 return 'http'

@@ -31,7 +31,6 @@ from enum import IntEnum
 from itertools import zip_longest
 from textwrap import fill
 from typing import Optional
-from urllib.parse import urlparse
 from warnings import warn
 
 import pywikibot
@@ -1290,12 +1289,6 @@ class Siteinfo(Container):
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
 
-        if prop == 'general':
-            if 'articlepath' not in data:  # Introduced in 1.16.0
-                # Old version of MediaWiki, extract from base
-                path = urlparse(data['base'])[2].rsplit('/', 1)[0] + '/$1'
-                data['articlepath'] = path
-
         # Convert boolean props from empty strings to actual boolean values
         if prop in Siteinfo.BOOLEAN_PROPS.keys():
             # siprop=namespaces and
@@ -2277,14 +2270,6 @@ class APISite(BaseSite):
             raise NotImplementedError(
                 'MediaWiki messages missing: {0}'.format(needed_mw_messages))
 
-        if self.mw_version < '1.16':
-            for key, value in msgs.items():
-                if key == 'and' and value == ',&#32;and':
-                    # v1.14 defined and as ',&#32;and'; fixed in v1.15
-                    msgs['and'] = ' and'
-                else:
-                    msgs[key] = pywikibot.html2unicode(value)
-
         args = list(args)
         concat = msgs['and'] + msgs['word-separator']
         return msgs['comma-separator'].join(
@@ -2338,20 +2323,14 @@ class APISite(BaseSite):
         """
         Return a Timestamp object representing the current server time.
 
-        For wikis with a version newer than 1.16 it uses the 'time' property
-        of the siteinfo 'general'. It'll force a reload before returning the
-        time. It requests to expand the text '{{CURRENTTIMESTAMP}}' for older
-        wikis.
+        It uses the 'time' property of the siteinfo 'general'. It'll force a
+        reload before returning the time.
 
         @return: the current server time
         @rtype: L{Timestamp}
         """
-        if self.mw_version >= '1.16':
-            return pywikibot.Timestamp.fromISOformat(
-                self.siteinfo.get('time', expiry=True))
-        else:
-            return pywikibot.Timestamp.fromtimestampformat(
-                self.expand_text('{{CURRENTTIMESTAMP}}'))
+        return pywikibot.Timestamp.fromISOformat(
+            self.siteinfo.get('time', expiry=True))
 
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
@@ -2417,8 +2396,6 @@ class APISite(BaseSite):
             else:
                 custom_name = nsdata.pop('*')
                 canonical_name = nsdata.pop('canonical')
-
-            nsdata.setdefault('content', ns == 0)  # mw < 1.16
 
             default_case = Namespace.default_case(ns)
             if 'case' not in nsdata:
@@ -2502,17 +2479,10 @@ class APISite(BaseSite):
                 version = self.family.version(self.code)
 
         if MediaWikiVersion(version) < MediaWikiVersion('1.19'):
-            warn('\n'
-                 + fill('Support of MediaWiki {mw_version} will be dropped. '
-                        'It is recommended to use MediaWiki 1.19 or above. '
-                        'You may use every Pywikibot 3.0.X release, Pywikibot '
-                        '"{py_version}" or the "python2" release from the '
-                        'repository for older MediaWiki versions. '
-                        'See T245350 for further information.'
-                        .format(mw_version=version,
-                                py_version=pywikibot.__version__)),
-                 FutureWarning)
-
+            raise RuntimeError(
+                'Pywikibot "{}" does not support MediaWiki "{}".\n'
+                'Use Pywikibot prior to "5.0" or "python2" branch '
+                'instead.'.format(pywikibot.__version__, version))
         return version
 
     @property
@@ -3208,11 +3178,6 @@ class APISite(BaseSite):
             types_wiki.append('patrol')
             valid_types = [token for token in types if token in types_wiki]
 
-            # Pre 1.17, preload token was the same as the edit token.
-            if mw_ver < '1.17':
-                if 'patrol' in types and 'edit' not in valid_types:
-                    valid_types.append('edit')
-
         elif mw_ver < '1.24wmf19':
             types_wiki = self._paraminfo.parameter('tokens',
                                                    'type')['type']
@@ -3235,8 +3200,7 @@ class APISite(BaseSite):
     def get_tokens(self, types, all=False):
         """Preload one or multiple tokens.
 
-        For all MediaWiki versions prior to 1.20, only one token can be
-        retrieved at once.
+        For MediaWiki version 1.19, only one token can be retrieved at once.
         For MediaWiki versions since 1.24wmfXXX a new token
         system was introduced which reduced the amount of tokens available.
         Most of them were merged into the 'csrf' token. If the token type in
@@ -3250,9 +3214,7 @@ class APISite(BaseSite):
          - userrights
          - watch
 
-         (*) Patrol was added in v1.14.
-             Until v1.16, the patrol token is same as the edit token.
-             For v1.17-19, the patrol token must be obtained from the query
+         (*) For v1.19, the patrol token must be obtained from the query
              list recentchanges.
 
         @see: U{https://www.mediawiki.org/wiki/API:Tokens}
@@ -3298,24 +3260,20 @@ class APISite(BaseSite):
             # patrol token require special handling.
             # TODO: try to catch exceptions?
             if 'patrol' in valid_tokens:
-                if mw_ver < '1.17':
-                    if 'edit' in user_tokens:
-                        user_tokens['patrol'] = user_tokens['edit']
-                else:
-                    req = self._simple_request(action='query',
-                                               list='recentchanges',
-                                               rctoken='patrol', rclimit=1)
+                req = self._simple_request(action='query',
+                                           list='recentchanges',
+                                           rctoken='patrol', rclimit=1)
 
-                    req._warning_handler = warn_handler
-                    data = req.submit()
+                req._warning_handler = warn_handler
+                data = req.submit()
 
-                    if 'query' in data:
-                        data = data['query']
-                    if 'recentchanges' in data:
-                        item = data['recentchanges'][0]
-                        pywikibot.debug(str(item), _logger)
-                        if 'patroltoken' in item:
-                            user_tokens['patrol'] = item['patroltoken']
+                if 'query' in data:
+                    data = data['query']
+                if 'recentchanges' in data:
+                    item = data['recentchanges'][0]
+                    pywikibot.debug(str(item), _logger)
+                    if 'patroltoken' in item:
+                        user_tokens['patrol'] = item['patroltoken']
         else:
             if mw_ver < '1.24wmf19':
                 if all is not False:
@@ -3645,11 +3603,9 @@ class APISite(BaseSite):
         @type endsort: str
         @param startprefix: if provided, only generate pages >= this title
             lexically; not valid if sortby="timestamp"; overrides "startsort"
-            (requires MW 1.18+)
         @type startprefix: str
         @param endprefix: if provided, only generate pages < this title
             lexically; not valid if sortby="timestamp"; overrides "endsort"
-            (requires MW 1.18+)
         @type endprefix: str
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -3661,8 +3617,6 @@ class APISite(BaseSite):
             values: page, subcat, file
         @rtype: typing.Iterable[pywikibot.Page]
         @raises KeyError: a namespace identifier was not resolved
-        @raises NotImplementedError: startprefix or endprefix parameters are
-            given but site.version is less than 1.18.
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
@@ -3747,9 +3701,6 @@ class APISite(BaseSite):
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'endtime'")
         if startprefix and sortby != 'timestamp':
-            if self.mw_version < '1.18':
-                raise NotImplementedError(
-                    'categorymembers: "startprefix" requires MW 1.18+')
             cmargs['gcmstartsortkeyprefix'] = startprefix
         elif startprefix:
             raise ValueError('categorymembers: invalid combination of '
@@ -3760,9 +3711,6 @@ class APISite(BaseSite):
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'startsort'")
         if endprefix and sortby != 'timestamp':
-            if self.mw_version < '1.18':
-                raise NotImplementedError(
-                    'categorymembers: "endprefix" requires MW 1.18+')
             cmargs['gcmendsortkeyprefix'] = endprefix
         elif endprefix:
             raise ValueError('categorymembers: '
@@ -3852,11 +3800,10 @@ class APISite(BaseSite):
 
         rvargs = {'type_arg': 'info|revisions'}
 
-        rvargs['rvprop'] = ['ids', 'timestamp', 'flags', 'comment', 'user']
+        rvargs['rvprop'] = ['comment', 'flags', 'ids', 'sha1', 'timestamp',
+                            'user']
         if self.mw_version >= '1.21':
             rvargs['rvprop'].append('contentmodel')
-        if self.mw_version >= '1.19':
-            rvargs['rvprop'].append('sha1')
         if content:
             rvargs['rvprop'].append('content')
             if section is not None:
@@ -4213,7 +4160,6 @@ class APISite(BaseSite):
             aigen.request['gaisha1base36'] = sha1base36
         return aigen
 
-    @need_version('1.17')
     @deprecated_args(limit='total')  # ignore falimit setting
     def filearchive(self, start=None, end=None, reverse=False, total=None,
                     **kwargs):
@@ -4258,7 +4204,6 @@ class APISite(BaseSite):
 
         @note: logevents only logs user blocks, while this method
             iterates all blocks including IP ranges.
-        @note: C{userid} key will be given for mw 1.18+ only
         @note: C{iprange} parameter cannot be used together with C{users}.
 
         @param starttime: start iterating at this Timestamp
@@ -4284,9 +4229,7 @@ class APISite(BaseSite):
         bkgen = self._generator(api.ListGenerator, type_arg='blocks',
                                 total=total)
         bkgen.request['bkprop'] = ['id', 'user', 'by', 'timestamp', 'expiry',
-                                   'reason', 'range', 'flags']
-        if self.mw_version >= '1.18':
-            bkgen.request['bkprop'] += ['userid']
+                                   'reason', 'range', 'flags', 'userid']
         if starttime:
             bkgen.request['bkstart'] = starttime
         if endtime:
@@ -4440,7 +4383,6 @@ class APISite(BaseSite):
         if namespace is not None:
             legen.set_namespace(namespace)
         if tag:
-            # Supported in version 1.16+; earlier sites will cause APIError
             legen.request['letag'] = tag
 
         return legen
@@ -4452,11 +4394,10 @@ class APISite(BaseSite):
                      rcnamespace='namespaces', number='total', rclimit='total',
                      showMinor='minor', showBot='bot', showAnon='anon',
                      showRedirects='redirect', showPatrolled='patrolled',
-                     topOnly='top_only')
+                     topOnly='top_only', pagelist=None)
     def recentchanges(self, start=None, end=None, reverse=False,
-                      namespaces=None, pagelist=None, changetype=None,
-                      minor=None, bot=None, anon=None,
-                      redirect=None, patrolled=None, top_only=False,
+                      namespaces=None, changetype=None, minor=None, bot=None,
+                      anon=None, redirect=None, patrolled=None, top_only=False,
                       total=None, user=None, excludeuser=None, tag=None):
         """Iterate recent changes.
 
@@ -4472,8 +4413,6 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param pagelist: iterate changes to pages in this list only
-        @param pagelist: list of Pages
         @param changetype: only iterate changes of this type ("edit" for
             edits to existing pages, "new" for new pages, "log" for log
             entries)
@@ -4520,13 +4459,6 @@ class APISite(BaseSite):
             rcgen.request['rcend'] = end
         if reverse:
             rcgen.request['rcdir'] = 'newer'
-        if pagelist:
-            if self.mw_version > '1.14':
-                pywikibot.warning(
-                    'recentchanges: pagelist option is disabled; ignoring.')
-            else:
-                rcgen.request['rctitles'] = (p.title(with_section=False)
-                                             for p in pagelist)
         if changetype:
             rcgen.request['rctype'] = changetype
         filters = {'minor': minor,
@@ -4576,9 +4508,7 @@ class APISite(BaseSite):
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        where_types = ['text', 'title', 'titles']
-        if self.mw_version >= '1.17':
-            where_types.append('nearmatch')
+        where_types = ['nearmatch', 'text', 'title', 'titles']
         if not searchstring:
             raise Error('search: searchstring cannot be empty')
         if where not in where_types:
@@ -4839,12 +4769,8 @@ class APISite(BaseSite):
         @param usernames: a list of user names
         @type usernames: list, or other iterable, of str
         """
-        usprop = ['blockinfo', 'groups', 'editcount', 'registration',
-                  'emailable']
-        if self.mw_version >= '1.16':
-            usprop.append('gender')
-        if self.mw_version >= '1.17':
-            usprop.append('rights')
+        usprop = ['blockinfo', 'gender', 'groups', 'editcount', 'registration',
+                  'rights', 'emailable']
         usgen = api.ListGenerator(
             'users', site=self, parameters={
                 'ususers': usernames, 'usprop': usprop})
@@ -4953,7 +4879,6 @@ class APISite(BaseSite):
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
             * unwatch: remove the page from the watchlist
-            The following settings are supported by mw >= 1.16 only
             * preferences: use the preference settings (default)
             * nochange: don't change the watchlist
         @param bot: if True, mark edit with bot flag
@@ -5023,14 +4948,7 @@ class APISite(BaseSite):
 
         watch_items = {'watch', 'unwatch', 'preferences', 'nochange'}
         if watch in watch_items:
-            if self.mw_version < '1.16':
-                if watch in ['preferences', 'nochange']:
-                    pywikibot.warning('The watch value {0} is not supported '
-                                      'by {1}'.format(watch, self))
-                else:
-                    params[watch] = True
-            else:
-                params['watchlist'] = watch
+            params['watchlist'] = watch
         elif watch:
             pywikibot.warning(
                 "editpage: Invalid watch value '%(watch)s' ignored."
@@ -5559,9 +5477,9 @@ class APISite(BaseSite):
         @see: U{https://www.mediawiki.org/wiki/API:Protect}
 
         @param protections: A dict mapping type of protection to protection
-            level of that type. Valid types of protection are 'edit', 'move',
-            'create', and 'upload'. Valid protection levels (in MediaWiki 1.12)
-            are '' (equivalent to 'none'), 'autoconfirmed', and 'sysop'.
+            level of that type. Valid restriction types are 'edit', 'create',
+            'move' and 'upload'. Valid restriction levels are '' (equivalent
+            to 'none' or 'all'), 'autoconfirmed', and 'sysop'.
             If None is given, however, that protection will be skipped.
         @type protections: dict
         @param reason: Reason for the action
@@ -6502,7 +6420,6 @@ class APISite(BaseSite):
         """
         return self.querypage('Unwatchedpages', total)
 
-    @need_version('1.18')
     @deprecated_args(step=None)
     def wantedpages(self, total=None):
         """Yield Pages from Special:Wantedpages.
@@ -6511,7 +6428,6 @@ class APISite(BaseSite):
         """
         return self.querypage('Wantedpages', total)
 
-    @need_version('1.18')
     def wantedfiles(self, total=None):
         """Yield Pages from Special:Wantedfiles.
 
@@ -6519,7 +6435,6 @@ class APISite(BaseSite):
         """
         return self.querypage('Wantedfiles', total)
 
-    @need_version('1.18')
     def wantedtemplates(self, total=None):
         """Yield Pages from Special:Wantedtemplates.
 
@@ -6527,7 +6442,6 @@ class APISite(BaseSite):
         """
         return self.querypage('Wantedtemplates', total)
 
-    @need_version('1.18')
     @deprecated_args(number='total', step=None, repeat=None)
     def wantedcategories(self, total=None):
         """Yield Pages from Special:Wantedcategories.
@@ -6595,7 +6509,6 @@ class APISite(BaseSite):
         """
         return self.querypage('Withoutinterwiki', total)
 
-    @need_version('1.18')
     @deprecated_args(step=None)
     def broken_redirects(self, total=None):
         """Yield Pages with broken redirects from Special:BrokenRedirects.
@@ -6604,7 +6517,6 @@ class APISite(BaseSite):
         """
         return self.querypage('BrokenRedirects', total)
 
-    @need_version('1.18')
     @deprecated_args(step=None)
     def double_redirects(self, total=None):
         """Yield Pages with double redirects from Special:DoubleRedirects.
@@ -6613,7 +6525,6 @@ class APISite(BaseSite):
         """
         return self.querypage('DoubleRedirects', total)
 
-    @need_version('1.18')
     @deprecated_args(step=None)
     def redirectpages(self, total=None):
         """Yield redirect pages from Special:ListRedirects.
@@ -6657,10 +6568,6 @@ class APISite(BaseSite):
         assert 'create' in self.protection_types(), \
             "'create' should be a valid protection type."
         if type == 'create':
-            if self.mw_version < '1.15':
-                raise NotImplementedError(
-                    'protectedpages(type=create) requires MW 1.15+')
-
             return self._generator(
                 api.PageGenerator, type_arg='protectedtitles',
                 namespaces=namespaces, gptlevel=level, total=total)
@@ -6702,7 +6609,6 @@ class APISite(BaseSite):
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 
-    @need_version('1.18')
     def compare(self, old, diff):
         """
         Corresponding method to the 'action=compare' API action.

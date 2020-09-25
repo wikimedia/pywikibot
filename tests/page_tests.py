@@ -630,7 +630,7 @@ class TestPageBaseUnicode(DefaultDrySiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize page instance."""
-        super(TestPageBaseUnicode, cls).setUpClass()
+        super().setUpClass()
         cls.page = pywikibot.Page(cls.site, 'Ō')
 
 
@@ -677,14 +677,14 @@ class TestPageRepr(TestPageBaseUnicode):
 
     def setUp(self):
         """Force the console encoding to UTF-8."""
-        super(TestPageRepr, self).setUp()
+        super().setUp()
         self._old_encoding = config.console_encoding
         config.console_encoding = 'utf8'
 
     def tearDown(self):
         """Restore the original console encoding."""
         config.console_encoding = self._old_encoding
-        super(TestPageRepr, self).tearDown()
+        super().tearDown()
 
     def test_mainpage_type(self):
         """Test the return type of repr(Page(<main page>)) is str."""
@@ -709,14 +709,14 @@ class TestPageReprASCII(TestPageBaseUnicode):
 
     def setUp(self):
         """Patch the current console encoding to ASCII."""
-        super(TestPageReprASCII, self).setUp()
+        super().setUp()
         self._old_encoding = config.console_encoding
         config.console_encoding = 'ascii'
 
     def tearDown(self):
         """Restore the original console encoding."""
         config.console_encoding = self._old_encoding
-        super(TestPageReprASCII, self).tearDown()
+        super().tearDown()
 
 
 class TestPageBotMayEdit(TestCase):
@@ -731,7 +731,7 @@ class TestPageBotMayEdit(TestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestPageBotMayEdit, self).setUp()
+        super().setUp()
         self.page = pywikibot.Page(self.site,
                                    'not_existent_page_for_pywikibot_tests')
         if self.page.exists():

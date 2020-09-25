@@ -1498,21 +1498,12 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
 
     """
     kwargs = {
-        'recurse': recurse, 'total': total,
-        'content': content, 'namespaces': namespaces,
+        'content': content,
+        'namespaces': namespaces,
+        'recurse': recurse,
+        'startprefix': start,
+        'total': total,
     }
-    if start:
-        if category.site.mw_version < '1.18':
-            kwargs.pop('total', None)
-            count = 0
-            for article in category.articles(**kwargs):
-                if article.title() >= start:
-                    count += 1
-                    yield article
-                    if count == total:
-                        return
-            return
-        kwargs['startprefix'] = start
     yield from category.articles(**kwargs)
 
 

@@ -240,9 +240,6 @@ class ParamInfo(Sized, Container):
             return
         mw_ver = self.site.mw_version
 
-        if mw_ver < '1.15':
-            self._parse_help()
-
         # The paraminfo api deprecated the old request syntax of
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
         # must only use 'modules' parameter.
@@ -251,17 +248,13 @@ class ParamInfo(Sized, Container):
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
 
-        # v1.18 and earlier paraminfo doesn't include modules; must use 'query'
         # Assume that by v1.26, it will be desirable to prefetch 'query'
-        if mw_ver > '1.26' or mw_ver < '1.19':
+        if mw_ver > '1.26':
             self.preloaded_modules |= {'query'}
 
         self._fetch(self.preloaded_modules)
 
-        # paraminfo 'mainmodule' was added 1.15
-        assert('main' in self._paraminfo)
         main_modules_param = self.parameter('main', 'action')
-
         assert(main_modules_param)
         assert('type' in main_modules_param)
         assert(isinstance(main_modules_param['type'], list))
@@ -277,9 +270,8 @@ class ParamInfo(Sized, Container):
         self._limit = query_modules_param['limit']
 
         if query_modules_param and 'type' in query_modules_param:
-            # 1.19+ 'type' is the list of modules; on 1.18, it is 'string'
-            if isinstance(query_modules_param['type'], list):
-                self._add_submodules('query', query_modules_param['type'])
+            # 'type' is the list of modules
+            self._add_submodules('query', query_modules_param['type'])
 
         if 'query' not in self._modules:
             assert 'query' not in self._paraminfo
@@ -287,7 +279,7 @@ class ParamInfo(Sized, Container):
         assert 'query' in self._modules
 
     def _emulate_pageset(self):
-        """Emulate the pageset module, which existed in MW 1.15-1.24."""
+        """Emulate the pageset module, which existed until MW 1.24."""
         # pageset isn't a module in the new system, so it is emulated, with
         # the paraminfo from the query module.
         assert('query' in self._paraminfo)
@@ -300,56 +292,6 @@ class ParamInfo(Sized, Container):
             'readrights': '',
             'helpurls': [],
             'parameters': self._paraminfo['query']['parameters']
-        }
-
-    def _parse_help(self):
-        """Emulate paraminfo['main'] data using help for mw 1.14."""
-        # Request need ParamInfo to determine use_get
-        request = self.site._request(expiry=config.API_config_expiry,
-                                     use_get=True,
-                                     parameters={'action': 'help'})
-        result = request.submit()
-
-        assert('help' in result)
-        assert(isinstance(result['help'], dict))
-        assert('mime' in result['help'])
-        assert(result['help']['mime'] == 'text/plain')
-        assert('help' in result['help'])
-        assert(isinstance(result['help']['help'], str))
-
-        help_text = result['help']['help']
-
-        start = help_text.find('What action you would like to perform')
-        start = help_text.find('One value: ', start) + len('One value: ')
-        end = help_text.find('\n', start)
-
-        action_modules = help_text[start:end].split(', ')
-
-        start = help_text.find('The format of the output')
-        start = help_text.find('One value: ', start) + len('One value: ')
-        end = help_text.find('\n', start)
-
-        format_modules = help_text[start:end].split(', ')
-
-        self._paraminfo['main'] = {
-            'name': 'main',
-            'path': 'main',
-            'classname': 'ApiMain',
-            'prefix': '',
-            'readrights': '',
-            'helpurls': [],
-            'parameters': [
-                {
-                    'name': 'action',
-                    'type': action_modules,
-                    'submodules': '',
-                },
-                {
-                    'name': 'format',
-                    'type': format_modules,
-                    'submodules': '',
-                },
-            ],
         }
 
     @staticmethod
