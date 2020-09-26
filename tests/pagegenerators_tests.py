@@ -1663,6 +1663,7 @@ class TestLinksearchPageGenerator(TestCase):
                                                      protocol='https',
                                                      site=self.site,
                                                      total=1)
+        self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
         self.assertEqual(len(list(gen)), 1)
 
 
