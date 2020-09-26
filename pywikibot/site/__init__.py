@@ -3395,8 +3395,9 @@ class APISite(BaseSite):
                         namespaces=namespaces,
                         content=content
                     )
-            return itertools.chain(*genlist.values())
-        return blgen
+            yield from itertools.chain(*genlist.values())
+        else:
+            yield from blgen
 
     @deprecated_args(step=None, filterRedirects='filter_redirects')
     def page_embeddedin(self, page, *, filter_redirects=None, namespaces=None,
@@ -3426,9 +3427,9 @@ class APISite(BaseSite):
         if filter_redirects is not None:
             eiargs['geifilterredir'] = ('redirects' if filter_redirects
                                         else 'nonredirects')
-        return self._generator(api.PageGenerator, type_arg='embeddedin',
-                               namespaces=namespaces, total=total,
-                               g_content=content, **eiargs)
+        yield from self._generator(api.PageGenerator, type_arg='embeddedin',
+                                   namespaces=namespaces, total=total,
+                                   g_content=content, **eiargs)
 
     @deprecated_args(
         step=None, followRedirects='follow_redirects',
@@ -3499,10 +3500,10 @@ class APISite(BaseSite):
         else:
             pltitle = page.title(with_section=False).encode(self.encoding())
             plargs['titles'] = pltitle
-        return self._generator(api.PageGenerator, type_arg='links',
-                               namespaces=namespaces, total=total,
-                               g_content=content, redirects=follow_redirects,
-                               **plargs)
+        yield from self._generator(
+            api.PageGenerator, type_arg='links', namespaces=namespaces,
+            total=total, g_content=content, redirects=follow_redirects,
+            **plargs)
 
     # Sortkey doesn't work with generator
     @deprecated_args(withSortKey=None, step=None)
@@ -3521,9 +3522,8 @@ class APISite(BaseSite):
         else:
             clargs['titles'] = page.title(
                 with_section=False).encode(self.encoding())
-        return self._generator(api.PageGenerator,
-                               type_arg='categories', total=total,
-                               g_content=content, **clargs)
+        yield from self._generator(api.PageGenerator, type_arg='categories',
+                                   total=total, g_content=content, **clargs)
 
     @deprecated_args(step=None)
     def pageimages(self, page, *, total=None, content=False):
@@ -3537,9 +3537,9 @@ class APISite(BaseSite):
 
         """
         imtitle = page.title(with_section=False).encode(self.encoding())
-        return self._generator(api.PageGenerator, type_arg='images',
-                               titles=imtitle, total=total,
-                               g_content=content)
+        yield from self._generator(api.PageGenerator, type_arg='images',
+                                   titles=imtitle, total=total,
+                                   g_content=content)
 
     @deprecated_args(step=None)
     def pagetemplates(self, page, *, namespaces=None, total=None,
@@ -3560,9 +3560,9 @@ class APISite(BaseSite):
             type such as NoneType or bool
         """
         tltitle = page.title(with_section=False).encode(self.encoding())
-        return self._generator(api.PageGenerator, type_arg='templates',
-                               titles=tltitle, namespaces=namespaces,
-                               total=total, g_content=content)
+        yield from self._generator(api.PageGenerator, type_arg='templates',
+                                   titles=tltitle, namespaces=namespaces,
+                                   total=total, g_content=content)
 
     @deprecated_args(step=None)
     def categorymembers(self, category, *, namespaces=None, sortby=None,
@@ -3721,8 +3721,8 @@ class APISite(BaseSite):
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'endsort'")
 
-        return self._generator(api.PageGenerator, namespaces=namespaces,
-                               total=total, g_content=content, **cmargs)
+        yield from self._generator(api.PageGenerator, namespaces=namespaces,
+                                   total=total, g_content=content, **cmargs)
 
     @deprecated_args(getText='content', sysop=None)
     @remove_last_args(['rollback'])
@@ -4004,7 +4004,7 @@ class APISite(BaseSite):
                 apgen.request['gapprlevel'] = protect_level
         if reverse:
             apgen.request['gapdir'] = 'descending'
-        return apgen
+        yield from apgen
 
     @deprecated_args(step=None)
     def alllinks(self, start='!', prefix='', namespace=0, unique=False,
@@ -4071,7 +4071,7 @@ class APISite(BaseSite):
             acgen.request['gacprefix'] = prefix
         if reverse:
             acgen.request['gacdir'] = 'descending'
-        return acgen
+        yield from acgen
 
     def isBot(self, username):
         """Return True is username is a bot user."""
@@ -4119,7 +4119,7 @@ class APISite(BaseSite):
             augen.request['auprefix'] = prefix
         if group:
             augen.request['augroup'] = group
-        return augen
+        yield from augen
 
     @deprecated_args(step=None)
     def allimages(self, start='!', prefix='', minsize=None, maxsize=None,
@@ -4158,7 +4158,7 @@ class APISite(BaseSite):
             aigen.request['gaisha1'] = sha1
         if sha1base36:
             aigen.request['gaisha1base36'] = sha1base36
-        return aigen
+        yield from aigen
 
     @deprecated_args(limit='total')  # ignore falimit setting
     def filearchive(self, start=None, end=None, reverse=False, total=None,
@@ -4190,7 +4190,7 @@ class APISite(BaseSite):
             fagen.request['fa' + k] = v
         if reverse:
             fagen.request['fadir'] = 'descending'
-        return fagen
+        yield from fagen
 
     @deprecated_args(step=None)
     def blocks(self, starttime=None, endtime=None, reverse=False,
@@ -4248,7 +4248,7 @@ class APISite(BaseSite):
             bkgen.request['bkusers'] = users
         elif iprange:
             bkgen.request['bkip'] = iprange
-        return bkgen
+        yield from bkgen
 
     @deprecated_args(step=None)
     def exturlusage(self, url=None, protocol=None, namespaces=None,
@@ -4284,10 +4284,10 @@ class APISite(BaseSite):
         # with any URL.
         if url == '*':
             url = None
-        return self._generator(api.PageGenerator, type_arg='exturlusage',
-                               geuquery=url, geuprotocol=protocol,
-                               namespaces=namespaces,
-                               total=total, g_content=content)
+        yield from self._generator(api.PageGenerator, type_arg='exturlusage',
+                                   geuquery=url, geuprotocol=protocol,
+                                   namespaces=namespaces, total=total,
+                                   g_content=content)
 
     @deprecated_args(step=None)
     def imageusage(self, image, namespaces=None, filterredir=None,
@@ -4315,9 +4315,9 @@ class APISite(BaseSite):
         if filterredir is not None:
             iuargs['giufilterredir'] = ('redirects' if filterredir else
                                         'nonredirects')
-        return self._generator(api.PageGenerator, type_arg='imageusage',
-                               namespaces=namespaces,
-                               total=total, g_content=content, **iuargs)
+        yield from self._generator(api.PageGenerator, type_arg='imageusage',
+                                   namespaces=namespaces, total=total,
+                                   g_content=content, **iuargs)
 
     @property
     def logtypes(self):
@@ -4385,7 +4385,7 @@ class APISite(BaseSite):
         if tag:
             legen.request['letag'] = tag
 
-        return legen
+        yield from legen
 
     @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
                      rctype='changetype', revision=None, repeat=None,
@@ -4479,7 +4479,7 @@ class APISite(BaseSite):
         if excludeuser:
             rcgen.request['rcexcludeuser'] = excludeuser
         rcgen.request['rctag'] = tag
-        return rcgen
+        yield from rcgen
 
     @deprecated_args(number='total', step=None, key='searchstring',
                      getredirects='get_redirects')
@@ -4536,7 +4536,7 @@ class APISite(BaseSite):
                                 total=total, g_content=content)
         if self.mw_version < '1.23':
             srgen.request['gsrredirects'] = get_redirects
-        return srgen
+        yield from srgen
 
     @deprecated_args(step=None, showMinor='minor')
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
@@ -4594,7 +4594,7 @@ class APISite(BaseSite):
         option_set = api.OptionSet(self, 'usercontribs', 'show')
         option_set['minor'] = minor
         ucgen.request['ucshow'] = option_set
-        return ucgen
+        yield from ucgen
 
     @deprecated_args(step=None, showMinor='minor', showAnon='anon',
                      showBot='bot')
@@ -4642,7 +4642,7 @@ class APISite(BaseSite):
         filters = {'minor': minor, 'bot': bot, 'anon': anon}
         wlgen.request['wlshow'] = api.OptionSet(self, 'watchlist', 'show',
                                                 filters)
-        return wlgen
+        yield from wlgen
 
     @deprecated_args(step=None, get_text='content', page='titles',
                      limit='total')
@@ -4774,7 +4774,7 @@ class APISite(BaseSite):
         usgen = api.ListGenerator(
             'users', site=self, parameters={
                 'ususers': usernames, 'usprop': usprop})
-        return usgen
+        yield from usgen
 
     @deprecated_args(step=None)
     def randompages(self, total=None, namespaces=None,
@@ -4816,9 +4816,9 @@ class APISite(BaseSite):
                 params['grnredirect'] = redirects == 'redirects'
             else:
                 params['grnfilterredir'] = redirects
-        return self._generator(api.PageGenerator, type_arg='random',
-                               namespaces=namespaces, total=total,
-                               g_content=content, **params)
+        yield from self._generator(api.PageGenerator, type_arg='random',
+                                   namespaces=namespaces, total=total,
+                                   g_content=content, **params)
 
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
@@ -6349,9 +6349,8 @@ class APISite(BaseSite):
         assert special_page in param['type'], (
             '{0} not in {1}'.format(special_page, param['type']))
 
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage=special_page,
-                               total=total)
+        yield from self._generator(api.PageGenerator, type_arg='querypage',
+                                   gqppage=special_page, total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def longpages(self, total=None):
@@ -7103,7 +7102,7 @@ class APISite(BaseSite):
         gen = api.PageGenerator(site=self, generator='watchlistraw',
                                 expiry=expiry)
         gen.set_maximum_items(total)
-        return gen
+        yield from gen
 
     @need_extension('UrlShortener')
     def create_short_link(self, url):
@@ -8001,4 +8000,4 @@ class DataSite(APISite):
         gen = api.APIGenerator('wbsearchentities', data_name='search',
                                site=self, parameters=parameters)
         gen.set_maximum_items(total)
-        return gen
+        yield from gen
