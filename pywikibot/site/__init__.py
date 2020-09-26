@@ -29,7 +29,7 @@ from contextlib import suppress
 from enum import IntEnum
 from itertools import zip_longest
 from textwrap import fill
-from typing import Optional
+from typing import List, Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -4049,18 +4049,30 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
-                     rctype='changetype', revision=None, repeat=None,
-                     rcstart='start', rcend='end', rcdir=None, step=None,
+    @deprecated_args(returndict=True, nobots=True, rcshow=True,
+                     rctype='changetype', revision=True, repeat=True,
+                     rcstart='start', rcend='end', rcdir=True, step=True,
                      includeredirects='redirect', namespace='namespaces',
                      rcnamespace='namespaces', number='total', rclimit='total',
                      showMinor='minor', showBot='bot', showAnon='anon',
                      showRedirects='redirect', showPatrolled='patrolled',
-                     topOnly='top_only', pagelist=None)
-    def recentchanges(self, start=None, end=None, reverse=False,
-                      namespaces=None, changetype=None, minor=None, bot=None,
-                      anon=None, redirect=None, patrolled=None, top_only=False,
-                      total=None, user=None, excludeuser=None, tag=None):
+                     topOnly='top_only', pagelist=True)
+    def recentchanges(self, *,
+                      start=None,
+                      end=None,
+                      reverse: bool = False,
+                      namespaces=None,
+                      changetype: Optional[str] = None,
+                      minor: Optional[bool] = None,
+                      bot: Optional[bool] = None,
+                      anon: Optional[bool] = None,
+                      redirect: Optional[bool] = None,
+                      patrolled: Optional[bool] = None,
+                      top_only: bool = False,
+                      total: Optional[int] = None,
+                      user: Union[str, List[str], None] = None,
+                      excludeuser: Union[str, List[str], None] = None,
+                      tag: Optional[str] = None):
         """Iterate recent changes.
 
         @see: U{https://www.mediawiki.org/wiki/API:RecentChanges}
@@ -4070,7 +4082,6 @@ class APISite(BaseSite):
         @param end: Timestamp to end listing at
         @type end: pywikibot.Timestamp
         @param reverse: if True, start with oldest changes (default: newest)
-        @type reverse: bool
         @param namespaces: only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
@@ -4078,31 +4089,21 @@ class APISite(BaseSite):
         @param changetype: only iterate changes of this type ("edit" for
             edits to existing pages, "new" for new pages, "log" for log
             entries)
-        @type changetype: basestring
         @param minor: if True, only list minor edits; if False, only list
             non-minor edits; if None, list all
-        @type minor: bool or None
         @param bot: if True, only list bot edits; if False, only list
             non-bot edits; if None, list all
-        @type bot: bool or None
         @param anon: if True, only list anon edits; if False, only list
             non-anon edits; if None, list all
-        @type anon: bool or None
         @param redirect: if True, only list edits to redirect pages; if
             False, only list edits to non-redirect pages; if None, list all
-        @type redirect: bool or None
         @param patrolled: if True, only list patrolled edits; if False,
             only list non-patrolled edits; if None, list all
-        @type patrolled: bool or None
         @param top_only: if True, only list changes that are the latest
             revision (default False)
-        @type top_only: bool
         @param user: if not None, only list edits by this user or users
-        @type user: basestring|list
         @param excludeuser: if not None, exclude edits by this user or users
-        @type excludeuser: basestring|list
         @param tag: a recent changes tag
-        @type tag: str
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
