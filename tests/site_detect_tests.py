@@ -156,7 +156,6 @@ class APIHiddenTestCase(SiteDetectionTestCase):
         """
         self.assertNoSite('http://wikisophia.org/index.php?title=$1')
 
-    @unittest.expectedFailure
     def test_ecoreality(self):
         """Test detection of MediaWiki sites for www.EcoReality.org.
 
