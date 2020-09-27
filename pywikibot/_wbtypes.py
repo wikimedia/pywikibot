@@ -5,22 +5,26 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import abc
 import json
 
 
-class WbRepresentation:
+class WbRepresentation(abc.ABC):
 
     """Abstract class for Wikibase representations."""
 
+    @abc.abstractmethod
     def __init__(self):
         """Constructor."""
         raise NotImplementedError
 
+    @abc.abstractmethod
     def toWikibase(self):
         """Convert representation to JSON for the Wikibase API."""
         raise NotImplementedError
 
     @classmethod
+    @abc.abstractmethod
     def fromWikibase(cls, json):
         """Create a representation object based on JSON from Wikibase API."""
         raise NotImplementedError
