@@ -28,9 +28,9 @@ class TestLogentriesBase(TestCase):
 
     It uses the German Wikipedia for a current representation of the
     log entries and the test Wikipedia for the future representation.
-    It also tests on a wiki with MW 1.19 or older to check that it can
-    still read the older format. It currently uses lyricwiki which as of
-    this commit uses 1.19.24.
+    It also tests on a wiki with MW 1.19 to check that it can still read
+    the older format. It currently uses wowwiki which as of this commit
+    uses 1.19.24.
     """
 
     sites = {
@@ -45,7 +45,7 @@ class TestLogentriesBase(TestCase):
             'target': 'Hauptseite',
         },
         'old': {
-            'family': 'lyricwiki',
+            'family': 'wowwiki',
             'code': 'en',
             'target': None,
         }
