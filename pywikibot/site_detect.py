@@ -21,6 +21,8 @@ from pywikibot.tools import MediaWikiVersion
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
+MIN_VERSION = MediaWikiVersion('1.19')
+
 
 class MWSite:
 
@@ -41,7 +43,7 @@ class MWSite:
         check_response(r)
 
         if fromurl != r.data.url:
-            pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
+            pywikibot.log('{} redirected to {}'.format(fromurl, r.data.url))
             fromurl = r.data.url
 
         self.fromurl = fromurl
@@ -62,13 +64,16 @@ class MWSite:
             except (ServerError, RequestException):
                 raise
             except Exception as e:
-                pywikibot.log('MW detection failed: {0!r}'.format(e))
+                pywikibot.log('MW detection failed: {!r}'.format(e))
 
             if not self.version:
                 self._fetch_old_version()
 
         if not self.api:
-            raise RuntimeError('Unsupported url: {0}'.format(self.fromurl))
+            raise RuntimeError('Unsupported url: {}'.format(self.fromurl))
+
+        if not self.version or self.version < MIN_VERSION:
+            raise RuntimeError('Unsupported version: {}'.format(self.version))
 
         if not self.articlepath:
             if self.private_wiki:
@@ -80,14 +85,10 @@ class MWSite:
                         'private. Use the Main Page URL instead of the API.')
             else:
                 raise RuntimeError('Unable to determine articlepath: '
-                                   '{0}'.format(self.fromurl))
-
-        if (not self.version
-                or self.version < MediaWikiVersion('1.19')):
-            raise RuntimeError('Unsupported version: {0}'.format(self.version))
+                                   '{}'.format(self.fromurl))
 
     def __repr__(self):
-        return '{0}("{1}")'.format(
+        return '{}("{}")'.format(
             self.__class__.__name__, self.fromurl)
 
     @property
@@ -150,8 +151,9 @@ class MWSite:
             info = site.siteinfo
         else:
             info = info['query']['general']
+
         self.version = MediaWikiVersion.from_generator(info['generator'])
-        if self.version < MediaWikiVersion('1.17'):
+        if self.version < MIN_VERSION:
             return
 
         self.server = urljoin(self.fromurl, info['server'])
@@ -228,7 +230,7 @@ class WikiHTMLPageParser(HTMLParser):
 
         if not new_parsed_url.scheme or not new_parsed_url.netloc:
             new_parsed_url = urlparse(
-                '{0}://{1}{2}'.format(
+                '{}://{}{}'.format(
                     new_parsed_url.scheme or self.url.scheme,
                     new_parsed_url.netloc or self.url.netloc,
                     new_parsed_url.path))
@@ -244,11 +246,11 @@ class WikiHTMLPageParser(HTMLParser):
                         or self._parsed_url.netloc in new_parsed_url.netloc):
                     return
 
-                assert new_parsed_url == self._parsed_url, '{0} != {1}'.format(
+                assert new_parsed_url == self._parsed_url, '{} != {}'.format(
                     self._parsed_url, new_parsed_url)
 
         self._parsed_url = new_parsed_url
-        self.server = '{0}://{1}'.format(
+        self.server = '{}://{}'.format(
             self._parsed_url.scheme, self._parsed_url.netloc)
         self.scriptpath = self._parsed_url.path
 
