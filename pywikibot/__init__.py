@@ -15,6 +15,7 @@ import time
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
+from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import (
@@ -91,23 +92,23 @@ __all__ = (
     '__maintainer__', '__maintainer_email__', '__name__', '__release__',
     '__url__', '__version__',
     'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
-    'Category', 'CircularRedirect', 'Claim', 'config',
+    'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
     'FilePage', 'handle_args', 'handleArgs', 'html2unicode', 'input',
-    'input_choice', 'input_yn', 'inputChoice', 'InterwikiRedirectPage',
-    'InvalidTitle', 'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link',
-    'LockedNoPage', 'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget',
-    'NoPage', 'NoSuchSite', 'NoUsername', 'NoWikibaseEntity',
-    'OtherPageSaveError', 'output', 'Page', 'PageCreatedConflict',
-    'PageDeletedConflict', 'PageNotSaved', 'PageRelatedError',
-    'PageSaveRelatedError', 'PropertyPage', 'QuitKeyboardInterrupt',
-    'SectionError', 'Server504Error', 'ServerError', 'showHelp', 'Site',
-    'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
-    'TitleblacklistError', 'translate', 'ui', 'unicode2html',
-    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'UserBlocked', 'warning',
-    'WikiBaseError', 'WikidataBot',
+    'input_choice', 'input_yn', 'InterwikiRedirectPage', 'InvalidTitle',
+    'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage',
+    'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget', 'NoPage',
+    'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
+    'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
+    'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
+    'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
+    'showDiff', 'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink',
+    'SpamblacklistError', 'stdout', 'Timestamp', 'TitleblacklistError',
+    'translate', 'ui', 'unicode2html', 'UnknownExtension', 'UnknownFamily',
+    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
+    'UserBlocked', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikiBaseError', 'WikidataBot',
 )
 __all__ += textlib_methods
 
@@ -343,7 +344,7 @@ class Coordinate(_WbRepresentation):
                    globe, site=site, globe_item=data['globe'])
 
     @property
-    def precision(self):
+    def precision(self) -> Optional[float]:
         """
         Return the precision of the geo coordinate.
 
@@ -367,10 +368,9 @@ class Coordinate(_WbRepresentation):
         M{r_φ = r cos φ}, where r is the radius of earth, φ the latitude
 
         Therefore::
+
             precision = math.degrees(
                 self._dim/(radius*math.cos(math.radians(self.lat))))
-
-        @rtype: float or None
         """
         if self._dim is None and self._precision is None:
             return None
@@ -384,7 +384,7 @@ class Coordinate(_WbRepresentation):
     def precision(self, value):
         self._precision = value
 
-    def precisionToDim(self):
+    def precisionToDim(self) -> Optional[int]:
         """
         Convert precision from Wikibase to GeoData's dim and return the latter.
 
@@ -394,17 +394,18 @@ class Coordinate(_WbRepresentation):
 
         Carrying on from the earlier derivation of precision, since
         precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat))))
-        we get:
+        we get::
+
             dim = math.radians(
                 precision)*radius*math.cos(math.radians(self.lat))
+
         But this is not valid, since it returns a float value for dim which is
         an integer. We must round it off to the nearest integer.
 
         Therefore::
+
             dim = int(round(math.radians(
                 precision)*radius*math.cos(math.radians(self.lat))))
-
-        @rtype: int or None
         """
         if self._dim is None and self._precision is None:
             raise ValueError('No values set for dim or precision')
@@ -468,12 +469,20 @@ class WbTime(_WbRepresentation):
     _items = ('year', 'month', 'day', 'hour', 'minute', 'second',
               'precision', 'before', 'after', 'timezone', 'calendarmodel')
 
-    def __init__(self, year=None, month=None, day=None,
-                 hour=None, minute=None, second=None,
-                 precision=None, before=0, after=0,
-                 timezone=0, calendarmodel=None, site=None):
-        """
-        Create a new WbTime object.
+    def __init__(self,
+                 year: Optional[int] = None,
+                 month: Optional[int] = None,
+                 day: Optional[int] = None,
+                 hour: Optional[int] = None,
+                 minute: Optional[int] = None,
+                 second: Optional[int] = None,
+                 precision: Union[int, str, None] = None,
+                 before: int = 0,
+                 after: int = 0,
+                 timezone: int = 0,
+                 calendarmodel: Optional[str] = None,
+                 site=None):
+        """Create a new WbTime object.
 
         The precision can be set by the Wikibase int value (0-14) or by a human
         readable string, e.g., 'hour'. If no precision is given, it is set
@@ -481,6 +490,7 @@ class WbTime(_WbRepresentation):
 
         Timezone information is given in three different ways depending on the
         time:
+
         * Times after the implementation of UTC (1972): as an offset from UTC
           in minutes;
         * Times before the implementation of UTC: the offset of the time zone
@@ -490,29 +500,18 @@ class WbTime(_WbRepresentation):
           to minutes.
 
         @param year: The year as a signed integer of between 1 and 16 digits.
-        @type year: int
         @param month: Month
-        @type month: int
         @param day: Day
-        @type day: int
         @param hour: Hour
-        @type hour: int
         @param minute: Minute
-        @type minute: int
         @param second: Second
-        @type second: int
         @param precision: The unit of the precision of the time.
-        @type precision: int or str
         @param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
-        @type before: int
         @param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
-        @type after: int
         @param timezone: Timezone information in minutes.
-        @type timezone: int
         @param calendarmodel: URI identifying the calendar model
-        @type calendarmodel: str
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
         """
@@ -562,12 +561,18 @@ class WbTime(_WbRepresentation):
                 raise ValueError('Invalid precision: "%s"' % precision)
 
     @classmethod
-    def fromTimestr(cls, datetimestr, precision=14, before=0, after=0,
-                    timezone=0, calendarmodel=None, site=None):
-        """
-        Create a new WbTime object from a UTC date/time string.
+    def fromTimestr(cls,
+                    datetimestr: str,
+                    precision: Union[int, str] = 14,
+                    before: int = 0,
+                    after: int = 0,
+                    timezone: int = 0,
+                    calendarmodel: Optional[str] = None,
+                    site=None):
+        """Create a new WbTime object from a UTC date/time string.
 
         The timestamp differs from ISO 8601 in that:
+
         * The year is always signed and having between 1 and 16 digits;
         * The month, day and time are zero if they are unknown;
         * The Z is discarded since time zone is determined from the timezone
@@ -575,19 +580,13 @@ class WbTime(_WbRepresentation):
 
         @param datetimestr: Timestamp in a format resembling ISO 8601,
             e.g. +2013-01-01T00:00:00Z
-        @type datetimestr: str
         @param precision: The unit of the precision of the time.
-        @type precision: int or str
         @param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
-        @type before: int
         @param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
-        @type after: int
         @param timezone: Timezone information in minutes.
-        @type timezone: int
         @param calendarmodel: URI identifying the calendar model
-        @type calendarmodel: str
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
         @rtype: pywikibot.WbTime
@@ -932,13 +931,14 @@ class _WbDataPage(_WbRepresentation):
         raise NotImplementedError
 
     @classmethod
-    def _get_type_specifics(cls, site):
+    def _get_type_specifics(cls, site) -> dict:
         """
         Return the specifics for a given data type.
 
         Must be implemented in the extended class.
 
         The dict should have three keys:
+
         * ending: str, required filetype-like ending in page titles.
         * label: str, describing the data type for use in error messages.
         * data_site: pywikibot.site.APISite, site serving as a repository for
@@ -946,7 +946,6 @@ class _WbDataPage(_WbRepresentation):
 
         @param site: The Wikibase site
         @type site: pywikibot.site.APISite
-        @rtype: dict
         """
         raise NotImplementedError
 
