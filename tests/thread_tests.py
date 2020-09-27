@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for threading tools."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from tests.aspects import unittest, TestCase
 
@@ -28,8 +28,7 @@ class BasicThreadedGeneratorTestCase(TestCase):
     def gen_func(self):
         """Helper method for generator test."""
         iterable = 'abcd'
-        for i in iterable:
-            yield i
+        yield from iterable
 
     def test_run_from_gen_function(self):
         """Test thread running with generator as target."""
@@ -48,13 +47,10 @@ class GeneratorIntersectTestCase(TestCase):
         # If they are a generator, we need to convert to a list
         # first otherwise the generator is empty the second time.
         datasets = [list(gen) for gen in gens]
-
         set_result = set(datasets[0]).intersection(*datasets[1:])
-
         result = list(intersect_generators(datasets))
 
         self.assertCountEqual(set(result), result)
-
         self.assertCountEqual(result, set_result)
 
 
@@ -74,7 +70,5 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass
