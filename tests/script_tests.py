@@ -47,9 +47,8 @@ def check_script_deps(script_name):
 failed_dep_script_set = {name for name in script_deps
                          if not check_script_deps(name)}
 
-unrunnable_script_set = {
-    'version',  # does not use global args
-}
+# scripts which cannot be tested
+unrunnable_script_set = set()
 
 
 def list_scripts(path, exclude=None):
@@ -134,6 +133,7 @@ no_args_expected_results = {
     'shell': ('>>> ', 'Welcome to the'),
     'transferbot': 'Target site not different from source site',
     'unusedfiles': ('Working on', None),
+    'version': 'Pywikibot: [',
     'watchlist': 'Retrieving watchlist',
 
     # The following auto-run and typically can't be validated,
@@ -349,7 +349,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
     # Here come scripts requiring and missing dependencies, that haven't been
     # fixed to output -help in that case.
-    _expected_failures = set()
+    _expected_failures = {'version'}
     _allowed_failures = []
 
     _arguments = '-help'
