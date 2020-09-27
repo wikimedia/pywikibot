@@ -3339,11 +3339,11 @@ class TestSubdomainFamilySite(TestCase):
     """Test subdomain family site."""
 
     code = 'en'
-    family = 'lyricwiki'
+    family = 'wowwiki'
 
-    def test_lyrics(self):
-        """Test lyrics.fandom.com."""
-        url = 'lyrics.fandom.com'
+    def test_wow(self):
+        """Test wowwiki.fandom.com."""
+        url = 'wowwiki.fandom.com'
         site = self.site
         self.assertEqual(site.hostname(), url)
         self.assertEqual(site.code, 'en')
@@ -3351,12 +3351,12 @@ class TestSubdomainFamilySite(TestCase):
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), url)
 
-        self.assertRaises(KeyError, site.family.hostname, 'lyrics')
-        self.assertRaises(KeyError, site.family.hostname, 'lyricwiki')
+        self.assertRaises(KeyError, site.family.hostname, 'wow')
+        self.assertRaises(KeyError, site.family.hostname, 'wowwiki')
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
-                          'lyricwiki', 'lyricwiki')
+                          'wowwiki', 'wowwiki')
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
-                          'de', 'lyricwiki')
+                          'ceb', 'wowwiki')
 
 
 class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
