@@ -32,13 +32,6 @@ class Family(family.FandomFamily):
         """DEPRECATED. languages_by_size property for compatibility purpose."""
         return list(cls.codes)
 
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return the version for this family."""
-        if code == 'es':
-            return '1.33.1'
-        return super().version(code)
-
     @classproperty
     def langs(cls):
         """Property listing family languages."""

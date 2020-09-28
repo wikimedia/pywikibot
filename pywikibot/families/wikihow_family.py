@@ -6,7 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import deprecated, classproperty
+from pywikibot.tools import classproperty
 
 
 class Family(family.SubdomainFamily):  # noqa: D101
@@ -49,11 +49,6 @@ class Family(family.SubdomainFamily):  # noqa: D101
     def scriptpath(self, code):
         """Return the script path for this family."""
         return ''
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return the version for this family."""
-        return '1.33.0-alpha'
 
     def protocol(self, code):
         """Return 'https' as the protocol."""

@@ -19,7 +19,6 @@ from os.path import basename, dirname, splitext
 from typing import Dict, List, Optional, Tuple
 
 import pywikibot
-from pywikibot.comms.http import fetch
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
@@ -1030,21 +1029,6 @@ class Family:
         """Return the name of the MySQL database."""
         return '%s%s' % (code, self.name)
 
-    # Which version of MediaWiki is used?
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return MediaWiki version number as a string.
-
-        Use L{pywikibot.site.mw_version} to compare version strings.
-        """
-        # Here we return the latest mw release for downloading
-        if not hasattr(self, '_version'):
-            self._version = fetch(
-                'https://www.mediawiki.org/w/api.php?action=expandtemplates'
-                '&text={{MW_stable_release_number}}&prop=wikitext&format=json'
-            ).data.json()['expandtemplates']['wikitext']
-        return self._version
-
     def force_version(self, code):
         """
         Return a manual version number.
@@ -1262,11 +1246,6 @@ class SubdomainFamily(Family):
 class FandomFamily(Family):
 
     """Common features of Fandom families."""
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return the version for this family."""
-        return '1.19.24'
 
     @classproperty
     def langs(cls):
