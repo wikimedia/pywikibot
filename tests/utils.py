@@ -27,6 +27,7 @@ from pywikibot.comms import threadedhttp
 from pywikibot import config
 from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
+from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
 from tests import _pwb_py, unittest
 
@@ -335,7 +336,7 @@ class DrySite(pywikibot.site.APISite):
 
     """Dummy class to use instead of L{pywikibot.site.APISite}."""
 
-    _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
+    _loginstatus = LoginStatus.NOT_ATTEMPTED
 
     def __init__(self, code, fam, user):
         """Initializer."""

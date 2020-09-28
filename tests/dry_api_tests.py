@@ -15,7 +15,7 @@ from pywikibot.data.api import (
     QueryGenerator,
 )
 from pywikibot.family import Family
-from pywikibot.site import LoginStatus
+from pywikibot.login import LoginStatus
 from pywikibot.tools import suppress_warnings
 
 from tests import join_images_path, patch
