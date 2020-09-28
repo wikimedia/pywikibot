@@ -21,11 +21,6 @@ pywikibot.families.incubator\_family module
 
 .. automodule:: pywikibot.families.incubator_family
 
-pywikibot.families.lyricwiki\_family module
--------------------------------------------
-
-.. automodule:: pywikibot.families.lyricwiki_family
-
 pywikibot.families.mediawiki\_family module
 -------------------------------------------
 
