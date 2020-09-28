@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 from contextlib import closing
+from typing import Optional
 
 import pywikibot
 
@@ -20,7 +21,9 @@ from pywikibot.tools import deprecated_args
 
 
 @deprecated_args(encoding=None)
-def mysql_query(query: str, params=None, dbname=None, verbose=None):
+def mysql_query(query: str, params=None,
+                dbname: Optional[str] = None,
+                verbose: Optional[bool] = None):
     """Yield rows from a MySQL query.
 
     An example query that yields all ns0 pages might look like::
@@ -31,19 +34,17 @@ def mysql_query(query: str, params=None, dbname=None, verbose=None):
         FROM page
         WHERE page_namespace = 0;
 
-    From MediaWiki 1.5, all projects use Unicode (UTF-8) character encoding.
+    Supported MediaWiki projects use Unicode (UTF-8) character encoding.
     Cursor charset is utf8.
 
     @param query: MySQL query to execute
     @param params: input parameters for the query, if needed
         if list or tuple, %s shall be used as placeholder in the query string.
         if a dict, %(key)s shall be used as placeholder in the query string.
-    @type params: tuple, list or dict of str (unicode in py2)
+    @type params: tuple, list or dict of str
     @param dbname: db name
-    @type dbname: str
     @param verbose: if True, print query to be executed;
         if None, config.verbose_output will be used.
-    @type verbose: None or bool
     @return: generator which yield tuples
     """
     # These are specified in config2.py or user-config.py
