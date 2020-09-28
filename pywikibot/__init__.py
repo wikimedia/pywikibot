@@ -119,10 +119,6 @@ for _name in textlib_methods:
     globals()[_name] = wrapped_func
 
 
-deprecated = redirect_func(__deprecated)
-deprecate_arg = redirect_func(_deprecate_arg)
-
-
 class Timestamp(datetime.datetime):
 
     """Class for handling MediaWiki timestamps.
