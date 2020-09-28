@@ -31,7 +31,6 @@ from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
-from warnings import warn
 
 import pywikibot
 
@@ -41,7 +40,6 @@ from pywikibot.tools import (
     DequeGenerator,
     filter_unique,
     intersect_generators,
-    issue_deprecation_warning,
     itergroup,
     ModuleDeprecationWrapper,
     redirect_func,
@@ -50,11 +48,7 @@ from pywikibot.tools import (
 from pywikibot import date, config, i18n, xmlreader
 from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
-from pywikibot.exceptions import (
-    ArgumentDeprecationWarning,
-    ServerError,
-    UnknownExtension,
-)
+from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.proofreadpage import ProofreadPage
 
 
@@ -586,43 +580,30 @@ class GeneratorFactory:
         return dupfiltergen
 
     @deprecated_args(arg='category')
-    def getCategory(self, category):
+    def getCategory(self, category: str) -> tuple:
         """
         Return Category and start as defined by category.
 
         @param category: category name with start parameter
-        @type category: str
-        @rtype: tuple
         """
-        if category and category.startswith('-'):
-            categoryname = category.partition(':')[2]
-            issue_deprecation_warning(
-                'The usage of "{0}" as actual parameter of '
-                'pagegenerators.getCategory'.format(category),
-                categoryname, depth=3,
-                warning_class=ArgumentDeprecationWarning,
-                since='20141019')
-        else:
-            categoryname = category
-
-        if not categoryname:
-            categoryname = i18n.input(
+        if not category:
+            category = i18n.input(
                 'pywikibot-enter-category-name',
                 fallback_prompt='Please enter the category name:')
-        categoryname = categoryname.replace('#', '|')
+        category = category.replace('#', '|')
 
-        categoryname, sep, startfrom = categoryname.partition('|')
+        category, _, startfrom = category.partition('|')
         if not startfrom:
             startfrom = None
 
-        # Insert Category: before category name to avoid parsing problems in
+        # Insert "Category:" before category name to avoid parsing problems in
         # Link.parse() when categoryname contains ":";
         # Part before ":" might be interpreted as an interwiki prefix
-        prefix = categoryname.split(':', 1)[0]  # whole word if ":" not present
+        prefix = category.split(':', 1)[0]  # whole word if ":" not present
         if prefix not in self.site.namespaces[14]:
-            categoryname = '{0}:{1}'.format(
-                self.site.namespace(14), categoryname)
-        cat = pywikibot.Category(pywikibot.Link(categoryname,
+            category = '{}:{}'.format(
+                self.site.namespace(14), category)
+        cat = pywikibot.Category(pywikibot.Link(category,
                                                 source=self.site,
                                                 default_namespace=14))
         return cat, startfrom
@@ -713,7 +694,7 @@ class GeneratorFactory:
         valid_cats = [c for _list in cats.values() for c in _list]
 
         value = '' if value is None else value
-        cat, sep, lint_from = value.partition('/')
+        cat, _, lint_from = value.partition('/')
         if not lint_from:
             lint_from = None
 
@@ -880,11 +861,7 @@ class GeneratorFactory:
 
     def _handle_namespaces(self, value):
         """Handle `-namespaces` argument."""
-        if isinstance(self._namespaces, frozenset):
-            warn('Cannot handle arg -namespaces as namespaces can not '
-                 'be altered after a generator is created.',
-                 ArgumentDeprecationWarning, 3)
-            return True
+        assert not isinstance(self._namespaces, frozenset)
         if not value:
             value = pywikibot.input('What namespace are you filtering on?')
         NOT_KEY = 'not:'
@@ -1119,27 +1096,6 @@ class GeneratorFactory:
             (temp[0][0], temp[0][1], dict(temp[1:]), ifnot))
         return True
 
-    @staticmethod
-    def _handle_yahoo(value):
-        """Handle `-yahoo` argument."""
-        issue_deprecation_warning('-yahoo', depth=3,
-                                  warning_class=ArgumentDeprecationWarning,
-                                  since='20181125')
-
-    @staticmethod
-    def _handle_untagged(value):
-        """Handle `-untagged` argument."""
-        issue_deprecation_warning('-untagged', depth=3,
-                                  warning_class=ArgumentDeprecationWarning,
-                                  since='20161116')
-
-    @staticmethod
-    def _handle_wikidataquery(value):
-        """Handle `-wikidataquery` argument."""
-        issue_deprecation_warning('-wikidataquery', depth=3,
-                                  warning_class=ArgumentDeprecationWarning,
-                                  since='20170520')
-
     def _handle_sparqlendpoint(self, value):
         """Handle `-sparqlendpoint` argument."""
         if not value:
@@ -1198,7 +1154,7 @@ class GeneratorFactory:
             value = arg
             arg = '-' + self._positional_arg_name
         else:
-            arg, sep, value = arg.partition(':')
+            arg, _, value = arg.partition(':')
 
         if value == '':
             value = None

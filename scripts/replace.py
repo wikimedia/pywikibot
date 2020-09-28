@@ -150,17 +150,11 @@ from queue import Queue
 
 import pywikibot
 from pywikibot import editor
-from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
 from pywikibot import i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-from pywikibot.tools import (
-    chars,
-    deprecated,
-    deprecated_args,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import chars, deprecated, deprecated_args
 
 
 # This is required for the text that is shown when you run this script
@@ -384,7 +378,7 @@ class ReplacementListEntry(ReplacementBase):
         return _get_text_exceptions(self.fix_set.exceptions or {})
 
 
-class XmlDumpReplacePageGenerator(object):
+class XmlDumpReplacePageGenerator:
 
     """
     Iterator that will yield Pages that might contain text to replace.
@@ -875,11 +869,7 @@ def main(*args):
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
-        elif arg.startswith(('-sql', '-mysqlquery')):
-            if arg.startswith('-sql'):
-                issue_deprecation_warning('The usage of "-sql"', '-mysqlquery',
-                                          1, ArgumentDeprecationWarning,
-                                          since='20180617')
+        elif arg.startswith('-mysqlquery'):
             useSql = True
             sql_query = arg.partition(':')[2]
         elif arg.startswith('-excepttitle:'):
@@ -912,11 +902,6 @@ def main(*args):
             edit_summary = True
         elif arg.startswith('-manualinput'):
             manual_input = True
-        elif arg.startswith('-replacementfile'):
-            issue_deprecation_warning(
-                '-replacementfile',
-                '-pairsfile',
-                2, ArgumentDeprecationWarning, since='20160304')
         elif arg.startswith('-pairsfile'):
             if len(commandline_replacements) % 2:
                 replacement_file_arg_misplaced = True

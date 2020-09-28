@@ -70,13 +70,11 @@ import os
 import re
 
 from typing import Generator, Tuple
-from warnings import warn
 
 import pywikibot
 
 from pywikibot import config, i18n
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
-from pywikibot.exceptions import ArgumentDeprecationWarning
 
 
 class NoTitle(Exception):
@@ -301,12 +299,7 @@ def main(*args) -> None:
         arg, sep, value = arg.partition(':')
         option = arg.partition('-')[2]
         # reader options
-        if option == 'start':
-            r_options['begin'] = value
-            warn('-start param (text that marks the beginning) of a page has '
-                 'been deprecated in favor of begin; make sure to use the '
-                 'updated param.', ArgumentDeprecationWarning)
-        elif option in ('begin', 'end', 'titlestart', 'titleend', 'title'):
+        if option in ('begin', 'end', 'titlestart', 'titleend', 'title'):
             r_options[option] = value
         elif option == 'file':
             filename = value

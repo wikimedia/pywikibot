@@ -51,16 +51,13 @@ Please fix these if you are capable and motivated:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from itertools import chain
 import sys
 
 import pywikibot
 from pywikibot import Bot, i18n
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators as pg
-from pywikibot.tools import filter_unique, issue_deprecation_warning
+from pywikibot.tools import filter_unique
 from pywikibot.tools.formatter import color_format
 
 from scripts.image import ImageRobot as ImageBot
@@ -190,7 +187,7 @@ class NowCommonsDeleteBot(Bot):
             'replaceloose': False,
             'replaceonly': False,
         })
-        super(NowCommonsDeleteBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.site = pywikibot.Site()
         if not self.site.has_image_repository:
@@ -390,14 +387,6 @@ def main(*args):
         if arg == '-replacealways':
             options['replace'] = True
             options['replacealways'] = True
-        elif arg == '-hash':  # T132303
-            raise NotImplementedError(
-                "The '-hash' argument is not implemented anymore.")
-        elif arg == '-autonomous':
-            issue_deprecation_warning('-autonomous', '-always', 2,
-                                      ArgumentDeprecationWarning,
-                                      since='20140724')
-            options['always'] = True
         elif arg.startswith('-'):
             if arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
                 options[arg[1:]] = True

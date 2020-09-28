@@ -83,9 +83,7 @@ import pywikibot
 from pywikibot import i18n, xmlreader
 from pywikibot.bot import (ExistingPageBot, OptionHandler, RedirectPageBot,
                            SingleSiteBot)
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools import issue_deprecation_warning
 
 
 def space_to_underscore(link) -> str:
@@ -731,13 +729,8 @@ def main(*args) -> None:
             gen_options[option] = int(value)
         elif option in ('page', 'start', 'until'):
             gen_options[option] = value
-        elif option in ('limit', 'total'):
+        elif option == 'limit':
             options['limit'] = gen_options['limit'] = int(value)
-            if option == 'total':
-                issue_deprecation_warning('The usage of "{0}"'.format(arg),
-                                          '-limit', 2,
-                                          ArgumentDeprecationWarning,
-                                          since='20190120')
         else:
             pywikibot.output('Unknown argument: ' + arg)
 

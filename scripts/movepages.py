@@ -42,8 +42,6 @@ import pywikibot
 
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot
-from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import issue_deprecation_warning
 
 
 # This is required for the text that is shown when you run this script
@@ -192,12 +190,7 @@ def main(*args) -> None:
     for arg in local_args:
         if genFactory.handleArg(arg):
             continue
-        if arg == '-pairs' or arg.startswith('-pairs:'):
-            issue_deprecation_warning(
-                '-pairs',
-                '-pairsfile',
-                2, ArgumentDeprecationWarning, since='20160304')
-        elif arg.startswith('-pairsfile'):
+        if arg.startswith('-pairsfile'):
             if len(arg) == len('-pairsfile'):
                 filename = pywikibot.input(
                     'Enter the name of the file containing pairs:')

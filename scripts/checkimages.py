@@ -92,12 +92,11 @@ from typing import Generator, List, Tuple
 import pywikibot
 
 from pywikibot.bot import suggest_help
-from pywikibot.exceptions import ArgumentDeprecationWarning, NotEmailableError
+from pywikibot.exceptions import NotEmailableError
 from pywikibot.family import Family
 from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 from pywikibot.site import Namespace
-from pywikibot.tools import issue_deprecation_warning
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -1549,15 +1548,9 @@ def main(*args) -> bool:
                     'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        elif arg.startswith(('-sleep', '-time')):
-            if arg.startswith('-sleep'):
-                length = len('-sleep')
-            else:
-                issue_deprecation_warning('-time', '-sleep', 2,
-                                          ArgumentDeprecationWarning,
-                                          since='20151209')
-                length = len('-time')
-            if len(arg) == length:
+        elif arg.startswith('-sleep'):
+            length = len(arg)
+            if length == len('-sleep'):
                 time_sleep = int(pywikibot.input(
                     'How many seconds do you want runs to be apart?'))
             else:
@@ -1568,12 +1561,7 @@ def main(*args) -> bool:
             logFullError = False
         elif arg == '-commons':
             commonsActive = True
-        elif arg == '-duplicatesreport' or arg == '-duplicatereport':
-            if arg == '-duplicatereport':
-                issue_deprecation_warning('-duplicatereport',
-                                          '-duplicatesreport',
-                                          2, ArgumentDeprecationWarning,
-                                          since='20161116')
+        elif arg == '-duplicatesreport':
             duplicatesReport = True
         elif arg.startswith('-duplicates'):
             duplicatesActive = True
