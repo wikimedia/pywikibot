@@ -107,16 +107,18 @@ class Pre119SiteTestCase(SiteDetectionTestCase):
 
     def test_hrwiki(self):
         """Test detection of MediaWiki sites for www.hrwiki.org."""
-        self.assertNoSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
+        self.assertNoSite('http://www.hrwiki.org/index.php/$1')  # v 1.15.4
 
     def test_wikifon(self):
         """Test detection of MediaWiki sites for www.wikifon.org."""
-        self.assertNoSite('http://www.wikifon.org/$1')  # v1.11
+        self.assertNoSite('http://www.wikifon.org/$1')  # v1.11.0
 
-    def test_wikitree(self):
-        """Test detection of MediaWiki sites for wikitree.org."""
-        # v1.11, with no query module
-        self.assertNoSite('http://wikitree.org/index.php?title=$1')
+    def test_ecoreality(self):
+        """Test detection of MediaWiki sites for www.ecoreality.org.
+
+        api.php is not available. Anyway the wiki is outdated.
+        """
+        self.assertNoSite('http://www.ecoreality.org/wiki/$1')  # v1.16.2
 
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
