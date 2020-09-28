@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 from collections import OrderedDict
 import functools
@@ -18,7 +16,6 @@ import pywikibot.textlib as textlib
 
 from pywikibot.site import _IWEntry
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
-from pywikibot.tools import suppress_warnings
 from pywikibot import UnknownSite
 
 from tests.aspects import (
@@ -591,7 +588,7 @@ class TestTemplateParams(TestCase):
                          [(None, OrderedDict())])
 
     def test_regexes(self):
-        """Test _ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX."""
+        """Test _ETP_REGEX and NESTED_TEMPLATE_REGEX."""
         func = textlib._ETP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
@@ -618,35 +615,6 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|b={{c}} }}'))
         self.assertIsNone(func('{{a|b={{c|d=1}} }}'))
         self.assertIsNone(func('{{a|b={} }}'))
-        self.assertIsNone(func('{{:a|b={{c|d=1}} }}'))
-
-        self.assertIsNone(func('{{a|{{c}} }}'))
-        self.assertIsNone(func('{{a|{{c|d}} }}'))
-
-        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
-            func = textlib.TEMP_REGEX.search
-
-        self.assertIsNotNone(func('{{{1}}}'))
-        self.assertIsNotNone(func('{{a|b={{c}} }}'))
-        self.assertIsNotNone(func('{{a|b={{c|d=1}} }}'))
-        self.assertIsNotNone(func('{{a|{{c}} }}'))
-        self.assertIsNotNone(func('{{a|{{c|d}} }}'))
-
-        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
-            func = textlib.TEMP_REGEX.match
-
-        self.assertIsNotNone(func('{{#if:foo}}'))
-        self.assertIsNotNone(func('{{foo:}}'))
-
-        self.assertIsNotNone(func('{{CURRENTYEAR}}'))
-        self.assertIsNotNone(func('{{1}}'))
-
-        self.assertIsNotNone(func('{{a|b={{CURRENTYEAR}} }}'))
-        self.assertIsNotNone(func('{{a|b={{{1}}} }}'))
-
-        self.assertIsNone(func('{{a|b={{c}} }}'))
-        self.assertIsNone(func('{{a|b={{c|d=1}} }}'))
-        self.assertIsNotNone(func('{{a|b={} }}'))
         self.assertIsNone(func('{{:a|b={{c|d=1}} }}'))
 
         self.assertIsNone(func('{{a|{{c}} }}'))
