@@ -560,33 +560,33 @@ class Family:
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
     language_groups = {
-        # languages using the arabic script (incomplete)
+        # languages using the Arabic script (incomplete)
         'arab': [
-            'ar', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
-            # languages using multiple scripts, including arabic
+            'ar', 'ary', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
+            # languages using multiple scripts, including Arabic
             'kk', 'ku', 'tt', 'ug', 'pnb'
         ],
-        # languages that use chinese symbols
+        # languages that use Chinese symbols
         'chinese': [
             'wuu', 'zh', 'zh-classical', 'zh-yue', 'gan', 'ii',
-            # languages using multiple/mixed scripts, including chinese
+            # languages using multiple/mixed scripts, including Chinese
             'ja', 'za'
         ],
-        # languages that use the cyrillic alphabet
+        # languages that use the Cyrillic alphabet
         'cyril': [
             'ab', 'av', 'ba', 'be', 'be-tarask', 'bg', 'bxr', 'ce', 'cu',
             'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
             'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
             'udm', 'uk', 'xal',
-            # languages using multiple scripts, including cyrillic
+            # languages using multiple scripts, including Cyrillic
             'ha', 'kk', 'sh', 'sr', 'tt'
         ],
-        # languages that use a greek script
+        # languages that use a Greek script
         'grec': [
             'el', 'grc', 'pnt'
-            # languages using multiple scripts, including greek
+            # languages using multiple scripts, including Greek
         ],
-        # languages that use the latin alphabet
+        # languages that use the Latin alphabet
         'latin': [
             'aa', 'ace', 'af', 'ak', 'als', 'an', 'ang', 'ast', 'ay', 'bar',
             'bat-smg', 'bcl', 'bi', 'bm', 'br', 'bs', 'ca', 'cbk-zam', 'cdo',
@@ -607,7 +607,7 @@ class Family:
             'tn', 'to', 'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've',
             'vec', 'vi', 'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
             'zh-min-nan', 'zu',
-            # languages using multiple scripts, including latin
+            # languages using multiple scripts, including Latin
             'az', 'chr', 'ckb', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr',
             'tt', 'ug', 'za'
         ],
