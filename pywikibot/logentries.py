@@ -99,7 +99,7 @@ class LogEntry(UserDict):
         else:  # try old mw style preceding mw 1.19
             return self[self._expected_type]
 
-    @deprecated('page()', since='20150617')
+    @deprecated('page()', since='20150617', future_warning=True)
     def title(self):
         """
         DEPRECATED: Alias for page().
@@ -285,7 +285,7 @@ class MoveEntry(LogEntry):
 
     _expected_type = 'move'
 
-    @deprecated('target_ns.id', since='20150518')
+    @deprecated('target_ns.id', since='20150518', future_warning=True)
     def new_ns(self):
         """Return namespace id of target page."""
         return self.target_ns.id
@@ -298,7 +298,7 @@ class MoveEntry(LogEntry):
                                     if 'target_ns' in self._params
                                     else self._params['new_ns']]
 
-    @deprecated('target_page', since='20150518')
+    @deprecated('target_page', since='20150518', future_warning=True)
     def new_title(self):
         """Return page object of the new title."""
         return self.target_page

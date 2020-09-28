@@ -71,8 +71,7 @@ class TextEditor:
         return ' '.join("'{0}'".format(part) if ' ' in part else part
                         for part in command)
 
-    @deprecated('_command (should not be used from the outside)',
-                since='20150111', future_warning=True)
+    @deprecated(since='20150111', future_warning=True)
     def command(self, tempFilename, text, jumpIndex=None):
         """Return editor selected in user-config.py."""
         return TextEditor._concat(self._command(tempFilename, text, jumpIndex))

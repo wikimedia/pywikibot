@@ -708,7 +708,7 @@ class ParamInfo(Sized, Container):
         return {'{}+{}'.format(prefix, mod) for mod in modules}
 
     @property
-    @deprecated('prefix_map', since='20150715')
+    @deprecated('prefix_map', since='20150715', future_warning=True)
     def prefixes(self):
         """
         Mapping of module to its prefix for all modules with a prefix.
@@ -752,7 +752,7 @@ class ParamInfo(Sized, Container):
         return {mod: self[mod][attribute]
                 for mod in modules if attribute in self[mod]}
 
-    @deprecated('attributes', since='20150715')
+    @deprecated('attributes', since='20150715', future_warning=True)
     def module_attribute_map(self, attribute: str,
                              modules: Optional[set] = None):
         """
@@ -775,7 +775,7 @@ class ParamInfo(Sized, Container):
                 for mod in modules if self[mod][attribute]}
 
     @property
-    @deprecated('parameter()', since='20150905')
+    @deprecated('parameter()', since='20150905', future_warning=True)
     def query_modules_with_limits(self):
         """Set of all query modules which have limits."""
         if not self._with_limits:

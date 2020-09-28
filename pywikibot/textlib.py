@@ -313,6 +313,7 @@ def _get_regexes(keys, site):
                     issue_deprecation_warning(
                         'site=None',
                         "a valid site for '{}' regex".format(exc),
+                        warning_class=FutureWarning,
                         since='20151006')
                     site = pywikibot.Site()
 
@@ -2034,7 +2035,7 @@ class TimeStripper:
         """Deprecated comment_pattern instance variable."""
         return self._comment_pat
 
-    @deprecated('module function', since='20151118')
+    @deprecated('module function', since='20151118', future_warning=True)
     def findmarker(self, text: str, base: str = '@@', delta: str = '@'):
         """Find a string which is not part of text."""
         return findmarker(text, base, delta)

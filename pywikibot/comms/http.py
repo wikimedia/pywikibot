@@ -242,7 +242,7 @@ def request(site=None, uri: Optional[str] = None, method='GET', params=None,
         # +1 because of @deprecate_arg
         issue_deprecation_warning(
             'Invoking http.request without argument site', 'http.fetch()', 3,
-            since='20150814')
+            warning_class=FutureWarning, since='20150814')
         r = fetch(uri, method, params, body, headers, **kwargs)
         return r.text
 

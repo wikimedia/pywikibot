@@ -892,7 +892,9 @@ class SelfCallMixin:
         """Do nothing and just return itself."""
         if hasattr(self, '_own_desc'):
             issue_deprecation_warning('Calling {}'.format(self._own_desc),
-                                      'it directly', since='20150515')
+                                      'it directly',
+                                      warning_class=FutureWarning,
+                                      since='20150515')
         return self
 
 
