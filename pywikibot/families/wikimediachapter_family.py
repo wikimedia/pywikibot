@@ -28,7 +28,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     @classproperty
-    @deprecated(since='20150621')
+    @deprecated(since='20150621', future_warning=True)
     def countries(cls):
         """Deprecated."""
         return cls.codes

@@ -663,14 +663,17 @@ class Family:
             issue_deprecation_warning('nocapitalize',
                                       "APISite.siteinfo['case'] or "
                                       "Namespace.case == 'case-sensitive'",
+                                      warning_class=FutureWarning,
                                       since='20150214')
         elif name == 'known_families':
             issue_deprecation_warning('known_families',
                                       'APISite.interwiki(prefix)',
+                                      warning_class=FutureWarning,
                                       since='20150503')
         elif name == 'shared_data_repository':
             issue_deprecation_warning('shared_data_repository',
                                       'APISite.data_repository()',
+                                      warning_class=FutureWarning,
                                       since='20151023')
         return super().__getattribute__(name)
 
@@ -731,14 +734,15 @@ class Family:
         return cls
 
     @classproperty
-    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014')
+    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014',
+                future_warning=True)
     def iwkeys(cls):
         """DEPRECATED: List of (interwiki_forward's) family codes."""
         if cls.interwiki_forward:
             return list(pywikibot.Family(cls.interwiki_forward).langs.keys())
         return list(cls.langs.keys())
 
-    @deprecated('APISite.interwiki', since='20151014')
+    @deprecated('APISite.interwiki', since='20151014', future_warning=True)
     def get_known_families(self, site):
         """DEPRECATED: Return dict of inter-family interwiki links."""
         return self.known_families
@@ -912,7 +916,7 @@ class Family:
         """Return path to api.php."""
         return '%s/api.php' % self.scriptpath(code)
 
-    @deprecated('APISite.article_path', since='20150905')
+    @deprecated('APISite.article_path', since='20150905', future_warning=True)
     def nicepath(self, code):
         """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
         return '/wiki/'
@@ -930,7 +934,8 @@ class Family:
         """Return the path to title using index.php with redirects disabled."""
         return '%s?title=%s&redirect=no' % (self.path(code), title)
 
-    @deprecated('APISite.nice_get_address(title)', since='20150628')
+    @deprecated('APISite.nice_get_address(title)', since='20150628',
+                future_warning=True)
     def nice_get_address(self, code, title):
         """DEPRECATED: Return the nice path to title using index.php."""
         return '%s%s' % (self.nicepath(code), title)

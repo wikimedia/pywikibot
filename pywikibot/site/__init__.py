@@ -386,7 +386,8 @@ class Namespace(Iterable, ComparableMixin):
         return False
 
     @classmethod
-    @deprecated('NamespacesDict.lookup_name', since='20150703')
+    @deprecated('NamespacesDict.lookup_name', since='20150703',
+                future_warning=True)
     def lookup_name(cls, name, namespaces=None):
         """
         Find the Namespace for a name.
@@ -404,7 +405,8 @@ class Namespace(Iterable, ComparableMixin):
         return NamespacesDict._lookup_name(name, namespaces)
 
     @staticmethod
-    @deprecated('NamespacesDict.resolve', since='20150703')
+    @deprecated('NamespacesDict.resolve', since='20150703',
+                future_warning=True)
     def resolve(identifiers, namespaces=None):
         """
         Resolve namespace identifiers to obtain Namespace objects.
@@ -943,7 +945,8 @@ class BaseSite(ComparableMixin):
         """
         return self._interwikimap[prefix].local
 
-    @deprecated('APISite.namespaces.lookup_name', since='20150703')
+    @deprecated('APISite.namespaces.lookup_name', since='20150703',
+                future_warning=True)
     def ns_index(self, namespace):
         """
         Return the Namespace for a given namespace name.
@@ -955,7 +958,8 @@ class BaseSite(ComparableMixin):
         """
         return self.namespaces.lookup_name(namespace)
 
-    @deprecated('APISite.namespaces.lookup_name', since='20150703')
+    @deprecated('APISite.namespaces.lookup_name', since='20150703',
+                future_warning=True)
     def getNamespaceIndex(self, namespace):
         """DEPRECATED: Return the Namespace for a given namespace name."""
         return self.namespaces.lookup_name(namespace)
@@ -1152,7 +1156,8 @@ class BaseSite(ComparableMixin):
         """Return local name for the Category namespace."""
         return self.namespace(14)
 
-    @deprecated('list(namespaces.CATEGORY)', since='20150829')
+    @deprecated('list(namespaces.CATEGORY)', since='20150829',
+                future_warning=True)
     def category_namespaces(self):
         """Return names for the Category namespace."""
         return list(self.namespace(14, all=True))
@@ -1174,7 +1179,8 @@ class BaseSite(ComparableMixin):
 
     # deprecated methods for backwards-compatibility
 
-    @deprecated('pywikibot.data.api.encode_url', since='20151211')
+    @deprecated('pywikibot.data.api.encode_url', since='20151211',
+                future_warning=True)
     def urlEncode(self, query):
         """DEPRECATED."""
         return api.encode_url(query)
@@ -1978,7 +1984,7 @@ class APISite(BaseSite):
         else:
             return [word]
 
-    @deprecated('expand_text', since='20150831')
+    @deprecated('expand_text', since='20150831', future_warning=True)
     def resolvemagicwords(self, wikitext):
         """
         Replace the {{ns:xx}} marks in a wikitext with the namespace names.
@@ -2073,7 +2079,8 @@ class APISite(BaseSite):
         """Site information dict."""
         return self._siteinfo
 
-    @deprecated('siteinfo or Namespace instance', since='20150830')
+    @deprecated('siteinfo or Namespace instance', since='20150830',
+                future_warning=True)
     def case(self):
         """Return this site's capitalization rule."""
         # This is the global setting via $wgCapitalLinks, it is used whenever
@@ -2084,7 +2091,7 @@ class APISite(BaseSite):
         """Return this site's internal id."""
         return self.siteinfo['wikiid']
 
-    @deprecated('APISite.lang', since='20150629')
+    @deprecated('APISite.lang', since='20150629', future_warning=True)
     def language(self):
         """Return the code for the language of this Site."""
         return self.lang
@@ -2468,7 +2475,8 @@ class APISite(BaseSite):
         return (pageitem['imageinfo']
                 if history else pageitem['imageinfo'][0])
 
-    @deprecated('Check the content model instead', since='20150128')
+    @deprecated('Check the content model instead', since='20150128',
+                future_warning=True)
     def loadflowinfo(self, page):
         """
         Load Flow-related information about a given page.
@@ -2938,7 +2946,7 @@ class APISite(BaseSite):
 
         return user_tokens
 
-    @deprecated("the 'tokens' property", since='20150218')
+    @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
     def getToken(self, getalways=True, getagain=False):
         """DEPRECATED: Get edit token."""
@@ -2955,7 +2963,7 @@ class APISite(BaseSite):
             del self.tokens._tokens[self.user()][token]
         return self.tokens[token]
 
-    @deprecated("the 'tokens' property", since='20150218')
+    @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
     def getPatrolToken(self):
         """DEPRECATED: Get patrol token."""
@@ -5618,7 +5626,8 @@ class APISite(BaseSite):
                                       '"report_success" is True or None',
                                       '"report_success=False" or define '
                                       '"ignore_warnings" as callable/iterable',
-                                      3, since='20150823')
+                                      3, warning_class=FutureWarning,
+                                      since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
@@ -6914,6 +6923,7 @@ class DataSite(APISite):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
             issue_deprecation_warning('claim without on_item set', depth=3,
+                                      warning_class=FutureWarning,
                                       since='20160309')
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',
@@ -6965,7 +6975,8 @@ class DataSite(APISite):
                 else:  # urls
                     instead = None
                 issue_deprecation_warning('DataSite.{0}()'.format(attr),
-                                          instead, since='20151022')
+                                          instead, warning_class=FutureWarning,
+                                          since='20151022')
                 if props == 'urls':
                     props = 'sitelinks/urls'
                 method = self._get_propertyitem

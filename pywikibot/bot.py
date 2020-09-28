@@ -863,7 +863,7 @@ def handle_args(args=None, do_help=True):
     return non_global_args
 
 
-@deprecated('handle_args', since='20150409')
+@deprecated('handle_args', since='20150409', future_warning=True)
 def handleArgs(*args):
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)
@@ -1545,7 +1545,8 @@ class MultipleSitesBot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    @deprecated("the page's site property", since='20150615')
+    @deprecated("the page's site property", since='20150615',
+                future_warning=True)
     def site(self):
         """
         Return the site if it's set and ValueError otherwise.

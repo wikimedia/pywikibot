@@ -1252,7 +1252,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
 
 # alias for backwards-compability
-getSite = redirect_func(Site, old_name='getSite', since='20150924')
+getSite = redirect_func(Site, old_name='getSite', since='20150924',
+                        future_warning=True)
 
 
 # These imports depend on Wb* classes above.
@@ -1408,12 +1409,12 @@ _putthread.setDaemon(True)
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr(
     'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
-    since='20150921')
+    since='20150921', future_warning=True)
 wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
                     'use pywikibot.bot.QuitKeyboardInterrupt instead.',
-    since='20150619')
+    since='20150619', future_warning=True)
 wrapper._add_deprecated_attr(
     'MediaWikiVersion', _MediaWikiVersion,
     warning_message='pywikibot.MediaWikiVersion is deprecated; '
