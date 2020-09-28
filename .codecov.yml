@@ -19,7 +19,6 @@ coverage:
     - pywikibot/families/__init__.py
     - scripts/archive
     - scripts/userscripts
-    - scripts/version.py
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
     - scripts/maintenance/wikimedia_sites.py
