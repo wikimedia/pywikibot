@@ -92,6 +92,7 @@ from typing import Generator, List, Tuple
 import pywikibot
 
 from pywikibot.bot import suggest_help
+from pywikibot import config2 as config
 from pywikibot.exceptions import NotEmailableError
 from pywikibot.family import Family
 from pywikibot import i18n
@@ -591,6 +592,7 @@ class checkImagesBot:
         except pywikibot.NoPage:
             pywikibot.output(self.imageName + ' has been deleted...')
             return False
+
         # You can use this function also to find only the user that
         # has upload the image (FixME: Rewrite a bit this part)
         if put:
@@ -603,6 +605,7 @@ class checkImagesBot:
             except pywikibot.LockedPage:
                 pywikibot.output('File is locked. Skipping.')
                 return False
+
         # paginetta it's the image page object.
         try:
             if reportPageObject == self.image and self.uploader:
@@ -617,6 +620,7 @@ class checkImagesBot:
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
             return False
+
         upBots = i18n.translate(self.site, uploadBots)
         user = pywikibot.User(self.site, nick)
         luser = user.title(as_url=True)
@@ -641,6 +645,7 @@ class checkImagesBot:
         else:
             self.notification2 = self.notification
         second_text = False
+
         # Getting the talk page's history, to check if there is another
         # advise...
         try:
@@ -669,6 +674,7 @@ class checkImagesBot:
             pywikibot.output('The user page is blank')
             second_text = False
             testoattuale = i18n.translate(self.site, empty)
+
         if self.commTalk:
             commentox = self.commTalk
         else:
@@ -677,8 +683,8 @@ class checkImagesBot:
         if second_text:
             newText = '{}\n\n{}'.format(testoattuale, self.notification2)
         else:
-            newText = '{0}\n\n== {1} ==\n{2}'.format(testoattuale, self.head,
-                                                     self.notification)
+            newText = '{}\n\n== {} ==\n{}'.format(testoattuale, self.head,
+                                                  self.notification)
 
         # Check maximum number of notifications for this talk page
         if (self.num_notify is not None
@@ -1446,11 +1452,13 @@ class checkImagesBot:
             pywikibot.output("Skipping {} because it's a redirect."
                              .format(self.imageName))
             return
+
         # Delete the fields where the templates cannot be loaded
         regex_nowiki = re.compile(r'<nowiki>(.*?)</nowiki>', re.DOTALL)
         regex_pre = re.compile(r'<pre>(.*?)</pre>', re.DOTALL)
         self.imageCheckText = regex_nowiki.sub('', self.imageCheckText)
         self.imageCheckText = regex_pre.sub('', self.imageCheckText)
+
         # Deleting the useless template from the description (before adding
         # sth in the image the original text will be reloaded, don't worry).
         if self.isTagged():
@@ -1462,31 +1470,39 @@ class checkImagesBot:
             if a_word in self.imageCheckText:
                 # There's a template, probably a license
                 brackets = True
+
         # Is the extension allowed? (is it an image or f.e. a .xls file?)
         if allowed_formats and extension.lower() not in allowed_formats:
             delete = True
+
         (license_found, hiddenTemplateFound) = self.smartDetection()
+
         # Here begins the check block.
         if brackets and license_found:
             return
-        elif delete:
+
+        if delete:
             pywikibot.output('{} is not a file!'.format(self.imageName))
             if not di:
                 pywikibot.output('No localized message given for '
                                  "'delete_immediately'. Skipping.")
                 return
+
             # Some formatting for delete immediately template
             dels = dels % {'adding': di}
             di = '\n' + di
+
             # Modify summary text
-            pywikibot.setAction(dels)
+            config.default_edit_summary = dels
+
             canctext = di % extension
             notification = din % {'file': self.image.title(as_link=True,
                                                            textlink=True)}
             head = dih
             self.report(canctext, self.imageName, notification, head)
             return
-        elif not self.imageCheckText.strip():  # empty image description
+
+        if not self.imageCheckText.strip():  # empty image description
             pywikibot.output(
                 "The file's description for {} does not contain a license "
                 ' template!'.format(self.imageName))
@@ -1498,17 +1514,15 @@ class checkImagesBot:
             self.report(self.unvertext, self.imageName, notification, head,
                         smwl)
             return
-        else:
-            pywikibot.output('{} has only text and not the specific '
-                             'license...'.format(self.imageName))
-            if hiddenTemplateFound and HiddenTN:
-                notification = HiddenTN % self.imageName
-            elif nn:
-                notification = nn % self.imageName
-            head = nh
-            self.report(self.unvertext, self.imageName, notification, head,
-                        smwl)
-            return
+
+        pywikibot.output('{} has only text and not the specific '
+                         'license...'.format(self.imageName))
+        if hiddenTemplateFound and HiddenTN:
+            notification = HiddenTN % self.imageName
+        elif nn:
+            notification = nn % self.imageName
+        head = nh
+        self.report(self.unvertext, self.imageName, notification, head, smwl)
 
 
 def main(*args) -> bool:
