@@ -31,7 +31,6 @@ from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
-from typing import List, Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -1349,64 +1348,19 @@ def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
                                               total=total, returndict=True))
 
 
-@deprecated_args(nobots=True, pagelist=True, step=True)
-def RecentChangesPageGenerator(*,
-                               start=None,
-                               end=None,
-                               reverse: bool = False,
-                               namespaces=None,
-                               changetype: Optional[str] = None,
-                               showMinor: Optional[bool] = None,
-                               showBot: Optional[bool] = None,
-                               showAnon: Optional[bool] = None,
-                               showRedirects: Optional[bool] = None,
-                               showPatrolled: Optional[bool] = None,
-                               topOnly: bool = False,
-                               total: Optional[int] = None,
-                               user: Union[str, List[str], None] = None,
-                               excludeuser: Union[str, List[str], None] = None,
-                               site=None,
-                               tag: Optional[str] = None,
-                               _filter_unique=None):
+def RecentChangesPageGenerator(site=None, _filter_unique=None, **kwargs):
     """
     Generate pages that are in the recent changes list, including duplicates.
 
-    @param start: Timestamp to start listing from
-    @type start: pywikibot.Timestamp
-    @param end: Timestamp to end listing at
-    @type end: pywikibot.Timestamp
-    @param reverse: if True, start with oldest changes (default: newest)
-    @param changetype: only iterate changes of this type ("edit" for
-        edits to existing pages, "new" for new pages, "log" for log
-        entries)
-    @param showMinor: if True, only list minor edits; if False, only list
-        non-minor edits; if None, list all
-    @param showBot: if True, only list bot edits; if False, only list
-        non-bot edits; if None, list all
-    @param showAnon: if True, only list anon edits; if False, only list
-        non-anon edits; if None, list all
-    @param showRedirects: if True, only list edits to redirect pages; if
-        False, only list edits to non-redirect pages; if None, list all
-    @param showPatrolled: if True, only list patrolled edits; if False,
-        only list non-patrolled edits; if None, list all
-    @param topOnly: if True, only list changes that are the latest revision
-        (default False)
-    @param user: if not None, only list edits by this user or users
-    @param excludeuser: if not None, exclude edits by this user or users
+    For parameters refer pywikibot.site.recentchanges
+
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
-    @param tag: a recent changes tag
     """
     if site is None:
         site = pywikibot.Site()
 
-    gen = site.recentchanges(start=start, end=end, reverse=reverse,
-                             namespaces=namespaces, changetype=changetype,
-                             minor=showMinor, bot=showBot, anon=showAnon,
-                             redirect=showRedirects, patrolled=showPatrolled,
-                             top_only=topOnly, total=total, user=user,
-                             excludeuser=excludeuser, tag=tag)
-
+    gen = site.recentchanges(**kwargs)
     gen.request['rcprop'] = 'title'
     gen = (pywikibot.Page(site, rc['title'])
            for rc in gen if rc['type'] != 'log' or 'title' in rc)
