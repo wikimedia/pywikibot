@@ -1963,23 +1963,23 @@ class BasePage(ComparableMixin):
 
     @deprecated_args(throttle=True)
     def protect(self, edit=False, move=False, create=None, upload=None,
-                unprotect=False, reason=None, prompt=None, protections=None,
+                unprotect=False,
+                reason: Optional[str] = None,
+                prompt: Optional[bool] = None,
+                protections: Optional[dict] = None,
                 **kwargs):
         """
         Protect or unprotect a wiki page. Requires administrator status.
 
-        Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
-        'none'), 'autoconfirmed', and 'sysop'. If None is given, however,
+        Valid protection levels are '' (equivalent to 'none'),
+        'autoconfirmed', and 'sysop'. If None is given, however,
         that protection will be skipped.
 
         @param protections: A dict mapping type of protection to protection
             level of that type.
-        @type protections: dict
         @param reason: Reason for the action
-        @type reason: basestring
         @param prompt: Whether to ask user for confirmation (deprecated).
                        Defaults to protections is None
-        @type prompt: bool
         """
         def process_deprecated_arg(value, arg_name):
             # if protections was set and value is None, don't interpret that
