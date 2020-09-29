@@ -68,6 +68,11 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
         """Test basic interset with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
 
+    @unittest.expectedFailure
+    def test_intersect_with_dups_failing(self):
+        """Failing basic intersect test with duplicates."""
+        self.assertEqualItertools(['abb', 'bb'])
+
 
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
