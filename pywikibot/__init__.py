@@ -55,7 +55,6 @@ from pywikibot.logging import (
     critical, debug, error, exception, log, output, stdout, warning
 )
 from pywikibot.site import BaseSite
-import pywikibot.textlib as textlib
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
     classproperty,
@@ -76,16 +75,6 @@ else:
     from functools import lru_cache
     cache = lru_cache(None)
 
-
-textlib_methods = (
-    'categoryFormat', 'compileLinkR', 'extract_templates_and_params',
-    'getCategoryLinks', 'getLanguageLinks', 'interwikiFormat', 'interwikiSort',
-    'isDisabled', 'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
-    'removeDisabledParts', 'removeHTMLParts', 'removeLanguageLinks',
-    'removeLanguageLinksAndSeparator', 'replaceCategoryInPlace',
-    'replaceCategoryLinks', 'replaceExcept', 'replaceLanguageLinks',
-    'TimeStripper', 'unescape',
-)
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
@@ -110,13 +99,6 @@ __all__ = (
     'UserBlocked', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
     'WbTabularData', 'WbTime', 'WbUnknown', 'WikiBaseError', 'WikidataBot',
 )
-__all__ += textlib_methods
-
-
-for _name in textlib_methods:
-    target = getattr(textlib, _name)
-    wrapped_func = redirect_func(target, since='20140820', future_warning=True)
-    globals()[_name] = wrapped_func
 
 
 class Timestamp(datetime.datetime):
@@ -211,23 +193,21 @@ class Timestamp(datetime.datetime):
 
     def __add__(self, other):
         """Perform addition, returning a Timestamp instead of datetime."""
-        newdt = super(Timestamp, self).__add__(other)
+        newdt = super().__add__(other)
         if isinstance(newdt, datetime.datetime):
             return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
                              newdt.minute, newdt.second, newdt.microsecond,
                              newdt.tzinfo)
-        else:
-            return newdt
+        return newdt
 
     def __sub__(self, other):
         """Perform subtraction, returning a Timestamp instead of datetime."""
-        newdt = super(Timestamp, self).__sub__(other)
+        newdt = super().__sub__(other)
         if isinstance(newdt, datetime.datetime):
             return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
                              newdt.minute, newdt.second, newdt.microsecond,
                              newdt.tzinfo)
-        else:
-            return newdt
+        return newdt
 
 
 class Coordinate(_WbRepresentation):
