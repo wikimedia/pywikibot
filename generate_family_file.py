@@ -130,11 +130,6 @@ class FamilyFileGenerator:
             "'{code}': '{path}',".format(code=k, path=w.scriptpath)
             for k, w in self.wikis.items())
 
-        code_version_pairs = '\n            '.join(
-            "'{code}': None,".format(code=k) if w.version is None else
-            "'{code}': '{version}',".format(code=k, version=w.version)
-            for k, w in self.wikis.items())
-
         code_protocol_pairs = '\n            '.join(
             "'{code}': '{protocol}',".format(
                 code=k, protocol=urlparse(w.server).scheme
@@ -145,7 +140,6 @@ class FamilyFileGenerator:
                 'url': self.base_url, 'name': self.name,
                 'code_hostname_pairs': code_hostname_pairs,
                 'code_path_pairs': code_path_pairs,
-                'code_version_pairs': code_version_pairs,
                 'code_protocol_pairs': code_protocol_pairs})
 
 
@@ -161,7 +155,6 @@ Configuration parameters:
 Please do not commit this to the Git repository!
 \"\"\"
 from pywikibot import family
-from pywikibot.tools import deprecated
 
 
 class Family(family.Family):  # noqa: D101
@@ -174,12 +167,6 @@ class Family(family.Family):  # noqa: D101
     def scriptpath(self, code):
         return {
             %(code_path_pairs)s
-        }[code]
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        return {
-            %(code_version_pairs)s
         }[code]
 
     def protocol(self, code):
