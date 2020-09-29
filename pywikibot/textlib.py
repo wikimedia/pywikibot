@@ -26,7 +26,6 @@ from pywikibot.family import Family
 from pywikibot.tools import (
     deprecate_arg,
     deprecated,
-    DeprecatedRegex,
     issue_deprecation_warning,
 )
 
@@ -45,22 +44,6 @@ _regex_cache = {}
 _ETP_REGEX = re.compile(
     r'{{(?:msg:)?(?P<name>[^{\|]+?)'
     r'(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?)?)?}}')
-
-# This template is a more inclusive template matching algorithm
-# that allows system variables, but does not match nested templates.
-# It exists for backwards compatibility to the old 'TEMP_REGEX'
-# which was the _ETP_REGEX.
-TEMP_REGEX = DeprecatedRegex(
-    r"""
-    {{\s*(?:msg:\s*)?
-      (?P<name>[^{\|]+?)\s*
-      (?:\|(?P<params>[^{]*
-            (?:(?:{}|{{[A-Z]+(?:\:[^}])?}}|{{{[^}]+}}}) [^{]*)*
-           )?
-      )?
-    }}
-    """, re.VERBOSE, 'textlib.TEMP_REGEX', 'textlib.NESTED_TEMPLATE_REGEX',
-    since='20150212')
 
 # The regex below collects nested templates, providing simpler
 # identification of templates used at the top-level of wikitext.
