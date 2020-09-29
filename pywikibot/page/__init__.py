@@ -446,12 +446,8 @@ class BasePage(ComparableMixin):
         return self.autoFormat()[0] is not None
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=True,
-                     change_edit_time=True,
-                     expandtemplates=True)
-    def get(self, force=False, get_redirect=False) -> str:
-        """
-        Return the wiki-text of the page.
+    def get(self, force: bool = False, get_redirect: bool = False) -> str:
+        """Return the wiki-text of the page.
 
         This will retrieve the page from the server if it has not been
         retrieved yet, or if force is True. This can raise the following
@@ -512,8 +508,8 @@ class BasePage(ComparableMixin):
             raise self._getexception
 
     @remove_last_args(['sysop'])
-    @deprecated_args(throttle=True, change_edit_time=True)
-    def getOldVersion(self, oldid, force=False, get_redirect=False) -> str:
+    def getOldVersion(self, oldid,
+                      force: bool = False, get_redirect: bool = False) -> str:
         """
         Return text of an old revision of this page; same options as get().
 
@@ -938,15 +934,17 @@ class BasePage(ComparableMixin):
         disambig_in_page = disambigs.intersection(templates)
         return self.namespace() != 10 and len(disambig_in_page) > 0
 
-    @deprecated_args(
-        step=True, withTemplateInclusion='with_template_inclusion',
-        onlyTemplateInclusion='only_template_inclusion',
-        redirectsOnly='filter_redirects')
-    def getReferences(
-        self, follow_redirects=True, with_template_inclusion=True,
-        only_template_inclusion=False, filter_redirects=False,
-        namespaces=None, total=None, content=False
-    ):
+    @deprecated_args(withTemplateInclusion='with_template_inclusion',
+                     onlyTemplateInclusion='only_template_inclusion',
+                     redirectsOnly='filter_redirects')
+    def getReferences(self,
+                      follow_redirects: bool = True,
+                      with_template_inclusion: bool = True,
+                      only_template_inclusion: bool = False,
+                      filter_redirects: bool = False,
+                      namespaces=None,
+                      total: Optional[int] = None,
+                      content: bool = False):
         """
         Return an iterator all pages that refer to or embed the page.
 
@@ -982,10 +980,14 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=True, followRedirects='follow_redirects',
+    @deprecated_args(followRedirects='follow_redirects',
                      filterRedirects='filter_redirects')
-    def backlinks(self, follow_redirects=True, filter_redirects=None,
-                  namespaces=None, total=None, content=False):
+    def backlinks(self,
+                  follow_redirects: bool = True,
+                  filter_redirects: Optional[bool] = None,
+                  namespaces=None,
+                  total: Optional[int] = None,
+                  content: bool = False):
         """
         Return an iterator for pages that link to this page.
 
@@ -1007,9 +1009,11 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(step=True)
-    def embeddedin(self, filter_redirects=None, namespaces=None,
-                   total=None, content=False):
+    def embeddedin(self,
+                   filter_redirects: Optional[bool] = None,
+                   namespaces=None,
+                   total: Optional[int] = None,
+                   content: bool = False):
         """
         Return an iterator for pages that embed this page as a template.
 
@@ -1188,16 +1192,21 @@ class BasePage(ComparableMixin):
         return True
 
     @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary', sysop=True)
-    def save(self, summary=None, watch=None, minor=True, botflag=None,
-             force=False, asynchronous=False, callback=None,
-             apply_cosmetic_changes=None, quiet=False, **kwargs):
+    @deprecated_args(comment='summary')
+    def save(self,
+             summary: Optional[str] = None,
+             watch: Union[str, bool, None] = None,
+             minor: bool = True,
+             botflag: Optional[bool] = None,
+             force: bool = False,
+             asynchronous: bool = False,
+             callback=None, apply_cosmetic_changes=None,
+             quiet: bool = False, **kwargs):
         """
         Save the current contents of page's text to the wiki.
 
         @param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
-        @type summary: str
         @param watch: Specify how the watchlist is affected by this edit, set
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
@@ -1211,11 +1220,9 @@ class BasePage(ComparableMixin):
             user's watchlist.
         @type watch: str, bool (deprecated) or None
         @param minor: if True, mark this edit as minor
-        @type minor: bool
         @param botflag: if True, mark this edit as made by a bot (default:
             True if user has bot status, False if not)
         @param force: if True, ignore botMayEdit() setting
-        @type force: bool
         @param asynchronous: if True, launch a separate thread to save
             asynchronously
         @param callback: a callable object that will be called after the
@@ -1231,7 +1238,6 @@ class BasePage(ComparableMixin):
             defaults to False.
             In asynchronous mode, if True, it is up to the calling bot to
             manage the output e.g. via callback.
-        @type quiet: bool
         """
         if not summary:
             summary = config.default_edit_summary
@@ -1399,8 +1405,9 @@ class BasePage(ComparableMixin):
         else:
             raise pywikibot.NoPage(self)
 
-    @deprecated_args(step=True)
-    def linkedPages(self, namespaces=None, total=None, content=False):
+    def linkedPages(self, namespaces=None,
+                    total: Optional[int] = None,
+                    content: bool = False):
         """
         Iterate Pages that this Page links to.
 
@@ -1412,11 +1419,8 @@ class BasePage(ComparableMixin):
         @param namespaces: only iterate links in these namespaces
         @param namespaces: int, or list of ints
         @param total: iterate no more than this number of pages in total
-        @type total: int
         @param content: if True, retrieve the content of the current version
             of each linked page (default False)
-        @type content: bool
-
         @return: a generator that yields Page objects.
         @rtype: generator
         """
@@ -1481,16 +1485,14 @@ class BasePage(ComparableMixin):
         else:
             return [i for i in self._langlinks if not i.site.obsolete]
 
-    @deprecated_args(step=True)
-    def iterlanglinks(self, total=None, include_obsolete=False):
-        """
-        Iterate all inter-language links on this page.
+    def iterlanglinks(self,
+                      total: Optional[int] = None,
+                      include_obsolete: bool = False):
+        """Iterate all inter-language links on this page.
 
         @param total: iterate no more than this number of pages in total
         @param include_obsolete: if true, yield even Link object whose site
                                  is obsolete
-        @type include_obsolete: bool
-
         @return: a generator that yields Link objects.
         @rtype: generator
         """
@@ -1511,8 +1513,7 @@ class BasePage(ComparableMixin):
         """
         return ItemPage.fromPage(self)
 
-    @deprecated_args(get_redirect=True)
-    def templates(self, content=False):
+    def templates(self, content: bool = False):
         """
         Return a list of Page objects for templates used on this Page.
 
@@ -1530,8 +1531,9 @@ class BasePage(ComparableMixin):
 
         return self._templates
 
-    @deprecated_args(step=True)
-    def itertemplates(self, total=None, content=False):
+    def itertemplates(self,
+                      total: Optional[int] = None,
+                      content: bool = False):
         """
         Iterate Page objects for templates used on this Page.
 
@@ -1548,8 +1550,7 @@ class BasePage(ComparableMixin):
             return iter(self._templates)
         return self.site.pagetemplates(self, total=total, content=content)
 
-    @deprecated_args(followRedirects=True, loose=True, step=True)
-    def imagelinks(self, total=None, content=False):
+    def imagelinks(self, total: Optional[int] = None, content: bool = False):
         """
         Iterate FilePage objects for images displayed on this Page.
 
@@ -1560,9 +1561,11 @@ class BasePage(ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(nofollow_redirects=True, get_redirect=True, step=True,
-                     withSortKey='with_sort_key')
-    def categories(self, with_sort_key=False, total=None, content=False):
+    @deprecated_args(withSortKey='with_sort_key')
+    def categories(self,
+                   with_sort_key: bool = False,
+                   total: Optional[int] = None,
+                   content: bool = False):
         """
         Iterate categories that the article is in.
 
@@ -1579,8 +1582,7 @@ class BasePage(ComparableMixin):
 
         return self.site.pagecategories(self, total=total, content=content)
 
-    @deprecated_args(step=True)
-    def extlinks(self, total=None):
+    def extlinks(self, total: Optional[int] = None):
         """
         Iterate all external URLs (not interwiki links) from this page.
 
@@ -1674,9 +1676,11 @@ class BasePage(ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse', step=True,
-                     rollback=True)
-    def revisions(self, reverse=False, total=None, content=False,
+    @deprecated_args(getText='content', reverseOrder='reverse')
+    def revisions(self,
+                  reverse: bool = False,
+                  total: Optional[int] = None,
+                  content: bool = False,
                   starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
@@ -1686,8 +1690,10 @@ class BasePage(ComparableMixin):
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
-    @deprecated_args(forceReload=True, reverseOrder='reverse', step=True)
-    def getVersionHistoryTable(self, reverse=False, total=None):
+    @deprecated_args(reverseOrder='reverse')
+    def getVersionHistoryTable(self,
+                               reverse: bool = False,
+                               total: Optional[int] = None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
@@ -1698,8 +1704,9 @@ class BasePage(ComparableMixin):
         result += '|}\n'
         return result
 
-    @deprecated_args(step=True)
-    def contributors(self, total=None, starttime=None, endtime=None):
+    def contributors(self,
+                     total: Optional[int] = None,
+                     starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
 
@@ -1715,8 +1722,7 @@ class BasePage(ComparableMixin):
                                       starttime=starttime, endtime=endtime))
 
     @deprecated('contributors().keys()', since='20150206', future_warning=True)
-    @deprecated_args(step=True)
-    def contributingUsers(self, total=None):
+    def contributingUsers(self, total: Optional[int] = None):
         """
         Return a set of usernames (or IPs) of users who edited this page.
 
@@ -1782,10 +1788,13 @@ class BasePage(ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
-    @deprecated_args(
-        throttle=True, deleteAndMove='noredirect', movetalkpage='movetalk')
+    @deprecated_args(deleteAndMove='noredirect', movetalkpage='movetalk')
     @remove_last_args(['safe'])
-    def move(self, newtitle, reason=None, movetalk=True, noredirect=False):
+    def move(self,
+             newtitle: str,
+             reason: Optional[str] = None,
+             movetalk: bool = True,
+             noredirect: bool = False):
         """
         Move this page to a new title.
 
@@ -1803,8 +1812,11 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    @deprecated_args(throttle=True)
-    def delete(self, reason=None, prompt=True, mark=False, quit=False):
+    def delete(self,
+               reason: Optional[str] = None,
+               prompt: bool = True,
+               mark: bool = False,
+               quit: bool = False):
         """
         Delete the page from the wiki. Requires administrator status.
 
@@ -1868,8 +1880,7 @@ class BasePage(ComparableMixin):
             self._has_deleted_revisions = bool(list(gen))
         return self._has_deleted_revisions
 
-    @deprecated_args(step=True)
-    def loadDeletedRevisions(self, total=None, **kwargs):
+    def loadDeletedRevisions(self, total: Optional[int] = None, **kwargs):
         """
         Retrieve deleted revisions for this Page.
 
@@ -1925,8 +1936,8 @@ class BasePage(ComparableMixin):
                 'Timestamp %d is not a deleted revision' % timestamp)
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecated_args(comment='reason', throttle=True)
-    def undelete(self, reason=None):
+    @deprecated_args(comment='reason')
+    def undelete(self, reason: Optional[str] = None):
         """
         Undelete revisions based on the markers set by previous calls.
 
@@ -1962,9 +1973,11 @@ class BasePage(ComparableMixin):
                 'Please enter a reason for the undeletion:')
         self.site.undelete_page(self, reason, undelete_revs)
 
-    @deprecated_args(throttle=True)
-    def protect(self, edit=False, move=False, create=None, upload=None,
-                unprotect=False,
+    def protect(self,
+                edit: bool = False,
+                move: bool = False,
+                create=None, upload=None,
+                unprotect: bool = False,
                 reason: Optional[str] = None,
                 prompt: Optional[bool] = None,
                 protections: Optional[dict] = None,
@@ -2183,8 +2196,8 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecated_args(defaultNamespace='ns', insite=True)
-    def __init__(self, source, title='', ns=0):
+    @deprecated_args(defaultNamespace='ns')
+    def __init__(self, source, title: str = '', ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
             if not title:
@@ -2211,7 +2224,6 @@ class Page(BasePage):
 
         return self._raw_extracted_templates
 
-    @deprecated_args(get_redirect=True)
     def templatesWithParams(self):
         """
         Return templates used on this Page.
@@ -2376,8 +2388,7 @@ class FilePage(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    @deprecated_args(insite=True)
-    def __init__(self, source, title=''):
+    def __init__(self, source, title: str = ''):
         """Initializer."""
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
@@ -2519,10 +2530,8 @@ class FilePage(Page):
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
                 '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
-    @deprecated_args(step=True)
-    def usingPages(self, total=None, content=False):
-        """
-        Yield Pages on which the file is displayed.
+    def usingPages(self, total: Optional[int] = None, content: bool = False):
+        """Yield Pages on which the file is displayed.
 
         @param total: iterate no more than this number of pages in total
         @param content: if True, load the current content of each iterated page
@@ -2648,8 +2657,8 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecated_args(insite=True, sortKey='sort_key')
-    def __init__(self, source, title='', sort_key=None):
+    @deprecated_args(sortKey='sort_key')
+    def __init__(self, source, title: str = '', sort_key=None):
         """
         Initializer.
 
@@ -2661,10 +2670,8 @@ class Category(Page):
             raise ValueError("'%s' is not in the category namespace!"
                              % title)
 
-    @deprecated_args(
-        forceInterwiki=True, textlink=True, noInterwiki=True,
-        sortKey='sort_key')
-    def aslink(self, sort_key=None) -> str:
+    @deprecated_args(sortKey='sort_key')
+    def aslink(self, sort_key: Optional[str] = None) -> str:
         """
         Return a link to place a page in this Category.
 
@@ -2673,7 +2680,6 @@ class Category(Page):
 
         @param sort_key: The sort key for the article to be placed in this
             Category; if omitted, default sort key is used.
-        @type sort_key: (optional) str
         """
         key = sort_key or self.sortKey
         if key is not None:
@@ -2682,8 +2688,10 @@ class Category(Page):
             title_with_sort_key = self.title(with_section=False)
         return '[[%s]]' % title_with_sort_key
 
-    @deprecated_args(startFrom=True, cacheResults=True, step=True)
-    def subcategories(self, recurse=False, total=None, content=False):
+    def subcategories(self,
+                      recurse: Union[int, bool] = False,
+                      total: Optional[int] = None,
+                      content: bool = False):
         """
         Iterate all subcategories of the current category.
 
@@ -2691,7 +2699,6 @@ class Category(Page):
             subcategories. If an int, limit recursion to this number of
             levels. (Example: recurse=1 will iterate direct subcats and
             first-level sub-sub-cats, but no deeper.)
-        @type recurse: int or bool
         @param total: iterate no more than this number of
             subcategories in total (at all levels)
         @param content: if True, retrieve the content of the current version
@@ -2734,13 +2741,15 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', step=True)
+    @deprecated_args(startFrom='startprefix')
     def articles(self,
                  recurse: Union[int, bool] = False,
-                 total=None, content=False,
+                 total: Optional[int] = None,
+                 content: bool = False,
                  namespaces: Union[int, List[int]] = None,
-                 sortby: str = None,
-                 reverse=False, starttime=None, endtime=None,
+                 sortby: Optional[str] = None,
+                 reverse: bool = False,
+                 starttime=None, endtime=None,
                  startsort: Optional[str] = None,
                  endsort: Optional[str] = None,
                  startprefix: Optional[str] = None,
@@ -2832,8 +2841,9 @@ class Category(Page):
                         if total == 0:
                             return
 
-    @deprecated_args(step=True)
-    def members(self, recurse=False, namespaces=None, total=None,
+    def members(self, recurse: bool = False,
+                namespaces=None,
+                total: Optional[int] = None,
                 content=False):
         """Yield all category contents (subcats, pages, and files).
 
@@ -6494,7 +6504,7 @@ def unicode2html(string: str, encoding: str) -> str:
     return string
 
 
-@deprecated_args(site2=True, site='encodings')
+@deprecated_args(site='encodings')
 def url2unicode(title: str, encodings='utf-8') -> str:
     """
     Convert URL-encoded text to unicode using several encoding.
