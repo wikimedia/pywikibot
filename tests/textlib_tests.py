@@ -587,8 +587,8 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
                          [(None, OrderedDict())])
 
-    def test_regexes(self):
-        """Test _ETP_REGEX and NESTED_TEMPLATE_REGEX."""
+    def test_etp_regex(self):
+        """Test _ETP_REGEX."""
         func = textlib._ETP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
@@ -620,6 +620,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
+    def test_nested_template_regex(self):
+        """Test NESTED_TEMPLATE_REGEX."""
         func = textlib.NESTED_TEMPLATE_REGEX.search
 
         # Numerically named templates are rejected
