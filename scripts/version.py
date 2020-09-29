@@ -28,13 +28,6 @@ except ImportError:
 WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 
-def check_environ(environ_name) -> None:
-    """Print environment variable."""
-    pywikibot.output('{0}: {1}'.format(environ_name,
-                                       os.environ.get(environ_name,
-                                                      'Not set')))
-
-
 def main(*args) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: ' + getversion())
@@ -67,9 +60,15 @@ def main(*args) -> None:
     if toolforge_env_hostname:
         pywikibot.output('Toolforge hostname: ' + toolforge_env_hostname)
 
-    check_environ('PYWIKIBOT_DIR')
-    check_environ('PYWIKIBOT_DIR_PWB')
-    check_environ('PYWIKIBOT_NO_USER_CONFIG')
+    # check environment settings
+    settings = {key for key in os.environ if key.startswith('PYWIKIBOT')}
+    settings.update(['PYWIKIBOT_DIR', 'PYWIKIBOT_DIR_PWB',
+                     'PYWIKIBOT_NO_USER_CONFIG'])
+    for environ_name in sorted(settings):
+        pywikibot.output('{0}: {1}'.format(environ_name,
+                                           os.environ.get(environ_name,
+                                                          'Not set')))
+
     pywikibot.output('Config base dir: ' + pywikibot.config2.base_dir)
     for family, usernames in pywikibot.config2.usernames.items():
         if not usernames:
