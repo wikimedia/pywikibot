@@ -105,7 +105,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             warning that matches the skip_list won't be adjusted.
         @type skip_list: list of object or (obj, str, int, int)
         """
-        super(WarningSourceSkipContextManager, self).__init__(record=True)
+        super().__init__(record=True)
         self.skip_list = skip_list
 
     @property
@@ -180,7 +180,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
             log.append(warn_msg)
 
-        log = super(WarningSourceSkipContextManager, self).__enter__()
+        log = super().__enter__()
         self._module.showwarning = detailed_show_warning
         return log
 
@@ -233,7 +233,7 @@ class DryParamInfo(dict):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(DryParamInfo, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.modules = set()
         self.action_modules = set()
         self.query_modules = set()
@@ -251,7 +251,7 @@ class DryParamInfo(dict):
     def __getitem__(self, name):
         """Return dry data or a dummy parameter block."""
         try:
-            return super(DryParamInfo, self).__getitem__(name)
+            return super().__getitem__(name)
         except KeyError:
             return {'name': name, 'limit': None}
 
@@ -340,7 +340,7 @@ class DrySite(pywikibot.site.APISite):
 
     def __init__(self, code, fam, user):
         """Initializer."""
-        super(DrySite, self).__init__(code, fam, user)
+        super().__init__(code, fam, user)
         self._userinfo = pywikibot.tools.EMPTY_DEFAULT
         self._paraminfo = DryParamInfo()
         self._siteinfo = DummySiteinfo({})
@@ -414,7 +414,7 @@ class DryDataSite(DrySite, pywikibot.site.DataSite):
     """Dummy class to use instead of L{pywikibot.site.DataSite}."""
 
     def _build_namespaces(self):
-        namespaces = super(DryDataSite, self)._build_namespaces()
+        namespaces = super()._build_namespaces()
         namespaces[0].defaultcontentmodel = 'wikibase-item'
         namespaces[120] = Namespace(id=120,
                                     case='first-letter',
@@ -526,7 +526,7 @@ class PatchedHttp(object):
         @param data: The data returned for any request or fetch.
         @type data: callable or False (or other depending on request/fetch)
         """
-        super(PatchedHttp, self).__init__()
+        super().__init__()
         self._module = module
         self.data = data
 
