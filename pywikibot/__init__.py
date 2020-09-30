@@ -24,7 +24,7 @@ from pywikibot.__metadata__ import (
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
-    input, input_choice, input_yn, handle_args, showHelp, ui,
+    input, input_choice, input_yn, handle_args, show_help, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
     # the following are flagged as deprecated on usage
     handleArgs,
@@ -92,12 +92,13 @@ __all__ = (
     'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
     'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
     'QuitKeyboardInterrupt', 'SectionError', 'Server504Error', 'ServerError',
-    'showDiff', 'showHelp', 'Site', 'SiteDefinitionError', 'SiteLink',
-    'SpamblacklistError', 'stdout', 'Timestamp', 'TitleblacklistError',
-    'translate', 'ui', 'unicode2html', 'UnknownExtension', 'UnknownFamily',
-    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
-    'UserBlocked', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
-    'WbTabularData', 'WbTime', 'WbUnknown', 'WikiBaseError', 'WikidataBot',
+    'showDiff', 'show_help', 'showHelp', 'Site', 'SiteDefinitionError',
+    'SiteLink', 'SpamblacklistError', 'stdout', 'Timestamp',
+    'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
+    'UploadWarning', 'url2unicode', 'User', 'UserBlocked', 'warning',
+    'WbGeoShape', 'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime',
+    'WbUnknown', 'WikiBaseError', 'WikidataBot',
 )
 
 
@@ -1403,3 +1404,5 @@ wrapper._add_deprecated_attr(
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')
+wrapper._add_deprecated_attr('showHelp', show_help,
+                             since='20200705', future_warning=True)

@@ -121,7 +121,7 @@ class CaseChecker(object):
                 self.doFailed = True
             else:
                 pywikibot.output('Unknown argument {}.'.format(arg))
-                pywikibot.showHelp()
+                pywikibot.show_help()
                 sys.exit()
 
         if self.namespaces == [] and not self.doFailed:

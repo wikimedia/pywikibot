@@ -72,7 +72,7 @@ __all__ = (
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
     'calledModuleName', 'handle_args', 'handleArgs',
-    'showHelp', 'suggest_help',
+    'show_help', 'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
@@ -128,7 +128,6 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools.formatter import color_format
 
-
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
 
@@ -165,7 +164,7 @@ GLOBAL OPTIONS
 -help             Show this help text.
 
 -log              Enable the log file, using the default filename
-                  '%s-bot.log'
+                  '{}-bot.log'
                   Logs will be stored in the logs subdirectory.
 
 -log:xyz          Enable the log file, using 'xyz' as the filename.
@@ -199,6 +198,13 @@ GLOBAL OPTIONS
 
 -<config var>:n   You may use all given numeric config variables as option and
                   modify it with command line.
+
+"""
+
+_GLOBAL_HELP_NOTE = """
+GLOBAL OPTIONS
+==============
+For global options use -help:global or run pwb.py -help
 
 """
 
@@ -767,7 +773,7 @@ def handle_args(args=None, do_help=True):
     for arg in args:
         option, _, value = arg.partition(':')
         if do_help is not False and option == '-help':
-            do_help = True
+            do_help = value or True
         elif option == '-dir':
             pass
         elif option == '-family':
@@ -856,7 +862,7 @@ def handle_args(args=None, do_help=True):
         pywikibot.output('Python ' + sys.version)
 
     if do_help:
-        showHelp()
+        show_help(show_global=do_help == 'global')
         sys.exit(0)
 
     debug('handle_args() completed.', _logger)
@@ -869,7 +875,7 @@ def handleArgs(*args):
     return handle_args(args)
 
 
-def showHelp(module_name=None):
+def show_help(module_name=None, show_global=False):
     """Show help for the Bot."""
     if not module_name:
         module_name = calledModuleName()
@@ -879,19 +885,29 @@ def showHelp(module_name=None):
         except NameError:
             module_name = 'no_module'
 
-    global_help = _GLOBAL_HELP % module_name
     try:
-        module = import_module('%s' % module_name)
+        module = import_module(module_name)
         help_text = module.__doc__
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
-        pywikibot.stdout(help_text)  # output to STDOUT
     except Exception:
         if module_name:
-            pywikibot.stdout('Sorry, no help available for %s' % module_name)
-        pywikibot.log('showHelp:', exc_info=True)
-    pywikibot.stdout(global_help)
+            pywikibot.stdout('Sorry, no help available for ' + module_name)
+        pywikibot.log('show_help:', exc_info=True)
+    else:
+        pywikibot.stdout(help_text)  # output to STDOUT
+
+    if show_global or module_name == 'pwb':
+        pywikibot.stdout(_GLOBAL_HELP.format(module_name))
+    else:
+        pywikibot.stdout(_GLOBAL_HELP_NOTE)
+
+
+@deprecated('show_help', since='20200705')
+def showHelp(module_name=None):
+    """DEPRECATED. Use show_help()."""
+    return show_help(module_name)
 
 
 def suggest_help(missing_parameters=[], missing_generator=False,

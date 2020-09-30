@@ -352,7 +352,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     _expected_failures = {'version'}
     _allowed_failures = []
 
-    _arguments = '-help'
+    _arguments = '-help:global'
     _results = None
 
 
