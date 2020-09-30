@@ -54,9 +54,34 @@ import pywikibot
 from pywikibot.comms import http
 from pywikibot.data.api import Request
 from pywikibot.exceptions import OtherPageSaveError
+from pywikibot import textlib
 from pywikibot.tools import ModuleDeprecationWrapper
 
 _logger = 'proofreadpage'
+
+
+def decompose(fn):  # noqa: N805
+    """Decorator.
+
+    Decompose text if needed and recompose text.
+    """
+    def wrapper(obj, *args, **kwargs):
+        if not hasattr(obj, '_full_header'):
+            obj._decompose_page()
+        _res = fn(obj, *args, **kwargs)
+        obj._compose_page()
+        return _res
+
+    return wrapper
+
+
+def check_if_cached(fn):  # noqa: N805
+    """Decorator to check if data are cached and cache them if needed."""
+    def wrapper(self, *args, **kwargs):
+        if self._cached is False:
+            self._get_page_mappings()
+        return fn(self, *args, **kwargs)
+    return wrapper
 
 
 class FullHeader:
@@ -289,19 +314,6 @@ class ProofreadPage(pywikibot.Page):
                 and hasattr(self, '_quality')):
             return int(self._quality)
         return self.ql
-
-    def decompose(fn):  # noqa: N805
-        """Decorator.
-
-        Decompose text if needed and recompose text.
-        """
-        def wrapper(obj, *args, **kwargs):
-            if not hasattr(obj, '_full_header'):
-                obj._decompose_page()
-            _res = fn(obj, *args, **kwargs)
-            obj._compose_page()
-            return _res
-        return wrapper
 
     @property
     @decompose
@@ -595,7 +607,6 @@ class ProofreadPage(pywikibot.Page):
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
-                timeout = e
                 pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
             except Exception as e:
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
@@ -608,7 +619,7 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.warning('retrying in {} seconds ...'.format(retry))
             time.sleep(retry)
         else:
-            return True, timeout
+            return True, ReadTimeout
 
         if 400 <= response.status < 600:
             return (True, 'Http response status {}'.format(response.status))
@@ -795,14 +806,6 @@ class IndexPage(pywikibot.Page):
 
         self._cached = False
 
-    def check_if_cached(fn):  # noqa: N805
-        """Decorator to check if data are cached and cache them if needed."""
-        def wrapper(self, *args, **kwargs):
-            if self._cached is False:
-                self._get_page_mappings()
-            return fn(self, *args, **kwargs)
-        return wrapper
-
     def _parse_redlink(self, href):
         """Parse page title when link in Index is a redlink."""
         p_href = re.compile(
@@ -835,9 +838,9 @@ class IndexPage(pywikibot.Page):
             return False
 
         # Discard all inner templates as only top-level ones matter
-        tmplts = pywikibot.textlib.extract_templates_and_params_regex_simple(
+        templates = textlib.extract_templates_and_params_regex_simple(
             self.text)
-        if len(tmplts) != 1 or tmplts[0][0] != self.INDEX_TEMPLATE:
+        if len(templates) != 1 or templates[0][0] != self.INDEX_TEMPLATE:
             # Only a single call to the INDEX_TEMPLATE is allowed
             return False
 
