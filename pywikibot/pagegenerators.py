@@ -48,6 +48,7 @@ from pywikibot.tools import (
 from pywikibot import date, config, i18n, xmlreader
 from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
+from pywikibot.data import api
 from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.proofreadpage import ProofreadPage
 
@@ -502,7 +503,7 @@ class GeneratorFactory:
 
         for i in range(len(self.gens)):
             if self.namespaces:
-                if (isinstance(self.gens[i], pywikibot.data.api.QueryGenerator)
+                if (isinstance(self.gens[i], api.QueryGenerator)
                         and self.gens[i].support_namespace()):
                     self.gens[i].set_namespace(self.namespaces)
                 # QueryGenerator does not support namespace param.
@@ -1286,7 +1287,7 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
 
 @deprecated_args(number='total', step=None, namespace='namespaces',
                  repeat=None, get_redirect=None)
-def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
+def NewpagesPageGenerator(site=None, namespaces=(0, ), total=None):
     """
     Iterate Page objects for all new titles in a single namespace.
 
@@ -1669,10 +1670,10 @@ class ItemClaimFilter:
                 on_repo = False
             if on_repo:
                 if page.namespace() == page.site.property_namespace:
-                    cls = pywikibot.PropertyPage
+                    page_cls = pywikibot.PropertyPage
                 else:
-                    cls = pywikibot.ItemPage
-                page = cls(page.site, page.title(with_ns=False))
+                    page_cls = pywikibot.ItemPage
+                page = page_cls(page.site, page.title(with_ns=False))
             else:
                 try:
                     page = pywikibot.ItemPage.fromPage(page)
@@ -1957,6 +1958,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
     @param show_filtered: Output a message for each page not yielded
     @type show_filtered: bool
     """
+    ts = None
     if timestamp:
         if isinstance(timestamp, str):
             ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
@@ -2169,8 +2171,8 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
     """
     A wrapper generator used to exclude if page has a wikibase item or not.
 
-    @param gen: Generator to wrap.
-    @type gen: generator
+    @param generator: Generator to wrap.
+    @type generator: generator
     @param has_item: Exclude pages without an item if True, or only
         include pages without an item if False
     @type has_item: bool
@@ -2660,7 +2662,7 @@ class XMLDumpOldPageGenerator(Iterator):
     @param start: skip entries below that value
     @type start: str or None
     @param namespaces: namespace filter
-    @type identifiers: iterable of basestring or Namespace key,
+    @type namespaces: iterable of str or Namespace key,
         or a single instance of those types
     @param site: current site for the generator
     @type site: pywikibot.Site or None

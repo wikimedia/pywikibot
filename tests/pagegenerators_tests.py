@@ -492,7 +492,6 @@ class TestDayPageGenerator(DefaultSiteTestCase):
         """Setup class for tests."""
         super(TestDayPageGenerator, cls).setUpClass()
         cls.site = cls.get_site()
-        cls.fd = date.FormatDate(cls.site)
 
     def _run_test(self, start_month=1, end_month=12, year=2000):
         """Test method for DayPageGenerator."""
@@ -516,7 +515,7 @@ class TestDayPageGenerator(DefaultSiteTestCase):
         expected = []
         for month in range(start_month, end_month + 1):
             for day in range(1, calendar.monthrange(year, month)[1] + 1):
-                expected.append(self.fd(month, day))
+                expected.append(date.format_date(month, day, self.site))
 
         self.assertPageTitlesEqual(gen2, expected)
 
