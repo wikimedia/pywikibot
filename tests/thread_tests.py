@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from collections import Counter
 from contextlib import suppress
 
 from tests.aspects import unittest, TestCase
@@ -53,6 +54,18 @@ class GeneratorIntersectTestCase(TestCase):
         self.assertCountEqual(set(result), result)
         self.assertCountEqual(result, set_result)
 
+    def assertEqualItertoolsWithDuplicates(self, gens):
+        """Assert intersect_generators result equals Counter intersection."""
+        # If they are a generator, we need to convert to a list
+        # first otherwise the generator is empty the second time.
+        datasets = [list(gen) for gen in gens]
+        counter_result = Counter(datasets[0])
+        for dataset in datasets[1:]:
+            counter_result = counter_result & Counter(dataset)
+        counter_result = list(counter_result.elements())
+        result = list(intersect_generators(datasets, allow_duplicates=True))
+        self.assertCountEqual(counter_result, result)
+
 
 class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
 
@@ -61,17 +74,21 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
     net = False
 
     def test_intersect_basic(self):
-        """Test basic interset without duplicates."""
+        """Test basic intersect without duplicates."""
         self.assertEqualItertools(['abc', 'db', 'ba'])
 
     def test_intersect_with_dups(self):
-        """Test basic interset with duplicates."""
+        """Test basic intersect with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
 
-    @unittest.expectedFailure
-    def test_intersect_with_dups_failing(self):
-        """Failing basic intersect test with duplicates."""
-        self.assertEqualItertools(['abb', 'bb'])
+    def test_intersect_with_accepted_dups(self):
+        """Test intersect with duplicates accepted."""
+        self.assertEqualItertoolsWithDuplicates(['abc', 'db', 'ba'])
+        self.assertEqualItertoolsWithDuplicates(['aabc', 'dddb', 'baa'])
+        self.assertEqualItertoolsWithDuplicates(['abb', 'bb'])
+        self.assertEqualItertoolsWithDuplicates(['bb', 'abb'])
+        self.assertEqualItertoolsWithDuplicates(['abbcd', 'abcba'])
+        self.assertEqualItertoolsWithDuplicates(['abcba', 'abbcd'])
 
 
 if __name__ == '__main__':  # pragma: no cover
