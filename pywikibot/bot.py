@@ -1428,15 +1428,14 @@ class Bot(BaseBot):
             return
 
         if site not in self._sites:
-            log('LOADING SITE %s VERSION: %s'
-                % (site, site.version()))
+            log('LOADING SITE {} VERSION: {}'.format(site, site.mw_version))
 
             self._sites.add(site)
             if len(self._sites) == 2:
-                log('%s uses multiple sites' % self.__class__.__name__)
+                log('{} uses multiple sites'.format(self.__class__.__name__))
         if self._site and self._site != site:
-            log('%s: changing site from %s to %s'
-                % (self.__class__.__name__, self._site, site))
+            log('{}: changing site from {} to {}'
+                .format(self.__class__.__name__, self._site, site))
         self._site = site
 
     def run(self):
