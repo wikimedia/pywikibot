@@ -124,6 +124,7 @@ import os
 import pickle
 import re
 
+from contextlib import suppress
 from operator import methodcaller
 from typing import Optional, Set
 
@@ -170,7 +171,7 @@ class CategoryPreprocess(BaseBot):
     def __init__(self, follow_redirects=False, edit_redirects=False,
                  create=False, **kwargs):
         """Initializer."""
-        super(CategoryPreprocess, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.follow_redirects = follow_redirects
         self.edit_redirects = edit_redirects
         self.create = create
@@ -374,16 +375,11 @@ class CategoryDatabase:
             }
             # store dump to disk in binary format
             with open_archive(filename, 'wb') as f:
-                try:
+                with suppress(pickle.PicklingError):
                     pickle.dump(databases, f, protocol=config.pickle_protocol)
-                except pickle.PicklingError:
-                    pass
         else:
-            try:
+            with suppress(EnvironmentError):
                 os.remove(filename)
-            except EnvironmentError:
-                pass
-            else:
                 pywikibot.output('Database is empty. {} removed'
                                  .format(config.shortpath(filename)))
 
@@ -983,9 +979,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
         site = pywikibot.Site()
         self.cat = pywikibot.Category(site, cat_title)
-        super(CategoryTidyRobot, self).__init__(
-            generator=pagegenerators.PreloadingGenerator(
-                self.cat.articles(namespaces=namespaces)))
+        super().__init__(generator=pagegenerators.PreloadingGenerator(
+            self.cat.articles(namespaces=namespaces)))
 
     @deprecated_args(article='member')
     def move_to_category(self, member, original_cat, current_cat) -> None:

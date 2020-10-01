@@ -6,10 +6,12 @@
 # Distributed under the terms of the MIT license.
 #
 import codecs
-from collections import OrderedDict
 import functools
 import os
 import re
+
+from collections import OrderedDict
+from contextlib import suppress
 
 import pywikibot
 import pywikibot.textlib as textlib
@@ -42,7 +44,7 @@ class TestSectionFunctions(TestCase):
     def setUp(self):
         """Setup tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
-        super(TestSectionFunctions, self).setUp()
+        super().setUp()
 
     def contains(self, fn, sn):
         """Invoke does_text_contain_section()."""
@@ -769,7 +771,7 @@ class TestReplaceLinks(TestCase):
     @classmethod
     def setUpClass(cls):
         """Create a fake interwiki cache."""
-        super(TestReplaceLinks, cls).setUpClass()
+        super().setUpClass()
         # make APISite.interwiki work and prevent it from doing requests
         for site in cls.sites.values():
             mapping = {}
@@ -1488,7 +1490,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Cache namespace 10 (Template) case sensitivity."""
-        super(TestMultiTemplateMatchBuilder, cls).setUpClass()
+        super().setUpClass()
         cls._template_not_case_sensitive = (
             cls.get_site().namespaces.TEMPLATE.case != 'case-sensitive')
 
@@ -1566,7 +1568,7 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
     @classmethod
     def setUpClass(cls):
         """Define set of valid targets for the example text."""
-        super(TestGetLanguageLinks, cls).setUpClass()
+        super().setUpClass()
         cls.sites_set = {cls.enwp, cls.dewp}
 
     def test_getLanguageLinks(self, key):
@@ -1682,7 +1684,5 @@ class TestExtractSections(DefaultDrySiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

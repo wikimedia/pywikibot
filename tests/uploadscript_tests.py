@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """upload.py script test."""
 #
-# (C) Pywikibot team, 2019
+# (C) Pywikibot team, 2019-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from scripts.upload import CHUNK_SIZE_REGEX, get_chunk_size
 
@@ -44,7 +44,5 @@ class TestUploadScript(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

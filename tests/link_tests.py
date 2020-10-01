@@ -5,9 +5,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
+
+from contextlib import suppress
 
 import pywikibot
 
@@ -205,13 +205,13 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
 
     def setUp(self):
         """Set up test case."""
-        super(Issue10254TestCase, self).setUp()
+        super().setUp()
         self._orig_unicodedata = pywikibot.page.unicodedata
 
     def tearDown(self):
         """Tear down test case."""
         pywikibot.page.unicodedata = self._orig_unicodedata
-        super(Issue10254TestCase, self).tearDown()
+        super().tearDown()
 
     def test_no_change(self):
         """Test T102461 (Python issue 10254) is not encountered."""
@@ -1032,7 +1032,5 @@ class TestSiteLink(WikimediaDefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

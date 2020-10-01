@@ -5,9 +5,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import json
+
+from contextlib import suppress
 
 from tests import mock
 
@@ -311,7 +311,5 @@ class TestEventSource(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

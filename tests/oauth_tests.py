@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """Test OAuth functionality."""
 #
-# (C) Pywikibot team, 2015-2019
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
+
+from contextlib import suppress
 
 from pywikibot.login import OauthLoginManager
 
@@ -35,7 +35,7 @@ class OAuthSiteTestCase(TestCase):
 
     def setUp(self):
         """Check if OAuth extension is installed and OAuth tokens are set."""
-        super(OAuthSiteTestCase, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         if not self.site.has_extension('OAuth'):
             self.skipTest('OAuth extension not loaded on test site')
@@ -83,7 +83,5 @@ class TestOauthLoginManger(DefaultOAuthSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

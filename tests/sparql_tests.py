@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from contextlib import suppress
+
 import pywikibot.data.sparql as sparql
 
 from tests.aspects import unittest, TestCase, WikidataTestCase
@@ -214,7 +216,5 @@ class URITests(Shared.SparqlNodeTests):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

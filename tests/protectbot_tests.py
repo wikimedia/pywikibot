@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for scripts/protect.py."""
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
@@ -61,7 +61,5 @@ class TestProtectionBot(ScriptMainTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

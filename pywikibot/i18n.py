@@ -28,6 +28,7 @@ import re
 
 from collections.abc import Mapping
 from collections import defaultdict
+from contextlib import suppress
 from textwrap import fill
 from warnings import warn
 
@@ -523,7 +524,7 @@ class _PluralMappingAlias(Mapping):
         else:
             self.source = source
         self.index = -1
-        super(_PluralMappingAlias, self).__init__()
+        super().__init__()
 
     def __getitem__(self, key):
         self.index += 1
@@ -626,11 +627,10 @@ def translate(code, xdict, parameters=None, fallback=False):
     # else we check for PLURAL variants
     trans = _extract_plural(code, trans, plural_parameters)
     if parameters:
-        try:
+        # On error: parameter is for PLURAL variants only,
+        # don't change the string
+        with suppress(KeyError, TypeError):
             return trans % parameters
-        except (KeyError, TypeError):
-            # parameter is for PLURAL variants only, don't change the string
-            pass
     return trans
 
 
@@ -759,10 +759,8 @@ def twtranslate(
         # This is called due to the old twntranslate function which ignored
         # KeyError. Instead only_plural should be used.
         if isinstance(parameters.source, dict):
-            try:
+            with suppress(KeyError):
                 trans %= parameters.source
-            except KeyError:
-                pass
         parameters = None
 
     if parameters is not None and not isinstance(parameters, Mapping):
