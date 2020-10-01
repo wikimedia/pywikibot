@@ -692,7 +692,7 @@ class ThreadList(list):
                   .format(thd, thd.queue.qsize()), self._logger)
 
 
-def intersect_generators(genlist):
+def intersect_generators(genlist, allow_duplicates=False):
     """
     Intersect generators listed in genlist.
 
@@ -707,6 +707,8 @@ def intersect_generators(genlist):
 
     @param genlist: list of page generators
     @type genlist: list
+    @param allow_duplicates: allow duplicates if present in all generators
+    @type allow_duplicates: bool
     """
     # If any generator is empty, no pages are going to be returned
     for source in genlist:
@@ -717,7 +719,8 @@ def intersect_generators(genlist):
 
     # Item is cached to check that it is found n_gen
     # times before being yielded.
-    cache = collections.defaultdict(set)
+    from collections import Counter
+    cache = collections.defaultdict(Counter)
     n_gen = len(genlist)
 
     # Class to keep track of alive threads.
@@ -729,6 +732,9 @@ def intersect_generators(genlist):
         threaded_gen.daemon = True
         thrlist.append(threaded_gen)
 
+    ones = Counter(thrlist)
+    seen = {}
+
     while True:
         # Get items from queues in a round-robin way.
         for t in thrlist:
@@ -736,14 +742,23 @@ def intersect_generators(genlist):
                 # TODO: evaluate if True and timeout is necessary.
                 item = t.queue.get(True, 0.1)
 
-                # Cache entry is a set of thread.
-                # Duplicates from same thread are not counted twice.
-                cache[item].add(t)
+                if not allow_duplicates and hash(item) in seen:
+                    continue
+
+                # Cache entry is a Counter of ThreadedGenerator objects.
+                cache[item].update([t])
                 if len(cache[item]) == n_gen:
-                    yield item
-                    # Remove item from cache.
-                    # No chance of seeing it again (see later: early stop).
-                    cache.pop(item)
+                    if allow_duplicates:
+                        yield item
+                        # Remove item from cache if possible.
+                        if all(el == 1 for el in cache[item].values()):
+                            cache.pop(item)
+                        else:
+                            cache[item] -= ones
+                    else:
+                        yield item
+                        cache.pop(item)
+                        seen[hash(item)] = True
 
                 active = thrlist.active_count()
                 max_cache = n_gen
