@@ -28,9 +28,10 @@ def add_init_routine(routine):
 def _init():
     """Init any routines which have not already been called."""
     for init_routine in _init_routines:
-        if init_routine not in _inited_routines:
-            init_routine()
+        found = init_routine in _inited_routines  # prevent infinite loop
         _inited_routines.add(init_routine)
+        if not found:
+            init_routine()
 
     # Clear the list of routines to be inited
     _init_routines[:] = []  # the global variable is used with slice operator
