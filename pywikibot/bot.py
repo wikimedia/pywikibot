@@ -350,35 +350,29 @@ def writelogheader():
 
     This may help the user to track errors or report bugs.
     """
-    # If a http thread is not available, it's too early to print a header
-    # that includes version information, which may need to query a server.
-    # The http module can't be imported due to circular dependencies.
-    http = sys.modules.get('pywikibot.comms.http', None)
-    if not http or not hasattr(http, 'threads') or not len(http.threads):
-        return
-
+    log('')
     log('=== Pywikibot framework v{} -- Logging header ==='
         .format(pywikibot.__version__))
 
     # script call
-    log('COMMAND: {0}'.format(sys.argv))
+    log('COMMAND: {}'.format(sys.argv))
 
     # script call time stamp
-    log('DATE: %s UTC' % str(datetime.datetime.utcnow()))
+    log('DATE: {} UTC'.format(datetime.datetime.utcnow()))
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
-        log('VERSION: %s' %
-            version.getversion(online=config.log_pywiki_repo_version).strip())
+        log('VERSION: {}'.format(
+            version.getversion(online=config.log_pywiki_repo_version).strip()))
     except version.ParseError:
         exception()
 
     # system
     if hasattr(os, 'uname'):
-        log('SYSTEM: {0}'.format(os.uname()))
+        log('SYSTEM: {}'.format(os.uname()))
 
     # config file dir
-    log('CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
+    log('CONFIG FILE DIR: {}'.format(pywikibot.config2.base_dir))
 
     all_modules = sys.modules.keys()
 
@@ -401,9 +395,9 @@ def writelogheader():
                         '[{}]'.format(info.get('type', 'path unknown')))
         info.setdefault('ver', '??')
         if 'err' in info:
-            log('  %(name)s: %(err)s' % info)
+            log('  {name}: {err}'.format_map(info))
         else:
-            log('  %(name)s (%(path)s) = %(ver)s' % info)
+            log('  {name} ({path}) = {ver}'.format_map(info))
 
     # imported modules
     log('MODULES:')
@@ -412,13 +406,13 @@ def writelogheader():
         ver = version.get_module_version(module)
         mtime = version.get_module_mtime(module)
         if filename and ver and mtime:
-            log('  {0} {1} {2}'
+            log('  {} {} {}'
                 .format(filename, ver[:7], mtime.isoformat(' ')))
 
     if config.log_pywiki_repo_version:
-        log('PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
+        log('PYWIKI REPO VERSION: {}'.format(version.getversion_onlinerepo()))
 
-    log('=== ' * 14)
+    log('=' * 57)
 
 
 add_init_routine(init_handlers)
