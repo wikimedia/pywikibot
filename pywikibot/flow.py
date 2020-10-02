@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import abc
 import logging
 
 from urllib.parse import urlparse, parse_qs
@@ -18,15 +19,11 @@ logger = logging.getLogger('pywiki.wiki.flow')
 
 
 # Flow page-like objects (boards and topics)
-class FlowPage(BasePage):
+class FlowPage(BasePage, abc.ABC):
 
-    """
-    The base page for the Flow extension.
+    """The base page meta class for the Flow extension.
 
-    There should be no need to instantiate this directly.
-
-    Subclasses must provide a _load() method to load and cache
-    the object's internal data from the API.
+    It cannot be instantiated directly.
     """
 
     def __init__(self, source, title=''):
@@ -45,9 +42,14 @@ class FlowPage(BasePage):
         if not self.site.has_extension('Flow'):
             raise UnknownExtension('site is not Flow-enabled')
 
-    def _load_uuid(self):
-        """Load and save the UUID of the page."""
-        self._uuid = self._load()['workflowId']
+    @abc.abstractmethod
+    def _load(self, force: bool = False):
+        """Abstract method to load and cache the Flow data.
+
+        Subclasses must overwrite _load() method to load and cache
+        the object's internal data from the API.
+        """
+        raise NotImplementedError
 
     @property
     def uuid(self):
@@ -57,7 +59,7 @@ class FlowPage(BasePage):
         @rtype: str
         """
         if not hasattr(self, '_uuid'):
-            self._load_uuid()
+            self._uuid = self._load()['workflowId']
         return self._uuid
 
     def get(self, force=False, get_redirect=False):
@@ -151,11 +153,11 @@ class Topic(FlowPage):
 
     """A Flow discussion topic."""
 
-    def _load(self, content_format: str = 'wikitext', force: bool = False):
+    def _load(self, force: bool = False, content_format: str = 'wikitext'):
         """Load and cache the Topic's data.
 
-        @param content_format: The post format in which to load
         @param force: Whether to force a reload if the data is already loaded
+        @param content_format: The post format in which to load
         """
         if not hasattr(self, '_data') or force:
             self._data = self.site.load_topic(self, content_format)
@@ -382,14 +384,14 @@ class Post:
             assert isinstance(content['content'], str)
             self._content[content['format']] = content['content']
 
-    @deprecate_arg('format', 'content_format')
-    def _load(self, content_format='wikitext', load_from_topic: bool = False):
+    def _load(self, force: bool = True, content_format: str = 'wikitext',
+              load_from_topic: bool = False):
         """Load and cache the Post's data using the given content format.
 
         @param load_from_topic: Whether to load the post from the whole topic
         """
         if load_from_topic:
-            data = self.page._load(content_format=content_format, force=True)
+            data = self.page._load(force=force, content_format=content_format)
         else:
             data = self.site.load_post_current_revision(self.page, self.uuid,
                                                         content_format)
@@ -450,7 +452,7 @@ class Post:
         @return: The contents of the post in the given content format
         """
         if content_format not in self._content or force:
-            self._load(content_format)
+            self._load(content_format=content_format)
         return self._content[content_format]
 
     @deprecate_arg('format', 'content_format')
@@ -472,7 +474,7 @@ class Post:
         # load_from_topic workaround due to T106733
         # (replies not returned by view-post)
         if not hasattr(self, '_current_revision') or force:
-            self._load(content_format, load_from_topic=True)
+            self._load(content_format=content_format, load_from_topic=True)
 
         reply_uuids = self._current_revision['replies']
         self._replies = [Post(self.page, uuid) for uuid in reply_uuids]
