@@ -65,7 +65,7 @@ class TestUserClass(TestCase):
         self.assertIsInstance(user.registration(), pywikibot.Timestamp)
         self.assertGreater(user.editCount(), 0)
         self.assertFalse(user.isBlocked())
-        self.assertTrue(user.isEmailable())
+        # self.assertTrue(user.isEmailable())
         self.assertEqual(user.gender(), 'unknown')
         self.assertIn('userid', user.getprops())
         self.assertEqual(user.getprops()['userid'], 287832)
