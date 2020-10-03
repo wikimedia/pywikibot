@@ -26,6 +26,7 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot.comms.http import fetch
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated
 
@@ -118,14 +119,14 @@ def getversiondict():
         # pywikibot was imported without using version control at all.
         tag, rev, date, hsh = (
             '', '-1 (unknown)', '0 (unknown)', '(unknown)')
+        warn('Unable to detect version; exceptions raised:\n{!r}'
+             .format(exceptions), UserWarning)
+        exceptions = None
 
     # git and svn can silently fail, as it may be a nightly.
-    if getversion_package in exceptions:
-        warn('Unable to detect version; exceptions raised:\n%r'
-             % exceptions, UserWarning)
-    elif exceptions:
-        pywikibot.debug('version algorithm exceptions:\n%r'
-                        % exceptions, _logger)
+    if exceptions:
+        pywikibot.debug('version algorithm exceptions:\n{!r}'
+                        .format(exceptions), _logger)
 
     if isinstance(date, str):
         datestring = date
@@ -190,23 +191,19 @@ order by revision desc, changed_date desc""")
     return tag, rev, date
 
 
-def github_svn_rev2hash(tag, rev):
+def github_svn_rev2hash(tag: str, rev):
     """Convert a Subversion revision to a Git hash using Github.
 
     @param tag: name of the Subversion repo on Github
     @param rev: Subversion revision identifier
     @return: the git hash
-    @rtype: str
     """
-    from pywikibot.comms import http
-
-    uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
-    request = http.fetch(uri=uri, method='PROPFIND',
-                         body="<?xml version='1.0' encoding='utf-8'?>"
-                              '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
-                         headers={'label': str(rev),
-                                  'user-agent': 'SVN/1.7.5 {pwb}'})
-
+    uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
+    request = fetch(uri=uri, method='PROPFIND',
+                    body="<?xml version='1.0' encoding='utf-8'?>"
+                         '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
+                    headers={'label': str(rev),
+                             'user-agent': 'SVN/1.7.5 {pwb}'})
     dom = xml.dom.minidom.parse(BytesIO(request.raw))
     hsh = dom.getElementsByTagName('C:git-commit')[0].firstChild.nodeValue
     date = dom.getElementsByTagName('S:date')[0].firstChild.nodeValue

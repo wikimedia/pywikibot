@@ -27,9 +27,9 @@ from warnings import warn
 
 import requests
 
-from pywikibot import __version__, __url__, config
-from pywikibot.bot import calledModuleName
+import pywikibot
 from pywikibot.comms import threadedhttp
+from pywikibot import config2 as config
 from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
@@ -41,7 +41,6 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     ModuleDeprecationWrapper,
 )
-import pywikibot.version
 
 try:
     import requests_oauthlib
@@ -85,7 +84,7 @@ atexit.register(_flush)
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join(str(i) for i in sys.version_info),
     'http_backend': 'requests/' + requests.__version__,
-    'pwb': 'Pywikibot/' + __version__,
+    'pwb': 'Pywikibot/' + pywikibot.__version__,
 }
 
 
@@ -98,7 +97,7 @@ class _UserAgentFormatter(Formatter):
         # This is the Pywikibot revision; also map it to {version} at present.
         if key == 'version' or key == 'revision':
             return pywikibot.version.getversiondict()['rev']
-        return super(_UserAgentFormatter, self).get_value(key, args, kwargs)
+        return super().get_value(key, args, kwargs)
 
 
 _USER_AGENT_FORMATTER = _UserAgentFormatter()
@@ -143,7 +142,7 @@ def user_agent(site=None, format_string: str = None) -> str:
     """
     values = USER_AGENT_PRODUCTS.copy()
 
-    script_name = calledModuleName()
+    script_name = pywikibot.bot.calledModuleName()
 
     values['script'] = script_name
 
@@ -278,8 +277,9 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
             warn('config.authenticate["{path}"] has invalid value.\n'
                  'It should contain 2 or 4 items, not {length}.\n'
                  'See {url}/OAuth for more info.'
-                 .format(path=path, length=len(config.authenticate[path]),
-                         url=__url__))
+                 .format(path=path,
+                         length=len(config.authenticate[path]),
+                         url=pywikibot.__url__))
     return None
 
 

@@ -51,7 +51,7 @@ from textwrap import fill
 from typing import Dict, List, Tuple
 from warnings import warn
 
-from pywikibot import __version__ as pwb_version
+from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import issue_deprecation_warning
 
