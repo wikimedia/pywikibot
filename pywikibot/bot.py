@@ -124,6 +124,7 @@ from pywikibot.logging import (
 from pywikibot.logging import critical
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
+    PYTHON_VERSION,
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools.formatter import color_format
@@ -403,11 +404,16 @@ def writelogheader():
     log('MODULES:')
     for module in sys.modules.values():
         filename = version.get_module_filename(module)
-        ver = version.get_module_version(module)
-        mtime = version.get_module_mtime(module)
-        if filename and ver and mtime:
-            log('  {} {} {}'
-                .format(filename, ver[:7], mtime.isoformat(' ')))
+        if not filename:
+            continue
+
+        param = {'sep': ' '}
+        if PYTHON_VERSION >= (3, 6, 0):
+            param['timespec'] = 'seconds'
+        mtime = version.get_module_mtime(module).isoformat(**param)
+
+        log('  {} {}'
+            .format(mtime, filename))
 
     if config.log_pywiki_repo_version:
         log('PYWIKI REPO VERSION: {}'.format(version.getversion_onlinerepo()))

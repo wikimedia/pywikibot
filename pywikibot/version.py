@@ -21,6 +21,7 @@ from distutils import log
 from distutils.sysconfig import get_python_lib
 from importlib import import_module
 from io import BytesIO
+from typing import Optional
 from warnings import warn
 
 import pywikibot
@@ -387,7 +388,7 @@ def getversion_onlinerepo(path='branches/master'):
 
 
 @deprecated('get_module_version, get_module_filename and get_module_mtime',
-            since='20150221')
+            since='20150221', future_warning=True)
 def getfileversion(filename):
     """Retrieve revision number of file.
 
@@ -419,7 +420,8 @@ def getfileversion(filename):
         return None
 
 
-def get_module_version(module):
+@deprecated('pywikibot.__version__', since='20201003')
+def get_module_version(module) -> Optional[str]:
     """
     Retrieve __version__ variable from an imported module.
 
@@ -427,14 +429,13 @@ def get_module_version(module):
     @type module: module
     @return: The version hash without the surrounding text. If not present
         return None.
-    @rtype: str or None
     """
     if hasattr(module, '__version__'):
-        return module.__version__[5:-1]
+        return module.__version__
     return None
 
 
-def get_module_filename(module):
+def get_module_filename(module) -> Optional[str]:
     """
     Retrieve filename from an imported pywikibot module.
 
@@ -445,12 +446,12 @@ def get_module_filename(module):
     @param module: The module instance.
     @type module: module
     @return: The filename if it's a pywikibot module otherwise None.
-    @rtype: str or None
     """
-    if hasattr(module, '__file__') and os.path.exists(module.__file__):
+    if hasattr(module, '__file__'):
         filename = module.__file__
-        if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
-            filename = filename[:-1]
+        if not filename or not os.path.exists(filename):
+            return None
+
         program_dir = _get_program_dir()
         if filename[:len(program_dir)] == program_dir:
             return filename
