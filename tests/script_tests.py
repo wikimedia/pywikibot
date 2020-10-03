@@ -214,7 +214,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     .format(script_name))
 
             def testScript(self):
-                global_args = 'Global arguments available for all'
+                global_args = 'For global options use -help:global or run pwb'
 
                 cmd = [script_name] + args
                 data_in = script_input.get(script_name)
@@ -352,7 +352,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     _expected_failures = {'version'}
     _allowed_failures = []
 
-    _arguments = '-help:global'
+    _arguments = '-help'
     _results = None
 
 
