@@ -84,16 +84,9 @@ class TestAPIMWException(DefaultSiteTestCase):
 
     def tearDown(self):
         """Check warning and error calls."""
-        try:
-            pywikibot.warning.assert_called_with(
-                'API error internal_api_error_fake: Fake error message')
-            pywikibot.error.assert_called_with(
-                'Detected MediaWiki API exception internal_api_error_fake: '
-                'Fake error message\n[servedby: unittest]; raising')
-        finally:
-            self.warning_patcher.stop()
-            self.error_patcher.stop()
-            super(TestAPIMWException, self).tearDown()
+        self.warning_patcher.stop()
+        self.error_patcher.stop()
+        super(TestAPIMWException, self).tearDown()
 
     def test_API_error(self):
         """Test a static request."""
@@ -101,6 +94,11 @@ class TestAPIMWException(DefaultSiteTestCase):
                                                       'fake': True})
         with PatchedHttp(api, self.data):
             self.assertRaises(api.APIMWException, req.submit)
+            pywikibot.warning.assert_called_with(
+                'API error internal_api_error_fake: Fake error message')
+            pywikibot.error.assert_called_with(
+                'You have no API read permissions. '
+                'Seems you are not logged in.')
 
     def test_API_error_encoding_ASCII(self):
         """Test a Page instance as parameter using ASCII chars."""
@@ -111,6 +109,11 @@ class TestAPIMWException(DefaultSiteTestCase):
         self.assert_parameters = {'fake': ''}
         with PatchedHttp(api, self._dummy_request):
             self.assertRaises(api.APIMWException, req.submit)
+            pywikibot.warning.assert_called_with(
+                'API error internal_api_error_fake: Fake error message')
+            pywikibot.error.assert_called_with(
+                'Detected MediaWiki API exception internal_api_error_fake: '
+                'Fake error message\n[servedby: unittest]; raising')
 
     def test_API_error_encoding_Unicode(self):
         """Test a Page instance as parameter using non-ASCII chars."""
@@ -121,6 +124,11 @@ class TestAPIMWException(DefaultSiteTestCase):
         self.assert_parameters = {'fake': ''}
         with PatchedHttp(api, self._dummy_request):
             self.assertRaises(api.APIMWException, req.submit)
+            pywikibot.warning.assert_called_with(
+                'API error internal_api_error_fake: Fake error message')
+            pywikibot.error.assert_called_with(
+                'Detected MediaWiki API exception internal_api_error_fake: '
+                'Fake error message\n[servedby: unittest]; raising')
 
 
 class TestApiFunctions(DefaultSiteTestCase):
