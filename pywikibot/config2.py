@@ -1012,7 +1012,7 @@ class _DifferentTypeError(UserWarning, TypeError):
     """An error when the required type doesn't match the actual type."""
 
     def __init__(self, name, actual_type, allowed_types):
-        super(_DifferentTypeError, self).__init__(
+        super().__init__(
             'Configuration variable "{0}" is defined as "{1.__name__}" in '
             'your user-config.py but expected "{2}".'
             .format(name, actual_type, '", "'.join(t.__name__
