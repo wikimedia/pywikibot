@@ -2102,24 +2102,20 @@ class APISite(BaseSite):
         return self.siteinfo['lang']
 
     def version(self):
-        """
-        Return live project version number as a string.
+        """Return live project version number as a string.
 
-        This overwrites the corresponding family method for APISite class. Use
-        L{pywikibot.site.mw_version} to compare MediaWiki versions.
+        Use L{pywikibot.site.mw_version} to compare MediaWiki versions.
         """
-        version = self.force_version()
-        if not version:
-            try:
-                version = self.siteinfo.get('generator',
-                                            expiry=1).split(' ')[1]
-            except pywikibot.data.api.APIError:
-                # May occur if you are not logged in (no API read permissions).
-                pywikibot.exception('You have no API read permissions. Seems '
-                                    'you are not logged in')
-                version = self.family.version(self.code)
+        try:
+            version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
+        except pywikibot.data.api.APIError:
+            msg = 'You have no API read permissions.'
+            if not self.logged_in():
+                msg += ' Seems you are not logged in.'
+            pywikibot.error(msg)
+            raise
 
-        if MediaWikiVersion(version) < MediaWikiVersion('1.19'):
+        if MediaWikiVersion(version) < '1.19':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
                 'Use Pywikibot prior to "5.0" or "python2" branch '
