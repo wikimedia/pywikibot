@@ -5,9 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__docformat__ = 'epytext'
-
-# standard python libraries
 import codecs
 import re
 

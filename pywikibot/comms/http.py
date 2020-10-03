@@ -16,8 +16,6 @@ This module is responsible for
 #
 # Distributed under the terms of the MIT license.
 #
-__docformat__ = 'epytext'
-
 import atexit
 import sys
 
