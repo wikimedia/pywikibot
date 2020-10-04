@@ -132,8 +132,10 @@ class TestLogentriesMeta(MetaTestCaseClass):
         def test_method(logtype):
             def test_logevent(self, key):
                 """Test a single logtype entry."""
-                if key == 'old' and logtype == 'thanks':
-                    self.skipTest('Thanks extension not on old.')
+                site = self.sites[key]['site']
+                if logtype not in site.logtypes:
+                    self.skipTest('{}: "{}" logtype not available on {}.'
+                                  .format(key, logtype, site))
                 self._test_logevent(logtype)
 
             return test_logevent
