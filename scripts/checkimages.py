@@ -1542,108 +1542,71 @@ def main(*args) -> bool:
     site = pywikibot.Site()
     # Here below there are the local parameters.
     for arg in local_args:
-        if arg.startswith('-limit'):
-            if len(arg) == 6:
-                limit = int(pywikibot.input(
-                    'How many files do you want to check?'))
-            else:
-                limit = int(arg[7:])
-        elif arg.startswith('-sleep'):
-            length = len(arg)
-            if length == len('-sleep'):
-                time_sleep = int(pywikibot.input(
-                    'How many seconds do you want runs to be apart?'))
-            else:
-                time_sleep = int(arg[length + 1:])
-        elif arg == '-break':
+        option, _, value = arg.partition(':')
+        if option == '-limit':
+            limit = int(value or pywikibot.input(
+                'How many files do you want to check?'))
+        elif option == '-sleep':
+            time_sleep = int(value or pywikibot.input(
+                'How many seconds do you want runs to be apart?'))
+        elif option == '-break':
             repeat = False
-        elif arg == '-nologerror':
+        elif option == '-nologerror':
             logFullError = False
-        elif arg == '-commons':
+        elif option == '-commons':
             commonsActive = True
-        elif arg == '-duplicatesreport':
+        elif option == '-duplicatesreport':
             duplicatesReport = True
-        elif arg.startswith('-duplicates'):
+        elif option == '-duplicates':
             duplicatesActive = True
-            if len(arg) == 11:
-                duplicates_rollback = 1
-            elif len(arg) > 11:
-                duplicates_rollback = int(arg[12:])
-        elif arg.startswith('-maxusernotify'):
-            if len(arg) == 13:
-                max_user_notify = int(pywikibot.input(
-                    'What should be the maximum number of notifications per '
-                    'user per check?'))
-            elif len(arg) > 13:
-                max_user_notify = int(arg[14:])
-        elif arg == '-sendemail':
+            duplicates_rollback = int(value or 1)
+        elif option == '-maxusernotify':
+            max_user_notify = int(value or pywikibot.input(
+                'What should be the maximum number of notifications per user '
+                'per check?'))
+        elif option == '-sendemail':
             sendemailActive = True
-        elif arg.startswith('-skip'):
-            if len(arg) == 5:
-                skip_number = int(pywikibot.input(
-                    'How many files do you want to skip?'))
-            elif len(arg) > 5:
-                skip_number = int(arg[6:])
-        elif arg.startswith('-wait'):
-            if len(arg) == 5:
-                waitTime = int(pywikibot.input(
-                    'How many time do you want to wait before checking the '
-                    'files?'))
-            elif len(arg) > 5:
-                waitTime = int(arg[6:])
-        elif arg.startswith('-start'):
-            if len(arg) == 6:
-                firstPageTitle = pywikibot.input(
-                    'From which page do you want to start?')
-            elif len(arg) > 6:
-                firstPageTitle = arg[7:]
-            namespaces = tuple(ns + ':'
-                               for ns in site.namespace(Namespace.FILE, all))
+        elif option == '-skip':
+            skip_number = int(value or pywikibot.input(
+                'How many files do you want to skip?'))
+        elif option == '-wait':
+            waitTime = int(value or pywikibot.input(
+                'How many time do you want to wait before checking the '
+                'files?'))
+        elif option == '-start':
+            firstPageTitle = value or pywikibot.input(
+                'From which page do you want to start?')
+            namespaces = tuple(
+                ns + ':' for ns in site.namespace(Namespace.FILE, True))
             if firstPageTitle.startswith(namespaces):
-                firstPageTitle = firstPageTitle.split(':')[1]
+                firstPageTitle = firstPageTitle.split(':', 1)[1]
             generator = site.allimages(start=firstPageTitle)
             repeat = False
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                regexPageName = str(pywikibot.input(
-                    'Which page do you want to use for the regex?'))
-            elif len(arg) > 5:
-                regexPageName = str(arg[6:])
+        elif option == '-page':
+            regexPageName = value or pywikibot.input(
+                'Which page do you want to use for the regex?')
             repeat = False
             regexGen = True
-        elif arg.startswith('-url'):
-            if len(arg) == 4:
-                regexPageUrl = str(pywikibot.input(
-                    'Which url do you want to use for the regex?'))
-            elif len(arg) > 4:
-                regexPageUrl = str(arg[5:])
+        elif option == '-url':
+            regexPageUrl = value or pywikibot.input(
+                'Which url do you want to use for the regex?')
             urlUsed = True
             repeat = False
             regexGen = True
-        elif arg.startswith('-regex'):
-            if len(arg) == 6:
-                regexpToUse = str(pywikibot.input(
-                    'Which regex do you want to use?'))
-            elif len(arg) > 6:
-                regexpToUse = str(arg[7:])
+        elif option == '-regex':
+            regexpToUse = value or pywikibot.input(
+                'Which regex do you want to use?')
             generator = 'regex'
             repeat = False
-        elif arg.startswith('-cat'):
-            if len(arg) == 4:
-                catName = str(pywikibot.input('In which category do I work?'))
-            elif len(arg) > 4:
-                catName = str(arg[5:])
-            catSelected = pywikibot.Category(site,
-                                             'Category:{}'.format(catName))
-            generator = catSelected.articles(namespaces=[6])
+        elif option == '-cat':
+            cat_name = value or pywikibot.input('In which category do I work?')
+            cat = pywikibot.Category(site, 'Category:' + cat_name)
+            generator = cat.articles(namespaces=[6])
             repeat = False
-        elif arg.startswith('-ref'):
-            if len(arg) == 4:
-                refName = str(pywikibot.input(
-                    'The references of what page should I parse?'))
-            elif len(arg) > 4:
-                refName = str(arg[5:])
-            ref = pywikibot.Page(site, refName)
+        elif option == '-ref':
+            ref_name = value or pywikibot.input(
+                'The references of what page should I parse?')
+            ref = pywikibot.Page(site, ref_name)
             generator = ref.getReferences(namespaces=[6])
             repeat = False
         else:
@@ -1651,8 +1614,6 @@ def main(*args) -> bool:
 
     if not generator:
         normal = True
-
-    skip = skip_number > 0
 
     # Ensure that the bot is localized and right command args are given
     if site.code not in project_inserted:
@@ -1703,18 +1664,20 @@ def main(*args) -> bool:
         for image in generator:
             # Setting the image for the main class
             Bot.setParameters(image)
-            if skip:
-                skip = Bot.skipImages(skip_number, limit)
-                if skip:
-                    continue
+
+            if skip_number and Bot.skipImages(skip_number, limit):
+                continue
+
             # Check on commons if there's already an image with the same name
             if commonsActive and site.family.name != 'commons':
                 if not Bot.checkImageOnCommons():
                     continue
+
             # Check if there are duplicates of the image on the project
             if duplicatesActive:
                 if not Bot.checkImageDuplicated(duplicates_rollback):
                     continue
+
             Bot.checkStep()
 
         if repeat:
