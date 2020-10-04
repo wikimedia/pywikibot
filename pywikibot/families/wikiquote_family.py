@@ -31,7 +31,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'en', 'it', 'pl', 'ru', 'cs', 'fa', 'de', 'pt', 'es', 'fr', 'uk', 'he',
         'sk', 'bs', 'tr', 'ca', 'fi', 'az', 'sl', 'lt', 'eo', 'zh', 'bg', 'ar',
         'hr', 'hy', 'et', 'el', 'su', 'nn', 'id', 'sv', 'li', 'hu', 'ko', 'nl',
-        'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'ur', 'th', 'te', 'be',
+        'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'th', 'ur', 'te', 'be',
         'cy', 'no', 'ml', 'sq', 'kn', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'da',
         'sa', 'is', 'vi', 'br', 'mr', 'af', 'wo', 'ky',
     ]
