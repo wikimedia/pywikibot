@@ -45,8 +45,6 @@ Examples:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import time
 import webbrowser
@@ -165,21 +163,15 @@ project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 
 def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
     """Understand if the page is blocked and if it has the right template."""
-    if TTP:
-        for catchRegex in TTP:  # TTP = templateTotalProtection
+    results = 'sysop-total', 'autoconfirmed-total', 'unique'
+    for index, template in enumerate((TTP, TSP, TU)):
+        if not template:
+            continue
+        for catchRegex in template:
             resultCatch = re.findall(catchRegex, text)
             if resultCatch:
-                return ('sysop-total', catchRegex)
-    if TSP:
-        for catchRegex in TSP:
-            resultCatch = re.findall(catchRegex, text)
-            if resultCatch:
-                return ('autoconfirmed-total', catchRegex)
-    if TU:
-        for catchRegex in TU:
-            resultCatch = re.findall(catchRegex, text)
-            if resultCatch:
-                return ('unique', catchRegex)
+                return results[index], catchRegex
+
     if TSMP and TTMP and TTP != TTMP and TSP != TSMP:
         for catchRegex in TTMP:
             resultCatch = re.findall(catchRegex, text)
