@@ -273,11 +273,13 @@ class TestScriptMeta(MetaTestCaseClass):
                                        '{} seconds'.format(timeout), end=' ')
                     elif 'SIMULATION: edit action blocked' in err_result:
                         unittest_print(' auto-run script simulated edit '
-                                       'blocked', end='  ')
+                                       'blocked', end=' ')
                     else:
                         unittest_print(
                             ' auto-run script stderr within {} seconds: {!r}'
                             .format(timeout, err_result), end='  ')
+                    unittest_print(' exit code: {}'
+                                   .format(result['exit_code']), end=' ')
 
                 self.assertNotIn('Traceback (most recent call last)',
                                  err_result)
