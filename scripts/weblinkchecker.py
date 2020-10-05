@@ -133,7 +133,7 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, ThreadList
 from pywikibot.tools.formatter import color_format
 
 try:
@@ -857,32 +857,24 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
             self.HTTPignore = HTTPignore
         self.day = day
 
+        # Limit the number of threads started at the same time
+        self.threads = ThreadList(limit=config.max_external_links,
+                                  wait_time=config.retry_wait)
+
     def treat_page(self):
         """Process one page."""
         page = self.current_page
-        text = page.get()
-        for url in weblinksIn(text):
+        for url in weblinksIn(page.text):
             for ignoreR in ignorelist:
                 if ignoreR.match(url):
                     break
-            else:  # not ignore url
-                # Limit the number of threads started at the same time. Each
-                # thread will check one page, then die.
-                while threading.activeCount() >= config.max_external_links:
-                    pywikibot.sleep(config.retry_wait)
+            else:
+                # Each thread will check one page, then die.
                 thread = LinkCheckThread(page, url, self.history,
                                          self.HTTPignore, self.day)
                 # thread dies when program terminates
                 thread.setDaemon(True)
-                try:
-                    thread.start()
-                except threading.ThreadError:
-                    pywikibot.warning(
-                        "Can't start a new thread.\nPlease decrease "
-                        'max_external_links in your user-config.py or use\n'
-                        "'-max_external_links:' option with a smaller value. "
-                        'Default is 50.')
-                    raise
+                self.threads.append(thread)
 
 
 def RepeatPageGenerator():
