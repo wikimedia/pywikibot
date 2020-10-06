@@ -165,7 +165,10 @@ The contents of the package
     |                        | number of pages to be put on the wiki.                  |
     +------------------------+---------------------------------------------------------+
     | #pageimport.py         | Import pages from a certain wiki to another.            |
-    +------------------------+---------------------------------------------------------+
+    +------------------------+--+------------------------------------------------------+
+    | parser_function_count.py  | Find expensive templates that are subject to be      |
+    |                           | converted to Lua.                                    |
+    +------------------------+--+------------------------------------------------------+
     | patrol.py              | Obtains a list pages and marks the edits as patrolled   |
     |                        | based on a whitelist.                                   |
     +------------------------+---------------------------------------------------------+
