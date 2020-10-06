@@ -496,7 +496,7 @@ class NoReferencesBot(Bot):
 
     def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'verbose': True,
         })
         super().__init__(**kwargs)
@@ -524,24 +524,24 @@ class NoReferencesBot(Bot):
         oldTextCleaned = textlib.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):
-            if self.getOption('verbose'):
+            if self.opt.verbose:
                 pywikibot.output('No changes necessary: references tag found.')
             return False
 
         if self.referencesTemplates:
             templateR = '{{(' + '|'.join(self.referencesTemplates) + ')'
             if re.search(templateR, oldTextCleaned, re.IGNORECASE):
-                if self.getOption('verbose'):
+                if self.opt.verbose:
                     pywikibot.output(
                         'No changes necessary: references template found.')
                 return False
 
         if not self.refR.search(oldTextCleaned):
-            if self.getOption('verbose'):
+            if self.opt.verbose:
                 pywikibot.output('No changes necessary: no ref tags found.')
             return False
 
-        if self.getOption('verbose'):
+        if self.opt.verbose:
             pywikibot.output('Found ref without references.')
         return True
 
