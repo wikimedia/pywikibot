@@ -530,7 +530,9 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
                 path = path[0:path.index('__init__.py')]
 
             info['path'] = path
-            assert path not in paths, 'Path of the package is in defined paths'
+            assert path not in paths, \
+                   'Path {} of the package {} is in defined paths as {}' \
+                   .format(path, name, paths[path])
             paths[path] = name
 
         if '__version__' in package.__dict__:

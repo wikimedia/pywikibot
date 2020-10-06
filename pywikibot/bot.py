@@ -387,9 +387,8 @@ def writelogheader():
     if config.verbose_output:
         check_package_list += all_modules
 
-    packages = version.package_versions(check_package_list)
-
     log('PACKAGES:')
+    packages = version.package_versions(check_package_list)
     for name in sorted(packages.keys()):
         info = packages[name]
         info.setdefault('path',
