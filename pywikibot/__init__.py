@@ -56,9 +56,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import BaseSite
 from pywikibot.tools import (
-    # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
     classproperty,
-    deprecated as __deprecated,
     deprecate_arg as _deprecate_arg,
     issue_deprecation_warning,
     normalize_username,
@@ -1254,13 +1252,6 @@ from pywikibot.page import (  # noqa: E402
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
-
-
-@__deprecated('comment parameter for page saving method', since='20140604',
-              future_warning=True)
-def setAction(s):
-    """Set a summary to use for changed page submissions."""
-    config.default_edit_summary = s
 
 
 def showDiff(oldtext, newtext, context=0):
