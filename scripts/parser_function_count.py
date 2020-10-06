@@ -116,7 +116,7 @@ class ParserFunctionCountBot(SingleSiteBot,
     @property
     def generator(self):
         """Generator."""
-        gen = self.site.allpages(start=self.option.start,
+        gen = self.site.allpages(start=self.opt.start,
                                  namespace=10, filterredir=False)
         if self.site.doc_subpage:
             gen = pagegenerators.RegexFilterPageGenerator(

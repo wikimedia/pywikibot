@@ -101,6 +101,7 @@ auto_run_script_list = [
     'revertbot',
     'noreferences',
     'nowcommons',
+    'parser_function_count',
     'patrol',
     'shell',
     'standardize_interwiki',
@@ -127,6 +128,7 @@ no_args_expected_results = {
     'imageharvest': 'From what URL should I get the images',
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
+    'parser_function_count': 'Hold on, this will need some time.',
     'replace': 'Press Enter to use this automatic message',
     'replicate_wiki':
         'error: the following arguments are required: destination',
