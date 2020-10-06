@@ -153,7 +153,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     def test_xml_simple(self):
         """Test the generator without any narrowing."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'))
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
@@ -161,7 +161,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using one namespace id."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         pages = list(gen)
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                    site=self.get_site())
@@ -170,7 +170,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using multiple separate namespaces parameters."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
@@ -178,7 +178,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using multiple namespaces in one parameter."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0,1', '-xmlstart:Fake page')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
@@ -186,7 +186,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using a start partial page."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         pages = list(gen)
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                    site=self.get_site())
@@ -195,7 +195,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using a start page with an underscore."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake_page')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         pages = list(gen)
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                    site=self.get_site())
@@ -204,7 +204,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         """Test the generator using a namespace name."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:Talk', '-xmlstart:Fake page')
-        gen = self.constructor_args[0]
+        gen = self.constructor_kwargs['generator']
         pages = list(gen)
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                    site=self.get_site())
