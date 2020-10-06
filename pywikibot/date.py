@@ -11,6 +11,7 @@ import re
 
 from collections import defaultdict
 from contextlib import suppress
+from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot import Site
@@ -42,7 +43,8 @@ millFormats = ['MillenniumAD', 'MillenniumBC']
 snglValsFormats = ['CurrEvents']
 
 
-def multi(value, tuplst):
+@singledispatch
+def multi(value: int, tuplst):
     """
     Run multiple pattern checks for the same entry.
 
@@ -52,24 +54,25 @@ def multi(value, tuplst):
     first to encode/decode a single value (e.g. simpleInt), second is a
     predicate function with an integer parameter that returns true or false.
     When the 2nd function evaluates to true, the 1st function is used.
-
     """
-    if isinstance(value, str):
-        # Try all functions, and test result against predicates
-        for func, pred in tuplst:
-            try:
-                res = func(value)
-            except ValueError:
-                continue
-            if pred(res):
-                return res
-    else:
-        # Find a predicate that gives true for this int value, and run a
-        # function
-        for func, pred in tuplst:
-            if pred(value):
-                return func(value)
+    # Find a predicate that gives true for this int value, and run a
+    # function
+    for func, pred in tuplst:
+        if pred(value):
+            return func(value)
+    raise ValueError('could not find a matching function')
 
+
+@multi.register(str)
+def _(value: str, tuplst):
+    # Try all functions, and test result against predicates
+    for func, pred in tuplst:
+        try:
+            res = func(value)
+        except ValueError:
+            continue
+        if pred(res):
+            return res
     raise ValueError('could not find a matching function')
 
 
@@ -406,7 +409,8 @@ def escapePattern2(pattern):
     return _escPtrnCache2[pattern]
 
 
-def dh(value, pattern, encf, decf, filter=None):
+@singledispatch
+def dh(value: int, pattern, encf, decf, filter=None):
     """Function to help with year parsing.
 
     Usually it will be used as a lambda call in a map::
@@ -433,46 +437,49 @@ def dh(value, pattern, encf, decf, filter=None):
 
     """
     compPattern, strPattern, decoders = escapePattern2(pattern)
-    if isinstance(value, str):
-        m = compPattern.match(value)
-        if m:
-            # decode each found value using provided decoder
-            values = [decoder[2](m.group(i + 1))
-                      for i, decoder in enumerate(decoders)]
-            decValue = decf(values)
+    # Encode an integer value into a textual form.
+    # This will be called from outside as well as recursivelly to verify
+    # parsed value
+    if filter and not filter(value):
+        raise ValueError('value {} is not allowed'.format(value))
 
-            assert not isinstance(decValue, str), \
-                'Decoder must not return a string!'
+    params = encf(value)
 
-            # recursive call to re-encode and see if we get the original
-            # (may through filter exception)
-            if value == dh(decValue, pattern, encf, decf, filter):
-                return decValue
-
-        raise ValueError("reverse encoding didn't match")
+    if isinstance(params, (tuple, list)):
+        assert len(params) == len(decoders), (
+            'parameter count ({0}) does not match decoder count ({1})'
+            .format(len(params), len(decoders)))
+        # convert integer parameters into their textual representation
+        params = tuple(_make_parameter(decoders[i], param)
+                       for i, param in enumerate(params))
+        return strPattern % params
     else:
-        # Encode an integer value into a textual form.
-        # This will be called from outside as well as recursivelly to verify
-        # parsed value
-        if filter and not filter(value):
-            raise ValueError('value {} is not allowed'.format(value))
+        assert len(decoders) == 1, (
+            'A single parameter does not match {0} decoders.'
+            .format(len(decoders)))
+        # convert integer parameter into its textual representation
+        return strPattern % _make_parameter(decoders[0], params)
 
-        params = encf(value)
 
-        if isinstance(params, (tuple, list)):
-            assert len(params) == len(decoders), (
-                'parameter count ({0}) does not match decoder count ({1})'
-                .format(len(params), len(decoders)))
-            # convert integer parameters into their textual representation
-            params = tuple(_make_parameter(decoders[i], param)
-                           for i, param in enumerate(params))
-            return strPattern % params
-        else:
-            assert len(decoders) == 1, (
-                'A single parameter does not match {0} decoders.'
-                .format(len(decoders)))
-            # convert integer parameter into its textual representation
-            return strPattern % _make_parameter(decoders[0], params)
+@dh.register(str)
+def _(value: str, pattern, encf, decf, filter=None):
+    compPattern, strPattern, decoders = escapePattern2(pattern)
+    m = compPattern.match(value)
+    if m:
+        # decode each found value using provided decoder
+        values = [decoder[2](m.group(i + 1))
+                  for i, decoder in enumerate(decoders)]
+        decValue = decf(values)
+
+        assert not isinstance(decValue, str), \
+            'Decoder must not return a string!'
+
+        # recursive call to re-encode and see if we get the original
+        # (may through filter exception)
+        if value == dh(decValue, pattern, encf, decf, filter):
+            return decValue
+
+    raise ValueError("reverse encoding didn't match")
 
 
 def _make_parameter(decoder, param):
