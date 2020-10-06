@@ -6,29 +6,25 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
-from itertools import chain, combinations
 import os
 import re
-from string import ascii_letters
 import sys
+
+from itertools import chain, combinations
+from string import ascii_letters
 
 import pywikibot
 
 from pywikibot import i18n
 
 from pywikibot.data import api
-from pywikibot.tools import first_lower, first_upper, formatter, PY2
+from pywikibot.tools import first_lower, first_upper, formatter
 
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
-if PY2:
-    from future_builtins import zip
 
-
-class CaseChecker(object):
+class CaseChecker:
 
     """Case checker."""
 
@@ -90,7 +86,7 @@ class CaseChecker(object):
     def __init__(self):
         """Initializer with arg parsing."""
         for arg in pywikibot.handle_args():
-            arg, sep, value = arg.partition(':')
+            arg, _, value = arg.partition(':')
             if arg == '-from':
                 self.apfrom = value or pywikibot.input(
                     'Which page to start from: ')
@@ -124,14 +120,14 @@ class CaseChecker(object):
                 pywikibot.show_help()
                 sys.exit()
 
-        if self.namespaces == [] and not self.doFailed:
-            if self.apfrom == '':
+        if not self.namespaces and not self.doFailed:
+            if not self.apfrom:
                 # 0 should be after templates ns
                 self.namespaces = [14, 10, 12, 0]
             else:
                 self.namespaces = [0]
 
-        if self.aplimit is None:
+        if not self.aplimit:
             self.aplimit = 200 if self.links else 'max'
 
         if not self.doFailed:
@@ -141,7 +137,7 @@ class CaseChecker(object):
                                 'gapfilterredir': self.filterredir}
         else:
             self.queryParams = {'action': 'query'}
-            if self.apfrom != '':
+            if self.apfrom:
                 pywikibot.output('Argument "-from" is ignored with "-failed"')
 
         propParam = 'info'
@@ -156,11 +152,13 @@ class CaseChecker(object):
 
         if len(self.localSuspects) != len(self.latinSuspects):
             raise ValueError('Suspects must be the same size')
+
         if len(self.localKeyboard) != len(self.latinKeyboard):
             raise ValueError('Keyboard info must be the same size')
 
         if not os.path.isabs(self.wikilogfile):
             self.wikilogfile = pywikibot.config.datafilepath(self.wikilogfile)
+
         self.wikilog = self.OpenLogFile(self.wikilogfile)
 
         if not os.path.isabs(self.failedTitles):
@@ -173,17 +171,15 @@ class CaseChecker(object):
             self.failedTitles += '.failed'
 
         iterzip = zip(self.localSuspects, self.latinSuspects)
-        self.lclToLatDict = {
-            ord(local): latin for local, latin in iterzip}
-        self.latToLclDict = {
-            ord(latin): local for local, latin in iterzip}
+        self.lclToLatDict = {ord(local): latin for local, latin in iterzip}
+        self.latToLclDict = {ord(latin): local for local, latin in iterzip}
 
         if self.localKeyboard is not None:
             iterzip = zip(self.localKeyboard, self.latinKeyboard)
-            self.lclToLatKeybDict = {
-                ord(local): latin for local, latin in iterzip}
-            self.latToLclKeybDict = {
-                ord(latin): local for local, latin in iterzip}
+            self.lclToLatKeybDict = {ord(local): latin
+                                     for local, latin in iterzip}
+            self.latToLclKeybDict = {ord(latin): local
+                                     for local, latin in iterzip}
         else:
             self.lclToLatKeybDict = {}
             self.latToLclKeybDict = {}
@@ -220,22 +216,21 @@ class CaseChecker(object):
                 pageid = data['query']['pageids'][0]
                 links = data['query']['pages'][pageid]['links']
 
-                allWords = [nn for n in links
-                            for nn in self.FindBadWords(n['title'])]
+                self.knownWords = {nn for n in links
+                                   for nn in self.FindBadWords(n['title'])}
 
-                self.knownWords = set(allWords)
             else:
                 raise ValueError('The number of pageids is not 1')
 
-            pywikibot.output('Loaded whitelist with %i items'
-                             % len(self.knownWords))
-            if len(self.knownWords) > 0:
+            pywikibot.output('Loaded whitelist with {} items'
+                             .format(len(self.knownWords)))
+            if self.knownWords:
                 pywikibot.log('Whitelist: '
                               + ', '.join(self.MakeLink(i, False)
                                           for i in self.knownWords))
         else:
-            pywikibot.output('Whitelist is not known for language %s'
-                             % self.site.code)
+            pywikibot.output(
+                'Whitelist is not known for language ' + self.site.code)
 
     def RunQuery(self, params):
         """API query."""
@@ -270,7 +265,6 @@ class CaseChecker(object):
             else:
                 raise ValueError('Unexpected query-continue values: {}'
                                  .format(qc))
-            continue
 
     def Run(self):
         """Run the bot."""
@@ -293,13 +287,9 @@ class CaseChecker(object):
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
         except Exception:
-            pywikibot.output('Exception at Title = %s, Next = %s'
-                             % (self.currentTitle, self.apfrom))
-            try:
-                import traceback
-                pywikibot.output(traceback.format_exc())
-            except Exception:
-                pywikibot.output('Unable to print exception info')
+            pywikibot.output('Exception at Title = {}, Next = {}'
+                             .format(self.currentTitle, self.apfrom))
+            pywikibot.exception()
             raise
 
     def ProcessDataBlock(self, data):
@@ -312,13 +302,16 @@ class CaseChecker(object):
             printed = False
             title = page['title']
             self.currentTitle = title
+
             if 'missing' in page:
                 continue
+
             if firstItem:
                 if self.lastLetter != title[0]:
-                    pywikibot.ui.output('Processing %s\n' % title)
+                    pywikibot.output('Processing {}\n'.format(title))
                     self.lastLetter = title[0]
                 firstItem = False
+
             if self.titles:
                 err = self.ProcessTitle(title)
                 if err:
@@ -346,14 +339,16 @@ class CaseChecker(object):
                                         follow_redirects=False):
                                     if p.namespace() == 2:
                                         continue
+
                                     oldText = p.text
                                     newText = self.ReplaceLink(oldText, title,
                                                                newTitle)
                                     if not self.PutNewPage(
-                                        p, newText, [
-                                            self.MakeMoveSummary(title,
-                                                                 newTitle)]):
+                                        p, newText,
+                                            [self.MakeMoveSummary(title,
+                                                                  newTitle)]):
                                         replErrors = True
+
                                 if not replErrors:
                                     editSummary = i18n.twtranslate(
                                         self.site,
@@ -386,7 +381,7 @@ class CaseChecker(object):
                                 changed = True
 
                     if not changed:
-                        if len(err[1]) > 0:
+                        if err[1]:
                             self.AppendLineToLog(self.failedTitles, title)
                         else:
                             self.AddNoSuggestionTitle(title)
@@ -395,14 +390,11 @@ class CaseChecker(object):
                         printed = True
 
             if self.links:
-                allLinks = None
+                allLinks = []
                 if 'links' in page:
-                    allLinks = page['links']
+                    allLinks += page['links']
                 if 'categories' in page:
-                    if allLinks:
-                        allLinks = allLinks + page['categories']
-                    else:
-                        allLinks = page['categories']
+                    allLinks += page['categories']
 
                 if allLinks:
                     pageObj = None
@@ -414,7 +406,7 @@ class CaseChecker(object):
                         ltxt = link['title']
                         err = self.ProcessTitle(ltxt)
                         if err:
-                            if len(err[1]) > 0:
+                            if err[1]:
                                 foundSuggestions = True
                             elif self.AddNoSuggestionTitle(ltxt):
                                 continue
@@ -449,7 +441,8 @@ class CaseChecker(object):
 
                     if foundSuggestions:
                         self.AppendLineToLog(self.failedTitles, title)
-            if self.stopAfter > 0:
+
+            if self.stopAfter:
                 self.stopAfter -= 1
                 if self.stopAfter == 0:
                     raise ValueError('Stopping because we are done')
@@ -468,14 +461,15 @@ class CaseChecker(object):
     def ProcessTitle(self, title):
         """Process title."""
         badWords = list(self.FindBadWords(title))
-        if len(badWords) > 0:
+        if badWords:
             # Allow known words, allow any roman numerals with local suffixes
             badWords = {i for i in badWords
                         if i not in self.knownWords
                         and self.romanNumSfxPtrn.match(i) is not None}
 
-        if len(badWords) == 0 or self.Page(title).is_filepage():
-            return
+        if not badWords or self.Page(title).is_filepage():
+            return None
+
         count = 0
         ambigBadWords = set()
         ambigBadWordsCount = 0
@@ -511,12 +505,13 @@ class CaseChecker(object):
                 ambigBadWords.add(badWord)
                 # Cannot do len(ambigBadWords) because they might be duplicates
                 ambigBadWordsCount += 1
+
             if not mightBeLcl and not mightBeLat:
                 # try to match one of the knownWords
                 bwLen = len(badWord)
                 kw = [w for w in self.knownWords if len(w) == bwLen]
                 for p in range(bwLen):
-                    if len(kw) == 0:
+                    if not kw:
                         break
                     c = badWord[p]
                     co = ord(c)
@@ -541,18 +536,17 @@ class CaseChecker(object):
         if len(mapLcl) + len(mapLat) - ambigBadWordsCount < count:
             # We cannot auto-translate - offer a list of suggested words
             suggestions = list(mapLcl.values()) + list(mapLat.values())
-            if len(suggestions) > 0:
+            if suggestions:
                 infoText += ', word suggestions: ' + ', '.join(
                     self.ColorCodeWord(t) for t in suggestions)
             else:
                 infoText += ', no suggestions'
         else:
-
             # Replace all unambiguous bad words
             for k, v in dict(chain(mapLat.items(), mapLcl.items())).items():
                 if k not in ambigBadWords:
                     title = title.replace(k, v)
-            if len(ambigBadWords) == 0:
+            if not ambigBadWords:
                 # There are no ambiguity, we can safelly convert
                 possibleAlternatives.append(title)
                 infoText += ', convert to ' + self.MakeLink(title)
@@ -572,7 +566,7 @@ class CaseChecker(object):
                             title2 = title2.replace(bw, mapLat[bw])
                         possibleAlternatives.append(title2)
 
-                if len(possibleAlternatives) > 0:
+                if possibleAlternatives:
                     infoText += ', can be converted to ' + ', '.join(
                         self.MakeLink(t) for t in possibleAlternatives)
                 else:
@@ -581,8 +575,9 @@ class CaseChecker(object):
 
     def PickTarget(self, title, original, candidates):
         """Pick target from candidates."""
-        if len(candidates) == 0:
-            return
+        if not candidates:
+            return None
+
         if len(candidates) == 1:
             return candidates[0]
 
@@ -598,11 +593,14 @@ class CaseChecker(object):
                 pagesRedir[newTitle] = dst.getRedirectTarget().title()
             else:
                 pagesExist.append(newTitle)
+
         if len(pagesExist) == 1:
             return pagesExist[0]
-        elif len(pagesExist) == 0 and len(pagesRedir) > 0:
+
+        if not pagesExist and pagesRedir:
             if len(pagesRedir) == 1:
                 return list(pagesRedir.keys())[0]
+
             t = None
             for v in pagesRedir.values():
                 if not t:
@@ -615,8 +613,9 @@ class CaseChecker(object):
                 return list(pagesRedir.keys())[0]
 
         if not self.autonomous:
-            pywikibot.output('Could not auto-decide for page %s. Which link '
-                             'should be chosen?' % self.MakeLink(title, False))
+            pywikibot.output('Could not auto-decide for page {}. Which link '
+                             'should be chosen?'
+                             .format(self.MakeLink(title, False)))
             pywikibot.output('Original title: ', newline=False)
             self.ColorCodeWord(original + '\n', True)
             for count, t in enumerate(candidates, 1):
@@ -647,6 +646,7 @@ class CaseChecker(object):
             res += self.lclClrFnt
         else:
             res += self.latClrFnt
+
         for letter in word:
             if letter in self.localLtr:
                 if not lastIsCyr:
@@ -657,6 +657,7 @@ class CaseChecker(object):
                     res += self.suffixClr + self.latClrFnt
                     lastIsCyr = False
             res += letter
+
         return res + self.suffixClr + '</b>'
 
     def _ColorCodeWordScreen(self, word):
@@ -666,6 +667,7 @@ class CaseChecker(object):
             res += self.colorFormatLocalColor
         else:
             res += self.colorFormatLatinColor
+
         for letter in word:
             if letter in self.localLtr:
                 if not lastIsCyr:
@@ -676,14 +678,15 @@ class CaseChecker(object):
                     res += self.colorFormatLatinColor
                     lastIsCyr = False
             res += letter
+
         return formatter.color_format(res + self.colorFormatSuffix)
 
     def AddNoSuggestionTitle(self, title):
         """Add backlinks to log."""
         if title in self.seenUnresolvedLinks:
             return True
-        self.seenUnresolvedLinks.add(title)
 
+        self.seenUnresolvedLinks.add(title)
         params = {
             'action': 'query',
             'list': 'backlinks',
@@ -700,10 +703,10 @@ class CaseChecker(object):
             cl = len(bl)
             redirs = len([i for i in bl if 'redirect' in i])
 
-        if cl > 0 and 'query-continue' in data:
+        if cl and 'query-continue' in data:
             count = '50+'
         else:
-            count = str(cl if cl > 0 else 'no backlinks')
+            count = str(cl or 'no backlinks')
 
         self.AppendLineToLog(self.nosuggestions, '* {} ({}{})'
                              .format(self.MakeLink(title), count,
@@ -716,8 +719,8 @@ class CaseChecker(object):
         title = pageObj.title(as_link=True, textlink=True)
         coloredMsg = ', '.join(self.ColorCodeWord(m) for m in msg)
         if pageObj.text == pageTxt:
-            self.WikiLog('* Error: Text replacement failed in %s (%s)'
-                         % (self.MakeLink(title, False), coloredMsg))
+            self.WikiLog('* Error: Text replacement failed in {} ({})'
+                         .format(self.MakeLink(title, False), coloredMsg))
         else:
             pywikibot.output('Case Replacements: {}'.format(', '.join(msg)))
             pageObj.text = pageTxt
@@ -729,11 +732,9 @@ class CaseChecker(object):
                         self.site.mediawiki_message(
                             'comma-separator').join(msg)))
                 return True
-            except KeyboardInterrupt:
-                raise
             except (pywikibot.LockedPage, pywikibot.PageNotSaved):
-                self.WikiLog('* Error: Could not save updated page %s (%s)'
-                             % (self.MakeLink(title, False), coloredMsg))
+                self.WikiLog('* Error: Could not save updated page {} ({})'
+                             .format(self.MakeLink(title, False), coloredMsg))
         return False
 
     def MakeMoveSummary(self, fromTitle, toTitle):
@@ -746,7 +747,7 @@ class CaseChecker(object):
         prf = '' if self.Page(title).namespace() == 0 else ':'
         cc = '|««« {} »»»'.format(
             self.ColorCodeWord(title) if colorcode else '')
-        return '[[%s%s%s]]' % (prf, title, cc)
+        return '[[{}{}{}]]'.format(prf, title, cc)
 
     def OpenLogFile(self, filename):
         """Open logfile."""
@@ -773,6 +774,7 @@ class CaseChecker(object):
 
         if len(frmParts) != len(toParts):
             raise ValueError('Splitting parts do not match counts')
+
         for i, part in enumerate(frmParts):
             if part != len(toParts[i]):
                 raise ValueError('Splitting parts do not match word length')
