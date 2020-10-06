@@ -77,7 +77,7 @@ class BasicBot(
         """
         # Add your own options to the bot and set their defaults
         # -always option is predefined by BaseBot class
-        self.availableOptions.update({
+        self.available_options.update({
             'replace': False,  # delete old text and write the new text
             'summary': None,  # your own bot summary
             'text': 'Test',  # add this text from option. 'Test' is default
@@ -86,7 +86,6 @@ class BasicBot(
 
         # call initializer of the super class
         super().__init__(site=True, **kwargs)
-
         # assign the generator to the bot
         self.generator = generator
 
@@ -103,13 +102,13 @@ class BasicBot(
 
         # Retrieve your private option
         # Use your own text or use the default 'Test'
-        text_to_add = self.getOption('text')
+        text_to_add = self.opt.text
 
-        if self.getOption('replace'):
+        if self.opt.replace:
             # replace the page text
             text = text_to_add
 
-        elif self.getOption('top'):
+        elif self.opt.top:
             # put text on top
             text = text_to_add + text
 
@@ -119,7 +118,7 @@ class BasicBot(
 
         # if summary option is None, it takes the default i18n summary from
         # i18n subdirectory with summary_key as summary key.
-        self.put_current(text, summary=self.getOption('summary'))
+        self.put_current(text, summary=self.opt.summary)
 
 
 def main(*args) -> None:

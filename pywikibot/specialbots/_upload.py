@@ -81,8 +81,8 @@ class UploadRobot(BaseBot):
         @type always: bool
         """
         super().__init__(**kwargs)
-        always = self.getOption('always')
-        if (always and ignore_warning is not True and aborts is not True):
+        always = self.opt.always
+        if always and ignore_warning is not True and aborts is not True:
             raise ValueError('When always is set to True, either '
                              'ignore_warning or aborts must be set to True.')
         if always and not description:
@@ -218,7 +218,7 @@ class UploadRobot(BaseBot):
             pywikibot.warning('file_url is not given. '
                               'Set to self.url by default.')
 
-        always = self.getOption('always')
+        always = self.opt.always
         # Isolate the pure name
         filename = file_url
         # Filename may be either a URL or a local file path

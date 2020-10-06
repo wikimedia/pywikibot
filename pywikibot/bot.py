@@ -23,7 +23,7 @@ conjunction. Each bot should subclass at least one of these four classes:
   scripts.ini configuration file. That file consists of sections, led by a
   C{[section]} header and followed by C{option: value} or C{option=value}
   entries. The section is the script name without .py suffix. All options
-  identified must be predefined in availableOptions dictionary.
+  identified must be predefined in available_options dictionary.
 
 * L{Bot}: The previous base class which should be avoided. This class is mainly
   used for bots which work with wikibase or together with an image repository.
@@ -127,6 +127,7 @@ from pywikibot.tools import (
     PYTHON_VERSION,
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
+from pywikibot.tools import classproperty
 from pywikibot.tools.formatter import color_format
 
 # Note: all output goes through python std library "logging" module
@@ -995,6 +996,24 @@ def open_webbrowser(page):
     i18n.input('pywikibot-enter-finished-browser')
 
 
+class _OptionDict(dict):
+
+    """The option dict which holds the options of OptionHandler."""
+
+    def __init__(self, classname, options):
+        self.classname = classname
+        super().__init__(options)
+
+    def __missing__(self, key):
+        raise pywikibot.Error("'{}' is not a valid option for {}."
+                              .format(key, self.classname))
+    __getattr__ = dict.__getitem__
+
+
+_DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
+                   'or Optionhandler.opt[option] item'
+
+
 class OptionHandler:
 
     """Class to get and set options."""
@@ -1004,46 +1023,64 @@ class OptionHandler:
     # The values are the default values
     # Overwrite this in subclasses!
 
-    availableOptions = {}  # type: Dict[str, Any]
+    available_options = {}  # type: Dict[str, Any]
 
     def __init__(self, **kwargs):
         """
-        Only accept options defined in availableOptions.
+        Only accept options defined in available_options.
 
         @param kwargs: bot options
         """
-        self.setOptions(**kwargs)
+        self.set_options(**kwargs)
 
+    @classproperty
+    @deprecated('available_options', since='20201006')
+    def availableOptions(cls):
+        """DEPRECATED. Available_options class property."""
+        return cls.available_options
+
+    @deprecated('set_options', since='20201006')
     def setOptions(self, **kwargs):
-        """
-        Set the instance options.
+        """DEPRECATED. Set the instance options."""
+        self.set_options(**kwargs)
 
-        @param kwargs: options
-        """
-        valid_options = set(self.availableOptions)
-        received_options = set(kwargs)
+    def set_options(self, **options):
+        """Set the instance options."""
+        valid_options = set(self.available_options)
+        received_options = set(options)
 
-        # contains the options overridden from defaults
-        self.options = {
-            opt: kwargs[opt] for opt in received_options & valid_options}
+        # self.opt contains all available options including defaults
+        self.opt = _OptionDict(self.__class__.__name__, self.available_options)
+        # self.options contains the options overridden from defaults
+        self._options = {opt: options[opt]
+                         for opt in received_options & valid_options}
+        self.opt.update(self.options)
 
         for opt in received_options - valid_options:
-            pywikibot.warning('%s is not a valid option. It was ignored.'
-                              % opt)
+            pywikibot.warning('{} is not a valid option. It was ignored.'
+                              .format(opt))
 
+    @deprecated(_DEPRECATION_MSG, since='20201006')
     def getOption(self, option):
-        """
-        Get the current value of an option.
+        """DEPRECATED. Get the current value of an option.
 
-        @param option: key defined in OptionHandler.availableOptions
+        @param option: key defined in OptionHandler.available_options
         @raise pywikibot.exceptions.Error: No valid option is given with
             option parameter
         """
-        try:
-            return self.options.get(option, self.availableOptions[option])
-        except KeyError:
-            raise pywikibot.Error("'{0}' is not a valid option for {1}."
-                                  .format(option, self.__class__.__name__))
+        return self.opt[option]
+
+    @property
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
+    def options(self):
+        """DEPRECATED. Return changed options."""
+        return self._options
+
+    @options.setter
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
+    def options(self, options):
+        """DEPRECATED. Return changed options."""
+        self.set_options(**options)
 
 
 class BaseBot(OptionHandler):
@@ -1066,7 +1103,7 @@ class BaseBot(OptionHandler):
     # The values are the default values
     # Extend this in subclasses!
 
-    availableOptions = {
+    available_options = {
         'always': False,  # By default ask for confirmation when putting a page
     }
 
@@ -1074,7 +1111,7 @@ class BaseBot(OptionHandler):
 
     def __init__(self, **kwargs):
         """
-        Only accept options defined in availableOptions.
+        Only accept options defined in available_options.
 
         @param kwargs: bot options
         """
@@ -1118,7 +1155,7 @@ class BaseBot(OptionHandler):
 
     def user_confirm(self, question):
         """Obtain user response if bot option 'always' not enabled."""
-        if self.getOption('always'):
+        if self.opt.always:
             return True
 
         choice = pywikibot.input_choice(question,
@@ -1203,7 +1240,7 @@ class BaseBot(OptionHandler):
         if not self.user_confirm('Do you want to accept these changes?'):
             return False
 
-        if 'asynchronous' not in kwargs and self.getOption('always'):
+        if 'asynchronous' not in kwargs and self.opt.always:
             kwargs['asynchronous'] = True
 
         ignore_save_related_errors = kwargs.pop('ignore_save_related_errors',
@@ -1589,7 +1626,7 @@ class ConfigParserBot(BaseBot):
 
     """A bot class that can read options from scripts.ini file.
 
-    All options must be predefined in availableOptions dictionary. The type
+    All options must be predefined in available_options dictionary. The type
     of these options is responsible for the correct interpretation of the
     options type given by the .ini file. They can be interpreted as bool,
     int, float or str (default). The settings file may be like:
@@ -1603,22 +1640,22 @@ class ConfigParserBot(BaseBot):
 
     The option values are interpreted in this order::
 
-    - availableOptions default setting
+    - available_options default setting
     - script.ini options settings
     - command line arguments
     """
 
     INI = 'scripts.ini'
 
-    def setOptions(self, **kwargs):
+    def set_options(self, **kwargs):
         """Read settings from scripts.ini file."""
         conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
             pywikibot.output('Reading settings from {} file.'.format(self.INI))
-            args = {}
-            for option, value in self.availableOptions.items():
+            options = {}
+            for option, value in self.available_options.items():
                 if not conf.has_option(section, option):
                     continue
                 # use a convenience parser method, default to get()
@@ -1628,15 +1665,15 @@ class ConfigParserBot(BaseBot):
                     method = getattr(conf, 'getboolean')
                 else:
                     method = getattr(conf, 'get' + value_type, default)
-                args[option] = method(section, option)
-            for opt in set(conf.options(section)) - set(args):
+                options[option] = method(section, option)
+            for opt in set(conf.options(section)) - set(options):
                 pywikibot.warning(
                     '"{}" is not a valid option. It was ignored.'.format(opt))
-            args.update(kwargs)
+            options.update(kwargs)
         else:
-            args = kwargs
+            options = kwargs
 
-        super().setOptions(**args)
+        super().set_options(**options)
 
 
 class CurrentPageBot(BaseBot):
@@ -1813,7 +1850,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     @ivar create_missing_item: If True, new items will be created if the
         current page doesn't have one. Subclasses should override this in the
-        initializer with a bool value or using self.getOption.
+        initializer with a bool value or using self.opt attribute.
 
     @type create_missing_item: bool
     """
