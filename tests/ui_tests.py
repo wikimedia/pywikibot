@@ -33,6 +33,7 @@ import sys
 import time
 import warnings
 
+from contextlib import suppress
 
 import pywikibot
 from pywikibot.bot import (
@@ -64,7 +65,7 @@ if os.name == 'nt':
         win32clipboard = None
 
 
-class Stream(object):
+class Stream:
 
     """Handler for a StringIO or BytesIO instance able to patch itself."""
 
@@ -95,7 +96,7 @@ class Stream(object):
 
 if os.name == 'nt':
 
-    class pywikibotWrapper(object):
+    class pywikibotWrapper:
 
         """pywikibot wrapper class."""
 
@@ -198,7 +199,7 @@ class UITestCase(TestCaseBase):
     net = False
 
     def setUp(self):
-        super(UITestCase, self).setUp()
+        super().setUp()
         patch()
 
         pywikibot.config.colorized_output = True
@@ -207,7 +208,7 @@ class UITestCase(TestCaseBase):
         pywikibot.ui.encoding = 'utf-8'
 
     def tearDown(self):
-        super(UITestCase, self).tearDown()
+        super().tearDown()
         unpatch()
 
 
@@ -510,7 +511,7 @@ class WindowsTerminalTestCase(UITestCase):
             except AttributeError as e2:
                 raise unittest.SkipTest('pywinauto Application failed: {}\n{}'
                                         .format(e1, e2))
-        super(WindowsTerminalTestCase, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def setUpProcess(cls, command):
@@ -543,7 +544,7 @@ class WindowsTerminalTestCase(UITestCase):
         cls._process.kill()
 
     def setUp(self):
-        super(WindowsTerminalTestCase, self).setUp()
+        super().setUp()
         self.setclip('')
 
     def waitForWindow(self):
@@ -593,7 +594,7 @@ class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestWindowsTerminalUnicode, cls).setUpClass()
+        super().setUpClass()
         fn = inspect.getfile(inspect.currentframe())
         cls.setUpProcess(['python', 'pwb.py', fn,
                           '--run-as-slave-interpreter'])
@@ -607,7 +608,7 @@ class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
         cls.tearDownProcess()
 
     def setUp(self):
-        super(TestWindowsTerminalUnicode, self).setUp()
+        super().setUp()
 
         self.pywikibot.set_config('colorized_output', True)
         self.pywikibot.set_config('transliterate', False)
@@ -644,7 +645,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestWindowsTerminalUnicodeArguments, cls).setUpClass()
+        super().setUpClass()
         cls.setUpProcess(['cmd', '/k', 'echo off'])
 
     @classmethod
@@ -688,7 +689,7 @@ class FakeUITest(TestCase):
 
     def setUp(self):
         """Create dummy instances for the test and patch encounter_color."""
-        super(FakeUITest, self).setUp()
+        super().setUp()
         self.stream = io.StringIO()
         self.ui_obj = self.ui_class()
         self._orig_encounter_color = self.ui_obj.encounter_color
@@ -698,7 +699,7 @@ class FakeUITest(TestCase):
     def tearDown(self):
         """Unpatch the encounter_color method."""
         self.ui_obj.encounter_color = self._orig_encounter_color
-        super(FakeUITest, self).tearDown()
+        super().tearDown()
         self.assertEqual(self._index,
                          len(self._colors) if self.expect_color else 0)
 
@@ -758,14 +759,14 @@ class FakeUIColorizedTestBase(TestCase):
 
     def setUp(self):
         """Force colorized_output to True."""
-        super(FakeUIColorizedTestBase, self).setUp()
+        super().setUp()
         self._old_config = pywikibot.config2.colorized_output
         pywikibot.config2.colorized_output = True
 
     def tearDown(self):
         """Undo colorized_output configuration."""
         pywikibot.config2.colorized_output = self._old_config
-        super(FakeUIColorizedTestBase, self).tearDown()
+        super().tearDown()
 
 
 class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
@@ -804,7 +805,7 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
 
     def setUp(self):
         """Patch the ctypes import and initialize a stream and UI instance."""
-        super(FakeWin32Test, self).setUp()
+        super().setUp()
         self._orig_ctypes = terminal_interface_win32.ctypes
         ctypes = FakeModule.create_dotted('ctypes.windll.kernel32')
         ctypes.windll.kernel32.SetConsoleTextAttribute = self._handle_setattr
@@ -814,7 +815,7 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
     def tearDown(self):
         """Unpatch the ctypes import and check that all colors were used."""
         terminal_interface_win32.ctypes = self._orig_ctypes
-        super(FakeWin32Test, self).tearDown()
+        super().tearDown()
 
     def _encounter_color(self, color, target_stream):
         """Call the original method."""
@@ -842,14 +843,13 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
 
     def setUp(self):
         """Change the local stream's console to None to disable colors."""
-        super(FakeWin32UncolorizedTest, self).setUp()
+        super().setUp()
         self.stream._hConsole = None
 
 
 if __name__ == '__main__':  # pragma: no cover
     try:
-        unittest.main()
-    except SystemExit:
-        pass
+        with suppress(SystemExit):
+            unittest.main()
     finally:
         unpatch()

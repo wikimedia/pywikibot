@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Test Interwiki Link functionality."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot import config2 as config
 
@@ -90,7 +90,5 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

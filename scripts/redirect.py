@@ -76,6 +76,7 @@ and arguments can be:
 #
 import datetime
 
+from contextlib import suppress
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Union
 
 import pywikibot
@@ -274,13 +275,11 @@ class RedirectGenerator(OptionHandler):
                 try:
                     if pages[target]:
                         final = target
-                        try:
+                        with suppress(KeyError):
                             while result <= maxlen:
                                 result += 1
                                 final = redirects[final]
                             # result = None
-                        except KeyError:
-                            pass
                 except KeyError:
                     result = None
                 yield (redirect, result, target, final)
@@ -311,15 +310,13 @@ class RedirectGenerator(OptionHandler):
             yield self.page_title
         else:
             pywikibot.output('Retrieving broken redirect special page...')
-            for page in self.site.preloadpages(self.site.broken_redirects()):
-                yield page
+            yield from self.site.preloadpages(self.site.broken_redirects())
 
     def retrieve_double_redirects(self) -> Generator[
             Union[str, pywikibot.Page], None, None]:
         """Retrieve double redirects."""
         if self.use_move_log:
-            for redir_page in self.get_moved_pages_redirects():
-                yield redir_page
+            yield from self.get_moved_pages_redirects()
         elif self.use_api:
             count = 0
             for (pagetitle, type, target, final) \
@@ -344,8 +341,7 @@ class RedirectGenerator(OptionHandler):
             yield self.page_title
         else:
             pywikibot.output('Retrieving double redirect special page...')
-            for page in self.site.preloadpages(self.site.double_redirects()):
-                yield page
+            yield from self.site.preloadpages(self.site.double_redirects())
 
     def get_moved_pages_redirects(self) -> Generator[pywikibot.Page, None,
                                                      None]:
@@ -378,9 +374,8 @@ class RedirectGenerator(OptionHandler):
             # moved_page is now a redirect, so any redirects pointing
             # to it need to be changed
             try:
-                for page in moved_page.getReferences(follow_redirects=True,
-                                                     filter_redirects=True):
-                    yield page
+                yield from moved_page.getReferences(follow_redirects=True,
+                                                    filter_redirects=True)
             except (pywikibot.CircularRedirect,
                     pywikibot.InterwikiRedirectPage,
                     pywikibot.NoPage,
@@ -497,10 +492,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 pywikibot.exception()
             except pywikibot.NoPage:
                 movedTarget = None
-                try:
+                with suppress(pywikibot.NoMoveTarget):
                     movedTarget = targetPage.moved_target()
-                except pywikibot.NoMoveTarget:
-                    pass
                 if movedTarget:
                     if not movedTarget.exists():
                         # FIXME: Test to another move

@@ -129,6 +129,7 @@ import requests
 import pywikibot
 
 from pywikibot import comms, i18n, config, pagegenerators, textlib, config2
+
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
@@ -718,9 +719,8 @@ class History:
         @return: True if previously found dead, else returns False.
         """
         if url in self.historyDict:
-            with self.semaphore:
-                with suppress(KeyError):  # Not sure why this can happen
-                    del self.historyDict[url]
+            with self.semaphore, suppress(KeyError):
+                del self.historyDict[url]
             return True
 
         return False

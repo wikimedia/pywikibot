@@ -11,6 +11,8 @@ These tests write to the wiki.
 #
 import os
 
+from contextlib import suppress
+
 from pywikibot.specialbots import UploadRobot
 
 from tests import join_images_path
@@ -83,7 +85,5 @@ class TestDryUploadbot(DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

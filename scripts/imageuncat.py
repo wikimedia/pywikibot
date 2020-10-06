@@ -11,12 +11,11 @@ the site commons should be given and not a Wikipedia or similar.
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
@@ -1299,15 +1298,8 @@ def addUncat(page):
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
-    try:
+    with suppress(pywikibot.EditConflict, pywikibot.LockedPage):
         page.put(newtext, putcomment)
-    except pywikibot.EditConflict:
-        # Skip this page
-        pass
-    except pywikibot.LockedPage:
-        # Skip this page
-        pass
-    return
 
 
 def main(*args):

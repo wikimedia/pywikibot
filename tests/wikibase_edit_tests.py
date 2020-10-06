@@ -6,13 +6,13 @@ Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failiure_tests.py
 """
 #
-# (C) Pywikibot team, 2014-2019
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import time
+
+from contextlib import suppress
 
 import pywikibot
 
@@ -394,7 +394,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
 
     def setUp(self):
         """Add a claim with two qualifiers."""
-        super(TestWikibaseRemoveQualifier, self).setUp()
+        super().setUp()
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
         item.get()
@@ -460,7 +460,5 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

@@ -39,10 +39,9 @@ Furthermore, the following command line parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
+from contextlib import suppress
 from functools import partial
 
 import pywikibot
@@ -52,10 +51,8 @@ from pywikibot.tools import has_module
 try:
     import stdnum.isbn
 except ImportError:
-    try:
+    with suppress(ImportError):
         import isbnlib
-    except ImportError:
-        pass
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -168,7 +165,7 @@ class IsbnBot(Bot):
             'to13': False,
             'format': False,
         })
-        super(IsbnBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = generator
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
@@ -226,7 +223,7 @@ class IsbnWikibaseBot(WikidataBot):
         self.isbn_10_prop_id = kwargs.pop('prop-isbn-10', None)
         self.isbn_13_prop_id = kwargs.pop('prop-isbn-13', None)
 
-        super(IsbnWikibaseBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = generator
         if self.isbn_10_prop_id is None:
