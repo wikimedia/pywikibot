@@ -1054,7 +1054,7 @@ class OptionHandler:
         # self.options contains the options overridden from defaults
         self._options = {opt: options[opt]
                          for opt in received_options & valid_options}
-        self.opt.update(self.options)
+        self.opt.update(self._options)
 
         for opt in received_options - valid_options:
             pywikibot.warning('{} is not a valid option. It was ignored.'
