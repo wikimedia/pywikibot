@@ -23,28 +23,24 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import base64
 import hashlib
 import io
 import re
 
+from contextlib import suppress
+from urllib.parse import urlencode
+
 import pywikibot
-from pywikibot import config, textlib
 from pywikibot.comms.http import fetch
+from pywikibot import config2 as config
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import PY2
+from pywikibot import textlib
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
     Tkdialog = _tk_error
-
-if not PY2:
-    from urllib.parse import urlencode
-else:
-    from urllib import urlencode
 
 try:
     import flickrapi  # see: http://stuvel.eu/projects/flickrapi
@@ -137,12 +133,11 @@ def findDuplicateImages(photo, site=None):
     return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
 
-def getTags(photoInfo, raw=False):
+def getTags(photoInfo, raw: bool = False):
     """Get all the tags on a photo.
 
     @param raw: use original tag name
         see https://www.flickr.com/services/api/misc.tags.html
-    @type raw: bool
     """
     return [tag.attrib['raw'].lower() if raw else tag.text.lower()
             for tag in photoInfo.find('photo').find('tags').findall('tag')]
@@ -427,8 +422,6 @@ def main(*args):
     @param args: command line arguments
     @type args: str
     """
-    local_args = pywikibot.handle_args(args)
-
     group_id = ''
     photoset_id = ''
     user_id = ''
@@ -438,111 +431,93 @@ def main(*args):
     addCategory = ''
     removeCategories = False
     autonomous = False
-    totalPhotos = 0
-    uploadedPhotos = 0
+    override = ''  # override license text
 
     # Do we mark the images as reviewed right away?
-    if config.flickr['review']:
-        flickrreview = config.flickr['review']
-    else:
-        flickrreview = False
+    flickrreview = config.flickr['review']
 
     # Set the Flickr reviewer
-    if config.flickr['reviewer']:
-        reviewer = config.flickr['reviewer']
-    elif 'commons' in config.usernames['commons']:
-        reviewer = config.usernames['commons']['commons']
-    else:
-        reviewer = ''
+    reviewer = config.flickr['reviewer']
+    if not reviewer:
+        with suppress(KeyError):
+            reviewer = config.usernames['commons']['commons']
 
-    # Should be renamed to overrideLicense or something like that
-    override = ''
-    for arg in local_args:
-        if arg.startswith('-group_id'):
-            if len(arg) == 9:
-                group_id = pywikibot.input('What is the group_id of the pool?')
-            else:
-                group_id = arg[10:]
-        elif arg.startswith('-photoset_id'):
-            if len(arg) == 12:
-                photoset_id = pywikibot.input('What is the photoset_id?')
-            else:
-                photoset_id = arg[13:]
-        elif arg.startswith('-user_id'):
-            if len(arg) == 8:
-                user_id = pywikibot.input(
-                    'What is the user_id of the flickr user?')
-            else:
-                user_id = arg[9:]
-        elif arg.startswith('-start_id'):
-            if len(arg) == 9:
-                start_id = pywikibot.input(
-                    'What is the id of the photo you want to start at?')
-            else:
-                start_id = arg[10:]
-        elif arg.startswith('-end_id'):
-            if len(arg) == 7:
-                end_id = pywikibot.input(
-                    'What is the id of the photo you want to end at?')
-            else:
-                end_id = arg[8:]
-        elif arg.startswith('-tags'):
-            if len(arg) == 5:
-                tags = pywikibot.input(
-                    'What is the tag you want to filter out (currently only '
-                    'one supported)?')
-            else:
-                tags = arg[6:]
-        elif arg == '-flickrreview':
+    local_args = pywikibot.handle_args(args)
+    for local_arg in local_args:
+        if not local_arg.startswith('-'):
+            continue
+        arg, _, value = local_arg[1:].partition(':')
+        if arg == 'group_id':
+            group_id = value or pywikibot.input(
+                'What is the group_id of the pool?')
+        elif arg == 'photoset_id':
+            photoset_id = value or pywikibot.input('What is the photoset_id?')
+        elif arg == 'user_id':
+            user_id = value or pywikibot.input(
+                'What is the user_id of the flickr user?')
+        elif arg == 'start_id':
+            start_id = value or pywikibot.input(
+                'What is the id of the photo you want to start at?')
+        elif arg == 'end_id':
+            end_id = value or pywikibot.input(
+                'What is the id of the photo you want to end at?')
+        elif arg == 'tags':
+            tags = value or pywikibot.input(
+                'What is the tag you want to filter out (currently only '
+                'one supported)?')
+        elif arg == 'flickrreview':
             flickrreview = True
-        elif arg.startswith('-reviewer'):
-            if len(arg) == 9:
-                reviewer = pywikibot.input('Who is the reviewer?')
-            else:
-                reviewer = arg[10:]
-        elif arg.startswith('-override'):
-            if len(arg) == 9:
-                override = pywikibot.input('What is the override text?')
-            else:
-                override = arg[10:]
-        elif arg.startswith('-addcategory'):
-            if len(arg) == 12:
-                addCategory = pywikibot.input(
-                    'What category do you want to add?')
-            else:
-                addCategory = arg[13:]
-        elif arg == '-removecategories':
+        elif arg == 'reviewer':
+            reviewer = value or pywikibot.input('Who is the reviewer?')
+        elif arg == 'override':
+            override = value or pywikibot.input('What is the override text?')
+        elif arg == 'addcategory':
+            addCategory = value or pywikibot.input(
+                'What category do you want to add?')
+        elif arg == 'removecategories':
             removeCategories = True
-        elif arg == '-autonomous':
+        elif arg == 'autonomous':
             autonomous = True
 
+    # check dependencies, settings and parameters
+    missing_dependencies = None
     if isinstance(flickrapi, ImportError):
-        pywikibot.bot.suggest_help(missing_dependencies=('flickrapi',))
+        missing_dependencies = ('flickrapi',)
 
-    elif not config.flickr['api_key']:
+    additional_text = None
+    if not config.flickr['api_key']:
         additional_text = (
             'Flickr api key not found! Get yourself an api key\n'
             'Any flickr user can get a key at\n'
             'https://www.flickr.com/services/api/keys/apply/')
-        pywikibot.bot.suggest_help(additional_text=additional_text)
 
-    elif user_id or group_id or photoset_id:
-        if 'api_secret' in config.flickr and config.flickr['api_secret']:
-            flickr = flickrapi.FlickrAPI(config.flickr['api_key'],
-                                         config.flickr['api_secret'])
-        else:
-            pywikibot.output('Accessing public content only')
-            flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
+    missing_parameters = []
+    if not (user_id or group_id or photoset_id):
+        missing_parameters = ['user_id', 'group_id', 'photoset_id']
 
-        for photo_id in getPhotos(flickr, user_id, group_id, photoset_id,
-                                  start_id, end_id, tags):
-            uploadedPhotos += processPhoto(flickr, photo_id, flickrreview,
-                                           reviewer, override, addCategory,
-                                           removeCategories, autonomous)
-            totalPhotos += 1
-        pywikibot.output('Finished running')
-        pywikibot.output('Total photos: ' + str(totalPhotos))
-        pywikibot.output('Uploaded photos: ' + str(uploadedPhotos))
+    if pywikibot.bot.suggest_help(additional_text=additional_text,
+                                  missing_parameters=missing_parameters,
+                                  missing_dependencies=missing_dependencies):
+        return
+
+    if config.flickr['api_secret']:
+        flickr = flickrapi.FlickrAPI(config.flickr['api_key'],
+                                     config.flickr['api_secret'])
+    else:
+        pywikibot.output('Accessing public content only')
+        flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
+
+    totalPhotos = 0
+    uploadedPhotos = 0
+    for photo_id in getPhotos(flickr, user_id, group_id, photoset_id,
+                              start_id, end_id, tags):
+        uploadedPhotos += processPhoto(flickr, photo_id, flickrreview,
+                                       reviewer, override, addCategory,
+                                       removeCategories, autonomous)
+        totalPhotos += 1
+    pywikibot.output('Finished running')
+    pywikibot.output('Total photos: ' + str(totalPhotos))
+    pywikibot.output('Uploaded photos: ' + str(uploadedPhotos))
 
 
 if __name__ == '__main__':
