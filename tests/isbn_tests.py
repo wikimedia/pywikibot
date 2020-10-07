@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 try:
@@ -156,12 +154,12 @@ class TestIsbnBot(ScriptMainTestCase):
         """Patch the Bot class to avoid an actual write."""
         self._original_userPut = Bot.userPut
         Bot.userPut = userPut_dummy
-        super(TestIsbnBot, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Unpatch the Bot class."""
         Bot.userPut = self._original_userPut
-        super(TestIsbnBot, self).tearDown()
+        super().tearDown()
 
     def test_isbn(self):
         """Test the ISBN bot."""
@@ -191,7 +189,7 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase,
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
-        super(TestIsbnWikibaseBot, cls).setUpClass()
+        super().setUpClass()
 
         # Check if the unit test item page and the property both exist
         item_ns = cls.get_repo().item_namespace
@@ -220,13 +218,13 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase,
         Claim.setTarget = setTarget_dummy
         TestIsbnWikibaseBot._original_editEntity = ItemPage.editEntity
         ItemPage.editEntity = editEntity_dummy
-        super(TestIsbnWikibaseBot, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Unpatch the dummy methods."""
         Claim.setTarget = TestIsbnWikibaseBot._original_setTarget
         ItemPage.editEntity = TestIsbnWikibaseBot._original_editEntity
-        super(TestIsbnWikibaseBot, self).tearDown()
+        super().tearDown()
 
     def test_isbn_format(self):
         """Test format using the bot and wikibase."""
@@ -254,9 +252,9 @@ def editEntity_dummy(self, data=None, **kwargs):
 
 def setUpModule():  # noqa: N802
     """Skip tests if isbn libraries are missing."""
-    if not (has_module('stdnum', version='1.13')
-            or has_module('isbnlib', version='3.9.10')):
-        raise unittest.SkipTest('neither python-stdlib nor isbnlib available.')
+    if not (has_module('stdnum', version='1.14')
+            or has_module('isbnlib', version='3.10.3')):
+        raise unittest.SkipTest('neither python-stdnum nor isbnlib available.')
 
 
 if __name__ == '__main__':  # pragma: no cover
