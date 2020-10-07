@@ -30,7 +30,7 @@ class TWNBotTestCase(TestCase):
         if not i18n.messages_available():
             raise unittest.SkipTest("i18n messages package '{}' not available."
                                     .format(i18n._messages_package_name))
-        super(TWNBotTestCase, cls).setUpClass()
+        super().setUpClass()
 
 
 class FakeSaveBotTestCase(TestCase):
@@ -78,7 +78,7 @@ class FakeSaveBotTestCase(TestCase):
 
     def setUp(self):
         """Set up test by resetting the counters."""
-        super(FakeSaveBotTestCase, self).setUp()
+        super().setUp()
         self.assert_saves = getattr(self, 'default_assert_saves', 1)
         self.save_called = 0
 
@@ -87,7 +87,7 @@ class FakeSaveBotTestCase(TestCase):
         self.assertEqual(self._bot._save_counter,
                          self._old_counter + self.assert_saves)
         self.assertEqual(self.save_called, self.assert_saves)
-        super(FakeSaveBotTestCase, self).tearDown()
+        super().tearDown()
 
     def bot_save(self, page, func, *args, **kwargs):
         """Handle when bot's userPut was called."""
@@ -105,7 +105,7 @@ class FakeSaveBotTestCase(TestCase):
         self.save_called += 1
 
 
-class TestBotTreatExit(object):
+class TestBotTreatExit:
 
     """Mixin to provide handling for treat and exit."""
 
@@ -320,6 +320,8 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
         """Set the number of treated pages to _count."""
         def exit():
             t = self._count if treated is None else treated
+            # Due to PEP 3135 super()._exit(...)() would raise
+            # RuntimeError: super(): no arguments
             super(LiveBotTestCase, self)._exit(t, written, exception)()
         return exit
 
