@@ -71,7 +71,7 @@ class FakeSaveBotTestCase(TestCase):
         """Set and patch the current bot."""
         assert value._save_page != self.bot_save, 'bot may not be patched.'
         self._bot = value
-        self._bot.options['always'] = True
+        self._bot.opt.always = True
         self._original = self._bot._save_page
         self._bot._save_page = self.bot_save
         self._old_counter = self._bot._save_counter
@@ -355,6 +355,55 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
         self.bot.treat_page = self._treat_page(treat_generator(), post_treat)
         self.bot.exit = self._exit()
         self.bot.run()
+
+
+class Options(pywikibot.bot.OptionHandler):
+
+    """A derived OptionHandler class."""
+
+    available_options = {
+        'foo': 'bar',
+        'bar': 42,
+        'baz': False
+    }
+
+
+class TestOptionHandler(TestCase):
+
+    """OptionHandler test class."""
+
+    dry = True
+
+    def setUp(self):
+        """Setup tests."""
+        self.option_handler = Options(baz=True)
+        super().setUp()
+
+    def test_opt_values(self):
+        """Test OptionHandler."""
+        oh = self.option_handler
+        self.assertEqual(oh.opt.foo, 'bar')
+        self.assertEqual(oh.opt.bar, 42)
+        self.assertTrue(oh.opt.baz)
+        self.assertEqual(oh.opt.foo, oh.opt['foo'])
+        oh.opt.baz = 'Hey'
+        self.assertEqual(oh.opt.baz, 'Hey')
+        self.assertEqual(oh.opt['baz'], 'Hey')
+        self.assertNotIn('baz', oh.opt.__dict__)
+        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
+            self.assertEqual(oh.options['baz'], 'Hey')
+
+    def test_options(self):
+        """Test deprecated option attribute."""
+        oh = self.option_handler
+        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
+            self.assertNotIn('bar', oh.options)
+            self.assertIn('baz', oh.options)
+            self.assertTrue(oh.options['baz'])
+            self.assertEqual(oh.opt['baz'], oh.options['baz'])
+            oh.options['baz'] = False
+            self.assertFalse(oh.options['baz'])
+            self.assertFalse(oh.opt.baz)
 
 
 if __name__ == '__main__':  # pragma: no cover
