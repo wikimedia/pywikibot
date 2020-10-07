@@ -559,11 +559,12 @@ class Family:
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
     language_groups = {
-        # languages using the Arabic script (incomplete)
+        # languages using the Arabic script
         'arab': [
-            'ar', 'ary', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
+            'ar', 'ary', 'arz', 'azb', 'ckb', 'fa', 'glk', 'ks', 'lrc',
+            'mzn', 'ps', 'sd', 'ur',
             # languages using multiple scripts, including Arabic
-            'kk', 'ku', 'tt', 'ug', 'pnb'
+            'ha', 'kk', 'ku', 'pnb', 'ug'
         ],
         # languages that use Chinese symbols
         'chinese': [
