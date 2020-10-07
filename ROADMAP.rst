@@ -1,6 +1,9 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* OptionHandler/BaseBot options are accessable as OptionHandler.opt attributes or keyword item (see also T264721)
+* pywikibot.setAction() function was removed
+* A namedtuple is the result of textlib.extract_sections()
 * Prevent circular imports in config2.py and http.py (T264500)
 * version.get_module_version() is deprecated and gives no meaningfull result
 * Fix version.get_module_filename() and update log lines (T264235)
@@ -40,6 +43,7 @@ Current release changes
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: version.getfileversion() is desupported and will be removed
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
 * 5.0.0: Outdated recentchanges parameter will be removed
