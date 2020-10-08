@@ -127,7 +127,7 @@ from pywikibot.tools import (
     PYTHON_VERSION,
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
 
 # Note: all output goes through python std library "logging" module
@@ -1001,13 +1001,39 @@ class _OptionDict(dict):
     """The option dict which holds the options of OptionHandler."""
 
     def __init__(self, classname, options):
-        self.classname = classname
+        self._classname = classname
+        self._options = {}
         super().__init__(options)
 
     def __missing__(self, key):
         raise pywikibot.Error("'{}' is not a valid option for {}."
-                              .format(key, self.classname))
-    __getattr__ = dict.__getitem__
+                              .format(key, self._classname))
+
+    def __getattr__(self, name):
+        """Get item from dict."""
+        return self.__getitem__(name)
+
+    def __setattr__(self, name, value):
+        """Set item or attribute."""
+        if name not in ('_classname', '_options'):
+            self.__setitem__(name, value)
+        else:
+            super().__setattr__(name, value)
+
+    def __getitem__(self, key):
+        """Update options fro backward compatibility and get item."""
+        self.update_options()
+        return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        """Set item in dict and deprecated option dict."""
+        if key in self._options:
+            self._options[key] = value
+        super().__setitem__(key, value)
+
+    def update_options(self):
+        """Update dict from deprecated options for backward compatibility."""
+        self.update(self._options)
 
 
 _DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
@@ -1046,15 +1072,24 @@ class OptionHandler:
 
     def set_options(self, **options):
         """Set the instance options."""
+        warning = 'pywikibot.bot.OptionHandler.availableOptions'
+        with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
+                               category=DeprecationWarning):
+            old_options = self.availableOptions is not self.available_options
+        if old_options:  # old options were set and not updated
+            self.available_options = self.availableOptions
+            issue_deprecation_warning(warning, 'available_options',
+                                      since='20201006')
+
         valid_options = set(self.available_options)
         received_options = set(options)
 
         # self.opt contains all available options including defaults
         self.opt = _OptionDict(self.__class__.__name__, self.available_options)
         # self.options contains the options overridden from defaults
-        self._options = {opt: options[opt]
-                         for opt in received_options & valid_options}
-        self.opt.update(self._options)
+        self.opt._options = {opt: options[opt]
+                             for opt in received_options & valid_options}
+        self.opt.update(self.opt._options)
 
         for opt in received_options - valid_options:
             pywikibot.warning('{} is not a valid option. It was ignored.'
@@ -1074,13 +1109,20 @@ class OptionHandler:
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
     def options(self):
         """DEPRECATED. Return changed options."""
-        return self._options
+        return self.opt._options
 
     @options.setter
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
     def options(self, options):
         """DEPRECATED. Return changed options."""
         self.set_options(**options)
+
+    def __getattribute__(self, name):
+        """Update options for backward compatibility of options property."""
+        attr = super().__getattribute__(name)
+        if name == 'opt':
+            attr.update_options()
+        return attr
 
 
 class BaseBot(OptionHandler):
