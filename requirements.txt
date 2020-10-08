@@ -30,7 +30,7 @@ mwoauth>=0.2.4,!=0.3.1
 pydot >= 1.2
 
 # cosmetic_changes and scripts/isbn
-python-stdnum >= 1.13
+python-stdnum >= 1.14
 
 # GUI
 Pillow >= 6.2.2
