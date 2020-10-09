@@ -10,18 +10,20 @@ Do not import classes directly from here but from specialbots.
 # Distributed under the terms of the MIT license.
 #
 import os
+import requests
 import tempfile
 
-from contextlib import closing
+from pathlib import Path
 from urllib.parse import urlparse
-from urllib.request import URLopener
 
 import pywikibot
+import pywikibot.comms.http as http
 import pywikibot.data.api
 
-from pywikibot import config
 
+from pywikibot import config
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
+from pywikibot.exceptions import FatalServerError
 from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
 
@@ -115,62 +117,65 @@ class UploadRobot(BaseBot):
             pywikibot.warning('file_url is not given. '
                               'Set to self.url by default.')
         pywikibot.output('Reading file {}'.format(file_url))
-        resume = False
-        rlen = 0
-        _contents = None
-        dt = 15
-        uo = URLopener()
-        retrieved = False
 
-        while not retrieved:
-            if resume:
-                pywikibot.output('Resume download...')
-                uo.addheader('Range', 'bytes={}-'.format(rlen))
-
-            with closing(uo.open(file_url)) as infile:
-                info = infile.info()
-
-                info_get = info.get
-                content_type = info_get('Content-Type')
-                content_len = info_get('Content-Length')
-                accept_ranges = info_get('Accept-Ranges')
-
-                if 'text/html' in content_type:
-                    pywikibot.output(
-                        "Couldn't download the image: "
-                        'the requested URL was not found on server.')
-                    return
-
-                valid_ranges = accept_ranges == 'bytes'
-
-                if resume:
-                    _contents += infile.read()
-                else:
-                    _contents = infile.read()
-
-            retrieved = True
-            if content_len:
-                rlen = len(_contents)
-                content_len = int(content_len)
-                if rlen < content_len:
-                    retrieved = False
-                    pywikibot.output(
-                        'Connection closed at byte {} ({} left)'
-                        .format(rlen, content_len))
-                    if valid_ranges and rlen > 0:
-                        resume = True
-                    pywikibot.output('Sleeping for {} seconds...'.format(dt))
-                    pywikibot.sleep(dt)
-                    if dt <= 60:
-                        dt += 15
-                    elif dt < 360:
-                        dt += 60
-            else:
-                pywikibot.log(
-                    'WARNING: length check of retrieved data not possible.')
         handle, tempname = tempfile.mkstemp()
-        with os.fdopen(handle, 'wb') as t:
-            t.write(_contents)
+        path = Path(tempname)
+        size = 0
+
+        dt_gen = (el for el in (15, 30, 45, 60, 120, 180, 240, 300))
+        while True:
+            file_len = path.stat().st_size
+            if file_len:
+                pywikibot.output('Download resumed.')
+                headers = {'Range': 'bytes={}-'.format(file_len)}
+            else:
+                headers = {}
+
+            with open(path, 'ab') as fd:
+                os.lseek(handle, file_len, 0)
+                try:
+                    r = http.fetch(file_url, stream=True, headers=headers)
+                    response = r.data
+                    response.raise_for_status()
+
+                    # get download info, if available
+                    # Note: this is not enough to exclude pages
+                    #       e.g. 'application/json' is also not a media
+                    if 'text/' in response.headers['Content-Type']:
+                        raise FatalServerError('The requested URL was not '
+                                               'found on server.')
+                    size = max(size,
+                               int(response.headers.get('Content-Length', 0)))
+
+                    # stream content to temp file (in chunks of 1Mb)
+                    for chunk in response.iter_content(chunk_size=1024 * 1024):
+                        fd.write(chunk)
+
+                # raised from connection lost during response.iter_content()
+                except requests.ConnectionError:
+                    fd.flush()
+                    pywikibot.output(
+                        'Connection closed at byte %s' % path.stat().st_size)
+                # raised from response.raise_for_status()
+                except requests.HTTPError as e:
+                    # exit criteria if size is not available
+                    # error on last iteration is OK, we're requesting
+                    #    {'Range': 'bytes=file_len-'}
+                    if response.status_code == 416 and path.stat().st_size:
+                        break
+                    else:
+                        raise FatalServerError(str(e)) from e
+
+            if size and size == path.stat().st_size:
+                break
+            try:
+                dt = next(dt_gen)
+                pywikibot.output('Sleeping for {} seconds ...'.format(dt))
+                pywikibot.sleep(dt)
+            except StopIteration:
+                raise FatalServerError('Download failed, too many retries!')
+
+        pywikibot.output('Downloaded {} bytes'.format(path.stat().st_size))
         return tempname
 
     def _handle_warning(self, warning):
@@ -397,7 +402,10 @@ class UploadRobot(BaseBot):
 
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
         if '://' in file_url and not site.has_right('upload_by_url'):
-            file_url = self.read_file_content(file_url)
+            try:
+                file_url = self.read_file_content(file_url)
+            except FatalServerError:
+                return None
 
         try:
             success = imagepage.upload(file_url,
