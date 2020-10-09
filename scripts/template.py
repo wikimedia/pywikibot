@@ -194,20 +194,18 @@ class TemplateRobot(ReplaceBot):
         self.templates = templates
 
         # get edit summary message if it's empty
-        if not self.getOption('summary'):
+        if not self.opt.summary:
             comma = self.site.mediawiki_message('comma-separator')
             params = {'list': comma.join(self.templates.keys()),
                       'num': len(self.templates)}
 
-            if self.getOption('remove'):
-                self.options['summary'] = i18n.twtranslate(
-                    self.site, 'template-removing', params)
-            elif self.getOption('subst'):
-                self.options['summary'] = i18n.twtranslate(
-                    self.site, 'template-substituting', params)
+            if self.opt.remove:
+                tw_key = 'template-removing'
+            elif self.opt.subst:
+                tw_key = 'template-substituting'
             else:
-                self.options['summary'] = i18n.twtranslate(
-                    self.site, 'template-changing', params)
+                tw_key = 'template-changing'
+            self.opt.summary = i18n.twtranslate(self.site, tw_key, params)
 
         replacements = []
         exceptions = {}
@@ -215,18 +213,18 @@ class TemplateRobot(ReplaceBot):
         for old, new in self.templates.items():
             template_regex = builder.pattern(old)
 
-            if self.getOption('subst') and self.getOption('remove'):
+            if self.opt.subst and self.opt.remove:
                 replacements.append((template_regex,
                                      r'{{subst:%s\g<parameters>}}' % new))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
-            elif self.getOption('subst'):
+            elif self.opt.subst:
                 replacements.append(
                     (template_regex, r'{{%s:%s\g<parameters>}}' %
-                     (self.getOption('subst'), old)))
+                     (self.opt.subst, old)))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
-            elif self.getOption('remove'):
+            elif self.opt.remove:
                 separate_line_regex = re.compile(
                     r'^[*#:]* *{0} *\n'.format(template_regex.pattern),
                     re.DOTALL | re.MULTILINE)
@@ -252,9 +250,9 @@ class TemplateRobot(ReplaceBot):
 
         super().__init__(
             generator, replacements, exceptions,
-            always=self.getOption('always'),
-            addcat=self.getOption('addcat'),
-            summary=self.getOption('summary'))
+            always=self.opt.always,
+            addcat=self.opt.addcat,
+            summary=self.opt.summary)
 
 
 def main(*args) -> None:

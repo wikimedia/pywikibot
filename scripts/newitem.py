@@ -46,8 +46,8 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     treat_missing_item = True
 
     def __init__(self, generator, **kwargs) -> None:
-        """Only accepts options defined in availableOptions."""
-        self.availableOptions.update({
+        """Only accepts options defined in available_options."""
+        self.available_options.update({
             'always': True,
             'lastedit': 7,
             'pageage': 21,
@@ -57,8 +57,6 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
 
         super().__init__(**kwargs)
         self.generator = generator
-        self.pageAge = self.getOption('pageage')
-        self.lastEdit = self.getOption('lastedit')
         self._skipping_templates = {}
 
     def setup(self) -> None:
@@ -66,16 +64,17 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         super().setup()
 
         self.pageAgeBefore = self.repo.server_time() - timedelta(
-            days=self.pageAge)
+            days=self.opt.pageage)
         self.lastEditBefore = self.repo.server_time() - timedelta(
-            days=self.lastEdit)
-        pywikibot.output('Page age is set to {0} days so only pages created'
-                         '\nbefore {1} will be considered.\n'
-                         .format(self.pageAge, self.pageAgeBefore.isoformat()))
+            days=self.opt.lastedit)
+        pywikibot.output('Page age is set to {} days so only pages created'
+                         '\nbefore {} will be considered.\n'
+                         .format(self.opt.pageage,
+                                 self.pageAgeBefore.isoformat()))
         pywikibot.output(
-            'Last edit is set to {0} days so only pages last edited'
-            '\nbefore {1} will be considered.\n'
-            .format(self.lastEdit, self.lastEditBefore.isoformat()))
+            'Last edit is set to {} days so only pages last edited'
+            '\nbefore {} will be considered.\n'
+            .format(self.opt.lastedit, self.lastEditBefore.isoformat()))
 
     @staticmethod
     def _touch_page(page) -> None:
@@ -93,7 +92,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
                 page.title(as_link=True)))
 
     def _callback(self, page, exc) -> None:
-        if exc is None and self.getOption('touch'):
+        if exc is None and self.opt.touch:
             self._touch_page(page)
 
     def get_skipping_templates(self, site) -> Set[pywikibot.Page]:
@@ -177,7 +176,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         if item and item.exists():
             pywikibot.output('{0} already has an item: {1}.'
                              .format(page, item))
-            if self.getOption('touch') is True:
+            if self.opt.touch is True:
                 self._touch_page(page)
             return
 
@@ -217,8 +216,7 @@ def main(*args) -> None:
     if not bot.site.logged_in():
         bot.site.login()
     user = pywikibot.User(bot.site, bot.site.username())
-    if bot.getOption('touch') == 'newly' \
-            and 'autoconfirmed' not in user.groups():
+    if bot.opt.touch == 'newly' and 'autoconfirmed' not in user.groups():
         pywikibot.warning(fill(
             'You are logged in as {}, an account that is '
             'not in the autoconfirmed group on {}. Script '
@@ -226,7 +224,7 @@ def main(*args) -> None:
             'items to avoid triggering edit rates or '
             'captchas. Use -touch param to force this.'
             .format(user.username, bot.site.sitename)))
-        bot.options['touch'] = False
+        bot.opt.touch = False
     bot.run()
 
 

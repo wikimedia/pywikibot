@@ -51,7 +51,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
     def __init__(self, **kwargs) -> None:
         """Initialize the bot."""
-        self.availableOptions.update({
+        self.available_options.update({
             'clean': False,
             'create': False,
             'merge': False,
@@ -64,14 +64,14 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                              'use interwiki.py instead.'.format(
                                  site=self.site))
         self.repo = self.site.data_repository()
-        if not self.getOption('summary'):
-            self.options['summary'] = pywikibot.i18n.twtranslate(
+        if not self.opt.summary:
+            self.opt.summary = pywikibot.i18n.twtranslate(
                 self.site, 'interwikidata-clean-summary')
 
     def treat_page(self) -> None:
         """Check page."""
         if (self.current_page.namespace() not in NAMESPACES
-                and not self.getOption('ignore_ns')):
+                and not self.opt.ignore_ns):
             output('{page} is not in allowed namespaces, skipping'
                    .format(page=self.current_page.title(
                        as_link=True)))
@@ -89,13 +89,13 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
         if item is None:
             item = self.try_to_add()
-            if self.getOption('create') and item is None:
+            if self.opt.create and item is None:
                 item = self.create_item()
         else:
-            if self.getOption('merge'):
+            if self.opt.merge:
                 item = self.try_to_merge(item)
 
-        if item and self.getOption('clean'):
+        if item and self.opt.clean:
             self.current_item = item
             self.clean_page()
 
@@ -151,7 +151,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         output('Cleaning up the page')
         new_text = pywikibot.textlib.removeLanguageLinks(
             self.current_page.text, site=self.current_page.site)
-        self.put_current(new_text, summary=self.getOption('summary'))
+        self.put_current(new_text, summary=self.opt.summary)
 
     def get_items(self) -> Set[pywikibot.ItemPage]:
         """Return all items of pages linked through the interwiki."""

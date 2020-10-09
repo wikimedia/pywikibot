@@ -98,17 +98,17 @@ class LonelyPagesBot(SingleSiteBot):
 
     def __init__(self, generator, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'enablePage': None,    # Check if someone set an enablePage or not
             'disambigPage': None,  # If no disambigPage given, not use it.
         })
-        super(LonelyPagesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
 
         # Take the configurations according to our project
-        if self.getOption('enablePage'):
-            self.options['enablePage'] = pywikibot.Page(
-                self.site, self.getOption('enablePage'))
+        if self.opt.enablePage:
+            self.opt.enablePage = pywikibot.Page(
+                self.site, self.opt.enablePage)
         self.comment = i18n.twtranslate(
             self.site, 'lonelypages-comment-add-template')
         self.commentdisambig = i18n.twtranslate(
@@ -127,9 +127,9 @@ class LonelyPagesBot(SingleSiteBot):
         else:
             self._settings = orphan_template
         # DisambigPage part
-        if self.getOption('disambigPage') is not None:
+        if self.opt.disambigPage is not None:
             self.disambigpage = pywikibot.Page(
-                self.site, self.getOption('disambigPage'))
+                self.site, self.opt.disambigPage)
             try:
                 self.disambigtext = self.disambigpage.get()
             except pywikibot.NoPage:
@@ -139,7 +139,7 @@ class LonelyPagesBot(SingleSiteBot):
             except pywikibot.IsRedirectPage:
                 pywikibot.output("{0} is a redirect, don't use it!"
                                  .format(self.disambigpage.title()))
-                self.options['disambigPage'] = None
+                self.opt.disambigPage = None
 
     @property
     def settings(self):
@@ -148,7 +148,7 @@ class LonelyPagesBot(SingleSiteBot):
 
     def enable_page(self):
         """Enable or disable bot via wiki page."""
-        enable = self.getOption('enablePage')
+        enable = self.opt.enablePage
         if enable is not None:
             try:
                 getenable = enable.get()
@@ -204,7 +204,7 @@ class LonelyPagesBot(SingleSiteBot):
                     .format(page.title()))
                 return
             if (page.isDisambig()
-                    and self.getOption('disambigPage') is not None):
+                    and self.opt.disambigPage is not None):
                 pywikibot.output('{0} is a disambig page, report..'
                                  .format(page.title()))
                 if not page.title().lower() in self.disambigtext.lower():

@@ -224,10 +224,10 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'summary': None,
         })
-        super(CommonscatBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def skip_page(self, page):
         """Skip category redirects or disambigs."""
@@ -241,7 +241,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 'Page {page} on {page.site} is a disambiguation. '
                 'Skipping.'.format(page=page))
             return True
-        return super(CommonscatBot, self).skip_page(page)
+        return super().skip_page(page)
 
     def skipPage(self, page):
         """Determine if the page should be skipped."""
@@ -317,11 +317,11 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     textToAdd = '{{%s|%s}}' % (primaryCommonscat,
                                                commonscatLink)
                 result, _, always = add_text(page, textToAdd,
-                                             self.getOption('summary'),
-                                             always=self.getOption('always'))
+                                             self.opt.summary,
+                                             always=self.opt.always)
                 if result is True:
                     self._save_counter += 1
-                self.options['always'] = always
+                self.opt.always = always
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
@@ -350,8 +350,8 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                              page.get())
         else:  # nothing left to do
             return
-        if self.getOption('summary'):
-            comment = self.getOption('summary')
+        if self.opt.summary:
+            comment = self.opt.summary
         else:
             comment = i18n.twtranslate(page.site,
                                        'commonscat-msg_change',
