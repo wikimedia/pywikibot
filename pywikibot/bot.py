@@ -1042,7 +1042,44 @@ _DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
 
 class OptionHandler:
 
-    """Class to get and set options."""
+    """Class to get and set options.
+
+    How to use options of OptionHandler and its BaseBot subclasses:
+    First define a available_options class attribute to define all
+    available options:
+
+    available_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+
+    Or you may update the predefined setting in the class initializer.
+    BaseBot predefines a 'always' options and sets it to False:
+
+    self.available_options.update(always=True, another_option='Yes')
+
+    Now you can instantiate an OptionHandler or BaseBot class passing
+    options other than default values:
+
+    >>> bot = OptionHandler(baz=True)
+
+    You can access bot options either as keyword item or attribute:
+
+    >>> bot.opt.foo
+    'bar'
+    >>> bot.opt['bar']
+    42
+    >>> bot.opt.baz  # default was overridden
+    True
+
+    You can set the options in the same way:
+
+    >>> bot.opt.bar = 4711
+    >>> bot.opt['baz'] = None
+    >>>
+
+    Or you can use the option as a dict:
+
+    >>> 'Option opt.{foo} is {bar}'.format_map(bot.opt)
+    'Option opt.bar is 4711'
+    """
 
     # Handler configuration.
     # Only the keys of the dict can be passed as init options
@@ -1139,6 +1176,8 @@ class BaseBot(OptionHandler):
 
     If the subclass does not set a generator, or does not override
     treat() or run(), NotImplementedError is raised.
+
+    For bot options handling refer OptionHandler class above.
     """
 
     # Handler configuration.
