@@ -5,6 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Callable, Dict, Union
+
+PluralRule = Dict[str, Union[int, Callable]]
+
 plural_rules = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},
     'ar': {'nplurals': 6, 'plural': lambda n:
@@ -77,7 +81,7 @@ plural_rules = {
            1 if (n % 100 == 2) else
            2 if n % 100 in (3, 4) else
            3},
-}
+}  # type: Dict[str, PluralRule]
 
 plural_rules.update(
     dict.fromkeys(
@@ -99,3 +103,8 @@ plural_rules.update(
          0 if n % 10 == 1 and n % 100 != 11 else
          1 if (2 <= (n % 10) <= 4) and (n % 100 < 10 or n % 100 >= 20)
          else 2}))
+
+
+def plural_rule(lang: str) -> PluralRule:
+    """Return the plural rule for a given lang."""
+    return plural_rules.get(lang, plural_rules['_default'])
