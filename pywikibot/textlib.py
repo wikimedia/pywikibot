@@ -2012,13 +2012,13 @@ class TimeStripper:
                                        self.site.siteinfo['timezone'])
 
     @property
-    @deprecated('_hyperlink_pat', since='20170212')
+    @deprecated(since='20170212', future_warning=True)
     def linkP(self):
         """Deprecated linkP instance variable."""
         return self._hyperlink_pat
 
     @property
-    @deprecated('_comment_pat', since='20170212')
+    @deprecated(since='20170212', future_warning=True)
     def comment_pattern(self):
         """Deprecated comment_pattern instance variable."""
         return self._comment_pat
