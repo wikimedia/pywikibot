@@ -32,8 +32,6 @@ used on a page reachable via interwiki links.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import sys
 
@@ -150,7 +148,7 @@ class ImageTransferBot(object):
         @return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
-        url = sourceImagePage.fileUrl().encode('utf-8')
+        url = sourceImagePage.get_file_url().encode('utf-8')
         pywikibot.output('URL should be: ' + url)
         # localize the text that should be printed on image description page
         try:

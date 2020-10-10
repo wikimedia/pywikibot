@@ -60,9 +60,9 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
 
     def treat(self, image):
         """Process one image page."""
-        # Use fileUrl() and file_is_shared() to confirm it is local media
+        # Use get_file_url() and file_is_shared() to confirm it is local media
         # rather than a local page with the same name as shared media.
-        if (image.fileUrl() and not image.file_is_shared()
+        if (image.get_file_url() and not image.file_is_shared()
                 and 'http://' not in image.text):
             if self.template_image in image.text:
                 pywikibot.output('{0} done already'
