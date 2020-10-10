@@ -23,7 +23,7 @@ This is just a first version so that other people can play around with it.
 Expect the code to change a lot!
 """
 #
-# (c) Pywikibot team, 2009-2019
+# (c) Pywikibot team, 2009-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -108,7 +108,7 @@ def match_image_pages(imagePageA, imagePageB):
 
 def get_image_from_image_page(imagePage):
     """Get the image object to work based on an imagePage object."""
-    imageURL = imagePage.fileUrl()
+    imageURL = imagePage.get_file_url()
     imageURLopener = http.fetch(imageURL)
     imageBuffer = io.BytesIO(imageURLopener.raw[:])
     image = Image.open(imageBuffer)

@@ -61,8 +61,6 @@ By default the bot works on your home wiki (set in user-config)
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import re
 import threading
@@ -280,7 +278,7 @@ class imageTransfer(threading.Thread):
                 'added categories -->', '')
             CH += '[[Category:' + self.category + ']]'
 
-        bot = UploadRobot(url=self.imagePage.fileUrl(), description=CH,
+        bot = UploadRobot(url=self.imagePage.get_file_url(), description=CH,
                           use_filename=self.newname, keep_filename=True,
                           verify_description=False, ignore_warning=True,
                           target_site=self.image_repo)
@@ -394,7 +392,7 @@ class TkdialogIC(Tkdialog):
         if isinstance(Tkinter, ImportError):
             raise Tkinter
 
-        super(TkdialogIC, self).__init__()
+        super().__init__()
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         # Always appear the same size and in the bottom-left corner

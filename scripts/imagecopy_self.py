@@ -36,13 +36,12 @@ check it yourself.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import threading
 import webbrowser
 
 from datetime import datetime
+from queue import Queue
 from textwrap import fill
 
 import pywikibot
@@ -51,14 +50,8 @@ from pywikibot import pagegenerators, i18n
 
 from pywikibot.specialbots import UploadRobot
 from pywikibot.textlib import removeCategoryLinks
-from pywikibot.tools import PY2
 
 from scripts import imagerecat, image
-
-if not PY2:
-    from queue import Queue
-else:
-    from Queue import Queue
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog, Tkinter
@@ -688,7 +681,7 @@ class TkdialogICS(Tkdialog):
         # to configure this
 
         # Get all the relevant fields
-        super(TkdialogICS, self).__init__()
+        super().__init__()
         self.imagepage = fields.get('imagepage')
         self.filename = fields.get('filename')
 
@@ -880,7 +873,7 @@ class uploader(threading.Thread):
         """Work on a single image."""
         cid = self.buildNewImageDescription(fields)
         pywikibot.output(cid)
-        bot = UploadRobot(url=fields.get('imagepage').fileUrl(),
+        bot = UploadRobot(url=fields.get('imagepage').get_file_url(),
                           description=cid,
                           use_filename=fields.get('filename'),
                           keep_filename=True, verify_description=False,
