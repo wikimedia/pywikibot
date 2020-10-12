@@ -69,6 +69,7 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'an': 'an',
     'arc': 'arc',
     'arn': 'an',
+    'ary': 'arc',
     'arz': 'arc',
     'as': 'as',
     'ast': 'an',
