@@ -148,7 +148,7 @@ class ImageTransferBot(object):
         @return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
-        url = sourceImagePage.get_file_url().encode('utf-8')
+        url = sourceImagePage.get_file_url()
         pywikibot.output('URL should be: ' + url)
         # localize the text that should be printed on image description page
         try:
