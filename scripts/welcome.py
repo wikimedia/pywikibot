@@ -217,6 +217,7 @@ netext = {
     'wikipedia': {
         'am': '{{subst:Welcome}} %s',
         'ar': '{{subst:ترحيب}} %s',
+        'ary': '{{subst:welcome}} %s',
         'arz': '{{subst:ترحيب}} %s',
         'as': '{{subst:আদৰণি}} %s',
         'ba': '{{Hello}} %s',
