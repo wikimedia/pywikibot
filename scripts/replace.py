@@ -529,7 +529,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     @deprecated_args(acceptall='always', addedCat='addcat')
     def __init__(self, generator, replacements, exceptions={}, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'addcat': None,
             'allowoverlap': False,
             'recursive': False,
@@ -550,12 +550,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         self.replacements = replacements
         self.exceptions = exceptions
 
-        self.sleep = self.getOption('sleep')
-        self.summary = self.getOption('summary')
-
-        self.addcat = self.getOption('addcat')
-        if self.addcat and isinstance(self.addcat, str):
-            self.addcat = pywikibot.Category(self.site, self.addcat)
+        if self.opt.addcat and isinstance(self.opt.addcat, str):
+            self.opt.addcat = pywikibot.Category(self.site, self.opt.addcat)
 
         self._pending_processed_titles = Queue()
 
@@ -595,8 +591,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         exceptions = _get_text_exceptions(self.exceptions)
         skipped_containers = set()
         for replacement in self.replacements:
-            if self.sleep:
-                pywikibot.sleep(self.sleep)
+            if self.opt.sleep:
+                pywikibot.sleep(self.opt.sleep)
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue
@@ -619,7 +615,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
                 exceptions + replacement.get_inside_exceptions(),
-                allowoverlap=self.getOption('allowoverlap'), site=self.site)
+                allowoverlap=self.opt.allowoverlap, site=self.site)
             if old_text != new_text:
                 applied.add(replacement)
 
@@ -660,8 +656,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 default_summaries.add((replacement.old, replacement.new))
         summary_messages = sorted(summary_messages)
         if default_summaries:
-            if self.summary:
-                summary_messages.insert(0, self.summary)
+            if self.opt.summary:
+                summary_messages.insert(0, self.opt.summary)
             else:
                 comma = self.site.mediawiki_message('comma-separator')
                 default_summary = comma.join(
@@ -706,7 +702,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 last_text = new_text
                 new_text = self.apply_replacements(last_text, applied,
                                                    page)
-                if not self.getOption('recursive'):
+                if not self.opt.recursive:
                     break
 
             if new_text == original_text:
@@ -714,12 +710,12 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                                  + page.title(as_link=True))
                 return
 
-            if self.addcat:
+            if self.opt.addcat:
                 # Fetch only categories in wikitext, otherwise the others
                 # will be explicitly added.
                 cats = textlib.getCategoryLinks(new_text, site=page.site)
-                if self.addcat not in cats:
-                    cats.append(self.addcat)
+                if self.opt.addcat not in cats:
+                    cats.append(self.opt.addcat)
                     new_text = textlib.replaceCategoryLinks(new_text,
                                                             cats,
                                                             site=page.site)
@@ -727,8 +723,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             # Highlight the title in purple.
             self.current_page = page
             pywikibot.showDiff(original_text, new_text, context=context)
-            if self.getOption('always'):
+            if self.opt.always:
                 break
+
             choice = pywikibot.input_choice(
                 'Do you want to accept these changes?',
                 [('Yes', 'y'), ('No', 'n'), ('Edit original', 'e'),
@@ -761,7 +758,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 last_text = None
                 continue
             if choice == 'a':
-                self.options['always'] = True
+                self.opt.always = True
             if choice == 'y':
                 self.save(page, original_text, new_text, applied,
                           show_diff=False, quiet=True,
@@ -775,7 +772,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             # choice must be 'N'
             break
 
-        if self.getOption('always') and new_text != original_text:
+        if self.opt.always and new_text != original_text:
             self.save(page, original_text, new_text, applied,
                       show_diff=False, asynchronous=False)
 

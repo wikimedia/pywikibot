@@ -1255,7 +1255,7 @@ class BaseBot(OptionHandler):
 
         if choice == 'a':
             # Remember the choice
-            self.options['always'] = True
+            self.opt.always = True
 
         return True
 

@@ -104,30 +104,28 @@ class UploadTextBot(SingleSiteBot):
         @param generator: page generator
         @type generator: generator
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'showdiff': False,
             'force': False,
             'ocr': False,
             'summary': 'Bot: uploading text',
             'threads': 5
         })
-        super(UploadTextBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
 
-        # TODO: create i18 files
         # Get edit summary message if it's empty.
-        if not self.getOption('summary'):
-            self.options['summary'] = i18n.twtranslate(self.site,
-                                                       'djvutext-creating')
+        if not self.opt.summary:
+            self.opt.summary = i18n.twtranslate(self.site, 'djvutext-creating')
 
-        if self.getOption('ocr'):
-            self._num_threads = self.getOption('threads')
+        if self.opt.ocr:
+            self._num_threads = self.opt.threads
             self._queue_in = queue.Queue()
             self._queue_out = queue.PriorityQueue()
 
             # If not "-force", no reason to get OCR for existing pages
             # and to process them in Bot.run().
-            if not self.getOption('force'):
+            if not self.opt.force:
                 self.generator = (p for p in self.generator if not p.exists())
             self._spawn_ocr_threads()
 
@@ -151,7 +149,7 @@ class UploadTextBot(SingleSiteBot):
         while True:
             page, idx = self._queue_in.get()
             try:
-                text_body = page.ocr(ocr_tool=self.getOption('ocr'))
+                text_body = page.ocr(ocr_tool=self.opt.ocr)
             except ValueError as e:
                 # TODO: is it a problem in PY2?
                 pywikibot.error(str(e))
@@ -184,28 +182,22 @@ class UploadTextBot(SingleSiteBot):
             raise pywikibot.Error('Page {} must be a ProofreadPage object.'
                                   .format(page))
 
-        summary = self.getOption('summary')
-
-        if page.exists():
-            old_text = page.text
-        else:
-            old_text = ''
-
-        if self.getOption('ocr'):
+        old_text = page.text if page.exists() else ''
+        if self.opt.ocr:
             _body = self._get_ocr(page)
             if _body is None:
                 pywikibot.output('No OCR found. Skipping {}'
                                  .format(page.title(as_link=True)))
                 return
+
             page.body = _body
 
-        if (page.exists()
-                and not (self.getOption('ocr') and self.getOption('force'))):
+        if page.exists() and not (self.opt.ocr and self.opt.force):
             pywikibot.output('Page {} already exists, not adding!'
                              .format(page))
         else:
-            self.userPut(page, old_text, page.text, summary=summary,
-                         show_diff=self.getOption('showdiff'))
+            self.userPut(page, old_text, page.text, summary=self.opt.summary,
+                         show_diff=self.opt.showdiff)
 
 
 def main(*args):

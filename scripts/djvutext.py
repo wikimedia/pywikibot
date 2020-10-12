@@ -62,7 +62,7 @@ class DjVuTextBot(SingleSiteBot):
         @param pages: page interval to upload (start, end)
         @type pages: tuple
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'force': False,
             'summary': None
         })
@@ -80,9 +80,9 @@ class DjVuTextBot(SingleSiteBot):
         self.generator = self.gen()
 
         # Get edit summary message if it's empty.
-        if not self.getOption('summary'):
-            self.options['summary'] = i18n.twtranslate(
-                self._index.site, 'djvutext-creating')
+        if not self.opt.summary:
+            self.opt.summary = i18n.twtranslate(self._index.site,
+                                                'djvutext-creating')
 
     def page_number_gen(self):
         """Generate pages numbers from specified page intervals."""
@@ -111,8 +111,8 @@ class DjVuTextBot(SingleSiteBot):
         page.body = self._djvu.get_page(page.page_number)
         new_text = page.text
 
-        summary = self.getOption('summary')
-        if page.exists() and not self.getOption('force'):
+        summary = self.opt.summary
+        if page.exists() and not self.opt.force:
             pywikibot.output(
                 'Page {} already exists, not adding!\n'
                 'Use -force option to overwrite the output page.'
