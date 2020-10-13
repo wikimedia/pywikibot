@@ -71,6 +71,14 @@ nowCommonsTemplate = {
 # Translations for license templates.
 # Must only be given when they are in fact different.
 licenseTemplates = {
+    ('wikipedia:ar', 'commons:commons'): {
+        'رخصة جنو للوثائق الحرة': 'GFDL',
+        'رخصة جنو للوثائق الحرة - شخصي': 'GFDL-self',
+        'ملكية عامة': 'PD',
+        'ملكية عامة - شخصي': 'PD-self',
+        'ملكية عامة - فن': 'PD-Art',
+        'ملكية عامة - الحكومة الأمريكية': 'PD-USGov',
+    },
     ('wikipedia:de', 'commons:commons'): {
         'Bild-GFDL': 'GFDL',
         'Bild-GFDL-OpenGeoDB': 'GFDL-OpenGeoDB',
