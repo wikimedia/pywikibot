@@ -691,7 +691,8 @@ class Family:
             fam = config.family
 
         assert all(x in NAME_CHARACTERS for x in fam), \
-            'Name of family %s must be ASCII characters and digits' % fam
+            'Name of family {} must be ASCII letters and digits [a-zA-Z0-9]' \
+            .format(fam)
 
         if fam in Family._families:
             return Family._families[fam]
@@ -720,14 +721,18 @@ class Family:
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
                           .format(cls.name, fam), FamilyMaintenanceWarning)
-        # Family 'name' and the 'langs' codes must be ascii, and the
-        # codes must be lower-case due to the Site loading algorithm.
+        # Family 'name' and the 'langs' codes must be ascii letters and digits,
+        # and codes must be lower-case due to the Site loading algorithm;
+        # codes can accept also underscore/dash.
         if not all(x in NAME_CHARACTERS for x in cls.name):
-            warnings.warn('Family name {} contains non-ascii characters'
+            warnings.warn('Name of family {} must be ASCII letters '
+                          'and digits [a-zA-Z0-9]'
                           .format(cls.name), FamilyMaintenanceWarning)
         for code in cls.langs.keys():
             if not all(x in CODE_CHARACTERS for x in code):
-                warnings.warn('Family {} code {} contains non-ascii characters'
+                warnings.warn('Family {} code {} must be ASCII lowercase '
+                              'letters and digits [a-z0-9] or '
+                              'underscore/dash [_-]'
                               .format(cls.name, code),
                               FamilyMaintenanceWarning)
         Family._families[fam] = cls

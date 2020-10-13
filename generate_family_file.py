@@ -8,10 +8,18 @@
 #
 import codecs
 import os
+import string
 import sys
 
 from os import environ, getenv
 from urllib.parse import urlparse
+
+# see pywikibot.family.py
+# Legal characters for Family name and Family langs keys
+NAME_CHARACTERS = string.ascii_letters + string.digits
+# nds_nl code alias requires "_"n
+# dash must be the last char to be reused as regex in update_linktrails
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
 class FamilyFileGenerator:
@@ -30,6 +38,11 @@ class FamilyFileGenerator:
             url = input('Please insert URL to wiki: ')
         if name is None:
             name = input('Please insert a short name (eg: freeciv): ')
+
+        assert all(x in NAME_CHARACTERS for x in name), \
+            'Name of family {} must be ASCII letters and digits' \
+            '[a-zA-Z0-9]'.format(name)
+
         self.dointerwiki = dointerwiki
         self.base_url = url
         self.name = name
@@ -90,6 +103,12 @@ class FamilyFileGenerator:
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
+
+        for wiki in self.langs:
+            assert all(x in CODE_CHARACTERS for x in wiki['prefix']), \
+                'Family {} code {} must be ASCII lowercase ' \
+                'letters and digits [a-z0-9] or underscore/dash [_-]' \
+                .format(self.name, wiki['prefix'])
 
     def getapis(self):
         """Load other language pages."""
