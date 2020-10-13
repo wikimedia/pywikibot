@@ -62,6 +62,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'ar': ('/شرح', '/doc'),
         'es': ('/uso', '/doc'),
         'sr': ('/док', ),
     }

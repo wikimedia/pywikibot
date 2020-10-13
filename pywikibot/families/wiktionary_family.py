@@ -129,5 +129,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'ar': ('/شرح', '/doc'),
         'sr': ('/док', ),
     }

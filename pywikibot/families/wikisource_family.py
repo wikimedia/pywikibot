@@ -40,7 +40,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
         'en': ('Category redirect',),
         'es': ('Categoría redirigida',),
@@ -128,11 +128,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['ar', 'as', 'az', 'bn', 'en', 'es',
+                     ['as', 'az', 'bn', 'en', 'es',
                       'et', 'gu', 'hu', 'it', 'ja', 'kn', 'ml',
                       'mk', 'mr', 'pt', 'ro', 'sa', 'sah', 'ta',
                       'te', 'th', 'vi']
                      ),
+        'ar': ('/شرح', '/doc'),
         'be': ('/Дакументацыя', ),
         'bn': ('/নথি', ),
         'br': ('/diellerezh', ),

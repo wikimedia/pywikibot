@@ -31,7 +31,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'en': ('Category redirect',),
     }
 

@@ -68,6 +68,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     category_redirect_templates = {
         '_default': (),
         'ar': ('تحويل تصنيف',),
+        'ary': ('Category redirect',),
         'arz': ('تحويل تصنيف',),
         'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
         'bs': ('Category redirect',),
@@ -170,10 +171,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['ar', 'bn', 'cs', 'da', 'en', 'es', 'hr', 'hu', 'id',
+                     ['arz', 'bn', 'cs', 'da', 'en', 'es', 'hr', 'hu', 'id',
                       'ilo', 'ja', 'ms', 'pt', 'ro', 'ru', 'simple', 'sh',
                       'vi', 'zh']
                      ),
+        'ar': ('/شرح', '/doc', ),
+        'ary': ('/توثيق', '/شرح', '/doc', ),
         'bs': ('/dok', ),
         'ca': ('/ús', ),
         'de': ('Doku', '/Meta'),
@@ -200,6 +203,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # Templates that indicate an edit should be avoided
     edit_restricted_templates = {
         'ar': ('تحرر',),
+        'ary': ('كاتبدل دابا',),
+        'arz': ('بتتطور',),
         'bs': ('Izmjena u toku',),
         'cs': ('Pracuje se',),
         'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
@@ -216,6 +221,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # Archive templates that indicate an edit of non-archive bots
     # should be avoided
     archived_page_templates = {
+        'ar': ('أرشيف نقاش',),
+        'arz': ('صفحة ارشيف',),
         'cs': ('Archiv', 'Archiv Wikipedie', 'Archiv diskuse',
                'Archivace start', 'Posloupnost archivů', 'Rfa-archiv-start',
                'Rfc-archiv-start',),
