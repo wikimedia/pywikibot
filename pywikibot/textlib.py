@@ -913,7 +913,7 @@ def extract_sections(
 #        1 - inter-language links inside the own family.
 #            They go to a corresponding page in another language in the same
 #            family, such as from 'en.wikipedia' to 'pt.wikipedia', or from
-#            'es.wiktionary' to 'arz.wiktionary'.
+#            'es.wiktionary' to 'ar.wiktionary'.
 #            Families with this kind have several language-specific sites.
 #            They have their interwiki_forward attribute set to None
 #        2 - language links forwarding to another family.
@@ -924,7 +924,7 @@ def extract_sections(
 #            inter-language links is kept in their interwiki_forward attribute.
 #        These functions only deal with links of these two kinds only. They
 #        do not find or change links of other kinds, nor any that are formatted
-#        as in-line interwiki links (e.g., "[[:es:Articulo]]".
+#        as in-line interwiki links (e.g., "[[:es:Artículo]]".
 
 @deprecate_arg('pageLink', None)
 def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:

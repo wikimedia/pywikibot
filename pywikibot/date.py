@@ -527,6 +527,9 @@ formats = {
         'ar': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو',
                                 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر',
                                 'أكتوبر', 'نوفمبر', 'ديسمبر']),
+        'arz': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'ابريل', 'مايو',
+                                 'يونيه', 'يوليه', 'اغسطس', 'سبتمبر',
+                                 'اكتوبر', 'نوفمبر', 'ديسمبر']),
         'ast': lambda v: slh(v, ['xineru', 'febreru', 'marzu', 'abril',
                                  'mayu', 'xunu', 'xunetu', 'agostu',
                                  'setiembre', 'ochobre', 'payares',
@@ -1648,6 +1651,7 @@ formats = {
         'an': lambda v: dh_yearAD(v, '%d (muertes)'),
         'ay': lambda v: dh_yearAD(v, 'Jiwäwi %d'),
         'ar': lambda v: dh_yearAD(v, 'وفيات %d'),
+        'arz': lambda v: dh_yearAD(v, 'وفيات %d'),
         'ba': lambda v: dh_yearAD(v, '%d йылда үлгәндәр'),
         'bar': lambda v: dh_yearAD(v, 'Gestorben %d'),
         'be': lambda v: dh_yearAD(v, 'Памерлі ў %d годзе'),
@@ -1743,7 +1747,8 @@ formats = {
     'CurrEvents': {
         'an': lambda v: dh_singVal(v, 'Autualidá'),
         'ang': lambda v: dh_singVal(v, 'Efenealde belimpas'),
-        'ar': lambda v: dh_singVal(v, 'الأحداث الجارية'),
+        'ar': lambda v: dh_singVal(v, 'أحداث جارية'),
+        'arz': lambda v: dh_singVal(v, 'احداث دلوقتى'),
         'be': lambda v: dh_singVal(v, 'Бягучыя падзеі'),
         'bg': lambda v: dh_singVal(v, 'Текущи събития'),
         'ca': lambda v: dh_singVal(v, 'Viquipèdia:Actualitat'),
@@ -1870,6 +1875,9 @@ addFmt2('ang', False, '%%d %s', True)
 addFmt1('ar', False, ['%d يناير', '%d فبراير', '%d مارس', '%d أبريل',
                       '%d مايو', '%d يونيو', '%d يوليو', '%d أغسطس',
                       '%d سبتمبر', '%d أكتوبر', '%d نوفمبر', '%d ديسمبر'])
+addFmt1('arz', False, ['%d يناير', '%d فبراير', '%d مارس', '%d ابريل',
+                       '%d مايو', '%d يونيه', '%d يوليه', '%d اغسطس',
+                       '%d سبتمبر', '%d اكتوبر', '%d نوفمبر', '%d ديسمبر'])
 addFmt1('ast', False, ['%d de xineru', '%d de febreru', '%d de marzu',
                        "%d d'abril", '%d de mayu', '%d de xunu',
                        '%d de xunetu', "%d d'agost", '%d de setiembre',
