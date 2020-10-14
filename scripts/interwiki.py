@@ -385,6 +385,8 @@ class GiveUpOnPage(pywikibot.Error):
 ignoreTemplates = {
     '_default': ['delete'],
     'ar': ['تحرر', 'تحويل لين'],
+    'ary': ['كاتبدل دابا'],
+    'arz': ['بتتطور'],
     'cs': ['Pracuje_se'],
     'de': ['inuse', 'in use', 'in bearbeitung', 'inbearbeitung',
            'löschen', 'sla',
