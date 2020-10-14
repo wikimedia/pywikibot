@@ -3,7 +3,7 @@
 Script to copy self published files from English Wikipedia to Commons.
 
 This bot is based on imagecopy.py and intended to be used to empty out
-http://en.wikipedia.org/wiki/Category:Self-published_work
+https://en.wikipedia.org/wiki/Category:Self-published_work
 
 This bot uses a graphical interface and may not work from commandline
 only environment.
@@ -62,6 +62,9 @@ except ImportError as _tk_error:
 NL = ''
 
 nowCommonsTemplate = {
+    'ar': '{{الآن كومنز|%s}}',
+    'ary': '{{Now Commons|%s}}',
+    'arz': '{{Now Commons|%s}}',
     'de': '{{NowCommons|%s}}',
     'en': ('{{NowCommons|1=File:%s|date=~~~~~|'
            'reviewer={{subst:REVISIONUSER}}}}'),
@@ -72,6 +75,9 @@ nowCommonsTemplate = {
 }
 
 moveToCommonsTemplate = {
+    'ar': ['نقل إلى كومنز', 'Copy to Wikimedia Commons'],
+    'ary': ['نقل إلى كومنز', 'Copy to Wikimedia Commons'],
+    'arz': ['نقل ل كومنز', 'Copy to Wikimedia Commons'],
     'de': ['NowCommons', 'NC', 'NCT', 'Nowcommons'],
     'en': ['Commons ok', 'Copy to Wikimedia Commons', 'Move to commons',
            'Movetocommons', 'To commons',
@@ -82,6 +88,11 @@ moveToCommonsTemplate = {
 }
 
 skipTemplates = {
+    'ar': ['NowCommons',
+           'الآن كومونز',
+           ],
+    'ary': ['NowCommons', ],
+    'arz': ['NowCommons', ],
     'de': ['Löschprüfung',
            'NoCommons',
            'NowCommons',
@@ -240,6 +251,9 @@ sourceGarbage = {
 }
 
 informationTemplate = {
+    'ar': 'معلومات',
+    'ary': 'معلومات',
+    'arz': 'معلومات',
     'de': 'Information',
     'en': 'Information',
     'lb': 'Information',
@@ -248,6 +262,33 @@ informationTemplate = {
 }
 
 informationFields = {
+    'ar': {
+        'location': 'remarks',
+        'وصف': 'description',
+        'مصدر': 'source',
+        'تاريخ': 'date',
+        'منتج': 'author',
+        'إذن': 'permission',
+        'نسخ أخرى': 'other versions',
+    },
+    'ary': {
+        'location': 'remarks',
+        'وصف': 'description',
+        'مصدر': 'source',
+        'تاريخ': 'date',
+        'منتج': 'author',
+        'إذن': 'permission',
+        'نسخ أخرى': 'other versions',
+    },
+    'arz': {
+        'location': 'remarks',
+        'وصف': 'description',
+        'مصدر': 'source',
+        'تاريخ': 'date',
+        'منتج': 'author',
+        'إذن': 'permission',
+        'نسخ أخرى': 'other versions',
+    },
     'de': {
         'anmerkungen': 'remarks',  # FIXME: More flexible
         'beschreibung': 'description',

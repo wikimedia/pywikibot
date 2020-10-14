@@ -48,6 +48,8 @@ docuReplacements = {
 
 nowCommonsTemplate = {
     'ar': '{{الآن كومنز|%s}}',
+    'ary': '{{Now Commons|%s}}',
+    'arz': '{{Now Commons|%s}}',
     'de': '{{NowCommons|%s}}',
     'fr': '{{Désormais sur Commons|%s}}',
     'en': '{{subst:ncd|Image:%s}}',

@@ -98,6 +98,8 @@ nowCommonsTemplate = {
     'am': '{{NowCommons|File:%s}}',
     'ang': '{{NowCommons|File:%s}}',
     'ar': '{{الآن كومنز|%s}}',
+    'ary': '{{Now Commons|%s}}',
+    'arz': '{{Now Commons|%s}}',
     'ast': '{{EnCommons|File:%s}}',
     'az': '{{NowCommons|%s}}',
     'bar': '{{NowCommons|%s}}',
