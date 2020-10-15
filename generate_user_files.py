@@ -11,6 +11,8 @@ import os
 import re
 import sys
 
+from typing import Optional, Tuple
+
 from collections import namedtuple
 from textwrap import fill
 
@@ -95,18 +97,16 @@ def file_exists(filename):
     return False
 
 
-def get_site_and_lang(default_family='wikipedia', default_lang='en',
-                      default_username=None, force=False):
+def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
+                      default_lang: Optional[str] = 'en',
+                      default_username: Optional[str] = None, force=False):
     """
     Ask the user for the family, language and username.
 
     @param default_family: The default family which should be chosen.
-    @type default_family: None or str
     @param default_lang: The default language which should be chosen, if the
         family supports this language.
-    @type default_lang: None or str
     @param default_username: The default username which should be chosen.
-    @type default_username: None or str
     @return: The family, language and username
     @rtype: tuple of three str
     """
@@ -425,14 +425,13 @@ def ask_for_dir_change(force):
     return userfile, passfile
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and generate user-config.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     # set the config family and mylang values to an invalid state so that
     # the script can detect that the command line arguments -family & -lang
