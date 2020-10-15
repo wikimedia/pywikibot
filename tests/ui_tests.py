@@ -69,15 +69,13 @@ class Stream:
 
     """Handler for a StringIO or BytesIO instance able to patch itself."""
 
-    def __init__(self, name, patched_streams):
+    def __init__(self, name: str, patched_streams: dict):
         """
         Create a new stream with a StringIO or BytesIO instance.
 
         @param name: The part after 'std' (e.g. 'err').
-        @type name: str
         @param patched_streams: A mapping which maps the original stream to
             the patched stream.
-        @type patched_streams: dict
         """
         self._stream = io.StringIO()
         self._name = 'std{0}'.format(name)

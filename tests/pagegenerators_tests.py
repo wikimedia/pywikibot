@@ -11,6 +11,7 @@ import logging
 import sys
 
 from contextlib import suppress
+from typing import Optional
 
 import pywikibot
 from pywikibot import pagegenerators, date
@@ -727,20 +728,17 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
     """Test item claim filter page generator generator."""
 
-    def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
+    def _simple_claim_test(self, prop: str, claim, qualifiers: Optional[dict],
+                           valid: bool, negate: bool = False):
         """
         Test given claim on sample (India) page.
 
         @param prop: the property to check
-        @type prop: str
         @param claim: the claim the property should contain
         @param qualifiers: qualifiers to check or None
-        @type qualifiers: dict or None
         @param valid: true if the page should be yielded by the generator,
             false otherwise
-        @type valid: bool
         @param negate: true to swap the filters' behavior
-        @type negate: bool
         """
         item = pywikibot.ItemPage(self.get_repo(), 'Q668')
         gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop, claim,

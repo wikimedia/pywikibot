@@ -26,12 +26,11 @@ class SiteDetectionTestCase(TestCase):
 
     net = True
 
-    def assertSite(self, url):
+    def assertSite(self, url: str):
         """
         Assert a MediaWiki site can be loaded from the url.
 
         @param url: Url of tested site
-        @type url: str
         @raises AssertionError: Site under url is not MediaWiki powered
         """
         try:
@@ -39,12 +38,11 @@ class SiteDetectionTestCase(TestCase):
         except (ServerError, Timeout) as e:
             self.skipTest(e)
 
-    def assertNoSite(self, url):
+    def assertNoSite(self, url: str):
         """
         Assert a url is not a MediaWiki site.
 
         @param url: Url of tested site
-        @type url: str
         @raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError, ConnectionError, RuntimeError,

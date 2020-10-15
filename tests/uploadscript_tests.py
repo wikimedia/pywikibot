@@ -18,13 +18,11 @@ class TestUploadScript(TestCase):
 
     net = False
 
-    def match(self, value=''):
+    def match(self, value: str = '') -> int:
         """Create a match object and call get_chunk_site.
 
         @param value: a chunk size value
-        @type value: str
         @return: chunk size in bytes
-        @rtype: int
         """
         option = '-chunked'
         if value:
