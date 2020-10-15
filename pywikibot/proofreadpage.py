@@ -34,7 +34,7 @@ from functools import partial
 from requests.exceptions import ReadTimeout
 
 try:
-    from bs4 import BeautifulSoup, FeatureNotFound
+    from bs4 import BeautifulSoup
 except ImportError as e:
     BeautifulSoup = e
 
@@ -42,6 +42,7 @@ except ImportError as e:
         """Raise BeautifulSoup when called, if bs4 is not available."""
         raise BeautifulSoup
 else:
+    from bs4 import FeatureNotFound
     try:
         BeautifulSoup('', 'lxml')
     except FeatureNotFound:
@@ -231,7 +232,7 @@ class ProofreadPage(pywikibot.Page):
         left, sep, right = base.rpartition('.')
         ext = right if sep else ''
 
-        return (base, ext, num)
+        return base, ext, num
 
     @property
     def index(self):
@@ -610,7 +611,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
             except Exception as e:
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
-                return (True, e)
+                return True, e
             else:
                 pywikibot.debug('{}: {}'.format(ocr_tool, response.text),
                                 _logger)
@@ -622,7 +623,7 @@ class ProofreadPage(pywikibot.Page):
             return True, ReadTimeout
 
         if 400 <= response.status < 600:
-            return (True, 'Http response status {}'.format(response.status))
+            return True, 'Http response status {}'.format(response.status)
 
         data = json.loads(response.text)
 
@@ -639,9 +640,9 @@ class ProofreadPage(pywikibot.Page):
 
         if error:
             pywikibot.error('OCR query %s: %s' % (cmd_uri, _text))
-            return (error, _text)
+            return error, _text
         else:
-            return (error, parser_func(_text))
+            return error, parser_func(_text)
 
     def _do_hocr(self):
         """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
@@ -682,7 +683,7 @@ class ProofreadPage(pywikibot.Page):
         except ValueError:
             error_text = 'No prp-page-image src found for %s.' % self
             pywikibot.error(error_text)
-            return (True, error_text)
+            return True, error_text
 
         try:
             cmd_fmt = self._OCR_CMDS[ocr_tool]
@@ -806,7 +807,8 @@ class IndexPage(pywikibot.Page):
 
         self._cached = False
 
-    def _parse_redlink(self, href):
+    @staticmethod
+    def _parse_redlink(href):
         """Parse page title when link in Index is a redlink."""
         p_href = re.compile(
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
@@ -1041,7 +1043,8 @@ class IndexPage(pywikibot.Page):
             raise KeyError('Page number ".../{}" not in range.'
                            .format(page_number))
 
-    def _get_from_label(self, mapping_dict, label):
+    @staticmethod
+    def _get_from_label(mapping_dict, label):
         """Helper function to get info from label."""
         # Convert label to string if an integer is passed.
         if isinstance(label, int):
