@@ -22,6 +22,7 @@ import binascii
 import os.path
 
 from os import remove, replace, symlink, urandom
+from typing import Tuple
 
 import pywikibot
 from pywikibot import Bot
@@ -171,14 +172,13 @@ class DownloadDumpBot(Bot):
         pywikibot.output('Done! File stored as ' + file_final_storepath)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     opts = {}
     unknown_args = []

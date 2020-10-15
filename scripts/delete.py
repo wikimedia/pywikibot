@@ -58,7 +58,7 @@ Delete everything in the category "To delete" without prompting:
 #
 import collections
 
-from typing import Set
+from typing import Tuple, Set
 
 import pywikibot
 
@@ -135,14 +135,13 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
-    def __init__(self, generator, summary, **kwargs) -> None:
+    def __init__(self, generator, summary: str, **kwargs) -> None:
         """
         Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable
         @param summary: the reason for the (un)deletion
-        @type summary: str
         """
         self.availableOptions.update({
             'undelete': False,
@@ -227,14 +226,13 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                                      quit=True)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     page_name = ''
     summary = None
