@@ -602,7 +602,6 @@ def replace_links(text: str, replace, site=None) -> str:
     remaining.
 
     @param text: the text in which to replace links
-    @type text: basestring
     @param replace: either a callable which reacts like described above.
         The callable must accept four parameters link, text, groups, rng and
         allows for user interaction. The groups are a dict containing 'title',
@@ -639,7 +638,7 @@ def replace_links(text: str, replace, site=None) -> str:
         """Normalize the replacement into a list."""
         if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
             raise ValueError('The replacement must be None, False, '
-                             'a sequence, a Link or a basestring but '
+                             'a sequence, a Link or a str but '
                              'is "{0}"'.format(type(replacement)))
 
     def title_section(link) -> str:
@@ -655,7 +654,7 @@ def replace_links(text: str, replace, site=None) -> str:
         replace_list = [to_link(replace[0]), replace[1]]
         if not isinstance(replace_list[0], pywikibot.Link):
             raise ValueError(
-                'The original value must be either basestring, Link or Page '
+                'The original value must be either str, Link or Page '
                 'but is "{0}"'.format(type(replace_list[0])))
         if replace_list[1] is not False and replace_list[1] is not None:
             if isinstance(replace_list[1], str):
@@ -756,7 +755,7 @@ def replace_links(text: str, replace, site=None) -> str:
             raise ValueError('The result must be unicode (str in Python 3) '
                              'and not bytes (str in Python 2).')
 
-        # Verify that it's either Link, Page or basestring
+        # Verify that it's either Link, Page or str
         check_classes(new_link)
         # Use section and label if it's a Link and not otherwise
         if isinstance(new_link, pywikibot.Link):
@@ -1562,7 +1561,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
 # --------------------------------
 
 def extract_templates_and_params(text: str, remove_disabled_parts=None,
-                                 strip=None):
+                                 strip: Optional[bool] = None):
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -1597,7 +1596,6 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
     @param strip: if enabled, strip arguments and values of templates.
         If None (default), this is enabled when mwparserfromhell
         is not available and disabled if mwparserfromhell is present.
-    @type strip: bool
     @return: list of template name and params
     @rtype: list of tuple
     """

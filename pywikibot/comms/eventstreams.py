@@ -18,6 +18,8 @@ from functools import partial
 import json
 import socket
 
+from typing import Optional
+
 from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.response import httplib
@@ -157,7 +159,7 @@ class EventStreams:
                                         if self._since else '')))
         return self._url
 
-    def set_maximum_items(self, value):
+    def set_maximum_items(self, value: int):
         """
         Set the maximum number of items to be retrieved from the stream.
 
@@ -166,7 +168,6 @@ class EventStreams:
 
         @param value: The value of maximum number of items to be retrieved
             in total to set.
-        @type value: int
         """
         if value is not None:
             self._total = int(value)
@@ -261,13 +262,12 @@ class EventStreams:
             else:
                 self.filter[ftype].append(partial(_in, key=key, value=value))
 
-    def streamfilter(self, data):
+    def streamfilter(self, data: dict):
         """Filter function for eventstreams.
 
         See the description of register_filter() how it works.
 
         @param data: event data dict used by filter functions
-        @type data: dict
         """
         if any(function(data) for function in self.filter['none']):
             return False
@@ -328,13 +328,12 @@ class EventStreams:
         del self.source
 
 
-def site_rc_listener(site, total=None):
+def site_rc_listener(site, total: Optional[int] = None):
     """Yield changes received from EventStream.
 
     @param site: the Pywikibot.Site object to yield live recent changes for
     @type site: Pywikibot.BaseSite
     @param total: the maximum number of changes to return
-    @type total: int
 
     @return: pywikibot.comms.eventstream.rc_listener configured for given site
     @raises ImportError: sseclient installation is required
