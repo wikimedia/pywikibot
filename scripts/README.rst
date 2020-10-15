@@ -254,7 +254,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | welcome.py             | Script to welcome new users.                            |
     +------------------------+---------------------------------------------------------+
-    | wikisourcetext.py      | This bot applies to wikisource sites to upload text.    |
+    | wikisourcetext.py      | This bot applies to Wikisource sites to upload text.    |
     +------------------------+---------------------------------------------------------+
 
 

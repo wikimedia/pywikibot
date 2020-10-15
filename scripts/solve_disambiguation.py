@@ -100,6 +100,8 @@ from pywikibot.tools.formatter import SequenceOutputter
 
 # Disambiguation Needed template
 dn_template = {
+    'ar': '{{بحاجة لتوضيح}}',
+    'arz': '{{Disambiguation needed}}',
     'en': '{{dn}}',
     'fr': '{{Lien vers un homonyme}}',
 }
@@ -108,6 +110,7 @@ dn_template = {
 # (Begriffsklärungen nach Modell 2)
 primary_topic_format = {
     'ar': '%s_(توضيح)',
+    'arz': '%s_(توضيح)',
     'ca': '%s_(desambiguació)',
     'cs': '%s_(rozcestník)',
     'de': '%s_(Begriffsklärung)',
@@ -140,9 +143,6 @@ primary_topic_format = {
 
 ignore_title = {
     'wikipedia': {
-        'ar': [
-            'تصنيف:صفحات توضيح',
-        ],
         'ca': [
             'Viquipèdia:Enllaços incorrectes a pàgines de desambiguació',
             'Viquipèdia:Registre de pàgines de desambiguació òrfenes',

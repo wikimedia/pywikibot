@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 
-This bot applies to wikisource sites to upload text.
+This bot applies to Wikisource sites to upload text.
 
 Text is uploaded to pages in Page ns, for a specified Index.
 Text to be stored, if the page is not-existing, is preloaded from the file used
