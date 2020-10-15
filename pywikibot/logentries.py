@@ -339,24 +339,16 @@ class PatrolEntry(LogEntry):
     _expected_type = 'patrol'
 
     @property
-    def current_id(self):
-        """
-        Return the current id.
-
-        @rtype: int
-        """
+    def current_id(self) -> int:
+        """Return the current id."""
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['curid']
                    if 'curid' in self._params else self._params['cur'])
 
     @property
-    def previous_id(self):
-        """
-        Return the previous id.
-
-        @rtype: int
-        """
+    def previous_id(self) -> int:
+        """Return the previous id."""
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['previd']
