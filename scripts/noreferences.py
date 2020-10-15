@@ -61,6 +61,11 @@ placeBeforeSections = {
         'انظر أيضا',
         'ملاحظات'
     ],
+    'arz': [              # no explicit policy on where to put the references
+        'لينكات برانيه',
+        'لينكات',
+        'شوف كمان'
+    ],
     'ca': [
         'Bibliografia',
         'Bibliografia complementària',
@@ -243,6 +248,16 @@ referencesSections = {
             'المراجع والمصادر',
             'المصادر والمراجع',
         ],
+        'ary': [
+            'لمصادر',
+            'مصادر',
+        ],
+        'arz': [
+            'مراجع',
+            'المراجع',
+            'مصادر',
+            'المصادر',
+        ],
         'ca': [
             'Referències',
         ],
@@ -396,8 +411,12 @@ referencesSections['wiktionary'].update(cs=['poznámky', 'reference'])
 # on your wiki, you don't have to enter anything here.
 referencesTemplates = {
     'wikipedia': {
-        'ar': ['Reflist', 'مراجع', 'ثبت المراجع', 'ثبت_المراجع',
-               'بداية المراجع', 'نهاية المراجع', 'المراجع'],
+        'ar': ['مراجع', 'المراجع', 'ثبت المراجع',
+               'ثبت المصادر', 'قائمة مصادر', 'Reflist'],
+        'ary': ['مراجع', 'المراجع', 'المصادر',
+                'Reflist', 'Refs'],
+        'arz': ['مصادر', 'مراجع', 'المراجع', 'ثبت المراجع',
+                'Reflist', 'Refs'],
         'be': ['Зноскі', 'Примечания', 'Reflist', 'Спіс заўваг',
                'Заўвагі'],
         'be-tarask': ['Зноскі'],
@@ -450,6 +469,8 @@ referencesTemplates = {
 referencesSubstitute = {
     'wikipedia': {
         'ar': '{{مراجع}}',
+        'ary': '{{مراجع}}',
+        'arz': '{{مصادر}}',
         'be': '{{зноскі}}',
         'da': '{{reflist}}',
         'dsb': '{{referency}}',
