@@ -2006,9 +2006,12 @@ class BasePage(ComparableMixin):
                     value = ''
                 if value is not None:  # empty string is allowed
                     protections[arg_name] = value
-                    warn('"protections" argument of protect() replaces "{0}"'
-                         .format(arg_name),
-                         FutureWarning)
+                    issue_deprecation_warning(
+                        '"{}" argument of protect()'.format(arg_name),
+                        '"protections" dict',
+                        warning_class=FutureWarning,
+                        since='20140815')
+
             else:
                 if value:
                     warn('"protections" argument of protect() replaces "{0}";'
@@ -2029,16 +2032,20 @@ class BasePage(ComparableMixin):
                              % (self.title(as_link=True)))
             reason = pywikibot.input('Please enter a reason for the action:')
         if unprotect:
-            warn('"unprotect" argument of protect() is deprecated',
-                 FutureWarning, 2)
+            issue_deprecation_warning(
+                '"unprotect" argument of protect()',
+                warning_class=FutureWarning,
+                since='20140815')
             protections = {p_type: ''
                            for p_type in self.applicable_protections()}
         answer = 'y'
         if called_using_deprecated_arg and prompt is None:
             prompt = True
         if prompt:
-            warn('"prompt" argument of protect() is deprecated',
-                 FutureWarning, 2)
+            issue_deprecation_warning(
+                '"prompt" argument of protect()',
+                warning_class=FutureWarning,
+                since='20140815')
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.input_choice(
                 'Do you want to change the protection level of %s?'
