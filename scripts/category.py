@@ -126,7 +126,7 @@ import re
 
 from contextlib import suppress
 from operator import methodcaller
-from typing import Optional, Set
+from typing import Optional, Tuple, Set
 
 import pywikibot
 
@@ -1298,14 +1298,13 @@ class CategoryTreeRobot:
             pywikibot.stdout(tree)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments.
-    @type args: str
     """
     from_given = False
     to_given = False

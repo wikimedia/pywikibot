@@ -32,6 +32,8 @@ Example:
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from typing import Tuple
+
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import (
@@ -83,14 +85,13 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
                                              summary=comment)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
 

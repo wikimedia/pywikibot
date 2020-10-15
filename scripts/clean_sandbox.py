@@ -46,6 +46,8 @@ import datetime
 import sys
 import time
 
+from typing import Tuple
+
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
@@ -255,14 +257,13 @@ class SandboxBot(Bot, ConfigParserBot):
                 pywikibot.sleep(self.getOption('hours') * 60 * 60)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     opts = {}
     local_args = pywikibot.handle_args(args)

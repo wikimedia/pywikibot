@@ -35,6 +35,7 @@ import time
 
 from contextlib import suppress
 from datetime import timedelta
+from typing import Tuple
 
 import pywikibot
 
@@ -485,14 +486,13 @@ class CategoryRedirectBot(SingleSiteBot):
             edit_request_page.save(comment)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
     for arg in pywikibot.handle_args(args):
