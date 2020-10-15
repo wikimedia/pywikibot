@@ -79,6 +79,7 @@ _templates = {
     'af': ('Weesbladsy', 'datum={{subst:CURRENTMONTHNAME}} '
                          '{{subst:CURRENTYEAR}}', ['wi']),
     'ar': ('يتيمة', 'تاريخ={{نسخ:اسم_شهر}} {{نسخ:عام}}'),
+    'arz': ('يتيمه', 'تاريخ={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
     'ca': ('Orfe', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
     'en': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}',
            ['wi']),
