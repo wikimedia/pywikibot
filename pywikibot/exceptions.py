@@ -89,7 +89,7 @@ UserWarning: warnings targeted at users
 #
 from typing import Optional
 
-from pywikibot.tools import _NotImplementedWarning
+from pywikibot.tools import deprecated, _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -161,8 +161,10 @@ class PageRelatedError(Error):
         else:
             super().__init__(self.message % page)
 
+    @deprecated('PageRelatedError.page attribute', since='20201016',
+                future_warning=True)
     def getPage(self):
-        """Return the page related to the exception."""
+        """DEPRECATED. Return the page related to the exception."""
         return self.page
 
 
@@ -251,7 +253,7 @@ class InconsistentTitleReceived(PageLoadRelatedError):
         @param page: Page that caused the exception
         @type page: Page object
         @param actual: title obtained by query
-        @type reason: basestring
+        @type actual: basestring
 
         """
         self.message = "Query on %s returned data on '{0}'".format(actual)
@@ -336,7 +338,7 @@ class InterwikiRedirectPage(PageRelatedError):
         """Initializer.
 
         @param target_page: Target page of the redirect.
-        @type reason: Page
+        @type target_page: Page
         """
         self.target_page = target_page
         self.target_site = target_page.site
