@@ -1,6 +1,12 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* callback parameter of comms.http.fetch() is desupported
+* Fix api.APIError() calls for Flow and Thanks extension
+* edit, move, create, upload, unprotect and prompt parameters of Page.protect() are deprecated (T227610)
+* Accept only valid names in generate_family_file.py (T265328, T265353)
+* New plural.plural_rule() function returns a rule for a given language
+* Replace deprecated urllib.request.URLopener with http.fetch (T255575)
 * OptionHandler/BaseBot options are accessable as OptionHandler.opt attributes or keyword item (see also T264721)
 * pywikibot.setAction() function was removed
 * A namedtuple is the result of textlib.extract_sections()
@@ -43,6 +49,9 @@ Current release changes
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 5.0.0: PageRelatedError.getPage() will be removes in favour of PageRelatedError.page
+* 5.0.0: HttpRequest result of http.fetch() will be replaced by requests.Response (T265206)
+* 5.0.0: edit, move, create, upload, unprotect and prompt parameters of Page.protect() will be removed (T227610)
 * 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: version.getfileversion() is desupported and will be removed
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
