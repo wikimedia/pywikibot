@@ -375,6 +375,7 @@ templates = {
 # do nothing if this is in it
 done = {
     'ar': ('{{شطب}}', '{{حذف}}', '{{خرق}}'),
+    'arz': ('{{مسح}}',),
     'en': ('{{VfD}}', '{{AfD}}', '{{AfD1}}', '{{cleanup}}', '{{nonsense}}',
            '{{deletedpage}}', '{{db-reason}}', '{{notability}}',
            '{{not verified}}', '{{unreferenced}}', '{{db-empty}}',
