@@ -40,7 +40,7 @@ class FamilyFileGenerator:
             name = input('Please insert a short name (eg: freeciv): ')
 
         assert all(x in NAME_CHARACTERS for x in name), \
-            'Name of family {} must be ASCII letters and digits' \
+            'Name of family "{}" must be ASCII letters and digits ' \
             '[a-zA-Z0-9]'.format(name)
 
         self.dointerwiki = dointerwiki
