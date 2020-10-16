@@ -2979,9 +2979,8 @@ class LoginManager(login.LoginManager):
         """Login to the site.
 
         Note, this doesn't actually return or do anything with cookies.
-        The threadedhttp module takes care of all the cookie stuff,
-        this just has a legacy name for now and should be renamed in the
-        future.
+        The http module takes care of all the cookie stuff, this just
+        has a legacy name for now and should be renamed in the future.
 
         @return: empty string if successful, throws exception on failure
         """
@@ -3084,7 +3083,7 @@ class LoginManager(login.LoginManager):
         raise APIError(code=status, info=info)
 
     def storecookiedata(self, data):
-        """Ignore data; cookies are set by threadedhttp module."""
+        """Ignore data; cookies are set by http module."""
         http.cookie_jar.save(ignore_discard=True)
 
     def get_login_token(self) -> str:
