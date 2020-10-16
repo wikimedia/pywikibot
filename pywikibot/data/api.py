@@ -2971,8 +2971,7 @@ class LoginManager(login.LoginManager):
 
     def keyword(self, key):
         """Get API keyword from mapping."""
-        index = 0 if self.action == 'login' else 1
-        return self.mapping[key][index]
+        return self.mapping[key][self.action != 'login']
 
     @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
     def getCookie(self) -> str:
