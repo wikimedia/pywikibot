@@ -182,128 +182,6 @@ class TestFlowLockTopic(TestCase):
         self.assertFalse(topic.is_locked)
 
 
-class TestFlowHide(TestCase):
-
-    """Hiding topics and posts."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    user = True
-    write = True
-
-    def test_hide_topic(self):
-        """Hide and restore a test topic."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        if topic.is_moderated:
-            topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-        # Hide
-        topic.hide(MODERATION_REASON)
-        self.assertTrue(topic.is_moderated)
-        # Restore
-        topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-
-    def test_hide_post(self):
-        """Hide and restore a test post."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        post = Post(topic, 'sq1qvoig1az8w7cd')
-        if post.is_moderated:
-            post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-        # Hide
-        post.hide(MODERATION_REASON)
-        self.assertTrue(post.is_moderated)
-        # Restore
-        post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-
-
-class TestFlowDelete(TestCase):
-
-    """Deleting topics and posts."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    user = True
-    write = True
-    sysop = True
-
-    def test_delete_topic(self):
-        """Delete and restore a test topic."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        if topic.is_moderated:
-            topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-        # Delete
-        topic.delete_mod(MODERATION_REASON)
-        self.assertTrue(topic.is_moderated)
-        # Restore
-        topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-
-    def test_delete_post(self):
-        """Delete and restore a test post."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        post = Post(topic, 'sq1qvoig1az8w7cd')
-        if post.is_moderated:
-            post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-        # Delete
-        post.delete(MODERATION_REASON)
-        self.assertTrue(post.is_moderated)
-        # Restore
-        post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-
-
-class TestFlowSuppress(TestCase):
-
-    """Suppressing topics and posts."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    user = True
-    write = True
-    sysop = True
-
-    def test_suppress_post(self):
-        """Suppress and restore a test post."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        post = Post(topic, 'sq1qvoig1az8w7cd')
-        if post.is_moderated:
-            post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-        # Suppress
-        post.suppress(MODERATION_REASON)
-        self.assertTrue(post.is_moderated)
-        # Restore
-        post.restore(MODERATION_REASON)
-        self.assertFalse(post.is_moderated)
-
-    def test_suppress_topic(self):
-        """Suppress and restore a test topic."""
-        # Setup
-        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
-        if topic.is_moderated:
-            topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-        # Suppress
-        topic.suppress(MODERATION_REASON)
-        self.assertTrue(topic.is_moderated)
-        # Restore
-        topic.restore(MODERATION_REASON)
-        self.assertFalse(topic.is_moderated)
-
-
 class TestFlowEditFailure(TestCase):
 
     """Flow-related edit failure tests."""
@@ -325,6 +203,79 @@ class TestFlowEditFailure(TestCase):
         self.assertRaises(LockedPage, topic_root.reply, content, 'wikitext')
         topic_reply = topic.root.replies(force=True)[0]
         self.assertRaises(LockedPage, topic_reply.reply, content, 'wikitext')
+
+
+class FlowTests(TestCase):
+
+    """Flow tests base class."""
+
+    family = 'wikipedia'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def setUp(self):
+        """Setup tests."""
+        self.topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        self.post = Post(self.topic, 'sq1qvoig1az8w7cd')
+
+
+class TestFlowHide(FlowTests):
+
+    """Hiding topics and posts."""
+
+    def test_hide(self):
+        """Hide and restore a test topic and post."""
+        for flow in (self.topic, self.post):
+            with self.subTest(flow=flow.__class__.__name__):
+                # Setup
+                if flow.is_moderated:
+                    flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
+                # Hide
+                flow.hide(MODERATION_REASON)
+                self.assertTrue(flow.is_moderated)
+                # Restore
+                flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
+
+
+class TestFlowSysop(FlowTests):
+
+    """Deleting and Suppressing topics and posts."""
+
+    sysop = True
+
+    def test_delete(self):
+        """Delete and restore a test topic and post."""
+        for flow in (self.topic, self.post):
+            with self.subTest(flow=flow.__class__.__name__):
+                # Setup
+                if flow.is_moderated:
+                    flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
+                # Delete
+                flow.delete_mod(MODERATION_REASON)
+                self.assertTrue(flow.is_moderated)
+                # Restore
+                flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
+
+    def test_suppress(self):
+        """Suppress and restore a test topic and post."""
+        for flow in (self.topic, self.post):
+            with self.subTest(flow=flow.__class__.__name__):
+                # Setup
+                if flow.is_moderated:
+                    flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
+                # Suppress
+                flow.suppress(MODERATION_REASON)
+                self.assertTrue(flow.is_moderated)
+                # Restore
+                flow.restore(MODERATION_REASON)
+                self.assertFalse(flow.is_moderated)
 
 
 if __name__ == '__main__':  # pragma: no cover
