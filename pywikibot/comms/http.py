@@ -283,8 +283,10 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
     return None
 
 
+@deprecated(since='20201015', future_warning=True)
 def _http_process(session, http_request) -> None:
-    """
+    """DEPRECATED.
+
     Process an `threadedhttp.HttpRequest` instance.
 
     @param session: Session that will be used to process the `http_request`.
@@ -351,9 +353,11 @@ def error_handling_callback(request):
         warning('Http response status {0}'.format(request.data.status_code))
 
 
+@deprecated(since='20201015', future_warning=True)
 def _enqueue(uri, method='GET', params=None, body=None, headers=None,
              data=None, **kwargs):
-    """
+    """DEPRECATED.
+
     Enqueue non-blocking threaded HTTP request with callback.
 
     Callbacks, including the default error handler if enabled, are run in the
@@ -411,10 +415,7 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
           use_fake_user_agent: Union[bool, str] = False,
           data=None, **kwargs):
     """
-    Blocking HTTP request.
-
-    Note: The callback runs in the HTTP thread, where exceptions are logged
-    but are not able to be caught.
+    HTTP request.
 
     See L{requests.Session.request} for parameters.
 
@@ -422,6 +423,17 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     @param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
+
+    @kwarg charset: Either a valid charset (usable for str.decode()) or None
+        to automatically chose the charset from the returned header (defaults
+        to latin-1)
+    @type charset: CodecInfo, str, None
+    @kwarg disable_ssl_certificate_validation: diable SSL Verification
+    @type disable_ssl_certificate_validation: bool
+    @kwarg callback: Method to call once data is fetched
+    @type callback: callable
+    @kwarg callbacks: Methods to call once data is fetched
+    @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
     # body and data parameters both map to the data parameter of
@@ -432,9 +444,15 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
-    # Skip if already specified in request.
-    if not headers.get('user-agent', None):
-        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+    headers.update(config.extra_headers.copy() or {})
+
+    if headers.get('user-agent', False):
+        user_agent_format_string = headers.get('user-agent')
+        if not user_agent_format_string or '{' in user_agent_format_string:
+            headers['user-agent'] = user_agent(None, user_agent_format_string)
+    else:
+        # if not already specified,
+        # get fake UA exceptions from `fake_user_agent_exceptions` config.
         uri_domain = urlparse(uri).netloc
         use_fake_user_agent = config.fake_user_agent_exceptions.get(
             uri_domain, use_fake_user_agent)
@@ -444,13 +462,51 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         elif use_fake_user_agent is True:
             headers['user-agent'] = fake_user_agent()
 
-    request = _enqueue(uri, method, params, body, headers, **kwargs)
-    # if there's no data in the answer we're in trouble
-    assert request._data is not None
-    # Run the error handling callback in the callers thread so exceptions
-    # may be caught.
+    callbacks = kwargs.pop('callbacks', [])
+    callback = kwargs.pop('callback', None)
+    if callback:
+        callbacks.append(callback)
+
     if default_error_handling:
-        error_handling_callback(request)
+        callbacks.append(error_handling_callback)
+
+    charset = kwargs.pop('charset', None)
+    request = threadedhttp.HttpRequest(
+        uri, method, params, body, headers, callbacks, charset, **kwargs)
+
+    auth = get_authentication(uri)
+    if auth is not None and len(auth) == 4:
+        if isinstance(requests_oauthlib, ImportError):
+            warn('%s' % requests_oauthlib, ImportWarning)
+            error('OAuth authentication not supported: %s'
+                  % requests_oauthlib)
+            auth = None
+        else:
+            auth = requests_oauthlib.OAuth1(*auth)
+
+    timeout = config.socket_timeout
+    ignore_validation = kwargs.pop('disable_ssl_certificate_validation', False)
+
+    try:
+        # Note that the connections are pooled which mean that a future
+        # HTTPS request can succeed even if the certificate is invalid and
+        # verify=True, when a request with verify=False happened before
+        response = session.request(method, uri, params=params, data=body,
+                                   headers=headers, auth=auth, timeout=timeout,
+                                   verify=not ignore_validation,
+                                   **kwargs)
+    except Exception as e:
+        request.data = e
+    else:
+        request.data = response
+    #  error_handling_callback is called in HttpRequest data.setter
+
+    # if there's no data in the answer we're in trouble
+    try:
+        request.data
+    except AssertionError as e:
+        raise e
+
     return request
 
 # Deprecated parts ############################################################
