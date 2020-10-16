@@ -12,6 +12,8 @@ import re
 import sys
 import threading
 
+from typing import Optional
+
 import pywikibot
 from pywikibot import config2 as config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
@@ -238,7 +240,8 @@ class UI:
         # May be overridden by subclass
         return input()
 
-    def input(self, question, password=False, default='', force=False):
+    def input(self, question: str, password: bool = False,
+              default: str = '', force: bool = False) -> str:
         """
         Ask the user a question and return the answer.
 
@@ -249,15 +252,10 @@ class UI:
         a trailing question mark.
 
         @param question: The question, without trailing whitespace.
-        @type question: basestring
         @param password: if True, hides the user's input (for password entry).
-        @type password: bool
         @param default: The default answer if none was entered. None to require
             an answer.
-        @type default: basestring
         @param force: Automatically use the default
-        @type force: bool
-        @rtype: str
         """
         assert(not password or not default)
         end_marker = ':'
@@ -300,8 +298,9 @@ class UI:
             raise QuitKeyboardInterrupt()
         return text
 
-    def input_choice(self, question, options, default=None,
-                     return_shortcut=True, automatic_quit=True, force=False):
+    def input_choice(self, question: str, options, default: str = None,
+                     return_shortcut: bool = True,
+                     automatic_quit: bool = True, force: bool = False):
         """
         Ask the user and returns a value from the options.
 
@@ -310,7 +309,6 @@ class UI:
         ambiguous index.
 
         @param question: The question, without trailing whitespace.
-        @type question: basestring
         @param options: Iterable of all available options. Each entry contains
             the full length answer and a shortcut of only one character.
             Alternatively they may be Option (or subclass) instances or
@@ -321,19 +319,15 @@ class UI:
             Singletons of Option and its subclasses are also accepted.
         @param default: The default answer if no was entered. None to require
             an answer.
-        @type default: basestring
         @param return_shortcut: Whether the shortcut or the index in the option
             should be returned.
-        @type return_shortcut: bool
         @param automatic_quit: Adds the option 'Quit' ('q') if True and throws
             a L{QuitKeyboardInterrupt} if selected.
-        @type automatic_quit: bool
         @param force: Automatically use the default
-        @type force: bool
         @return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
-        @rtype: int (if not return_shortcut), lowercased basestring (otherwise)
+        @rtype: int (if not return_shortcut), lowercased str (otherwise)
         """
         if force and default is None:
             raise ValueError('With no default option it cannot be forced')
@@ -406,17 +400,15 @@ class UI:
             else:
                 pywikibot.error('Invalid response')
 
-    def editText(self, text, jumpIndex=None, highlight=None):
+    def editText(self, text: str, jumpIndex: Optional[int] = None,
+                 highlight: Optional[str] = None):
         """Return the text as edited by the user.
 
         Uses a Tkinter edit box because we don't have a console editor
 
         @param text: the text to be edited
-        @type text: str
         @param jumpIndex: position at which to put the caret
-        @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
-        @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
         @rtype: str or None

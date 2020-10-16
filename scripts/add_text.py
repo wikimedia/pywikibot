@@ -74,7 +74,7 @@ from pywikibot.tools.formatter import color_format
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def get_text(page, old, create) -> str:
+def get_text(page, old: str, create: bool) -> str:
     """
     Get text on page. If old is not None, return old.
 
@@ -82,9 +82,7 @@ def get_text(page, old, create) -> str:
     @type page: pywikibot.page.BasePage
     @param old: If not None, this parameter is returned instead
         of fetching text from the page
-    @type old: str
     @param create: Create the page if it doesn't exist
-    @type create: bool
     @return: The page's text or old parameter if not None
     """
     if old is None:
@@ -107,20 +105,17 @@ def get_text(page, old, create) -> str:
     return text
 
 
-def put_text(page, new, summary, count, asynchronous=False) -> Optional[bool]:
+def put_text(page, new: str, summary: str, count: int,
+             asynchronous: bool = False) -> Optional[bool]:
     """
     Save the new text.
 
     @param page: The page to update and save
     @type page: pywikibot.page.BasePage
     @param new: The new text for the page
-    @type new: str
     @param summary: Summary of page changes.
-    @type summary: str
     @param count: Maximum num attempts to reach the server
-    @type count: int
     @param asynchronous: Save the page asynchronously
-    @type asynchronous: bool
     @return: True if successful, False if unsuccessful, None if
         waiting for server
     """
@@ -151,9 +146,12 @@ def put_text(page, new, summary, count, asynchronous=False) -> Optional[bool]:
     return False
 
 
-def add_text(page, addText, summary=None, regexSkip=None,
-             regexSkipUrl=None, always=False, up=False, putText=True,
-             oldTextGiven=None, reorderEnabled=True, create=False
+def add_text(page, addText: str, summary: Optional[str] = None,
+             regexSkip: Optional[str] = None,
+             regexSkipUrl: Optional[str] = None,
+             always: bool = False, up: bool = False,
+             putText: bool = True, oldTextGiven: Optional[str] = None,
+             reorderEnabled: bool = True, create: bool = False
              ) -> Union[Tuple[bool, bool, bool], Tuple[str, str, bool]]:
     """
     Add text to a page.
@@ -161,27 +159,17 @@ def add_text(page, addText, summary=None, regexSkip=None,
     @param page: The page to add text to
     @type page: pywikibot.page.BasePage
     @param addText: Text to add
-    @type addText: str
     @param summary: Summary of changes. If None, beginning of addText is used.
-    @type summary: str
     @param regexSkip: Abort if text on page matches
-    @type regexSkip: str
     @param regexSkipUrl: Abort if full url matches
-    @type regexSkipUrl: str
     @param always: Always add text without user confirmation
-    @type always: bool
     @param up: If True, add text to top of page, else add at bottom.
-    @type up: bool
     @param putText: If True, save changes to the page, else return
         (text, newtext, always)
-    @type putText: bool
     @param oldTextGiven: If None fetch page text, else use this text
-    @type oldTextGiven: str
     @param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
-    @type reorderEnabled: bool
     @param create: Create page if it does not exist
-    @type create: bool
     @return: If putText=True: (success, success, always)
         else: (text, newtext, always)
     """
@@ -282,14 +270,13 @@ def add_text(page, addText, summary=None, regexSkip=None,
         error_count += 1
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     # If none, the var is set only for check purpose.
     summary = None

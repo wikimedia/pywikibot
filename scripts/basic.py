@@ -33,6 +33,8 @@ The following generators and filters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Tuple
+
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -121,14 +123,13 @@ class BasicBot(
         self.put_current(text, summary=self.opt.summary)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
     # Process global arguments to determine desired site

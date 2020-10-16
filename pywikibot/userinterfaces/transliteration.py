@@ -1110,17 +1110,15 @@ class transliterator:
             trans[char] = value
         self.trans = trans
 
-    def transliterate(self, char: str, default='?', prev='-', next='-') -> str:
+    def transliterate(self, char: str, default: str = '?',
+                      prev: str = '-', next: str = '-') -> str:
         """
         Transliterate the character.
 
         @param char: The character to transliterate.
         @param default: The character used when there is no transliteration.
-        @type default: str
         @param prev: The previous character
-        @type prev: str
         @param next: The next character
-        @type next: str
         @return: The transliterated character which may be an empty string
         """
         if char in self.trans:
