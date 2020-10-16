@@ -2385,7 +2385,7 @@ class APISite(BaseSite):
         """Iterate global image usage for a given FilePage.
 
         @param page: the page to return global image usage for.
-        @type image: pywikibot.FilePage
+        @type page: pywikibot.FilePage
         @param total: iterate no more than this number of pages in total.
         @raises TypeError: input page is not a FilePage.
         @raises pywikibot.exceptions.SiteDefinitionError: Site could not be
@@ -2508,7 +2508,7 @@ class APISite(BaseSite):
         for the given action type.
 
         @param page: a pywikibot.Page object
-        @type param: pywikibot.Page
+        @type page: pywikibot.Page
         @param action: a valid restriction type like 'edit', 'move'
         @type action: str
         @rtype: bool
@@ -6193,8 +6193,8 @@ class APISite(BaseSite):
 
         @see: U{https://www.mediawiki.org/wiki/API:Protectedtitles}
 
-        @param namespaces: The searched namespace.
-        @type namespaces: int or Namespace or str
+        @param namespace: The searched namespace.
+        @type namespace: int or Namespace or str
         @param type: The protection type to search for (default 'edit').
         @type type: str
         @param level: The protection level (like 'autoconfirmed'). If False it
@@ -6299,7 +6299,7 @@ class APISite(BaseSite):
         """Return a generator to pages containing linter errors.
 
         @param lint_categories: categories of lint errors
-        @type lntcategories: an iterable that returns values (str),
+        @type lint_categories: an iterable that returns values (str),
             or a pipe-separated string of values.
 
         @param total: if not None, yielding this many items in total
@@ -6364,7 +6364,7 @@ class APISite(BaseSite):
                                    source=source)
         data = req.submit()
         if data['result']['success'] != 1:
-            raise api.APIError('Thanking unsuccessful')
+            raise api.APIError('Thanking unsuccessful', '')
         return data
 
     @need_extension('Flow')
@@ -6383,7 +6383,7 @@ class APISite(BaseSite):
                                    postid=post_id, token=token)
         data = req.submit()
         if data['result']['success'] != 1:
-            raise api.APIError('Thanking unsuccessful')
+            raise api.APIError('Thanking unsuccessful', '')
         return data
 
     # Flow API calls
@@ -7083,7 +7083,7 @@ class DataSite(APISite):
         req = self._simple_request(**params)
         data = req.submit()
         if 'success' not in data:
-            raise api.APIError(data['errors'])
+            raise api.APIError(data['errors'], '')
         return data['entities']
 
     def preload_entities(self, pagelist, groupsize=50):
