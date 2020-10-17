@@ -10,6 +10,7 @@ import threading
 import time
 
 from contextlib import suppress
+from typing import Optional
 
 import pywikibot
 from pywikibot import config
@@ -267,7 +268,7 @@ class Throttle:
             else:
                 self.last_read = time.time()
 
-    def lag(self, lagtime=None):
+    def lag(self, lagtime: Optional[float] = None):
         """Seize the throttle lock due to server lag.
 
         Usually the self.retry-after value from response_header of the last
@@ -284,7 +285,6 @@ class Throttle:
         @param lagtime: The time to wait for the next request which is the
             last maxlag time from api warning. This is only used as a fallback
             if self.retry-after isn't set.
-        @type lagtime: float
         """
         started = time.time()
         with self.lock:

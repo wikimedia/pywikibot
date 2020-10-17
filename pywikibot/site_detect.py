@@ -9,6 +9,7 @@ import json
 
 from contextlib import suppress
 from html.parser import HTMLParser
+from typing import Optional
 from urllib.parse import urljoin, urlparse
 from requests.exceptions import RequestException
 
@@ -170,12 +171,8 @@ class MWSite:
         return hash(self.server + self.scriptpath)
 
     @property
-    def api(self):
-        """
-        Get api URL.
-
-        @rtype: str or None
-        """
+    def api(self) -> Optional[str]:
+        """Get api URL."""
         if self.server is None or self.scriptpath is None:
             return
 

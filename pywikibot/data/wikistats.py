@@ -118,12 +118,11 @@ class WikiStats:
         self._raw[format][table] = data
         return data
 
-    def csv(self, table: str):
+    def csv(self, table: str) -> list:
         """
         Fetch and parse CSV for a table.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         if table in self._data['csv']:
             return self._data['csv'][table]
@@ -136,12 +135,11 @@ class WikiStats:
 
         return data
 
-    def xml(self, table: str):
+    def xml(self, table: str) -> list:
         """
         Fetch and parse XML for a table.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         if table in self._data['xml']:
             return self._data['xml'][table]
@@ -163,11 +161,10 @@ class WikiStats:
         self._data['xml'][table] = data
         return data
 
-    def get(self, table: str, format='csv'):
+    def get(self, table: str, format='csv') -> list:
         """Get a list of a table of data.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         try:
             func = getattr(self, format)
@@ -176,13 +173,12 @@ class WikiStats:
                                       .format(format))
         return func(table)
 
-    def get_dict(self, table: str, format='csv'):
+    def get_dict(self, table: str, format='csv') -> dict:
         """Get dictionary of a table of data using format.
 
         @param table: table of data to fetch
         @param format: format of data to use
         @type format: 'xml' or 'csv', or None to autoselect.
-        @rtype: dict
         """
         if format is None:  # old autoselect
             format = 'csv'
