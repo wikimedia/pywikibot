@@ -26,13 +26,12 @@ class FlowPage(BasePage, abc.ABC):
     It cannot be instantiated directly.
     """
 
-    def __init__(self, source, title=''):
+    def __init__(self, source, title: str = ''):
         """Initializer.
 
         @param source: A Flow-enabled site or a Link or Page on such a site
         @type source: Site, pywikibot.page.Link, or pywikibot.page.Page
         @param title: normalized title of the page
-        @type title: str
 
         @raises TypeError: incorrect use of parameters
         @raises ValueError: use of non-Flow-enabled Site
@@ -52,11 +51,10 @@ class FlowPage(BasePage, abc.ABC):
         raise NotImplementedError
 
     @property
-    def uuid(self):
+    def uuid(self) -> str:
         """Return the UUID of the page.
 
         @return: UUID of the page
-        @rtype: str
         """
         if not hasattr(self, '_uuid'):
             self._uuid = self._load()['workflowId']
@@ -187,15 +185,13 @@ class Topic(FlowPage):
         return cls(board.site, data['topic-page'])
 
     @classmethod
-    def from_topiclist_data(cls, board, root_uuid, topiclist_data):
+    def from_topiclist_data(cls, board, root_uuid: str, topiclist_data: dict):
         """Create a Topic object from API data.
 
         @param board: The topic's parent Flow board
         @type board: Board
         @param root_uuid: The UUID of the topic and its root post
-        @type root_uuid: str
         @param topiclist_data: The data returned by view-topiclist
-        @type topiclist_data: dict
         @return: A Topic object derived from the supplied data
         @rtype: Topic
         @raises TypeError: any passed parameters have wrong types
@@ -253,56 +249,50 @@ class Topic(FlowPage):
         return self.root.reply(content, content_format)
 
     # Moderation
-    def lock(self, reason):
+    def lock(self, reason: str):
         """Lock this topic.
 
         @param reason: The reason for locking this topic
-        @type reason: str
         """
         self.site.lock_topic(self, True, reason)
         self._reload()
 
-    def unlock(self, reason):
+    def unlock(self, reason: str):
         """Unlock this topic.
 
         @param reason: The reason for unlocking this topic
-        @type reason: str
         """
         self.site.lock_topic(self, False, reason)
         self._reload()
 
-    def delete_mod(self, reason):
+    def delete_mod(self, reason: str):
         """Delete this topic through the Flow moderation system.
 
         @param reason: The reason for deleting this topic.
-        @type reason: str
         """
         self.site.delete_topic(self, reason)
         self._reload()
 
-    def hide(self, reason):
+    def hide(self, reason: str):
         """Hide this topic.
 
         @param reason: The reason for hiding this topic.
-        @type reason: str
         """
         self.site.hide_topic(self, reason)
         self._reload()
 
-    def suppress(self, reason):
+    def suppress(self, reason: str):
         """Suppress this topic.
 
         @param reason: The reason for suppressing this topic.
-        @type reason: str
         """
         self.site.suppress_topic(self, reason)
         self._reload()
 
-    def restore(self, reason):
+    def restore(self, reason: str):
         """Restore this topic.
 
         @param reason: The reason for restoring this topic.
-        @type reason: str
         """
         self.site.restore_topic(self, reason)
         self._reload()
@@ -313,14 +303,13 @@ class Post:
 
     """A post to a Flow discussion topic."""
 
-    def __init__(self, page, uuid):
+    def __init__(self, page, uuid: str):
         """
         Initializer.
 
         @param page: Flow topic
         @type page: Topic
         @param uuid: UUID of a Flow post
-        @type uuid: str
 
         @raises TypeError: incorrect types of parameters
         """
@@ -337,16 +326,14 @@ class Post:
         self._content = {}
 
     @classmethod
-    def fromJSON(cls, page, post_uuid, data):
+    def fromJSON(cls, page, post_uuid: str, data: dict):
         """
         Create a Post object using the data returned from the API call.
 
         @param page: A Flow topic
         @type page: Topic
         @param post_uuid: The UUID of the post
-        @type post_uuid: str
         @param data: The JSON data returned from the API
-        @type data: dict
 
         @return: A Post object
         @raises TypeError: data is not a dict
@@ -357,11 +344,10 @@ class Post:
 
         return post
 
-    def _set_data(self, data):
+    def _set_data(self, data: dict):
         """Set internal data and cache content.
 
         @param data: The data to store internally
-        @type data: dict
         @raises TypeError: data is not a dict
         @raises ValueError: missing data entries or post/revision not found
         """
@@ -399,11 +385,10 @@ class Post:
         return self._current_revision
 
     @property
-    def uuid(self):
+    def uuid(self) -> str:
         """Return the UUID of the post.
 
         @return: UUID of the post
-        @rtype: str
         """
         return self._uuid
 
@@ -508,38 +493,34 @@ class Post:
         return post
 
     # Moderation
-    def delete(self, reason):
+    def delete(self, reason: str):
         """Delete this post through the Flow moderation system.
 
         @param reason: The reason for deleting this post.
-        @type reason: str
         """
         self.site.delete_post(self, reason)
         self._load()
 
-    def hide(self, reason):
+    def hide(self, reason: str):
         """Hide this post.
 
         @param reason: The reason for hiding this post.
-        @type reason: str
         """
         self.site.hide_post(self, reason)
         self._load()
 
-    def suppress(self, reason):
+    def suppress(self, reason: str):
         """Suppress this post.
 
         @param reason: The reason for suppressing this post.
-        @type reason: str
         """
         self.site.suppress_post(self, reason)
         self._load()
 
-    def restore(self, reason):
+    def restore(self, reason: str):
         """Restore this post.
 
         @param reason: The reason for restoring this post.
-        @type reason: str
         """
         self.site.restore_post(self, reason)
         self._load()

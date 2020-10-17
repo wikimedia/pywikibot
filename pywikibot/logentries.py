@@ -6,7 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
-from typing import Optional
+from typing import List, Optional
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
@@ -189,14 +189,13 @@ class BlockEntry(LogEntry):
         else:
             return super(BlockEntry, self).page()
 
-    def flags(self):
+    def flags(self) -> List[str]:
         """
         Return a list of (str) flags associated with the block entry.
 
         It raises an Error if the entry is an unblocking log entry.
 
         @return: list of flags strings
-        @rtype: list
         """
         if self.action() == 'unblock':
             return []
@@ -449,12 +448,11 @@ class LogEntryFactory(object):
                 classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
-    def _createFromData(self, logdata):
+    def _createFromData(self, logdata: dict):
         """
         Check for logtype from data, and creates the correct LogEntry.
 
         @param logdata: log entry data
-        @type logdata: dict
         @rtype: LogEntry
         """
         try:

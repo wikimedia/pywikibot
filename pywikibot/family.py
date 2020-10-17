@@ -681,11 +681,10 @@ class Family:
 
     @staticmethod
     @deprecated_args(fatal=None)
-    def load(fam=None):
+    def load(fam: Optional[str] = None):
         """Import the named family.
 
         @param fam: family name (if omitted, uses the configured default)
-        @type fam: str
         @return: a Family instance configured for the named family.
         @raises pywikibot.exceptions.UnknownFamily: family not known
         """
@@ -827,27 +826,23 @@ class Family:
             .format(code))
 
     # Methods
-    def protocol(self, code):
+    def protocol(self, code: str) -> str:
         """
         The protocol to use to connect to the site.
 
         May be overridden to return 'https'. Other protocols are not supported.
 
         @param code: language code
-        @type code: str
         @return: protocol that this family uses
-        @rtype: str
         """
         return 'http'
 
-    def ignore_certificate_error(self, code):
+    def ignore_certificate_error(self, code: str) -> bool:
         """
         Return whether a HTTPS certificate error should be ignored.
 
         @param code: language code
-        @type code: str
         @return: flag to allow access if certificate has an error.
-        @rtype: bool
         """
         return False
 
@@ -859,7 +854,7 @@ class Family:
         """The hostname to use for SSL connections."""
         return self.hostname(code)
 
-    def scriptpath(self, code):
+    def scriptpath(self, code: str) -> str:
         """The prefix used to locate scripts on this wiki.
 
         This is the value displayed when you enter {{SCRIPTPATH}} on a
@@ -871,10 +866,8 @@ class Family:
         uses a different value.
 
         @param code: Site code
-        @type code: str
         @raises KeyError: code is not recognised
         @return: URL path without ending '/'
-        @rtype: str
         """
         return '/w'
 
@@ -893,18 +886,15 @@ class Family:
             host = self.hostname(code)
         return protocol, host
 
-    def base_url(self, code, uri, protocol=None):
+    def base_url(self, code: str, uri: str, protocol=None) -> str:
         """
         Prefix uri with port and hostname.
 
         @param code: The site code
-        @type code: str
         @param uri: The absolute path after the hostname
-        @type uri: str
         @param protocol: The protocol which is used. If None it'll determine
             the protocol from the code.
         @return: The full URL ending with uri
-        @rtype: str
         """
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
@@ -964,7 +954,7 @@ class Family:
 
         return config.site_interface
 
-    def from_url(self, url):
+    def from_url(self, url: str) -> Optional[str]:
         """
         Return whether this family matches the given url.
 
@@ -980,10 +970,8 @@ class Family:
         @param url: the URL which may contain a C{$1}. If it's missing it is
             assumed to be at the end and if it's present nothing is allowed
             after it.
-        @type url: str
         @return: The language code of the url. None if that url is not from
             this family.
-        @rtype: str or None
         @raises RuntimeError: When there are multiple languages in this family
             which would work with the given URL.
         @raises ValueError: When text is present after $1.
@@ -1153,7 +1141,7 @@ class Family:
 
         These domains may also exist in another family.
 
-        @rtype: iterable of str
+        @rtype: set of str
         """
         return set(cls.langs.values())
 
@@ -1162,7 +1150,7 @@ class Family:
         """
         Get list of codes used by this family.
 
-        @rtype: iterable of str
+        @rtype: set of str
         """
         return set(cls.langs.keys())
 
@@ -1401,14 +1389,12 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
 
 @deprecated_args(site=None)
-def AutoFamily(name, url):
+def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.
 
     @param name: Name for the family
-    @type name: str
     @param url: API endpoint URL of the wiki
-    @type url: str
     @return: Generated family class
     @rtype: SingleSiteFamily
     """

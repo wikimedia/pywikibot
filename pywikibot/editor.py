@@ -76,7 +76,8 @@ class TextEditor:
         """Return editor selected in user-config.py."""
         return TextEditor._concat(self._command(tempFilename, text, jumpIndex))
 
-    def edit(self, text: str, jumpIndex=None, highlight=None) -> Optional[str]:
+    def edit(self, text: str, jumpIndex: Optional[int] = None,
+             highlight: Optional[str] = None) -> Optional[str]:
         """
         Call the editor and thus allows the user to change the text.
 
@@ -84,9 +85,7 @@ class TextEditor:
 
         @param text: the text to be edited
         @param jumpIndex: position at which to put the caret
-        @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
-        @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
         """

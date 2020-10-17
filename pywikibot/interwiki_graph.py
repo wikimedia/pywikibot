@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 from collections import Counter
 import itertools
 import threading
+from typing import Optional
 
 try:
     import pydot
@@ -250,16 +251,14 @@ class GraphDrawer(object):
         self.saveGraphFile()
 
 
-def getFilename(page, extension=None):
+def getFilename(page, extension: Optional[str] = None) -> str:
     """
     Create a filename that is unique for the page.
 
     @param page: page used to create the new filename
     @type page: pywikibot.page.Page
     @param extension: file extension
-    @type extension: str
     @return: filename of <family>-<lang>-<page>.<ext>
-    @rtype: str
     """
     filename = '%s-%s-%s' % (page.site.family.name,
                              page.site.code,

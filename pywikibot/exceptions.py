@@ -87,7 +87,7 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
+from typing import Optional, Union
 
 from pywikibot.tools import deprecated, _NotImplementedWarning
 
@@ -190,11 +190,10 @@ class OtherPageSaveError(PageSaveRelatedError):
 
     message = 'Edit to page %(title)s failed:\n%(reason)s'
 
-    def __init__(self, page, reason):
+    def __init__(self, page, reason: Union[str, Exception]):
         """Initializer.
 
         @param reason: Details of the problem
-        @type reason: Exception or basestring
         """
         self.reason = reason
         super().__init__(page)
@@ -247,13 +246,12 @@ class InconsistentTitleReceived(PageLoadRelatedError):
 
     """Page receives a title inconsistent with query."""
 
-    def __init__(self, page, actual):
+    def __init__(self, page, actual: str):
         """Initializer.
 
         @param page: Page that caused the exception
         @type page: Page object
         @param actual: title obtained by query
-        @type actual: basestring
 
         """
         self.message = "Query on %s returned data on '{0}'".format(actual)
