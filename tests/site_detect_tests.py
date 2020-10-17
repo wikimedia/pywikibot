@@ -123,10 +123,6 @@ class PreAPISiteTestCase(SiteDetectionTestCase):
 
     """Test detection of MediaWiki sites prior to the API."""
 
-    def test_wikif1(self):
-        """Test detection of MediaWiki sites for www.wikif1.org."""
-        self.assertNoSite('http://www.wikif1.org/$1')
-
     def test_thelemapedia(self):
         """Test detection of MediaWiki sites for www.thelemapedia.org."""
         self.assertNoSite('http://www.thelemapedia.org/index.php/$1')
