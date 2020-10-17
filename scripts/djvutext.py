@@ -34,6 +34,8 @@ The following parameters are supported:
 #
 import os.path
 
+from typing import Tuple
+
 import pywikibot
 
 from pywikibot import i18n
@@ -121,14 +123,13 @@ class DjVuTextBot(SingleSiteBot):
             self.userPut(page, old_text, new_text, summary=summary)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     index = None
     djvu_path = '.'  # default djvu file directory

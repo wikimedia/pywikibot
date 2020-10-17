@@ -32,6 +32,8 @@ For further information see pywikibot/cosmetic_changes.py
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Tuple
+
 import pywikibot
 
 from pywikibot import config, cosmetic_changes, i18n, pagegenerators
@@ -76,14 +78,13 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
                              asynchronous=self.getOption('async'))
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
 

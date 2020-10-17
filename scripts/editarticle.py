@@ -35,6 +35,8 @@ import os
 import sys
 import tempfile
 
+from typing import Tuple
+
 import pywikibot
 
 from pywikibot import i18n
@@ -111,14 +113,13 @@ class ArticleEditor(object):
             pywikibot.output('Nothing changed')
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     app = ArticleEditor(*args)
     app.run()
