@@ -203,16 +203,6 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
 
     """Test T102461 (Python issue 10254)."""
 
-    def setUp(self):
-        """Set up test case."""
-        super().setUp()
-        self._orig_unicodedata = pywikibot.page.unicodedata
-
-    def tearDown(self):
-        """Tear down test case."""
-        pywikibot.page.unicodedata = self._orig_unicodedata
-        super().tearDown()
-
     def test_no_change(self):
         """Test T102461 (Python issue 10254) is not encountered."""
         title = 'Li̍t-sṳ́'
@@ -231,10 +221,14 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_partially_qualified_NS0_code(self):
-        """Test ':wikipedia:Main Page' on enwp is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_partially_qualified_NS0_code(self):
+        """Test ':wikipedia:Main Page' on enwp is namespace 4."""
         link = Link(':wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -243,8 +237,6 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS1_code(self):
         """Test ':wikipedia:Talk:Main Page' on enwp is namespace 4."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -253,8 +245,6 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS0_family(self):
         """Test ':en:Main Page' on enwp is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -263,8 +253,6 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS1_family(self):
         """Test ':en:Talk:Main Page' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -280,10 +268,14 @@ class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(LinkTestCase):
     code = 'en'
     cached = True
 
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
+        config.mylang = 'en'
+        config.family = 'wikipedia'
+
     def test_partially_qualified_NS0_family(self):
         """Test ':en:Main Page' on dewp is namespace 0."""
-        config.mylang = 'de'
-        config.family = 'wikipedia'
         link = Link(':en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -292,8 +284,6 @@ class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(LinkTestCase):
 
     def test_partially_qualified_NS1_family(self):
         """Test ':en:Talk:Main Page' on dewp is namespace 1."""
-        config.mylang = 'de'
-        config.family = 'wikipedia'
         link = Link(':en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -309,10 +299,14 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_partially_qualified_NS0_code(self):
-        """Test ':wikipedia:Main Page' on enws is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
+
+    def test_partially_qualified_NS0_code(self):
+        """Test ':wikipedia:Main Page' on enws is namespace 0."""
         link = Link(':wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -321,8 +315,6 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_partially_qualified_NS1_code(self):
         """Test ':wikipedia:Talk:Main Page' on enws is ns 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link(':wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -362,10 +354,14 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':en:wikipedia:Main Page' on enwp is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test ':en:wikipedia:Main Page' on enwp is namespace 4."""
         link = Link(':en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -374,8 +370,6 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test ':en:wikipedia:Talk:Main Page' on enwp is namespace 4."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -399,10 +393,14 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
     }
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':en:wikipedia:Main Page' on enws is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test ':en:wikipedia:Main Page' on enws is namespace 0."""
         link = Link(':en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -411,8 +409,6 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test ':en:wikipedia:Main Page' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link(':en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -421,8 +417,6 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikipedia:en:Main Page' on enws is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link(':wikipedia:en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -431,8 +425,6 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test ':wikipedia:en:Talk:Main Page' on enws is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link(':wikipedia:en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -456,10 +448,14 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     }
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':en:wikipedia:Main Page' on wikidata is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'wikidata'
         config.family = 'wikidata'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test ':en:wikipedia:Main Page' on wikidata is namespace 4."""
         link = Link(':en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -468,8 +464,6 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test ':en:wikipedia:Talk:Main Page' on wikidata is namespace 4."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link(':en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -478,8 +472,6 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikipedia:en:Main Page' on wikidata is namespace 0."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link(':wikipedia:en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -488,8 +480,6 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test ':wikipedia:en:Talk:Main Page' on wikidata is namespace 1."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link(':wikipedia:en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -517,10 +507,14 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
     }
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':testwiki:wikidata:Q6' on enwp is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test ':testwiki:wikidata:Q6' on enwp is namespace 0."""
         link = Link(':testwiki:wikidata:Q6')
         link.parse()
         self.assertEqual(link.site, self.get_site('wikidata'))
@@ -529,8 +523,6 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test ':testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':testwiki:wikidata:Talk:Q6')
         link.parse()
         self.assertEqual(link.site, self.get_site('wikidata'))
@@ -539,7 +531,6 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikidata:testwiki:Q6' on enwp is namespace 0."""
-        config.mylang = 'en'
         config.family = 'wikipedia'
         link = Link(':wikidata:testwiki:Q6')
         link.parse()
@@ -549,8 +540,6 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test ':wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':wikidata:testwiki:Talk:Q6')
         link.parse()
         self.assertEqual(link.site, self.get_site('test.wp'))
@@ -566,10 +555,14 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
     code = 'species'
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':species:species:Main Page' on species is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test ':species:species:Main Page' on species is namespace 0."""
         link = Link(':species:species:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -578,8 +571,6 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test ':species:species:Talk:Main Page' on species is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link(':species:species:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -598,10 +589,14 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_partially_qualified_NS0_code(self):
-        """Test 'wikipedia:Main Page' on enwp is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_partially_qualified_NS0_code(self):
+        """Test 'wikipedia:Main Page' on enwp is namespace 4."""
         link = Link('wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -610,8 +605,6 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS1_code(self):
         """Test 'wikipedia:Talk:Main Page' on enwp is namespace 4."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -620,8 +613,6 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS0_family(self):
         """Test 'en:Main Page' on enwp is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -630,8 +621,6 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
     def test_partially_qualified_NS1_family(self):
         """Test 'en:Talk:Main Page' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -647,10 +636,14 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
     code = 'en'
     cached = True
 
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
+        config.mylang = 'en'
+        config.family = 'wikipedia'
+
     def test_partially_qualified_NS0_family(self):
         """Test 'en:Main Page' on dewp is namespace 0."""
-        config.mylang = 'de'
-        config.family = 'wikipedia'
         link = Link('en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -659,8 +652,6 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
 
     def test_partially_qualified_NS1_family(self):
         """Test 'en:Talk:Main Page' on dewp is namespace 1."""
-        config.mylang = 'de'
-        config.family = 'wikipedia'
         link = Link('en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -676,10 +667,14 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_partially_qualified_NS0_code(self):
-        """Test 'wikipedia:Main Page' on enws is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
+
+    def test_partially_qualified_NS0_code(self):
+        """Test 'wikipedia:Main Page' on enws is namespace 0."""
         link = Link('wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -688,8 +683,6 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_partially_qualified_NS1_code(self):
         """Test 'wikipedia:Talk:Main Page' on enws is ns 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link('wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -705,10 +698,14 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test 'en:wikipedia:Main Page' on enwp is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test 'en:wikipedia:Main Page' on enwp is namespace 4."""
         link = Link('en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -717,8 +714,6 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test 'en:wikipedia:Talk:Main Page' on enwp is namespace 4."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -742,10 +737,14 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
     }
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test 'en:wikipedia:Main Page' on enws is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test 'en:wikipedia:Main Page' on enws is namespace 0."""
         link = Link('en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -754,8 +753,6 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test 'en:wikipedia:Main Page' on enws is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link('en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -764,8 +761,6 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikipedia:en:Main Page' on enws is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link('wikipedia:en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -774,8 +769,6 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test 'wikipedia:en:Talk:Main Page' on enws is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikisource'
         link = Link('wikipedia:en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -799,10 +792,14 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     }
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test 'en:wikipedia:Main Page' on wikidata is namespace 4."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'wikidata'
         config.family = 'wikidata'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test 'en:wikipedia:Main Page' on wikidata is namespace 4."""
         link = Link('en:wikipedia:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -811,8 +808,6 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test 'en:wikipedia:Talk:Main Page' on wikidata isn't namespace 1."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link('en:wikipedia:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -821,8 +816,6 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikipedia:en:Main Page' on wikidata is namespace 0."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link('wikipedia:en:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -831,8 +824,6 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test 'wikipedia:en:Talk:Main Page' on wikidata is namespace 1."""
-        config.mylang = 'wikidata'
-        config.family = 'wikidata'
         link = Link('wikipedia:en:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site('enwp'))
@@ -848,10 +839,14 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
     code = 'test'
     cached = True
 
-    def test_fully_qualified_NS0_code(self):
-        """Test 'testwiki:wikidata:Q6' on enwp is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_code(self):
+        """Test 'testwiki:wikidata:Q6' on enwp is namespace 0."""
         link = Link('testwiki:wikidata:Q6')
         link.parse()
         self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
@@ -860,8 +855,6 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test 'testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('testwiki:wikidata:Talk:Q6')
         link.parse()
         self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
@@ -870,8 +863,6 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikidata:testwiki:Q6' on enwp is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Q6')
         link.parse()
         self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
@@ -880,8 +871,6 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family(self):
         """Test 'wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Talk:Q6')
         link.parse()
         self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
@@ -897,10 +886,14 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
     code = 'species'
     cached = True
 
-    def test_fully_qualified_NS0_family_code(self):
-        """Test 'species:species:Main Page' on enwp is namespace 0."""
+    def setUp(self):
+        """Setup tests."""
+        super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+    def test_fully_qualified_NS0_family_code(self):
+        """Test 'species:species:Main Page' on enwp is namespace 0."""
         link = Link('species:species:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -909,8 +902,6 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_family_code(self):
         """Test 'species:species:Talk:Main Page' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('species:species:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -919,8 +910,6 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS0_code(self):
         """Test 'species:Main Page' on enwp is namespace 0."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('species:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
@@ -929,8 +918,6 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS1_code(self):
         """Test 'species:Talk:Main Page' on enwp is namespace 1."""
-        config.mylang = 'en'
-        config.family = 'wikipedia'
         link = Link('species:Talk:Main Page')
         link.parse()
         self.assertEqual(link.site, self.get_site())
