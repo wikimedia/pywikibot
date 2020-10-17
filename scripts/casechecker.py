@@ -83,8 +83,8 @@ class CaseChecker:
     namespaces = []
     filterredir = 'nonredirects'
 
-    def __init__(self):
-        """Initializer with arg parsing."""
+    def handle_args(self):
+        """Arg parsing."""
         for arg in pywikibot.handle_args():
             arg, _, value = arg.partition(':')
             if arg == '-from':
@@ -120,6 +120,9 @@ class CaseChecker:
                 pywikibot.show_help()
                 sys.exit()
 
+    def __init__(self):
+        """Initializer."""
+        self.handle_args()
         if not self.namespaces and not self.doFailed:
             if not self.apfrom:
                 # 0 should be after templates ns
