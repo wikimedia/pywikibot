@@ -421,7 +421,7 @@ class Post:
         """Return the page associated with the post.
 
         @return: Page associated with the post
-        @rtype: FlowPage
+        @rtype: Topic
         """
         return self._page
 
