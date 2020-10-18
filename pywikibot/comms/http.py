@@ -52,7 +52,7 @@ except ImportError as e:
 # 'certificate verify failed' is a commonly detectable string
 SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
-_logger = 'comm.http'
+_logger = 'comms.http'
 
 cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
@@ -446,21 +446,35 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     headers = headers or {}
     headers.update(config.extra_headers.copy() or {})
 
-    if headers.get('user-agent', False):
-        user_agent_format_string = headers.get('user-agent')
-        if not user_agent_format_string or '{' in user_agent_format_string:
-            headers['user-agent'] = user_agent(None, user_agent_format_string)
-    else:
-        # if not already specified,
-        # get fake UA exceptions from `fake_user_agent_exceptions` config.
+    def assign_fake_user_agent(use_fake_user_agent, uri):
         uri_domain = urlparse(uri).netloc
         use_fake_user_agent = config.fake_user_agent_exceptions.get(
             uri_domain, use_fake_user_agent)
 
+        if use_fake_user_agent is False:
+            return user_agent()
+        if use_fake_user_agent is True:
+            return fake_user_agent()
         if use_fake_user_agent and isinstance(use_fake_user_agent, str):
-            headers['user-agent'] = use_fake_user_agent  # Custom UA.
-        elif use_fake_user_agent is True:
-            headers['user-agent'] = fake_user_agent()
+            return use_fake_user_agent  # Custom UA.
+        raise ValueError('Invalid parameter: '
+                         'use_fake_user_agent={}'.format(use_fake_user_agent))
+
+    def assign_user_agent(user_agent_format_string):
+        if not user_agent_format_string or '{' in user_agent_format_string:
+            return user_agent(None, user_agent_format_string)
+        else:
+            # do nothing, it is already a UA
+            return user_agent_format_string
+
+    # If not already specified.
+    if 'user-agent' not in headers:
+        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+        headers['user-agent'] = assign_fake_user_agent(use_fake_user_agent,
+                                                       uri)
+    # Already specified.
+    else:
+        headers['user-agent'] = assign_user_agent(headers.get('user-agent'))
 
     callbacks = kwargs.pop('callbacks', [])
     callback = kwargs.pop('callback', None)
