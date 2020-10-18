@@ -48,7 +48,7 @@ import types
 from locale import getdefaultlocale
 from os import getenv, environ
 from textwrap import fill
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
@@ -271,7 +271,7 @@ def user_home_path(path):
     return os.path.join(os.path.expanduser('~'), path)
 
 
-def get_base_dir(test_directory=None):
+def get_base_dir(test_directory: Optional[str] = None) -> str:
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order:
@@ -292,8 +292,6 @@ def get_base_dir(test_directory=None):
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
-    @type test_directory: str or None
-    @rtype: str
     """
     def exists(directory):
         directory = os.path.abspath(directory)
@@ -883,7 +881,7 @@ pickle_protocol = 2
 # #############################################
 
 
-def makepath(path, create=True):
+def makepath(path: str, create: bool = True):
     """Return a normalized absolute version of the path argument.
 
     If the given path already exists in the filesystem or create is False
@@ -895,10 +893,8 @@ def makepath(path, create=True):
     from holger@trillke.net 2002/03/18
 
     @param path: path in the filesystem
-    @type path: str
     @param create: create the directory if it is True. Otherwise do not change
         the filesystem. Default is True.
-    @type create: bool
     """
     dpath = os.path.normpath(os.path.dirname(path))
     if create and not os.path.exists(dpath):

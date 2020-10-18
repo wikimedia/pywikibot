@@ -480,7 +480,7 @@ class CosmeticChangesToolkit:
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 
-    def cleanUpLinks(self, text):
+    def cleanUpLinks(self, text: str) -> str:
         """Tidy up wikilinks found in a string.
 
         This function will:
@@ -497,9 +497,7 @@ class CosmeticChangesToolkit:
         * Capitalize the article title of the link, if appropriate
 
         @param text: string to perform the clean-up on
-        @type text: str
         @return: text with tidied wikilinks
-        @rtype: str
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.

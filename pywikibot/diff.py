@@ -579,7 +579,7 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     return text
 
 
-def html_comparator(compare_string):
+def html_comparator(compare_string: str) -> dict:
     """List of added and deleted contexts from 'action=compare' html string.
 
     This function is useful when combineds with site.py's "compare" method.
@@ -587,9 +587,7 @@ def html_comparator(compare_string):
     Here we use BeautifulSoup to get the un-HTML-ify the context of changes.
     Finally we present the added and deleted contexts.
     @param compare_string: HTML string from mediawiki API
-    @type compare_string: str
     @return: deleted and added list of contexts
-    @rtype: dict
     """
     from bs4 import BeautifulSoup
 

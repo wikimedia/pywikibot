@@ -1814,7 +1814,7 @@ for monthOfYear in yrMnthFmts:
     formats[monthOfYear] = {}
 
 
-def addFmt1(lang, isMnthOfYear, patterns):
+def addFmt1(lang: str, isMnthOfYear, patterns):
     """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
@@ -1822,7 +1822,6 @@ def addFmt1(lang, isMnthOfYear, patterns):
     The patterns parameter is a list of 12 elements to be used for each month.
 
     @param lang: language code
-    @type lang: str
     """
     assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
 
@@ -2234,7 +2233,6 @@ def format_date(month, day, lang=None, year=2000):
     """Format a date localized to given lang.
 
     @param month: month in range of 1..12
-    @type month: int
     @param day: day of month in range of 1..31
     @type day: int
     @param lang: a site object or language key. Defaults to current site.
