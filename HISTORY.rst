@@ -245,7 +245,7 @@ Release history
 * TokenWallet: login automatically
 * Add closed_wikis to Family.langs property (T225413)
 * Redirect 'mo' site code to 'ro' and remove interwiki_replacement_overrides (T225417, T89451)
-* Add support for badges on Wikibase item sitelinks (T128202)
+* Add support for badges on Wikibase item sitelinks through a SiteLink object instead plain str (T128202)
 * Remove login.showCaptchaWindow() method
 * New parameter supplied in suggest_help function for missing dependencies
 * Remove NonMWAPISite class
