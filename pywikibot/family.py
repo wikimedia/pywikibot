@@ -1427,8 +1427,7 @@ def AutoFamily(name, url):
         # AutoFamily refers to the variable set below, not the function
         return super().scriptpath(code)
 
-    # str() used because py2 can't accept a unicode as the name of a class
-    AutoFamily = type(str('AutoFamily'), (SingleSiteFamily,), locals())
+    AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()
 
 

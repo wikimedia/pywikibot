@@ -20,7 +20,6 @@ import hashlib
 import logging
 import os.path
 import re
-import sys
 import unicodedata
 
 from collections import Counter, defaultdict, OrderedDict
@@ -3820,8 +3819,7 @@ class WikibaseEntity:
         if not hasattr(cls, 'title_pattern'):
             return True
 
-        # todo: use re.fullmatch when Python 3.4+ required
-        return bool(re.match(cls.title_pattern + '$', entity_id))
+        return bool(re.fullmatch(cls.title_pattern, entity_id))
 
     def __getattr__(self, name):
         if name in self.DATA_ATTRIBUTES:
@@ -6458,6 +6456,7 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
             # match.string stores original text so we do not need
             # to pass it to handle_entity, ♥ Python
             return match.group(0)
+
         if match.group('decimal'):
             unicode_codepoint = int(match.group('decimal'))
         elif match.group('hex'):
@@ -6470,14 +6469,11 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
             unicode_codepoint, unicode_codepoint)
 
         if unicode_codepoint and unicode_codepoint not in ignore:
-            if unicode_codepoint > sys.maxunicode:
-                # solve narrow Python 2 build exception (UTF-16)
-                return eval("'\\U{0:08x}'".format(unicode_codepoint))
-            else:
-                return chr(unicode_codepoint)
-        else:
-            # Leave the entity unchanged
-            return match.group(0)
+            return chr(unicode_codepoint)
+
+        # Leave the entity unchanged
+        return match.group(0)
+
     return _ENTITY_SUB(handle_entity, text)
 
 

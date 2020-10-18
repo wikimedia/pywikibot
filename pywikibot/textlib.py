@@ -681,15 +681,18 @@ def replace_links(text: str, replace, site=None) -> str:
         m = link_pattern.search(text, pos=curpos)
         if not m:
             break
+
         # Ignore links to sections of the same page
         if not m.group('title').strip():
             curpos = m.end()
             continue
+
         # Ignore interwiki links
         if (site.isInterwikiLink(m.group('title').strip())
                 and not m.group('title').strip().startswith(':')):
             curpos = m.end()
             continue
+
         groups = m.groupdict()
         if groups['label'] and '[[' in groups['label']:
             # TODO: Work on the link within the label too
@@ -704,10 +707,12 @@ def replace_links(text: str, replace, site=None) -> str:
             end = extended_match.end()
         else:
             end = m.end()
+
         start = m.start()
         # Since this point the m variable shouldn't be used as it may not
         # contain all contents
         del m
+
         try:
             link = pywikibot.Link.create_separated(
                 groups['title'], site, section=groups['section'],
@@ -735,15 +740,16 @@ def replace_links(text: str, replace, site=None) -> str:
             # remove preleading ":" from the link text
             if new_label[0] == ':':
                 new_label = new_label[1:]
+
         new_linktrail = groups['linktrail']
         if new_linktrail:
             new_label += new_linktrail
 
         if new_link is False:
             # unlink - we remove the section if there's any
-            assert isinstance(new_label, str), \
-                'link text must be str.'
+            assert isinstance(new_label, str), 'link text must be str.'
             new_link = new_label
+
         if isinstance(new_link, str):
             # Nothing good can come out of the fact that bytes is returned so
             # force unicode
@@ -751,9 +757,9 @@ def replace_links(text: str, replace, site=None) -> str:
             # Make sure that next time around we will not find this same hit.
             curpos = start + len(new_link)
             continue
-        elif isinstance(new_link, bytes):
-            raise ValueError('The result must be unicode (str in Python 3) '
-                             'and not bytes (str in Python 2).')
+
+        if isinstance(new_link, bytes):
+            raise ValueError('The result must be str and not bytes.')
 
         # Verify that it's either Link, Page or str
         check_classes(new_link)
@@ -780,6 +786,7 @@ def replace_links(text: str, replace, site=None) -> str:
 
         if new_section:
             new_title += '#' + new_section
+
         if new_label is None:
             new_label = new_title
 
@@ -806,6 +813,7 @@ def replace_links(text: str, replace, site=None) -> str:
         else:
             new_text = '[[{0}]]{1}'.format(new_label[:len(new_title)],
                                            new_label[len(new_title):])
+
         text = text[:start] + new_text + text[end:]
         # Make sure that next time around we will not find this same hit.
         curpos = start + len(new_text)
