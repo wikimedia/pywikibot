@@ -28,6 +28,7 @@ To create a new distribution:
 #
 # Distributed under the terms of the MIT license.
 #
+# ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 import os
 import sys
 

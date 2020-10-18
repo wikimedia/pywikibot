@@ -932,7 +932,7 @@ class DequeGenerator(Iterator, collections.deque):
     """A generator that allows items to be added during generating."""
 
     def __next__(self):
-        """Python 3 iterator method."""
+        """Iterator method."""
         if len(self):
             return self.popleft()
         else:
@@ -964,8 +964,7 @@ def open_archive(filename, mode='rb', use_extension=True):
     @raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     @raises FileNotFoundError: When the filename doesn't exist and it tries
-        to read from it or it tries to determine the compression algorithm (or
-        IOError on Python 2).
+        to read from it or it tries to determine the compression algorithm.
     @raises OSError: When it's not a 7z archive but the file extension is 7z.
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.

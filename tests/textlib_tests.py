@@ -1008,9 +1008,10 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
-        self.assertRaisesRegex(
-            ValueError, r'unicode \(str.*bytes \(str',
-            textlib.replace_links, self.text, callback, self.wp_site)
+
+        with self.assertRaisesRegex(ValueError,
+                                    r'The result must be str and not bytes\.'):
+            textlib.replace_links(self.text, callback, self.wp_site)
 
     def test_replace_interwiki_links(self):
         """Make sure interwiki links can not be replaced."""
