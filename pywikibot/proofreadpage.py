@@ -32,6 +32,7 @@ import time
 
 from functools import partial
 from requests.exceptions import ReadTimeout
+from typing import Optional
 
 try:
     from bs4 import BeautifulSoup
@@ -438,14 +439,13 @@ class ProofreadPage(pywikibot.Page):
         return self._text
 
     @text.setter
-    def text(self, value):
+    def text(self, value: str):
         """Update current text.
 
         Mainly for use within the class, called by other methods.
         Use self.header, self.body and self.footer to set page content,
 
         @param value: New value or None
-        @param value: basestring
 
         @raise Error: the page is not formatted according to ProofreadPage
             extension.
@@ -968,24 +968,21 @@ class IndexPage(pywikibot.Page):
         """
         return len(self._page_from_numbers)
 
-    def page_gen(self, start=1, end=None, filter_ql=None,
-                 only_existing=False, content=True):
+    def page_gen(self, start: Optional[int] = 1,
+                 end: Optional[int] = None, filter_ql=None,
+                 only_existing: bool = False, content: bool = True):
         """Return a page generator which yields pages contained in Index page.
 
         Range is [start ... end], extremes included.
 
         @param start: first page, defaults to 1
-        @type start: int
         @param end: num_pages if end is None
-        @type end: int
         @param filter_ql: filters quality levels
                           if None: all but 'Without Text'.
         @type filter_ql: list of ints (corresponding to ql constants
                          defined in ProofreadPage).
         @param only_existing: yields only existing pages.
-        @type only_existing: bool
         @param content: preload content.
-        @type content: bool
         """
         if end is None:
             end = self.num_pages

@@ -31,6 +31,7 @@ from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
+from typing import List, Optional, Union
 
 import pywikibot
 
@@ -420,7 +421,7 @@ class GeneratorFactory:
     that are used by many scripts and that determine which pages to work on.
     """
 
-    def __init__(self, site=None, positional_arg_name=None):
+    def __init__(self, site=None, positional_arg_name: Optional[str] = None):
         """
         Initializer.
 
@@ -428,7 +429,6 @@ class GeneratorFactory:
         @type site: L{pywikibot.site.BaseSite}
         @param positional_arg_name: generator to use for positional args,
             which do not begin with a hyphen
-        @type positional_arg_name: basestring
         """
         self.gens = []
         self._namespaces = []
@@ -610,13 +610,12 @@ class GeneratorFactory:
         return cat, startfrom
 
     @deprecated_args(arg='category')
-    def getCategoryGen(self, category, recurse=False, content=False,
-                       gen_func=None):
+    def getCategoryGen(self, category: str, recurse: bool = False,
+                       content: bool = False, gen_func=None):
         """
         Return generator based on Category defined by category and gen_func.
 
         @param category: category name with start parameter
-        @type category: str
         @rtype: generator
         """
         cat, startfrom = self.getCategory(category)
@@ -627,15 +626,14 @@ class GeneratorFactory:
                         content=content)
 
     @staticmethod
-    def _parse_log_events(logtype, user=None, start=None, end=None):
+    def _parse_log_events(logtype: str, user: Optional[str] = None,
+                          start=None, end=None):
         """
         Parse the -logevent argument information.
 
         @param logtype: A valid logtype
-        @type logtype: str
         @param user: A username associated to the log events. Ignored if
             empty string or None.
-        @type user: str
         @param start: Timestamp to start listing from. For backward
             compatibility, this can also be the total amount of pages
             that should be returned. It is taken as 'total' if the value does
@@ -1137,7 +1135,7 @@ class GeneratorFactory:
                 'Invalid -logevents parameter "{0}"'.format(params[0]))
         return self._parse_log_events(*params)
 
-    def handleArg(self, arg):
+    def handleArg(self, arg: str) -> bool:
         """Parse one argument at a time.
 
         If it is recognized as an argument that specifies a generator, a
@@ -1147,9 +1145,7 @@ class GeneratorFactory:
         arguments have been parsed to get the final output generator.
 
         @param arg: Pywikibot argument consisting of -name:value
-        @type arg: basestring
         @return: True if the argument supplied was recognised by the factory
-        @rtype: bool
         """
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg
@@ -1178,8 +1174,9 @@ def _int_none(v):
 
 @deprecated('Site.allpages()', since='20180512')
 @deprecated_args(step=None)
-def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
-                          site=None, total=None, content=False
+def AllpagesPageGenerator(start: str = '!', namespace=0,
+                          includeredirects=True, site=None,
+                          total: Optional[int] = None, content: bool = False
                           ):  # pragma: no cover
     """
     Iterate Page objects for all titles in a single namespace.
@@ -1188,7 +1185,6 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
     includeredirects equals the string 'only', only redirects are added.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param content: If True, load current version of each page (default False)
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -1208,26 +1204,24 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
 
 
 @deprecated_args(step=None)
-def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
-                           site=None, total=None, content=False):
+def PrefixingPageGenerator(prefix: str, namespace=None,
+                           includeredirects: Union[None, bool, str] = True,
+                           site=None, total: int = None,
+                           content: bool = False):
     """
     Prefixed Page generator.
 
     @param prefix: The prefix of the pages.
-    @type prefix: str
     @param namespace: Namespace to retrieve pages from
     @type namespace: Namespace or int
     @param includeredirects: If includeredirects is None, False or an empty
         string, redirects will not be found. If includeredirects equals the
         string 'only', only redirects will be found. Otherwise redirects will
         be included.
-    @type includeredirects: None, bool, str
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param content: If True, load current version of each page (default False)
-    @type content: bool
     @return: a generator that yields Page objects
     @rtype: generator
     """
@@ -1249,27 +1243,25 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
 
 
 @deprecated_args(number='total', mode='logtype', repeat=None)
-def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
-                           total=None, start=None, end=None, reverse=False):
+def LogeventsPageGenerator(logtype: Optional[str] = None,
+                           user: Optional[str] = None, site=None,
+                           namespace: Optional[int] = None,
+                           total: Optional[int] = None, start=None,
+                           end=None, reverse: bool = False):
     """
     Generate Pages for specified modes of logevents.
 
     @param logtype: Mode of logs to retrieve
-    @type logtype: basestring
     @param user: User of logs retrieved
-    @type user: basestring
     @param site: Site for generator results
     @type site: L{pywikibot.site.BaseSite}
     @param namespace: Namespace to retrieve logs from
-    @type namespace: int
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param start: Timestamp to start listing from
     @type start: pywikibot.Timestamp
     @param end: Timestamp to end listing at
     @type end: pywikibot.Timestamp
     @param reverse: if True, start with oldest changes (default: newest)
-    @type reverse: bool
     """
     if site is None:
         site = pywikibot.Site()
@@ -1287,12 +1279,12 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
 
 @deprecated_args(number='total', step=None, namespace='namespaces',
                  repeat=None, get_redirect=None)
-def NewpagesPageGenerator(site=None, namespaces=(0, ), total=None):
+def NewpagesPageGenerator(site=None, namespaces=(0, ),
+                          total: Optional[int] = None):
     """
     Iterate Page objects for all new titles in a single namespace.
 
     @param total: Maxmium number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -1329,12 +1321,11 @@ def RecentChangesPageGenerator(site=None, _filter_unique=None, **kwargs):
 
 @deprecated('site.unconnected_pages()', since='20180512')
 @deprecated_args(step=None)
-def UnconnectedPageGenerator(site=None, total=None):
+def UnconnectedPageGenerator(site=None, total: Optional[int] = None):
     """
     Iterate Page objects for all unconnected pages to a Wikibase repository.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.APISite}
     """
@@ -1440,7 +1431,7 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
 
 @deprecated('Page.linkedPages()', since='20200515')
 @deprecated_args(step=None)
-def LinkedPageGenerator(linkingPage, total=None, content=False):
+def LinkedPageGenerator(linkingPage, total: int = None, content: bool = False):
     """DEPRECATED. Yield all pages linked from a specific page.
 
     See L{pywikibot.page.BasePage.linkedPages} for details.
@@ -1448,9 +1439,7 @@ def LinkedPageGenerator(linkingPage, total=None, content=False):
     @param linkingPage: the page that links to the pages we want
     @type linkingPage: L{pywikibot.Page}
     @param total: the total number of pages to iterate
-    @type total: int
     @param content: if True, retrieve the current content of each linked page
-    @type content: bool
     @return: a generator that yields Page objects of pages linked to
         linkingPage
     @rtype: generator
@@ -1459,7 +1448,7 @@ def LinkedPageGenerator(linkingPage, total=None, content=False):
                                    content=content)  # pragma: no cover
 
 
-def TextfilePageGenerator(filename=None, site=None):
+def TextfilePageGenerator(filename: Optional[str] = None, site=None):
     """Iterate pages from a list in a text file.
 
     The file must contain page links between double-square-brackets or, in
@@ -1468,7 +1457,6 @@ def TextfilePageGenerator(filename=None, site=None):
 
     @param filename: the name of the file that should be read. If no name is
                      given, the generator prompts the user.
-    @type filename: str
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
 
@@ -1533,15 +1521,13 @@ def PagesFromPageidGenerator(pageids, site=None):
 
 
 @deprecated_args(number='total', step=None)
-def UserContributionsGenerator(username, namespaces=None, site=None,
-                               total=None,
+def UserContributionsGenerator(username, namespaces: List[int] = None,
+                               site=None, total: Optional[int] = None,
                                _filter_unique=_filter_unique_pages):
     """Yield unique pages edited by user:username.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param namespaces: list of namespace numbers to fetch contribs from
-    @type namespaces: list of int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -1572,7 +1558,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     namespace filtering more efficiently than this generator.
 
     @param namespaces: list of namespace identifiers to limit results
-    @type namespaces: iterable of basestring or Namespace key,
+    @type namespaces: iterable of str or Namespace key,
         or a single instance of those types.
     @param site: Site for generator results; mandatory if
         namespaces contains namespace names. Defaults to the default site.
@@ -1598,14 +1584,13 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
 
 
 @deprecated_args(ignoreList='ignore_list')
-def PageTitleFilterPageGenerator(generator, ignore_list):
+def PageTitleFilterPageGenerator(generator, ignore_list: dict):
     """
     Yield only those pages are not listed in the ignore list.
 
     @param ignore_list: family names are mapped to dictionaries in which
         language codes are mapped to lists of page titles. Each title must
         be a valid regex as they are compared using L{re.search}.
-    @type ignore_list: dict
 
     """
     def is_ignored(page):
@@ -1623,16 +1608,14 @@ def PageTitleFilterPageGenerator(generator, ignore_list):
             yield page
 
 
-def RedirectFilterPageGenerator(generator, no_redirects=True,
-                                show_filtered=False):
+def RedirectFilterPageGenerator(generator, no_redirects: bool = True,
+                                show_filtered: bool = False):
     """
     Yield pages from another generator that are redirects or not.
 
     @param no_redirects: Exclude redirects if True, else only include
         redirects.
-    @param no_redirects: bool
     @param show_filtered: Output a message for each page not yielded
-    @type show_filtered: bool
     """
     for page in generator or []:
         if no_redirects:
@@ -1692,20 +1675,19 @@ class ItemClaimFilter:
         return False
 
     @classmethod
-    def filter(cls, generator, prop, claim, qualifiers=None, negate=False):
+    def filter(cls, generator, prop: str, claim,
+               qualifiers: Optional[dict] = None,
+               negate: bool = False):
         """
         Yield all ItemPages which contain certain claim in a property.
 
         @param prop: property id to check
-        @type prop: str
         @param claim: value of the property to check. Can be exact value (for
             instance, ItemPage instance) or a string (e.g. 'Q37470').
         @param qualifiers: dict of qualifiers that must be present, or None if
             qualifiers are irrelevant
-        @type qualifiers: dict or None
         @param negate: true if pages that do *not* contain specified claim
             should be yielded, false otherwise
-        @type negate: bool
         """
         for page in generator:
             if cls.__filter_match(page, prop, claim, qualifiers) is not negate:
@@ -1716,7 +1698,8 @@ class ItemClaimFilter:
 ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 
 
-def SubpageFilterGenerator(generator, max_depth=0, show_filtered=False):
+def SubpageFilterGenerator(generator, max_depth: int = 0,
+                           show_filtered: bool = False):
     """
     Generator which filters out subpages based on depth.
 
@@ -1726,9 +1709,7 @@ def SubpageFilterGenerator(generator, max_depth=0, show_filtered=False):
     @param generator: A generator object
     @type generator: any generator or iterator
     @param max_depth: Max depth of subpages to yield, at least zero
-    @type max_depth: int
     @param show_filtered: Output a message for each page not yielded
-    @type show_filtered: bool
     """
     assert max_depth >= 0, 'Max subpage depth must be at least 0'
 
@@ -1824,7 +1805,7 @@ class RegexFilter:
                 if cls.__filter_match(reg, page.text, quantifier))
 
 
-def QualityFilterPageGenerator(generator, quality):
+def QualityFilterPageGenerator(generator, quality: List[int]):
     """
     Wrap a generator to filter pages according to quality levels.
 
@@ -1833,7 +1814,6 @@ def QualityFilterPageGenerator(generator, quality):
 
     @param generator: A generator object
     @param quality: proofread-page quality levels (valid range 0-4)
-    @type quality: list of int
 
     """
     for page in generator:
@@ -1934,8 +1914,10 @@ def EdittimeFilterPageGenerator(generator,
         yield page
 
 
-def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
-                            max_revision_depth=None, show_filtered=False):
+def UserEditFilterGenerator(generator, username: str, timestamp=None,
+                            skip: bool = False,
+                            max_revision_depth: Optional[int] = None,
+                            show_filtered: bool = False):
     """
     Generator which will yield Pages modified by username.
 
@@ -1947,16 +1929,12 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
 
     @param generator: A generator object
     @param username: user name which edited the page
-    @type username: str
     @param timestamp: ignore edits which are older than this timestamp
     @type timestamp: datetime or str (MediaWiki format JJJJMMDDhhmmss) or None
     @param skip: Ignore pages edited by the given user
-    @type skip: bool
     @param max_revision_depth: It only looks at the last editors given by
         max_revision_depth
-    @type max_revision_depth: int or None
     @param show_filtered: Output a message for each page not yielded
-    @type show_filtered: bool
     """
     ts = None
     if timestamp:
@@ -2012,7 +1990,7 @@ def PageWithTalkPageGenerator(generator, return_talk_only=False):
 
 @deprecated('LiveRCPageGenerator or EventStreams', since='20180415')
 def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
-                       total=None, **kwargs):
+                       total: Optional[int] = None, **kwargs):
     """Yield items in live time.
 
     The provided generator must support parameter 'start', 'end',
@@ -2037,7 +2015,6 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
     @param sleep_duration: duration between each query
     @param total: if it is a positive number, iterate no more than this
         number of items in total. Otherwise, iterate forever
-    @type total: int or None
     @return: a generator yielding items in ascending order by time
     """
     kwargs.pop('reverse', None)  # always get newest item first
@@ -2062,13 +2039,12 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
 
 
 @deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=None)
-def PreloadingGenerator(generator, groupsize=50):
+def PreloadingGenerator(generator, groupsize: int = 50):
     """
     Yield preloaded pages taken from another generator.
 
     @param generator: pages to iterate over
     @param groupsize: how many pages to preload at once
-    @type groupsize: int
     """
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
@@ -2102,7 +2078,7 @@ def DequePreloadingGenerator(generator, groupsize=50):
 
 
 @deprecated_args(step='groupsize')
-def PreloadingEntityGenerator(generator, groupsize=50):
+def PreloadingEntityGenerator(generator, groupsize: int = 50):
     """
     Yield preloaded pages taken from another generator.
 
@@ -2111,7 +2087,6 @@ def PreloadingEntityGenerator(generator, groupsize=50):
     @param generator: pages to iterate over
     @type generator: Iterable
     @param groupsize: how many pages to preload at once
-    @type groupsize: int
     """
     sites = {}
     for page in generator:
@@ -2130,12 +2105,11 @@ def PreloadingEntityGenerator(generator, groupsize=50):
 
 
 @deprecated_args(number='total', step=None, repeat=None)
-def NewimagesPageGenerator(total=None, site=None):
+def NewimagesPageGenerator(total: Optional[int] = None, site=None):
     """
     New file generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2166,8 +2140,8 @@ def WikibaseItemGenerator(gen):
             yield pywikibot.ItemPage.fromPage(page)
 
 
-def WikibaseItemFilterPageGenerator(generator, has_item=True,
-                                    show_filtered=False):
+def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
+                                    show_filtered: bool = False):
     """
     A wrapper generator used to exclude if page has a wikibase item or not.
 
@@ -2175,9 +2149,7 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
     @type generator: generator
     @param has_item: Exclude pages without an item if True, or only
         include pages without an item if False
-    @type has_item: bool
     @param show_filtered: Output a message for each page not yielded
-    @type show_filtered: bool
     @return: Wrapped generator
     @rtype: generator
     """
@@ -2205,12 +2177,12 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
 
 @deprecated('Site.unusedfiles()', since='20200515')
 @deprecated_args(extension=None, number='total', repeat=None)
-def UnusedFilesGenerator(total=None, site=None):  # pragma: no cover
+def UnusedFilesGenerator(total: Optional[int] = None,
+                         site=None):  # pragma: no cover
     """
     DEPRECATED. Unused files generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2236,12 +2208,12 @@ def WithoutInterwikiPageGenerator(total=None, site=None):  # pragma: no cover
 
 @deprecated('Site.uncategorizedcategories()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedCategoryGenerator(total=100, site=None):  # pragma: no cover
+def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
+                                   site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized category generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2252,12 +2224,12 @@ def UnCategorizedCategoryGenerator(total=100, site=None):  # pragma: no cover
 
 @deprecated('Site.uncategorizedimages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedImageGenerator(total=100, site=None):  # pragma: no cover
+def UnCategorizedImageGenerator(total: int = 100,
+                                site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized file generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2268,12 +2240,12 @@ def UnCategorizedImageGenerator(total=100, site=None):  # pragma: no cover
 
 @deprecated('Site.uncategorizedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedPageGenerator(total=100, site=None):  # pragma: no cover
+def UnCategorizedPageGenerator(total: int = 100,
+                               site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2284,12 +2256,12 @@ def UnCategorizedPageGenerator(total=100, site=None):  # pragma: no cover
 
 @deprecated('Site.uncategorizedtemplates()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnCategorizedTemplateGenerator(total=100, site=None):  # pragma: no cover
+def UnCategorizedTemplateGenerator(total: int = 100,
+                                   site=None):  # pragma: no cover
     """
     DEPRECATED. Uncategorized template generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2300,12 +2272,12 @@ def UnCategorizedTemplateGenerator(total=100, site=None):  # pragma: no cover
 
 @deprecated('Site.lonelypages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def LonelyPagesPageGenerator(total=None, site=None):  # pragma: no cover
+def LonelyPagesPageGenerator(total: Optional[int] = None,
+                             site=None):  # pragma: no cover
     """
     DEPRECATED. Lonely page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2316,12 +2288,12 @@ def LonelyPagesPageGenerator(total=None, site=None):  # pragma: no cover
 
 @deprecated('Site.unwatchedpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def UnwatchedPagesPageGenerator(total=None, site=None):  # pragma: no cover
+def UnwatchedPagesPageGenerator(total: Optional[int] = None,
+                                site=None):  # pragma: no cover
     """
     DEPRECATED. Unwatched page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2331,15 +2303,13 @@ def UnwatchedPagesPageGenerator(total=None, site=None):  # pragma: no cover
 
 
 @deprecated('Site.pages_with_property()', since='20200515')
-def page_with_property_generator(name, total=None,
+def page_with_property_generator(name: str, total: Optional[int] = None,
                                  site=None):  # pragma: no cover
     """
     Special:PagesWithProperty page generator.
 
     @param name: Property name of pages to be retrieved
-    @type name: str
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2349,12 +2319,11 @@ def page_with_property_generator(name, total=None,
 
 
 @deprecated('Site.wantedpages', since='20180803')
-def WantedPagesPageGenerator(total=100, site=None):  # pragma: no cover
+def WantedPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     Wanted page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2364,12 +2333,11 @@ def WantedPagesPageGenerator(total=100, site=None):  # pragma: no cover
 
 
 @deprecated_args(number='total', repeat=None)
-def AncientPagesPageGenerator(total=100, site=None):  # pragma: no cover
+def AncientPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     Ancient page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2380,12 +2348,11 @@ def AncientPagesPageGenerator(total=100, site=None):  # pragma: no cover
 
 @deprecated('Site.deadendpages()', since='20200515')
 @deprecated_args(number='total', repeat=None)
-def DeadendPagesPageGenerator(total=100, site=None):  # pragma: no cover
+def DeadendPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     DEPRECATED. Dead-end page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2395,12 +2362,11 @@ def DeadendPagesPageGenerator(total=100, site=None):  # pragma: no cover
 
 
 @deprecated_args(number='total', repeat=None)
-def LongPagesPageGenerator(total=100, site=None):
+def LongPagesPageGenerator(total: int = 100, site=None):
     """
     Long page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2410,12 +2376,11 @@ def LongPagesPageGenerator(total=100, site=None):
 
 
 @deprecated_args(number='total', repeat=None)
-def ShortPagesPageGenerator(total=100, site=None):
+def ShortPagesPageGenerator(total: int = 100, site=None):
     """
     Short page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2426,13 +2391,12 @@ def ShortPagesPageGenerator(total=100, site=None):
 
 @deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
-def RandomPageGenerator(total=None, site=None,
+def RandomPageGenerator(total: Optional[int] = None, site=None,
                         namespaces=None):  # pragma: no cover
     """
     DEPRECATED. Random page generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2443,13 +2407,12 @@ def RandomPageGenerator(total=None, site=None,
 
 @deprecated('Site.randompages()', since='20200515')
 @deprecated_args(number='total')
-def RandomRedirectPageGenerator(total=None, site=None,
+def RandomRedirectPageGenerator(total: Optional[int] = None, site=None,
                                 namespaces=None):  # pragma: no cover
     """
     DEPRECATED. Random redirect generator.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2461,23 +2424,20 @@ def RandomRedirectPageGenerator(total=None, site=None,
 
 @deprecated('Site.exturlusage()', since='20200515')
 @deprecated_args(link='url', euprotocol='protocol', step=None)
-def LinksearchPageGenerator(url, namespaces=None, total=None,
-                            site=None, protocol=None):
+def LinksearchPageGenerator(url: str, namespaces: List[int] = None,
+                            total: Optional[int] = None, site=None,
+                            protocol: Optional[str] = None):
     """DEPRECATED. Yield all pages that link to a certain URL.
 
     @param url: The URL to search for (with ot without the protocol prefix);
             this may include a '*' as a wildcard, only at the start of the
             hostname
-    @type url: str
     @param namespaces: list of namespace numbers to fetch contribs from
-    @type namespaces: list of int
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results
     @type site: L{pywikibot.site.BaseSite}
     @param protocol: Protocol to search for, likely http or https, http by
             default. Full list shown on Special:LinkSearch wikipage
-    @type protocol: str
     """
     if site is None:
         site = pywikibot.Site()
@@ -2487,13 +2447,12 @@ def LinksearchPageGenerator(url, namespaces=None, total=None,
 
 @deprecated('Site.search()', since='20200515')
 @deprecated_args(number='total', step=None)
-def SearchPageGenerator(query, total=None, namespaces=None,
+def SearchPageGenerator(query, total: Optional[int] = None, namespaces=None,
                         site=None):  # pragma: no cover
     """
     DEPRECATED. Yield pages from the MediaWiki internal search engine.
 
     @param total: Maximum number of pages to retrieve in total
-    @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2502,7 +2461,7 @@ def SearchPageGenerator(query, total=None, namespaces=None,
     return site.search(query, total=total, namespaces=namespaces)
 
 
-def LiveRCPageGenerator(site=None, total=None):
+def LiveRCPageGenerator(site=None, total: Optional[int] = None):
     """
     Yield pages from a socket.io RC stream.
 
@@ -2516,7 +2475,6 @@ def LiveRCPageGenerator(site=None, total=None):
     @param site: site to return recent changes for
     @type site: pywikibot.BaseSite
     @param total: the maximum number of changes to return
-    @type total: int
     """
     if site is None:
         site = pywikibot.Site()
@@ -2678,7 +2636,8 @@ class XMLDumpOldPageGenerator(Iterator):
     """
 
     @deprecated_args(xmlFilename='filename', xmlStart='start')
-    def __init__(self, filename, start=None, namespaces=None, site=None,
+    def __init__(self, filename: str, start: Optional[str] = None,
+                 namespaces=None, site=None,
                  text_predicate=None):
         """Initializer."""
         self.text_predicate = text_predicate
@@ -2756,14 +2715,14 @@ def YearPageGenerator(start=1, end=2050, site=None):
 
 
 @deprecated_args(startMonth='start_month', endMonth='end_month')
-def DayPageGenerator(start_month=1, end_month=12, site=None, year=2000):
+def DayPageGenerator(start_month: int = 1, end_month: int = 12,
+                     site=None, year: int = 2000):
     """
     Day page generator.
 
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     @param year: considering leap year.
-    @type year: int
     """
     if site is None:
         site = pywikibot.Site()
@@ -2801,20 +2760,19 @@ def WikidataPageFromItemGenerator(gen, site):
             yield pywikibot.Page(site, sitelink)
 
 
-def WikidataSPARQLPageGenerator(query, site=None,
-                                item_name='item', endpoint=None,
-                                entity_url=None, result_type=set):
+def WikidataSPARQLPageGenerator(query,
+                                site=None, item_name: str = 'item',
+                                endpoint: Optional[str] = None,
+                                entity_url: Optional[str] = None,
+                                result_type=set):
     """Generate pages that result from the given SPARQL query.
 
     @param query: the SPARQL query string.
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     @param item_name: name of the item in the SPARQL query
-    @type item_name: str
     @param endpoint: SPARQL endpoint URL
-    @type endpoint: str
     @param entity_url: URL prefix for any entities returned in a query.
-    @type entity_url: str
     @param result_type: type of the iterable in which
              SPARQL results are stored (default set)
     @type result_type: iterable
@@ -2839,20 +2797,17 @@ def WikidataSPARQLPageGenerator(query, site=None,
     return WikidataPageFromItemGenerator(entities, site)
 
 
-def WikibaseSearchItemPageGenerator(
-    text, language=None, total=None, site=None
-):
+def WikibaseSearchItemPageGenerator(text: str,
+                                    language: Optional[str] = None,
+                                    total: Optional[int] = None, site=None):
     """
     Generate pages that contain the provided text.
 
     @param text: Text to look for.
-    @type text: str
     @param language: Code of the language to search in. If not specified,
         value from pywikibot.config.data_lang is used.
-    @type language: str
     @param total: Maximum number of pages to retrieve in total, or None in
         case of no limit.
-    @type total: int or None
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
