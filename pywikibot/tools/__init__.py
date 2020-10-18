@@ -171,7 +171,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Stop logging warnings and show those that do not match to params."""
-        super().__exit__()
+        super().__exit__(exc_type, exc_val, exc_tb)
         for warning in self.log:
             if (
                 not issubclass(warning.category, self.category)
