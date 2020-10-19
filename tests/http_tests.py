@@ -336,6 +336,18 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
             use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.headers['user-agent'], 'ARBITRARY')
 
+        # Empty value
+        self.assertRaisesRegex(ValueError,
+                               'Invalid parameter: use_fake_user_agent',
+                               http.fetch, self.get_httpbin_url('/status/200'),
+                               use_fake_user_agent='')
+
+        # Parameter wrongly set to None
+        self.assertRaisesRegex(ValueError,
+                               'Invalid parameter: use_fake_user_agent',
+                               http.fetch, self.get_httpbin_url('/status/200'),
+                               use_fake_user_agent=None)
+
         # Manually overridden domains
         config.fake_user_agent_exceptions = {
             self.get_httpbin_hostname(): 'OVERRIDDEN'}
@@ -367,17 +379,18 @@ class GetFakeUserAgentTestCase(TestCase):
 
     def _test_config_settings(self):
         """Test if method honours configuration toggle."""
-        # ON: True and None in config are considered turned on.
-        config.fake_user_agent = True
-        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
-        config.fake_user_agent = None
-        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+        with suppress_warnings(r'.*?get_fake_user_agent is deprecated'):
+            # ON: True and None in config are considered turned on.
+            config.fake_user_agent = True
+            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+            config.fake_user_agent = None
+            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
 
-        # OFF: All other values won't make it return random UA.
-        config.fake_user_agent = False
-        self.assertEqual(http.get_fake_user_agent(), http.user_agent())
-        config.fake_user_agent = 'ARBITRARY'
-        self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
+            # OFF: All other values won't make it return random UA.
+            config.fake_user_agent = False
+            self.assertEqual(http.get_fake_user_agent(), http.user_agent())
+            config.fake_user_agent = 'ARBITRARY'
+            self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
 
     @require_modules('fake_useragent')
     def test_with_fake_useragent(self):
