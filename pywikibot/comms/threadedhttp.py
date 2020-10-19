@@ -134,34 +134,36 @@ class HttpRequest:
     @property
     def encoding(self):
         """Detect the response encoding."""
-        if not hasattr(self, '_encoding'):
-            if self.charset is None and self.header_encoding is None:
-                pywikibot.log("Http response doesn't contain a charset.")
-                charset = 'latin1'
-            else:
-                charset = self.charset
+        if hasattr(self, '_encoding'):
+            return self._encoding
 
-            if self.header_encoding is not None \
-               and (charset is None
-                    or codecs.lookup(self.header_encoding)
-                    != codecs.lookup(charset)):
-                if charset:
-                    pywikibot.warning(
-                        'Encoding "{}" requested but "{}" received in the '
-                        'header.'.format(charset, self.header_encoding))
+        if self.charset is None and self.header_encoding is None:
+            pywikibot.log("Http response doesn't contain a charset.")
+            charset = 'latin1'
+        else:
+            charset = self.charset
 
-                # TODO: Buffer decoded content, weakref does remove it too
-                #       early (directly after this method)
-                self._encoding = self._try_decode(self.header_encoding)
-            else:
-                self._encoding = None
+        _encoding = UnicodeError()
+        if self.header_encoding is not None \
+           and (charset is None
+                or codecs.lookup(self.header_encoding)
+                != codecs.lookup(charset)):
+            if charset:
+                pywikibot.warning(
+                    'Encoding "{}" requested but "{}" received in the '
+                    'header.'.format(charset, self.header_encoding))
 
-            if charset and (isinstance(self._encoding, Exception)
-                            or self._encoding is None):
-                self._encoding = self._try_decode(charset)
+            # TODO: Buffer decoded content, weakref does remove it too
+            #       early (directly after this method)
+            _encoding = self._try_decode(self.header_encoding)
 
-        if isinstance(self._encoding, Exception):
-            raise self._encoding
+        if charset and isinstance(_encoding, Exception):
+            _encoding = self._try_decode(charset)
+
+        if isinstance(_encoding, Exception):
+            raise _encoding
+        else:
+            self._encoding = _encoding
         return self._encoding
 
     def _try_decode(self, encoding):
