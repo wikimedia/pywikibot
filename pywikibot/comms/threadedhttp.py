@@ -108,26 +108,27 @@ class HttpRequest:
     @property
     def header_encoding(self):
         """Return charset given by the response header."""
-        if not hasattr(self, '_header_encoding'):
-            content_type = self.response_headers.get('content-type', '')
-            pos = content_type.find('charset=')
-            if pos >= 0:
-                pos += len('charset=')
-                encoding = self.response_headers['content-type'][pos:]
-                self._header_encoding = encoding
-            elif 'json' in content_type:
-                # application/json | application/sparql-results+json
-                self._header_encoding = 'utf-8'
-            elif 'xml' in content_type:
-                header = self.raw[:100].splitlines()[0]  # bytes
-                m = re.search(
-                    br'encoding=(["\'])(?P<encoding>.+?)\1', header)
-                if m:
-                    self._header_encoding = m.group('encoding').decode('utf-8')
-                else:
-                    self._header_encoding = 'utf-8'
+        if hasattr(self, '_header_encoding'):
+            return self._header_encoding
+
+        content_type = self.response_headers.get('content-type', '')
+        m = re.search('charset=(?P<charset>.*?$)', content_type)
+        if m:
+            self._header_encoding = m.group('charset')
+        elif 'json' in content_type:
+            # application/json | application/sparql-results+json
+            self._header_encoding = 'utf-8'
+        elif 'xml' in content_type:
+            header = self.raw[:100].splitlines()[0]  # bytes
+            m = re.search(
+                br'encoding=(["\'])(?P<encoding>.+?)\1', header)
+            if m:
+                self._header_encoding = m.group('encoding').decode('utf-8')
             else:
-                self._header_encoding = None
+                self._header_encoding = 'utf-8'
+        else:
+            self._header_encoding = None
+
         return self._header_encoding
 
     @property
