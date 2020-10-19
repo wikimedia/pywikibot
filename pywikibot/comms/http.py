@@ -303,7 +303,7 @@ def _http_process(session, http_request) -> None:
     uri = http_request.uri
     params = http_request.params
     body = http_request.body
-    headers = http_request.headers
+    headers = http_request.all_headers
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
@@ -342,20 +342,21 @@ def error_handling_callback(request):
         if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
             raise FatalServerError(str(request.data))
 
-    if request.status == 504:
-        raise Server504Error('Server %s timed out' % request.hostname)
+    if request.status_code == 504:
+        raise Server504Error('Server {} timed out'
+                             .format(urlparse(request.url).netloc))
 
-    if request.status == 414:
+    if request.status_code == 414:
         raise Server414Error('Too long GET request')
 
     if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.uri)
+        error('An error occurred for uri ' + request.url)
         raise request.data from None
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
-    if request.status not in (200, 207):
-        warning('Http response status {0}'.format(request.data.status_code))
+    if request.status_code not in (200, 207):
+        warning('Http response status {}'.format(request.status_code))
 
 
 @deprecated(since='20201015', future_warning=True)

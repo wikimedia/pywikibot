@@ -2888,10 +2888,10 @@ class PetScanPageGenerator:
             req = http.fetch(url, params=self.opts)
         except ReadTimeout:
             raise ServerError(
-                'received ReadTimeout from {0}'.format(url))
+                'received ReadTimeout from {}'.format(url))
         if 500 <= req.status < 600:
             raise ServerError(
-                'received {0} status from {1}'.format(req.status, req.uri))
+                'received {} status from {}'.format(req.status_code, req.url))
         j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
         yield from raw_pages
