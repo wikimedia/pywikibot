@@ -70,7 +70,7 @@ def update_family(families):
 
         if original == new:
             pywikibot.output('The lists match!')
-            return
+            continue
 
         pywikibot.output("The lists don't match, the new list is:")
         text = '    languages_by_size = [\n'
