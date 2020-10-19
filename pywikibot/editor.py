@@ -18,7 +18,6 @@ from typing import Optional
 import pywikibot
 
 from pywikibot import config
-from pywikibot.tools import deprecated
 
 try:
     from pywikibot.userinterfaces import gui
@@ -70,11 +69,6 @@ class TextEditor:
     def _concat(command):
         return ' '.join("'{0}'".format(part) if ' ' in part else part
                         for part in command)
-
-    @deprecated(since='20150111', future_warning=True)
-    def command(self, tempFilename, text, jumpIndex=None):
-        """Return editor selected in user-config.py."""
-        return TextEditor._concat(self._command(tempFilename, text, jumpIndex))
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,
              highlight: Optional[str] = None) -> Optional[str]:
