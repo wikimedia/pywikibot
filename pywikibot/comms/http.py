@@ -153,6 +153,12 @@ def user_agent(site=None, format_string: str = None) -> str:
     username = ''
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
+
+    values['family'] = ''
+    values['code'] = ''
+    values['lang'] = ''  # TODO: use site.lang, if known
+    values['site'] = ''
+
     if site:
         script_comments.append(str(site))
 
@@ -160,20 +166,19 @@ def user_agent(site=None, format_string: str = None) -> str:
         # is not the best for a HTTP header if the username isn't ASCII.
         if site.username():
             username = user_agent_username(site.username())
-            script_comments.append(
-                'User:' + username)
+            script_comments.append('User:' + username)
 
-    values.update({
-        'family': site.family.name if site else '',
-        'code': site.code if site else '',
-        'lang': site.code if site else '',  # TODO: use site.lang, if known
-        'site': str(site) if site else '',
-        'username': username,
-        'script_comments': '; '.join(script_comments)
-    })
+        values.update({
+            'family': site.family.name,
+            'code': site.code,
+            'lang': site.code,  # TODO: use site.lang, if known
+            'site': str(site),
+        })
 
-    if not format_string:
-        format_string = config.user_agent_format
+    values['username'] = username
+    values['script_comments'] = '; '.join(script_comments)
+
+    format_string = format_string or config.user_agent_format
 
     formatted = _USER_AGENT_FORMATTER.format(format_string, **values)
     # clean up after any blank components
@@ -410,6 +415,7 @@ def _enqueue(uri, method='GET', params=None, body=None, headers=None,
     return request
 
 
+@deprecate_arg('callback', True)
 def fetch(uri, method='GET', params=None, body=None, headers=None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False,
@@ -430,8 +436,6 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     @type charset: CodecInfo, str, None
     @kwarg disable_ssl_certificate_validation: diable SSL Verification
     @type disable_ssl_certificate_validation: bool
-    @kwarg callback: Method to call once data is fetched
-    @type callback: callable
     @kwarg callbacks: Methods to call once data is fetched
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
@@ -463,10 +467,6 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
             headers['user-agent'] = fake_user_agent()
 
     callbacks = kwargs.pop('callbacks', [])
-    callback = kwargs.pop('callback', None)
-    if callback:
-        callbacks.append(callback)
-
     if default_error_handling:
         callbacks.append(error_handling_callback)
 
