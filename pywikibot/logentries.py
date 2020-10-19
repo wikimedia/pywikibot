@@ -6,11 +6,16 @@
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
-from typing import List, Optional
+from typing import Optional
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated, classproperty
+from pywikibot.tools import classproperty, deprecated, PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 _logger = 'wiki'
 

@@ -99,7 +99,7 @@ from contextlib import closing
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -129,6 +129,11 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+else:
+    from typing import Dict
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'

@@ -21,7 +21,7 @@ import sys
 
 from http import cookiejar
 from string import Formatter
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 from urllib.parse import quote, urlparse
 from warnings import warn
 
@@ -39,7 +39,13 @@ from pywikibot.tools import (
     deprecate_arg,
     file_mode_checker,
     issue_deprecation_warning,
+    PYTHON_VERSION,
 )
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 try:
     import requests_oauthlib

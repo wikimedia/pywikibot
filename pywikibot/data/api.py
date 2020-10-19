@@ -22,7 +22,7 @@ from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
 from inspect import getfullargspec
 from io import BytesIO
-from typing import Optional, Set, Tuple, Union
+from typing import Optional, Union
 from warnings import warn
 from urllib.parse import urlencode, unquote
 
@@ -41,6 +41,12 @@ from pywikibot.tools import (
     deprecated, itergroup, PYTHON_VERSION, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Set = set
+    Tuple = tuple
+else:
+    from typing import Set, Tuple
 
 
 _logger = 'data.api'

@@ -8,12 +8,16 @@
 import codecs
 import re
 
-from typing import Dict, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 import pywikibot
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
 
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+else:
+    from typing import Dict
 
 _logger = 'comms.threadedhttp'
 

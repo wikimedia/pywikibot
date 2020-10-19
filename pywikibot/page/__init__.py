@@ -27,7 +27,7 @@ from collections.abc import MutableMapping
 from contextlib import suppress
 from html.entities import name2codepoint
 from itertools import chain
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
@@ -55,10 +55,17 @@ from pywikibot.tools import (
     first_upper,
     issue_deprecation_warning,
     manage_wrapping,
+    PYTHON_VERSION,
     redirect_func,
     remove_last_args,
 )
 from pywikibot.tools import is_IP
+
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+    List = list
+else:
+    from typing import Dict, List
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'

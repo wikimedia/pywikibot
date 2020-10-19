@@ -31,7 +31,7 @@ from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import pywikibot
 
@@ -52,7 +52,12 @@ from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import PYTHON_VERSION
 
+if PYTHON_VERSION >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 _logger = 'pagegenerators'
 
