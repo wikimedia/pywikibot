@@ -506,6 +506,7 @@ class ReferencesRobot(SingleSiteBot):
 
     def run(self):
         """Run the Bot."""
+        self.setup()
         editedpages = 0
         for page in self.generator:
             try:
