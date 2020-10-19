@@ -23,7 +23,7 @@ conjunction. Each bot should subclass at least one of these four classes:
   scripts.ini configuration file. That file consists of sections, led by a
   C{[section]} header and followed by C{option: value} or C{option=value}
   entries. The section is the script name without .py suffix. All options
-  identified must be predefined in availableOptions dictionary.
+  identified must be predefined in available_options dictionary.
 
 * L{Bot}: The previous base class which should be avoided. This class is mainly
   used for bots which work with wikibase or together with an image repository.
@@ -63,7 +63,7 @@ __all__ = (
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
     'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
     'init_handlers', 'writelogheader',
-    'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
+    'input', 'input_choice', 'input_yn', 'input_list_choice',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
@@ -72,7 +72,7 @@ __all__ = (
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
     'calledModuleName', 'handle_args', 'handleArgs',
-    'showHelp', 'suggest_help',
+    'show_help', 'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
@@ -99,6 +99,7 @@ from contextlib import closing
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
+from typing import Any, Dict
 from warnings import warn
 
 import pywikibot
@@ -123,13 +124,11 @@ from pywikibot.logging import (
 from pywikibot.logging import critical
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
+    PYTHON_VERSION,
 )
-from pywikibot.tools._logging import (
-    LoggingFormatter as _LoggingFormatter,
-    RotatingFileHandler,
-)
+from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
+from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
-
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -167,7 +166,7 @@ GLOBAL OPTIONS
 -help             Show this help text.
 
 -log              Enable the log file, using the default filename
-                  '%s-bot.log'
+                  '{}-bot.log'
                   Logs will be stored in the logs subdirectory.
 
 -log:xyz          Enable the log file, using 'xyz' as the filename.
@@ -204,6 +203,13 @@ GLOBAL OPTIONS
 
 """
 
+_GLOBAL_HELP_NOTE = """
+GLOBAL OPTIONS
+==============
+For global options use -help:global or run pwb.py -help
+
+"""
+
 
 class UnhandledAnswer(Exception):
 
@@ -212,15 +218,6 @@ class UnhandledAnswer(Exception):
     def __init__(self, stop=False):
         """Initializer."""
         self.stop = stop
-
-
-class LoggingFormatter(_LoggingFormatter):
-
-    """Logging formatter that uses config.console_encoding."""
-
-    def __init__(self, fmt=None, datefmt=None):
-        """Initializer setting underlying encoding to console_encoding."""
-        _LoggingFormatter.__init__(self, fmt, datefmt, config.console_encoding)
 
 
 # Initialize the handlers and formatters for the logging system.
@@ -355,35 +352,29 @@ def writelogheader():
 
     This may help the user to track errors or report bugs.
     """
-    # If a http thread is not available, it's too early to print a header
-    # that includes version information, which may need to query a server.
-    # The http module can't be imported due to circular dependencies.
-    http = sys.modules.get('pywikibot.comms.http', None)
-    if not http or not hasattr(http, 'threads') or not len(http.threads):
-        return
-
+    log('')
     log('=== Pywikibot framework v{} -- Logging header ==='
         .format(pywikibot.__version__))
 
     # script call
-    log('COMMAND: {0}'.format(sys.argv))
+    log('COMMAND: {}'.format(sys.argv))
 
     # script call time stamp
-    log('DATE: %s UTC' % str(datetime.datetime.utcnow()))
+    log('DATE: {} UTC'.format(datetime.datetime.utcnow()))
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
-        log('VERSION: %s' %
-            version.getversion(online=config.log_pywiki_repo_version).strip())
+        log('VERSION: {}'.format(
+            version.getversion(online=config.log_pywiki_repo_version).strip()))
     except version.ParseError:
         exception()
 
     # system
     if hasattr(os, 'uname'):
-        log('SYSTEM: {0}'.format(os.uname()))
+        log('SYSTEM: {}'.format(os.uname()))
 
     # config file dir
-    log('CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
+    log('CONFIG FILE DIR: {}'.format(pywikibot.config2.base_dir))
 
     all_modules = sys.modules.keys()
 
@@ -397,33 +388,37 @@ def writelogheader():
     if config.verbose_output:
         check_package_list += all_modules
 
-    packages = version.package_versions(check_package_list)
-
     log('PACKAGES:')
+    packages = version.package_versions(check_package_list)
     for name in sorted(packages.keys()):
         info = packages[name]
         info.setdefault('path',
                         '[{}]'.format(info.get('type', 'path unknown')))
         info.setdefault('ver', '??')
         if 'err' in info:
-            log('  %(name)s: %(err)s' % info)
+            log('  {name}: {err}'.format_map(info))
         else:
-            log('  %(name)s (%(path)s) = %(ver)s' % info)
+            log('  {name} ({path}) = {ver}'.format_map(info))
 
     # imported modules
     log('MODULES:')
     for module in sys.modules.values():
         filename = version.get_module_filename(module)
-        ver = version.get_module_version(module)
-        mtime = version.get_module_mtime(module)
-        if filename and ver and mtime:
-            log('  {0} {1} {2}'
-                .format(filename, ver[:7], mtime.isoformat(' ')))
+        if not filename:
+            continue
+
+        param = {'sep': ' '}
+        if PYTHON_VERSION >= (3, 6, 0):
+            param['timespec'] = 'seconds'
+        mtime = version.get_module_mtime(module).isoformat(**param)
+
+        log('  {} {}'
+            .format(mtime, filename))
 
     if config.log_pywiki_repo_version:
-        log('PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
+        log('PYWIKI REPO VERSION: {}'.format(version.getversion_onlinerepo()))
 
-    log('=== ' * 14)
+    log('=' * 57)
 
 
 add_init_routine(init_handlers)
@@ -489,30 +484,6 @@ def input_choice(question, answers, default=None, return_shortcut=True,
 
     return ui.input_choice(question, answers, default, return_shortcut,
                            automatic_quit=automatic_quit, force=force)
-
-
-@deprecated('input_choice', since='20140825', future_warning=True)
-def inputChoice(question, answers, hotkeys, default=None):
-    """Ask the user a question with several options, return the user's choice.
-
-    DEPRECATED: Use L{input_choice} instead!
-
-    The user's input will be case-insensitive, so the hotkeys should be
-    distinctive case-insensitively.
-
-    @param question: a string that will be shown to the user. Don't add a
-        space after the question mark/colon, this method will do this for you.
-    @type question: basestring
-    @param answers: a list of strings that represent the options.
-    @type answers: list of basestring
-    @param hotkeys: a list of one-letter strings, one for each answer.
-    @param default: an element of hotkeys, or None. The default choice that
-        will be returned when the user just presses Enter.
-    @return: a one-letter string in lowercase.
-    @rtype: str
-    """
-    return input_choice(question, zip(answers, hotkeys), default=default,
-                        automatic_quit=False)
 
 
 def input_yn(question, default=None, automatic_quit=True, force=False):
@@ -802,7 +773,7 @@ def handle_args(args=None, do_help=True):
     for arg in args:
         option, _, value = arg.partition(':')
         if do_help is not False and option == '-help':
-            do_help = True
+            do_help = value or True
         elif option == '-dir':
             pass
         elif option == '-family':
@@ -891,20 +862,20 @@ def handle_args(args=None, do_help=True):
         pywikibot.output('Python ' + sys.version)
 
     if do_help:
-        showHelp()
+        show_help(show_global=do_help == 'global')
         sys.exit(0)
 
     debug('handle_args() completed.', _logger)
     return non_global_args
 
 
-@deprecated('handle_args', since='20150409')
+@deprecated('handle_args', since='20150409', future_warning=True)
 def handleArgs(*args):
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)
 
 
-def showHelp(module_name=None):
+def show_help(module_name=None, show_global=False):
     """Show help for the Bot."""
     if not module_name:
         module_name = calledModuleName()
@@ -914,19 +885,29 @@ def showHelp(module_name=None):
         except NameError:
             module_name = 'no_module'
 
-    global_help = _GLOBAL_HELP % module_name
     try:
-        module = import_module('%s' % module_name)
+        module = import_module(module_name)
         help_text = module.__doc__
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
-        pywikibot.stdout(help_text)  # output to STDOUT
     except Exception:
         if module_name:
-            pywikibot.stdout('Sorry, no help available for %s' % module_name)
-        pywikibot.log('showHelp:', exc_info=True)
-    pywikibot.stdout(global_help)
+            pywikibot.stdout('Sorry, no help available for ' + module_name)
+        pywikibot.log('show_help:', exc_info=True)
+    else:
+        pywikibot.stdout(help_text)  # output to STDOUT
+
+    if show_global or module_name == 'pwb':
+        pywikibot.stdout(_GLOBAL_HELP.format(module_name))
+    else:
+        pywikibot.stdout(_GLOBAL_HELP_NOTE)
+
+
+@deprecated('show_help', since='20200705')
+def showHelp(module_name=None):
+    """DEPRECATED. Use show_help()."""
+    return show_help(module_name)
 
 
 def suggest_help(missing_parameters=[], missing_generator=False,
@@ -1015,55 +996,170 @@ def open_webbrowser(page):
     i18n.input('pywikibot-enter-finished-browser')
 
 
+class _OptionDict(dict):
+
+    """The option dict which holds the options of OptionHandler."""
+
+    def __init__(self, classname, options):
+        self._classname = classname
+        self._options = {}
+        super().__init__(options)
+
+    def __missing__(self, key):
+        raise pywikibot.Error("'{}' is not a valid option for {}."
+                              .format(key, self._classname))
+
+    def __getattr__(self, name):
+        """Get item from dict."""
+        return self.__getitem__(name)
+
+    def __setattr__(self, name, value):
+        """Set item or attribute."""
+        if name not in ('_classname', '_options'):
+            self.__setitem__(name, value)
+        else:
+            super().__setattr__(name, value)
+
+    def __getitem__(self, key):
+        """Update options fro backward compatibility and get item."""
+        self.update_options()
+        return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        """Set item in dict and deprecated option dict."""
+        if key in self._options:
+            self._options[key] = value
+        super().__setitem__(key, value)
+
+    def update_options(self):
+        """Update dict from deprecated options for backward compatibility."""
+        self.update(self._options)
+
+
+_DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
+                   'or Optionhandler.opt[option] item'
+
+
 class OptionHandler:
 
-    """Class to get and set options."""
+    """Class to get and set options.
+
+    How to use options of OptionHandler and its BaseBot subclasses:
+    First define a available_options class attribute to define all
+    available options:
+
+    available_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+
+    Or you may update the predefined setting in the class initializer.
+    BaseBot predefines a 'always' options and sets it to False:
+
+    self.available_options.update(always=True, another_option='Yes')
+
+    Now you can instantiate an OptionHandler or BaseBot class passing
+    options other than default values:
+
+    >>> bot = OptionHandler(baz=True)
+
+    You can access bot options either as keyword item or attribute:
+
+    >>> bot.opt.foo
+    'bar'
+    >>> bot.opt['bar']
+    42
+    >>> bot.opt.baz  # default was overridden
+    True
+
+    You can set the options in the same way:
+
+    >>> bot.opt.bar = 4711
+    >>> bot.opt['baz'] = None
+    >>>
+
+    Or you can use the option as a dict:
+
+    >>> 'Option opt.{foo} is {bar}'.format_map(bot.opt)
+    'Option opt.bar is 4711'
+    """
 
     # Handler configuration.
     # Only the keys of the dict can be passed as init options
     # The values are the default values
     # Overwrite this in subclasses!
 
-    availableOptions = {}
+    available_options = {}  # type: Dict[str, Any]
 
     def __init__(self, **kwargs):
         """
-        Only accept options defined in availableOptions.
+        Only accept options defined in available_options.
 
         @param kwargs: bot options
         """
-        self.setOptions(**kwargs)
+        self.set_options(**kwargs)
 
+    @classproperty
+    @deprecated('available_options', since='20201006')
+    def availableOptions(cls):
+        """DEPRECATED. Available_options class property."""
+        return cls.available_options
+
+    @deprecated('set_options', since='20201006')
     def setOptions(self, **kwargs):
-        """
-        Set the instance options.
+        """DEPRECATED. Set the instance options."""
+        self.set_options(**kwargs)
 
-        @param kwargs: options
-        """
-        valid_options = set(self.availableOptions)
-        received_options = set(kwargs)
+    def set_options(self, **options):
+        """Set the instance options."""
+        warning = 'pywikibot.bot.OptionHandler.availableOptions'
+        with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
+                               category=DeprecationWarning):
+            old_options = self.availableOptions is not self.available_options
+        if old_options:  # old options were set and not updated
+            self.available_options = self.availableOptions
+            issue_deprecation_warning(warning, 'available_options',
+                                      since='20201006')
 
-        # contains the options overridden from defaults
-        self.options = {
-            opt: kwargs[opt] for opt in received_options & valid_options}
+        valid_options = set(self.available_options)
+        received_options = set(options)
+
+        # self.opt contains all available options including defaults
+        self.opt = _OptionDict(self.__class__.__name__, self.available_options)
+        # self.options contains the options overridden from defaults
+        self.opt._options = {opt: options[opt]
+                             for opt in received_options & valid_options}
+        self.opt.update(self.opt._options)
 
         for opt in received_options - valid_options:
-            pywikibot.warning('%s is not a valid option. It was ignored.'
-                              % opt)
+            pywikibot.warning('{} is not a valid option. It was ignored.'
+                              .format(opt))
 
+    @deprecated(_DEPRECATION_MSG, since='20201006')
     def getOption(self, option):
-        """
-        Get the current value of an option.
+        """DEPRECATED. Get the current value of an option.
 
-        @param option: key defined in OptionHandler.availableOptions
+        @param option: key defined in OptionHandler.available_options
         @raise pywikibot.exceptions.Error: No valid option is given with
             option parameter
         """
-        try:
-            return self.options.get(option, self.availableOptions[option])
-        except KeyError:
-            raise pywikibot.Error("'{0}' is not a valid option for {1}."
-                                  .format(option, self.__class__.__name__))
+        return self.opt[option]
+
+    @property
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
+    def options(self):
+        """DEPRECATED. Return changed options."""
+        return self.opt._options
+
+    @options.setter
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
+    def options(self, options):
+        """DEPRECATED. Return changed options."""
+        self.set_options(**options)
+
+    def __getattribute__(self, name):
+        """Update options for backward compatibility of options property."""
+        attr = super().__getattribute__(name)
+        if name == 'opt':
+            attr.update_options()
+        return attr
 
 
 class BaseBot(OptionHandler):
@@ -1080,13 +1176,15 @@ class BaseBot(OptionHandler):
 
     If the subclass does not set a generator, or does not override
     treat() or run(), NotImplementedError is raised.
+
+    For bot options handling refer OptionHandler class above.
     """
 
     # Handler configuration.
     # The values are the default values
     # Extend this in subclasses!
 
-    availableOptions = {
+    available_options = {
         'always': False,  # By default ask for confirmation when putting a page
     }
 
@@ -1094,7 +1192,7 @@ class BaseBot(OptionHandler):
 
     def __init__(self, **kwargs):
         """
-        Only accept options defined in availableOptions.
+        Only accept options defined in available_options.
 
         @param kwargs: bot options
         """
@@ -1138,7 +1236,7 @@ class BaseBot(OptionHandler):
 
     def user_confirm(self, question):
         """Obtain user response if bot option 'always' not enabled."""
-        if self.getOption('always'):
+        if self.opt.always:
             return True
 
         choice = pywikibot.input_choice(question,
@@ -1157,7 +1255,7 @@ class BaseBot(OptionHandler):
 
         if choice == 'a':
             # Remember the choice
-            self.options['always'] = True
+            self.opt.always = True
 
         return True
 
@@ -1223,7 +1321,7 @@ class BaseBot(OptionHandler):
         if not self.user_confirm('Do you want to accept these changes?'):
             return False
 
-        if 'asynchronous' not in kwargs and self.getOption('always'):
+        if 'asynchronous' not in kwargs and self.opt.always:
             kwargs['asynchronous'] = True
 
         ignore_save_related_errors = kwargs.pop('ignore_save_related_errors',
@@ -1313,10 +1411,7 @@ class BaseBot(OptionHandler):
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
         pywikibot.output('Script terminated ', newline=False)
-        # Python 2 also needs QuitKeyboardInterrupt
-        # to be compared with exc_info[0] (T195687)
-        if exc_info[0] is None or exc_info[0] in (KeyboardInterrupt,
-                                                  QuitKeyboardInterrupt):
+        if exc_info[0] is None or exc_info[0] is KeyboardInterrupt:
             pywikibot.output('successfully.')
         else:
             pywikibot.output('by exception:\n')
@@ -1463,15 +1558,14 @@ class Bot(BaseBot):
             return
 
         if site not in self._sites:
-            log('LOADING SITE %s VERSION: %s'
-                % (site, site.version()))
+            log('LOADING SITE {} VERSION: {}'.format(site, site.mw_version))
 
             self._sites.add(site)
             if len(self._sites) == 2:
-                log('%s uses multiple sites' % self.__class__.__name__)
+                log('{} uses multiple sites'.format(self.__class__.__name__))
         if self._site and self._site != site:
-            log('%s: changing site from %s to %s'
-                % (self.__class__.__name__, self._site, site))
+            log('{}: changing site from {} to {}'
+                .format(self.__class__.__name__, self._site, site))
         self._site = site
 
     def run(self):
@@ -1580,7 +1674,8 @@ class MultipleSitesBot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    @deprecated("the page's site property", since='20150615')
+    @deprecated("the page's site property", since='20150615',
+                future_warning=True)
     def site(self):
         """
         Return the site if it's set and ValueError otherwise.
@@ -1609,7 +1704,7 @@ class ConfigParserBot(BaseBot):
 
     """A bot class that can read options from scripts.ini file.
 
-    All options must be predefined in availableOptions dictionary. The type
+    All options must be predefined in available_options dictionary. The type
     of these options is responsible for the correct interpretation of the
     options type given by the .ini file. They can be interpreted as bool,
     int, float or str (default). The settings file may be like:
@@ -1623,22 +1718,22 @@ class ConfigParserBot(BaseBot):
 
     The option values are interpreted in this order::
 
-    - availableOptions default setting
+    - available_options default setting
     - script.ini options settings
     - command line arguments
     """
 
     INI = 'scripts.ini'
 
-    def setOptions(self, **kwargs):
+    def set_options(self, **kwargs):
         """Read settings from scripts.ini file."""
         conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
             pywikibot.output('Reading settings from {} file.'.format(self.INI))
-            args = {}
-            for option, value in self.availableOptions.items():
+            options = {}
+            for option, value in self.available_options.items():
                 if not conf.has_option(section, option):
                     continue
                 # use a convenience parser method, default to get()
@@ -1648,15 +1743,15 @@ class ConfigParserBot(BaseBot):
                     method = getattr(conf, 'getboolean')
                 else:
                     method = getattr(conf, 'get' + value_type, default)
-                args[option] = method(section, option)
-            for opt in set(conf.options(section)) - set(args):
+                options[option] = method(section, option)
+            for opt in set(conf.options(section)) - set(options):
                 pywikibot.warning(
                     '"{}" is not a valid option. It was ignored.'.format(opt))
-            args.update(kwargs)
+            options.update(kwargs)
         else:
-            args = kwargs
+            options = kwargs
 
-        super().setOptions(**args)
+        super().set_options(**options)
 
 
 class CurrentPageBot(BaseBot):
@@ -1833,7 +1928,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     @ivar create_missing_item: If True, new items will be created if the
         current page doesn't have one. Subclasses should override this in the
-        initializer with a bool value or using self.getOption.
+        initializer with a bool value or using self.opt attribute.
 
     @type create_missing_item: bool
     """

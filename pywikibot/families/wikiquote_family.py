@@ -29,8 +29,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'it', 'pl', 'ru', 'cs', 'fa', 'de', 'pt', 'es', 'fr', 'uk', 'he',
-        'sk', 'bs', 'tr', 'ca', 'fi', 'az', 'sl', 'lt', 'eo', 'zh', 'bg', 'hr',
-        'hy', 'ar', 'el', 'su', 'id', 'nn', 'et', 'sv', 'li', 'hu', 'ko', 'nl',
+        'sk', 'bs', 'tr', 'ca', 'fi', 'az', 'sl', 'lt', 'eo', 'zh', 'bg', 'et',
+        'ar', 'hr', 'hy', 'el', 'su', 'nn', 'id', 'sv', 'li', 'hu', 'ko', 'nl',
         'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'th', 'ur', 'te', 'be',
         'cy', 'no', 'ml', 'sq', 'kn', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'da',
         'sa', 'is', 'vi', 'br', 'mr', 'af', 'wo', 'ky',
@@ -38,7 +38,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'en': ('Category redirect',),
         'ro': ('Redirect categorie',),
         'sq': ('Kategori e zhvendosur',),
@@ -64,6 +64,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'ar': ('/شرح', '/doc'),
         'sr': ('/док', ),
     }
 

@@ -14,7 +14,7 @@ from collections import Counter
 
 import pywikibot
 
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated_args
 
 
 def _call_cmd(args, lib='djvulibre') -> tuple:
@@ -91,12 +91,6 @@ class DjVuFile:
     def __str__(self) -> str:
         """Return a string representation."""
         return str("{}('{}')").format(self.__class__.__name__, self._filename)
-
-    @property
-    @deprecated('DjVuFile.file', since='2010222', future_warning=True)
-    def file_djvu(self):
-        """Deprecated file_djvu instance variable."""
-        return self.file
 
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""

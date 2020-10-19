@@ -271,6 +271,11 @@ scripts.pagefromfile script
 
 .. automodule:: scripts.pagefromfile
 
+scripts.parser\_function\_count script
+--------------------------------------
+
+.. automodule:: scripts.parser_function_count
+
 scripts.patrol script
 ---------------------
 
@@ -329,6 +334,11 @@ scripts.spamremove script
 -------------------------
 
 .. automodule:: scripts.spamremove
+
+scripts.speedy\_delete script
+-----------------------------
+
+.. automodule:: scripts.speedy_delete
 
 scripts.standardize\_interwiki script
 -------------------------------------

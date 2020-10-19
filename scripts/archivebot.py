@@ -191,7 +191,6 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
         7d - 7 days
         2w - 2 weeks (14 days)
         1y - 1 year
-    @type string: str
     @param timestamp: a timestamp to calculate a more accurate duration offset
         used by years
     @type timestamp: datetime.datetime
@@ -231,7 +230,6 @@ def checkstr(string: str) -> Tuple[str, str]:
         7d - 7 days
         2w - 2 weeks (14 days)
         1y - 1 year
-    @type string: str
     @return: key and duration extracted form the string
     """
     if string.isdigit():

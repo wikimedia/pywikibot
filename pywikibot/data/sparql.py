@@ -7,6 +7,7 @@
 #
 import json
 
+from typing import Optional
 from urllib.parse import quote
 
 from requests.exceptions import Timeout
@@ -27,26 +28,25 @@ class SparqlQuery:
     This class allows to run SPARQL queries against any SPARQL endpoint.
     """
 
-    def __init__(self, endpoint=None, entity_url=None, repo=None,
-                 max_retries=None, retry_wait=None):
+    def __init__(self,
+                 endpoint: Optional[str] = None,
+                 entity_url: Optional[str] = None, repo=None,
+                 max_retries: Optional[int] = None,
+                 retry_wait: Optional[float] = None):
         """
         Create endpoint.
 
         @param endpoint: SPARQL endpoint URL
-        @type endpoint: str
         @param entity_url: URL prefix for any entities returned in a query.
-        @type entity_url: str
         @param repo: The Wikibase site which we want to run queries on. If
             provided this overrides any value in endpoint and entity_url.
             Defaults to Wikidata.
         @type repo: pywikibot.site.DataSite
         @param max_retries: (optional) Maximum number of times to retry after
                errors, defaults to config.max_retries.
-        @type max_retries: int
         @param retry_wait: (optional) Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
                until config.retry_max is reached).
-        @type retry_wait: float
         """
         # default to Wikidata
         if not repo and not endpoint:
@@ -91,7 +91,8 @@ class SparqlQuery:
         """
         return self.last_response
 
-    def select(self, query: str, full_data=False, headers=DEFAULT_HEADERS):
+    def select(self, query: str, full_data: bool = False,
+               headers=DEFAULT_HEADERS):
         """
         Run SPARQL query and return the result.
 
@@ -100,7 +101,6 @@ class SparqlQuery:
 
         @param query: Query text
         @param full_data: Whether return full data objects or only values
-        @type full_data: bool
         @return: List of query results or None if query failed
         """
         data = self.query(query, headers=headers)

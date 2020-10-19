@@ -8,10 +8,18 @@
 #
 import codecs
 import os
+import string
 import sys
 
 from os import environ, getenv
 from urllib.parse import urlparse
+
+# see pywikibot.family.py
+# Legal characters for Family name and Family langs keys
+NAME_CHARACTERS = string.ascii_letters + string.digits
+# nds_nl code alias requires "_"n
+# dash must be the last char to be reused as regex in update_linktrails
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
 class FamilyFileGenerator:
@@ -30,6 +38,11 @@ class FamilyFileGenerator:
             url = input('Please insert URL to wiki: ')
         if name is None:
             name = input('Please insert a short name (eg: freeciv): ')
+
+        assert all(x in NAME_CHARACTERS for x in name), \
+            'Name of family "{}" must be ASCII letters and digits ' \
+            '[a-zA-Z0-9]'.format(name)
+
         self.dointerwiki = dointerwiki
         self.base_url = url
         self.name = name
@@ -91,6 +104,12 @@ class FamilyFileGenerator:
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
 
+        for wiki in self.langs:
+            assert all(x in CODE_CHARACTERS for x in wiki['prefix']), \
+                'Family {} code {} must be ASCII lowercase ' \
+                'letters and digits [a-z0-9] or underscore/dash [_-]' \
+                .format(self.name, wiki['prefix'])
+
     def getapis(self):
         """Load other language pages."""
         print('Loading wikis... ')
@@ -130,11 +149,6 @@ class FamilyFileGenerator:
             "'{code}': '{path}',".format(code=k, path=w.scriptpath)
             for k, w in self.wikis.items())
 
-        code_version_pairs = '\n            '.join(
-            "'{code}': None,".format(code=k) if w.version is None else
-            "'{code}': '{version}',".format(code=k, version=w.version)
-            for k, w in self.wikis.items())
-
         code_protocol_pairs = '\n            '.join(
             "'{code}': '{protocol}',".format(
                 code=k, protocol=urlparse(w.server).scheme
@@ -145,7 +159,6 @@ class FamilyFileGenerator:
                 'url': self.base_url, 'name': self.name,
                 'code_hostname_pairs': code_hostname_pairs,
                 'code_path_pairs': code_path_pairs,
-                'code_version_pairs': code_version_pairs,
                 'code_protocol_pairs': code_protocol_pairs})
 
 
@@ -161,7 +174,6 @@ Configuration parameters:
 Please do not commit this to the Git repository!
 \"\"\"
 from pywikibot import family
-from pywikibot.tools import deprecated
 
 
 class Family(family.Family):  # noqa: D101
@@ -174,12 +186,6 @@ class Family(family.Family):  # noqa: D101
     def scriptpath(self, code):
         return {
             %(code_path_pairs)s
-        }[code]
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        return {
-            %(code_version_pairs)s
         }[code]
 
     def protocol(self, code):

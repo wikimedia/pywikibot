@@ -29,17 +29,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'en', 'mg', 'fr', 'ru', 'de', 'sh', 'es', 'zh', 'ku', 'el', 'nl', 'sv',
-        'pl', 'lt', 'it', 'ca', 'fi', 'ta', 'hu', 'tr', 'hy', 'io', 'ko', 'kn',
+        'en', 'mg', 'fr', 'ru', 'de', 'sh', 'es', 'zh', 'el', 'nl', 'sv', 'pl',
+        'ku', 'lt', 'it', 'ca', 'fi', 'ta', 'hu', 'tr', 'hy', 'io', 'ko', 'kn',
         'pt', 'ja', 'vi', 'sr', 'th', 'chr', 'hi', 'ro', 'no', 'et', 'id',
-        'ml', 'my', 'cs', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'jv', 'gl',
+        'ml', 'cs', 'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'gl', 'jv',
         'az', 'oc', 'eu', 'uk', 'br', 'da', 'lo', 'hr', 'is', 'simple', 'ast',
-        'fj', 'la', 'tg', 'ky', 'sk', 'bg', 'ur', 'ps', 'wa', 'cy', 'vo', 'af',
+        'fj', 'la', 'tg', 'ky', 'sk', 'bg', 'wa', 'ur', 'ps', 'cy', 'vo', 'af',
         'zh-min-nan', 'he', 'shn', 'scn', 'tl', 'pa', 'sw', 'fy', 'bn', 'nn',
-        'lv', 'sq', 'ka', 'co', 'mn', 'pnb', 'sl', 'min', 'lb', 'nds', 'bs',
-        'nah', 'sa', 'kk', 'ms', 'km', 'vec', 'tk', 'mk', 'be', 'sm', 'hsb',
-        'yue', 'gd', 'shy', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt', 'mt',
-        'sd', 'gn', 'mr', 'ie', 'so', 'fo', 'csb', 'ug', 'st', 'roa-rup', 'si',
+        'lv', 'sl', 'ka', 'sq', 'co', 'mn', 'pnb', 'min', 'lb', 'nds', 'bs',
+        'nah', 'sa', 'kk', 'yue', 'ms', 'km', 'vec', 'tk', 'mk', 'be', 'sm',
+        'hsb', 'shy', 'gd', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt', 'mt',
+        'sd', 'gn', 'mr', 'fo', 'ie', 'so', 'csb', 'ug', 'st', 'roa-rup', 'si',
         'hif', 'zu', 'kl', 'su', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',
         'gv', 'kw', 'tpi', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'ha', 'iu',
         'am', 'dv', 'sg', 'ti', 'tn', 'ks',
@@ -129,5 +129,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en']
                      ),
+        'ar': ('/شرح', '/doc'),
         'sr': ('/док', ),
     }

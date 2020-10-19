@@ -150,17 +150,11 @@ from queue import Queue
 
 import pywikibot
 from pywikibot import editor
-from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
 from pywikibot import i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-from pywikibot.tools import (
-    chars,
-    deprecated,
-    deprecated_args,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import chars, deprecated, deprecated_args
 
 
 # This is required for the text that is shown when you run this script
@@ -384,7 +378,7 @@ class ReplacementListEntry(ReplacementBase):
         return _get_text_exceptions(self.fix_set.exceptions or {})
 
 
-class XmlDumpReplacePageGenerator(object):
+class XmlDumpReplacePageGenerator:
 
     """
     Iterator that will yield Pages that might contain text to replace.
@@ -535,7 +529,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     @deprecated_args(acceptall='always', addedCat='addcat')
     def __init__(self, generator, replacements, exceptions={}, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'addcat': None,
             'allowoverlap': False,
             'recursive': False,
@@ -556,12 +550,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         self.replacements = replacements
         self.exceptions = exceptions
 
-        self.sleep = self.getOption('sleep')
-        self.summary = self.getOption('summary')
-
-        self.addcat = self.getOption('addcat')
-        if self.addcat and isinstance(self.addcat, str):
-            self.addcat = pywikibot.Category(self.site, self.addcat)
+        if self.opt.addcat and isinstance(self.opt.addcat, str):
+            self.opt.addcat = pywikibot.Category(self.site, self.opt.addcat)
 
         self._pending_processed_titles = Queue()
 
@@ -601,8 +591,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         exceptions = _get_text_exceptions(self.exceptions)
         skipped_containers = set()
         for replacement in self.replacements:
-            if self.sleep:
-                pywikibot.sleep(self.sleep)
+            if self.opt.sleep:
+                pywikibot.sleep(self.opt.sleep)
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue
@@ -625,7 +615,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
                 exceptions + replacement.get_inside_exceptions(),
-                allowoverlap=self.getOption('allowoverlap'), site=self.site)
+                allowoverlap=self.opt.allowoverlap, site=self.site)
             if old_text != new_text:
                 applied.add(replacement)
 
@@ -643,7 +633,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
 
-    def _log_changes(self, page, err):
+    def _replace_async_callback(self, page, err):
         """Log changed titles for display."""
         # This is an async put callback
         if not isinstance(err, Exception):
@@ -652,16 +642,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         else:  # unsuccessful pages
             self._pending_processed_titles.put((page.title(as_link=True),
                                                 False))
-
-    def _replace_async_callback(self, page, err):
-        """Callback for asynchronous page edit."""
-        self._log_changes(page, err)
-
-    def _replace_sync_callback(self, page, err):
-        """Callback for synchronous page edit."""
-        self._log_changes(page, err)
-        if isinstance(err, Exception):
-            raise err
 
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
@@ -676,8 +656,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 default_summaries.add((replacement.old, replacement.new))
         summary_messages = sorted(summary_messages)
         if default_summaries:
-            if self.summary:
-                summary_messages.insert(0, self.summary)
+            if self.opt.summary:
+                summary_messages.insert(0, self.opt.summary)
             else:
                 comma = self.site.mediawiki_message('comma-separator')
                 default_summary = comma.join(
@@ -722,7 +702,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 last_text = new_text
                 new_text = self.apply_replacements(last_text, applied,
                                                    page)
-                if not self.getOption('recursive'):
+                if not self.opt.recursive:
                     break
 
             if new_text == original_text:
@@ -730,12 +710,12 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                                  + page.title(as_link=True))
                 return
 
-            if self.addcat:
+            if self.opt.addcat:
                 # Fetch only categories in wikitext, otherwise the others
                 # will be explicitly added.
                 cats = textlib.getCategoryLinks(new_text, site=page.site)
-                if self.addcat not in cats:
-                    cats.append(self.addcat)
+                if self.opt.addcat not in cats:
+                    cats.append(self.opt.addcat)
                     new_text = textlib.replaceCategoryLinks(new_text,
                                                             cats,
                                                             site=page.site)
@@ -743,8 +723,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             # Highlight the title in purple.
             self.current_page = page
             pywikibot.showDiff(original_text, new_text, context=context)
-            if self.getOption('always'):
+            if self.opt.always:
                 break
+
             choice = pywikibot.input_choice(
                 'Do you want to accept these changes?',
                 [('Yes', 'y'), ('No', 'n'), ('Edit original', 'e'),
@@ -777,7 +758,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 last_text = None
                 continue
             if choice == 'a':
-                self.options['always'] = True
+                self.opt.always = True
             if choice == 'y':
                 self.save(page, original_text, new_text, applied,
                           show_diff=False, quiet=True,
@@ -791,17 +772,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             # choice must be 'N'
             break
 
-        if self.getOption('always') and new_text != original_text:
+        if self.opt.always and new_text != original_text:
             self.save(page, original_text, new_text, applied,
-                      show_diff=False, quiet=True,
-                      callback=self._replace_sync_callback,
-                      asynchronous=False)
-            if self._pending_processed_titles.qsize() > 50:
-                while not self._pending_processed_titles.empty():
-                    proc_title, res = self._pending_processed_titles.get()
-                    pywikibot.output('Page {0}{1} saved'
-                                     .format(proc_title,
-                                             '' if res else ' not'))
+                      show_diff=False, asynchronous=False)
 
     def save(self, page, oldtext, newtext, applied, **kwargs):
         """Save the given page."""
@@ -893,11 +866,7 @@ def main(*args):
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
-        elif arg.startswith(('-sql', '-mysqlquery')):
-            if arg.startswith('-sql'):
-                issue_deprecation_warning('The usage of "-sql"', '-mysqlquery',
-                                          1, ArgumentDeprecationWarning,
-                                          since='20180617')
+        elif arg.startswith('-mysqlquery'):
             useSql = True
             sql_query = arg.partition(':')[2]
         elif arg.startswith('-excepttitle:'):
@@ -930,11 +899,6 @@ def main(*args):
             edit_summary = True
         elif arg.startswith('-manualinput'):
             manual_input = True
-        elif arg.startswith('-replacementfile'):
-            issue_deprecation_warning(
-                '-replacementfile',
-                '-pairsfile',
-                2, ArgumentDeprecationWarning, since='20160304')
         elif arg.startswith('-pairsfile'):
             if len(commandline_replacements) % 2:
                 replacement_file_arg_misplaced = True

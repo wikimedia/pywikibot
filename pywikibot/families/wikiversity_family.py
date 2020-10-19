@@ -17,7 +17,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiversity'
 
     languages_by_size = [
-        'de', 'en', 'fr', 'zh', 'ru', 'it', 'cs', 'pt', 'es', 'sv', 'sl', 'fi',
+        'de', 'en', 'fr', 'zh', 'ru', 'it', 'cs', 'pt', 'es', 'sl', 'sv', 'fi',
         'ar', 'el', 'hi', 'ko', 'ja',
     ]
 
@@ -31,7 +31,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'en': ('Category redirect',),
     }
 

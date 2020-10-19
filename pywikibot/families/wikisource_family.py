@@ -27,10 +27,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
-        'mul', 'pt', 'gu', 'sr', 'fa', 'hu', 'sv', 'ml', 'bn', 'ko', 'sa',
-        'sl', 'hy', 'te', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
-        'az', 'tr', 'br', 'la', 'ca', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
-        'vec', 'pms', 'et', 'be', 'da', 'id', 'lij', 'mk', 'yi', 'hi', 'mr',
+        'mul', 'gu', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
+        'sl', 'te', 'hy', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
+        'tr', 'az', 'br', 'la', 'ca', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
+        'vec', 'pms', 'et', 'be', 'id', 'da', 'lij', 'mk', 'hi', 'yi', 'mr',
         'bg', 'as', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'bs', 'sah', 'sk',
         'cy', 'zh-min-nan', 'fo',
     ]
@@ -40,9 +40,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
         'en': ('Category redirect',),
+        'es': ('Categoría redirigida',),
         'ro': ('Redirect categorie',),
         'zh': ('分類重定向',),
     }
@@ -97,6 +98,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'da': [102],
         'en': [102],
         'eo': [102],
+        'es': [106],
         'et': [106],
         'fa': [102],
         'fr': [102],
@@ -126,11 +128,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['ar', 'as', 'az', 'bn', 'en', 'es',
+                     ['as', 'az', 'bn', 'en', 'es',
                       'et', 'gu', 'hu', 'it', 'ja', 'kn', 'ml',
                       'mk', 'mr', 'pt', 'ro', 'sa', 'sah', 'ta',
                       'te', 'th', 'vi']
                      ),
+        'ar': ('/شرح', '/doc'),
         'be': ('/Дакументацыя', ),
         'bn': ('/নথি', ),
         'br': ('/diellerezh', ),

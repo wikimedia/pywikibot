@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
 
@@ -49,7 +49,7 @@ class TestReplacementsMain(TWNBotTestCase):
                 # Unpatch already here, as otherwise super calls will use
                 # this class' super which is the class itself
                 replace.ReplaceRobot = self._original_bot
-                super(FakeReplaceBot, inner_self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
             def run(inner_self):  # noqa: N805
@@ -66,7 +66,7 @@ class TestReplacementsMain(TWNBotTestCase):
             site.login = patched_login
             return site
 
-        super(TestReplacementsMain, self).setUp()
+        super().setUp()
         self._original_bot = replace.ReplaceRobot
         self._original_input = replace.pywikibot.input
         self._original_site = replace.pywikibot.Site
@@ -82,7 +82,7 @@ class TestReplacementsMain(TWNBotTestCase):
         replace.pywikibot.input = self._original_input
         replace.pywikibot.Site = self._original_site
         with empty_sites():
-            super(TestReplacementsMain, self).tearDown()
+            super().tearDown()
 
     def _fake_input(self, message):
         """Cache the message and return static text "TESTRUN"."""
@@ -244,7 +244,5 @@ class TestReplacementsMain(TWNBotTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

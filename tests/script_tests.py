@@ -47,9 +47,8 @@ def check_script_deps(script_name):
 failed_dep_script_set = {name for name in script_deps
                          if not check_script_deps(name)}
 
-unrunnable_script_set = {
-    'version',  # does not use global args
-}
+# scripts which cannot be tested
+unrunnable_script_set = set()
 
 
 def list_scripts(path, exclude=None):
@@ -102,6 +101,7 @@ auto_run_script_list = [
     'revertbot',
     'noreferences',
     'nowcommons',
+    'parser_function_count',
     'patrol',
     'shell',
     'standardize_interwiki',
@@ -128,12 +128,15 @@ no_args_expected_results = {
     'imageharvest': 'From what URL should I get the images',
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
+    'parser_function_count': 'Hold on, this will need some time.',
     'replace': 'Press Enter to use this automatic message',
     'replicate_wiki':
         'error: the following arguments are required: destination',
     'shell': ('>>> ', 'Welcome to the'),
+    'speedy_delete': "does not have 'delete' right for site",
     'transferbot': 'Target site not different from source site',
     'unusedfiles': ('Working on', None),
+    'version': 'Pywikibot: [',
     'watchlist': 'Retrieving watchlist',
 
     # The following auto-run and typically can't be validated,
@@ -214,7 +217,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     .format(script_name))
 
             def testScript(self):
-                global_args = 'Global arguments available for all'
+                global_args = 'For global options use -help:global or run pwb'
 
                 cmd = [script_name] + args
                 data_in = script_input.get(script_name)
@@ -272,11 +275,13 @@ class TestScriptMeta(MetaTestCaseClass):
                                        '{} seconds'.format(timeout), end=' ')
                     elif 'SIMULATION: edit action blocked' in err_result:
                         unittest_print(' auto-run script simulated edit '
-                                       'blocked', end='  ')
+                                       'blocked', end=' ')
                     else:
                         unittest_print(
                             ' auto-run script stderr within {} seconds: {!r}'
                             .format(timeout, err_result), end='  ')
+                    unittest_print(' exit code: {}'
+                                   .format(result['exit_code']), end=' ')
 
                 self.assertNotIn('Traceback (most recent call last)',
                                  err_result)
@@ -349,7 +354,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
     # Here come scripts requiring and missing dependencies, that haven't been
     # fixed to output -help in that case.
-    _expected_failures = set()
+    _expected_failures = {'version'}
     _allowed_failures = []
 
     _arguments = '-help'

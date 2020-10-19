@@ -61,6 +61,8 @@ The contents of the package
     |                        | articles), if other language wikipedia already has such |
     |                        | a template                                              |
     +------------------------+---------------------------------------------------------+
+    | coordinate_import.py   | Coordinate importing script.                            |
+    +------------------------+---------------------------------------------------------+
     | #copyright.py          | This robot check copyright text in Google, Yahoo! and   |
     |                        | Live Search.                                            |
     +------------------------+---------------------------------------------------------+
@@ -68,8 +70,6 @@ The contents of the package
     |                        | Uses YurikAPI.                                          |
     +------------------------+---------------------------------------------------------+
     | #copyright_put.py      | Put reports of copyright.py on wiki pages.              |
-    +------------------------+---------------------------------------------------------+
-    | coordinate_import.py   | Coordinate importing script.                            |
     +------------------------+---------------------------------------------------------+
     | cosmetic_changes.py    | Can do slight modifications to a wiki page source code  |
     |                        | such that the code looks cleaner.                       |
@@ -135,7 +135,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | listpages.py           | listpages: report number of pages found                 |
     +------------------------+---------------------------------------------------------+
-    | login.py               | [IMPROV] Reduce maximum line length to 130              |
+    | login.py               | Script to log the bot in to a wiki account.             |
     +------------------------+---------------------------------------------------------+
     | lonelypages.py         | Place a template on pages which are not linked to by    |
     |                        | other pages, and are therefore lonely                   |
@@ -165,7 +165,10 @@ The contents of the package
     |                        | number of pages to be put on the wiki.                  |
     +------------------------+---------------------------------------------------------+
     | #pageimport.py         | Import pages from a certain wiki to another.            |
-    +------------------------+---------------------------------------------------------+
+    +------------------------+--+------------------------------------------------------+
+    | parser_function_count.py  | Find expensive templates that are subject to be      |
+    |                           | converted to Lua.                                    |
+    +------------------------+--+------------------------------------------------------+
     | patrol.py              | Obtains a list pages and marks the edits as patrolled   |
     |                        | based on a whitelist.                                   |
     +------------------------+---------------------------------------------------------+
@@ -209,15 +212,13 @@ The contents of the package
     | states-redirect.py     | A robot to add redirects to cities for state            |
     |                        | abbreviations.                                          |
     +------------------------+---------------------------------------------------------+
-    | #speedy_delete.py      | This bot load a list of pages from the category of      |
-    |                        | candidates for speedy deletion and give the             |
-    |                        | user an interactive prompt to decide whether            |
-    |                        | each should be deleted or not.                          |
+    | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
+    |                        | for speedy deletion.                                    |
     +------------------------+---------------------------------------------------------+
     | #spellcheck.py         | This bot spellchecks wiki pages.                        |
     +------------------------+---+-----------------------------------------------------+
-    | #standardize_notes.py      | Converts external links and notes/references to     |
-    |                            |  : Footnote3 ref/note format.  Rewrites References. |
+    | #standardize_notes.py  | Converts external links and notes/references to         |
+    |                        | Footnote3 ref/note format.  Rewrites References.        |
     +----------------------------+-----------------------------------------------------+
     | #statistics_in_wikitable.py| This bot renders statistics provided by             |
     |                            | [[Special:Statistics]] in a table on a wiki page.   |
@@ -253,11 +254,11 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | welcome.py             | Script to welcome new users.                            |
     +------------------------+---------------------------------------------------------+
-    | wikisourcetext.py      | This bot applies to wikisource sites to upload text.    |
+    | wikisourcetext.py      | This bot applies to Wikisource sites to upload text.    |
     +------------------------+---------------------------------------------------------+
 
 
-    +----------------------------------------------------------------------------------+
+    +------------------------+---------------------------------------------------------+
     | archive                | Scripts no longer maintained.                           |
     +========================+=========================================================+
     | cfd.py                 | Processes the categories for discussion working page.   |
@@ -268,25 +269,40 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
 
 
+    +------------------------+---------------------------------------------------------+
+    | maintenance            | Framework helper scripts.                               |
+    +========================+=========================================================+
+    | cache.py               | Script for showing and deleting API cache.              |
+    +------------------------+---------------------------------------------------------+
+    | colors.py              | Utility to show pywikibot colors.                       |
+    +------------------------+---------------------------------------------------------+
+    | compat2core.py         | Helper script to convert compat 1.0 scripts to the core |
+    |                        | 3.0 framework. Also works for newer Pywikibot releases. |
+    +------------------------+---------------------------------------------------------+
+    | make_i18n_dict.py      | Generate a i18n file from a given script.               |
+    +------------------------+---------------------------------------------------------+
+    | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
+    +------------------------+---------------------------------------------------------+
+    | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
+    +------------------------+---------------------------------------------------------+
+
+
     +----------------------------------------------------------------------------------+
     | Others                                                                           |
     +========================+=========================================================+
     | i18n (folder)          | Contains i18n translations for bot edit summaries.      |
-    +------------------------+---------------------------------------------------------+
-    | maintenance (folder)   | Contains maintenance scripts for the developing team.   |
     +------------------------+---------------------------------------------------------+
     | userscripts (folder)   | Empty folder for user scripts.                          |
     +------------------------+---------------------------------------------------------+
     | README.rst             | This file (Short info of all scripts).                  |
     +------------------------+---------------------------------------------------------+
 
-**External software can be used with Pywikibot:**
-  * PyGoogle to access Google Web API and PySearch to access Yahoo! Search
-    Web Services for use with copyright.py.
+**External packages could be required with Pywikibot:**
+The pwb.py wrapper scripts informs about the requirement and how to install.
 
 
 More precise information, and a list of the options that are available for
 the various programs, can be retrieved by running the bot with the -help
-parameter, e.g.
+parameter, e.g.::
 
     python pwb.py interwiki -help

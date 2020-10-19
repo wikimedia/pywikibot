@@ -28,6 +28,7 @@ To create a new distribution:
 #
 # Distributed under the terms of the MIT license.
 #
+# ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 import os
 import sys
 
@@ -57,7 +58,7 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.13'],
+    'isbn': ['python-stdnum>=1.14'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],

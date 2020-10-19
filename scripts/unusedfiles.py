@@ -16,14 +16,10 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.flow import Board
-from pywikibot.tools import issue_deprecation_warning
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',
@@ -51,7 +47,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         self.availableOptions.update({
             'nouserwarning': False  # do not warn uploader
         })
-        super(UnusedFilesBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.template_image = i18n.translate(self.site,
                                              template_to_the_image)
@@ -64,9 +60,9 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
 
     def treat(self, image):
         """Process one image page."""
-        # Use fileUrl() and file_is_shared() to confirm it is local media
+        # Use get_file_url() and file_is_shared() to confirm it is local media
         # rather than a local page with the same name as shared media.
-        if (image.fileUrl() and not image.file_is_shared()
+        if (image.get_file_url() and not image.file_is_shared()
                 and 'http://' not in image.text):
             if self.template_image in image.text:
                 pywikibot.output('{0} done already'
@@ -129,11 +125,6 @@ def main(*args):
         arg, sep, value = arg.partition(':')
         if arg == '-limit':
             total = value
-        elif arg == '-total':
-            total = value
-            issue_deprecation_warning('The usage of "{0}"'.format(arg),
-                                      '-limit', 2, ArgumentDeprecationWarning,
-                                      since='20190120')
         else:
             options[arg[1:]] = True
 

@@ -43,33 +43,27 @@ Broken HTML tables will most likely result in broken wiki tables!
 Please check every article you change.
 """
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
 # Automatically ported from compat branch by compat2core.py script
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 import pywikibot
-from pywikibot import config
-from pywikibot import i18n
-from pywikibot import pagegenerators
-from pywikibot import xmlreader
+from pywikibot import config, i18n, pagegenerators, xmlreader
 
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            suggest_help, input_yn)
-from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.textlib import replaceExcept
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class TableXmlDumpPageGenerator(object):
+class TableXmlDumpPageGenerator:
     """Generator to yield all pages that seem to contain an HTML table."""
 
     def __init__(self, xmlfilename):
@@ -98,7 +92,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             'skipwarning': False  # on warning skip that page
         })
 
-        super(Table2WikiRobot, self).__init__(site=True, **kwargs)
+        super().__init__(**kwargs)
 
     def convertTable(self, table):
         """
@@ -393,12 +387,11 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Mark all table start and end tags that are not disabled by nowiki tags,
         comments etc. We will then later only work on these marked tags.
         """
-        text = pywikibot.replaceExcept(text, _table_start_regex, '<##table##',
-                                       exceptions=['comment', 'math',
-                                                   'nowiki', 'pre', 'source'])
-        text = pywikibot.replaceExcept(text, _table_end_regex, '</##table##>',
-                                       exceptions=['comment', 'math',
-                                                   'nowiki', 'pre', 'source'])
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'source']
+        text = replaceExcept(text, _table_start_regex, '<##table##',
+                             exceptions=exceptions)
+        text = replaceExcept(text, _table_end_regex, '</##table##>',
+                             exceptions=exceptions)
         return text
 
     def findTable(self, text):
@@ -411,33 +404,32 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         m = _marked_table_start_search(text)
         if not m:
             return None, 0, 0
-        else:
-            start = m.start()
-            offset = m.end()
-            original_text = text
-            text = text[m.end():]
-            # depth level of table nesting
-            depth = 1
-            # i = start + 1
-            while depth > 0:
-                next_starting = _marked_table_start_search(text)
-                next_ending = _marked_table_end_search(text)
-                if not next_ending:
-                    pywikibot.output(
-                        'More opening than closing table tags. Skipping.')
-                    return None, 0, 0
-                # if another table tag is opened before one is closed
-                elif (next_starting
-                      and next_starting.start() < next_ending.start()):
-                    offset += next_starting.end()
-                    text = text[next_starting.end():]
-                    depth += 1
-                else:
-                    offset += next_ending.end()
-                    text = text[next_ending.end():]
-                    depth -= 1
-            end = offset
-            return original_text[start:end], start, end
+
+        start = m.start()
+        offset = m.end()
+        original_text = text
+        text = text[m.end():]
+        # depth level of table nesting
+        depth = 1
+        while depth > 0:
+            next_starting = _marked_table_start_search(text)
+            next_ending = _marked_table_end_search(text)
+            if not next_ending:
+                pywikibot.output(
+                    'More opening than closing table tags. Skipping.')
+                return None, 0, 0
+
+            # if another table tag is opened before one is closed
+            if next_starting and next_starting.start() < next_ending.start():
+                offset += next_starting.end()
+                text = text[next_starting.end():]
+                depth += 1
+            else:
+                offset += next_ending.end()
+                text = text[next_ending.end():]
+                depth -= 1
+        end = offset
+        return original_text[start:end], start, end
 
     def convertAllHTMLTables(self, text):
         """
@@ -462,7 +454,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             new_table, table_warns_num, table_warns = self.convertTable(table)
             warning_sum += table_warns_num
             for msg in table_warns:
-                warning_messages += 'In table %i: %s' % (
+                warning_messages += 'In table {}: {}'.format(
                     converted_tables + 1, msg)
             text = text[:start] + new_table + text[end:]
             converted_tables += 1
@@ -539,25 +531,15 @@ def main(*args):
     gen_factory = pagegenerators.GeneratorFactory(positional_arg_name='page')
 
     for arg in local_args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         if option == '-xml':
             filename = value or pywikibot.input(
                 "Please enter the XML dump's filename:")
             gen = TableXmlDumpPageGenerator(filename)
-        elif option == '-auto':
-            issue_deprecation_warning(
-                'The usage of "-auto"', '-always',
-                1, ArgumentDeprecationWarning, since='20170205')
-            options['always'] = True
         elif option in ['-always', '-quiet', '-skipwarning']:
             options[option[1:]] = True
         else:
-            if option in ('-sql', '-mysqlquery'):
-                if option == '-sql':
-                    issue_deprecation_warning(
-                        'The usage of "-sql"', '-mysqlquery',
-                        1, ArgumentDeprecationWarning, since='20170205')
-
+            if option == '-mysqlquery':
                 query = value or """
 SELECT page_namespace, page_title
 FROM page JOIN text ON (page_id = old_id)

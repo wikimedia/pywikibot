@@ -5,24 +5,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
-
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
+from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError, Timeout
 
 import pywikibot
+
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
-from pywikibot.tools import PY2
 
 from tests import unittest_print
 from tests.aspects import unittest, TestCase, PatchingTestCase
 from tests.utils import DrySite
-
-if not PY2:
-    from urllib.parse import urlparse
-else:
-    from urlparse import urlparse
 
 
 class SiteDetectionTestCase(TestCase):
@@ -31,12 +26,11 @@ class SiteDetectionTestCase(TestCase):
 
     net = True
 
-    def assertSite(self, url):
+    def assertSite(self, url: str):
         """
         Assert a MediaWiki site can be loaded from the url.
 
         @param url: Url of tested site
-        @type url: str
         @raises AssertionError: Site under url is not MediaWiki powered
         """
         try:
@@ -44,12 +38,11 @@ class SiteDetectionTestCase(TestCase):
         except (ServerError, Timeout) as e:
             self.skipTest(e)
 
-    def assertNoSite(self, url):
+    def assertNoSite(self, url: str):
         """
         Assert a url is not a MediaWiki site.
 
         @param url: Url of tested site
-        @type url: str
         @raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError, ConnectionError, RuntimeError,
@@ -62,10 +55,6 @@ class SiteDetectionTestCase(TestCase):
 class StandardVersionSiteTestCase(SiteDetectionTestCase):
 
     """Test detection of MediaWiki sites."""
-
-    def test_hrwiki(self):
-        """Test detection of MediaWiki sites for www.hrwiki.org."""
-        self.assertSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
 
     def test_proofwiki(self):
         """Test detection of MediaWiki sites for www.proofwiki.org."""
@@ -110,27 +99,29 @@ class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
         self.assertSite('http://tfwiki.net/wiki/$1')
 
 
-class Pre114SiteTestCase(SiteDetectionTestCase):
+class Pre119SiteTestCase(SiteDetectionTestCase):
 
-    """Test pre 1.14 sites which should be detected as unsupported."""
+    """Test pre 1.19 sites which should be detected as unsupported."""
+
+    def test_hrwiki(self):
+        """Test detection of MediaWiki sites for www.hrwiki.org."""
+        self.assertNoSite('http://www.hrwiki.org/index.php/$1')  # v 1.15.4
 
     def test_wikifon(self):
         """Test detection of MediaWiki sites for www.wikifon.org."""
-        self.assertNoSite('http://www.wikifon.org/$1')  # v1.11
+        self.assertNoSite('http://www.wikifon.org/$1')  # v1.11.0
 
-    def test_wikitree(self):
-        """Test detection of MediaWiki sites for wikitree.org."""
-        # v1.11, with no query module
-        self.assertNoSite('http://wikitree.org/index.php?title=$1')
+    def test_ecoreality(self):
+        """Test detection of MediaWiki sites for www.ecoreality.org.
+
+        api.php is not available. Anyway the wiki is outdated.
+        """
+        self.assertNoSite('http://www.ecoreality.org/wiki/$1')  # v1.16.2
 
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
 
     """Test detection of MediaWiki sites prior to the API."""
-
-    def test_wikif1(self):
-        """Test detection of MediaWiki sites for www.wikif1.org."""
-        self.assertNoSite('http://www.wikif1.org/$1')
 
     def test_thelemapedia(self):
         """Test detection of MediaWiki sites for www.thelemapedia.org."""
@@ -161,7 +152,6 @@ class APIHiddenTestCase(SiteDetectionTestCase):
         """
         self.assertNoSite('http://wikisophia.org/index.php?title=$1')
 
-    @unittest.expectedFailure
     def test_ecoreality(self):
         """Test detection of MediaWiki sites for www.EcoReality.org.
 
@@ -345,7 +335,5 @@ class PrivateWikiTestCase(PatchingTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

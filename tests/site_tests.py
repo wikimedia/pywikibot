@@ -7,23 +7,21 @@
 #
 import pickle
 import random
-import re
 import threading
 import time
 
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
-from datetime import datetime
 
 import pywikibot
 
-from pywikibot import async_request, config, page_put_queue
 from pywikibot.comms import http
+from pywikibot import config
 from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools import suppress_warnings
 
-from tests import patch, unittest_print, MagicMock
+from tests import patch, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -37,7 +35,6 @@ from tests.aspects import (
     WikidataTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
-from tests.utils import entered_loop
 
 
 class TokenTestBase(TestCaseBase):
@@ -86,25 +83,8 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
             'pywikibot.site.BaseSite.nocapitalize',
             "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
 
-    def test_live_version(self):
-        """Test live_version."""
-        mysite = self.get_site()
-        ver = mysite.live_version()
-        self.assertIsInstance(ver, tuple)
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertIsInstance(ver[2], str)
-        self.assertOneDeprecation()
-
-    def test_getcurrenttime(self):
-        """Test live_version."""
-        self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
-        self.assertOneDeprecation()
-
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
-        if self.site.mw_version < '1.16':
-            self.skipTest('requires v1.16+')
-
         old = self.site.siteinfo('general')
         self.assertIn('time', old)
         self.assertEqual(old, self.site.siteinfo['general'])
@@ -290,14 +270,13 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))
         self.assertTrue(mysite.sametitle('Test name', 'Test name'))
         self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
-        # User, MediaWiki (both since 1.16) and Special are always
+        # User, MediaWiki and Special are always
         # first-letter (== only first non-namespace letter is case insensitive)
         # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
         self.assertTrue(mysite.sametitle('Special:Always', 'Special:always'))
-        if mysite.mw_version >= '1.16':
-            self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
-            self.assertTrue(mysite.sametitle('MediaWiki:Always',
-                                             'MediaWiki:always'))
+        self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
+        self.assertTrue(mysite.sametitle('MediaWiki:Always',
+                                         'MediaWiki:always'))
 
     def test_constructors(self):
         """Test cases for site constructors."""
@@ -978,9 +957,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
-        if self.site.mw_version < '1.15':
-            self.skipTest('requires v1.15+')
-
         pages = list(self.get_site().protectedpages(type='create', total=10))
         # Do not check for the existence of pages as they might exist (T205883)
         self.assertLessEqual(len(pages), 10)
@@ -1395,50 +1371,6 @@ class TestLogEvents(DefaultSiteTestCase):
                           reverse=True, total=5)
 
 
-class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test logpages methods."""
-
-    def test_logpages(self):
-        """Test the deprecated site.logpages() method."""
-        le = list(self.site.logpages(number=10))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(le), 10)
-        for entry in le:
-            self.assertIsInstance(entry, tuple)
-            if not isinstance(entry[0], int):  # autoblock removal entry
-                self.assertIsInstance(entry[0], pywikibot.Page)
-            self.assertIsInstance(entry[1], str)
-            self.assertIsInstance(entry[2], int)
-            self.assertIsInstance(entry[3], str)
-
-    def test_list_namespace(self):
-        """Test the deprecated site.logpages() when namespace is a list."""
-        if self.site.mw_version <= '1.19.24':  # T217664
-            self.skipTest(
-                'logevents does not support namespace parameter with MediaWiki'
-                ' {}.'.format(self.site.mw_version))
-        le = list(self.site.logpages(namespace=[2, 3], number=10))
-        for entry in le:
-            if isinstance(entry[0], int):  # autoblock removal entry
-                continue
-            try:
-                self.assertIn(entry[0].namespace(), [2, 3])
-            except HiddenKeyError as e:
-                self.skipTest(
-                    'Log entry {entry} is hidden:\n{entry.data}\n{error!r}'
-                    .format(entry=entry, error=e))
-
-    def test_logpages_dump(self):
-        """Test the deprecated site.logpages() method using dump mode."""
-        le = list(self.site.logpages(number=10, dump=True))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(le), 10)
-        for entry in le:
-            self.assertIsInstance(entry, dict)
-            self.assertIn('title', entry)
-
-
 class TestRecentChanges(DefaultSiteTestCase):
 
     """Test recentchanges method."""
@@ -1536,22 +1468,6 @@ class TestRecentChanges(DefaultSiteTestCase):
             prefix = title[:title.index(':')]
             self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
             self.assertIn(change['ns'], [6, 7])
-
-    def test_pagelist(self):
-        """Test the site.recentchanges() with pagelist deprecated MW 1.14."""
-        mysite = self.site
-        mainpage = self.get_mainpage()
-        imagepage = self.imagepage
-        if mysite.mw_version <= '1.14':
-            pagelist = [mainpage]
-            if imagepage:
-                pagelist += [imagepage]
-            titlelist = {page.title() for page in pagelist}
-            for change in mysite.recentchanges(pagelist=pagelist,
-                                               total=5):
-                self.assertIsInstance(change, dict)
-                self.assertIn('title', change)
-                self.assertIn(change['title'], titlelist)
 
     def test_changetype(self):
         """Test the site.recentchanges() with changetype."""
@@ -2307,12 +2223,8 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def _test_tokens(self, version, test_version, additional_token):
         """Test tokens."""
-        if version and self._version < version:
-            raise unittest.SkipTest(
-                'Site {} version {} is too low for this tests.'
-                .format(self.mysite, self._version))
-
-        if version and self._version < test_version:
+        if version and (self._version < version
+                        or self._version < test_version):
             raise unittest.SkipTest(
                 'Site {} version {} is too low for this tests.'
                 .format(self.mysite, self._version))
@@ -2341,17 +2253,13 @@ class TestSiteTokens(DefaultSiteTestCase):
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
 
-    def test_patrol_tokens_in_mw_116(self):
-        """Test ability to get patrol token on MW 1.16 wiki."""
-        self._test_tokens('1.14', '1.16', 'patrol')
-
     def test_tokens_in_mw_119(self):
         """Test ability to get page tokens."""
         self._test_tokens(None, '1.19', 'delete')
 
     def test_patrol_tokens_in_mw_119(self):
         """Test ability to get patrol token on MW 1.19 wiki."""
-        self._test_tokens('1.14', '1.19', 'patrol')
+        self._test_tokens('1.19', '1.19', 'patrol')
 
     def test_tokens_in_mw_120_124wmf18(self):
         """Test ability to get page tokens."""
@@ -2359,7 +2267,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_patrol_tokens_in_mw_120(self):
         """Test ability to get patrol token."""
-        self._test_tokens('1.14', '1.20', 'patrol')
+        self._test_tokens('1.19', '1.20', 'patrol')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
@@ -2380,16 +2288,6 @@ class TestDeprecatedEditTokenFunctions(TokenTestBase,
     cached = True
     user = True
     token_type = 'edit'
-
-    def test_token(self):
-        """Test ability to get page tokens using site.tokens."""
-        token = self.token
-        mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        ttype = 'edit'
-        self.assertEqual(token, mysite.token(mainpage, ttype))
-        self.assertOneDeprecationParts('pywikibot.site.APISite.token',
-                                       "the 'tokens' property")
 
     def test_getToken(self):
         """Test ability to get page tokens using site.getToken."""
@@ -2478,111 +2376,6 @@ class TestSiteAPILimits(TestCase):
 
         mysite.loadrevisions(mypage, step=5, total=12)
         self.assertLength(mypage._revisions, 12)
-
-
-class TestSiteInfo(DefaultSiteTestCase):
-
-    """Test cases for Site metadata and capabilities."""
-
-    cached = True
-
-    def test_siteinfo(self):
-        """Test the siteinfo property."""
-        # general enteries
-        mysite = self.get_site()
-        self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
-        self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
-        self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
-        self.assertRegex(mysite.siteinfo['timezone'],
-                         '([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)')
-        self.assertIn(mysite.siteinfo['case'], ['first-letter',
-                                                'case-sensitive'])
-
-    def test_siteinfo_boolean(self):
-        """Test conversion of boolean properties from empty strings."""
-        mysite = self.get_site()
-        self.assertIsInstance(mysite.siteinfo['titleconversion'], bool)
-
-        self.assertIsInstance(mysite.namespaces[0].subpages, bool)
-        self.assertIsInstance(mysite.namespaces[0].content, bool)
-
-    def test_siteinfo_v1_16(self):
-        """Test v.16+ siteinfo values."""
-        if self.site.mw_version < '1.16':
-            self.skipTest('requires v1.16+')
-
-        mysite = self.get_site()
-        self.assertIsInstance(
-            datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
-            datetime)
-        self.assertEqual(re.findall(r'\$1', mysite.siteinfo['articlepath']),
-                         ['$1'])
-
-    def test_properties_with_defaults(self):
-        """Test the siteinfo properties with defaults."""
-        # This does not test that the defaults work correct,
-        # unless the default site is a version needing these defaults
-        # 'fileextensions' introduced in v1.15:
-        self.assertIsInstance(self.site.siteinfo.get('fileextensions'), list)
-        self.assertIn('fileextensions', self.site.siteinfo)
-        fileextensions = self.site.siteinfo.get('fileextensions')
-        self.assertIn({'ext': 'png'}, fileextensions)
-        # 'restrictions' introduced in v1.23:
-        mysite = self.site
-        self.assertIsInstance(mysite.siteinfo.get('restrictions'), dict)
-        self.assertIn('restrictions', mysite.siteinfo)
-        restrictions = self.site.siteinfo.get('restrictions')
-        self.assertIn('cascadinglevels', restrictions)
-
-    def test_no_cache(self):
-        """Test siteinfo caching can be disabled."""
-        if 'fileextensions' in self.site.siteinfo._cache:
-            del self.site.siteinfo._cache['fileextensions']
-        self.site.siteinfo.get('fileextensions', cache=False)
-        self.assertNotIn('fileextensions', self.site.siteinfo)
-
-    def test_not_exists(self):
-        """Test accessing a property not in siteinfo."""
-        not_exists = 'this-property-does-not-exist'
-        mysite = self.site
-        self.assertRaises(KeyError, mysite.siteinfo.__getitem__, not_exists)
-        self.assertNotIn(not_exists, mysite.siteinfo)
-        self.assertIsEmpty(mysite.siteinfo.get(not_exists))
-        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
-        self.assertFalse(
-            entered_loop(mysite.siteinfo.get(not_exists).items()))
-        self.assertFalse(
-            entered_loop(mysite.siteinfo.get(not_exists).values()))
-        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
-
-
-class TestSiteinfoDry(DefaultDrySiteTestCase):
-
-    """Test Siteinfo in dry mode."""
-
-    def test_siteinfo_timestamps(self):
-        """Test that cache has the timestamp of CachedRequest."""
-        site = self.get_site()
-        request_mock = MagicMock()
-        request_mock.submit = lambda: {'query': {'_prop': '_value'}}
-        request_mock._cachetime = '_cache_time'
-        with patch.object(site, '_request', return_value=request_mock):
-            siteinfo = pywikibot.site.Siteinfo(site)
-            result = siteinfo._get_siteinfo('_prop', False)
-        self.assertEqual(result, {'_prop': ('_value', '_cache_time')})
-
-
-class TestSiteinfoAsync(DefaultSiteTestCase):
-
-    """Test asynchronous siteinfo fetch."""
-
-    def test_async_request(self):
-        """Test async request."""
-        self.assertTrue(page_put_queue.empty())
-        self.assertNotIn('statistics', self.site.siteinfo)
-        async_request(self.site.siteinfo.get, 'statistics')
-        page_put_queue.join()
-        self.assertIn('statistics', self.site.siteinfo)
 
 
 class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
@@ -3546,11 +3339,11 @@ class TestSubdomainFamilySite(TestCase):
     """Test subdomain family site."""
 
     code = 'en'
-    family = 'lyricwiki'
+    family = 'wowwiki'
 
-    def test_lyrics(self):
-        """Test lyrics.fandom.com."""
-        url = 'lyrics.fandom.com'
+    def test_wow(self):
+        """Test wowwiki.fandom.com."""
+        url = 'wowwiki.fandom.com'
         site = self.site
         self.assertEqual(site.hostname(), url)
         self.assertEqual(site.code, 'en')
@@ -3558,12 +3351,12 @@ class TestSubdomainFamilySite(TestCase):
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), url)
 
-        self.assertRaises(KeyError, site.family.hostname, 'lyrics')
-        self.assertRaises(KeyError, site.family.hostname, 'lyricwiki')
+        self.assertRaises(KeyError, site.family.hostname, 'wow')
+        self.assertRaises(KeyError, site.family.hostname, 'wowwiki')
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
-                          'lyricwiki', 'lyricwiki')
+                          'wowwiki', 'wowwiki')
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
-                          'de', 'lyricwiki')
+                          'ceb', 'wowwiki')
 
 
 class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
@@ -3794,7 +3587,7 @@ class TestLoginLogout(DefaultSiteTestCase):
     def test_login_logout(self):
         """Validate login and logout methods by toggling the state."""
         site = self.get_site()
-        loginstatus = pywikibot.site.LoginStatus
+        loginstatus = pywikibot.login.LoginStatus
 
         self.assertTrue(site.logged_in())
         self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,

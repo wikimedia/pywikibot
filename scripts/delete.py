@@ -58,12 +58,10 @@ Delete everything in the category "To delete" without prompting:
 #
 import collections
 
-from typing import Set
-from warnings import warn
+from typing import Tuple, Set
 
 import pywikibot
 
-from pywikibot import exceptions
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 from pywikibot.page import Page
@@ -137,14 +135,13 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
-    def __init__(self, generator, summary, **kwargs) -> None:
+    def __init__(self, generator, summary: str, **kwargs) -> None:
         """
         Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable
         @param summary: the reason for the (un)deletion
-        @type summary: str
         """
         self.availableOptions.update({
             'undelete': False,
@@ -229,14 +226,13 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                                      quit=True)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     page_name = ''
     summary = None
@@ -256,10 +252,6 @@ def main(*args) -> None:
                 summary = pywikibot.input('Enter a reason for the deletion:')
             else:
                 summary = arg[len('-summary:'):]
-        elif arg.startswith('-images'):
-            warn('-image option is deprecated. Please use -imageused instead.',
-                 exceptions.ArgumentDeprecationWarning)
-            local_args.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
             options['undelete'] = True
         elif arg.startswith('-isorphan'):

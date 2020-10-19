@@ -46,6 +46,8 @@ import datetime
 import sys
 import time
 
+from typing import Tuple
+
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
@@ -68,9 +70,9 @@ content = {
     'ar': '{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق '
           'والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ '
           'هذه الصفحة كل 12 ساعة. -->',
-    'arz': '{{عنوان السبوره}}\n<!-- مرحبا! خد راحتك فى تجريب مهاراتك فى\n'
+    'arz': '{{عنوان السبوره}}\n<!-- مرحبا! خد راحتك فى تجريب مهاراتك فى'
            'التحرير تحت الخط ده. بما إن الصفحه دى لتجارب التعديل، فالصفحه دى '
-           'حيتم تنضيفها\nاوتوماتيكيا كل 12 ساعه. -->',
+           'حيتم تنضيفها اوتوماتيكيا كل 12 ساعه. -->',
     'az': '<!--- LÜTFƏN, BU SƏTRƏ TOXUNMAYIN --->\n{{Qaralama dəftəri}}\n'
           '<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
     'bar': '{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\n',
@@ -255,14 +257,13 @@ class SandboxBot(Bot, ConfigParserBot):
                 pywikibot.sleep(self.getOption('hours') * 60 * 60)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     opts = {}
     local_args = pywikibot.handle_args(args)

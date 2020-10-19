@@ -14,7 +14,7 @@ import pywikibot
 
 from tests import join_images_path
 
-from tests.aspects import unittest, TestCase, DeprecationTestCase
+from tests.aspects import unittest, TestCase
 
 
 class TestShareFiles(TestCase):
@@ -253,32 +253,6 @@ class TestFilePageLatestFileInfo(TestCase):
             'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
-
-
-class TestDeprecatedFilePage(DeprecationTestCase):
-
-    """Test deprecated parts of FilePage."""
-
-    family = 'commons'
-    code = 'commons'
-
-    cached = True
-
-    def test_getFirstUploader(self):
-        """Test getFirstUploader."""
-        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
-        first = page.getFirstUploader()
-        self.assertOneDeprecation()
-        self.assertEqual(first, ['Herbizid', '2011-03-18T10:04:48Z'])
-
-    def test_getLatestUploader(self):
-        """Test getLatestUploader."""
-        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
-        latest = page.getLatestUploader()
-        self.assertOneDeprecation()
-        self.assertLength(latest, 2)
-        for item in latest:
-            self.assertIsInstance(item, str)
 
 
 class TestFilePageDownload(TestCase):

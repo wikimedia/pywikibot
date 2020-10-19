@@ -74,6 +74,7 @@ try:
 except ImportError:
     stdnum_isbn = None
 
+
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
 # This is also used by interwiki.py
@@ -376,7 +377,7 @@ class CosmeticChangesToolkit:
 
     def translateAndCapitalizeNamespaces(self, text):
         """Use localized namespace names."""
-        # arz uses english stylish codes
+        # arz uses English stylish codes
         if self.site.sitename == 'wikipedia:arz':
             return text
         # wiki links aren't parsed here.
@@ -389,8 +390,7 @@ class CosmeticChangesToolkit:
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
             if namespace == 6 and self.site.family.name == 'wikipedia':
-                if self.site.code in ('en', 'fr') \
-                        and self.site.mw_version >= '1.14':
+                if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert 'Image' in namespaces
                     namespaces.remove('Image')
@@ -438,7 +438,7 @@ class CosmeticChangesToolkit:
     def translateMagicWords(self, text):
         """Use localized magic words."""
         # not wanted at ru
-        # arz uses english stylish codes
+        # arz uses English stylish codes
         # no need to run on English wikis
         if self.site.code in ['arz', 'en', 'ru']:
             return text
@@ -480,7 +480,7 @@ class CosmeticChangesToolkit:
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 
-    def cleanUpLinks(self, text):
+    def cleanUpLinks(self, text: str) -> str:
         """Tidy up wikilinks found in a string.
 
         This function will:
@@ -497,9 +497,7 @@ class CosmeticChangesToolkit:
         * Capitalize the article title of the link, if appropriate
 
         @param text: string to perform the clean-up on
-        @type text: str
         @return: text with tidied wikilinks
-        @rtype: str
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
@@ -549,7 +547,7 @@ class CosmeticChangesToolkit:
                 titleWithSection = titleWithSection.rstrip()
                 hadTrailingSpaces = len(titleWithSection) != titleLength
 
-            # Convert URL-encoded characters to unicode
+            # Convert URL-encoded characters to str
             titleWithSection = url2unicode(titleWithSection,
                                            encodings=self.site)
 
@@ -637,7 +635,7 @@ class CosmeticChangesToolkit:
         return text
 
     def resolveHtmlEntities(self, text):
-        """Replace HTML entities with unicode."""
+        """Replace HTML entities with string."""
         ignore = [
             38,     # Ampersand (&amp;)
             39,     # Single quotation mark (&quot;) per T26093

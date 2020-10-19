@@ -79,8 +79,9 @@ import pywikibot
 from pywikibot.data import api
 
 # The follow attributes are used by eval()
+from pywikibot.login import LoginStatus
 from pywikibot.page import User
-from pywikibot.site import APISite, ClosedSite, DataSite, LoginStatus
+from pywikibot.site import APISite, ClosedSite, DataSite
 
 from pywikibot.tools import PYTHON_VERSION
 

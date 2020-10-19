@@ -16,8 +16,6 @@ This module is responsible for
 #
 # Distributed under the terms of the MIT license.
 #
-__docformat__ = 'epytext'
-
 import atexit
 import sys
 
@@ -29,9 +27,9 @@ from warnings import warn
 
 import requests
 
-from pywikibot import __version__, __url__, config
-from pywikibot.bot import calledModuleName
+import pywikibot
 from pywikibot.comms import threadedhttp
+from pywikibot import config2 as config
 from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
@@ -43,7 +41,6 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     ModuleDeprecationWrapper,
 )
-import pywikibot.version
 
 try:
     import requests_oauthlib
@@ -61,7 +58,7 @@ cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
 cookie_jar = cookiejar.LWPCookieJar(cookie_file_path)
 try:
-    cookie_jar.load()
+    cookie_jar.load(ignore_discard=True)
 except cookiejar.LoadError:
     debug('Loading cookies failed.', _logger)
 else:
@@ -87,7 +84,7 @@ atexit.register(_flush)
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join(str(i) for i in sys.version_info),
     'http_backend': 'requests/' + requests.__version__,
-    'pwb': 'Pywikibot/' + __version__,
+    'pwb': 'Pywikibot/' + pywikibot.__version__,
 }
 
 
@@ -100,7 +97,7 @@ class _UserAgentFormatter(Formatter):
         # This is the Pywikibot revision; also map it to {version} at present.
         if key == 'version' or key == 'revision':
             return pywikibot.version.getversiondict()['rev']
-        return super(_UserAgentFormatter, self).get_value(key, args, kwargs)
+        return super().get_value(key, args, kwargs)
 
 
 _USER_AGENT_FORMATTER = _UserAgentFormatter()
@@ -145,7 +142,7 @@ def user_agent(site=None, format_string: str = None) -> str:
     """
     values = USER_AGENT_PRODUCTS.copy()
 
-    script_name = calledModuleName()
+    script_name = pywikibot.bot.calledModuleName()
 
     values['script'] = script_name
 
@@ -156,6 +153,12 @@ def user_agent(site=None, format_string: str = None) -> str:
     username = ''
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
+
+    values['family'] = ''
+    values['code'] = ''
+    values['lang'] = ''  # TODO: use site.lang, if known
+    values['site'] = ''
+
     if site:
         script_comments.append(str(site))
 
@@ -163,20 +166,19 @@ def user_agent(site=None, format_string: str = None) -> str:
         # is not the best for a HTTP header if the username isn't ASCII.
         if site.username():
             username = user_agent_username(site.username())
-            script_comments.append(
-                'User:' + username)
+            script_comments.append('User:' + username)
 
-    values.update({
-        'family': site.family.name if site else '',
-        'code': site.code if site else '',
-        'lang': site.code if site else '',  # TODO: use site.lang, if known
-        'site': str(site) if site else '',
-        'username': username,
-        'script_comments': '; '.join(script_comments)
-    })
+        values.update({
+            'family': site.family.name,
+            'code': site.code,
+            'lang': site.code,  # TODO: use site.lang, if known
+            'site': str(site),
+        })
 
-    if not format_string:
-        format_string = config.user_agent_format
+    values['username'] = username
+    values['script_comments'] = '; '.join(script_comments)
+
+    format_string = format_string or config.user_agent_format
 
     formatted = _USER_AGENT_FORMATTER.format(format_string, **values)
     # clean up after any blank components
@@ -242,7 +244,7 @@ def request(site=None, uri: Optional[str] = None, method='GET', params=None,
         # +1 because of @deprecate_arg
         issue_deprecation_warning(
             'Invoking http.request without argument site', 'http.fetch()', 3,
-            since='20150814')
+            warning_class=FutureWarning, since='20150814')
         r = fetch(uri, method, params, body, headers, **kwargs)
         return r.text
 
@@ -280,13 +282,16 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
             warn('config.authenticate["{path}"] has invalid value.\n'
                  'It should contain 2 or 4 items, not {length}.\n'
                  'See {url}/OAuth for more info.'
-                 .format(path=path, length=len(config.authenticate[path]),
-                         url=__url__))
+                 .format(path=path,
+                         length=len(config.authenticate[path]),
+                         url=pywikibot.__url__))
     return None
 
 
+@deprecated(since='20201015', future_warning=True)
 def _http_process(session, http_request) -> None:
-    """
+    """DEPRECATED.
+
     Process an `threadedhttp.HttpRequest` instance.
 
     @param session: Session that will be used to process the `http_request`.
@@ -353,9 +358,11 @@ def error_handling_callback(request):
         warning('Http response status {0}'.format(request.data.status_code))
 
 
+@deprecated(since='20201015', future_warning=True)
 def _enqueue(uri, method='GET', params=None, body=None, headers=None,
              data=None, **kwargs):
-    """
+    """DEPRECATED.
+
     Enqueue non-blocking threaded HTTP request with callback.
 
     Callbacks, including the default error handler if enabled, are run in the
@@ -408,15 +415,13 @@ def _enqueue(uri, method='GET', params=None, body=None, headers=None,
     return request
 
 
+@deprecate_arg('callback', True)
 def fetch(uri, method='GET', params=None, body=None, headers=None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False,
           data=None, **kwargs):
     """
-    Blocking HTTP request.
-
-    Note: The callback runs in the HTTP thread, where exceptions are logged
-    but are not able to be caught.
+    HTTP request.
 
     See L{requests.Session.request} for parameters.
 
@@ -424,6 +429,15 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     @param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
+
+    @kwarg charset: Either a valid charset (usable for str.decode()) or None
+        to automatically chose the charset from the returned header (defaults
+        to latin-1)
+    @type charset: CodecInfo, str, None
+    @kwarg disable_ssl_certificate_validation: diable SSL Verification
+    @type disable_ssl_certificate_validation: bool
+    @kwarg callbacks: Methods to call once data is fetched
+    @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
     # body and data parameters both map to the data parameter of
@@ -434,9 +448,15 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
-    # Skip if already specified in request.
-    if not headers.get('user-agent', None):
-        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+    headers.update(config.extra_headers.copy() or {})
+
+    if headers.get('user-agent', False):
+        user_agent_format_string = headers.get('user-agent')
+        if not user_agent_format_string or '{' in user_agent_format_string:
+            headers['user-agent'] = user_agent(None, user_agent_format_string)
+    else:
+        # if not already specified,
+        # get fake UA exceptions from `fake_user_agent_exceptions` config.
         uri_domain = urlparse(uri).netloc
         use_fake_user_agent = config.fake_user_agent_exceptions.get(
             uri_domain, use_fake_user_agent)
@@ -446,13 +466,47 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         elif use_fake_user_agent is True:
             headers['user-agent'] = fake_user_agent()
 
-    request = _enqueue(uri, method, params, body, headers, **kwargs)
-    # if there's no data in the answer we're in trouble
-    assert request._data is not None
-    # Run the error handling callback in the callers thread so exceptions
-    # may be caught.
+    callbacks = kwargs.pop('callbacks', [])
     if default_error_handling:
-        error_handling_callback(request)
+        callbacks.append(error_handling_callback)
+
+    charset = kwargs.pop('charset', None)
+    request = threadedhttp.HttpRequest(
+        uri, method, params, body, headers, callbacks, charset, **kwargs)
+
+    auth = get_authentication(uri)
+    if auth is not None and len(auth) == 4:
+        if isinstance(requests_oauthlib, ImportError):
+            warn('%s' % requests_oauthlib, ImportWarning)
+            error('OAuth authentication not supported: %s'
+                  % requests_oauthlib)
+            auth = None
+        else:
+            auth = requests_oauthlib.OAuth1(*auth)
+
+    timeout = config.socket_timeout
+    ignore_validation = kwargs.pop('disable_ssl_certificate_validation', False)
+
+    try:
+        # Note that the connections are pooled which mean that a future
+        # HTTPS request can succeed even if the certificate is invalid and
+        # verify=True, when a request with verify=False happened before
+        response = session.request(method, uri, params=params, data=body,
+                                   headers=headers, auth=auth, timeout=timeout,
+                                   verify=not ignore_validation,
+                                   **kwargs)
+    except Exception as e:
+        request.data = e
+    else:
+        request.data = response
+    #  error_handling_callback is called in HttpRequest data.setter
+
+    # if there's no data in the answer we're in trouble
+    try:
+        request.data
+    except AssertionError as e:
+        raise e
+
     return request
 
 # Deprecated parts ############################################################

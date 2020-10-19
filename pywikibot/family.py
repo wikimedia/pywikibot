@@ -16,9 +16,9 @@ import warnings
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
+from typing import Dict, List, Optional, Tuple
 
 import pywikibot
-from pywikibot.comms.http import fetch
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
@@ -78,7 +78,7 @@ class Family:
 
     name = None
 
-    langs = {}
+    langs = {}  # type: Dict[str, str]
 
     # For interwiki sorting order see
     # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
@@ -87,70 +87,72 @@ class Family:
     # MediaWiki:Interwiki_config-sorting_order-native-languagename
     alphabetic = [
         'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av', 'ay', 'az',
-        'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be',
-        'be-tarask', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo', 'bs', 'br', 'bxr',
-        'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho',
-        'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dty', 'dz',
-        'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee',
-        'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'gag', 'gd',
-        'gl', 'gan', 'ki', 'glk', 'gu', 'gor', 'got', 'hak', 'xal', 'ko', 'ha',
-        'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh',
-        'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it',
-        'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam', 'krc', 'ka', 'ks', 'csb',
-        'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg', 'gom', 'ht', 'ku', 'kj',
-        'ky', 'mrj', 'lad', 'lbe', 'lo', 'ltg', 'la', 'lv', 'lb', 'lez', 'lfn',
-        'lt', 'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai',
-        'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'ms', 'min',
-        'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl',
-        'nds-nl', 'cr', 'ne', 'new', 'ja', 'nqo', 'nap', 'ce', 'frr', 'pih',
-        'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng',
-        'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi',
-        'km', 'pcd', 'pms', 'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
-        'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se',
-        'sm', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
-        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
-        'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'shn', 'ta', 'kab',
-        'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy',
-        've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk',
-        'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa',
-        'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue',
-        'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn'
+        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av', 'ay',
+        'az', 'ban', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba',
+        'be', 'be-tarask', 'mnw', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo', 'bs',
+        'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn',
+        'tum', 'cho', 'co', 'cy', 'da', 'dk', 'ary', 'pdc', 'de', 'dv', 'nv',
+        'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo',
+        'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga',
+        'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'gor', 'got', 'hak',
+        'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io',
+        'ig', 'ilo', 'inh', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh',
+        'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam', 'krc',
+        'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg', 'gom',
+        'avk', 'ht', 'gcr', 'ku', 'kj', 'ky', 'mrj', 'lld', 'lad', 'lbe', 'lo',
+        'ltg', 'la', 'lv', 'lb', 'lez', 'lfn', 'lt', 'lij', 'li', 'ln', 'olo',
+        'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi',
+        'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo',
+        'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
+        'new', 'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
+        'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
+        'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pms',
+        'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro',
+        'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se', 'sm', 'sa', 'sg',
+        'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si',
+        'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn',
+        'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara',
+        'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy',
+        'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug',
+        'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls',
+        'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
+        'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
 
     # The revised sorting order by first word from meta
     # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
     alphabetic_revised = [
         'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av', 'ay', 'az',
-        'bjn', 'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan', 'map-bms', 'jv',
-        'su', 'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bar', 'bo',
-        'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch',
-        'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc',
-        'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz', 'mh', 'et', 'el', 'eml',
-        'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr',
-        'fy', 'ff', 'fur', 'ga', 'gv', 'sm', 'gag', 'gd', 'gl', 'gan', 'ki',
-        'glk', 'gu', 'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho',
-        'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh', 'bpy', 'ia', 'ie', 'iu',
-        'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'kl', 'kn', 'kr', 'pam',
-        'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky', 'rn', 'mrj', 'sw', 'kv',
-        'kg', 'gom', 'gor', 'ht', 'ku', 'shn', 'kj', 'lad', 'lbe', 'lez',
-        'lfn', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln',
-        'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'krc',
-        'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'cdo', 'mwl', 'koi', 'mdf',
-        'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
-        'new', 'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
-        'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
-        'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'km', 'pcd', 'pms', 'nds',
-        'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm',
-        'qu', 'ru', 'rue', 'sah', 'se', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq',
-        'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl',
-        'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta',
-        'kab', 'kbp', 'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg',
-        'tpi', 'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv',
-        'din', 'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro',
-        'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
-        'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn'
+        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av', 'ay',
+        'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn', 'zh-min-nan', 'nan',
+        'map-bms', 'jv', 'su', 'ba', 'min', 'be', 'be-tarask', 'mnw', 'bh',
+        'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb',
+        'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
+        'da', 'dk', 'ary', 'pdc', 'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz',
+        'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee',
+        'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'sm', 'gag',
+        'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal', 'ko', 'ha',
+        'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh',
+        'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he',
+        'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky',
+        'rn', 'mrj', 'sw', 'kv', 'kg', 'gom', 'avk', 'gor', 'ht', 'gcr', 'ku',
+        'shn', 'kj', 'lld', 'lad', 'lbe', 'lez', 'lfn', 'lo', 'la', 'ltg',
+        'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo',
+        'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf',
+        'arz', 'mzn', 'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my',
+        'nah', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nqo', 'nap',
+        'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr',
+        'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap',
+        'ps', 'jam', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
+        'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah', 'szy',
+        'se', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
+        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'kbp',
+        'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr',
+        'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk',
+        'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'zh-classical',
+        'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
+        'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
 
     # Order for fy: alphabetical by code, but y counts as i
@@ -169,9 +171,9 @@ class Family:
         'ab': '[a-zабвгҕдежзӡикқҟлмнопҧрстҭуфхҳцҵчҷҽҿшыҩџьә]*',
         'als': '[äöüßa-z]*',
         'an': '[a-záéíóúñ]*',
-        'ar': '[a-zء-ي]*',
-        'ary': '[a-zء-ي]*',
-        'arz': '[a-zء-ي]*',
+        'ar': '[a-zء-يؐ-ًؚ-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]*',
+        'ary': '[a-zء-يؐ-ًؚ-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]*',
+        'arz': '[a-zء-يؐ-ًؚ-ٰٟۖ-ۜ۟-۪ۤۧۨ-ۭ]*',
         'ast': '[a-záéíóúñ]*',
         'atj': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'av': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -315,6 +317,7 @@ class Family:
         'sh': '[a-zčćđžš]*',
         'sk': '[a-záäčďéíľĺňóôŕšťúýž]*',
         'sl': '[a-zčćđžš]*',
+        'smn': '[a-zâčđŋšžäá]*',
         'sr': '[abvgdđežzijklljmnnjoprstćufhcčdž'
               'šабвгдђежзијклљмнњопрстћуфхцчџш]*',
         'srn': '[a-zäöüïëéèà]*',
@@ -471,12 +474,12 @@ class Family:
 
     # A dict of tuples for different sites with names of templates
     # that indicate an edit should be avoided
-    edit_restricted_templates = {}
+    edit_restricted_templates = {}  # type: Dict[str, Tuple[str, ...]]
 
     # A dict of tuples for different sites with names of archive
     # templates that indicate an edit of non-archive bots
     # should be avoided
-    archived_page_templates = {}
+    archived_page_templates = {}  # type: Dict[str, Tuple[str, ...]]
 
     # A list of projects that share cross-project sessions.
     cross_projects = []
@@ -489,38 +492,38 @@ class Family:
     cross_projects_cookie_username = 'centralauth_User'
 
     # A list with the name in the cross-language flag permissions
-    cross_allowed = []
+    cross_allowed = []  # type: List[str]
 
     # A dict with the name of the category containing disambiguation
     # pages for the various languages. Only one category per language,
     # and without the namespace, so add things like:
     # 'en': "Disambiguation"
-    disambcatname = {}
+    disambcatname = {}  # type: Dict[str, str]
 
     # DEPRECATED, stores the code of the site which have a case sensitive
     # main namespace. Use the Namespace given from the Site instead
-    nocapitalize = []
+    nocapitalize = []  # type: List[str]
 
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
-    interwiki_attop = []
+    interwiki_attop = []  # type: List[str]
     # on_one_line is a list of languages that want the interwiki links
     # one-after-another on a single line
-    interwiki_on_one_line = []
+    interwiki_on_one_line = []  # type: List[str]
     # String used as separator between interwiki links and the text
     interwiki_text_separator = '\n\n'
 
     # Similar for category
-    category_attop = []
+    category_attop = []  # type: List[str]
     # on_one_line is a list of languages that want the category links
     # one-after-another on a single line
-    category_on_one_line = []
+    category_on_one_line = []  # type: List[str]
     # String used as separator between category links and the text
     category_text_separator = '\n\n'
     # When both at the bottom should categories come after interwikilinks?
     # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
     # extension which puts categories last on all sites. TO BE DEPRECATED!
-    categories_last = []
+    categories_last = []  # type: List[str]
 
     # Which languages have a special order for putting interlanguage
     # links, and what order is it? If a language is not in
@@ -546,46 +549,47 @@ class Family:
     # Which language codes no longer exist and by which language code
     # should they be replaced. If for example the language with code xx:
     # now should get code yy:, add {'xx':'yy'} to obsolete.
-    interwiki_replacements = {}
+    interwiki_replacements = {}  # type: Dict[str, str]
 
     # Codes that should be removed, usually because the site has been
     # taken down.
-    interwiki_removals = []
+    interwiki_removals = []  # type: List[str]
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
-    languages_by_size = []
+    languages_by_size = []  # type: List[str]
 
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
     language_groups = {
-        # languages using the arabic script (incomplete)
+        # languages using the Arabic script
         'arab': [
-            'ar', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
-            # languages using multiple scripts, including arabic
-            'kk', 'ku', 'tt', 'ug', 'pnb'
+            'ar', 'ary', 'arz', 'azb', 'ckb', 'fa', 'glk', 'ks', 'lrc',
+            'mzn', 'ps', 'sd', 'ur',
+            # languages using multiple scripts, including Arabic
+            'ha', 'kk', 'ku', 'pnb', 'ug'
         ],
-        # languages that use chinese symbols
+        # languages that use Chinese symbols
         'chinese': [
             'wuu', 'zh', 'zh-classical', 'zh-yue', 'gan', 'ii',
-            # languages using multiple/mixed scripts, including chinese
+            # languages using multiple/mixed scripts, including Chinese
             'ja', 'za'
         ],
-        # languages that use the cyrillic alphabet
+        # languages that use the Cyrillic alphabet
         'cyril': [
             'ab', 'av', 'ba', 'be', 'be-tarask', 'bg', 'bxr', 'ce', 'cu',
             'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
             'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
             'udm', 'uk', 'xal',
-            # languages using multiple scripts, including cyrillic
+            # languages using multiple scripts, including Cyrillic
             'ha', 'kk', 'sh', 'sr', 'tt'
         ],
-        # languages that use a greek script
+        # languages that use a Greek script
         'grec': [
             'el', 'grc', 'pnt'
-            # languages using multiple scripts, including greek
+            # languages using multiple scripts, including Greek
         ],
-        # languages that use the latin alphabet
+        # languages that use the Latin alphabet
         'latin': [
             'aa', 'ace', 'af', 'ak', 'als', 'an', 'ang', 'ast', 'ay', 'bar',
             'bat-smg', 'bcl', 'bi', 'bm', 'br', 'bs', 'ca', 'cbk-zam', 'cdo',
@@ -606,7 +610,7 @@ class Family:
             'tn', 'to', 'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've',
             'vec', 'vi', 'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
             'zh-min-nan', 'zu',
-            # languages using multiple scripts, including latin
+            # languages using multiple scripts, including Latin
             'az', 'chr', 'ckb', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr',
             'tt', 'ug', 'za'
         ],
@@ -646,7 +650,7 @@ class Family:
 
     # Some wiki farms have UrlShortener extension enabled only on the main
     # site. This value can specify this last one with (lang, family) tuple.
-    shared_urlshortner_wiki = None
+    shared_urlshortner_wiki = None  # type: Optional[Tuple[str, str]]
 
     _families = {}
 
@@ -662,24 +666,26 @@ class Family:
             issue_deprecation_warning('nocapitalize',
                                       "APISite.siteinfo['case'] or "
                                       "Namespace.case == 'case-sensitive'",
+                                      warning_class=FutureWarning,
                                       since='20150214')
         elif name == 'known_families':
             issue_deprecation_warning('known_families',
                                       'APISite.interwiki(prefix)',
+                                      warning_class=FutureWarning,
                                       since='20150503')
         elif name == 'shared_data_repository':
             issue_deprecation_warning('shared_data_repository',
                                       'APISite.data_repository()',
+                                      warning_class=FutureWarning,
                                       since='20151023')
         return super().__getattribute__(name)
 
     @staticmethod
     @deprecated_args(fatal=None)
-    def load(fam=None):
+    def load(fam: Optional[str] = None):
         """Import the named family.
 
         @param fam: family name (if omitted, uses the configured default)
-        @type fam: str
         @return: a Family instance configured for the named family.
         @raises pywikibot.exceptions.UnknownFamily: family not known
         """
@@ -687,7 +693,8 @@ class Family:
             fam = config.family
 
         assert all(x in NAME_CHARACTERS for x in fam), \
-            'Name of family %s must be ASCII characters and digits' % fam
+            'Name of family "{}" must be ASCII letters and digits ' \
+            '[a-zA-Z0-9]'.format(fam)
 
         if fam in Family._families:
             return Family._families[fam]
@@ -716,28 +723,33 @@ class Family:
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
                           .format(cls.name, fam), FamilyMaintenanceWarning)
-        # Family 'name' and the 'langs' codes must be ascii, and the
-        # codes must be lower-case due to the Site loading algorithm.
+        # Family 'name' and the 'langs' codes must be ascii letters and digits,
+        # and codes must be lower-case due to the Site loading algorithm;
+        # codes can accept also underscore/dash.
         if not all(x in NAME_CHARACTERS for x in cls.name):
-            warnings.warn('Family name {} contains non-ascii characters'
+            warnings.warn('Name of family {} must be ASCII letters '
+                          'and digits [a-zA-Z0-9]'
                           .format(cls.name), FamilyMaintenanceWarning)
         for code in cls.langs.keys():
             if not all(x in CODE_CHARACTERS for x in code):
-                warnings.warn('Family {} code {} contains non-ascii characters'
+                warnings.warn('Family {} code {} must be ASCII lowercase '
+                              'letters and digits [a-z0-9] or '
+                              'underscore/dash [_-]'
                               .format(cls.name, code),
                               FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
 
     @classproperty
-    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014')
+    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014',
+                future_warning=True)
     def iwkeys(cls):
         """DEPRECATED: List of (interwiki_forward's) family codes."""
         if cls.interwiki_forward:
             return list(pywikibot.Family(cls.interwiki_forward).langs.keys())
         return list(cls.langs.keys())
 
-    @deprecated('APISite.interwiki', since='20151014')
+    @deprecated('APISite.interwiki', since='20151014', future_warning=True)
     def get_known_families(self, site):
         """DEPRECATED: Return dict of inter-family interwiki links."""
         return self.known_families
@@ -815,27 +827,23 @@ class Family:
             .format(code))
 
     # Methods
-    def protocol(self, code):
+    def protocol(self, code: str) -> str:
         """
         The protocol to use to connect to the site.
 
         May be overridden to return 'https'. Other protocols are not supported.
 
         @param code: language code
-        @type code: str
         @return: protocol that this family uses
-        @rtype: str
         """
         return 'http'
 
-    def ignore_certificate_error(self, code):
+    def ignore_certificate_error(self, code: str) -> bool:
         """
         Return whether a HTTPS certificate error should be ignored.
 
         @param code: language code
-        @type code: str
         @return: flag to allow access if certificate has an error.
-        @rtype: bool
         """
         return False
 
@@ -847,7 +855,7 @@ class Family:
         """The hostname to use for SSL connections."""
         return self.hostname(code)
 
-    def scriptpath(self, code):
+    def scriptpath(self, code: str) -> str:
         """The prefix used to locate scripts on this wiki.
 
         This is the value displayed when you enter {{SCRIPTPATH}} on a
@@ -859,10 +867,8 @@ class Family:
         uses a different value.
 
         @param code: Site code
-        @type code: str
         @raises KeyError: code is not recognised
         @return: URL path without ending '/'
-        @rtype: str
         """
         return '/w'
 
@@ -881,18 +887,15 @@ class Family:
             host = self.hostname(code)
         return protocol, host
 
-    def base_url(self, code, uri, protocol=None):
+    def base_url(self, code: str, uri: str, protocol=None) -> str:
         """
         Prefix uri with port and hostname.
 
         @param code: The site code
-        @type code: str
         @param uri: The absolute path after the hostname
-        @type uri: str
         @param protocol: The protocol which is used. If None it'll determine
             the protocol from the code.
         @return: The full URL ending with uri
-        @rtype: str
         """
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
@@ -911,7 +914,7 @@ class Family:
         """Return path to api.php."""
         return '%s/api.php' % self.scriptpath(code)
 
-    @deprecated('APISite.article_path', since='20150905')
+    @deprecated('APISite.article_path', since='20150905', future_warning=True)
     def nicepath(self, code):
         """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
         return '/wiki/'
@@ -929,7 +932,8 @@ class Family:
         """Return the path to title using index.php with redirects disabled."""
         return '%s?title=%s&redirect=no' % (self.path(code), title)
 
-    @deprecated('APISite.nice_get_address(title)', since='20150628')
+    @deprecated('APISite.nice_get_address(title)', since='20150628',
+                future_warning=True)
     def nice_get_address(self, code, title):
         """DEPRECATED: Return the nice path to title using index.php."""
         return '%s%s' % (self.nicepath(code), title)
@@ -951,7 +955,7 @@ class Family:
 
         return config.site_interface
 
-    def from_url(self, url):
+    def from_url(self, url: str) -> Optional[str]:
         """
         Return whether this family matches the given url.
 
@@ -967,10 +971,8 @@ class Family:
         @param url: the URL which may contain a C{$1}. If it's missing it is
             assumed to be at the end and if it's present nothing is allowed
             after it.
-        @type url: str
         @return: The language code of the url. None if that url is not from
             this family.
-        @rtype: str or None
         @raises RuntimeError: When there are multiple languages in this family
             which would work with the given URL.
         @raises ValueError: When text is present after $1.
@@ -1028,41 +1030,6 @@ class Family:
     def dbName(self, code):
         """Return the name of the MySQL database."""
         return '%s%s' % (code, self.name)
-
-    # Which version of MediaWiki is used?
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return MediaWiki version number as a string.
-
-        Use L{pywikibot.site.mw_version} to compare version strings.
-        """
-        # Here we return the latest mw release for downloading
-        if not hasattr(self, '_version'):
-            self._version = fetch(
-                'https://www.mediawiki.org/w/api.php?action=expandtemplates'
-                '&text={{MW_stable_release_number}}&prop=wikitext&format=json'
-            ).data.json()['expandtemplates']['wikitext']
-        return self._version
-
-    def force_version(self, code):
-        """
-        Return a manual version number.
-
-        The site is usually using the version number from the servers'
-        siteinfo, but if there is a problem with that it's possible to return
-        a non-empty string here representing another version number.
-
-        For example, L{pywikibot.tools.MediaWikiVersion} treats version
-        numbers ending with 'alpha', 'beta' or 'rc' as newer than any version
-        ending with 'wmf<number>'. But if that causes breakage it's possible
-        to override it here to a version number which doesn't cause breakage.
-
-        @return: A version number which can be parsed using
-            L{pywikibot.tools.MediaWikiVersion}. If empty/None it uses the
-            version returned via siteinfo.
-        @rtype: str
-        """
-        return None
 
     def encoding(self, code):
         """Return the encoding for a specific language wiki."""
@@ -1175,7 +1142,7 @@ class Family:
 
         These domains may also exist in another family.
 
-        @rtype: iterable of str
+        @rtype: set of str
         """
         return set(cls.langs.values())
 
@@ -1184,7 +1151,7 @@ class Family:
         """
         Get list of codes used by this family.
 
-        @rtype: iterable of str
+        @rtype: set of str
         """
         return set(cls.langs.keys())
 
@@ -1261,11 +1228,6 @@ class SubdomainFamily(Family):
 class FandomFamily(Family):
 
     """Common features of Fandom families."""
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return the version for this family."""
-        return '1.19.24'
 
     @classproperty
     def langs(cls):
@@ -1364,9 +1326,9 @@ class WikimediaFamily(Family):
     }
 
     # Not open for edits; stewards can still edit.
-    closed_wikis = []
+    closed_wikis = []  # type: List[str]
     # Completely removed
-    removed_wikis = []
+    removed_wikis = []  # type: List[str]
 
     # WikimediaFamily uses wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
@@ -1428,14 +1390,12 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
 
 @deprecated_args(site=None)
-def AutoFamily(name, url):
+def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.
 
     @param name: Name for the family
-    @type name: str
     @param url: API endpoint URL of the wiki
-    @type url: str
     @return: Generated family class
     @rtype: SingleSiteFamily
     """
@@ -1454,8 +1414,7 @@ def AutoFamily(name, url):
         # AutoFamily refers to the variable set below, not the function
         return super().scriptpath(code)
 
-    # str() used because py2 can't accept a unicode as the name of a class
-    AutoFamily = type(str('AutoFamily'), (SingleSiteFamily,), locals())
+    AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()
 
 

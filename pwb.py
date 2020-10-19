@@ -18,6 +18,7 @@ to set the default site (see T216825):
 #
 # Distributed under the terms of the MIT license.
 #
+# ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 from __future__ import print_function
 
 import os
@@ -33,7 +34,7 @@ from warnings import warn
 pwb = None
 
 # The following snippet was developed by Ned Batchelder (and others)
-# for coverage [1], with python 3 support [2] added later,
+# for coverage [1], with Python 3 support [2] added later,
 # and is available under the BSD license (see [3])
 # [1]
 # https://bitbucket.org/ned/coveragepy/src/b5abcee50dbe/coverage/execfile.py
@@ -348,7 +349,9 @@ def main():
             warn('Parent module %s not found: %s'
                  % (file_package, e), ImportWarning)
 
-    if check_modules(filename) or '-help' in script_args:
+    help_option = any(arg.startswith('-help:') or arg == '-help'
+                      for arg in script_args)
+    if check_modules(filename) or help_option:
         run_python_file(filename,
                         [filename] + script_args,
                         [Path(filename).stem] + argvu[1:],

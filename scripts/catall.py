@@ -27,6 +27,8 @@ Options:
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from typing import Tuple
+
 import pywikibot
 from pywikibot import i18n, textlib
 from pywikibot.bot import QuitKeyboardInterrupt
@@ -81,14 +83,13 @@ def make_categories(page, list, site=None):
              summary=i18n.twtranslate(site, 'catall-changing'))
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and perform task.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     docorrections = True
     start = 'A'

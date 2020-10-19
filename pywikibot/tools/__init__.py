@@ -171,7 +171,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Stop logging warnings and show those that do not match to params."""
-        super().__exit__()
+        super().__exit__(exc_type, exc_val, exc_tb)
         for warning in self.log:
             if (
                 not issubclass(warning.category, self.category)
@@ -521,7 +521,7 @@ class ThreadedGenerator(threading.Thread):
         if not hasattr(self, 'generator'):
             raise RuntimeError('No generator for ThreadedGenerator to run.')
         self.args, self.kwargs = args, kwargs
-        threading.Thread.__init__(self, group=group, name=name)
+        super().__init__(group=group, name=name)
         self.queue = queue.Queue(qsize)
         self.finished = threading.Event()
 
@@ -692,7 +692,7 @@ class ThreadList(list):
                   .format(thd, thd.queue.qsize()), self._logger)
 
 
-def intersect_generators(genlist):
+def intersect_generators(genlist, allow_duplicates=False):
     """
     Intersect generators listed in genlist.
 
@@ -707,6 +707,8 @@ def intersect_generators(genlist):
 
     @param genlist: list of page generators
     @type genlist: list
+    @param allow_duplicates: allow duplicates if present in all generators
+    @type allow_duplicates: bool
     """
     # If any generator is empty, no pages are going to be returned
     for source in genlist:
@@ -717,7 +719,8 @@ def intersect_generators(genlist):
 
     # Item is cached to check that it is found n_gen
     # times before being yielded.
-    cache = collections.defaultdict(set)
+    from collections import Counter
+    cache = collections.defaultdict(Counter)
     n_gen = len(genlist)
 
     # Class to keep track of alive threads.
@@ -729,6 +732,9 @@ def intersect_generators(genlist):
         threaded_gen.daemon = True
         thrlist.append(threaded_gen)
 
+    ones = Counter(thrlist)
+    seen = {}
+
     while True:
         # Get items from queues in a round-robin way.
         for t in thrlist:
@@ -736,14 +742,23 @@ def intersect_generators(genlist):
                 # TODO: evaluate if True and timeout is necessary.
                 item = t.queue.get(True, 0.1)
 
-                # Cache entry is a set of thread.
-                # Duplicates from same thread are not counted twice.
-                cache[item].add(t)
+                if not allow_duplicates and hash(item) in seen:
+                    continue
+
+                # Cache entry is a Counter of ThreadedGenerator objects.
+                cache[item].update([t])
                 if len(cache[item]) == n_gen:
-                    yield item
-                    # Remove item from cache.
-                    # No chance of seeing it again (see later: early stop).
-                    cache.pop(item)
+                    if allow_duplicates:
+                        yield item
+                        # Remove item from cache if possible.
+                        if all(el == 1 for el in cache[item].values()):
+                            cache.pop(item)
+                        else:
+                            cache[item] -= ones
+                    else:
+                        yield item
+                        cache.pop(item)
+                        seen[hash(item)] = True
 
                 active = thrlist.active_count()
                 max_cache = n_gen
@@ -892,7 +907,9 @@ class SelfCallMixin:
         """Do nothing and just return itself."""
         if hasattr(self, '_own_desc'):
             issue_deprecation_warning('Calling {}'.format(self._own_desc),
-                                      'it directly', since='20150515')
+                                      'it directly',
+                                      warning_class=FutureWarning,
+                                      since='20150515')
         return self
 
 
@@ -915,7 +932,7 @@ class DequeGenerator(Iterator, collections.deque):
     """A generator that allows items to be added during generating."""
 
     def __next__(self):
-        """Python 3 iterator method."""
+        """Iterator method."""
         if len(self):
             return self.popleft()
         else:
@@ -947,8 +964,7 @@ def open_archive(filename, mode='rb', use_extension=True):
     @raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     @raises FileNotFoundError: When the filename doesn't exist and it tries
-        to read from it or it tries to determine the compression algorithm (or
-        IOError on Python 2).
+        to read from it or it tries to determine the compression algorithm.
     @raises OSError: When it's not a 7z archive but the file extension is 7z.
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.
@@ -1763,22 +1779,6 @@ def open_compressed(filename, use_extension=False):
     return open_archive(filename, use_extension=use_extension)
 
 
-class IteratorNextMixin(Iterator):
-
-    """DEPRECATED. Backwards compatibility for Iterators."""
-
-    pass
-
-
-class _UnicodeMixin:
-
-    """DEPRECATED. Mixin class to add __str__ method in Python 2 or 3."""
-
-    def __str__(self):
-        """Return the unicode representation as the str representation."""
-        return self.__unicode__()
-
-
 @deprecated('bot_choice.Option and its subclasses', since='20181217')
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
@@ -1803,18 +1803,7 @@ def concat_options(message, line_length, options):
     return '{} ({}):'.format(message, option_msg)
 
 
-@deprecated(since='20200723', future_warning=True)
-def py2_encode_utf_8(func):
-    """Decorator to optionally encode the string result of func on Python 2."""
-    return func
-
-
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('UnicodeMixin', _UnicodeMixin,
-                             replacement_name='',
-                             since='20200723', future_warning=True)
-wrapper._add_deprecated_attr('IteratorNextMixin', replacement_name='',
-                             since='20200723', future_warning=True)
 wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,

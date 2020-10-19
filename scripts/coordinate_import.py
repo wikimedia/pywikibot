@@ -41,7 +41,7 @@ The following command line parameters are supported:
 #
 # Distributed under the terms of MIT License.
 #
-from typing import Optional
+from typing import Optional, Tuple
 
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
@@ -146,14 +146,13 @@ class CoordImportRobot(WikidataBot):
             return True
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    @param args: command line argument
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests for threading tools."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from collections import Counter
+from contextlib import suppress
 
 from tests.aspects import unittest, TestCase
 
@@ -28,8 +29,7 @@ class BasicThreadedGeneratorTestCase(TestCase):
     def gen_func(self):
         """Helper method for generator test."""
         iterable = 'abcd'
-        for i in iterable:
-            yield i
+        yield from iterable
 
     def test_run_from_gen_function(self):
         """Test thread running with generator as target."""
@@ -48,14 +48,23 @@ class GeneratorIntersectTestCase(TestCase):
         # If they are a generator, we need to convert to a list
         # first otherwise the generator is empty the second time.
         datasets = [list(gen) for gen in gens]
-
         set_result = set(datasets[0]).intersection(*datasets[1:])
-
         result = list(intersect_generators(datasets))
 
         self.assertCountEqual(set(result), result)
-
         self.assertCountEqual(result, set_result)
+
+    def assertEqualItertoolsWithDuplicates(self, gens):
+        """Assert intersect_generators result equals Counter intersection."""
+        # If they are a generator, we need to convert to a list
+        # first otherwise the generator is empty the second time.
+        datasets = [list(gen) for gen in gens]
+        counter_result = Counter(datasets[0])
+        for dataset in datasets[1:]:
+            counter_result = counter_result & Counter(dataset)
+        counter_result = list(counter_result.elements())
+        result = list(intersect_generators(datasets, allow_duplicates=True))
+        self.assertCountEqual(counter_result, result)
 
 
 class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
@@ -65,16 +74,23 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
     net = False
 
     def test_intersect_basic(self):
-        """Test basic interset without duplicates."""
+        """Test basic intersect without duplicates."""
         self.assertEqualItertools(['abc', 'db', 'ba'])
 
     def test_intersect_with_dups(self):
-        """Test basic interset with duplicates."""
+        """Test basic intersect with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
+
+    def test_intersect_with_accepted_dups(self):
+        """Test intersect with duplicates accepted."""
+        self.assertEqualItertoolsWithDuplicates(['abc', 'db', 'ba'])
+        self.assertEqualItertoolsWithDuplicates(['aabc', 'dddb', 'baa'])
+        self.assertEqualItertoolsWithDuplicates(['abb', 'bb'])
+        self.assertEqualItertoolsWithDuplicates(['bb', 'abb'])
+        self.assertEqualItertoolsWithDuplicates(['abbcd', 'abcba'])
+        self.assertEqualItertoolsWithDuplicates(['abcba', 'abbcd'])
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

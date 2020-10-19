@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
+from typing import List, Optional
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
@@ -29,7 +30,7 @@ class LogEntry(UserDict):
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overridden in subclasses.
-    _expected_type = None
+    _expected_type = None  # type: Optional[str]
 
     def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""
@@ -98,7 +99,7 @@ class LogEntry(UserDict):
         else:  # try old mw style preceding mw 1.19
             return self[self._expected_type]
 
-    @deprecated('page()', since='20150617')
+    @deprecated('page()', since='20150617', future_warning=True)
     def title(self):
         """
         DEPRECATED: Alias for page().
@@ -188,14 +189,13 @@ class BlockEntry(LogEntry):
         else:
             return super(BlockEntry, self).page()
 
-    def flags(self):
+    def flags(self) -> List[str]:
         """
         Return a list of (str) flags associated with the block entry.
 
         It raises an Error if the entry is an unblocking log entry.
 
         @return: list of flags strings
-        @rtype: list
         """
         if self.action() == 'unblock':
             return []
@@ -284,7 +284,7 @@ class MoveEntry(LogEntry):
 
     _expected_type = 'move'
 
-    @deprecated('target_ns.id', since='20150518')
+    @deprecated('target_ns.id', since='20150518', future_warning=True)
     def new_ns(self):
         """Return namespace id of target page."""
         return self.target_ns.id
@@ -297,7 +297,7 @@ class MoveEntry(LogEntry):
                                     if 'target_ns' in self._params
                                     else self._params['new_ns']]
 
-    @deprecated('target_page', since='20150518')
+    @deprecated('target_page', since='20150518', future_warning=True)
     def new_title(self):
         """Return page object of the new title."""
         return self.target_page
@@ -338,24 +338,16 @@ class PatrolEntry(LogEntry):
     _expected_type = 'patrol'
 
     @property
-    def current_id(self):
-        """
-        Return the current id.
-
-        @rtype: int
-        """
+    def current_id(self) -> int:
+        """Return the current id."""
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['curid']
                    if 'curid' in self._params else self._params['cur'])
 
     @property
-    def previous_id(self):
-        """
-        Return the previous id.
-
-        @rtype: int
-        """
+    def previous_id(self) -> int:
+        """Return the previous id."""
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['previd']
@@ -456,12 +448,11 @@ class LogEntryFactory(object):
                 classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
-    def _createFromData(self, logdata):
+    def _createFromData(self, logdata: dict):
         """
         Check for logtype from data, and creates the correct LogEntry.
 
         @param logdata: log entry data
-        @type logdata: dict
         @rtype: LogEntry
         """
         try:

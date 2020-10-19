@@ -12,6 +12,7 @@ Useful for editing the contents of an article.
 import tkinter
 from tkinter.scrolledtext import ScrolledText
 from tkinter import simpledialog as tkSimpleDialog
+from typing import Optional, Tuple
 
 import pywikibot
 from pywikibot import __url__
@@ -370,15 +371,14 @@ class EditBoxWindow(tkinter.Frame):
         self.parent.config(menu=menubar)
         self.pack()
 
-    def edit(self, text: str, jumpIndex=None, highlight=None):
+    def edit(self, text: str, jumpIndex: Optional[int] = None,
+             highlight: Optional[str] = None):
         """
         Provide user with editor to modify text.
 
         @param text: the text to be edited
         @param jumpIndex: position at which to put the caret
-        @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
-        @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
         @rtype: str or None
@@ -583,11 +583,10 @@ class Tkdialog:
         self.skip = True
         self.root.destroy()
 
-    def show_dialog(self):
+    def show_dialog(self) -> Tuple[str, str, bool]:
         """Activate the dialog.
 
         @return: new description, name, and if the image is skipped
-        @rtype: tuple of (str, str, bool)
         """
         self.root.mainloop()
         return self.photo_description, self.filename, self.skip

@@ -10,6 +10,8 @@ import codecs
 import os
 import webbrowser
 
+from enum import IntEnum
+from typing import Optional
 from warnings import warn
 
 import pywikibot
@@ -54,12 +56,42 @@ botList = {
 }
 
 
+class LoginStatus(IntEnum):
+
+    """
+    Enum for Login statuses.
+
+    >>> LoginStatus.NOT_ATTEMPTED
+    LoginStatus(-3)
+    >>> LoginStatus.IN_PROGRESS.value
+    -2
+    >>> LoginStatus.NOT_LOGGED_IN.name
+    NOT_LOGGED_IN
+    >>> int(LoginStatus.AS_USER)
+    0
+    >>> LoginStatus(-3).name
+    'NOT_ATTEMPTED'
+    >>> LoginStatus(0).name
+    'AS_USER'
+    """
+
+    NOT_ATTEMPTED = -3
+    IN_PROGRESS = -2
+    NOT_LOGGED_IN = -1
+    AS_USER = 0
+
+    def __repr__(self):
+        """Return internal representation."""
+        return 'LoginStatus({})'.format(self)
+
+
 class LoginManager:
 
     """Site login manager."""
 
     @deprecated_args(username='user', verbose=None, sysop=None)
-    def __init__(self, password=None, site=None, user=None):
+    def __init__(self, password: Optional[str] = None,
+                 site=None, user: Optional[str] = None):
         """
         Initializer.
 
@@ -69,9 +101,7 @@ class LoginManager:
         @type site: BaseSite
         @param user: username to use.
             If user is None, the username is loaded from config.usernames.
-        @type user: basestring
         @param password: password to use
-        @type password: basestring
 
         @raises pywikibot.exceptions.NoUsername: No username is configured
             for the requested site.
@@ -167,14 +197,11 @@ class LoginManager:
         # THIS IS OVERRIDDEN IN data/api.py
         return None
 
-    def storecookiedata(self, data):
+    def storecookiedata(self, data: str) -> None:
         """
         Store cookie data.
 
         @param data: The raw data as returned by getCookie()
-        @type data: str
-
-        @return: None
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')
@@ -357,7 +384,8 @@ class OauthLoginManager(LoginManager):
     # authentication process
 
     @deprecated_args(sysop=None)
-    def __init__(self, password=None, site=None, user=None):
+    def __init__(self, password: Optional[str] = None, site=None,
+                 user: Optional[str] = None):
         """
         Initializer.
 
@@ -366,9 +394,7 @@ class OauthLoginManager(LoginManager):
         @param site: Site object to log into
         @type site: BaseSite
         @param user: consumer key
-        @type user: str
         @param password: consumer secret
-        @type password: str
 
         @raises pywikibot.exceptions.NoUsername: No username is configured
             for the requested site.
@@ -447,12 +473,8 @@ class OauthLoginManager(LoginManager):
         return self._access_token
 
     @property
-    def identity(self):
-        """
-        Get identifying information about a user via an authorized token.
-
-        @rtype: None or dict
-        """
+    def identity(self) -> Optional[dict]:
+        """Get identifying information about a user via an authorized token."""
         if self.access_token is None:
             pywikibot.error('Access token not set')
             return None

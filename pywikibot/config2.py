@@ -48,9 +48,10 @@ import types
 from locale import getdefaultlocale
 from os import getenv, environ
 from textwrap import fill
+from typing import Dict, List, Optional, Tuple
 from warnings import warn
 
-from pywikibot import __version__ as pwb_version
+from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import issue_deprecation_warning
 
@@ -133,7 +134,7 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-usernames = collections.defaultdict(dict)
+usernames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
 disambiguation_comment = collections.defaultdict(dict)
 
 # User agent format.
@@ -270,7 +271,7 @@ def user_home_path(path):
     return os.path.join(os.path.expanduser('~'), path)
 
 
-def get_base_dir(test_directory=None):
+def get_base_dir(test_directory: Optional[str] = None) -> str:
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order:
@@ -291,8 +292,6 @@ def get_base_dir(test_directory=None):
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
-    @type test_directory: str or None
-    @rtype: str
     """
     def exists(directory):
         directory = os.path.abspath(directory)
@@ -441,7 +440,7 @@ userinterface = 'terminal'
 # this can be used to pass variables to the UI init function
 # useful for e.g.
 # userinterface_init_kwargs = {'default_stream': 'stdout'}
-userinterface_init_kwargs = {}
+userinterface_init_kwargs = {}  # type: Dict[str, str]
 
 # i18n setting for user interface language
 # default is obtained from L{locale.getdefaultlocale}
@@ -552,7 +551,7 @@ debug_log = []
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
-user_script_paths = []
+user_script_paths = []  # type: List[str]
 
 # ############# INTERWIKI SETTINGS ##############
 
@@ -807,7 +806,7 @@ cosmetic_changes_mylang_only = True
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user-config.py:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_enable = {}
+cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
@@ -815,7 +814,7 @@ cosmetic_changes_enable = {}
 # language. This also overrides the settings in the cosmetic_changes_enable
 # dictionary. Please set your dict by adding such lines to your user-config.py:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_disable = {}
+cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
@@ -837,7 +836,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #
 # to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
-replicate_replace = {}
+replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 
 # ############# FURTHER SETTINGS ##############
 
@@ -847,7 +846,7 @@ replicate_replace = {}
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
 # in user-config.py for wikis with extra write actions.
-actions_to_block = []
+actions_to_block = []  # type: List[str]
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
@@ -882,7 +881,7 @@ pickle_protocol = 2
 # #############################################
 
 
-def makepath(path, create=True):
+def makepath(path: str, create: bool = True):
     """Return a normalized absolute version of the path argument.
 
     If the given path already exists in the filesystem or create is False
@@ -894,10 +893,8 @@ def makepath(path, create=True):
     from holger@trillke.net 2002/03/18
 
     @param path: path in the filesystem
-    @type path: str
     @param create: create the directory if it is True. Otherwise do not change
         the filesystem. Default is True.
-    @type create: bool
     """
     dpath = os.path.normpath(os.path.dirname(path))
     if create and not os.path.exists(dpath):
@@ -1011,7 +1008,7 @@ class _DifferentTypeError(UserWarning, TypeError):
     """An error when the required type doesn't match the actual type."""
 
     def __init__(self, name, actual_type, allowed_types):
-        super(_DifferentTypeError, self).__init__(
+        super().__init__(
             'Configuration variable "{0}" is defined as "{1.__name__}" in '
             'your user-config.py but expected "{2}".'
             .format(name, actual_type, '", "'.join(t.__name__
@@ -1062,11 +1059,11 @@ def _check_user_config_types(user_config, default_values, skipped):
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
-                warn('\n'
-                     + fill('Configuration variable "{0}" is defined in your '
-                            'user-config.py but unknown. It can be a '
-                            'misspelled one or a variable that is no longer '
-                            'supported.'.format(name)), UserWarning)
+                warn('\n' + fill('Configuration variable "{0}" is defined in '
+                                 'your user-config.py but unknown. It can be '
+                                 'a misspelled one or a variable that is no '
+                                 'longer supported.'.format(name)),
+                     UserWarning)
 
 
 _check_user_config_types(_exec_globals, _public_globals, _imports)
@@ -1117,7 +1114,7 @@ if OSWIN32 and editor:
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
         or getdefaultlocale()[0]
-    if userinterface_lang in [None, 'C']:
+    if userinterface_lang is None or userinterface_lang == 'C':
         userinterface_lang = 'en'
     else:
         userinterface_lang = userinterface_lang.split('_')[0]

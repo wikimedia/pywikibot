@@ -106,6 +106,7 @@ import io
 import os
 import posixpath
 
+from typing import Tuple
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -121,15 +122,13 @@ class Photo(pywikibot.FilePage):
 
     """Represents a Photo (or other file), with metadata, to be uploaded."""
 
-    def __init__(self, URL, metadata, site=None):
+    def __init__(self, URL: str, metadata: dict, site=None):
         """
         Initializer.
 
         @param URL: URL of photo
-        @type URL: str
         @param metadata: metadata about the photo that can be referred to
             from the title & template
-        @type metadata: dict
         @param site: target site
         @type site: pywikibot.site.APISite
 
@@ -177,7 +176,7 @@ class Photo(pywikibot.FilePage):
                 self.site.allimages(
                     sha1=base64.b16encode(hashObject.digest()))]
 
-    def getTitle(self, fmt):
+    def getTitle(self, fmt: str) -> str:
         """
         Populate format string with %(name)s entries using metadata.
 
@@ -185,9 +184,7 @@ class Photo(pywikibot.FilePage):
         a MediaWiki page title, and cause an API exception when used.
 
         @param fmt: format string
-        @type fmt: str
         @return: formatted string
-        @rtype: str
         """
         # FIXME: normalise the title so it is usable as a MediaWiki title.
         return fmt % self.metadata
@@ -223,7 +220,7 @@ class DataIngestionBot(pywikibot.Bot):
 
     """Data ingestion bot."""
 
-    def __init__(self, reader, titlefmt, pagefmt,
+    def __init__(self, reader, titlefmt: str, pagefmt: str,
                  site='deprecated_default_commons'):
         """
         Initializer.
@@ -231,9 +228,7 @@ class DataIngestionBot(pywikibot.Bot):
         @param reader: Generator of Photos to process.
         @type reader: Photo page generator
         @param titlefmt: Title format
-        @type titlefmt: basestring
         @param pagefmt: Page format
-        @type pagefmt: basestring
         @param site: Target site for image upload.
             Use None to determine the site from the pages treated.
             Defaults to 'deprecated_default_commons' to use Wikimedia Commons
@@ -326,14 +321,13 @@ class DataIngestionBot(pywikibot.Bot):
         return configuration
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

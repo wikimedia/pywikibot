@@ -333,8 +333,6 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import os
 import pickle
@@ -343,6 +341,7 @@ import socket
 import sys
 
 from collections import defaultdict
+from contextlib import suppress
 from itertools import chain
 from textwrap import fill
 
@@ -386,6 +385,8 @@ class GiveUpOnPage(pywikibot.Error):
 ignoreTemplates = {
     '_default': ['delete'],
     'ar': ['تحرر', 'تحويل لين'],
+    'ary': ['كاتبدل دابا'],
+    'arz': ['بتتطور'],
     'cs': ['Pracuje_se'],
     'de': ['inuse', 'in use', 'in bearbeitung', 'inbearbeitung',
            'löschen', 'sla',
@@ -399,7 +400,7 @@ ignoreTemplates = {
 }
 
 
-class InterwikiBotConfig(object):
+class InterwikiBotConfig:
 
     """Container class for interwikibot's settings."""
 
@@ -546,7 +547,7 @@ class InterwikiBotConfig(object):
         return True
 
 
-class PageTree(object):
+class PageTree:
 
     """
     Structure to manipulate a set of pages.
@@ -578,11 +579,8 @@ class PageTree(object):
 
     def filter(self, site):
         """Iterate over pages that are in Site site."""
-        try:
-            for page in self.tree[site]:
-                yield page
-        except KeyError:
-            pass
+        with suppress(KeyError):
+            yield from self.tree[site]
 
     def __len__(self):
         """Length of the object."""
@@ -596,20 +594,14 @@ class PageTree(object):
 
     def remove(self, page):
         """Remove a page from the tree."""
-        try:
+        with suppress(ValueError):
             self.tree[page.site].remove(page)
-        except ValueError:
-            pass
-        else:
             self.size -= 1
 
     def removeSite(self, site):
         """Remove all pages from Site site."""
-        try:
+        with suppress(KeyError):
             self.size -= len(self.tree[site])
-        except KeyError:
-            pass
-        else:
             del self.tree[site]
 
     def siteCounts(self):
@@ -619,9 +611,7 @@ class PageTree(object):
 
     def __iter__(self):
         """Iterate through all items of the tree."""
-        for site, plist in self.tree.items():
-            for page in plist:
-                yield page
+        yield from chain.from_iterable(self.tree.values())
 
 
 class Subject(interwiki_graph.Subject):
@@ -697,7 +687,7 @@ class Subject(interwiki_graph.Subject):
         """
         self.conf = conf
 
-        super(Subject, self).__init__(originPage)
+        super().__init__(originPage)
 
         self.repoPage = None
         # todo is a list of all pages that still need to be analyzed.
@@ -1625,28 +1615,22 @@ class Subject(interwiki_graph.Subject):
 
         # remove interwiki links to ignore
         for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
-            try:
+            with suppress(KeyError,
+                          pywikibot.SiteDefinitionError,
+                          pywikibot.InvalidTitle):
                 ignorepage = pywikibot.Page(page.site, iw.groups()[0])
-                if (new[ignorepage.site] == ignorepage) and \
-                   (ignorepage.site != page.site):
-                    if (ignorepage not in interwikis):
-                        pywikibot.output(
-                            'Ignoring link to %(to)s for %(from)s'
-                            % {'to': ignorepage,
-                               'from': page})
+                if new[ignorepage.site] == ignorepage \
+                   and ignorepage.site != page.site:
+                    param = {'to': ignorepage, 'from': page}
+                    if ignorepage not in interwikis:
+                        pywikibot.output('Ignoring link to {to} for {from}'
+                                         .format_map(param))
                         new.pop(ignorepage.site)
                     else:
                         pywikibot.output(
-                            'NOTE: Not removing interwiki from %(from)s to '
-                            '%(to)s (exists both commented and non-commented)'
-                            % {'to': ignorepage,
-                               'from': page})
-            except KeyError:
-                pass
-            except pywikibot.SiteDefinitionError:
-                pass
-            except pywikibot.InvalidTitle:
-                pass
+                            'NOTE: Not removing interwiki from {from} to '
+                            '{to} (exists both commented and non-commented)'
+                            .format_map(param))
 
         # sanity check - the page we are fixing must be the only one for that
         # site.
@@ -1885,7 +1869,7 @@ class Subject(interwiki_graph.Subject):
             pywikibot.output('ERROR: could not report backlinks')
 
 
-class InterwikiBot(object):
+class InterwikiBot:
 
     """
     A class keeping track of a list of subjects.
@@ -1984,11 +1968,10 @@ class InterwikiBot(object):
                                      .format(page))
                     continue
                 if page.namespace() == 10:
-                    try:
+                    loc = None
+                    with suppress(KeyError):
                         tmpl, loc = moved_links[page.site.code]
                         del tmpl
-                    except KeyError:
-                        loc = None
                     if loc is not None and loc in page.title():
                         pywikibot.output(
                             'Skipping: {} is a templates subpage'
@@ -2074,11 +2057,9 @@ class InterwikiBot(object):
                         break
             # If we have a few, getting the home language is a good thing.
             if not self.conf.restore_all:
-                try:
+                with suppress(KeyError):
                     if self.counts[pywikibot.Site()] > 4:
                         return pywikibot.Site()
-                except KeyError:
-                    pass
         # If getting the home language doesn't make sense, see how many
         # foreign page queries we can find.
         return self.maxOpenSite()
@@ -2216,16 +2197,16 @@ def compareLanguages(old, new, insite, summary):
 
 def botMayEdit(page):
     """Test for allowed edits."""
-    try:
-        tmpl, loc = moved_links[page.site.code]
-    except KeyError:
-        tmpl = []
+    tmpl = []
+    with suppress(KeyError):
+        tmpl, _ = moved_links[page.site.code]
+
     if not isinstance(tmpl, list):
         tmpl = [tmpl]
-    try:
+
+    with suppress(KeyError):
         tmpl += ignoreTemplates[page.site.code]
-    except KeyError:
-        pass
+
     tmpl += ignoreTemplates['_default']
     if tmpl != []:
         templates = page.templatesWithParams()
@@ -2430,17 +2411,13 @@ def main(*args):
         pywikibot.output('Script terminated sucessfully.')
     finally:
         if dumpFileName:
-            try:
+            with suppress(ValueError):
                 restoredFiles.remove(dumpFileName)
-            except ValueError:
-                pass
         for dumpFileName in restoredFiles:
-            try:
+            with suppress(OSError):
                 os.remove(dumpFileName)
                 pywikibot.output('Dumpfile {0} deleted'
                                  .format(dumpFileName.split('\\')[-1]))
-            except OSError:
-                pass
 
 
 if __name__ == '__main__':

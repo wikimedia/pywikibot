@@ -9,8 +9,6 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot.bot import (
     AlwaysChoice, AutomaticTWSummaryBot, ChoiceException, ExistingPageBot,
     InteractiveReplace, NoRedirectPageBot, UnhandledAnswer,
@@ -25,7 +23,7 @@ class EditReplacement(ChoiceException, UnhandledAnswer):
 
     def __init__(self):
         """Initializer."""
-        super(EditReplacement, self).__init__('edit', 'e')
+        super().__init__('edit', 'e')
         self.stop = True
 
 
@@ -35,10 +33,10 @@ class InteractiveUnlink(InteractiveReplace):
 
     def __init__(self, bot):
         """Create default settings."""
-        super(InteractiveUnlink, self).__init__(
-            old_link=bot.pageToUnlink, new_link=False, default='u')
+        super().__init__(old_link=bot.pageToUnlink,
+                         new_link=False, default='u')
         self._always = AlwaysChoice(self, 'unlink all pages', 'a')
-        self._always.always = bot.getOption('always')
+        self._always.always = bot.opt.always
         self.additional_choices = [
             AlwaysChoice(self, 'unlink all on page', 'p'),
             self._always, EditReplacement()]
@@ -48,8 +46,8 @@ class InteractiveUnlink(InteractiveReplace):
 
     def handle_answer(self, choice):
         """Handle choice and store in bot's options."""
-        answer = super(InteractiveUnlink, self).handle_answer(choice)
-        self._bot.options['always'] = self._always.always
+        answer = super().handle_answer(choice)
+        self._bot.opt.always = self._always.always
         return answer
 
 
@@ -59,12 +57,12 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
 
     def __init__(self, **kwargs):
         """Redirect all parameters and add namespace as an available option."""
-        self.availableOptions.update({
+        self.available_options.update({
             'namespaces': [],
             # Which namespaces should be processed?
             # default to [] which means all namespaces will be processed
         })
-        super(BaseUnlinkBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _create_callback(self):
         """Create a new callback instance for replace_links."""

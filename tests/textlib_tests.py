@@ -5,20 +5,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
-from collections import OrderedDict
 import functools
 import os
 import re
+
+from collections import OrderedDict
+from contextlib import suppress
 
 import pywikibot
 import pywikibot.textlib as textlib
 
 from pywikibot.site import _IWEntry
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
-from pywikibot.tools import suppress_warnings
 from pywikibot import UnknownSite
 
 from tests.aspects import (
@@ -45,7 +44,7 @@ class TestSectionFunctions(TestCase):
     def setUp(self):
         """Setup tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
-        super(TestSectionFunctions, self).setUp()
+        super().setUp()
 
     def contains(self, fn, sn):
         """Invoke does_text_contain_section()."""
@@ -590,8 +589,8 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
                          [(None, OrderedDict())])
 
-    def test_regexes(self):
-        """Test _ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX."""
+    def test_etp_regex(self):
+        """Test _ETP_REGEX."""
         func = textlib._ETP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
@@ -623,35 +622,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
-        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
-            func = textlib.TEMP_REGEX.search
-
-        self.assertIsNotNone(func('{{{1}}}'))
-        self.assertIsNotNone(func('{{a|b={{c}} }}'))
-        self.assertIsNotNone(func('{{a|b={{c|d=1}} }}'))
-        self.assertIsNotNone(func('{{a|{{c}} }}'))
-        self.assertIsNotNone(func('{{a|{{c|d}} }}'))
-
-        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
-            func = textlib.TEMP_REGEX.match
-
-        self.assertIsNotNone(func('{{#if:foo}}'))
-        self.assertIsNotNone(func('{{foo:}}'))
-
-        self.assertIsNotNone(func('{{CURRENTYEAR}}'))
-        self.assertIsNotNone(func('{{1}}'))
-
-        self.assertIsNotNone(func('{{a|b={{CURRENTYEAR}} }}'))
-        self.assertIsNotNone(func('{{a|b={{{1}}} }}'))
-
-        self.assertIsNone(func('{{a|b={{c}} }}'))
-        self.assertIsNone(func('{{a|b={{c|d=1}} }}'))
-        self.assertIsNotNone(func('{{a|b={} }}'))
-        self.assertIsNone(func('{{:a|b={{c|d=1}} }}'))
-
-        self.assertIsNone(func('{{a|{{c}} }}'))
-        self.assertIsNone(func('{{a|{{c|d}} }}'))
-
+    def test_nested_template_regex(self):
+        """Test NESTED_TEMPLATE_REGEX."""
         func = textlib.NESTED_TEMPLATE_REGEX.search
 
         # Numerically named templates are rejected
@@ -799,7 +771,7 @@ class TestReplaceLinks(TestCase):
     @classmethod
     def setUpClass(cls):
         """Create a fake interwiki cache."""
-        super(TestReplaceLinks, cls).setUpClass()
+        super().setUpClass()
         # make APISite.interwiki work and prevent it from doing requests
         for site in cls.sites.values():
             mapping = {}
@@ -1036,9 +1008,10 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
-        self.assertRaisesRegex(
-            ValueError, r'unicode \(str.*bytes \(str',
-            textlib.replace_links, self.text, callback, self.wp_site)
+
+        with self.assertRaisesRegex(ValueError,
+                                    r'The result must be str and not bytes\.'):
+            textlib.replace_links(self.text, callback, self.wp_site)
 
     def test_replace_interwiki_links(self):
         """Make sure interwiki links can not be replaced."""
@@ -1518,7 +1491,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Cache namespace 10 (Template) case sensitivity."""
-        super(TestMultiTemplateMatchBuilder, cls).setUpClass()
+        super().setUpClass()
         cls._template_not_case_sensitive = (
             cls.get_site().namespaces.TEMPLATE.case != 'case-sensitive')
 
@@ -1596,7 +1569,7 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
     @classmethod
     def setUpClass(cls):
         """Define set of valid targets for the example text."""
-        super(TestGetLanguageLinks, cls).setUpClass()
+        super().setUpClass()
         cls.sites_set = {cls.enwp, cls.dewp}
 
     def test_getLanguageLinks(self, key):
@@ -1628,71 +1601,77 @@ class TestExtractSections(DefaultDrySiteTestCase):
 
     """Test the extract_sections function."""
 
+    def _extract_sections_tests(self, result, header, sections, footer):
+        """Test extract_sections function."""
+        self.assertIsInstance(result, tuple)
+        self.assertIsInstance(result.sections, list)
+        self.assertEqual(result, (header, sections, footer))
+        self.assertEqual(result.header, header)
+        self.assertEqual(result.sections, sections)
+        self.assertEqual(result.footer, footer)
+        if result.sections:
+            for section in sections:
+                self.assertIsInstance(section, tuple)
+                self.assertLength(section, 2)
+
     def test_no_sections_no_footer(self):
         """Test for text having no sections or footer."""
-        self.assertEqual(
-            extract_sections('text', self.site),
-            ('text', [], '')
-        )
+        text = 'text'
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(result, text, [], '')
 
     def test_no_sections_with_footer(self):
         """Test for text having footer but no section."""
-        self.assertEqual(
-            extract_sections('text\n\n[[Category:A]]', self.site),
-            ('text\n\n', [], '[[Category:A]]')
-        )
+        text = 'text\n\n[[Category:A]]'
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(result, 'text\n\n', [], '[[Category:A]]')
 
     def test_with_section_no_footer(self):
         """Test for text having sections but no footer."""
-        self.assertEqual(
-            extract_sections(
-                'text\n\n'
+        text = ('text\n\n'
                 '==title==\n'
-                'content',
-                self.site),
-            ('text\n\n', [('==title==', '\ncontent')], '')
-        )
+                'content')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result, 'text\n\n', [('==title==', '\ncontent')], '')
 
     def test_with_section_with_footer(self):
         """Test for text having sections and footer."""
-        self.assertEqual(
-            extract_sections(
-                'text\n\n'
+        text = ('text\n\n'
                 '==title==\n'
                 'content\n'
-                '[[Category:A]]\n',
-                self.site),
-            ('text\n\n', [('==title==', '\ncontent\n')], '[[Category:A]]\n')
-        )
+                '[[Category:A]]\n')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n', [('==title==', '\ncontent\n')], '[[Category:A]]\n')
 
     def test_with_h1_and_h2_sections(self):
         """Test for text having h1 and h2 sections."""
-        self.assertEqual(
-            extract_sections(
-                'text\n\n'
+        text = ('text\n\n'
                 '=first level=\n'
                 'foo\n'
                 '==title==\n'
-                'bar',
-                self.site),
-            ('text\n\n',
-             [('=first level=', '\nfoo\n'), ('==title==', '\nbar')],
-             '')
-        )
+                'bar')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n',
+            [('=first level=', '\nfoo\n'), ('==title==', '\nbar')],
+            '')
 
     def test_with_h4_and_h2_sections(self):
         """Test for text having h4 and h2 sections."""
-        self.assertEqual(
-            extract_sections(
-                'text\n\n'
+        text = ('text\n\n'
                 '====title====\n'
                 '==title 2==\n'
-                'content',
-                self.site),
-            ('text\n\n',
-             [('====title====', '\n'), ('==title 2==', '\ncontent')],
-             '')
-        )
+                'content')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n',
+            [('====title====', '\n'), ('==title 2==', '\ncontent')],
+            '')
 
     def test_long_comment(self):
         r"""Test for text having a long expanse of white space.
@@ -1705,14 +1684,10 @@ class TestExtractSections(DefaultDrySiteTestCase):
         https://www.regular-expressions.info/catastrophic.html
         """
         text = '<!--                                         -->'
-        self.assertEqual(
-            extract_sections(text, self.site),
-            (text, [], '')
-        )
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(result, text, [], '')
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

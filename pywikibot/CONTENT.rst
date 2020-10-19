@@ -82,7 +82,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | http.py                    | Basic HTTP access interface                          |
     +----------------------------+------------------------------------------------------+
-    | threadedhttp.py            | Httplib2 threaded cookie layer extending httplib2    |
+    | threadedhttp.py            | HTTP requests wrapper                                |
     +----------------------------+------------------------------------------------------+
 
 
@@ -112,6 +112,8 @@ The contents of the package
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models.                      |
+    +----------------------------+------------------------------------------------------+
+    | _siteinfo.py               | Objects representing site info data contents.        |
     +----------------------------+------------------------------------------------------+
 
 

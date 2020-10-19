@@ -6,7 +6,9 @@
 # Distributed under the terms of the MIT license.
 #
 import re
+
 from textwrap import fill
+from typing import Optional
 
 import pywikibot
 
@@ -106,13 +108,12 @@ class StandardOption(Option):
 
     """An option with a description and shortcut and returning the shortcut."""
 
-    def __init__(self, option: str, shortcut, **kwargs):
+    def __init__(self, option: str, shortcut: str, **kwargs):
         """
         Initializer.
 
         @param option: option string
         @param shortcut: Shortcut of the option
-        @type shortcut: str
         """
         super().__init__(**kwargs)
         self.option = option
@@ -432,13 +433,12 @@ class ShowingListOption(ListOption, OutputOption):
 
     before_question = True
 
-    def __init__(self, sequence, prefix='', pre=None, post=None, **kwargs):
+    def __init__(self, sequence, prefix='', pre: Optional[str] = None,
+                 post: Optional[str] = None, **kwargs):
         """Initializer.
 
         @param pre: Additional comment printed before the list.
-        @type pre: str
         @param post: Additional comment printed after the list.
-        @type post: str
         """
         super().__init__(sequence, prefix, **kwargs)
         self.pre = pre

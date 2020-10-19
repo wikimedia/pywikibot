@@ -11,12 +11,11 @@ the site commons should be given and not a Wikipedia or similar.
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
@@ -1299,15 +1298,8 @@ def addUncat(page):
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
-    try:
+    with suppress(pywikibot.EditConflict, pywikibot.LockedPage):
         page.put(newtext, putcomment)
-    except pywikibot.EditConflict:
-        # Skip this page
-        pass
-    except pywikibot.LockedPage:
-        # Skip this page
-        pass
-    return
 
 
 def main(*args):
@@ -1354,14 +1346,6 @@ def main(*args):
                 'The usage of "-yesterday"',
                 '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
                 2, ArgumentDeprecationWarning, since='20160305')
-        elif arg.startswith('-recentchanges'):
-            if param_value is None:
-                arg = arg + ':120,70'
-                issue_deprecation_warning(
-                    '-recentchanges without parameters',
-                    '-recentchanges:offset,duration',
-                    2, ArgumentDeprecationWarning, since='20160320')
-            gen_factory.handleArg(arg)
         else:
             gen_factory.handleArg(arg)
 

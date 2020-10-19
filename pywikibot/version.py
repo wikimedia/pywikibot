@@ -21,10 +21,12 @@ from distutils import log
 from distutils.sysconfig import get_python_lib
 from importlib import import_module
 from io import BytesIO
+from typing import Optional
 from warnings import warn
 
 import pywikibot
 
+from pywikibot.comms.http import fetch
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated
 
@@ -55,23 +57,31 @@ def get_toolforge_hostname():
     return None
 
 
-def getversion(online=True):
+def getversion(online: bool = True) -> str:
     """Return a pywikibot version string.
 
-    @param online: (optional) Include information obtained online
+    @param online: Include information obtained online
     """
+    branches = {
+        'master': 'branches/master',
+        'stable': 'branches/stable',
+    }
     data = dict(getversiondict())  # copy dict to prevent changes in 'cache'
     data['cmp_ver'] = 'n/a'
+    local_hsh = data.get('hsh', '')
+    hsh = {}
 
     if online:
-        with suppress(Exception):
-            hsh3 = getversion_onlinerepo('tags/stable')
-            hsh2 = getversion_onlinerepo()
-            hsh1 = data['hsh']
-            data['cmp_ver'] = 'UNKNOWN' if not hsh1 else (
-                'OUTDATED' if hsh1 not in (hsh2, hsh3) else 'ok')
+        if not local_hsh:
+            data['cmp_ver'] = 'UNKNOWN'
+        else:
+            for branch, path in branches.items():
+                with suppress(Exception):
+                    hsh[getversion_onlinerepo(path)] = branch
+            if hsh:
+                data['cmp_ver'] = hsh.get(local_hsh, 'OUTDATED')
 
-    data['hsh'] = data['hsh'][:7]  # make short hash from full hash
+    data['hsh'] = local_hsh[:7]  # make short hash from full hash
     return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format_map(data)
 
 
@@ -109,14 +119,14 @@ def getversiondict():
         # pywikibot was imported without using version control at all.
         tag, rev, date, hsh = (
             '', '-1 (unknown)', '0 (unknown)', '(unknown)')
+        warn('Unable to detect version; exceptions raised:\n{!r}'
+             .format(exceptions), UserWarning)
+        exceptions = None
 
     # git and svn can silently fail, as it may be a nightly.
-    if getversion_package in exceptions:
-        warn('Unable to detect version; exceptions raised:\n%r'
-             % exceptions, UserWarning)
-    elif exceptions:
-        pywikibot.debug('version algorithm exceptions:\n%r'
-                        % exceptions, _logger)
+    if exceptions:
+        pywikibot.debug('version algorithm exceptions:\n{!r}'
+                        .format(exceptions), _logger)
 
     if isinstance(date, str):
         datestring = date
@@ -181,23 +191,19 @@ order by revision desc, changed_date desc""")
     return tag, rev, date
 
 
-def github_svn_rev2hash(tag, rev):
+def github_svn_rev2hash(tag: str, rev):
     """Convert a Subversion revision to a Git hash using Github.
 
     @param tag: name of the Subversion repo on Github
     @param rev: Subversion revision identifier
     @return: the git hash
-    @rtype: str
     """
-    from pywikibot.comms import http
-
-    uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
-    request = http.fetch(uri=uri, method='PROPFIND',
-                         body="<?xml version='1.0' encoding='utf-8'?>"
-                              '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
-                         headers={'label': str(rev),
-                                  'user-agent': 'SVN/1.7.5 {pwb}'})
-
+    uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
+    request = fetch(uri=uri, method='PROPFIND',
+                    body="<?xml version='1.0' encoding='utf-8'?>"
+                         '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
+                    headers={'label': str(rev),
+                             'user-agent': 'SVN/1.7.5 {pwb}'})
     dom = xml.dom.minidom.parse(BytesIO(request.raw))
     hsh = dom.getElementsByTagName('C:git-commit')[0].firstChild.nodeValue
     date = dom.getElementsByTagName('S:date')[0].firstChild.nodeValue
@@ -216,10 +222,7 @@ def getversion_svn_setuptools(path=None):
         - hash (git hash for the Subversion revision)
     @rtype: C{tuple} of three C{str} and a C{time.struct_time}
     """
-    try:
-        from setuptools import svn_utils
-    except ImportError:
-        from setuptools_svn import svn_utils
+    from setuptools_svn import svn_utils
 
     tag = 'pywikibot-core'
     _program_dir = path or _get_program_dir()
@@ -382,8 +385,8 @@ def getversion_onlinerepo(path='branches/master'):
 
 
 @deprecated('get_module_version, get_module_filename and get_module_mtime',
-            since='20150221')
-def getfileversion(filename):
+            since='20150221', future_warning=True)
+def getfileversion(filename: str):
     """Retrieve revision number of file.
 
     Extracts __version__ variable containing Id tag, without importing it.
@@ -393,7 +396,6 @@ def getfileversion(filename):
     returned. Because it doesn't import it, the version can
     be retrieved from any file.
     @param filename: Name of the file to get version
-    @type filename: str
     """
     _program_dir = _get_program_dir()
     __version__ = None
@@ -414,7 +416,8 @@ def getfileversion(filename):
         return None
 
 
-def get_module_version(module):
+@deprecated('pywikibot.__version__', since='20201003')
+def get_module_version(module) -> Optional[str]:
     """
     Retrieve __version__ variable from an imported module.
 
@@ -422,14 +425,13 @@ def get_module_version(module):
     @type module: module
     @return: The version hash without the surrounding text. If not present
         return None.
-    @rtype: str or None
     """
     if hasattr(module, '__version__'):
-        return module.__version__[5:-1]
+        return module.__version__
     return None
 
 
-def get_module_filename(module):
+def get_module_filename(module) -> Optional[str]:
     """
     Retrieve filename from an imported pywikibot module.
 
@@ -440,12 +442,12 @@ def get_module_filename(module):
     @param module: The module instance.
     @type module: module
     @return: The filename if it's a pywikibot module otherwise None.
-    @rtype: str or None
     """
-    if hasattr(module, '__file__') and os.path.exists(module.__file__):
+    if hasattr(module, '__file__'):
         filename = module.__file__
-        if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
-            filename = filename[:-1]
+        if not filename or not os.path.exists(filename):
+            return None
+
         program_dir = _get_program_dir()
         if filename[:len(program_dir)] == program_dir:
             return filename
@@ -527,7 +529,9 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
                 path = path[0:path.index('__init__.py')]
 
             info['path'] = path
-            assert path not in paths, 'Path of the package is in defined paths'
+            assert path not in paths, \
+                   'Path {} of the package {} is in defined paths as {}' \
+                   .format(path, name, paths[path])
             paths[path] = name
 
         if '__version__' in package.__dict__:

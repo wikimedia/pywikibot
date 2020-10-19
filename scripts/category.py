@@ -124,8 +124,9 @@ import os
 import pickle
 import re
 
+from contextlib import suppress
 from operator import methodcaller
-from typing import Optional, Set
+from typing import Optional, Tuple, Set
 
 import pywikibot
 
@@ -137,9 +138,7 @@ from pywikibot.bot import (
     BaseBot, Bot, MultipleSitesBot,
 )
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import (
-    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive,
-)
+from pywikibot.tools import deprecated_args, open_archive
 from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
@@ -172,7 +171,7 @@ class CategoryPreprocess(BaseBot):
     def __init__(self, follow_redirects=False, edit_redirects=False,
                  create=False, **kwargs):
         """Initializer."""
-        super(CategoryPreprocess, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.follow_redirects = follow_redirects
         self.edit_redirects = edit_redirects
         self.create = create
@@ -376,16 +375,11 @@ class CategoryDatabase:
             }
             # store dump to disk in binary format
             with open_archive(filename, 'wb') as f:
-                try:
+                with suppress(pickle.PicklingError):
                     pickle.dump(databases, f, protocol=config.pickle_protocol)
-                except pickle.PicklingError:
-                    pass
         else:
-            try:
+            with suppress(EnvironmentError):
                 os.remove(filename)
-            except EnvironmentError:
-                pass
-            else:
                 pywikibot.output('Database is empty. {} removed'
                                  .format(config.shortpath(filename)))
 
@@ -877,38 +871,6 @@ class CategoryMoveRobot(CategoryPreprocess):
         return var
 
 
-class CategoryRemoveRobot(CategoryMoveRobot):
-
-    """Removes the category tag for a given category.
-
-    It always removes the category tag for all pages in that given category.
-
-    If pagesonly parameter is False it removes also the category from all
-    subcategories, without prompting. If the category is empty, it will be
-    tagged for deleting. Does not remove category tags pointing at
-    subcategories.
-
-    @deprecated: Using CategoryRemoveRobot is deprecated, use
-        CategoryMoveRobot without newcat param instead.
-    """
-
-    @deprecated('CategoryMoveRobot without newcat parameter', since='20140416',
-                future_warning=True)
-    def __init__(
-            self, catTitle, batchMode=False, editSummary='',
-            useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
-            titleRegex=None, inPlace=False, pagesonly=False) -> None:
-        """Initializer."""
-        super().__init__(
-            oldcat=catTitle,
-            batch=batchMode,
-            comment=editSummary,
-            deletion_comment=useSummaryForDeletion,
-            title_regex=titleRegex,
-            inplace=inPlace,
-            pagesonly=pagesonly)
-
-
 class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
@@ -1017,9 +979,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
         site = pywikibot.Site()
         self.cat = pywikibot.Category(site, cat_title)
-        super(CategoryTidyRobot, self).__init__(
-            generator=pagegenerators.PreloadingGenerator(
-                self.cat.articles(namespaces=namespaces)))
+        super().__init__(generator=pagegenerators.PreloadingGenerator(
+            self.cat.articles(namespaces=namespaces)))
 
     @deprecated_args(article='member')
     def move_to_category(self, member, original_cat, current_cat) -> None:
@@ -1337,14 +1298,13 @@ class CategoryTreeRobot:
             pywikibot.stdout(tree)
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments.
-    @type args: str
     """
     from_given = False
     to_given = False
@@ -1547,7 +1507,3 @@ def main(*args) -> None:
 
 if __name__ == '__main__':
     main()
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('AddCategory', CategoryAddBot, since='20140918',
-                             future_warning=True)

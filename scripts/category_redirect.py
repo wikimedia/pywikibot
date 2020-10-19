@@ -25,27 +25,22 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+import pickle
 import re
 import time
 
+from contextlib import suppress
 from datetime import timedelta
+from typing import Tuple
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, config
 from pywikibot.bot import SingleSiteBot
-from pywikibot.tools import PY2
-
-if PY2:
-    import cPickle as pickle  # noqa: N813
-else:
-    import pickle
 
 
 class CategoryRedirectBot(SingleSiteBot):
@@ -58,7 +53,7 @@ class CategoryRedirectBot(SingleSiteBot):
             'tiny': False,  # use Non-empty category redirects only
             'delay': 7,  # cool down delay in days
         })
-        super(CategoryRedirectBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.cooldown = self.getOption('delay')
         self.catprefix = self.site.namespace(14) + ':'
         self.log_text = []
@@ -353,18 +348,14 @@ class CategoryRedirectBot(SingleSiteBot):
             if cat_title not in record:
                 # make sure every redirect has a record entry
                 record[cat_title] = {today: None}
-                try:
+                with suppress(pywikibot.Error):
                     newredirs.append('*# {} → {}'.format(
                         cat.title(as_link=True, textlink=True),
                         cat.getCategoryRedirectTarget().title(
                             as_link=True, textlink=True)))
-                except pywikibot.Error:
-                    pass
                 # do a null edit on cat
-                try:
+                with suppress(Exception):
                     cat.save()
-                except Exception:
-                    pass
 
         # delete record entries for non-existent categories
         for cat_name in list(record.keys()):
@@ -407,10 +398,8 @@ class CategoryRedirectBot(SingleSiteBot):
                 self.problems.append(message)
                 # do a null edit on cat to update any special redirect
                 # categories this wiki might maintain
-                try:
+                with suppress(Exception):
                     cat.save()
-                except Exception:
-                    pass
                 continue
             if dest.isCategoryRedirect():
                 double = dest.getCategoryRedirectTarget()
@@ -420,10 +409,8 @@ class CategoryRedirectBot(SingleSiteBot):
                         {'oldcat': dest.title(as_link=True, textlink=True)})
                     self.log_text.append(message)
                     # do a null edit on cat
-                    try:
+                    with suppress(Exception):
                         cat.save()
-                    except Exception:
-                        pass
                 else:
                     message = i18n.twtranslate(
                         self.site, 'category_redirect-log-double', {
@@ -472,10 +459,8 @@ class CategoryRedirectBot(SingleSiteBot):
                 self.log_text.append(message)
             counts[cat_title] = found
             # do a null edit on cat
-            try:
+            with suppress(Exception):
                 cat.save()
-            except Exception:
-                pass
 
         with open(datafile, 'wb') as f:
             pickle.dump(record, f, protocol=config.pickle_protocol)
@@ -501,14 +486,13 @@ class CategoryRedirectBot(SingleSiteBot):
             edit_request_page.save(comment)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
     for arg in pywikibot.handle_args(args):

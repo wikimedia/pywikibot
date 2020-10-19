@@ -35,6 +35,8 @@ class TestAPIMWException(DefaultSiteTestCase):
 
     """Test raising an APIMWException."""
 
+    user = True
+
     data = {'error': {'code': 'internal_api_error_fake',
                       'info': 'Fake error message'},
             'servedby': 'unittest',
@@ -84,23 +86,24 @@ class TestAPIMWException(DefaultSiteTestCase):
 
     def tearDown(self):
         """Check warning and error calls."""
-        try:
-            pywikibot.warning.assert_called_with(
-                'API error internal_api_error_fake: Fake error message')
-            pywikibot.error.assert_called_with(
-                'Detected MediaWiki API exception internal_api_error_fake: '
-                'Fake error message\n[servedby: unittest]; raising')
-        finally:
-            self.warning_patcher.stop()
-            self.error_patcher.stop()
-            super(TestAPIMWException, self).tearDown()
+        self.warning_patcher.stop()
+        self.error_patcher.stop()
+        super(TestAPIMWException, self).tearDown()
+
+    def _test_assert_called_with(self, req):
+        self.assertRaises(api.APIMWException, req.submit)
+        pywikibot.warning.assert_called_with(
+            'API error internal_api_error_fake: Fake error message')
+        pywikibot.error.assert_called_with(
+            'Detected MediaWiki API exception internal_api_error_fake: '
+            'Fake error message\n[servedby: unittest]; raising')
 
     def test_API_error(self):
         """Test a static request."""
         req = api.Request(site=self.site, parameters={'action': 'query',
                                                       'fake': True})
         with PatchedHttp(api, self.data):
-            self.assertRaises(api.APIMWException, req.submit)
+            self._test_assert_called_with(req)
 
     def test_API_error_encoding_ASCII(self):
         """Test a Page instance as parameter using ASCII chars."""
@@ -110,7 +113,7 @@ class TestAPIMWException(DefaultSiteTestCase):
                                                       'titles': page})
         self.assert_parameters = {'fake': ''}
         with PatchedHttp(api, self._dummy_request):
-            self.assertRaises(api.APIMWException, req.submit)
+            self._test_assert_called_with(req)
 
     def test_API_error_encoding_Unicode(self):
         """Test a Page instance as parameter using non-ASCII chars."""
@@ -120,7 +123,7 @@ class TestAPIMWException(DefaultSiteTestCase):
                                                       'titles': page})
         self.assert_parameters = {'fake': ''}
         with PatchedHttp(api, self._dummy_request):
-            self.assertRaises(api.APIMWException, req.submit)
+            self._test_assert_called_with(req)
 
 
 class TestApiFunctions(DefaultSiteTestCase):
@@ -994,33 +997,21 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         pywikibot.data.api.LoginManager = self.orig_login_manager
         super(TestLazyLoginNotExistUsername, self).tearDown()
 
-    # When there is no API access the deprecated family.version is used.
-    @suppress_warnings('pywikibot.family.Family.version is deprecated')
     @patch.object(pywikibot, 'output')
-    @patch.object(pywikibot, 'exception')
     @patch.object(pywikibot, 'warning')
     @patch.object(pywikibot, 'error')
-    def test_access_denied_notexist_username(
-        self, error, warning, exception, output
-    ):
+    def test_access_denied_notexist_username(self, error, warning, output):
         """Test the query with a username which does not exist."""
         self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
-        try:
-            error.assert_called_with('Login failed (readapidenied).')
-        except AssertionError:  # MW version is older than 1.34.0-wmf.13
-            try:
-                error.assert_called_with('Login failed (FAIL).')
-            except AssertionError:  # MW version is older than 1.27
-                error.assert_called_with('Login failed (Failed).')
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
-        exception.assert_called_with(
-            'You have no API read permissions. Seems you are not logged in')
+        error.assert_called_with(
+            'You have no API read permissions. Seems you are not logged in.')
         self.assertIn(
             'Logging in to steward:steward as ', output.call_args[0][0])
 
@@ -1029,12 +1020,10 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
 
     """Test no username."""
 
-    # When there is no API access the deprecated family.version is used.
-    @suppress_warnings('pywikibot.family.Family.version is deprecated')
     @patch.object(pywikibot, 'warning')
-    @patch.object(pywikibot, 'exception')
+    @patch.object(pywikibot, 'error')
     @patch.object(pywikibot.config, 'usernames', defaultdict(dict))
-    def test_access_denied_no_username(self, exception, warning):
+    def test_access_denied_no_username(self, error, warning):
         """Test the query without a username."""
         self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
@@ -1044,8 +1033,8 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
-        exception.assert_called_with(
-            'You have no API read permissions. Seems you are not logged in')
+        error.assert_called_with(
+            'You have no API read permissions. Seems you are not logged in.')
 
 
 class TestBadTokenRecovery(TestCase):

@@ -1,6 +1,17 @@
 Release history
 ===============
 
+4.3.0
+-----
+
+*2 September 2020*
+
+* Don't check for valid Family/Site if running generate_user_files.py (T261771)
+* Remove socket_timeout fix in config2.py introduced with T103069
+* Prevent huge traceback from underlying python libraries (T253236)
+* Localisation updates
+
+
 4.2.0
 -----
 
@@ -234,7 +245,7 @@ Release history
 * TokenWallet: login automatically
 * Add closed_wikis to Family.langs property (T225413)
 * Redirect 'mo' site code to 'ro' and remove interwiki_replacement_overrides (T225417, T89451)
-* Add support for badges on Wikibase item sitelinks (T128202)
+* Add support for badges on Wikibase item sitelinks through a SiteLink object instead plain str (T128202)
 * Remove login.showCaptchaWindow() method
 * New parameter supplied in suggest_help function for missing dependencies
 * Remove NonMWAPISite class

@@ -109,17 +109,33 @@ Loads all wiki pages where dead links were found during a prior run:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 import datetime
+import http.client as httpclient
 import pickle
 import re
 import socket
 import threading
 import time
 
+from contextlib import suppress
 from functools import partial
+from typing import Optional, Tuple
+from urllib.parse import urlsplit
+from urllib.request import quote
+
+import requests
+
+import pywikibot
+
+from pywikibot import comms, i18n, config, pagegenerators, textlib, config2
+
+from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator as _XMLDumpPageGenerator,
+)
+from pywikibot.tools import deprecated, ThreadList
+from pywikibot.tools.formatter import color_format
 
 try:
     import memento_client
@@ -127,29 +143,6 @@ try:
 except ImportError as e:
     memento_client = e
 
-import pywikibot
-
-from pywikibot import (
-    comms, i18n, config, pagegenerators, textlib, config2,
-)
-
-from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
-from pywikibot.pagegenerators import (
-    XMLDumpPageGenerator as _XMLDumpPageGenerator,
-)
-from pywikibot.tools import deprecated, PY2
-from pywikibot.tools.formatter import color_format
-
-import requests
-
-if not PY2:
-    import http.client as httplib
-    import urllib.parse as urlparse
-    import urllib.request as urllib
-else:
-    import httplib
-    import urllib
-    import urlparse
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -288,8 +281,8 @@ class NotAnURLError(BaseException):
     """The link is not an URL."""
 
 
-@deprecated('requests', since='20160120')
-class LinkChecker(object):
+@deprecated('requests', since='20160120', future_warning=True)
+class LinkChecker:
 
     """
     Check links.
@@ -342,16 +335,16 @@ class LinkChecker(object):
     def getConnection(self):
         """Get a connection."""
         if self.scheme == 'http':
-            return httplib.HTTPConnection(self.host)
+            return httpclient.HTTPConnection(self.host)
         elif self.scheme == 'https':
-            return httplib.HTTPSConnection(self.host)
+            return httpclient.HTTPSConnection(self.host)
         else:
             raise NotAnURLError(self.url)
 
     def getEncodingUsedByServer(self):
         """Get encodung used by server."""
         if not self.serverEncoding:
-            try:
+            with suppress(Exception):
                 pywikibot.output(
                     'Contacting server %s to find out its default encoding...'
                     % self.host)
@@ -359,8 +352,7 @@ class LinkChecker(object):
                 conn.request('HEAD', '/', None, self.header)
                 self.response = conn.getresponse()
                 self.readEncodingFromResponse(self.response)
-            except Exception:
-                pass
+
             if not self.serverEncoding:
                 # TODO: We might also load a page, then check for an encoding
                 # definition in a HTML meta tag.
@@ -373,20 +365,18 @@ class LinkChecker(object):
     def readEncodingFromResponse(self, response):
         """Read encoding from response."""
         if not self.serverEncoding:
-            try:
+            with suppress(Exception):
                 ct = response.getheader('Content-Type')
                 charsetR = re.compile('charset=(.+)')
                 charset = charsetR.search(ct).group(1)
                 self.serverEncoding = charset
-            except Exception:
-                pass
 
     def changeUrl(self, url):
         """Change url."""
         self.url = url
         # we ignore the fragment
         (self.scheme, self.host, self.path, self.query,
-         self.fragment) = urlparse.urlsplit(self.url)
+         self.fragment) = urlsplit(self.url)
         if not self.path:
             self.path = '/'
         if self.query:
@@ -399,17 +389,15 @@ class LinkChecker(object):
             self.query.encode('ascii')
         except UnicodeEncodeError:
             encoding = self.getEncodingUsedByServer()
-            self.path = urllib.quote(self.path.encode(encoding))
-            self.query = urllib.quote(self.query.encode(encoding), '=&')
+            self.path = quote(self.path.encode(encoding))
+            self.query = quote(self.query.encode(encoding), '=&')
 
-    def resolveRedirect(self, useHEAD=False):
+    def resolveRedirect(self, useHEAD=False) -> Optional[str]:
         """
         Return the redirect target URL as a string, if it is a HTTP redirect.
 
         If useHEAD is true, uses the HTTP HEAD method, which saves bandwidth
         by not downloading the body. Otherwise, the HTTP GET method is used.
-
-        @rtype: str or None
         """
         conn = self.getConnection()
         try:
@@ -422,7 +410,7 @@ class LinkChecker(object):
             self.response = conn.getresponse()
             # read the server's encoding, in case we need it later
             self.readEncodingFromResponse(self.response)
-        except httplib.BadStatusLine:
+        except httpclient.BadStatusLine:
             # Some servers don't seem to handle HEAD requests properly,
             # e.g. http://www.radiorus.ru/ which is running on a very old
             # Apache server. Using GET instead works on these (but it uses
@@ -467,18 +455,14 @@ class LinkChecker(object):
         else:
             return False  # not a redirect
 
-    def check(self, useHEAD=False):
-        """
-        Return True and the server status message if the page is alive.
-
-        @rtype: tuple of (bool, unicode)
-        """
+    def check(self, useHEAD=False) -> Tuple[bool, str]:
+        """Return True and the server status message if the page is alive."""
         try:
             wasRedirected = self.resolveRedirect(useHEAD=useHEAD)
         except UnicodeError as error:
             return False, 'Encoding Error: {0} ({1})'.format(
                 error.__class__.__name__, error)
-        except httplib.error as error:
+        except httpclient.error as error:
             return False, 'HTTP Error: {}'.format(error.__class__.__name__)
         except socket.error as error:
             # https://docs.python.org/3/library/socket.html :
@@ -542,7 +526,7 @@ class LinkChecker(object):
         else:
             try:
                 conn = self.getConnection()
-            except httplib.error as error:
+            except httpclient.error as error:
                 return False, 'HTTP Error: {0}'.format(
                     error.__class__.__name__)
             try:
@@ -573,7 +557,7 @@ class LinkCheckThread(threading.Thread):
 
     def __init__(self, page, url, history, HTTPignore, day):
         """Initializer."""
-        threading.Thread.__init__(self)
+        super().__init__()
         self.page = page
         self.url = url
         self.history = history
@@ -625,7 +609,7 @@ class LinkCheckThread(threading.Thread):
                                      config.weblink_dead_days)
 
 
-class History(object):
+class History:
 
     """
     Store previously found dead links.
@@ -735,16 +719,11 @@ class History(object):
         @return: True if previously found dead, else returns False.
         """
         if url in self.historyDict:
-            with self.semaphore:
-                try:
-                    del self.historyDict[url]
-                except KeyError:
-                    # Not sure why this can happen, but I guess we can
-                    # ignore this.
-                    pass
+            with self.semaphore, suppress(KeyError):
+                del self.historyDict[url]
             return True
-        else:
-            return False
+
+        return False
 
     def save(self):
         """Save the .dat file to disk."""
@@ -763,7 +742,7 @@ class DeadLinkReportThread(threading.Thread):
 
     def __init__(self):
         """Initializer."""
-        threading.Thread.__init__(self)
+        super().__init__()
         self.semaphore = threading.Semaphore()
         self.queue = []
         self.finishing = False
@@ -791,65 +770,64 @@ class DeadLinkReportThread(threading.Thread):
                     break
                 else:
                     time.sleep(0.1)
-            else:
-                with self.semaphore:
-                    url, errorReport, containingPage, archiveURL = \
-                        self.queue[0]
-                    self.queue = self.queue[1:]
-                    talkPage = containingPage.toggleTalkPage()
-                    pywikibot.output(color_format(
-                        '{lightaqua}** Reporting dead link on '
-                        '{0}...{default}',
-                        talkPage.title(as_link=True)))
-                    try:
-                        content = talkPage.get() + '\n\n\n'
-                        if url in content:
-                            pywikibot.output(color_format(
-                                '{lightaqua}** Dead link seems to have '
-                                'already been reported on {0}{default}',
-                                talkPage.title(as_link=True)))
-                            continue
-                    except (pywikibot.NoPage, pywikibot.IsRedirectPage):
-                        content = ''
+                    continue
 
-                    if archiveURL:
-                        archiveMsg = '\n' + \
-                                     i18n.twtranslate(
-                                         containingPage.site,
-                                         'weblinkchecker-archive_msg',
-                                         {'URL': archiveURL})
-                    else:
-                        archiveMsg = ''
-                    # The caption will default to "Dead link". But if there
-                    # is already such a caption, we'll use "Dead link 2",
-                    # "Dead link 3", etc.
-                    caption = i18n.twtranslate(containingPage.site,
-                                               'weblinkchecker-caption')
-                    i = 1
-                    count = ''
-                    # Check if there is already such a caption on
-                    # the talk page.
-                    while re.search('= *{0}{1} *='.format(caption, count),
-                                    content) is not None:
-                        i += 1
-                        count = ' ' + str(i)
-                    caption += count
-                    content += '== {0} ==\n\n{1}\n\n{2}{3}\n--~~~~'.format(
-                        caption, i18n.twtranslate(containingPage.site,
-                                                  'weblinkchecker-report'),
-                        errorReport, archiveMsg)
-
-                    comment = '[[{0}#{1}|→]] {2}'.format(
-                        talkPage.title(), caption,
-                        i18n.twtranslate(containingPage.site,
-                                         'weblinkchecker-summary'))
-                    try:
-                        talkPage.put(content, comment)
-                    except pywikibot.SpamblacklistError as error:
+            with self.semaphore:
+                url, errorReport, containingPage, archiveURL = self.queue[0]
+                self.queue = self.queue[1:]
+                talkPage = containingPage.toggleTalkPage()
+                pywikibot.output(color_format(
+                    '{lightaqua}** Reporting dead link on {}...{default}',
+                    talkPage))
+                try:
+                    content = talkPage.get() + '\n\n\n'
+                    if url in content:
                         pywikibot.output(color_format(
-                            '{lightaqua}** SpamblacklistError while trying to '
-                            'change {0}: {1}{default}',
-                            talkPage.title(as_link=True), error.url))
+                            '{lightaqua}** Dead link seems to have '
+                            'already been reported on {}{default}',
+                            talkPage))
+                        continue
+                except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+                    content = ''
+
+                if archiveURL:
+                    archiveMsg = '\n' + \
+                                 i18n.twtranslate(
+                                     containingPage.site,
+                                     'weblinkchecker-archive_msg',
+                                     {'URL': archiveURL})
+                else:
+                    archiveMsg = ''
+                # The caption will default to "Dead link". But if there
+                # is already such a caption, we'll use "Dead link 2",
+                # "Dead link 3", etc.
+                caption = i18n.twtranslate(containingPage.site,
+                                           'weblinkchecker-caption')
+                i = 1
+                count = ''
+                # Check if there is already such a caption on
+                # the talk page.
+                while re.search('= *{0}{1} *='
+                                .format(caption, count), content) is not None:
+                    i += 1
+                    count = ' ' + str(i)
+                caption += count
+                content += '== {0} ==\n\n{3}\n\n{1}{2}\n--~~~~'.format(
+                    caption, errorReport, archiveMsg,
+                    i18n.twtranslate(containingPage.site,
+                                     'weblinkchecker-report'))
+
+                comment = '[[{0}#{1}|→]] {2}'.format(
+                    talkPage.title(), caption,
+                    i18n.twtranslate(containingPage.site,
+                                     'weblinkchecker-summary'))
+                try:
+                    talkPage.put(content, comment)
+                except pywikibot.SpamblacklistError as error:
+                    pywikibot.output(color_format(
+                        '{lightaqua}** SpamblacklistError while trying to '
+                        'change {0}: {1}{default}',
+                        talkPage, error.url))
 
 
 class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
@@ -862,8 +840,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
 
     def __init__(self, generator, HTTPignore=None, day=7, site=True):
         """Initializer."""
-        super(WeblinkCheckerRobot, self).__init__(
-            generator=generator, site=site)
+        super().__init__(generator=generator, site=site)
 
         if config.report_dead_links_on_talk:
             pywikibot.log('Starting talk page thread')
@@ -880,33 +857,24 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
             self.HTTPignore = HTTPignore
         self.day = day
 
+        # Limit the number of threads started at the same time
+        self.threads = ThreadList(limit=config.max_external_links,
+                                  wait_time=config.retry_wait)
+
     def treat_page(self):
         """Process one page."""
         page = self.current_page
-        text = page.get()
-        for url in weblinksIn(text):
-            ignoreUrl = False
+        for url in weblinksIn(page.text):
             for ignoreR in ignorelist:
                 if ignoreR.match(url):
-                    ignoreUrl = True
-            if not ignoreUrl:
-                # Limit the number of threads started at the same time. Each
-                # thread will check one page, then die.
-                while threading.activeCount() >= config.max_external_links:
-                    pywikibot.sleep(config.retry_wait)
+                    break
+            else:
+                # Each thread will check one page, then die.
                 thread = LinkCheckThread(page, url, self.history,
                                          self.HTTPignore, self.day)
                 # thread dies when program terminates
                 thread.setDaemon(True)
-                try:
-                    thread.start()
-                except threading.ThreadError:
-                    pywikibot.warning(
-                        "Can't start a new thread.\nPlease decrease "
-                        'max_external_links in your user-config.py or use\n'
-                        "'-max_external_links:' option with a smaller value. "
-                        'Default is 50.')
-                    raise
+                self.threads.append(thread)
 
 
 def RepeatPageGenerator():
@@ -921,12 +889,11 @@ def RepeatPageGenerator():
         yield page
 
 
-def countLinkCheckThreads():
+def countLinkCheckThreads() -> int:
     """
     Count LinkCheckThread threads.
 
     @return: number of LinkCheckThread threads
-    @rtype: int
     """
     i = 0
     for thread in threading.enumerate():
@@ -935,11 +902,10 @@ def countLinkCheckThreads():
     return i
 
 
-@deprecated('requests', since='20160120')
+@deprecated('requests', since='20160120', future_warning=True)
 def check(url):
     """DEPRECATED: Use requests instead. Perform a check on URL."""
-    c = LinkChecker(url)
-    return c.check()
+    return LinkChecker(url).check()
 
 
 def main(*args):

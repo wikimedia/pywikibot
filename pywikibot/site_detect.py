@@ -6,16 +6,14 @@
 # Distributed under the terms of the MIT license.
 #
 import json
-import re
 
 from contextlib import suppress
 from html.parser import HTMLParser
+from typing import Optional
 from urllib.parse import urljoin, urlparse
-
 from requests.exceptions import RequestException
 
 import pywikibot
-
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion
@@ -24,17 +22,12 @@ from pywikibot.tools import MediaWikiVersion
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
+MIN_VERSION = MediaWikiVersion('1.19')
 
-class MWSite(object):
+
+class MWSite:
 
     """Minimal wiki site class."""
-
-    REwgEnableApi = re.compile(r'wgEnableAPI ?= ?true')
-    REwgServer = re.compile(r'wgServer ?= ?"([^"]*)"')
-    REwgScriptPath = re.compile(r'wgScriptPath ?= ?"([^"]*)"')
-    REwgArticlePath = re.compile(r'wgArticlePath ?= ?"([^"]*)"')
-    REwgContentLanguage = re.compile(r'wgContentLanguage ?= ?"([^"]*)"')
-    REwgVersion = re.compile(r'wgVersion ?= ?"([^"]*)"')
 
     def __init__(self, fromurl):
         """
@@ -43,7 +36,7 @@ class MWSite(object):
         @raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
         @raises Timeout: a timeout occurred while loading the site
-        @raises RuntimeError: Version not found or version less than 1.14
+        @raises RuntimeError: Version not found or version less than 1.19
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
@@ -51,7 +44,7 @@ class MWSite(object):
         check_response(r)
 
         if fromurl != r.data.url:
-            pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
+            pywikibot.log('{} redirected to {}'.format(fromurl, r.data.url))
             fromurl = r.data.url
 
         self.fromurl = fromurl
@@ -66,24 +59,22 @@ class MWSite(object):
         self.scriptpath = wp.scriptpath
         self.articlepath = None
 
-        try:
-            self._parse_pre_117(data)
-        except Exception as e:
-            pywikibot.log('MW pre-1.17 detection failed: {0!r}'.format(e))
-
         if self.api:
             try:
-                self._parse_post_117()
+                self._parse_site()
             except (ServerError, RequestException):
                 raise
             except Exception as e:
-                pywikibot.log('MW 1.17+ detection failed: {0!r}'.format(e))
+                pywikibot.log('MW detection failed: {!r}'.format(e))
 
             if not self.version:
                 self._fetch_old_version()
 
         if not self.api:
-            raise RuntimeError('Unsupported url: {0}'.format(self.fromurl))
+            raise RuntimeError('Unsupported url: {}'.format(self.fromurl))
+
+        if not self.version or self.version < MIN_VERSION:
+            raise RuntimeError('Unsupported version: {}'.format(self.version))
 
         if not self.articlepath:
             if self.private_wiki:
@@ -95,14 +86,10 @@ class MWSite(object):
                         'private. Use the Main Page URL instead of the API.')
             else:
                 raise RuntimeError('Unable to determine articlepath: '
-                                   '{0}'.format(self.fromurl))
-
-        if (not self.version
-                or self.version < MediaWikiVersion('1.14')):
-            raise RuntimeError('Unsupported version: {0}'.format(self.version))
+                                   '{}'.format(self.fromurl))
 
     def __repr__(self):
-        return '{0}("{1}")'.format(
+        return '{}("{}")'.format(
             self.__class__.__name__, self.fromurl)
 
     @property
@@ -118,21 +105,6 @@ class MWSite(object):
                                             iw['error']['info']))
         return [wiki for wiki in iw['query']['interwikimap']
                 if 'language' in wiki]
-
-    def _parse_pre_117(self, data):
-        """Parse HTML."""
-        if not self.REwgEnableApi.search(data):
-            pywikibot.log(
-                'wgEnableApi is not enabled in HTML of %s'
-                % self.fromurl)
-        with suppress(AttributeError):
-            self.version = MediaWikiVersion(
-                self.REwgVersion.search(data).group(1))
-
-        self.server = self.REwgServer.search(data).groups()[0]
-        self.scriptpath = self.REwgScriptPath.search(data).groups()[0]
-        self.articlepath = self.REwgArticlePath.search(data).groups()[0]
-        self.lang = self.REwgContentLanguage.search(data).groups()[0]
 
     def _fetch_old_version(self):
         """Extract the version from API help with ?version enabled."""
@@ -154,8 +126,8 @@ class MWSite(object):
             else:
                 self.version = MediaWikiVersion(self.version)
 
-    def _parse_post_117(self):
-        """Parse 1.17+ siteinfo data."""
+    def _parse_site(self):
+        """Parse siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
         check_response(response)
         # remove preleading newlines and Byte Order Mark (BOM), see T128992
@@ -180,8 +152,9 @@ class MWSite(object):
             info = site.siteinfo
         else:
             info = info['query']['general']
+
         self.version = MediaWikiVersion.from_generator(info['generator'])
-        if self.version < MediaWikiVersion('1.17'):
+        if self.version < MIN_VERSION:
             return
 
         self.server = urljoin(self.fromurl, info['server'])
@@ -198,12 +171,8 @@ class MWSite(object):
         return hash(self.server + self.scriptpath)
 
     @property
-    def api(self):
-        """
-        Get api URL.
-
-        @rtype: str or None
-        """
+    def api(self) -> Optional[str]:
+        """Get api URL."""
         if self.server is None or self.scriptpath is None:
             return
 
@@ -258,7 +227,7 @@ class WikiHTMLPageParser(HTMLParser):
 
         if not new_parsed_url.scheme or not new_parsed_url.netloc:
             new_parsed_url = urlparse(
-                '{0}://{1}{2}'.format(
+                '{}://{}{}'.format(
                     new_parsed_url.scheme or self.url.scheme,
                     new_parsed_url.netloc or self.url.netloc,
                     new_parsed_url.path))
@@ -274,11 +243,11 @@ class WikiHTMLPageParser(HTMLParser):
                         or self._parsed_url.netloc in new_parsed_url.netloc):
                     return
 
-                assert new_parsed_url == self._parsed_url, '{0} != {1}'.format(
+                assert new_parsed_url == self._parsed_url, '{} != {}'.format(
                     self._parsed_url, new_parsed_url)
 
         self._parsed_url = new_parsed_url
-        self.server = '{0}://{1}'.format(
+        self.server = '{}://{}'.format(
             self._parsed_url.scheme, self._parsed_url.netloc)
         self.scriptpath = self._parsed_url.path
 

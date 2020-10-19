@@ -21,14 +21,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'ru', 'sr', 'fr', 'en', 'pt', 'pl', 'de', 'zh', 'es', 'it', 'ar', 'cs',
+        'ru', 'sr', 'fr', 'en', 'pt', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
         'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'fi', 'ro', 'li', 'tr', 'ja',
         'eo', 'sq', 'no', 'ko', 'bg', 'bs', 'he',
     ]
 
     category_redirect_templates = {
         '_default': (),
-        'ar': ('قالب:تحويل تصنيف',),
+        'ar': ('تحويل تصنيف',),
         'fa': ('الگو:رده بهتر',),
         'no': ('Kategoriomdirigering',),
         'ro': ('Redirect categorie',),
@@ -53,6 +53,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '_default': (('/doc', ),
                      ['en', ]
                      ),
+        'ar': ('/شرح', '/doc'),
         'it': ('/man', ),
         'sr': ('/док', ),
     }

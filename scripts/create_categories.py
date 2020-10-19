@@ -35,6 +35,8 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Tuple
+
 import pywikibot
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
 from pywikibot import pagegenerators
@@ -92,14 +94,13 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         return super().skip_page(page)
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
 

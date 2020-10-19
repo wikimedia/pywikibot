@@ -16,6 +16,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import (
     WikibasePage, ItemPage, PropertyPage, Page, LanguageDict, AliasesDict,
+    ClaimCollection, SiteLinkCollection,
 )
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
@@ -949,6 +950,22 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(hasattr(item, '_content'))
 
+    def test_item_lazy_initialization(self):
+        """Test that Wikibase items are properly initialized lazily."""
+        wikidata = self.get_repo()
+        item = ItemPage(wikidata, 'Q60')
+        attrs = ['_content', 'labels', 'descriptions', 'aliases',
+                 'claims', 'sitelinks']
+        for attr in attrs:
+            with self.subTest(attr=attr, note='before loading'):
+                # hasattr() loads the attributes; use item.__dict__ for tests
+                self.assertNotIn(attr, item.__dict__)
+
+        item.labels  # trigger loading
+        for attr in attrs:
+            with self.subTest(attr=attr, note='after loading'):
+                self.assertIn(attr, item.__dict__)
+
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
         wikidata = self.get_repo()
@@ -1001,6 +1018,11 @@ class TestItemLoad(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata)
         self.assertEqual(item._link._title, '-1')
+        self.assertLength(item.labels, 0)
+        self.assertLength(item.descriptions, 0)
+        self.assertLength(item.aliases, 0)
+        self.assertLength(item.claims, 0)
+        self.assertLength(item.sitelinks, 0)
 
     def test_item_invalid_titles(self):
         """Test invalid titles of wikibase items."""
@@ -1758,9 +1780,24 @@ class TestLinks(WikidataTestCase):
         self.assertLength(wvlinks, 2)
 
 
-class TestLanguageDict(TestCase):
+class DataCollectionTestCase(WikidataTestCase):
+
+    """Test case for a Wikibase collection class."""
+
+    collection_class = None
+
+    def _test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        cls = self.collection_class
+        result = cls.new_empty(self.get_repo())
+        self.assertIsEmpty(result)
+
+
+class TestLanguageDict(DataCollectionTestCase):
 
     """Test cases covering LanguageDict methods."""
+
+    collection_class = LanguageDict
 
     family = 'wikipedia'
     code = 'en'
@@ -1832,10 +1869,16 @@ class TestLanguageDict(TestCase):
             LanguageDict.normalizeData(self.lang_out),
             {'en': {'language': 'en', 'value': 'foo'}})
 
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
 
-class TestAliasesDict(TestCase):
+
+class TestAliasesDict(DataCollectionTestCase):
 
     """Test cases covering AliasesDict methods."""
+
+    collection_class = AliasesDict
 
     family = 'wikipedia'
     code = 'en'
@@ -1927,6 +1970,32 @@ class TestAliasesDict(TestCase):
         ]}
         self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
 
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
+
+
+class TestClaimCollection(DataCollectionTestCase):
+
+    """Test cases covering ClaimCollection methods."""
+
+    collection_class = ClaimCollection
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
+
+
+class TestSiteLinkCollection(DataCollectionTestCase):
+
+    """Test cases covering SiteLinkCollection methods."""
+
+    collection_class = SiteLinkCollection
+
+    def test_new_empty(self):
+        """Test that new_empty method returns empty collection."""
+        self._test_new_empty()
+
 
 class TestWriteNormalizeData(TestCase):
 
@@ -1987,11 +2056,10 @@ class TestPreloadingEntityGenerator(TestCase):
     }
 
     def test_non_item_gen(self):
-        """Test PreloadingEntityGenerator with ReferringPageGenerator."""
+        """Test PreloadingEntityGenerator with getReferences()."""
         site = self.get_site('wikidata')
-        instance_of_page = pywikibot.Page(site, 'Property:P31')
-        ref_gen = pagegenerators.ReferringPageGenerator(
-            instance_of_page, total=5)
+        page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
         self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
 

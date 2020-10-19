@@ -217,6 +217,7 @@ netext = {
     'wikipedia': {
         'am': '{{subst:Welcome}} %s',
         'ar': '{{subst:ترحيب}} %s',
+        'ary': '{{subst:welcome}} %s',
         'arz': '{{subst:ترحيب}} %s',
         'as': '{{subst:আদৰণি}} %s',
         'ba': '{{Hello}} %s',
@@ -321,7 +322,7 @@ report_page = {
         'pdc': 'Benutzer:Xqt/Report',
         'ru': 'Участник:LatitudeBot/Рапорт',
         'sq': 'User:EagleBot/Report',
-        'sr': 'User:ZoranBot/Записи',
+        'sr': 'User:KizuleBot/Записи',
         'ur': 'Project:تختہ اعلانات برائے منتظمین/صارف نام برائے پڑتال',
         'zh': 'User:Welcomebot/report',
         'zh-yue': 'User:Alexbot/report',
@@ -342,7 +343,7 @@ bad_pag = {
         'no': 'Bruker:JhsBot/Daarlige ord',
         'ru': 'Участник:LatitudeBot/Чёрный список',
         'sq': 'User:Eagleal/Bad_names',
-        'sr': 'User:ZoranBot/лоша корисничка имена',
+        'sr': 'User:KizuleBot/лоша корисничка имена',
         'zh': 'User:Welcomebot/badname',
         'zh-yue': 'User:Welcomebot/badname',
     }

@@ -5,19 +5,20 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
 __all__ = (
     'requests', 'unittest', 'TestRequest', 'patch_request', 'unpatch_request',
     'mock', 'Mock', 'MagicMock', 'patch')
 
 import functools
-from itertools import chain
 import os
 import unittest
-from unittest.util import safe_repr
 import warnings
+
+from contextlib import suppress
+from itertools import chain
+from unittest import mock
+from unittest.mock import MagicMock, Mock, patch
+from unittest.util import safe_repr
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
@@ -25,19 +26,13 @@ import warnings
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests
 
-from pywikibot import config
 import pywikibot.data.api
+
+from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
 
-
-try:
-    import unittest.mock as mock
-    from unittest.mock import MagicMock, Mock, patch
-except ImportError:
-    import mock
-    from mock import MagicMock, Mock, patch
 
 assert safe_repr  # pyflakes workaround
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
@@ -110,6 +105,7 @@ library_test_modules = {
     'site',
     'site_decorators',
     'site_detect',
+    'siteinfo',
     'sparql',
     'tests',
     'textlib',
@@ -291,7 +287,7 @@ class TestRequest(CachedRequest):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(TestRequest, self).__init__(0, *args, **kwargs)
+        super().__init__(0, *args, **kwargs)
 
     @classmethod
     def create_simple(cls, **kwargs):
@@ -305,25 +301,22 @@ class TestRequest(CachedRequest):
 
     def _load_cache(self):
         """Return whether the cache can be used."""
-        if not super(TestRequest, self)._load_cache():
-            global cache_misses
+        global cache_hits
+        global cache_misses
+
+        if not super()._load_cache():
             cache_misses += 1
             return False
 
         # tokens need careful management in the cache
         # and can't be aggressively cached.
         # FIXME: remove once 'badtoken' is reliably handled in api.py
-        if 'intoken' in self._uniquedescriptionstr():
-            self._data = None
-            return False
+        for desc in ('intoken', 'lgpassword'):
+            if desc in self._uniquedescriptionstr():
+                self._data = None
+                return False
 
-        if 'lgpassword' in self._uniquedescriptionstr():
-            self._data = None
-            return False
-
-        global cache_hits
         cache_hits += 1
-
         return True
 
     def _write_cache(self, data):
@@ -334,7 +327,7 @@ class TestRequest(CachedRequest):
         if 'lgpassword' in self._uniquedescriptionstr():
             return
 
-        return super(TestRequest, self)._write_cache(data)
+        return super()._write_cache(data)
 
 
 original_expired = None
@@ -355,7 +348,5 @@ def unpatch_request():
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

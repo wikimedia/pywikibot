@@ -27,9 +27,14 @@ scripts.maintenance.make\_i18n\_dict script
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
+scripts.maintenance.update\_linktrails script
+---------------------------------------------
+
+.. automodule:: scripts.maintenance.update_linktrails
+
+
 scripts.maintenance.wikimedia\_sites script
 -------------------------------------------
 
 .. automodule:: scripts.maintenance.wikimedia_sites
-
 

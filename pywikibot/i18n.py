@@ -28,7 +28,9 @@ import re
 
 from collections.abc import Mapping
 from collections import defaultdict
+from contextlib import suppress
 from textwrap import fill
+from typing import List, Optional
 from warnings import warn
 
 import pywikibot
@@ -36,9 +38,15 @@ import pywikibot
 from pywikibot import __url__
 from pywikibot import config2 as config
 from pywikibot.exceptions import Error
-from pywikibot.plural import plural_rules
+from pywikibot.plural import plural_rule
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning)
+    deprecated, deprecated_args, issue_deprecation_warning, PYTHON_VERSION)
+
+if PYTHON_VERSION >= (3, 9, 0):
+    from functools import cache
+else:
+    from functools import lru_cache
+    cache = lru_cache(None)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -49,10 +57,6 @@ PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 _messages_package_name = 'scripts.i18n'
 # Flag to indicate whether translation messages are available
 _messages_available = None
-
-# Cache of translated messages
-_cache = defaultdict(dict)
-
 
 _LANG_TO_GROUP_NAME = defaultdict(str, {
     'aa': 'aa',
@@ -65,6 +69,7 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'an': 'an',
     'arc': 'arc',
     'arn': 'an',
+    'ary': 'arc',
     'arz': 'arc',
     'as': 'as',
     'ast': 'an',
@@ -270,6 +275,7 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'zh-min-nan': 'zh-min-nan',
     'zh-tw': 'zh-classical',
     'zh-yue': 'cdo'})
+
 _GROUP_NAME_TO_FALLBACKS = {
     '': [],
     'aa': ['am'],
@@ -355,7 +361,7 @@ _GROUP_NAME_TO_FALLBACKS = {
         'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']}
 
 
-def set_messages_package(package_name):
+def set_messages_package(package_name: str):
     """Set the package name where i18n messages are located."""
     global _messages_package_name
     global _messages_available
@@ -363,15 +369,13 @@ def set_messages_package(package_name):
     _messages_available = None
 
 
-def messages_available():
+def messages_available() -> bool:
     """
     Return False if there are no i18n messages available.
 
     To determine if messages are available, it looks for the package name
     set using L{set_messages_package} for a message bundle called 'pywikibot'
     containing messages.
-
-    @rtype: bool
     """
     global _messages_available
     if _messages_available is not None:
@@ -390,7 +394,7 @@ def messages_available():
     return True
 
 
-def _altlang(lang):
+def _altlang(lang: str) -> List[str]:
     """Define fallback languages for particular languages.
 
     If no translation is available to a specified language, translate() will
@@ -403,9 +407,7 @@ def _altlang(lang):
     This code is used by other translating methods below.
 
     @param lang: The language code
-    @type lang: str
     @return: language codes
-    @rtype: list of str
     """
     return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
 
@@ -421,39 +423,32 @@ class TranslationError(Error, ImportError):
     pass
 
 
-def _get_translation(lang, twtitle):
+@cache
+def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     """
     Return message of certain twtitle if exists.
 
     For internal use, don't use it directly.
     """
-    if twtitle in _cache[lang]:
-        return _cache[lang][twtitle]
     message_bundle = twtitle.split('-')[0]
-    filename = '%s/%s.json' % (message_bundle, lang)
+    filename = '{}/{}.json'.format(message_bundle, lang)
     try:
         trans_text = pkgutil.get_data(
             _messages_package_name, filename).decode('utf-8')
     except (OSError, IOError):  # file open can cause several exceptions
-        _cache[lang][twtitle] = None
         return None
+
     transdict = json.loads(trans_text)
-    _cache[lang].update(transdict)
-    try:
-        return transdict[twtitle]
-    except KeyError:
-        return None
+    return transdict.get(twtitle)
 
 
-def _extract_plural(code, message, parameters):
+def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
     """Check for the plural variants in message and replace them.
 
     @param message: the message to be replaced
-    @type message: str
     @param parameters: plural parameters passed from other methods
     @type parameters: Mapping of str to int
     @return: The message with the plural instances replaced
-    @rtype: str
     """
     def static_plural_value(n):
         return rule['plural']
@@ -499,11 +494,9 @@ def _extract_plural(code, message, parameters):
         return plural_entries[index]
 
     assert isinstance(parameters, Mapping), \
-        'parameters is not Mapping but {0}'.format(type(parameters))
-    try:
-        rule = plural_rules[code]
-    except KeyError:
-        rule = plural_rules['_default']
+        'parameters is not Mapping but {}'.format(type(parameters))
+
+    rule = plural_rule(lang)
     plural_value = rule['plural']
     if not callable(plural_value):
         assert rule['nplurals'] == 1
@@ -526,7 +519,7 @@ class _PluralMappingAlias(Mapping):
         else:
             self.source = source
         self.index = -1
-        super(_PluralMappingAlias, self).__init__()
+        super().__init__()
 
     def __getitem__(self, key):
         self.index += 1
@@ -629,18 +622,19 @@ def translate(code, xdict, parameters=None, fallback=False):
     # else we check for PLURAL variants
     trans = _extract_plural(code, trans, plural_parameters)
     if parameters:
-        try:
+        # On error: parameter is for PLURAL variants only,
+        # don't change the string
+        with suppress(KeyError, TypeError):
             return trans % parameters
-        except (KeyError, TypeError):
-            # parameter is for PLURAL variants only, don't change the string
-            pass
     return trans
 
 
 @deprecated_args(code='source')
-def twtranslate(
-    source, twtitle, parameters=None, fallback=True, only_plural=False
-):
+def twtranslate(source,
+                twtitle: str,
+                parameters: Optional[Mapping] = None,
+                fallback: bool = True,
+                only_plural: bool = False) -> Optional[str]:
     r"""
     Translate a message using JSON files in messages_package_name.
 
@@ -701,7 +695,6 @@ def twtranslate(
         plural instances. If this is False it will apply the parameters also
         to the resulting string. If this is True the placeholders must be
         manually applied afterwards.
-    @type only_plural: bool
     @raise IndexError: If the language supports and requires more plurals than
         defined for the given translation template.
     """
@@ -762,10 +755,8 @@ def twtranslate(
         # This is called due to the old twntranslate function which ignored
         # KeyError. Instead only_plural should be used.
         if isinstance(parameters.source, dict):
-            try:
+            with suppress(KeyError):
                 trans %= parameters.source
-            except KeyError:
-                pass
         parameters = None
 
     if parameters is not None and not isinstance(parameters, Mapping):
@@ -778,9 +769,10 @@ def twtranslate(
         return trans
 
 
-@deprecated('twtranslate', since='20151009')
+@deprecated('twtranslate', since='20151009', future_warning=True)
 @deprecated_args(code='source')
-def twntranslate(source, twtitle, parameters=None):
+def twntranslate(source, twtitle: str,
+                 parameters: Optional[Mapping] = None) -> Optional[str]:
     """DEPRECATED: Get translated string for the key."""
     if parameters is not None:
         parameters = _PluralMappingAlias(parameters)
@@ -788,7 +780,7 @@ def twntranslate(source, twtitle, parameters=None):
 
 
 @deprecated_args(code='source')
-def twhas_key(source, twtitle):
+def twhas_key(source, twtitle: str) -> bool:
     """
     Check if a message has a translation in the specified language code.
 
@@ -808,7 +800,7 @@ def twhas_key(source, twtitle):
     return transdict is not None
 
 
-def twget_keys(twtitle):
+def twget_keys(twtitle: str) -> List[str]:
     """
     Return all language codes for a special message.
 
@@ -832,7 +824,10 @@ def twget_keys(twtitle):
             if lang != 'qqq' and _get_translation(lang, twtitle)]
 
 
-def input(twtitle, parameters=None, password=False, fallback_prompt=None):
+def input(twtitle: str,
+          parameters: Optional[Mapping] = None,
+          password: bool = False,
+          fallback_prompt: Optional[str] = None) -> str:
     """
     Ask the user a question, return the user's answer.
 
@@ -843,17 +838,14 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     @param parameters: The values which will be applied to the translated text
     @param password: Hides the user's input (for password entry)
     @param fallback_prompt: The English prompt if i18n is not available.
-    @rtype: str
     """
-    if not messages_available():
-        if not fallback_prompt:
-            raise TranslationError(
-                'Unable to load messages package %s for bundle %s'
-                % (_messages_package_name, twtitle))
-        else:
-            prompt = fallback_prompt
-    else:
+    if messages_available():
         code = config.userinterface_lang
-
         prompt = twtranslate(code, twtitle, parameters)
+    elif fallback_prompt:
+        prompt = fallback_prompt
+    else:
+        raise TranslationError(
+            'Unable to load messages package {} for bundle {}'
+            .format(_messages_package_name, twtitle))
     return pywikibot.input(prompt, password)

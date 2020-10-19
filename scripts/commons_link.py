@@ -33,6 +33,7 @@ and pagegenerator can be one of these:
 from __future__ import absolute_import, division, unicode_literals
 
 import re
+from typing import Tuple
 
 import pywikibot
 
@@ -114,14 +115,13 @@ class CommonsLinkBot(Bot):
                 pywikibot.output('Page {} is locked'.format(page.title()))
 
 
-def main(*args):
+def main(*args: Tuple[str, ...]):
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
 

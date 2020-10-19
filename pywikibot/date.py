@@ -11,11 +11,12 @@ import re
 
 from collections import defaultdict
 from contextlib import suppress
+from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper, deprecated
+from pywikibot.tools import deprecated, first_lower, first_upper
 
 #
 # Different collections of well known formats
@@ -42,7 +43,8 @@ millFormats = ['MillenniumAD', 'MillenniumBC']
 snglValsFormats = ['CurrEvents']
 
 
-def multi(value, tuplst):
+@singledispatch
+def multi(value: int, tuplst):
     """
     Run multiple pattern checks for the same entry.
 
@@ -52,24 +54,25 @@ def multi(value, tuplst):
     first to encode/decode a single value (e.g. simpleInt), second is a
     predicate function with an integer parameter that returns true or false.
     When the 2nd function evaluates to true, the 1st function is used.
-
     """
-    if isinstance(value, str):
-        # Try all functions, and test result against predicates
-        for func, pred in tuplst:
-            try:
-                res = func(value)
-            except ValueError:
-                continue
-            if pred(res):
-                return res
-    else:
-        # Find a predicate that gives true for this int value, and run a
-        # function
-        for func, pred in tuplst:
-            if pred(value):
-                return func(value)
+    # Find a predicate that gives true for this int value, and run a
+    # function
+    for func, pred in tuplst:
+        if pred(value):
+            return func(value)
+    raise ValueError('could not find a matching function')
 
+
+@multi.register(str)
+def _(value: str, tuplst):
+    # Try all functions, and test result against predicates
+    for func, pred in tuplst:
+        try:
+            res = func(value)
+        except ValueError:
+            continue
+        if pred(res):
+            return res
     raise ValueError('could not find a matching function')
 
 
@@ -177,7 +180,7 @@ def decSinglVal(v):
     return v[0]
 
 
-@deprecated(since='20151014')
+@deprecated(since='20151014', future_warning=True)
 def encNoConv(i):
     """Return i."""
     return i
@@ -310,7 +313,7 @@ def romanNumToInt(v):
 
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
-# (from int to a u-string) and decoder (from u-string to an int)
+# (from int to a str) and decoder (from str to an int)
 _digitDecoders = {
     # %% is a %
     '%': '%',
@@ -406,7 +409,8 @@ def escapePattern2(pattern):
     return _escPtrnCache2[pattern]
 
 
-def dh(value, pattern, encf, decf, filter=None):
+@singledispatch
+def dh(value: int, pattern, encf, decf, filter=None):
     """Function to help with year parsing.
 
     Usually it will be used as a lambda call in a map::
@@ -433,46 +437,49 @@ def dh(value, pattern, encf, decf, filter=None):
 
     """
     compPattern, strPattern, decoders = escapePattern2(pattern)
-    if isinstance(value, str):
-        m = compPattern.match(value)
-        if m:
-            # decode each found value using provided decoder
-            values = [decoder[2](m.group(i + 1))
-                      for i, decoder in enumerate(decoders)]
-            decValue = decf(values)
+    # Encode an integer value into a textual form.
+    # This will be called from outside as well as recursivelly to verify
+    # parsed value
+    if filter and not filter(value):
+        raise ValueError('value {} is not allowed'.format(value))
 
-            assert not isinstance(decValue, str), \
-                'Decoder must not return a string!'
+    params = encf(value)
 
-            # recursive call to re-encode and see if we get the original
-            # (may through filter exception)
-            if value == dh(decValue, pattern, encf, decf, filter):
-                return decValue
-
-        raise ValueError("reverse encoding didn't match")
+    if isinstance(params, (tuple, list)):
+        assert len(params) == len(decoders), (
+            'parameter count ({0}) does not match decoder count ({1})'
+            .format(len(params), len(decoders)))
+        # convert integer parameters into their textual representation
+        params = tuple(_make_parameter(decoders[i], param)
+                       for i, param in enumerate(params))
+        return strPattern % params
     else:
-        # Encode an integer value into a textual form.
-        # This will be called from outside as well as recursivelly to verify
-        # parsed value
-        if filter and not filter(value):
-            raise ValueError('value {} is not allowed'.format(value))
+        assert len(decoders) == 1, (
+            'A single parameter does not match {0} decoders.'
+            .format(len(decoders)))
+        # convert integer parameter into its textual representation
+        return strPattern % _make_parameter(decoders[0], params)
 
-        params = encf(value)
 
-        if isinstance(params, (tuple, list)):
-            assert len(params) == len(decoders), (
-                'parameter count ({0}) does not match decoder count ({1})'
-                .format(len(params), len(decoders)))
-            # convert integer parameters into their textual representation
-            params = tuple(_make_parameter(decoders[i], param)
-                           for i, param in enumerate(params))
-            return strPattern % params
-        else:
-            assert len(decoders) == 1, (
-                'A single parameter does not match {0} decoders.'
-                .format(len(decoders)))
-            # convert integer parameter into its textual representation
-            return strPattern % _make_parameter(decoders[0], params)
+@dh.register(str)
+def _(value: str, pattern, encf, decf, filter=None):
+    compPattern, strPattern, decoders = escapePattern2(pattern)
+    m = compPattern.match(value)
+    if m:
+        # decode each found value using provided decoder
+        values = [decoder[2](m.group(i + 1))
+                  for i, decoder in enumerate(decoders)]
+        decValue = decf(values)
+
+        assert not isinstance(decValue, str), \
+            'Decoder must not return a string!'
+
+        # recursive call to re-encode and see if we get the original
+        # (may through filter exception)
+        if value == dh(decValue, pattern, encf, decf, filter):
+            return decValue
+
+    raise ValueError("reverse encoding didn't match")
 
 
 def _make_parameter(decoder, param):
@@ -485,7 +492,7 @@ def _make_parameter(decoder, param):
     return newValue
 
 
-@deprecated(since='20151014')
+@deprecated(since='20151014', future_warning=True)
 def MakeParameter(decoder, param):
     """DEPRECATED."""
     return _make_parameter(decoder, param)
@@ -520,6 +527,9 @@ formats = {
         'ar': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو',
                                 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر',
                                 'أكتوبر', 'نوفمبر', 'ديسمبر']),
+        'arz': lambda v: slh(v, ['يناير', 'فبراير', 'مارس', 'ابريل', 'مايو',
+                                 'يونيه', 'يوليه', 'اغسطس', 'سبتمبر',
+                                 'اكتوبر', 'نوفمبر', 'ديسمبر']),
         'ast': lambda v: slh(v, ['xineru', 'febreru', 'marzu', 'abril',
                                  'mayu', 'xunu', 'xunetu', 'agostu',
                                  'setiembre', 'ochobre', 'payares',
@@ -1641,6 +1651,7 @@ formats = {
         'an': lambda v: dh_yearAD(v, '%d (muertes)'),
         'ay': lambda v: dh_yearAD(v, 'Jiwäwi %d'),
         'ar': lambda v: dh_yearAD(v, 'وفيات %d'),
+        'arz': lambda v: dh_yearAD(v, 'وفيات %d'),
         'ba': lambda v: dh_yearAD(v, '%d йылда үлгәндәр'),
         'bar': lambda v: dh_yearAD(v, 'Gestorben %d'),
         'be': lambda v: dh_yearAD(v, 'Памерлі ў %d годзе'),
@@ -1736,7 +1747,8 @@ formats = {
     'CurrEvents': {
         'an': lambda v: dh_singVal(v, 'Autualidá'),
         'ang': lambda v: dh_singVal(v, 'Efenealde belimpas'),
-        'ar': lambda v: dh_singVal(v, 'الأحداث الجارية'),
+        'ar': lambda v: dh_singVal(v, 'أحداث جارية'),
+        'arz': lambda v: dh_singVal(v, 'احداث دلوقتى'),
         'be': lambda v: dh_singVal(v, 'Бягучыя падзеі'),
         'bg': lambda v: dh_singVal(v, 'Текущи събития'),
         'ca': lambda v: dh_singVal(v, 'Viquipèdia:Actualitat'),
@@ -1802,7 +1814,7 @@ for monthOfYear in yrMnthFmts:
     formats[monthOfYear] = {}
 
 
-def addFmt1(lang, isMnthOfYear, patterns):
+def addFmt1(lang: str, isMnthOfYear, patterns):
     """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
@@ -1810,7 +1822,6 @@ def addFmt1(lang, isMnthOfYear, patterns):
     The patterns parameter is a list of 12 elements to be used for each month.
 
     @param lang: language code
-    @type lang: str
     """
     assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
 
@@ -1863,6 +1874,9 @@ addFmt2('ang', False, '%%d %s', True)
 addFmt1('ar', False, ['%d يناير', '%d فبراير', '%d مارس', '%d أبريل',
                       '%d مايو', '%d يونيو', '%d يوليو', '%d أغسطس',
                       '%d سبتمبر', '%d أكتوبر', '%d نوفمبر', '%d ديسمبر'])
+addFmt1('arz', False, ['%d يناير', '%d فبراير', '%d مارس', '%d ابريل',
+                       '%d مايو', '%d يونيه', '%d يوليه', '%d اغسطس',
+                       '%d سبتمبر', '%d اكتوبر', '%d نوفمبر', '%d ديسمبر'])
 addFmt1('ast', False, ['%d de xineru', '%d de febreru', '%d de marzu',
                        "%d d'abril", '%d de mayu', '%d de xunu',
                        '%d de xunetu', "%d d'agost", '%d de setiembre',
@@ -2164,7 +2178,7 @@ for monthId in range(12):
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(30)
 
 
-@deprecated('calendar.monthrange', since='20150707')
+@deprecated('calendar.monthrange', since='20150707', future_warning=True)
 def getNumberOfDaysInMonth(month):
     """
     Return the maximum number of days in a given month, 1 being January, etc.
@@ -2219,7 +2233,6 @@ def format_date(month, day, lang=None, year=2000):
     """Format a date localized to given lang.
 
     @param month: month in range of 1..12
-    @type month: int
     @param day: day of month in range of 1..31
     @type day: int
     @param lang: a site object or language key. Defaults to current site.

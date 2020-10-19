@@ -16,11 +16,13 @@ import re
 import traceback
 
 from collections.abc import Container, MutableMapping, Sized
+from contextlib import suppress
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
 from inspect import getfullargspec
 from io import BytesIO
+from typing import Optional, Set, Tuple, Union
 from warnings import warn
 from urllib.parse import urlencode, unquote
 
@@ -34,6 +36,7 @@ from pywikibot.exceptions import (
     Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.family import SubdomainFamily
+from pywikibot.login import LoginStatus
 from pywikibot.tools import (
     deprecated, itergroup, PYTHON_VERSION, remove_last_args
 )
@@ -74,14 +77,14 @@ class CTEBinaryBytesGenerator(BytesGenerator):
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
-        super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._writeBody = self._write_body
 
     def _write_body(self, msg):
         if msg['content-transfer-encoding'] == 'binary':
             self._fp.write(msg.get_payload(decode=True))
         else:
-            super(CTEBinaryBytesGenerator, self)._handle_text(msg)
+            super()._handle_text(msg)
 
 
 class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
@@ -133,18 +136,18 @@ class UploadWarning(APIError):
 
     """Upload failed with a warning message (passed as the argument)."""
 
-    def __init__(self, code, message, file_key=None, offset=0):
+    def __init__(self, code, message,
+                 file_key: Optional[str] = None,
+                 offset: Union[int, bool] = 0):
         """
         Create a new UploadWarning instance.
 
         @param filekey: The filekey of the uploaded file to reuse it later. If
             no key is known or it is an incomplete file it may be None.
-        @type filekey: str or None
         @param offset: The starting offset for a chunked upload. Is False when
             there is no offset.
-        @type offset: int or bool
         """
-        super(UploadWarning, self).__init__(code, message)
+        super().__init__(code, message)
         self.file_key = file_key
         self.offset = offset
 
@@ -162,7 +165,7 @@ class APIMWException(APIError):
         """Save error dict returned by MW API."""
         self.mediawiki_exception_class_name = mediawiki_exception_class_name
         code = 'internal_api_error_' + mediawiki_exception_class_name
-        super(APIMWException, self).__init__(code, info, **kwargs)
+        super().__init__(code, info, **kwargs)
 
 
 class ParamInfo(Sized, Container):
@@ -238,9 +241,6 @@ class ParamInfo(Sized, Container):
             return
         mw_ver = self.site.mw_version
 
-        if mw_ver < '1.15':
-            self._parse_help()
-
         # The paraminfo api deprecated the old request syntax of
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
         # must only use 'modules' parameter.
@@ -249,17 +249,13 @@ class ParamInfo(Sized, Container):
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
 
-        # v1.18 and earlier paraminfo doesn't include modules; must use 'query'
         # Assume that by v1.26, it will be desirable to prefetch 'query'
-        if mw_ver > '1.26' or mw_ver < '1.19':
+        if mw_ver > '1.26':
             self.preloaded_modules |= {'query'}
 
         self._fetch(self.preloaded_modules)
 
-        # paraminfo 'mainmodule' was added 1.15
-        assert('main' in self._paraminfo)
         main_modules_param = self.parameter('main', 'action')
-
         assert(main_modules_param)
         assert('type' in main_modules_param)
         assert(isinstance(main_modules_param['type'], list))
@@ -275,9 +271,8 @@ class ParamInfo(Sized, Container):
         self._limit = query_modules_param['limit']
 
         if query_modules_param and 'type' in query_modules_param:
-            # 1.19+ 'type' is the list of modules; on 1.18, it is 'string'
-            if isinstance(query_modules_param['type'], list):
-                self._add_submodules('query', query_modules_param['type'])
+            # 'type' is the list of modules
+            self._add_submodules('query', query_modules_param['type'])
 
         if 'query' not in self._modules:
             assert 'query' not in self._paraminfo
@@ -285,7 +280,7 @@ class ParamInfo(Sized, Container):
         assert 'query' in self._modules
 
     def _emulate_pageset(self):
-        """Emulate the pageset module, which existed in MW 1.15-1.24."""
+        """Emulate the pageset module, which existed until MW 1.24."""
         # pageset isn't a module in the new system, so it is emulated, with
         # the paraminfo from the query module.
         assert('query' in self._paraminfo)
@@ -300,68 +295,17 @@ class ParamInfo(Sized, Container):
             'parameters': self._paraminfo['query']['parameters']
         }
 
-    def _parse_help(self):
-        """Emulate paraminfo['main'] data using help for mw 1.14."""
-        # Request need ParamInfo to determine use_get
-        request = self.site._request(expiry=config.API_config_expiry,
-                                     use_get=True,
-                                     parameters={'action': 'help'})
-        result = request.submit()
-
-        assert('help' in result)
-        assert(isinstance(result['help'], dict))
-        assert('mime' in result['help'])
-        assert(result['help']['mime'] == 'text/plain')
-        assert('help' in result['help'])
-        assert(isinstance(result['help']['help'], str))
-
-        help_text = result['help']['help']
-
-        start = help_text.find('What action you would like to perform')
-        start = help_text.find('One value: ', start) + len('One value: ')
-        end = help_text.find('\n', start)
-
-        action_modules = help_text[start:end].split(', ')
-
-        start = help_text.find('The format of the output')
-        start = help_text.find('One value: ', start) + len('One value: ')
-        end = help_text.find('\n', start)
-
-        format_modules = help_text[start:end].split(', ')
-
-        self._paraminfo['main'] = {
-            'name': 'main',
-            'path': 'main',
-            'classname': 'ApiMain',
-            'prefix': '',
-            'readrights': '',
-            'helpurls': [],
-            'parameters': [
-                {
-                    'name': 'action',
-                    'type': action_modules,
-                    'submodules': '',
-                },
-                {
-                    'name': 'format',
-                    'type': format_modules,
-                    'submodules': '',
-                },
-            ],
-        }
-
     @staticmethod
-    def _modules_to_set(modules):
+    def _modules_to_set(modules) -> set:
         """Return modules as a set.
 
-        @type modules: iterable or basestring
-        @rtype: set
+        @type modules: iterable or str
         """
         if isinstance(modules, str):
             return set(modules.split('|'))
         return set(modules)
 
-    def fetch(self, modules):
+    def fetch(self, modules) -> None:
         """
         Fetch paraminfo for multiple modules.
 
@@ -370,7 +314,6 @@ class ParamInfo(Sized, Container):
 
         @param modules: API modules to load
         @type modules: iterable or str
-        @rtype: NoneType
         """
         if 'main' not in self._paraminfo:
             # The first request should be 'paraminfo', so that
@@ -391,13 +334,11 @@ class ParamInfo(Sized, Container):
 
         self._fetch(modules)
 
-    def _fetch(self, modules):
+    def _fetch(self, modules: set) -> None:
         """
         Fetch paraminfo for multiple modules without initializing beforehand.
 
         @param modules: API modules to load and which haven't been loaded yet.
-        @type modules: set
-        @rtype: NoneType
         """
         def module_generator():
             """A generator yielding batches of modules."""
@@ -553,7 +494,7 @@ class ParamInfo(Sized, Container):
                 assert param['name'] == 'generator' and \
                     submodules >= set(param['type'])
 
-    def _normalize_modules(self, modules):
+    def _normalize_modules(self, modules) -> set:
         """Add query+ to any query module name not also in action modules."""
         # Users will supply the wrong type, and expect it to work.
         modules = self._modules_to_set(modules)
@@ -566,14 +507,13 @@ class ParamInfo(Sized, Container):
                 else mod
                 for mod in modules}
 
-    def normalize_modules(self, modules):
+    def normalize_modules(self, modules) -> set:
         """
         Convert the modules into module paths.
 
         Add query+ to any query module name not also in action modules.
 
         @return: The modules converted into a module paths
-        @rtype: set
         """
         self._init()
         return self._normalize_modules(modules)
@@ -657,7 +597,7 @@ class ParamInfo(Sized, Container):
         else:
             raise KeyError(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         """Return whether the key is valid."""
         try:
             self[key]
@@ -665,22 +605,19 @@ class ParamInfo(Sized, Container):
         except KeyError:
             return False
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return number of cached modules."""
         return len(self._paraminfo)
 
-    def parameter(self, module, param_name):
+    def parameter(self, module: str, param_name: str) -> Optional[dict]:
         """
         Get details about one modules parameter.
 
         Returns None if the parameter does not exist.
 
         @param module: API module name
-        @type module: str
         @param param_name: parameter name in the module
-        @type param_name: str
         @return: metadata that describes how the parameter may be used
-        @rtype: dict or None
         """
         # TODO: the 'description' field of each parameter is not in the default
         # output of v1.25, and can't removed from previous API versions.
@@ -711,7 +648,7 @@ class ParamInfo(Sized, Container):
 
     @property
     @deprecated('submodules() or module_paths', since='20150715')
-    def modules(self):
+    def modules(self) -> Set[str]:
         """
         Set of all main and query modules without path prefixes.
 
@@ -719,7 +656,6 @@ class ParamInfo(Sized, Container):
         the action modules and query modules).
 
         @return: module names
-        @rtype: set of str
         """
         return self.action_modules | self.query_modules
 
@@ -751,16 +687,13 @@ class ParamInfo(Sized, Container):
         """Set of all query module names without query+ path prefix."""
         return self.submodules('query')
 
-    def submodules(self, name, path=False):
+    def submodules(self, name: str, path: bool = False) -> set:
         """
         Set of all submodules.
 
         @param name: The name of the parent module.
-        @type name: str
         @param path: Whether the path and not the name is returned.
-        @type path: bool
         @return: The names or paths of the submodules.
-        @rtype: set
         """
         if name not in self._modules:
             self.fetch([name])
@@ -772,10 +705,10 @@ class ParamInfo(Sized, Container):
     @staticmethod
     def _prefix_submodules(modules, prefix):
         """Prefix submodules with path."""
-        return {'{0}+{1}'.format(prefix, mod) for mod in modules}
+        return {'{}+{}'.format(prefix, mod) for mod in modules}
 
     @property
-    @deprecated('prefix_map', since='20150715')
+    @deprecated('prefix_map', since='20150715', future_warning=True)
     def prefixes(self):
         """
         Mapping of module to its prefix for all modules with a prefix.
@@ -800,7 +733,7 @@ class ParamInfo(Sized, Container):
                                 if prefix}
         return self._prefix_map.copy()
 
-    def attributes(self, attribute, modules=None):
+    def attributes(self, attribute: str, modules: Optional[set] = None):
         """
         Mapping of modules with an attribute to the attribute value.
 
@@ -808,10 +741,8 @@ class ParamInfo(Sized, Container):
         attribute is empty or set to False.
 
         @param attribute: attribute name
-        @type attribute: basestring
         @param modules: modules to include. If None (default), it'll load all
             modules including all submodules using the paths.
-        @type modules: set or None
         @rtype: dict using modules as keys
         """
         if modules is None:
@@ -821,18 +752,17 @@ class ParamInfo(Sized, Container):
         return {mod: self[mod][attribute]
                 for mod in modules if attribute in self[mod]}
 
-    @deprecated('attributes', since='20150715')
-    def module_attribute_map(self, attribute, modules=None):
+    @deprecated('attributes', since='20150715', future_warning=True)
+    def module_attribute_map(self, attribute: str,
+                             modules: Optional[set] = None):
         """
         Mapping of modules with an attribute to the attribute value.
 
         @param attribute: attribute name
-        @type attribute: basestring
         @param modules: modules to include. If None (default) it'll load all
             action and query modules using the module names. It only uses the
             path for query modules which have the same name as an action
             module.
-        @type modules: set
         @rtype: dict using modules as keys
         """
         if modules is None:
@@ -845,7 +775,7 @@ class ParamInfo(Sized, Container):
                 for mod in modules if self[mod][attribute]}
 
     @property
-    @deprecated('parameter()', since='20150905')
+    @deprecated('parameter()', since='20150905', future_warning=True)
     def query_modules_with_limits(self):
         """Set of all query modules which have limits."""
         if not self._with_limits:
@@ -868,22 +798,22 @@ class OptionSet(MutableMapping):
     None and after setting it, any site (even None) will fail.
     """
 
-    def __init__(self, site=None, module=None, param=None, dict=None):
+    def __init__(self, site=None,
+                 module: Optional[str] = None,
+                 param: Optional[str] = None,
+                 dict: Optional[dict] = None):
         """
         Initializer.
 
         If a site is given, the module and param must be given too.
 
         @param site: The associated site
-        @type site: piwikibot.site.APISite
+        @type site: pywikibot.site.APISite or None
         @param module: The module name which is used by paraminfo. (Ignored
             when site is None)
-        @type module: str
         @param param: The parameter name inside the module. That parameter must
             have a 'type' entry. (Ignored when site is None)
-        @type param: str
         @param dict: The initializing dict which is used for L{from_dict}.
-        @type dict: dict
         """
         self._site_set = False
         self._enabled = set()
@@ -892,9 +822,9 @@ class OptionSet(MutableMapping):
         if dict:
             self.from_dict(dict)
 
-    def _set_site(self, site, module, param, clear_invalid=False):
-        """
-        Set the site and valid names.
+    def _set_site(self, site, module: str, param: str,
+                  clear_invalid: bool = False):
+        """Set the site and valid names.
 
         As soon as the site has been not None, any subsequent calls will fail,
         unless there had been invalid names and a KeyError was thrown.
@@ -902,13 +832,10 @@ class OptionSet(MutableMapping):
         @param site: The associated site
         @type site: pywikibot.site.APISite
         @param module: The module name which is used by paraminfo.
-        @type module: str
         @param param: The parameter name inside the module. That parameter must
             have a 'type' entry.
-        @type param: str
         @param clear_invalid: Instead of throwing a KeyError, invalid names are
             silently removed from the options (disabled by default).
-        @type clear_invalid: bool
         """
         if self._site_set:
             raise TypeError('The site can not be set multiple times.')
@@ -997,7 +924,7 @@ class OptionSet(MutableMapping):
         else:
             raise ValueError('Invalid value "{0}"'.format(value))
 
-    def __getitem__(self, name):
+    def __getitem__(self, name) -> Optional[bool]:
         """
         Return whether the option is enabled.
 
@@ -1005,7 +932,6 @@ class OptionSet(MutableMapping):
             Otherwise it returns None. If the site has been set it raises a
             KeyError if the name is invalid. Otherwise it might return a value
             even though the name might be invalid.
-        @rtype: bool/None
         """
         if name in self._enabled:
             return True
@@ -1026,15 +952,12 @@ class OptionSet(MutableMapping):
 
     def __iter__(self):
         """Iterate over each enabled and disabled option."""
-        for enabled in self._enabled:
-            yield enabled
-        for disabled in self._disabled:
-            yield disabled
+        yield from self._enabled
+        yield from self._disabled
 
     def api_iter(self):
         """Iterate over each option as they appear in the URL."""
-        for enabled in self._enabled:
-            yield enabled
+        yield from self._enabled
         for disabled in self._disabled:
             yield '!{0}'.format(disabled)
 
@@ -1130,8 +1053,6 @@ class Request(MutableMapping):
         so that when the API parameters are modified the changes can always be
         applied to the 'parameters' parameter.
 
-        @param parameters: The parameters used for the request to the API.
-        @type parameters: dict
         @param site: The Site to which the request will be submitted. If not
                supplied, uses the user's configured default Site.
         @param mime: If true, send in "multipart/form-data" format (default
@@ -1150,6 +1071,8 @@ class Request(MutableMapping):
         @param use_get: (optional) Use HTTP GET request if possible. If False
                it uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
+        @param parameters: The parameters used for the request to the API.
+        @type parameters: dict
         @param kwargs: The parameters used for the request to the API.
         """
         if site is None:
@@ -1277,7 +1200,7 @@ class Request(MutableMapping):
              '"parameters" parameter.', DeprecationWarning, 3)
 
     @classmethod
-    def clean_kwargs(cls, kwargs):
+    def clean_kwargs(cls, kwargs: dict) -> dict:
         """
         Convert keyword arguments into new parameters mode.
 
@@ -1287,9 +1210,7 @@ class Request(MutableMapping):
         added as a 'parameters' keyword. It will always create a shallow copy.
 
         @param kwargs: The original keyword arguments which is not modified.
-        @type kwargs: dict
         @return: The normalized keyword arguments.
-        @rtype: dict
         """
         if 'expiry' in kwargs and kwargs['expiry'] is None:
             del kwargs['expiry']
@@ -1350,15 +1271,10 @@ class Request(MutableMapping):
         """Implement dict interface."""
         return self._params[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value):
         """Set MediaWiki API request parameter.
 
-        @param key: param key
-
-        @type key: basestring
-
         @param value: param value(s)
-
         @type value: str in site encoding
             (string types may be a `|`-separated list)
             iterable, where items are converted to string
@@ -1427,7 +1343,7 @@ class Request(MutableMapping):
         except TypeError:
             self.mime_params = {} if value else None
 
-    @deprecated('_http_param_string', since='20141006')
+    @deprecated(since='20141006', future_warning=True)
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
@@ -1641,16 +1557,15 @@ class Request(MutableMapping):
         return use_get
 
     @classmethod
-    def _build_mime_request(cls, params, mime_params):
+    def _build_mime_request(cls, params: dict,
+                            mime_params) -> Tuple[dict, str]:
         """
         Construct a MIME multipart form post.
 
         @param params: HTTP request params
-        @type params: dict
         @param mime_params: HTTP request parts which must be sent in the body
         @type mime_params: dict of (content, keytype, headers)
         @return: HTTP request headers and body
-        @rtype: tuple (dict, str)
         """
         # construct a MIME message containing all API key/values
         container = MIMEMultipart(_subtype='form-data')
@@ -1694,11 +1609,10 @@ class Request(MutableMapping):
                         _logger)
         return use_get, uri, body, headers
 
-    def _http_request(self, use_get, uri, body, headers, paramstring):
+    def _http_request(self, use_get, uri, body, headers, paramstring) -> tuple:
         """Get or post a http request with exception handling.
 
         @return: a tuple containing data from request and use_get value
-        @rtype: tuple
         """
         try:
             data = http.request(
@@ -1729,13 +1643,11 @@ class Request(MutableMapping):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, data):
+    def _json_loads(self, data: str) -> dict:
         """Read source text and return a dict.
 
         @param data: raw data string
-        @type data: str
         @return: a data dict
-        @rtype: dict
         @raises APIError: unknown action found
         @raises APIError: unknown query result type
         """
@@ -1786,8 +1698,7 @@ class Request(MutableMapping):
             # case, force a re-login.
             username = result['query']['userinfo']['name']
             if (self.site.user() is not None and self.site.user() != username
-                    and self.site._loginstatus
-                    != pywikibot.site.LoginStatus.IN_PROGRESS):
+                    and self.site._loginstatus != LoginStatus.IN_PROGRESS):
                 message = ("Logged in as '{actual}' instead of '{expected}'."
                            .format(actual=username, expected=self.site.user()))
                 self._relogin(message)
@@ -1899,10 +1810,14 @@ class Request(MutableMapping):
                 'No rate limit found for action {}'.format(self.action))
         self.wait(delay)
 
-    def _bad_token(self, code):
+    def _bad_token(self, code) -> bool:
         """Check for bad token."""
-        if (code != 'badtoken' or self.site._loginstatus
-                == pywikibot.site.LoginStatus.IN_PROGRESS):
+        if code != 'badtoken':  # Other code not handled here
+            return False
+
+        if self.site._loginstatus == LoginStatus.IN_PROGRESS:
+            pywikibot.log('Login status: {}'
+                          .format(self.site._loginstatus.name))
             return False
 
         user_tokens = self.site.tokens._tokens[self.site.user()]
@@ -1928,24 +1843,23 @@ class Request(MutableMapping):
             for name, t_type in invalid_param.items():
                 self[name] = self.site.tokens[t_type]
             return True
-        else:
-            # otherwise couldn't find any … weird there is nothing what
-            # can be done here because it doesn't know which parameters
-            # to fix
-            pywikibot.log(
-                'Bad token error for {} but no parameter is using a '
-                'token. Current tokens: {}'
-                .format(self.site.user(),
-                        ', '.join('{}: {}'.format(*e)
-                                  for e in user_tokens.items())))
+
+        # otherwise couldn't find any … weird there is nothing what
+        # can be done here because it doesn't know which parameters
+        # to fix
+        pywikibot.log(
+            'Bad token error for {} but no parameter is using a '
+            'token. Current tokens: {}'
+            .format(self.site.user(),
+                    ', '.join('{}: {}'.format(*e)
+                              for e in user_tokens.items())))
         return False
 
-    def submit(self):
+    def submit(self) -> dict:
         """
         Submit a query and parse the response.
 
         @return: a dict containing data retrieved from api.php
-        @rtype: dict
         """
         self._add_defaults()
         use_get = self._use_get()
@@ -2039,7 +1953,9 @@ class Request(MutableMapping):
                 continue
 
             # If readapidenied is returned try to login
-            if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
+            if code == 'readapidenied' \
+               and self.site._loginstatus in (LoginStatus.NOT_ATTEMPTED,
+                                              LoginStatus.NOT_LOGGED_IN):
                 self.site.login()
                 continue
 
@@ -2109,7 +2025,7 @@ class CachedRequest(Request):
         @param expiry: either a number of days or a datetime.timedelta object
         """
         assert expiry is not None
-        super(CachedRequest, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not isinstance(expiry, datetime.timedelta):
             expiry = datetime.timedelta(expiry)
         self.expiry = min(expiry, datetime.timedelta(config.API_config_expiry))
@@ -2122,14 +2038,13 @@ class CachedRequest(Request):
         raise NotImplementedError('CachedRequest cannot be created simply.')
 
     @classmethod
-    def _get_cache_dir(cls):
+    def _get_cache_dir(cls) -> str:
         """
         Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 
         @return: base directory path for cache entries
-        @rtype: basestring
         """
         path = os.path.join(pywikibot.config2.base_dir,
                             'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
@@ -2138,37 +2053,28 @@ class CachedRequest(Request):
         return path
 
     @staticmethod
-    def _make_dir(dir):
-        """
-        Create directory if it does not exist already.
+    def _make_dir(dir_name: str) -> str:
+        """Create directory if it does not exist already.
 
-        The directory name (dir) is returned unmodified.
+        The directory name (dir_name) is returned unmodified.
 
-        @param dir: directory path
-        @type dir: basestring
-
+        @param dir_name: directory path
         @return: directory name
-        @rtype: basestring
         """
-        try:
-            os.makedirs(dir)
-        except OSError:
-            # directory already exists
-            pass
-        return dir
+        with suppress(OSError):  # directory already exists
+            os.makedirs(dir_name)
+        return dir_name
 
-    def _uniquedescriptionstr(self):
+    def _uniquedescriptionstr(self) -> str:
         """Return unique description for the cache entry.
 
         If this is modified, please also update
         scripts/maintenance/cache.py to support
         the new key and all previous keys.
-
-        @rtype: str
         """
         login_status = self.site._loginstatus
 
-        if login_status >= pywikibot.site.LoginStatus.AS_USER:
+        if login_status >= LoginStatus.AS_USER:
             # This uses the format of Page.__repr__, without performing
             # config.console_encoding as done by Page.__repr__.
             # The returned value can't be encoded to anything other than
@@ -2176,8 +2082,7 @@ class CachedRequest(Request):
             # tries to encode it as utf-8.
             user_key = 'User(User:{})'.format(self.site.userinfo['name'])
         else:
-            user_key = repr(pywikibot.site.LoginStatus(
-                pywikibot.site.LoginStatus.NOT_LOGGED_IN))
+            user_key = repr(LoginStatus(LoginStatus.NOT_LOGGED_IN))
 
         request_key = repr(sorted(self._encoded_items().items()))
         return repr(self.site) + user_key + request_key
@@ -2199,11 +2104,10 @@ class CachedRequest(Request):
     def _expired(self, dt):
         return dt + self.expiry < datetime.datetime.utcnow()
 
-    def _load_cache(self):
+    def _load_cache(self) -> bool:
         """Load cache entry for request, if available.
 
         @return: Whether the request was loaded from the cache
-        @rtype: bool
         """
         self._add_defaults()
         try:
@@ -2214,9 +2118,9 @@ class CachedRequest(Request):
             if self._expired(self._cachetime):
                 self._data = None
                 return False
-            pywikibot.debug('%s: cache hit (%s) for API request: %s'
-                            % (self.__class__.__name__, filename, uniquedescr),
-                            _logger)
+            pywikibot.debug('{}: cache hit ({}) for API request: {}'
+                            .format(self.__class__.__name__, filename,
+                                    uniquedescr), _logger)
             return True
         except IOError:
             # file not found
@@ -2235,14 +2139,14 @@ class CachedRequest(Request):
         """Submit cached request."""
         cached_available = self._load_cache()
         if not cached_available:
-            self._data = super(CachedRequest, self).submit()
+            self._data = super().submit()
             self._write_cache(self._data)
         else:
             self._handle_warnings(self._data)
         return self._data
 
 
-class _RequestWrapper(object):
+class _RequestWrapper:
 
     """A wrapper class to handle the usage of the C{parameters} parameter."""
 
@@ -2271,8 +2175,8 @@ class APIGenerator(_RequestWrapper):
     after iterating that many values.
     """
 
-    def __init__(self, action, continue_name='continue', limit_name='limit',
-                 data_name='data', **kwargs):
+    def __init__(self, action: str, continue_name: str = 'continue',
+                 limit_name: str = 'limit', data_name: str = 'data', **kwargs):
         """
         Initialize an APIGenerator object.
 
@@ -2280,13 +2184,9 @@ class APIGenerator(_RequestWrapper):
         documentation for values.
 
         @param action: API action name.
-        @type action: str
         @param continue_name: Name of the continue API parameter.
-        @type continue_name: str
         @param limit_name: Name of the limit API parameter.
-        @type limit_name: str
         @param data_name: Name of the data in API response.
-        @type data_name: str
         """
         kwargs = self._clean_kwargs(kwargs, action=action)
 
@@ -2303,7 +2203,7 @@ class APIGenerator(_RequestWrapper):
         self.request = self.request_class(**kwargs)
         self.request[self.limit_name] = self.query_increment
 
-    def set_query_increment(self, value):
+    def set_query_increment(self, value: int):
         """
         Set the maximum number of items to be retrieved per API query.
 
@@ -2311,7 +2211,6 @@ class APIGenerator(_RequestWrapper):
 
         @param value: The value of maximum number of items to be retrieved
             per API request to set.
-        @type value: int
         """
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
@@ -2319,7 +2218,7 @@ class APIGenerator(_RequestWrapper):
                         % (self.__class__.__name__, self.query_increment),
                         _logger)
 
-    def set_maximum_items(self, value):
+    def set_maximum_items(self, value: Union[int, str, None]):
         """
         Set the maximum number of items to be retrieved from the wiki.
 
@@ -2328,7 +2227,6 @@ class APIGenerator(_RequestWrapper):
 
         @param value: The value of maximum number of items to be retrieved
             in total to set. Ignores None value.
-        @type value: int or str or None
         """
         if value is not None and int(value) > 0:
             self.limit = int(value)
@@ -2566,7 +2464,6 @@ class QueryGenerator(_RequestWrapper):
 
         If not called, the default is to ask for "max" items and let the
         API decide how many to send.
-
         """
         limit = int(value)
 
@@ -2579,7 +2476,7 @@ class QueryGenerator(_RequestWrapper):
                         % (self.__class__.__name__, self.query_limit),
                         _logger)
 
-    def set_maximum_items(self, value):
+    def set_maximum_items(self, value: Union[int, str, None]):
         """Set the maximum number of items to be retrieved from the wiki.
 
         If not called, most queries will continue as long as there is
@@ -2592,7 +2489,6 @@ class QueryGenerator(_RequestWrapper):
 
         @param value: The value of maximum number of items to be retrieved
             in total to set. Ignores None value.
-        @type value: int or str or None
         """
         if value is not None:
             self.limit = int(value)
@@ -2612,7 +2508,7 @@ class QueryGenerator(_RequestWrapper):
                                                       self.api_limit),
                 _logger)
 
-    def support_namespace(self):
+    def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
 
         Note: this function will be removed when self.set_namespace() will
@@ -2620,7 +2516,6 @@ class QueryGenerator(_RequestWrapper):
               See T196619.
 
         @return: True if yes, False otherwise
-        @rtype: bool
         """
         assert(self.limited_module)  # some modules do not have a prefix
         return bool(
@@ -2631,9 +2526,9 @@ class QueryGenerator(_RequestWrapper):
         """Set a namespace filter on this query.
 
         @param namespaces: namespace identifiers to limit query results
-        @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types. May be a '|' separated
-            list of namespace identifiers. An empty iterator clears any
+        @type namespaces: iterable of str or Namespace key, or a single
+            instance of those types. May be a '|' separated list of
+            namespace identifiers. An empty iterator clears any
             namespace restriction.
         @raises KeyError: a namespace identifier was not resolved
 
@@ -2827,8 +2722,7 @@ class QueryGenerator(_RequestWrapper):
                 else:
                     self.normalized = {}
                 try:
-                    for result in self._extract_results(resultdata):
-                        yield result
+                    yield from self._extract_results(resultdata)
                 except RuntimeError:
                     return
                 # self.resultkey in data in last request.submit()
@@ -2873,7 +2767,7 @@ class PageGenerator(QueryGenerator):
 
     """
 
-    def __init__(self, generator, g_content=False, **kwargs):
+    def __init__(self, generator: str, g_content=False, **kwargs):
         """
         Initializer.
 
@@ -2881,7 +2775,6 @@ class PageGenerator(QueryGenerator):
         action=query is assumed and generator is required.
 
         @param generator: the "generator=" type from api.php
-        @type generator: str
         @param g_content: if True, retrieve the contents of the current
             version of each Page (default False)
 
@@ -2908,7 +2801,7 @@ class PageGenerator(QueryGenerator):
                      'timestamp|user|comment|url|size|sha1|metadata')
         appendParams(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.resultkey = 'pages'  # element to look for in result
         self.props = self.request['prop']
 
@@ -2932,22 +2825,6 @@ class PageGenerator(QueryGenerator):
         return p
 
 
-@deprecated('PageGenerator', since='20141106', future_warning=True)
-class CategoryPageGenerator(PageGenerator):
-
-    """Like PageGenerator, but yields Category objects instead of Pages."""
-
-    pass
-
-
-@deprecated('PageGenerator', since='20141106', future_warning=True)
-class ImagePageGenerator(PageGenerator):
-
-    """Like PageGenerator, but yields FilePage objects instead of Pages."""
-
-    pass
-
-
 class PropertyGenerator(QueryGenerator):
 
     """Iterator for queries of type action=query&prop=foo.
@@ -2963,7 +2840,7 @@ class PropertyGenerator(QueryGenerator):
 
     """
 
-    def __init__(self, prop, **kwargs):
+    def __init__(self, prop: str, **kwargs):
         """
         Initializer.
 
@@ -2971,11 +2848,9 @@ class PropertyGenerator(QueryGenerator):
         action=query is assumed and prop is required.
 
         @param prop: the "prop=" type from api.php
-        @type prop: str
-
         """
         kwargs = self._clean_kwargs(kwargs, prop=prop)
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self._props = frozenset(prop.split('|'))
         self.resultkey = 'pages'
 
@@ -2987,18 +2862,13 @@ class PropertyGenerator(QueryGenerator):
     def __iter__(self):
         """Yield results."""
         self._previous_dicts = {}
-        for result in super(PropertyGenerator, self).__iter__():
-            yield result
-        for result in self._previous_dicts.values():
-            yield result
+        yield from super().__iter__()
+        yield from self._previous_dicts.values()
 
     def _extract_results(self, resultdata):
         """Yield completed page_data of consecutive API requests."""
-        for d in self._fully_retrieved_data_dicts(resultdata):
-            yield d
-        for data_dict in super(PropertyGenerator, self)._extract_results(
-            resultdata
-        ):
+        yield from self._fully_retrieved_data_dicts(resultdata)
+        for data_dict in super()._extract_results(resultdata):
             if 'title' in data_dict:
                 d = self._previous_dicts.setdefault(data_dict['title'],
                                                     data_dict)
@@ -3046,7 +2916,7 @@ class ListGenerator(QueryGenerator):
 
     """
 
-    def __init__(self, listaction, **kwargs):
+    def __init__(self, listaction: str, **kwargs):
         """
         Initializer.
 
@@ -3054,11 +2924,9 @@ class ListGenerator(QueryGenerator):
         action=query is assumed and listaction is required.
 
         @param listaction: the "list=" type from api.php
-        @type listaction: str
-
         """
         kwargs = self._clean_kwargs(kwargs, list=listaction)
-        QueryGenerator.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
 
 class LogEntryListGenerator(ListGenerator):
@@ -3071,7 +2939,7 @@ class LogEntryListGenerator(ListGenerator):
 
     def __init__(self, logtype=None, **kwargs):
         """Initializer."""
-        ListGenerator.__init__(self, 'logevents', **kwargs)
+        super().__init__('logevents', **kwargs)
 
         from pywikibot import logentries
         self.entryFactory = logentries.LogEntryFactory(self.site, logtype)
@@ -3103,20 +2971,17 @@ class LoginManager(login.LoginManager):
 
     def keyword(self, key):
         """Get API keyword from mapping."""
-        index = 0 if self.action == 'login' else 1
-        return self.mapping[key][index]
+        return self.mapping[key][self.action != 'login']
 
     @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
-    def getCookie(self):
+    def getCookie(self) -> str:
         """Login to the site.
 
         Note, this doesn't actually return or do anything with cookies.
-        The threadedhttp module takes care of all the cookie stuff,
-        this just has a legacy name for now and should be renamed in the
-        future.
+        The http module takes care of all the cookie stuff, this just
+        has a legacy name for now and should be renamed in the future.
 
         @return: empty string if successful, throws exception on failure
-
         """
         if hasattr(self, '_waituntil'):
             if datetime.datetime.now() < self._waituntil:
@@ -3156,7 +3021,7 @@ class LoginManager(login.LoginManager):
         if self.site.family.ldapDomain:
             login_request[self.keyword('ldap')] = self.site.family.ldapDomain
 
-        self.site._loginstatus = -2  # IN_PROGRESS
+        self.site._loginstatus = LoginStatus.IN_PROGRESS
         while True:
             # get token using meta=tokens if supported
             if not below_mw_1_27:
@@ -3217,16 +3082,15 @@ class LoginManager(login.LoginManager):
         raise APIError(code=status, info=info)
 
     def storecookiedata(self, data):
-        """Ignore data; cookies are set by threadedhttp module."""
-        http.cookie_jar.save()
+        """Ignore data; cookies are set by http module."""
+        http.cookie_jar.save(ignore_discard=True)
 
-    def get_login_token(self):
+    def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.
 
         Requires MediaWiki >= 1.27.
 
         @return: login token
-        @rtype: str
         """
         if self.site.mw_version < '1.27':
             raise NotImplementedError('The method get_login_token() requires '
@@ -3239,7 +3103,7 @@ class LoginManager(login.LoginManager):
         return login_token_result['query']['tokens'].get('logintoken')
 
 
-def encode_url(query):
+def encode_url(query) -> str:
     """
     Encode parameters to pass with a url.
 
@@ -3251,7 +3115,6 @@ def encode_url(query):
     @param query: keys and values to be uncoded for passing with a url
     @type query: mapping object or a sequence of two-element tuples
     @return: encoded parameters with token parameters at the end
-    @rtype: str
     """
     if hasattr(query, 'items'):
         query = list(query.items())
@@ -3263,7 +3126,7 @@ def encode_url(query):
     return urlencode(query)
 
 
-def _update_pageid(page, pagedict):
+def _update_pageid(page, pagedict: dict):
     """Update pageid."""
     if 'pageid' in pagedict:
         page._pageid = int(pagedict['pageid'])
@@ -3282,7 +3145,7 @@ def _update_pageid(page, pagedict):
             .format(pagedict['title']))
 
 
-def _update_contentmodel(page, pagedict):
+def _update_contentmodel(page, pagedict: dict):
     """Update page content model."""
     page._contentmodel = pagedict.get('contentmodel')  # can be None
 
@@ -3293,7 +3156,7 @@ def _update_contentmodel(page, pagedict):
         page._quality_text = pagedict['proofread']['quality_text']
 
 
-def _update_protection(page, pagedict):
+def _update_protection(page, pagedict: dict):
     """Update page protection."""
     if 'restrictiontypes' in pagedict:
         page._applicable_protections = set(pagedict['restrictiontypes'])
@@ -3361,13 +3224,12 @@ def _update_coordinates(page, coordinates):
     page._coords = coords
 
 
-def update_page(page, pagedict, props=[]):
+def update_page(page, pagedict: dict, props=[]):
     """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
     @type page: pywikibot.page.Page
     @param pagedict: the contents of a "page" element of a query response
-    @type pagedict: dict
     @param props: the property names which resulted in pagedict. If a missing
         value in pagedict can indicate both 'false' and 'not present' the
         property which would make the value present must be in the props

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for the patrol script."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
+from contextlib import suppress
 
 from scripts import patrol
 
@@ -45,7 +44,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
 
     def setUp(self):
         """Create a bot dummy instance."""
-        super(TestPatrolBot, self).setUp()
+        super().setUp()
         self.bot = DummyPatrolBot(self.site)
 
     def test_parse_page_tuples(self):
@@ -81,7 +80,5 @@ class TestPatrolBot(DefaultDrySiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

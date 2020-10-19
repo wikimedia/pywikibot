@@ -32,9 +32,10 @@ import time
 
 from functools import partial
 from requests.exceptions import ReadTimeout
+from typing import Optional
 
 try:
-    from bs4 import BeautifulSoup, FeatureNotFound
+    from bs4 import BeautifulSoup
 except ImportError as e:
     BeautifulSoup = e
 
@@ -42,6 +43,7 @@ except ImportError as e:
         """Raise BeautifulSoup when called, if bs4 is not available."""
         raise BeautifulSoup
 else:
+    from bs4 import FeatureNotFound
     try:
         BeautifulSoup('', 'lxml')
     except FeatureNotFound:
@@ -54,9 +56,34 @@ import pywikibot
 from pywikibot.comms import http
 from pywikibot.data.api import Request
 from pywikibot.exceptions import OtherPageSaveError
+from pywikibot import textlib
 from pywikibot.tools import ModuleDeprecationWrapper
 
 _logger = 'proofreadpage'
+
+
+def decompose(fn):  # noqa: N805
+    """Decorator.
+
+    Decompose text if needed and recompose text.
+    """
+    def wrapper(obj, *args, **kwargs):
+        if not hasattr(obj, '_full_header'):
+            obj._decompose_page()
+        _res = fn(obj, *args, **kwargs)
+        obj._compose_page()
+        return _res
+
+    return wrapper
+
+
+def check_if_cached(fn):  # noqa: N805
+    """Decorator to check if data are cached and cache them if needed."""
+    def wrapper(self, *args, **kwargs):
+        if self._cached is False:
+            self._get_page_mappings()
+        return fn(self, *args, **kwargs)
+    return wrapper
 
 
 class FullHeader:
@@ -206,7 +233,7 @@ class ProofreadPage(pywikibot.Page):
         left, sep, right = base.rpartition('.')
         ext = right if sep else ''
 
-        return (base, ext, num)
+        return base, ext, num
 
     @property
     def index(self):
@@ -289,19 +316,6 @@ class ProofreadPage(pywikibot.Page):
                 and hasattr(self, '_quality')):
             return int(self._quality)
         return self.ql
-
-    def decompose(fn):  # noqa: N805
-        """Decorator.
-
-        Decompose text if needed and recompose text.
-        """
-        def wrapper(obj, *args, **kwargs):
-            if not hasattr(obj, '_full_header'):
-                obj._decompose_page()
-            _res = fn(obj, *args, **kwargs)
-            obj._compose_page()
-            return _res
-        return wrapper
 
     @property
     @decompose
@@ -425,14 +439,13 @@ class ProofreadPage(pywikibot.Page):
         return self._text
 
     @text.setter
-    def text(self, value):
+    def text(self, value: str):
         """Update current text.
 
         Mainly for use within the class, called by other methods.
         Use self.header, self.body and self.footer to set page content,
 
         @param value: New value or None
-        @param value: basestring
 
         @raise Error: the page is not formatted according to ProofreadPage
             extension.
@@ -595,11 +608,10 @@ class ProofreadPage(pywikibot.Page):
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
-                timeout = e
                 pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
             except Exception as e:
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
-                return (True, e)
+                return True, e
             else:
                 pywikibot.debug('{}: {}'.format(ocr_tool, response.text),
                                 _logger)
@@ -608,10 +620,10 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.warning('retrying in {} seconds ...'.format(retry))
             time.sleep(retry)
         else:
-            return True, timeout
+            return True, ReadTimeout
 
         if 400 <= response.status < 600:
-            return (True, 'Http response status {}'.format(response.status))
+            return True, 'Http response status {}'.format(response.status)
 
         data = json.loads(response.text)
 
@@ -628,9 +640,9 @@ class ProofreadPage(pywikibot.Page):
 
         if error:
             pywikibot.error('OCR query %s: %s' % (cmd_uri, _text))
-            return (error, _text)
+            return error, _text
         else:
-            return (error, parser_func(_text))
+            return error, parser_func(_text)
 
     def _do_hocr(self):
         """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
@@ -671,7 +683,7 @@ class ProofreadPage(pywikibot.Page):
         except ValueError:
             error_text = 'No prp-page-image src found for %s.' % self
             pywikibot.error(error_text)
-            return (True, error_text)
+            return True, error_text
 
         try:
             cmd_fmt = self._OCR_CMDS[ocr_tool]
@@ -795,15 +807,8 @@ class IndexPage(pywikibot.Page):
 
         self._cached = False
 
-    def check_if_cached(fn):  # noqa: N805
-        """Decorator to check if data are cached and cache them if needed."""
-        def wrapper(self, *args, **kwargs):
-            if self._cached is False:
-                self._get_page_mappings()
-            return fn(self, *args, **kwargs)
-        return wrapper
-
-    def _parse_redlink(self, href):
+    @staticmethod
+    def _parse_redlink(href):
         """Parse page title when link in Index is a redlink."""
         p_href = re.compile(
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
@@ -835,9 +840,9 @@ class IndexPage(pywikibot.Page):
             return False
 
         # Discard all inner templates as only top-level ones matter
-        tmplts = pywikibot.textlib.extract_templates_and_params_regex_simple(
+        templates = textlib.extract_templates_and_params_regex_simple(
             self.text)
-        if len(tmplts) != 1 or tmplts[0][0] != self.INDEX_TEMPLATE:
+        if len(templates) != 1 or templates[0][0] != self.INDEX_TEMPLATE:
             # Only a single call to the INDEX_TEMPLATE is allowed
             return False
 
@@ -963,24 +968,21 @@ class IndexPage(pywikibot.Page):
         """
         return len(self._page_from_numbers)
 
-    def page_gen(self, start=1, end=None, filter_ql=None,
-                 only_existing=False, content=True):
+    def page_gen(self, start: Optional[int] = 1,
+                 end: Optional[int] = None, filter_ql=None,
+                 only_existing: bool = False, content: bool = True):
         """Return a page generator which yields pages contained in Index page.
 
         Range is [start ... end], extremes included.
 
         @param start: first page, defaults to 1
-        @type start: int
         @param end: num_pages if end is None
-        @type end: int
         @param filter_ql: filters quality levels
                           if None: all but 'Without Text'.
         @type filter_ql: list of ints (corresponding to ql constants
                          defined in ProofreadPage).
         @param only_existing: yields only existing pages.
-        @type only_existing: bool
         @param content: preload content.
-        @type content: bool
         """
         if end is None:
             end = self.num_pages
@@ -1038,7 +1040,8 @@ class IndexPage(pywikibot.Page):
             raise KeyError('Page number ".../{}" not in range.'
                            .format(page_number))
 
-    def _get_from_label(self, mapping_dict, label):
+    @staticmethod
+    def _get_from_label(mapping_dict, label):
         """Helper function to get info from label."""
         # Convert label to string if an integer is passed.
         if isinstance(label, int):

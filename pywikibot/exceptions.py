@@ -87,7 +87,9 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot.tools import _NotImplementedWarning
+from typing import Optional, Union
+
+from pywikibot.tools import deprecated, _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -133,12 +135,11 @@ class PageRelatedError(Error):
     Page, and when a generic message can be written once for all.
     """
 
-    # Preformatted UNICODE message where the page title will be inserted
+    # Preformatted message where the page title will be inserted.
     # Override this in subclasses.
-    # 'Oh noes! Page %s is too funky, we should not delete it ;('
-    message = None
+    message = ''
 
-    def __init__(self, page, message=None):
+    def __init__(self, page, message: Optional[str] = None):
         """
         Initializer.
 
@@ -160,8 +161,10 @@ class PageRelatedError(Error):
         else:
             super().__init__(self.message % page)
 
+    @deprecated('PageRelatedError.page attribute', since='20201016',
+                future_warning=True)
     def getPage(self):
-        """Return the page related to the exception."""
+        """DEPRECATED. Return the page related to the exception."""
         return self.page
 
 
@@ -187,11 +190,10 @@ class OtherPageSaveError(PageSaveRelatedError):
 
     message = 'Edit to page %(title)s failed:\n%(reason)s'
 
-    def __init__(self, page, reason):
+    def __init__(self, page, reason: Union[str, Exception]):
         """Initializer.
 
         @param reason: Details of the problem
-        @type reason: Exception or basestring
         """
         self.reason = reason
         super().__init__(page)
@@ -244,13 +246,12 @@ class InconsistentTitleReceived(PageLoadRelatedError):
 
     """Page receives a title inconsistent with query."""
 
-    def __init__(self, page, actual):
+    def __init__(self, page, actual: str):
         """Initializer.
 
         @param page: Page that caused the exception
         @type page: Page object
         @param actual: title obtained by query
-        @type reason: basestring
 
         """
         self.message = "Query on %s returned data on '{0}'".format(actual)
@@ -335,7 +336,7 @@ class InterwikiRedirectPage(PageRelatedError):
         """Initializer.
 
         @param target_page: Target page of the redirect.
-        @type reason: Page
+        @type target_page: Page
         """
         self.target_page = target_page
         self.target_site = target_page.site
@@ -471,16 +472,6 @@ class BadTitle(Error):
     pass
 
 
-# UserBlocked exceptions should in general not be caught. If the bot has
-# been blocked, the bot operator should address the reason for the block
-# before continuing.
-class UserBlocked(Error):
-
-    """Your username or IP has been blocked."""
-
-    pass
-
-
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
@@ -570,5 +561,15 @@ class TimeoutError(Error):
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
+
+    pass
+
+# DEPRECATED exceptions which will be removed ##########################
+
+
+# UserBlocked exceptions is not used by the framework.
+class UserBlocked(Error):
+
+    """DEPRECATED. Your username or IP has been blocked."""
 
     pass

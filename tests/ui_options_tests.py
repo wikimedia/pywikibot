@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Bot tests for input_choice options."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 from pywikibot import bot, bot_choice
 
@@ -29,12 +29,20 @@ class TestChoiceOptions(TestCase):
     def test_output(self):
         """Test OutputOption."""
         option = bot_choice.OutputOption()
+        self.assertFalse(option.stop)
         with self.assertRaisesRegex(NotImplementedError, ''):
             message('?', [option], None)
+
+    def test_proxy_output(self):
+        """Test OutputProxyOption."""
+        option = bot_choice.OutputProxyOption('Test', 'T', None)
+        self.assertFalse(option.stop)
+        self.assertEqual(option.format(), '[t]est')
 
     def test_standard(self):
         """Test StandardOption."""
         option = bot.StandardOption('Test', 'T')
+        self.assertTrue(option.stop)
         self.assertEqual(option.option, 'Test')
         self.assertEqual(option.shortcut, 't')
         self.assertEqual(option.shortcut, option.result(None))
@@ -57,7 +65,9 @@ class TestChoiceOptions(TestCase):
     def test_Nested(self):
         """Test NestedOption."""
         standard = bot.StandardOption('Test', 'T')
+        self.assertTrue(standard.stop)
         option = bot.NestedOption('Next', 'x', 'Nested:', [standard])
+        self.assertFalse(option.stop)
         self.assertEqual(option.format('x'), 'Ne[X]t')
         self.assertEqual(option.format(), 'Ne[x]t')
         self.assertEqual(option._output, 'Nested: ([t]est)')
@@ -69,6 +79,7 @@ class TestChoiceOptions(TestCase):
     def test_Integer(self):
         """Test IntegerOption."""
         option = bot.IntegerOption(maximum=5, prefix='r')
+        self.assertTrue(option.stop)
         self.assertEqual(option.format('2'), 'r<number> [1-5]')
         self.assertEqual(option.format('r2'), 'r<number> [1-[2]-5]')
         self.assertEqual(option.format(default='r2'), 'r<number> [1-[2]-5]')
@@ -92,6 +103,7 @@ class TestChoiceOptions(TestCase):
                                bot.ListOption, [])
         options = ['foo', 'bar']
         option = bot.ListOption(options)
+        self.assertTrue(option.stop)
         self.assertEqual(message('?', [option], None), '? (<number> [1-2])')
         self.assertEqual(message('?', [option]), '? (<number> [1-2])')
         self.assertEqual(message('?', [option], '2'), '? (<number> [1-[2]])')
@@ -122,9 +134,69 @@ class TestChoiceOptions(TestCase):
             self.assertIsNone(option.handled('{}{}'.format(
                 prefix, len(options) + 1)))
 
+    def test_showing_list(self):
+        """Test ShowingListOption."""
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
+                               bot.ShowingListOption, [])
+        options = ['foo', 'bar']
+        option = bot.ShowingListOption(options)
+        self.assertEqual(message('?', [option]), '? (<number> [1-2])')
+
+    def test_multiple_choice_list(self):
+        """Test MultipleChoiceList."""
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
+                               bot.MultipleChoiceList, [])
+        options = ['foo', 'bar']
+        option = bot.MultipleChoiceList(options)
+        self.assertTrue(option.stop)
+        self.assertEqual(message('?', [option]), '? (<number> [1-2])')
+        self.assertFalse(option.test(''))
+        self.assertFalse(option.test('*'))
+        self.assertFalse(option.test('0'))
+        self.assertFalse(option.test('0,1'))
+        self.assertTrue(option.test('1'))
+        self.assertFalse(option.test('1,'))
+        self.assertTrue(option.test('1,2'))
+        self.assertTrue(option.test('2'))
+        self.assertFalse(option.test('2,3'))
+        self.assertFalse(option.test('3'))
+        self.assertEqual(option.result('1'), ('', [options[0]]))
+        self.assertEqual(option.result('1,2'), ('', [options[0], options[1]]))
+
+    def test_showing_multiple_choice_list(self):
+        """Test ShowingMultipleChoiceList."""
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
+                               bot.ShowingMultipleChoiceList, [])
+        options = ['foo', 'bar']
+        option = bot.ShowingMultipleChoiceList(options)
+        self.assertEqual(message('?', [option]), '? (<number> [1-2])')
+        self.assertFalse(option.test('*'))
+        self.assertTrue(option.test('1'))
+        self.assertTrue(option.test('1,2'))
+        self.assertTrue(option.test('2'))
+        self.assertFalse(option.test('2,3'))
+        self.assertEqual(option.result('2'), ('', [options[1]]))
+        self.assertEqual(option.result('1,2'), ('', [options[0], options[1]]))
+
+    def test_choice_excepton(self):
+        """Test ChoiceException."""
+        option = bot.ChoiceException('Test', 'T')
+        self.assertTrue(option.stop)
+        self.assertEqual(option.result('*'), option)
+        with self.assertRaises(bot.ChoiceException):
+            raise bot.ChoiceException('Test', 'T')
+
+    def test_quit_keyboard_interrupt(self):
+        """Test QuitKeyboardInterrupt."""
+        option = bot.QuitKeyboardInterrupt()
+        self.assertTrue(option.stop)
+        self.assertEqual(option.result('*'), option)
+        self.assertEqual(option.option, 'quit')
+        self.assertEqual(option.shortcut, 'q')
+        with self.assertRaises(bot.QuitKeyboardInterrupt):
+            raise bot.QuitKeyboardInterrupt()
+
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

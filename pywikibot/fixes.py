@@ -576,6 +576,7 @@ fixes = {
         'regex': False,
         'msg': {
             'ar': 'روبوت: إصلاح حالة حروف الصفحات الخاصة',
+            'arz': 'روبوت: تصليح حاله الحروف بتاعه الصفحات الخصوصيه',
             'en': 'Robot: Fixing special page capitalisation',
             'fa': 'ربات: تصحیح بزرگی و کوچکی حروف صفحه‌های ویژه',
         },
@@ -601,13 +602,14 @@ fixes = {
         ],
     },
     # yu top-level domain will soon be disabled, see
-    # http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+    # https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
     # The following are domains that are often-used.
     'yu-tld': {
         'regex': False,
         'nocase': True,
         'msg': {
             'ar':  'روبوت: إصلاح الوصلات إلى نطاقات .yu',
+            'arz':  'روبوت: تصليح اللينكات للدومين .yu',
             'de':  'Bot: Ersetze Links auf .yu-Domains',
             'en':  'Robot: Replacing links to .yu domains',
             'fa':  'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',

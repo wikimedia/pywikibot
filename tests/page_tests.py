@@ -13,14 +13,12 @@ from contextlib import suppress
 import pywikibot
 import pywikibot.page
 
-from pywikibot import config
-from pywikibot import InvalidTitle
-
+from pywikibot import config, InvalidTitle
 from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
-    unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
-    DefaultDrySiteTestCase, DeprecationTestCase,
+    DefaultDrySiteTestCase, DefaultSiteTestCase, SiteAttributeTestCase,
+    TestCase, unittest,
 )
 from tests import mock
 
@@ -625,30 +623,6 @@ class TestPageCoordinates(TestCase):
             self.assertTrue(coord.primary)
 
 
-class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test deprecation of Page attributes."""
-
-    def test_creator(self):
-        """Test getCreator."""
-        mainpage = self.get_mainpage()
-        creator = mainpage.getCreator()
-        self.assertEqual(creator,
-                         (mainpage.oldest_revision.user,
-                          mainpage.oldest_revision.timestamp.isoformat()))
-        self.assertIsInstance(creator[0], str)
-        self.assertIsInstance(creator[1], str)
-        self._ignore_unknown_warning_packages = True  # T163175
-        self.assertDeprecation()
-
-        self._reset_messages()
-        if self.site.mw_version >= '1.16':
-            self.assertIsInstance(mainpage.previous_revision_id, int)
-            self.assertEqual(mainpage.previous_revision_id,
-                             mainpage.latest_revision.parent_id)
-            self.assertDeprecation()
-
-
 class TestPageBaseUnicode(DefaultDrySiteTestCase):
 
     """Base class for tests requiring a page using a unicode title."""
@@ -656,7 +630,7 @@ class TestPageBaseUnicode(DefaultDrySiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize page instance."""
-        super(TestPageBaseUnicode, cls).setUpClass()
+        super().setUpClass()
         cls.page = pywikibot.Page(cls.site, 'Ō')
 
 
@@ -703,14 +677,14 @@ class TestPageRepr(TestPageBaseUnicode):
 
     def setUp(self):
         """Force the console encoding to UTF-8."""
-        super(TestPageRepr, self).setUp()
+        super().setUp()
         self._old_encoding = config.console_encoding
         config.console_encoding = 'utf8'
 
     def tearDown(self):
         """Restore the original console encoding."""
         config.console_encoding = self._old_encoding
-        super(TestPageRepr, self).tearDown()
+        super().tearDown()
 
     def test_mainpage_type(self):
         """Test the return type of repr(Page(<main page>)) is str."""
@@ -735,14 +709,14 @@ class TestPageReprASCII(TestPageBaseUnicode):
 
     def setUp(self):
         """Patch the current console encoding to ASCII."""
-        super(TestPageReprASCII, self).setUp()
+        super().setUp()
         self._old_encoding = config.console_encoding
         config.console_encoding = 'ascii'
 
     def tearDown(self):
         """Restore the original console encoding."""
         config.console_encoding = self._old_encoding
-        super(TestPageReprASCII, self).tearDown()
+        super().tearDown()
 
 
 class TestPageBotMayEdit(TestCase):
@@ -757,7 +731,7 @@ class TestPageBotMayEdit(TestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestPageBotMayEdit, self).setUp()
+        super().setUp()
         self.page = pywikibot.Page(self.site,
                                    'not_existent_page_for_pywikibot_tests')
         if self.page.exists():
@@ -931,6 +905,12 @@ class TestPageHistory(DefaultSiteTestCase):
         self.assertEqual(rev_count, mp.revision_count())
         cnt = mp.contributors()
         self.assertEqual(rev_count, sum(cnt.values()))
+
+        user, count = cnt.most_common(1)[0]
+        self.assertEqual(mp.revision_count([user]), count)
+        self.assertEqual(mp.revision_count(user), count)
+        self.assertEqual(mp.revision_count(pywikibot.User(self.site, user)),
+                         count)
 
         top_two = cnt.most_common(2)
         self.assertIsInstance(top_two, list)

@@ -42,15 +42,14 @@ Commandline parameters:
 
 """
 #
-# (C) Pywikibot team, 2011-2019
+# (C) Pywikibot team, 2011-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import time
 
 from collections import defaultdict
+from contextlib import suppress
 
 try:
     import mwparserfromhell
@@ -96,7 +95,7 @@ class PatrolBot(SingleSiteBot):
             'versionchecktime': 300,
             'autopatroluserns': False
         })
-        super(PatrolBot, self).__init__(site, **kwargs)
+        super().__init__(site, **kwargs)
         self.recent_gen = True
         self.user = None
         if self.getOption('whitelist'):
@@ -266,10 +265,9 @@ class PatrolBot(SingleSiteBot):
         if self.site.family.name != 'wikisource':
             return False
 
-        try:
+        author_ns = 0
+        with suppress(AttributeError, KeyError):
             author_ns = self.site.family.authornamespaces[self.site.lang][0]
-        except (AttributeError, KeyError):
-            author_ns = 0
 
         author_ns_prefix = self.site.namespace(author_ns) + ':'
         if title.startswith(author_ns_prefix):

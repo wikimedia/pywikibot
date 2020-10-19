@@ -8,7 +8,7 @@
 import math
 
 from string import Formatter
-from typing import Sequence
+from typing import Any, Mapping, Sequence
 
 from pywikibot.logging import output
 from pywikibot.userinterfaces.terminal_interface_base import colors
@@ -104,7 +104,8 @@ class _ColorFormatter(Formatter):
         if previous_literal:
             yield previous_literal, None, None, None
 
-    def vformat(self, format_string: str, args: Sequence, kwargs: dict) -> str:
+    def vformat(self, format_string: str, args: Sequence,
+                kwargs: Mapping[str, Any]) -> str:
         """Return the format result but verify no colors are keywords.
 
         @param format_string: The format template string

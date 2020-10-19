@@ -4,10 +4,10 @@
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
-import csv
-
 from collections import defaultdict
+from csv import DictReader
 from io import BytesIO, StringIO
+from xml.etree import ElementTree
 
 import pywikibot
 from pywikibot.comms import http
@@ -118,35 +118,31 @@ class WikiStats:
         self._raw[format][table] = data
         return data
 
-    def csv(self, table: str):
+    def csv(self, table: str) -> list:
         """
         Fetch and parse CSV for a table.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         if table in self._data['csv']:
             return self._data['csv'][table]
 
         raw = self.raw_cached(table, 'csv')
         f = StringIO(raw.decode('utf8'))
-        reader = csv.DictReader(f)
+        reader = DictReader(f)
         data = list(reader)
         self._data['csv'][table] = data
 
         return data
 
-    def xml(self, table: str):
+    def xml(self, table: str) -> list:
         """
         Fetch and parse XML for a table.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         if table in self._data['xml']:
             return self._data['xml'][table]
-
-        from xml.etree import ElementTree
 
         raw = self.raw_cached(table, 'xml')
         f = BytesIO(raw)
@@ -165,11 +161,10 @@ class WikiStats:
         self._data['xml'][table] = data
         return data
 
-    def get(self, table: str, format='csv'):
+    def get(self, table: str, format='csv') -> list:
         """Get a list of a table of data.
 
         @param table: table of data to fetch
-        @rtype: list
         """
         try:
             func = getattr(self, format)
@@ -178,13 +173,12 @@ class WikiStats:
                                       .format(format))
         return func(table)
 
-    def get_dict(self, table: str, format='csv'):
+    def get_dict(self, table: str, format='csv') -> dict:
         """Get dictionary of a table of data using format.
 
         @param table: table of data to fetch
         @param format: format of data to use
         @type format: 'xml' or 'csv', or None to autoselect.
-        @rtype: dict
         """
         if format is None:  # old autoselect
             format = 'csv'
