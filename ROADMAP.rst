@@ -20,7 +20,7 @@ Future release notes
 * 5.0.0: DataSite.get_item() method will be removed
 * 5.0.0: date.MakeParameter() function will be removed
 * 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed
-* 4.3.0: Unsused UserBlocked exception will be removed
+* 4.3.0: Unused UserBlocked exception will be removed
 * 4.3.0: Deprecated Page.contributingUsers() will be removed
 * 4.2.0: tools.StringTypes will be removed
 * 4.1.0: Deprecated editor.command will be removed
