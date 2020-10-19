@@ -19,9 +19,7 @@ from pywikibot import tools
 from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path, mock
-from tests.aspects import (
-    unittest, require_modules, DeprecationTestCase, TestCase
-)
+from tests.aspects import unittest, require_modules, TestCase
 
 
 class OpenArchiveTestCase(TestCase):
@@ -141,26 +139,6 @@ class OpenArchiveTestCase(TestCase):
                                    self.base_file + '.xz')
         finally:
             tools.lzma = old_lzma
-
-
-class OpenCompressedTestCase(OpenArchiveTestCase, DeprecationTestCase):
-
-    """Test opening files with the deprecated open_compressed."""
-
-    net = False
-
-    def _get_content(self, *args, **kwargs):
-        """Use open_compressed and return content using a with-statement."""
-        # open_archive default is True, but open_compressed default is False.
-        # The test cases assumes a default of True and we need to make
-        # open_compressed acknowledge that.
-        if 'use_extension' not in kwargs:
-            kwargs['use_extension'] = True
-
-        with tools.open_compressed(*args, **kwargs) as f:
-            content = f.read().replace(b'\r\n', b'\n')
-        self.assertOneDeprecation(self.INSTEAD)
-        return content
 
 
 class OpenArchiveWriteTestCase(TestCase):
