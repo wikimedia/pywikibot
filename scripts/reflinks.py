@@ -414,10 +414,10 @@ class ReferencesRobot(SingleSiteBot):
                 break
         if code:
             manual += '/{}'.format(code)
-        if self.opt.summary is None:
-            self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
-        else:
+        if self.opt.summary:
             self.msg = self.opt.summary
+        else:
+            self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
 
         local = i18n.translate(self.site, badtitles)
         if local:
