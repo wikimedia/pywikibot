@@ -1773,12 +1773,6 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-@deprecated('open_archive()', since='20150915', future_warning=True)
-def open_compressed(filename, use_extension=False):
-    """DEPRECATED: Open a file and uncompress it if needed."""
-    return open_archive(filename, use_extension=use_extension)
-
-
 @deprecated('bot_choice.Option and its subclasses', since='20181217')
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
@@ -1808,10 +1802,6 @@ wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
                              since='20200712', future_warning=True)
-wrapper._add_deprecated_attr('UnicodeType', str,
-                             since='20200813', future_warning=True)
 wrapper._add_deprecated_attr('StringTypes', (str, bytes),
                              replacement_name='(str, bytes)',
-                             since='20200813', future_warning=True)
-wrapper._add_deprecated_attr('signature', inspect.signature,
                              since='20200813', future_warning=True)
