@@ -615,12 +615,11 @@ class BasePage(ComparableMixin):
             return ''
 
     @text.setter
-    def text(self, value):
+    def text(self, value: str):
         """
         Update the current (edited) wikitext.
 
         @param value: New value or None
-        @type value: basestring
         """
         del self.text
         self._text = None if value is None else str(value)
@@ -1957,7 +1956,6 @@ class BasePage(ComparableMixin):
             pg.undelete('This will restore only selected revisions.')
 
         @param reason: Reason for the action.
-        @type reason: basestring
         """
         if hasattr(self, '_deletedRevs'):
             undelete_revs = [ts for ts, rev in self._deletedRevs.items()
@@ -3217,12 +3215,11 @@ class User(Page):
             else:
                 raise err
 
-    def unblock(self, reason=None):
+    def unblock(self, reason: Optional[str] = None):
         """
         Remove the block for the user.
 
         @param reason: Reason for the unblock.
-        @type reason: basestring
         """
         self.site.unblockuser(self, reason)
 
@@ -3231,9 +3228,9 @@ class User(Page):
 
         @keyword logtype: only iterate entries of this type
             (see mediawiki api documentation for available types)
-        @type logtype: basestring
+        @type logtype: str
         @keyword page: only iterate entries affecting this page
-        @type page: Page or basestring
+        @type page: Page or str
         @keyword namespace: namespace to retrieve logevents from
         @type namespace: int or Namespace
         @keyword start: only iterate entries from and after this Timestamp
@@ -3244,7 +3241,7 @@ class User(Page):
             (default: newest)
         @type reverse: bool
         @keyword tag: only iterate entries tagged with this tag
-        @type tag: basestring
+        @type tag: str
         @keyword total: maximum number of events to iterate
         @type total: int
         @rtype: iterable
@@ -3261,7 +3258,7 @@ class User(Page):
         return next(iter(self.logevents(total=1)), None)
 
     @deprecated_args(limit='total', namespace='namespaces')
-    def contributions(self, total=500, **kwargs) -> tuple:
+    def contributions(self, total: int = 500, **kwargs) -> tuple:
         """
         Yield tuples describing this user edits.
 
@@ -3271,12 +3268,11 @@ class User(Page):
         Pages returned are not guaranteed to be unique.
 
         @param total: limit result to this number of pages
-        @type total: int
         @keyword start: Iterate contributions starting at this Timestamp
         @keyword end: Iterate contributions ending at this Timestamp
         @keyword reverse: Iterate oldest contributions first (default: newest)
         @keyword namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @keyword showMinor: if True, iterate only minor edits; if False and
@@ -4544,16 +4540,14 @@ class ItemPage(WikibasePage):
         return page._item
 
     @classmethod
-    def from_entity_uri(cls, site, uri, lazy_load=False):
+    def from_entity_uri(cls, site, uri: str, lazy_load: bool = False):
         """
         Get the ItemPage from its entity uri.
 
         @param site: The Wikibase site for the item.
         @type site: pywikibot.site.DataSite
         @param uri: Entity uri for the Wikibase item.
-        @type uri: basestring
         @param lazy_load: Do not raise NoPage if ItemPage does not exist.
-        @type lazy_load: bool
         @rtype: pywikibot.page.ItemPage
 
         @raise TypeError: Site is not a valid DataSite.
@@ -4787,17 +4781,15 @@ class Property:
                    'tabular-data': 'string',
                    }
 
-    def __init__(self, site, id, datatype=None):
+    def __init__(self, site, id: str, datatype: Optional[str] = None):
         """
         Initializer.
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
         @param id: id of the property
-        @type id: basestring
         @param datatype: datatype of the property;
             if not given, it will be queried via the API
-        @type datatype: basestring
         """
         self.repo = site
         self.id = id.upper()

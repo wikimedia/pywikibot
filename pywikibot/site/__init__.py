@@ -213,15 +213,13 @@ class Namespace(Iterable, ComparableMixin):
         """
         return name in (x.lower() for x in self._distinct())
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         """Determine if item is a name of this namespace.
 
         The comparison is case insensitive, and item may have a single
         colon on one or both sides of the name.
 
         @param item: name to check
-        @type item: basestring
-        @rtype: bool
         """
         if item == '' and self.id == 0:
             return True
@@ -388,12 +386,11 @@ class Namespace(Iterable, ComparableMixin):
     @classmethod
     @deprecated('NamespacesDict.lookup_name', since='20150703',
                 future_warning=True)
-    def lookup_name(cls, name, namespaces=None):
+    def lookup_name(cls, name: str, namespaces=None):
         """
         Find the Namespace for a name.
 
         @param name: Name of the namespace.
-        @type name: basestring
         @param namespaces: namespaces to search
                            default: builtins only
         @type namespaces: dict of Namespace
@@ -416,7 +413,7 @@ class Namespace(Iterable, ComparableMixin):
         successfully finds. A numerical string is resolved as an integer.
 
         @param identifiers: namespace identifiers
-        @type identifiers: iterable of basestring or Namespace key,
+        @type identifiers: iterable of str or Namespace key,
             or a single instance of those types
         @param namespaces: namespaces to search (default: builtins only)
         @type namespaces: dict of Namespace
@@ -497,12 +494,11 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Get the number of namespaces."""
         return len(self._namespaces)
 
-    def lookup_name(self, name):
+    def lookup_name(self, name: str):
         """
         Find the Namespace for a name also checking aliases.
 
         @param name: Name of the namespace.
-        @type name: basestring
         @rtype: Namespace or None
         """
         name = Namespace.normalize_name(name)
@@ -510,14 +506,13 @@ class NamespacesDict(Mapping, SelfCallMixin):
             return None
         return self.lookup_normalized_name(name.lower())
 
-    def lookup_normalized_name(self, name):
+    def lookup_normalized_name(self, name: str):
         """
         Find the Namespace for a name also checking aliases.
 
         The name has to be normalized and must be lower case.
 
         @param name: Name of the namespace.
-        @type name: basestring
         @rtype: Namespace or None
         """
         return self._namespace_names.get(name)
@@ -545,7 +540,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         successfully finds. A numerical string is resolved as an integer.
 
         @param identifiers: namespace identifiers
-        @type identifiers: iterable of basestring or Namespace key,
+        @type identifiers: iterable of str or Namespace key,
             or a single instance of those types
         @return: list of Namespace objects in the same order as the
             identifiers
@@ -1361,7 +1356,7 @@ class APISite(BaseSite):
             constructor unchanged (not all types require this)
         @param namespaces: if not None, limit the query to namespaces in
             this list
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param total: if not None, limit the generator to yielding this
@@ -2988,7 +2983,7 @@ class APISite(BaseSite):
             both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param total: Maximum number of pages to retrieve in total.
@@ -3049,7 +3044,7 @@ class APISite(BaseSite):
             None, return both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
@@ -3082,7 +3077,7 @@ class APISite(BaseSite):
 
         @param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @rtype: typing.Iterable[pywikibot.Page]
@@ -3120,7 +3115,7 @@ class APISite(BaseSite):
 
         @param namespaces: Only iterate pages in these namespaces
             (default: all)
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param follow_redirects: if True, yields the target of any redirects,
@@ -3187,7 +3182,7 @@ class APISite(BaseSite):
         @see: U{https://www.mediawiki.org/wiki/API:Templates}
 
         @param namespaces: Only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
@@ -3216,7 +3211,7 @@ class APISite(BaseSite):
         @param namespaces: If present, only return category members from
             these namespaces. To yield subcategories or files, use
             parameter member_type instead.
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param sortby: determines the order in which results are generated,
@@ -3832,7 +3827,8 @@ class APISite(BaseSite):
 
     @deprecated_args(step=None)
     def blocks(self, starttime=None, endtime=None, reverse=False,
-               blockids=None, users=None, iprange=None, total=None):
+               blockids=None, users=None, iprange: Optional[str] = None,
+               total: Optional[int] = None):
         """Iterate all current blocks, in order of creation.
 
         The iterator yields dicts containing keys corresponding to the
@@ -3851,15 +3847,13 @@ class APISite(BaseSite):
         @param reverse: if True, iterate oldest blocks first (default: newest)
         @type reverse: bool
         @param blockids: only iterate blocks with these id numbers. Numbers
-            must be separated by '|' if given by a basestring.
-        @type blockids: basestring, tuple or list
+            must be separated by '|' if given by a str.
+        @type blockids: str, tuple or list
         @param users: only iterate blocks affecting these usernames or IPs
-        @type users: basestring, tuple or list
+        @type users: str, tuple or list
         @param iprange: a single IP or an IP range. Ranges broader than
             IPv4/16 or IPv6/19 are not accepted.
-        @type iprange: str
         @param total: total amount of block entries
-        @type total: int
         """
         if starttime and endtime:
             self.assert_valid_iter_params('blocks', starttime, endtime,
@@ -3889,8 +3883,9 @@ class APISite(BaseSite):
         return bkgen
 
     @deprecated_args(step=None)
-    def exturlusage(self, url=None, protocol=None, namespaces=None,
-                    total=None, content=False):
+    def exturlusage(self, url: Optional[str] = None,
+                    protocol: Optional[str] = None, namespaces=None,
+                    total: Optional[int] = None, content=False):
         """Iterate Pages that contain links to the given URL.
 
         @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
@@ -3898,14 +3893,11 @@ class APISite(BaseSite):
         @param url: The URL to search for (with ot without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
             of the hostname
-        @type url: str
         @param namespaces: list of namespace numbers to fetch contribs from
         @type namespaces: list of int
         @param total: Maximum number of pages to retrieve in total
-        @type total: int
         @param protocol: Protocol to search for, likely http or https, http by
                 default. Full list shown on Special:LinkSearch wikipage
-        @type protocol: str
         """
         separator = '://'
         if separator in url:
@@ -3938,7 +3930,7 @@ class APISite(BaseSite):
             the wiki)
         @type image: pywikibot.FilePage
         @param namespaces: If present, only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param filterredir: if True, only yield redirects; if False (and not
@@ -3964,8 +3956,11 @@ class APISite(BaseSite):
             'query+logevents', 'type')['type']))
 
     @deprecated_args(step=None)
-    def logevents(self, logtype=None, user=None, page=None, namespace=None,
-                  start=None, end=None, reverse=False, tag=None, total=None):
+    def logevents(self, logtype: Optional[str] = None,
+                  user: Optional[str] = None, page=None,
+                  namespace=None, start=None, end=None,
+                  reverse: bool = False, tag: Optional[str] = None,
+                  total: Optional[int] = None):
         """Iterate all log entries.
 
         @see: U{https://www.mediawiki.org/wiki/API:Logevents}
@@ -3975,9 +3970,7 @@ class APISite(BaseSite):
 
         @param logtype: only iterate entries of this type
             (see mediawiki api documentation for available types)
-        @type logtype: basestring
         @param user: only iterate entries that match this user name
-        @type user: basestring
         @param page: only iterate entries affecting this page
         @type page: pywikibot.Page or str
         @param namespace: namespace(s) to retrieve logevents from
@@ -3990,11 +3983,8 @@ class APISite(BaseSite):
         @param end: only iterate entries up to and through this Timestamp
         @type end: Timestamp or ISO date string
         @param reverse: if True, iterate oldest entries first (default: newest)
-        @type reverse: bool
         @param tag: only iterate entries tagged with this tag
-        @type tag: basestring
         @param total: maximum number of events to iterate
-        @type total: int
         @rtype: iterable
 
         @raises KeyError: the namespace identifier was not resolved
@@ -4059,7 +4049,7 @@ class APISite(BaseSite):
         @type end: pywikibot.Timestamp
         @param reverse: if True, start with oldest changes (default: newest)
         @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param changetype: only iterate changes of this type ("edit" for
@@ -4122,7 +4112,7 @@ class APISite(BaseSite):
 
     @deprecated_args(number='total', step=None, key='searchstring',
                      getredirects='get_redirects')
-    def search(self, searchstring, namespaces=None, where='text',
+    def search(self, searchstring: str, namespaces=None, where='text',
                get_redirects=False, total=None, content=False):
         """Iterate Pages that contain the searchstring.
 
@@ -4132,11 +4122,10 @@ class APISite(BaseSite):
         @see: U{https://www.mediawiki.org/wiki/API:Search}
 
         @param searchstring: the text to search for
-        @type searchstring: str
         @param where: Where to search; value must be "text", "title" or
             "nearmatch" (many wikis do not support title or nearmatch search)
         @param namespaces: search only in these namespaces (defaults to all)
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param get_redirects: if True, include redirects in results. Since
@@ -4180,7 +4169,7 @@ class APISite(BaseSite):
     @deprecated_args(step=None, showMinor='minor')
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse=False, namespaces=None, minor=None,
-                     total=None, top_only=False):
+                     total: Optional[int] = None, top_only=False):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
@@ -4194,13 +4183,12 @@ class APISite(BaseSite):
         @param end: Iterate contributions ending at this Timestamp
         @param reverse: Iterate oldest contributions first (default: newest)
         @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param minor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
         @param total: limit result to this number of pages
-        @type total: int
         @param top_only: if True, iterate only edits which are the latest
             revision (default: False)
         @raises pywikibot.exceptions.Error: either user or userprefix must be
@@ -4250,7 +4238,7 @@ class APISite(BaseSite):
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
         @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param minor: if True, only list minor edits; if False (and not
@@ -4285,7 +4273,8 @@ class APISite(BaseSite):
 
     @deprecated_args(step=None, get_text='content', page='titles',
                      limit='total')
-    def deletedrevs(self, titles=None, start=None, end=None, reverse=False,
+    def deletedrevs(self, titles=None, start=None, end=None,
+                    reverse: bool = False,
                     content=False, total=None, **kwargs):
         """Iterate deleted revisions.
 
@@ -4309,7 +4298,6 @@ class APISite(BaseSite):
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
-        @type reverse: bool
         @param content: If True, retrieve the content of each revision
         @param total: number of revisions to retrieve
         @keyword user: List revisions by this user
@@ -4427,7 +4415,7 @@ class APISite(BaseSite):
 
         @param total: the maximum number of pages to iterate
         @param namespaces: only iterate pages in these namespaces.
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param redirects: if True, include only redirect pages in results,
@@ -4497,7 +4485,7 @@ class APISite(BaseSite):
     @need_right('edit')
     def editpage(self, page, summary=None, minor=True, notminor=False,
                  bot=True, recreate=True, createonly=False, nocreate=False,
-                 watch=None, **kwargs):
+                 watch=None, **kwargs) -> bool:
         """Submit an edit to be saved to the wiki.
 
         @see: U{https://www.mediawiki.org/wiki/API:Edit}
@@ -4533,7 +4521,6 @@ class APISite(BaseSite):
         @kwarg undo: Revision id to undo. Overrides Page.text
         @type undo: int
         @return: True if edit succeeded, False if it failed
-        @rtype: bool
         @raises pywikibot.exceptions.Error: No text to be saved
         @raises pywikibot.exceptions.NoPage: recreate is disabled and page does
             not exist
@@ -4717,7 +4704,8 @@ class APISite(BaseSite):
 
     @need_right('mergehistory')
     @need_version('1.27.0-wmf.13')
-    def merge_history(self, source, dest, timestamp=None, reason=None):
+    def merge_history(self, source, dest, timestamp=None,
+                      reason: Optional[str] = None):
         """Merge revisions from one page into another.
 
         @see: U{https://www.mediawiki.org/wiki/API:Mergehistory}
@@ -4736,7 +4724,6 @@ class APISite(BaseSite):
             all revisions will be merged)
         @type timestamp: pywikibot.Timestamp
         @param reason: Optional reason for the history merge
-        @type reason: str
         """
         # Data for error messages
         errdata = {
@@ -4830,7 +4817,7 @@ class APISite(BaseSite):
     }
 
     @need_right('move')
-    def movepage(self, page, newtitle, summary, movetalk=True,
+    def movepage(self, page, newtitle: str, summary, movetalk=True,
                  noredirect=False):
         """Move a Page to a new title.
 
@@ -4838,7 +4825,6 @@ class APISite(BaseSite):
 
         @param page: the Page to be moved (must exist)
         @param newtitle: the new title for the Page
-        @type newtitle: str
         @param summary: edit summary (required!)
         @param movetalk: if True (default), also move the talk page if possible
         @param noredirect: if True, suppress creation of a redirect from the
@@ -4999,7 +4985,7 @@ class APISite(BaseSite):
 
     @need_right('delete')
     @deprecate_arg('summary', 'reason')
-    def deletepage(self, page, reason):
+    def deletepage(self, page, reason: str):
         """Delete page from the wiki. Requires appropriate privilege level.
 
         @see: U{https://www.mediawiki.org/wiki/API:Delete}
@@ -5007,7 +4993,6 @@ class APISite(BaseSite):
         @param page: Page to be deleted.
         @type page: pywikibot.Page
         @param reason: Deletion reason.
-        @type reason: str
 
         """
         token = self.tokens['delete']
@@ -5037,7 +5022,7 @@ class APISite(BaseSite):
 
     @need_right('undelete')
     @deprecate_arg('summary', 'reason')
-    def undelete_page(self, page, reason, revisions=None):
+    def undelete_page(self, page, reason: str, revisions=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
 
         @see: U{https://www.mediawiki.org/wiki/API:Undelete}
@@ -5048,7 +5033,6 @@ class APISite(BaseSite):
             If None, restores all revisions.
         @type revisions: list
         @param reason: Undeletion reason.
-        @type reason: basestring
 
         """
         token = self.tokens['delete']
@@ -5110,7 +5094,8 @@ class APISite(BaseSite):
 
     @need_right('protect')
     @deprecate_arg('summary', 'reason')
-    def protect(self, page, protections, reason, expiry=None, **kwargs):
+    def protect(self, page, protections: dict,
+                reason: str, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
         @see: U{https://www.mediawiki.org/wiki/API:Protect}
@@ -5120,9 +5105,7 @@ class APISite(BaseSite):
             'move' and 'upload'. Valid restriction levels are '' (equivalent
             to 'none' or 'all'), 'autoconfirmed', and 'sysop'.
             If None is given, however, that protection will be skipped.
-        @type protections: dict
         @param reason: Reason for the action
-        @type reason: basestring
         @param expiry: When the block should expire. This expiry will be
             applied to all protections. If None, 'infinite', 'indefinite',
             'never', or '' is given, there is no expiry.
@@ -5267,9 +5250,9 @@ class APISite(BaseSite):
             yield result['patrol']
 
     @need_right('block')
-    def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
-                  autoblock=True, noemail=False, reblock=False,
-                  allowusertalk=False):
+    def blockuser(self, user, expiry, reason: str, anononly=True,
+                  nocreate=True, autoblock=True, noemail=False,
+                  reblock=False, allowusertalk=False):
         """
         Block a user for certain amount of time and for a certain reason.
 
@@ -5279,7 +5262,7 @@ class APISite(BaseSite):
         @type user: L{pywikibot.User}
         @param expiry: The length or date/time when the block expires. If
             'never', 'infinite', 'indefinite' it never does. If the value is
-            given as a basestring it's parsed by php's strtotime function:
+            given as a str it's parsed by php's strtotime function:
 
                 U{http://php.net/manual/en/function.strtotime.php}
 
@@ -5287,12 +5270,11 @@ class APISite(BaseSite):
 
                 U{http://php.net/manual/en/datetime.formats.relative.php}
 
-            It is recommended to not use a basestring if possible to be
+            It is recommended to not use a str if possible to be
             independent of the API.
         @type expiry: Timestamp/datetime (absolute),
-            basestring (relative/absolute) or False ('never')
+            str (relative/absolute) or False ('never')
         @param reason: The reason for the block.
-        @type reason: basestring
         @param anononly: Disable anonymous edits for this IP.
         @type anononly: boolean
         @param nocreate: Prevent account creation.
@@ -5325,7 +5307,7 @@ class APISite(BaseSite):
         return data
 
     @need_right('unblock')
-    def unblockuser(self, user, reason=None):
+    def unblockuser(self, user, reason: Optional[str] = None):
         """
         Remove the block for the user.
 
@@ -5334,7 +5316,6 @@ class APISite(BaseSite):
         @param user: The username/IP without a namespace.
         @type user: L{pywikibot.User}
         @param reason: Reason for the unblock.
-        @type reason: basestring
         """
         req = self._simple_request(action='unblock',
                                    user=user.username,
@@ -5345,7 +5326,7 @@ class APISite(BaseSite):
         return data
 
     @need_right('editmywatchlist')
-    def watch(self, pages, unwatch=False):
+    def watch(self, pages, unwatch=False) -> bool:
         """Add or remove pages from watchlist.
 
         @see: U{https://www.mediawiki.org/wiki/API:Watch}
@@ -5356,7 +5337,6 @@ class APISite(BaseSite):
         @param unwatch: If True, remove pages from watchlist;
             if False add them (default).
         @return: True if API returned expected response; False otherwise
-        @rtype: bool
         @raises KeyError: 'watch' isn't in API response
 
         """
@@ -5387,7 +5367,7 @@ class APISite(BaseSite):
 
     @need_right('editmywatchlist')
     @deprecated('Site().watch', since='20160102')
-    def watchpage(self, page, unwatch=False):
+    def watchpage(self, page, unwatch=False) -> bool:
         """
         Add or remove page from watchlist.
 
@@ -5398,7 +5378,6 @@ class APISite(BaseSite):
         @param unwatch: If True, remove page from watchlist;
             if False (default), add it.
         @return: True if API returned expected response; False otherwise
-        @rtype: bool
 
         """
         try:
@@ -5409,10 +5388,10 @@ class APISite(BaseSite):
         return result
 
     @need_right('purge')
-    def purgepages(
-        self, pages, forcelinkupdate=False, forcerecursivelinkupdate=False,
-        converttitles=False, redirects=False
-    ):
+    def purgepages(self, pages, forcelinkupdate: bool = False,
+                   forcerecursivelinkupdate: bool = False,
+                   converttitles: bool = False, redirects: bool = False
+                   ) -> bool:
         """
         Purge the server's cache for one or multiple pages.
 
@@ -5422,14 +5401,10 @@ class APISite(BaseSite):
         @param converttitles: Convert titles to other variants if necessary.
             Only works if the wiki's content language supports variant
             conversion.
-        @type converttitles: bool
         @param forcelinkupdate: Update the links tables.
-        @type forcelinkupdate: bool
         @param forcerecursivelinkupdate: Update the links table, and update the
             links tables for any page that uses this page as a template.
-        @type forcerecursivelinkupdate: bool
         @return: True if API returned expected response; False otherwise
-        @rtype: bool
         """
         req = self._simple_request(action='purge', titles=list(set(pages)))
         if converttitles:
@@ -5507,8 +5482,8 @@ class APISite(BaseSite):
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
-               chunk_size=0, _file_key=None, _offset=0, _verify_stash=None,
-               report_success=None):
+               chunk_size: int = 0, _file_key: Optional[str] = None,
+               _offset=0, _verify_stash=None, report_success=None):
         """
         Upload a file to the wiki.
 
@@ -5540,10 +5515,8 @@ class APISite(BaseSite):
             U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
             will only upload in chunks, if the version number is 1.20 or higher
             and the chunk size is positive but lower than the file size.
-        @type chunk_size: int
         @param _file_key: Reuses an already uploaded file using the filekey. If
             None (default) it will upload the file.
-        @type _file_key: str or None
         @param _offset: When file_key is not None this can be an integer to
             continue a previously canceled chunked upload. If False it treats
             that as a finished upload. If True it requests the stash info from
@@ -5924,7 +5897,7 @@ class APISite(BaseSite):
         address (str), comment (str).
 
         @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @raises KeyError: a namespace identifier was not resolved
@@ -6306,7 +6279,7 @@ class APISite(BaseSite):
         @type total: int
 
         @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of basestring or Namespace key,
+        @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
 
