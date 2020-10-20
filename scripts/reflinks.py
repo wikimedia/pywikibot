@@ -495,8 +495,8 @@ class ReferencesRobot(SingleSiteBot):
     def setup(self):
         """Read dead links from file."""
         try:
-            self.dead_links = codecs.open(
-                listof404pages, 'r', 'latin_1').read()
+            with codecs.open(listof404pages, 'r', 'latin_1') as f:
+                self.dead_links = f.read()
         except IOError:
             raise NotImplementedError(
                 '404-links.txt is required for reflinks.py\n'
@@ -614,6 +614,7 @@ class ReferencesRobot(SingleSiteBot):
                         IOError,
                         httplib.error,
                         pywikibot.FatalServerError,
+                        pywikibot.Server414Error,
                         pywikibot.Server504Error) as e:
                     pywikibot.output("Can't retrieve page {} : {}"
                                      .format(ref.url, e))
