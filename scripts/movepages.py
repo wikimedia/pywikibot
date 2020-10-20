@@ -55,7 +55,7 @@ class MovePagesBot(MultipleSitesBot):
 
     def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'prefix': None,
             'noredirect': False,
             'movetalkpage': True,
@@ -72,22 +72,22 @@ class MovePagesBot(MultipleSitesBot):
     def moveOne(self, page, newPageTitle) -> None:
         """Move on page to newPageTitle."""
         try:
-            msg = self.getOption('summary')
+            msg = self.opt.summary
             if not msg:
                 msg = i18n.twtranslate(page.site, 'movepages-moving')
             pywikibot.output('Moving page {0} to [[{1}]]'
                              .format(page.title(as_link=True), newPageTitle))
             page.move(
                 newPageTitle, reason=msg,
-                movetalk=self.getOption('movetalkpage'),
-                noredirect=self.getOption('noredirect'))
+                movetalk=self.opt.movetalkpage,
+                noredirect=self.opt.noredirect)
         except pywikibot.PageRelatedError as error:
             pywikibot.output(error)
 
     def treat(self, page) -> None:
         """Treat a single page."""
         self.current_page = page
-        if self.getOption('skipredirects') and page.isRedirectPage():
+        if self.opt.skipredirects and page.isRedirectPage():
             pywikibot.output('Page {0} is a redirect; skipping.'
                              .format(page.title()))
             return
@@ -102,10 +102,10 @@ class MovePagesBot(MultipleSitesBot):
             newPageTitle = self.regex.sub(self.replacePattern, pagetitle)
             if not self.noNamespace and namesp:
                 newPageTitle = ('{0}:{1}'.format(namesp, newPageTitle))
-        if self.getOption('prefix'):
-            newPageTitle = ('{0}{1}'.format(self.getOption('prefix'),
+        if self.opt.prefix:
+            newPageTitle = ('{0}{1}'.format(self.opt.prefix,
                                             pagetitle))
-        if self.getOption('prefix') or self.appendAll or self.regexAll:
+        if self.opt.prefix or self.appendAll or self.regexAll:
             if self.user_confirm('Change the page title to "{0}"?'
                                  .format(newPageTitle)):
                 self.moveOne(page, newPageTitle)
