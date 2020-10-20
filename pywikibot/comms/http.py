@@ -39,7 +39,6 @@ from pywikibot.tools import (
     deprecate_arg,
     file_mode_checker,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
 )
 
 try:
@@ -523,45 +522,3 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         raise e
 
     return request
-
-# Deprecated parts ############################################################
-
-
-def _mode_check_decorator(func):
-    """DEPRECATED. Decorate load()/save() CookieJar methods."""
-    def wrapper(cls, **kwargs):
-        try:
-            filename = kwargs['filename']
-        except KeyError:
-            filename = cls.filename
-        res = func(cls, **kwargs)
-        file_mode_checker(filename, mode=0o600)
-        return res
-    return wrapper
-
-
-class PywikibotCookieJar(cookiejar.LWPCookieJar):
-
-    """DEPRECATED. CookieJar which checks file permissions."""
-
-    @deprecated(since='20181007', future_warning=True)
-    def __init__(self, *args, **kwargs):
-        """Initialize the class."""
-        super().__init__(*args, **kwargs)
-
-    @_mode_check_decorator
-    def load(self, **kwargs):
-        """Load cookies from file."""
-        super().load()
-
-    @_mode_check_decorator
-    def save(self, **kwargs):
-        """Save cookies to file."""
-        super().save()
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('PywikibotCookieJar', replacement_name='',
-                             since='20181007', future_warning=True)
-wrapper._add_deprecated_attr('mode_check_decorator', _mode_check_decorator,
-                             since='20200724', future_warning=True)
