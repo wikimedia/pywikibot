@@ -2632,7 +2632,7 @@ class FilePage(Page):
             revision = self.latest_file_info
 
         req = http.fetch(revision.url, stream=True)
-        if req.status == 200:
+        if req.status_code == 200:
             try:
                 with open(filename, 'wb') as f:
                     for chunk in req.data.iter_content(chunk_size):

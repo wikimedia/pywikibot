@@ -586,16 +586,16 @@ class ReferencesRobot(SingleSiteBot):
                                 'Redirect to root : {0} ', ref.link))
                             continue
 
-                    if f.status != codes.ok:
-                        pywikibot.output('HTTP error ({}) for {} on {}'
-                                         .format(f.status, ref.url,
-                                                 page.title(as_link=True)),
-                                         toStdout=True)
+                    if f.status_code != codes.ok:
+                        pywikibot.stdout('HTTP error ({}) for {} on {}'
+                                         .format(f.status_code, ref.url,
+                                                 page.title(as_link=True)))
                         # 410 Gone, indicates that the resource has been
                         # purposely removed
-                        if f.status == 410 \
-                           or (f.status == 404 and ('\t{}\t'.format(ref.url)
-                                                    in self.dead_links)):
+                        if f.status_code == 410 \
+                           or (f.status_code == 404
+                               and '\t{}\t'.format(
+                                   ref.url) in self.dead_links):
                             repl = ref.refDead()
                             new_text = new_text.replace(match.group(), repl)
                         continue

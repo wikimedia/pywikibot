@@ -289,7 +289,7 @@ class PrivateWikiTestCase(PatchingTestCase):
 
         return type(str('Response'),
                     (object,),
-                    {'status': 200,
+                    {'status_code': 200,
                      'text': self._responses[parsed_url.path],
                      'data': type(str('ResponseData'),
                                   (object,),

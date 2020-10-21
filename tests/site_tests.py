@@ -3285,7 +3285,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertEqual(site.hostname(), 'mh.wikipedia.org')
         r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
-        self.assertEqual(r.status, 200)
+        self.assertEqual(r.status_code, 200)
         self.assertEqual(site.siteinfo['lang'], 'mh')
 
     def test_removed_site(self):

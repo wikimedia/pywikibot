@@ -205,13 +205,13 @@ class TestHttpStatus(HttpbinTestCase):
         """Test follow 301 redirects correctly."""
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch(uri='http://en.wikipedia.org/wiki/Main%20Page')
-        self.assertEqual(r.status, 200)
+        self.assertEqual(r.status_code, 200)
         self.assertIsNotNone(r.data.history)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page',
                       r.data.url)
 
         r = http.fetch(uri='http://en.wikia.com')
-        self.assertEqual(r.status, 200)
+        self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data.url,
                          'https://www.fandom.com/explore')
 

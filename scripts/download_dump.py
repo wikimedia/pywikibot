@@ -97,7 +97,7 @@ class DownloadDumpBot(Bot):
                         download_filename)
                     pywikibot.output('Downloading file from ' + url)
                     response = fetch(url, stream=True)
-                    if response.status == 200:
+                    if response.status_code == 200:
                         with open(file_current_storepath, 'wb') as result_file:
                             try:
                                 total = int(response.response_headers[
@@ -134,7 +134,7 @@ class DownloadDumpBot(Bot):
                                 pywikibot.output(display_string, newline=False)
                             pywikibot.output('')
                     else:
-                        if response.status == 404:
+                        if response.status_code == 404:
                             pywikibot.output(
                                 'File with name "{filename}", '
                                 'from dumpdate "{dumpdate}", '
