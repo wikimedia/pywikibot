@@ -2889,7 +2889,7 @@ class PetScanPageGenerator:
         except ReadTimeout:
             raise ServerError(
                 'received ReadTimeout from {}'.format(url))
-        if 500 <= req.status < 600:
+        if 500 <= req.status_code < 600:
             raise ServerError(
                 'received {} status from {}'.format(req.status_code, req.url))
         j = json.loads(req.text)

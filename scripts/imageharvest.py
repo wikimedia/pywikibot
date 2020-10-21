@@ -53,7 +53,7 @@ def get_imagelinks(url):
         raise BeautifulSoup
 
     response = fetch(url)
-    if response.status != 200:
+    if response.status_code != 200:
         pywikibot.output('Skipping url: {}'
                          .format(url))
         return []

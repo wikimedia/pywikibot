@@ -269,11 +269,11 @@ class WikiHTMLPageParser(HTMLParser):
 
 def check_response(response):
     """Raise ServerError if the response indicates a server error."""
-    if response.status == 503:
+    if response.status_code == 503:
         raise ServerError('Service Unavailable')
-    elif response.status == 502:
+    elif response.status_code == 502:
         raise ServerError('Bad Gateway')
-    elif response.status == 500:
+    elif response.status_code == 500:
         raise ServerError('Internal Server Error')
-    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.text:
+    elif response.status_code == 200 and SERVER_DB_ERROR_MSG in response.text:
         raise ServerError('Server cannot access the database')
