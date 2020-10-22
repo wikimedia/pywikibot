@@ -208,7 +208,11 @@ class WikiHTMLPageParser(HTMLParser):
     def set_api_url(self, url):
         """Set api_url."""
         url = url.split('.php', 1)[0]
-        (value, script_name) = url.rsplit('/', 1)
+        try:
+            value, script_name = url.rsplit('/', 1)
+        except ValueError:
+            return
+
         if script_name not in ('api', 'load', 'opensearch_desc'):
             return
 
