@@ -143,7 +143,6 @@ matrix:
           packages:
             - djvulibre-bin
             - graphviz
-            - python-ipaddr
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
     - python: '3.6'
