@@ -1,7 +1,13 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* Support Namespace packages in version.py (T265946)
+* Server414Error was added to pywikibot (T266000)
+* Deprecated editor.command() method was removed
+* comms.PywikibotCookieJar and comms.mode_check_decorator were deleted
+* Remove deprecated tools function open_compressed and signature and UnicodeType class
+* Fix http_tests.LiveFakeUserAgentTestCase (T265842)
+* HttpRequest properties were renamed to request.Response identifiers (T265206)
 
 
 Future release notes
@@ -23,6 +29,3 @@ Future release notes
 * 4.3.0: Unused UserBlocked exception will be removed
 * 4.3.0: Deprecated Page.contributingUsers() will be removed
 * 4.2.0: tools.StringTypes will be removed
-* 4.1.0: Deprecated editor.command will be removed
-* 4.1.0: tools.open_compressed, tools.UnicodeType and tools.signature will be removed
-* 4.1.0: comms.PywikibotCookieJar and comms.mode_check_decorator will be removed
