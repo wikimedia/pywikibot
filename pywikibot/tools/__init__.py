@@ -1797,6 +1797,3 @@ wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
                              since='20200712', future_warning=True)
 wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
                              since='20200712', future_warning=True)
-wrapper._add_deprecated_attr('StringTypes', (str, bytes),
-                             replacement_name='(str, bytes)',
-                             since='20200813', future_warning=True)
