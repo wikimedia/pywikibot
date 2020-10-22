@@ -1790,10 +1790,3 @@ def concat_options(message, line_length, options):
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
     return '{} ({}):'.format(message, option_msg)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
-                             since='20200712', future_warning=True)
-wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
-                             since='20200712', future_warning=True)
