@@ -143,7 +143,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         @type generator: iterable
         @param summary: the reason for the (un)deletion
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'undelete': False,
             'isorphan': 0,
             'orphansonly': [],
@@ -159,7 +159,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         Display pages that link to the current page, sorted per namespace.
 
         Number of pages to display per namespace is provided by:
-        - self.getOption('isorphan')
+        - self.opt.isorphan
         """
         refs = self.current_page.ref_table
         if not refs:
@@ -173,7 +173,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
             pywikibot.warning('There is a page that links to {}.'
                               .format(self.current_page))
 
-        show_n_pages = self.getOption('isorphan')
+        show_n_pages = self.opt.isorphan
         width = len(max((ns.canonical_prefix() for ns in refs), key=len))
         for ns in sorted(refs):
             n_pages_in_ns = len(refs[ns])
@@ -189,25 +189,25 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
-        if self.getOption('undelete') and page.exists():
+        if self.opt.undelete and page.exists():
             pywikibot.output('Skipping: {0} already exists.'.format(page))
             return True
-        if not self.getOption('undelete') and not page.exists():
+        if not self.opt.undelete and not page.exists():
             pywikibot.output('Skipping: {0} does not exist.'.format(page))
             return True
         return super().skip_page(page)
 
     def treat_page(self) -> None:
         """Process one page from the generator."""
-        if self.getOption('undelete'):
+        if self.opt.undelete:
             self.current_page.undelete(self.summary)
         else:
-            if (self.getOption('isorphan') is not False
-                    and not self.getOption('always')):
+            if (self.opt.isorphan is not False
+                    and not self.opt.always):
                 self.display_references()
 
-            if self.getOption('orphansonly'):
-                namespaces = self.getOption('orphansonly')
+            if self.opt.orphansonly:
+                namespaces = self.opt.orphansonly
                 ns_with_ref = self.current_page.namespaces_with_ref_to_page(
                     namespaces)
                 ns_with_ref = sorted(ns_with_ref)
@@ -221,8 +221,8 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
             if self.current_page.site.user() is None:
                 self.current_page.site.login()
             self.current_page.delete(self.summary,
-                                     not self.getOption('always'),
-                                     self.getOption('always'),
+                                     not self.opt.always,
+                                     self.opt.always,
                                      quit=True)
 
 
