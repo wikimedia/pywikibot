@@ -39,15 +39,6 @@ class HttpTestCase(TestCase):
         },
     }
 
-    def test_async(self):
-        """Test http._enqueue using http://www.wikipedia.org/."""
-        r = http._enqueue('http://www.wikipedia.org/')
-        self.assertIsInstance(r, threadedhttp.HttpRequest)
-        self.assertEqual(r.status_code, 200)
-        self.assertIn('<html lang="mul"', r.text)
-        self.assertIsInstance(r.text, str)
-        self.assertIsInstance(r.raw, bytes)
-
     def test_fetch(self):
         """Test http.fetch using http://www.wikipedia.org/."""
         r = http.fetch('http://www.wikipedia.org/')
