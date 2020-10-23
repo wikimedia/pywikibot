@@ -1988,19 +1988,14 @@ class Request(MutableMapping):
                 param_repr = str(self._params)
                 pywikibot.log('API Error: query=\n%s'
                               % pprint.pformat(param_repr))
-                pywikibot.log('           response=\n%s'
-                              % result)
+                pywikibot.log('           response=\n{}'.format(result))
 
                 raise APIError(**result['error'])
             except TypeError:
                 raise RuntimeError(result)
 
-        msg = 'Maximum retries attempted due to maxlag without success.'
-        if os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1':
-            import unittest
-            raise unittest.SkipTest(msg)
-
-        raise MaxlagTimeoutError(msg)
+        raise MaxlagTimeoutError(
+            'Maximum retries attempted due to maxlag without success.')
 
     def wait(self, delay=None):
         """Determine how long to wait after a failed request."""
