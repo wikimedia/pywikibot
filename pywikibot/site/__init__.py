@@ -3890,7 +3890,7 @@ class APISite(BaseSite):
 
         @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
 
-        @param url: The URL to search for (with ot without the protocol
+        @param url: The URL to search for (with or without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
             of the hostname
         @param namespaces: list of namespace numbers to fetch contribs from
@@ -3899,21 +3899,23 @@ class APISite(BaseSite):
         @param protocol: Protocol to search for, likely http or https, http by
                 default. Full list shown on Special:LinkSearch wikipage
         """
-        separator = '://'
-        if separator in url:
-            found_protocol = url[:url.index(separator)]
-            url = url[url.index(separator) + len(separator):]
-            if protocol and protocol != found_protocol:
-                raise ValueError('Protocol was specified, but a different one '
-                                 'was found in searched url')
-            protocol = found_protocol
+        if url is not None:
+            found_protocol, _, url = url.rpartition('://')
+
+            # If url is * we make it None in order to search for every page
+            # with any URL.
+            if url == '*':
+                url = None
+
+            if found_protocol:
+                if protocol and protocol != found_protocol:
+                    raise ValueError('Protocol was specified, but a different '
+                                     'one was found in searched url')
+                protocol = found_protocol
+
         if not protocol:
             protocol = 'http'
 
-        # If url is * we make it None in order to search for every page
-        # with any URL.
-        if url == '*':
-            url = None
         return self._generator(api.PageGenerator, type_arg='exturlusage',
                                geuquery=url, geuprotocol=protocol,
                                namespaces=namespaces,
