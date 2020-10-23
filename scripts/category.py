@@ -471,7 +471,8 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
                         r'\1{0}\n\2'.format(categorytitle),
-                        ['nowiki', 'comment', 'math', 'pre', 'source'],
+                        ['comment', 'math', 'nowiki', 'pre',
+                         'syntaxhighlight'],
                         site=self.current_page.site)
                 else:
                     if self.includeonly == ['includeonly']:

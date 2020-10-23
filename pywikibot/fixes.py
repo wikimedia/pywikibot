@@ -128,12 +128,12 @@ fixes = {
             'inside-tags': [
                 'nowiki',
                 'comment',
+                'gallery',          # because of filenames
+                'hyperlink',        # e.g. commas in URLs
                 'math',
-                'pre',           # because of code examples
-                'source',        # because of code examples
-                'startspace',    # because of code examples
-                'hyperlink',     # e.g. commas in URLs
-                'gallery',       # because of filenames
+                'pre',              # because of code examples
+                'startspace',       # because of code examples
+                'syntaxhighlight',  # because of code examples
                 'timeline',
             ],
             'text-contains': [
@@ -220,8 +220,8 @@ fixes = {
                 'comment',
                 'math',
                 'pre',
-                'source',        # because of code examples
-                'startspace',    # because of code examples
+                'startspace',       # because of code examples
+                'syntaxhighlight',  # because of code examples
             ],
             'text-contains': [
                 r'http://.*?object=tx\|',                # regular dash in URL
@@ -266,8 +266,8 @@ fixes = {
                 'comment',
                 'math',
                 'pre',
-                'source',        # because of code examples
-                'startspace',    # because of code examples
+                'startspace',       # because of code examples
+                'syntaxhighlight',  # because of code examples
             ],
         }
     },

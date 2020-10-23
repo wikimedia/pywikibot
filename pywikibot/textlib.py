@@ -316,6 +316,8 @@ def _get_regexes(keys, site):
         # handle alias
         if exc == 'source':
             result.append(_tag_regex('syntaxhighlight'))
+        elif exc == 'syntaxhighlight':
+            result.append(_tag_regex('source'))
 
     return result
 
@@ -459,7 +461,7 @@ def removeDisabledParts(text: str, tags=None, include=[], site=None) -> str:
     @return: text stripped from disabled parts.
     """
     if not tags:
-        tags = ('comment', 'includeonly', 'nowiki', 'pre', 'source')
+        tags = ('comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight')
     tags = set(tags) - set(include)
     regexes = _get_regexes(tags, site)
     toRemoveR = re.compile('|'.join(x.pattern for x in regexes),
@@ -1022,7 +1024,8 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     interwikiR = re.compile(r'\[\[(%s)\s?:[^\[\]\n]*\]\][\s]*'
                             % languages, re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
-                         ['nowiki', 'comment', 'math', 'pre', 'source'],
+                         ['comment', 'math', 'nowiki', 'pre',
+                          'syntaxhighlight'],
                          marker=marker,
                          site=site)
     return text.strip()
@@ -1300,8 +1303,8 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
     catNamespace = '|'.join(site.namespaces.CATEGORY)
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
-                         ['nowiki', 'comment', 'math', 'pre', 'source',
-                          'includeonly'],
+                         ['comment', 'includeonly', 'math', 'nowiki', 'pre',
+                          'syntaxhighlight'],
                          marker=marker,
                          site=site)
     if marker:
@@ -1369,7 +1372,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
         r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s[\s\u200e\u200f]*'
         r'((?:\|[^]]+)?\]\])[^\S\n]*\n'
         % (catNamespace, title), re.I | re.M)
-    exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
+    exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
     if newcat is None:
         # First go through and try the more restrictive regex that removes
         # an entire line, if the category is the only thing on that line (this

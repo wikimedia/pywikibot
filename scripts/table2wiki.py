@@ -387,7 +387,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Mark all table start and end tags that are not disabled by nowiki tags,
         comments etc. We will then later only work on these marked tags.
         """
-        exceptions = ['comment', 'math', 'nowiki', 'pre', 'source']
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
         text = replaceExcept(text, _table_start_regex, '<##table##',
                              exceptions=exceptions)
         text = replaceExcept(text, _table_end_regex, '</##table##>',
