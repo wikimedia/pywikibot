@@ -224,7 +224,8 @@ class HttpRequest:
     @deprecated('the `text` property', since='20201011', future_warning=True)
     def decode(self, encoding, errors='strict') -> str:
         """Return the decoded response."""
-        return self.raw.decode(encoding, errors)
+        return self.raw.decode(encoding,
+                               errors) if not self.exception else None
 
     @property
     @deprecated('the `text` property', since='20180321', future_warning=True)
