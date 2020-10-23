@@ -45,21 +45,18 @@ class Family:
         # any Family class defined in this file are abstract
         if cls in globals().values():
             raise TypeError(
-                'Abstract Family class {0} cannot be instantiated; '
+                'Abstract Family class {} cannot be instantiated; '
                 'subclass it instead'.format(cls.__name__))
 
         # Override classproperty
         cls.instance = super().__new__(cls)
-        # staticmethod is because python 2.7 binds the lambda to the class
-        cls.__new__ = staticmethod(lambda cls: cls.instance)  # shortcut
+        cls.__new__ = lambda cls: cls.instance  # shortcut
 
         # don't use hasattr() here. consider only the class itself
         if '__init__' in cls.__dict__:
             # Initializer deprecated. Families should be immutable and any
             # instance / class modification should go to allocator (__new__).
-            # The function is read from __dict__ because deprecated expect a
-            # function and python 2.7 binds the method to the class.
-            cls.__init__ = deprecated(cls.__dict__['__init__'])
+            cls.__init__ = deprecated(cls.__init__)
 
             # Invoke initializer immediately and make initializer no-op.
             # This is to avoid repeated initializer invocation on repeated
