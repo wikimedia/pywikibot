@@ -49,12 +49,11 @@ class CategoryRedirectBot(SingleSiteBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'tiny': False,  # use Non-empty category redirects only
             'delay': 7,  # cool down delay in days
         })
         super().__init__(**kwargs)
-        self.cooldown = self.getOption('delay')
         self.catprefix = self.site.namespace(14) + ':'
         self.log_text = []
         self.edit_requests = []
@@ -110,7 +109,7 @@ class CategoryRedirectBot(SingleSiteBot):
 
     def get_cat(self):
         """Specify the category page."""
-        if self.getOption('tiny'):
+        if self.opt.tiny:
             self.cat = self.site.page_from_repository(
                 self.tiny_cat_redirect_cat)
         else:
@@ -177,7 +176,7 @@ class CategoryRedirectBot(SingleSiteBot):
     def readyToEdit(self, cat):
         """Return True if cat not edited during cooldown period, else False."""
         today = pywikibot.Timestamp.now()
-        deadline = today + timedelta(days=-self.cooldown)
+        deadline = today + timedelta(days=-self.opt.delay)
         if cat.editTime() is None:
             raise RuntimeError
         return (deadline > cat.editTime())
