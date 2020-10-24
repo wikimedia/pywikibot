@@ -594,68 +594,70 @@ class WelcomeBot(SingleSiteBot):
                     return True
         return False
 
-    def reportBadAccount(self, name=None, final=False) -> None:
-        """Report bad account."""
-        # Queue process
-        if name:
-            if globalvar.confirm:
-                answer = pywikibot.input_choice(
-                    '{} may have an unwanted username, do you want to report '
-                    'this user?'
-                    .format(name), [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
-                    'n', automatic_quit=False)
-                if answer in ['a', 'all']:
-                    answer = 'y'
-                    globalvar.confirm = False
-            else:
+    def reportBadAccount(self, name: str) -> None:  # should be renamed
+        """Add bad account to queue."""
+        if globalvar.confirm:
+            answer = pywikibot.input_choice(
+                '{} may have an unwanted username, do you want to report '
+                'this user?'
+                .format(name), [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                'n', automatic_quit=False)
+            if answer in ['a', 'all']:
                 answer = 'y'
+                globalvar.confirm = False
+        else:
+            answer = 'y'
 
-            if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
-                self.show_status()
-                pywikibot.output(
-                    '{} is possibly an unwanted username. It will be reported.'
-                    .format(name))
-                if hasattr(self, '_BAQueue'):
-                    self._BAQueue.append(name)
-                else:
-                    self._BAQueue = [name]
-
-        if len(self._BAQueue) >= globalvar.dumpToLog or final:
-            rep_text = ''
-            # name in queue is max, put detail to report page
-            pywikibot.output('Updating badname accounts to report page...')
-            rep_page = pywikibot.Page(self.site,
-                                      i18n.translate(self.site,
-                                                     report_page))
-            if rep_page.exists():
-                text_get = rep_page.get()
+        if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
+            self.show_status()
+            pywikibot.output(
+                '{} is possibly an unwanted username. It will be reported.'
+                .format(name))
+            if hasattr(self, '_BAQueue'):
+                self._BAQueue.append(name)
             else:
-                text_get = ('This is a report page for the Bad-username, '
-                            'please translate me. --~~~')
-            pos = 0
-            # The talk page includes "_" between the two names, in this way
-            # replace them to " ".
-            for usrna in self._BAQueue:
-                username = pywikibot.url2link(usrna, self.site, self.site)
-                n = re.compile(re.escape(username))
-                y = n.search(text_get, pos)
-                if y:
-                    pywikibot.output('{} is already in the report page.'
-                                     .format(username))
-                else:
-                    # Adding the log.
-                    rep_text += i18n.translate(self.site,
-                                               report_text) % username
-                    if self.site.code == 'it':
-                        rep_text = '%s%s}}' % (rep_text, self.bname[username])
+                self._BAQueue = [name]
 
-            com = i18n.twtranslate(self.site, 'welcome-bad_username')
-            if rep_text != '':
-                rep_page.put(text_get + rep_text, summary=com, force=True,
-                             minor=True)
-                self.show_status(Msg.DONE)
-                pywikibot.output('Reported')
-            self.BAQueue = []
+        if len(self._BAQueue) >= globalvar.dumpToLog:
+            self.report_bad_account()
+
+    def report_bad_account(self) -> None:
+        """Report bad account."""
+        rep_text = ''
+        # name in queue is max, put detail to report page
+        pywikibot.output('Updating badname accounts to report page...')
+        rep_page = pywikibot.Page(self.site,
+                                  i18n.translate(self.site,
+                                                 report_page))
+        if rep_page.exists():
+            text_get = rep_page.get()
+        else:
+            text_get = ('This is a report page for the Bad-username, '
+                        'please translate me. --~~~')
+        pos = 0
+        # The talk page includes "_" between the two names, in this way
+        # replace them to " ".
+        for usrna in self._BAQueue:
+            username = pywikibot.url2link(usrna, self.site, self.site)
+            n = re.compile(re.escape(username))
+            y = n.search(text_get, pos)
+            if y:
+                pywikibot.output('{} is already in the report page.'
+                                 .format(username))
+            else:
+                # Adding the log.
+                rep_text += i18n.translate(self.site,
+                                           report_text) % username
+                if self.site.code == 'it':
+                    rep_text = '%s%s}}' % (rep_text, self.bname[username])
+
+        com = i18n.twtranslate(self.site, 'welcome-bad_username')
+        if rep_text != '':
+            rep_page.put(text_get + rep_text, summary=com, force=True,
+                         minor=True)
+            self.show_status(Msg.DONE)
+            pywikibot.output('Reported')
+        self.BAQueue = []
 
     def makelogpage(self, queue=None) -> bool:
         """Make log page."""
@@ -871,7 +873,7 @@ class WelcomeBot(SingleSiteBot):
             if hasattr(self, '_BAQueue'):
                 self.show_status()
                 pywikibot.output('Putting bad name to report page...')
-                self.reportBadAccount(None, final=True)
+                self.report_bad_account()
             try:
                 if globalvar.recursive:
                     self.show_status()
