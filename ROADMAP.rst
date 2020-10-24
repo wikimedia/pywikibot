@@ -1,10 +1,13 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Fix incorrect server time (T266084)
+* L10N-Updates
 * Support Namespace packages in version.py (T265946)
 * Server414Error was added to pywikibot (T266000)
 * Deprecated editor.command() method was removed
 * comms.PywikibotCookieJar and comms.mode_check_decorator were deleted
+* Remove deprecated tools classes Stringtypes and UnicodeType
 * Remove deprecated tools function open_compressed and signature and UnicodeType class
 * Fix http_tests.LiveFakeUserAgentTestCase (T265842)
 * HttpRequest properties were renamed to request.Response identifiers (T265206)
@@ -28,4 +31,3 @@ Future release notes
 * 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed
 * 4.3.0: Unused UserBlocked exception will be removed
 * 4.3.0: Deprecated Page.contributingUsers() will be removed
-* 4.2.0: tools.StringTypes will be removed
