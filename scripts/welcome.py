@@ -169,6 +169,7 @@ import time
 
 from contextlib import suppress
 from datetime import timedelta
+from enum import Enum
 from random import choice
 from textwrap import fill
 from typing import Generator, List
@@ -430,22 +431,18 @@ logpage_header = {
 # and it will run correctly in your project ;)
 ############################################################################
 
-_COLORS = {
-    0: 'lightpurple',
-    1: 'lightaqua',
-    2: 'lightgreen',
-    3: 'lightyellow',
-    4: 'lightred',
-    5: 'lightblue'
-}
-_MSGS = {
-    0: 'MSG',
-    1: 'NoAct',
-    2: 'Match',
-    3: 'Skip',
-    4: 'Warn',
-    5: 'Done',
-}
+
+class Msg(Enum):
+
+    """Enum for show_status method providing message header and color."""
+
+    MSG = 'MSG', 'lightpurple'
+    IGNORE = 'NoAct', 'lightaqua'
+    MATCH = 'Match', 'lightgreen'
+    SKIP = 'Skip', 'lightyellow'
+    WARN = 'Warn', 'lightred'
+    DONE = 'Done', 'lightblue'
+    DEFAULT = 'MSG', 'lightpurple'
 
 
 class FilenameNotSet(pywikibot.Error):
@@ -557,7 +554,7 @@ class WelcomeBot(SingleSiteBot):
                                  .format(self.site))
                 list_loaded = load_word_function(badword_page.get())
             else:
-                self.show_status(4)
+                self.show_status(Msg.WARN)
                 pywikibot.output("The bad word page doesn't exist!")
             self._blacklist = elenco + elenco_others + list_loaded
             del elenco, elenco_others, list_loaded
@@ -574,10 +571,10 @@ class WelcomeBot(SingleSiteBot):
                                      .format(self.site))
                     list_white = load_word_function(whitelist_page.get())
                 else:
-                    self.show_status(4)
+                    self.show_status(Msg.WARN)
                     pywikibot.output("The whitelist's page doesn't exist!")
             else:
-                self.show_status(4)
+                self.show_status(Msg.WARN)
                 pywikibot.warning("The whitelist hasn't been set!")
 
             # Join the whitelist words.
@@ -656,7 +653,7 @@ class WelcomeBot(SingleSiteBot):
             if rep_text != '':
                 rep_page.put(text_get + rep_text, summary=com, force=True,
                              minor=True)
-                self.show_status(5)
+                self.show_status(Msg.DONE)
                 pywikibot.output('Reported')
             self.BAQueue = []
 
@@ -735,7 +732,7 @@ class WelcomeBot(SingleSiteBot):
         if not globalvar.signFileName:
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
-                self.show_status(4)
+                self.show_status(Msg.WARN)
                 pywikibot.output(
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
@@ -770,25 +767,25 @@ class WelcomeBot(SingleSiteBot):
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped."""
         if user.isBlocked():
-            self.show_status(3)
+            self.show_status(Msg.SKIP)
             pywikibot.output('{} has been blocked!'.format(user.username))
 
         elif 'bot' in user.groups():
-            self.show_status(3)
+            self.show_status(Msg.SKIP)
             pywikibot.output('{} is a bot!'.format(user.username))
 
         elif 'bot' in user.username.lower():
-            self.show_status(3)
+            self.show_status(Msg.SKIP)
             pywikibot.output('{} might be a global bot!'
                              .format(user.username))
 
         elif user.editCount() < globalvar.attachEditCount:
             if not user.editCount() == 0:
-                self.show_status(1)
+                self.show_status(Msg.IGNORE)
                 pywikibot.output('{0} has only {1} contributions.'
                                  .format(user.username, user.editCount()))
             elif not globalvar.quiet:
-                self.show_status(1)
+                self.show_status(Msg.IGNORE)
                 pywikibot.output('{} has no contributions.'
                                  .format(user.username))
         else:
@@ -804,12 +801,12 @@ class WelcomeBot(SingleSiteBot):
                 if self.skip_page(user):
                     continue
 
-                self.show_status(2)
+                self.show_status(Msg.MATCH)
                 pywikibot.output('{} has enough edits to be welcomed.'
                                  .format(user.username))
                 ustp = user.getUserTalkPage()
                 if ustp.exists():
-                    self.show_status(3)
+                    self.show_status(Msg.SKIP)
                     pywikibot.output('{} has been already welcomed.'
                                      .format(user.username))
                     continue
@@ -838,7 +835,7 @@ class WelcomeBot(SingleSiteBot):
                     # append welcomed, welcome_count++
                     ustp.put(welcome_text, welcome_comment, minor=False)
                 except pywikibot.EditConflict:
-                    self.show_status(4)
+                    self.show_status(Msg.WARN)
                     pywikibot.output(
                         'An edit conflict has occurred, skipping this user.')
                 else:
@@ -846,7 +843,7 @@ class WelcomeBot(SingleSiteBot):
 
                 welcomed_count = len(self.welcomed_users)
                 if globalvar.makeWelcomeLog:
-                    self.show_status(5)
+                    self.show_status(Msg.DONE)
                     if welcomed_count == 0:
                         count = 'No users have'
                     elif welcomed_count == 1:
@@ -896,10 +893,11 @@ class WelcomeBot(SingleSiteBot):
                 break
 
     @staticmethod
-    def show_status(n=0):
+    def show_status(message=Msg.DEFAULT):
         """Output colorized status."""
-        pywikibot.output(color_format('{color}[{0:5}]{default} ',
-                                      _MSGS[n], color=_COLORS[n]),
+        msg, color = message.value
+        pywikibot.output(color_format('{color}[{msg:5}]{default} ',
+                                      msg=msg, color=color),
                          newline=False)
 
 
