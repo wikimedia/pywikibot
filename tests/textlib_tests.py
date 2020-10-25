@@ -277,16 +277,6 @@ class TestTemplatesInCategory(TestCase):
             '[[Category:{{P1|Foo}}]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|Foo}}|bar]]', self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
-            self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:Foo{{!}}bar]]', self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}bar]][[Category:Wiki{{P2||pedia}}]]',
             self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sort_key='bar'),
@@ -294,6 +284,16 @@ class TestTemplatesInCategory(TestCase):
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}and{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sort_key='and|bar')])
+
+        for pattern in ('[[Category:{{P1|Foo}}|bar]]',
+                        '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
+                        '[[Category:Foo{{!}}bar]]'):
+            with self.SubTest(pattern=pattern):
+                self.assertEqual(textlib.getCategoryLinks(
+                    pattern, self.site, expand_text=True),
+                    [pywikibot.page.Category(self.site, 'Foo',
+                                             sort_key='bar')])
+
         with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
             textlib.getCategoryLinks('[[Category:nasty{{{!}}]]', self.site)
             warn.assert_called_once_with(
@@ -640,25 +640,18 @@ class TestTemplateParams(TestCase):
         self.assertIsNotNone(func('{{a|{{c|d}} }}'))
 
         # All templates are captured when template depth is greater than 2
-        m = func('{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz')
-        self.assertIsNotNone(m)
-        self.assertIsNotNone(m.group(0))
-        self.assertIsNone(m.group('name'))
-        self.assertIsNone(m.group(1))
-        self.assertIsNone(m.group('params'))
-        self.assertIsNone(m.group(2))
-        self.assertIsNotNone(m.group('unhandled_depth'))
-        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
-
-        m = func('{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz')
-        self.assertIsNotNone(m)
-        self.assertIsNotNone(m.group(0))
-        self.assertIsNone(m.group('name'))
-        self.assertIsNone(m.group(1))
-        self.assertIsNone(m.group('params'))
-        self.assertIsNone(m.group(2))
-        self.assertIsNotNone(m.group('unhandled_depth'))
-        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+        patterns = '{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz', \
+                   '{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz'
+        for pattern in patterns:
+            m = func(pattern)
+            self.assertIsNotNone(m)
+            self.assertIsNotNone(m.group(0))
+            self.assertIsNone(m.group('name'))
+            self.assertIsNone(m.group(1))
+            self.assertIsNone(m.group('params'))
+            self.assertIsNone(m.group(2))
+            self.assertIsNotNone(m.group('unhandled_depth'))
+            self.assertTrue(m.group(0).endswith('foo {{bar}}'))
 
 
 class TestGenericTemplateParams(PatchingTestCase):
