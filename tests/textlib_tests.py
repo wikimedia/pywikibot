@@ -288,7 +288,7 @@ class TestTemplatesInCategory(TestCase):
         for pattern in ('[[Category:{{P1|Foo}}|bar]]',
                         '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
                         '[[Category:Foo{{!}}bar]]'):
-            with self.SubTest(pattern=pattern):
+            with self.subTest(pattern=pattern):
                 self.assertEqual(textlib.getCategoryLinks(
                     pattern, self.site, expand_text=True),
                     [pywikibot.page.Category(self.site, 'Foo',
