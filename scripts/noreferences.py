@@ -495,7 +495,7 @@ referencesSubstitute = {
 # as it is already included there
 noTitleRequired = ['be', 'szl']
 
-maintenance_category = 'cite_error_refs_without_references_category'
+maintenance_category = 'Q6483427'
 
 _ref_regex = re.compile('</ref>', re.IGNORECASE)
 _references_regex = re.compile('<references.*?/>', re.IGNORECASE)
@@ -784,14 +784,10 @@ def main(*args) -> None:
     gen = genFactory.getCombinedGenerator()
     if not gen:
         site = pywikibot.Site()
-        try:
-            cat = site.expand_text(
-                site.mediawiki_message(maintenance_category))
-        except Exception:
-            pass
-        else:
-            cat = pywikibot.Category(site, 'Category:' + cat)
+        cat = site.page_from_repository(maintenance_category)
+        if cat:
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
+
     if gen:
         bot = NoReferencesBot(gen, **options)
         bot.run()
