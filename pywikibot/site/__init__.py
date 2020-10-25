@@ -5700,6 +5700,14 @@ class APISite(BaseSite):
                     while True:
                         f.seek(offset)
                         chunk = f.read(chunk_size)
+                        # workaround (hack) for T132676
+                        # append another '\r' so that one is the payload and
+                        # the second is used for newline when mangled by email
+                        # package.
+                        if (len(chunk) < chunk_size
+                                or (offset + len(chunk)) == filesize
+                                and chunk[-1] == b'\r'[0]):
+                            chunk += b'\r'
                         req = self._request(
                             throttle=throttle, mime=True,
                             parameters={
