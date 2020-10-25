@@ -25,13 +25,15 @@ Options:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from typing import Tuple
-
 import pywikibot
 from pywikibot import i18n, textlib
 from pywikibot.bot import QuitKeyboardInterrupt
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 def choosecats(pagetext):

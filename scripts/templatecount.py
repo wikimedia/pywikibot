@@ -40,9 +40,17 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 #
 import datetime
 
-from typing import Dict, Generator, List, Tuple
+from typing import Generator
 
 import pywikibot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+    List = list
+    Tuple = tuple
+else:
+    from typing import Dict, List, Tuple
 
 
 class TemplateCountRobot:

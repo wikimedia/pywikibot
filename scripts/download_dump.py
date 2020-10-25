@@ -22,11 +22,16 @@ import binascii
 import os.path
 
 from os import remove, replace, symlink, urandom
-from typing import Tuple
 
 import pywikibot
 from pywikibot import Bot
 from pywikibot.comms.http import fetch
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class DownloadDumpBot(Bot):

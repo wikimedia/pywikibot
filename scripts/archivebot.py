@@ -89,11 +89,10 @@ Options (may be omitted):
   -salt:SALT      specify salt
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-
 import datetime
 import locale
 import math
@@ -104,7 +103,7 @@ import time
 from collections import defaultdict, OrderedDict
 from hashlib import md5
 from math import ceil
-from typing import Any, List, Optional, Pattern, Set, Tuple
+from typing import Any, Optional, Pattern
 
 import pywikibot
 
@@ -112,8 +111,16 @@ from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
-from pywikibot.tools import issue_deprecation_warning, FrozenDict, deprecated
+from pywikibot.tools import (
+    deprecated, FrozenDict, issue_deprecation_warning, PYTHON_VERSION,
+)
 
+if PYTHON_VERSION >= (3, 9):
+    List = list
+    Set = set
+    Tuple = tuple
+else:
+    from typing import List, Set, Tuple
 
 ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]

@@ -117,7 +117,6 @@ This will move all pages in the category US to the category United States.
 #
 # Distributed under the terms of the MIT license.
 #
-
 import codecs
 import math
 import os
@@ -126,20 +125,30 @@ import re
 
 from contextlib import suppress
 from operator import methodcaller
-from typing import Optional, Tuple, Set
+from typing import Optional
 
 import pywikibot
 
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
 from pywikibot.bot import (
+    BaseBot,
+    Bot,
+    ContextOption,
+    IntegerOption,
+    MultipleSitesBot,
+    StandardOption,
     suggest_help,
-    IntegerOption, StandardOption, ContextOption,
-    BaseBot, Bot, MultipleSitesBot,
 )
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import deprecated_args, open_archive
+from pywikibot.tools import deprecated_args, open_archive, PYTHON_VERSION
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Set = set
+    Tuple = tuple
+else:
+    from typing import Set, Tuple
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

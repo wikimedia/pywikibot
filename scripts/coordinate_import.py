@@ -41,11 +41,17 @@ The following command line parameters are supported:
 #
 # Distributed under the terms of MIT License.
 #
-from typing import Optional, Tuple
+from typing import Optional
 
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownException
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

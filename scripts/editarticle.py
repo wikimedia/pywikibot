@@ -24,24 +24,26 @@ The following parameters are supported:
 --watch
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import argparse
 import os
 import sys
 import tempfile
-
-from typing import Tuple
 
 import pywikibot
 
 from pywikibot import i18n
 
 from pywikibot.editor import TextEditor
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class ArticleEditor(object):

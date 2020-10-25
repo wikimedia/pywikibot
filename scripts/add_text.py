@@ -53,7 +53,6 @@ Warning! Put it in one line, otherwise it won't work correctly:
         -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
         -summary:"Bot: Aggiungo template Categorizzare"
 """
-
 #
 # (C) Pywikibot team, 2007-2020
 #
@@ -63,13 +62,19 @@ import codecs
 import re
 import sys
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

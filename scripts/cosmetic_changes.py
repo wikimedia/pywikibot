@@ -32,12 +32,16 @@ For further information see pywikibot/cosmetic_changes.py
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Tuple
-
 import pywikibot
 
 from pywikibot import config, cosmetic_changes, i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 warning = """

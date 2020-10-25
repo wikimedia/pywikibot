@@ -69,12 +69,18 @@ import codecs
 import os
 import re
 
-from typing import Generator, Tuple
+from typing import Generator
 
 import pywikibot
 
 from pywikibot import config, i18n
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class NoTitle(Exception):
