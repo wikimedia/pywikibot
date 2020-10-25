@@ -40,7 +40,8 @@ from functools import partial
 
 import pywikibot
 
-from pywikibot import Bot, i18n, pagegenerators, textlib
+from pywikibot import i18n, pagegenerators, textlib
+from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 
 # This is required for the text that is shown when you run this script
@@ -511,7 +512,7 @@ XmlDumpNoReferencesPageGenerator = partial(
     XMLDumpPageGenerator, text_predicate=_match_xml_page_text)
 
 
-class NoReferencesBot(Bot):
+class NoReferencesBot(SingleSiteBot):
 
     """References section bot."""
 
@@ -523,7 +524,6 @@ class NoReferencesBot(Bot):
         super().__init__(**kwargs)
 
         self.generator = pagegenerators.PreloadingGenerator(generator)
-        self.site = pywikibot.Site()
 
         self.refR = _ref_regex
         self.referencesR = _references_regex
@@ -707,48 +707,47 @@ class NoReferencesBot(Bot):
                 ident=ident, text=self.referencesText)
         return oldText[:index].rstrip() + ref_section + oldText[index:]
 
-    def run(self) -> None:
+    def treat(self, page) -> None:
         """Run the bot."""
-        for page in self.generator:
-            self.current_page = page
+        self.current_page = page
+        try:
+            text = page.text
+        except pywikibot.NoPage:
+            pywikibot.warning('Page {0} does not exist?!'
+                              .format(page.title(as_link=True)))
+            return
+        except pywikibot.IsRedirectPage:
+            pywikibot.output('Page {0} is a redirect; skipping.'
+                             .format(page.title(as_link=True)))
+            return
+        except pywikibot.LockedPage:
+            pywikibot.warning('Page {0} is locked?!'
+                              .format(page.title(as_link=True)))
+            return
+        if page.isDisambig():
+            pywikibot.output('Page {0} is a disambig; skipping.'
+                             .format(page.title(as_link=True)))
+            return
+        if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
+            pywikibot.warning(
+                'Page {0} is edited by IP. Possible vandalized'
+                .format(page.title(as_link=True)))
+            return
+        if self.lacksReferences(text):
+            newText = self.addReferences(text)
             try:
-                text = page.text
-            except pywikibot.NoPage:
-                pywikibot.warning('Page {0} does not exist?!'
+                self.userPut(
+                    page, page.text, newText, summary=self.comment)
+            except pywikibot.EditConflict:
+                pywikibot.warning('Skipping {0} because of edit conflict'
                                   .format(page.title(as_link=True)))
-                continue
-            except pywikibot.IsRedirectPage:
-                pywikibot.output('Page {0} is a redirect; skipping.'
-                                 .format(page.title(as_link=True)))
-                continue
-            except pywikibot.LockedPage:
-                pywikibot.warning('Page {0} is locked?!'
-                                  .format(page.title(as_link=True)))
-                continue
-            if page.isDisambig():
-                pywikibot.output('Page {0} is a disambig; skipping.'
-                                 .format(page.title(as_link=True)))
-                continue
-            if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
+            except pywikibot.SpamblacklistError as e:
                 pywikibot.warning(
-                    'Page {0} is edited by IP. Possible vandalized'
-                    .format(page.title(as_link=True)))
-                continue
-            if self.lacksReferences(text):
-                newText = self.addReferences(text)
-                try:
-                    self.userPut(
-                        page, page.text, newText, summary=self.comment)
-                except pywikibot.EditConflict:
-                    pywikibot.warning('Skipping {0} because of edit conflict'
-                                      .format(page.title(as_link=True)))
-                except pywikibot.SpamblacklistError as e:
-                    pywikibot.warning(
-                        'Cannot change {0} because of blacklist entry {1}'
-                        .format(page.title(as_link=True), e.url))
-                except pywikibot.LockedPage:
-                    pywikibot.warning('Skipping {0} (locked page)'
-                                      .format(page.title(as_link=True)))
+                    'Cannot change {0} because of blacklist entry {1}'
+                    .format(page.title(as_link=True), e.url))
+            except pywikibot.LockedPage:
+                pywikibot.warning('Skipping {0} (locked page)'
+                                  .format(page.title(as_link=True)))
 
 
 def main(*args) -> None:
