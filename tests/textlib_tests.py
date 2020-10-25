@@ -179,8 +179,8 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
     with both a newline and an empty string as separators.
     """
 
-    old = ('[[Category:Cat1]]\n[[Category:Cat2|]]\n'
-           '[[Category:Cat1| ]]\n[[Category:Cat2|key]]')
+    old = '[[Category:Cat1]]\n[[Category:Cat2|]]\n' \
+          '[[Category:Cat1| ]]\n[[Category:Cat2|key]]'
 
     def test_standard_links(self):
         """Test getting and replacing categories."""
@@ -209,34 +209,18 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
         cats = textlib.getCategoryLinks(self.old, site=self.site)
 
-        # Sanity checking
-        temp = textlib.replaceCategoryInPlace(self.old, cats[0], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[0],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[1], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[1],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[2], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[2],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[3],
-                                              dummy, site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[3],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
+        for count, cat in enumerate(textlib.getCategoryLinks(self.old,
+                                                             site=self.site)):
+            with self.subTest(category=cat):
+                # Sanity checking
+                temp = textlib.replaceCategoryInPlace(self.old, cat, dummy,
+                                                      site=self.site)
+                self.assertNotEqual(temp, self.old)
+                new = textlib.replaceCategoryInPlace(temp, dummy, cat,
+                                                     site=self.site)
+                self.assertEqual(self.old, new)
+        else:
+            self.assertEqual(count, 3)
 
         # Testing removing categories
         temp = textlib.replaceCategoryInPlace(self.old, cats[0],
@@ -622,8 +606,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
-    def test_nested_template_regex(self):
-        """Test NESTED_TEMPLATE_REGEX."""
+    def test_nested_template_regex_search(self):
+        """Test NESTED_TEMPLATE_REGEX search."""
         func = textlib.NESTED_TEMPLATE_REGEX.search
 
         # Numerically named templates are rejected
@@ -637,6 +621,8 @@ class TestTemplateParams(TestCase):
 
         self.assertIsNone(func('{{{1|{{2|a}} }}}'))
 
+    def test_nested_template_regex_match(self):
+        """Test NESTED_TEMPLATE_REGEX match."""
         func = textlib.NESTED_TEMPLATE_REGEX.match
 
         self.assertIsNotNone(func('{{CURRENTYEAR}}'))
