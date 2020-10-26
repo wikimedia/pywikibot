@@ -63,6 +63,7 @@ from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
+from pywikibot.textlib import replaceExcept
 from pywikibot.tools.formatter import color_format
 
 from scripts import noreferences
@@ -375,7 +376,9 @@ class DuplicateReferences:
 
                 unnamed = '<ref {}name={} />'.format(group, name)
                 for ref in v[1][1:]:
-                    end = end.replace(ref, unnamed)
+                    # Don't replace inside templates (T266411)
+                    end = replaceExcept(end, re.escape(ref), unnamed,
+                                        exceptions=['template'])
                 text = header + end
 
         for (k, v) in named_repl.items():
