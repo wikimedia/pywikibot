@@ -425,7 +425,7 @@ class ReferencesRobot(SingleSiteBot):
         else:
             bad = globalbadtitles
         self.titleBlackList = re.compile(bad, re.I | re.S | re.X)
-        self.norefbot = noreferences.NoReferencesBot(None, verbose=False)
+        self.norefbot = noreferences.NoReferencesBot(verbose=False)
         self.deduplicator = DuplicateReferences(self.site)
 
         self.site_stop_page = i18n.translate(self.site, stop_page)
