@@ -728,25 +728,12 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         try:
             text = page.text
         except pywikibot.LockedPage:
-            pywikibot.warning('Page {0} is locked?!'
+            pywikibot.warning('Page {} is locked?!'
                               .format(page.title(as_link=True)))
             return
 
         if self.lacksReferences(text):
-            newText = self.addReferences(text)
-            try:
-                self.userPut(
-                    page, page.text, newText, summary=self.comment)
-            except pywikibot.EditConflict:
-                pywikibot.warning('Skipping {0} because of edit conflict'
-                                  .format(page.title(as_link=True)))
-            except pywikibot.SpamblacklistError as e:
-                pywikibot.warning(
-                    'Cannot change {0} because of blacklist entry {1}'
-                    .format(page.title(as_link=True), e.url))
-            except pywikibot.LockedPage:
-                pywikibot.warning('Skipping {0} (locked page)'
-                                  .format(page.title(as_link=True)))
+            self.put_current(self.addReferences(text), summary=self.comment)
 
 
 def main(*args) -> None:
