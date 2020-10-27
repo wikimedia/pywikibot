@@ -347,7 +347,6 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test returned types of user attributes."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.logged_in(), bool)
-        self.assertIsInstance(mysite.logged_in(True), bool)
         self.assertIsInstance(mysite.userinfo, dict)
 
     def test_messages(self):
@@ -1841,11 +1840,11 @@ class SiteSysopTestCase(DefaultSiteTestCase):
     def test_methods(self):
         """Test sysop related methods."""
         mysite = self.get_site()
-        self.assertIsInstance(mysite.is_blocked(True), bool)
-        self.assertIsInstance(mysite.has_right('edit', True), bool)
-        self.assertFalse(mysite.has_right('nonexistent_right', True))
-        self.assertIsInstance(mysite.has_group('bots', True), bool)
-        self.assertFalse(mysite.has_group('nonexistent_group', True))
+        self.assertIsInstance(mysite.is_blocked(), bool)
+        self.assertIsInstance(mysite.has_right('edit'), bool)
+        self.assertFalse(mysite.has_right('nonexistent_right'))
+        self.assertIsInstance(mysite.has_group('bots'), bool)
+        self.assertFalse(mysite.has_group('nonexistent_group'))
 
     def test_deletedrevs(self):
         """Test the site.deletedrevs() method."""

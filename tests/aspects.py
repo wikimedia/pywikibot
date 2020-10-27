@@ -667,12 +667,8 @@ class RequireUserMixin(TestCaseBase):
             if self._userpage.site == site:
                 return self._userpage
 
-        sysop = hasattr(self, 'sysop') and self.sysop
-
-        userpage = pywikibot.User(site, site.username(sysop))
-
+        userpage = pywikibot.User(site, site.username())
         self._userpage = userpage
-
         return userpage
 
 
