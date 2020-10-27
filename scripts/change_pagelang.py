@@ -101,15 +101,13 @@ class ChangeLangBot(SingleSiteBot):
                 currentlang, sitelang, self.opt.setlang),
                 [('Always', 'a'), ('Yes', 'y'), ('No', 'n'),
                  ('Never', 'v')], default='Y')
-            if choice == 'y':
-                self.changelang(page)
-            if choice == 'n':
-                pywikibot.output('Skipping ...\n')
             if choice == 'a':
                 self.opt.always = True
-                self.changelang(page)
-            if choice == 'v':
+            elif choice == 'v':
                 self.opt.never = True
+            if choice in 'ay':
+                self.changelang(page)
+            else:
                 pywikibot.output('Skipping ...\n')
 
 
