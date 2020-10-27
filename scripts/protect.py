@@ -58,15 +58,10 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, CurrentPageBot
-from pywikibot.tools import PY2
 
-if PY2:
-    from future_builtins import zip
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -87,11 +82,11 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         @type protections: dict
         @param kwargs: additional arguments directly feed to super().__init__()
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'summary': None,
             'expiry': None,
         })
-        super(ProtectionRobot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
         self.protections = protections
 
@@ -110,8 +105,8 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         applicable = self.current_page.applicable_protections()
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)
-        self.current_page.protect(reason=self.getOption('summary'),
-                                  expiry=self.getOption('expiry'),
+        self.current_page.protect(reason=self.opt.summary,
+                                  expiry=self.opt.expiry,
                                   protections=protections)
 
 

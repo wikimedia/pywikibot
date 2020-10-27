@@ -22,26 +22,20 @@ Other options:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError as e:
-    BeautifulSoup = e
+from urllib.parse import urljoin
 
 import pywikibot
 
 from pywikibot.bot import QuitKeyboardInterrupt
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import PY2
 
-if not PY2:
-    from urllib.parse import urljoin
-else:
-    from urlparse import urljoin
+try:
+    from bs4 import BeautifulSoup
+except ImportError as e:
+    BeautifulSoup = e
 
 fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
 
@@ -109,8 +103,10 @@ def run_bot(give_url, image_url, desc):
             break
         if not include:
             continue
+
         desc = pywikibot.input('Give the description of this image:')
         categories = []
+        mysite = pywikibot.Site()
         while True:
             cat = pywikibot.input('Specify a category (or press enter to '
                                   'end adding categories)')
@@ -128,7 +124,6 @@ def run_bot(give_url, image_url, desc):
 def main(*args):
     """Process command line arguments and invoke bot."""
     global shown
-    global mysite
     url = ''
     image_url = False
     shown = False
@@ -147,11 +142,10 @@ def main(*args):
             desc += [arg]
     desc = ' '.join(desc)
 
-    mysite = pywikibot.Site()
-    try:
-        run_bot(url, image_url, desc)
-    except ImportError:
+    if isinstance(BeautifulSoup, ImportError):
         pywikibot.bot.suggest_help(missing_dependencies=('beautifulsoup4',))
+    else:
+        run_bot(url, image_url, desc)
 
 
 if __name__ == '__main__':
