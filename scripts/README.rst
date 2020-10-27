@@ -46,6 +46,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | #censure.py            | Bad word checker bot.                                   |
     +------------------------+---------------------------------------------------------+
+    | change_pagelang.py     | Changes the content language of pages.                  |
+    +------------------------+---------------------------------------------------------+
     | checkimages.py         | Check recently uploaded files. Checks if a file         |
     |                        | description is present and if there are other problems  |
     |                        | in the image's description.                             |
