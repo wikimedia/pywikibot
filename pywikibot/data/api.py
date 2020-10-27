@@ -38,7 +38,8 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.tools import (
-    deprecated, itergroup, PYTHON_VERSION, remove_last_args
+    deprecated, issue_deprecation_warning, itergroup, PYTHON_VERSION,
+    remove_last_args,
 )
 from pywikibot.tools.formatter import color_format
 
@@ -984,7 +985,7 @@ class Request(MutableMapping):
     details on what parameters are accepted for each request type.
 
     Uploading files is a special case: to upload, the parameter "mime" must
-    be true, and the parameter "file" must be set equal to a valid
+    contain a dict, and the parameter "file" must be set equal to a valid
     filename on the local computer, _not_ to the content of the file.
 
     Returns a dict containing the JSON data returned by the wiki. Normally,
@@ -1026,7 +1027,7 @@ class Request(MutableMapping):
     # To make sure the default value of 'parameters' can be identified.
     _PARAM_DEFAULT = object()
 
-    def __init__(self, site=None, mime=None, throttle=True, mime_params=None,
+    def __init__(self, site=None, mime=None, throttle=True,
                  max_retries=None, retry_wait=None, use_get=None,
                  parameters=_PARAM_DEFAULT, **kwargs):
         """
@@ -1055,14 +1056,11 @@ class Request(MutableMapping):
 
         @param site: The Site to which the request will be submitted. If not
                supplied, uses the user's configured default Site.
-        @param mime: If true, send in "multipart/form-data" format (default
-               False). Parameters which should only be transferred via mime
-               mode can be defined via that parameter too (an empty dict acts
-               like 'True' not like 'False'!).
-        @type mime: bool or dict
-        @param mime_params: DEPRECATED! A dictionary of parameter which should
-               only be transferred via mime mode. If not None sets mime to
-               True.
+        @param mime: If not None, send in "multipart/form-data" format (default
+               None). Parameters which should only be transferred via mime
+               mode are defined via this parameter (even an empty dict means
+               mime shall be used).
+        @type mime: None or dict
         @param max_retries: (optional) Maximum number of times to retry after
                errors, defaults to config.max_retries.
         @param retry_wait: (optional) Minimum time in seconds to wait after an
@@ -1081,14 +1079,12 @@ class Request(MutableMapping):
                  .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
-        if mime_params is not None:
-            # mime may not be different from mime_params
-            if mime is not None and mime is not True:
-                raise ValueError('If mime_params is set, mime may not differ '
-                                 'from it.')
-            warn('Use the "mime" parameter instead of the "mime_params".')
-            mime = mime_params
-        self.mime = mime  # this also sets self.mime_params
+        self.mime = mime
+        if isinstance(mime, bool):  # type(mime) == bool is deprecated.
+            issue_deprecation_warning(
+                'Bool values of mime param in api.Request()',
+                depth=3, warning_class=FutureWarning, since='20201028')
+            self.mime = {} if mime is True else None
         self.throttle = throttle
         self.use_get = use_get
         if max_retries is None:
@@ -1326,23 +1322,6 @@ class Request(MutableMapping):
         """Return a list of tuples containing the parameters in any order."""
         return list(self._params.items())
 
-    @property
-    def mime(self):
-        """Return whether mime parameters are defined."""
-        return self.mime_params is not None
-
-    @mime.setter
-    def mime(self, value):
-        """
-        Change whether mime parameter should be defined.
-
-        This will clear the mime parameters.
-        """
-        try:
-            self.mime_params = dict(value)
-        except TypeError:
-            self.mime_params = {} if value else None
-
     @deprecated(since='20141006', future_warning=True)
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
@@ -1361,9 +1340,9 @@ class Request(MutableMapping):
         if hasattr(self, '__defaulted'):
             return
 
-        if self.mime_params \
-           and set(self._params.keys()) & set(self.mime_params.keys()):
-            raise ValueError('The mime_params and params may not share the '
+        if self.mime is not None \
+           and set(self._params.keys()) & set(self.mime.keys()):
+            raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
         if self.action == 'query':
@@ -1558,7 +1537,7 @@ class Request(MutableMapping):
 
     @classmethod
     def _build_mime_request(cls, params: dict,
-                            mime_params) -> Tuple[dict, str]:
+                            mime_params: dict) -> Tuple[dict, bytes]:
         """
         Construct a MIME multipart form post.
 
@@ -1588,9 +1567,9 @@ class Request(MutableMapping):
     def _get_request_params(self, use_get, paramstring):
         """Get request parameters."""
         uri = self.site.apipath()
-        if self.mime:
+        if self.mime is not None:
             (headers, body) = Request._build_mime_request(
-                self._encoded_items(), self.mime_params)
+                self._encoded_items(), self.mime)
             use_get = False  # MIME requests require HTTP POST
         else:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
