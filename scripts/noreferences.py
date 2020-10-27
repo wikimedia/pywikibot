@@ -43,6 +43,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
+from pywikibot.tools import remove_last_args
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -516,14 +517,13 @@ class NoReferencesBot(SingleSiteBot):
 
     """References section bot."""
 
-    def __init__(self, generator, **kwargs) -> None:
+    @remove_last_args(['gen'])
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         self.available_options.update({
             'verbose': True,
         })
         super().__init__(**kwargs)
-
-        self.generator = pagegenerators.PreloadingGenerator(generator)
 
         self.refR = _ref_regex
         self.referencesR = _references_regex
@@ -760,27 +760,25 @@ def main(*args) -> None:
     @type args: str
     """
     options = {}
+    gen = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
-            else:
-                xmlFilename = arg[5:]
-            genFactory.gens.append(
-                XmlDumpNoReferencesPageGenerator(xmlFilename))
-        elif arg == '-always':
+        opt, _, value = arg.partition(':')
+        if opt == '-xml':
+            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
+            gen = XmlDumpNoReferencesPageGenerator(xmlFilename)
+        elif opt == '-always':
             options['always'] = True
-        elif arg == '-quiet':
+        elif opt == '-quiet':
             options['verbose'] = False
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(gen, preload=True)
     if not gen:
         site = pywikibot.Site()
         cat = site.page_from_repository(maintenance_category)
@@ -788,7 +786,7 @@ def main(*args) -> None:
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
 
     if gen:
-        bot = NoReferencesBot(gen, **options)
+        bot = NoReferencesBot(generator=gen, **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
