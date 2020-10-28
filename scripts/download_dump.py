@@ -40,19 +40,29 @@ class DownloadDumpBot(Bot):
         'dumpdate': 'latest',
     }
 
-    def get_dump_name(self, db_name, typ):
+    @staticmethod
+    def get_dump_name(db_name, typ, dumpdate):
         """Check if dump file exists locally in a Toolforge server."""
         db_path = '/public/dumps/public/{}/'.format(db_name)
         if os.path.isdir(db_path):
-            dirs = [directory for directory in os.listdir(db_path) if
-                    directory.isdigit()]
-            dates = map(int, dirs)
-            dates = sorted(dates, reverse=True)
-            for date in dates:
-                dump_filepath = '/public/dumps/public/{}/{}/{}-{}-{}'.format(
-                    db_name, date, db_name, date, typ)
+            dump_filepath_template = (
+                '/public/dumps/public/{db_name}/{date}/{db_name}-{date}-{typ}')
+            if dumpdate != 'latest':
+                dump_filepath = dump_filepath_template.format(
+                    db_name=db_name, date=dumpdate, typ=typ)
                 if os.path.isfile(dump_filepath):
                     return dump_filepath
+            else:
+                # Search for the "latest" dump
+                dirs = [directory for directory in os.listdir(db_path) if
+                        directory.isdigit()]
+                dates = map(int, dirs)
+                dates = sorted(dates, reverse=True)
+                for date in dates:
+                    dump_filepath = dump_filepath_template.format(
+                        db_name=db_name, date=date, typ=typ)
+                    if os.path.isfile(dump_filepath):
+                        return dump_filepath
         return None
 
     def run(self):
@@ -78,7 +88,7 @@ class DownloadDumpBot(Bot):
 
         # https://wikitech.wikimedia.org/wiki/Help:Toolforge#Dumps
         toolforge_dump_filepath = self.get_dump_name(
-            self.opt.wikiname, self.opt.filename)
+            self.opt.wikiname, self.opt.filename, self.opt.dumpdate)
 
         # First iteration for atomic download with temporary file
         # Second iteration for fallback non-atomic download
