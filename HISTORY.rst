@@ -6,6 +6,7 @@ Release history
 
 *19 October 2020*
 
+* Add support for smn-wiki (T264962)
 * callback parameter of comms.http.fetch() is desupported
 * Fix api.APIError() calls for Flow and Thanks extension
 * edit, move, create, upload, unprotect and prompt parameters of Page.protect() are deprecated (T227610)
