@@ -5724,9 +5724,11 @@ class APISite(BaseSite):
                                 'offset': offset,
                                 'filename': file_page_title,
                                 'ignorewarnings': ignore_all_warnings})
-                        req.mime_params['chunk'] = (
-                            chunk, ('application', 'octet-stream'),
-                            {'filename': mime_filename})
+                        req.mime = {
+                            'chunk': (chunk,
+                                      ('application', 'octet-stream'),
+                                      {'filename': mime_filename})
+                        }
                         if _file_key:
                             req['filekey'] = _file_key
                         try:
@@ -5819,7 +5821,7 @@ class APISite(BaseSite):
                         file_contents = f.read()
                         filetype = (mimetypes.guess_type(source_filename)[0]
                                     or 'application/octet-stream')
-                        final_request.mime_params = {
+                        final_request.mime = {
                             'file': (file_contents, filetype.split('/'),
                                      {'filename': mime_filename})
                         }
