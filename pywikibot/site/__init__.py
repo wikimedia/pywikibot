@@ -29,7 +29,7 @@ from contextlib import suppress
 from itertools import zip_longest
 from pywikibot.login import LoginStatus as _LoginStatus
 from textwrap import fill
-from typing import List, Optional, Union
+from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -84,10 +84,16 @@ from pywikibot.tools import (
     merge_unique_dicts,
     ModuleDeprecationWrapper,
     normalize_username,
+    PYTHON_VERSION,
     remove_last_args,
     SelfCallMixin,
     SelfCallString,
 )
+
+if PYTHON_VERSION >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 __all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
            'NamespacesDict', 'PageInUse', 'RemovedSite',

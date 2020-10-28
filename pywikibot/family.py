@@ -16,16 +16,23 @@ import warnings
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
-    ModuleDeprecationWrapper, FrozenDict, classproperty,
+    classproperty, deprecated, deprecated_args, FrozenDict,
+    issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
+    remove_last_args,
 )
 
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+    List = list
+    Tuple = tuple
+else:
+    from typing import Dict, List, Tuple
 
 logger = logging.getLogger('pywiki.wiki.family')
 

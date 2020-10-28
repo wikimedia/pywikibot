@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from collections import OrderedDict, namedtuple
 from contextlib import suppress
 from html.parser import HTMLParser
-from typing import List, NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Optional, Union
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -27,7 +27,14 @@ from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     issue_deprecation_warning,
+    PYTHON_VERSION,
 )
+
+if PYTHON_VERSION >= (3, 9):
+    List = list
+    Tuple = tuple
+else:
+    from typing import List, Tuple
 
 try:
     import mwparserfromhell
