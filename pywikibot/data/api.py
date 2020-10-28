@@ -46,8 +46,9 @@ from pywikibot.tools.formatter import color_format
 if PYTHON_VERSION >= (3, 9):
     Set = set
     Tuple = tuple
+    FrozenSet = frozenset
 else:
-    from typing import Set, Tuple
+    from typing import Set, Tuple, FrozenSet
 
 
 _logger = 'data.api'
@@ -149,8 +150,8 @@ class UploadWarning(APIError):
         """
         Create a new UploadWarning instance.
 
-        @param filekey: The filekey of the uploaded file to reuse it later. If
-            no key is known or it is an incomplete file it may be None.
+        @param file_key: The file_key of the uploaded file to reuse it later.
+            If no key is known or it is an incomplete file it may be None.
         @param offset: The starting offset for a chunked upload. Is False when
             there is no offset.
         """
@@ -263,9 +264,9 @@ class ParamInfo(Sized, Container):
         self._fetch(self.preloaded_modules)
 
         main_modules_param = self.parameter('main', 'action')
-        assert(main_modules_param)
-        assert('type' in main_modules_param)
-        assert(isinstance(main_modules_param['type'], list))
+        assert main_modules_param
+        assert 'type' in main_modules_param
+        assert isinstance(main_modules_param['type'], list)
         assert self._action_modules == set(main_modules_param['type'])
 
         # While deprecated with warning in 1.25, paraminfo param 'querymodules'
@@ -341,7 +342,7 @@ class ParamInfo(Sized, Container):
 
         self._fetch(modules)
 
-    def _fetch(self, modules: set) -> None:
+    def _fetch(self, modules: Union[set, frozenset]) -> None:
         """
         Fetch paraminfo for multiple modules without initializing beforehand.
 
@@ -430,7 +431,7 @@ class ParamInfo(Sized, Container):
                 normalized_result = {missing_modules[0]: normalized_result}
             elif len(module_batch) > 1 and missing_modules:
                 # Rerequest the missing ones separately
-                pywikibot.log('Inconsitency in batch "{0}"; rerequest '
+                pywikibot.log('Inconsistency in batch "{0}"; rerequest '
                               'separately'.format(missing_modules))
                 failed_modules.extend(missing_modules)
 
@@ -498,6 +499,8 @@ class ParamInfo(Sized, Container):
                 for param in parameters:
                     if param['name'] == 'generator':
                         break
+                else:
+                    param = {}
                 assert param['name'] == 'generator' and \
                     submodules >= set(param['type'])
 
@@ -506,7 +509,7 @@ class ParamInfo(Sized, Container):
         # Users will supply the wrong type, and expect it to work.
         modules = self._modules_to_set(modules)
 
-        assert(self._action_modules)
+        assert self._action_modules
 
         return {'query+' + mod
                 if '+' not in mod and mod in self.query_modules
@@ -655,7 +658,7 @@ class ParamInfo(Sized, Container):
 
     @property
     @deprecated('submodules() or module_paths', since='20150715')
-    def modules(self) -> Set[str]:
+    def modules(self) -> Union[Set[str], FrozenSet[str]]:
         """
         Set of all main and query modules without path prefixes.
 
@@ -852,11 +855,11 @@ class OptionSet(MutableMapping):
         self._valid_disable = set()
         if site is None:
             return
-        for type in site._paraminfo.parameter(module, param)['type']:
-            if type[0] == '!':
-                self._valid_disable.add(type[1:])
+        for type_value in site._paraminfo.parameter(module, param)['type']:
+            if type_value[0] == '!':
+                self._valid_disable.add(type_value[1:])
             else:
-                self._valid_enable.add(type)
+                self._valid_enable.add(type_value)
         if clear_invalid:
             self._enabled &= self._valid_enable
             self._disabled &= self._valid_disable
@@ -868,7 +871,7 @@ class OptionSet(MutableMapping):
                                '"{0}"'.format('", "'.join(invalid_names)))
         self._site_set = True
 
-    def from_dict(self, dict):
+    def from_dict(self, dictionary):
         """
         Load options from the dict.
 
@@ -876,16 +879,17 @@ class OptionSet(MutableMapping):
         previously, but only the dict values should be applied it needs to be
         cleared first.
 
-        @param dict: A dictionary containing for each entry either the value
+        @param dictionary:
+            a dictionary containing for each entry either the value
             False, True or None. The names must be valid depending on whether
             they enable or disable the option. All names with the value None
             can be in either of the list.
-        @type dict: dict (keys are strings, values are bool/None)
+        @type dictionary: dict (keys are strings, values are bool/None)
         """
         enabled = set()
         disabled = set()
         removed = set()
-        for name, value in dict.items():
+        for name, value in dictionary.items():
             if value is True:
                 enabled.add(name)
             elif value is False:
@@ -1473,7 +1477,8 @@ class Request(MutableMapping):
             return {action: {'result': 'Success', 'nochange': ''}}
         return None
 
-    def _is_wikibase_error_retryable(self, error):
+    @staticmethod
+    def _is_wikibase_error_retryable(error):
         ERR_MSG = (
             'edit-already-exists',
             'actionthrottledtext',  # T192912
@@ -1495,7 +1500,7 @@ class Request(MutableMapping):
         return message in ERR_MSG
 
     @staticmethod
-    def _generate_MIME_part(key, content, keytype=None, headers=None):
+    def _generate_mime_part(key, content, keytype=None, headers=None):
         if not keytype:
             try:
                 content.encode('ascii')
@@ -1555,10 +1560,10 @@ class Request(MutableMapping):
         # construct a MIME message containing all API key/values
         container = MIMEMultipart(_subtype='form-data')
         for key, value in params.items():
-            submsg = cls._generate_MIME_part(key, value)
+            submsg = cls._generate_mime_part(key, value)
             container.attach(submsg)
         for key, value in mime_params.items():
-            submsg = cls._generate_MIME_part(key, *value)
+            submsg = cls._generate_mime_part(key, *value)
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
@@ -1628,7 +1633,7 @@ class Request(MutableMapping):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, data: str) -> dict:
+    def _json_loads(self, data: Union[str, bytes]) -> Optional[dict]:
         """Read source text and return a dict.
 
         @param data: raw data string
@@ -2026,7 +2031,7 @@ class CachedRequest(Request):
 
         @return: base directory path for cache entries
         """
-        path = os.path.join(pywikibot.config2.base_dir,
+        path = os.path.join(config.base_dir,
                             'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
@@ -2497,7 +2502,7 @@ class QueryGenerator(_RequestWrapper):
 
         @return: True if yes, False otherwise
         """
-        assert(self.limited_module)  # some modules do not have a prefix
+        assert self.limited_module  # some modules do not have a prefix
         return bool(
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
@@ -2518,7 +2523,7 @@ class QueryGenerator(_RequestWrapper):
         #    type such as NoneType or bool, or more than one namespace
         #    if the API module does not support multiple namespaces
         """
-        assert(self.limited_module)  # some modules do not have a prefix
+        assert self.limited_module  # some modules do not have a prefix
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
         if not param:
@@ -2760,7 +2765,7 @@ class PageGenerator(QueryGenerator):
 
         """
         # If possible, use self.request after __init__ instead of appendParams
-        def appendParams(params, key, value):
+        def append_params(params, key, value):
             if key in params:
                 params[key] += '|' + value
             else:
@@ -2768,18 +2773,18 @@ class PageGenerator(QueryGenerator):
         kwargs = self._clean_kwargs(kwargs)
         parameters = kwargs['parameters']
         # get some basic information about every page generated
-        appendParams(parameters, 'prop', 'info|imageinfo|categoryinfo')
+        append_params(parameters, 'prop', 'info|imageinfo|categoryinfo')
         if g_content:
             # retrieve the current revision
-            appendParams(parameters, 'prop', 'revisions')
-            appendParams(parameters, 'rvprop',
-                         'ids|timestamp|flags|comment|user|content')
+            append_params(parameters, 'prop', 'revisions')
+            append_params(parameters, 'rvprop',
+                          'ids|timestamp|flags|comment|user|content')
         if not ('inprop' in parameters
                 and 'protection' in parameters['inprop']):
-            appendParams(parameters, 'inprop', 'protection')
-        appendParams(parameters, 'iiprop',
-                     'timestamp|user|comment|url|size|sha1|metadata')
-        appendParams(parameters, 'iilimit', 'max')  # T194233
+            append_params(parameters, 'inprop', 'protection')
+        append_params(parameters, 'iiprop',
+                      'timestamp|user|comment|url|size|sha1|metadata')
+        append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)
         self.resultkey = 'pages'  # element to look for in result
@@ -3049,6 +3054,8 @@ class LoginManager(login.LoginManager):
                 if match:
                     delta = datetime.timedelta(
                         **{match.group(2): int(match.group(1))})
+                else:
+                    delta = 0
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
@@ -3204,7 +3211,7 @@ def _update_coordinates(page, coordinates):
     page._coords = coords
 
 
-def update_page(page, pagedict: dict, props=[]):
+def update_page(page, pagedict: dict, props=None):
     """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
@@ -3222,6 +3229,7 @@ def update_page(page, pagedict: dict, props=[]):
     _update_pageid(page, pagedict)
     _update_contentmodel(page, pagedict)
 
+    props = props or []
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
 

@@ -283,11 +283,11 @@ class DryMimeTests(TestCase):
     net = False
 
     def test_mime_file_payload(self):
-        """Test Request._generate_MIME_part loads binary as binary."""
+        """Test Request._generate_mime_part loads binary as binary."""
         local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
-        submsg = Request._generate_MIME_part(
+        submsg = Request._generate_mime_part(
             'file', file_content, ('image', 'png'),
             {'filename': local_filename})
         self.assertEqual(file_content, submsg.get_payload(decode=True))
