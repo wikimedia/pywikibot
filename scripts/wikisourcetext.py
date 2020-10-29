@@ -144,8 +144,7 @@ class UploadTextBot(SingleSiteBot):
             try:
                 text_body = page.ocr(ocr_tool=self.opt.ocr)
             except ValueError as e:
-                # TODO: is it a problem in PY2?
-                pywikibot.error(str(e))
+                pywikibot.error(e)
                 text_body = None  # Sentinel: signal exception to self.treat()
 
             self._queue_out.put((idx, text_body))
