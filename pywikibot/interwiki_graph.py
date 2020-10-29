@@ -14,7 +14,9 @@ from typing import Optional
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, ModuleDeprecationWrapper
+from pywikibot.tools import (
+    deprecated, deprecated_args, ModuleDeprecationWrapper)
+
 try:
     import pydot
 except ImportError as e:
@@ -39,21 +41,36 @@ class GraphSavingThread(threading.Thread):
     mechanism to kill a thread if it takes too long.
     """
 
-    def __init__(self, graph, originPage):
+    @deprecated_args(originPage='origin')  # since 20200617
+    def __init__(self, graph, origin):
         """Initializer."""
         super().__init__()
         self.graph = graph
-        self.originPage = originPage
+        self.origin = origin
+
+    @property
+    @deprecated('GraphSavingThread.origin', since='20200617')
+    def originPage(self):
+        """Deprecated property for the origin page.
+
+        DEPRECATED. Use origin.
+        """
+        return self.origin
+
+    @originPage.setter
+    @deprecated('GraphSavingThread.origin', since='20200617')
+    def originPage(self, value):
+        self.origin = value
 
     def run(self):
         """Write graphs to the data directory."""
-        for format in config.interwiki_graph_formats:
+        for fmt in config.interwiki_graph_formats:
             filename = config.datafilepath(
-                'interwiki-graphs/' + getFilename(self.originPage, format))
-            if self.graph.write(filename, prog='dot', format=format):
-                pywikibot.output('Graph saved as %s' % filename)
+                'interwiki-graphs/' + getFilename(self.origin, fmt))
+            if self.graph.write(filename, prog='dot', format=fmt):
+                pywikibot.output('Graph saved as ' + filename)
             else:
-                pywikibot.output('Graph could not be saved as %s' % filename)
+                pywikibot.output('Graph could not be saved as ' + filename)
 
 
 class Subject:
@@ -69,7 +86,7 @@ class Subject:
         # Remember the "origin page"
         self._origin = origin
 
-        # foundIn is a dictionary where pages are keys and lists of
+        # found_in is a dictionary where pages are keys and lists of
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
@@ -217,8 +234,8 @@ class GraphDrawer:
 
         For more info see U{https://meta.wikimedia.org/wiki/Interwiki_graphs}
         """
-        pywikibot.output('Preparing graph for %s'
-                         % self.subject.origin.title())
+        pywikibot.output('Preparing graph for {}'
+                         .format(self.subject.origin.title()))
         # create empty graph
         self.graph = pydot.Dot()
         # self.graph.set('concentrate', 'true')
