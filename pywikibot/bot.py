@@ -63,7 +63,7 @@ __all__ = (
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
     'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
     'init_handlers', 'writelogheader',
-    'input', 'input_choice', 'input_yn', 'input_list_choice',
+    'input', 'input_choice', 'input_yn', 'input_list_choice', 'ui',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
