@@ -62,10 +62,10 @@ class WikiStatsTestCase(TestCase):
             last = curr
             last_code = code
 
-    def test_csv(self):
-        """Test CSV."""
+    def test_wikipedia(self):
+        """Test WikiStats wikipedia data content."""
         ws = WikiStats()
-        data = ws.get_dict('wikipedia', 'csv')
+        data = ws.get_dict('wikipedia')
         self.assertIsInstance(data, dict)
         self.assertIn('en', data)
         self.assertIn('ht', data)
@@ -77,10 +77,10 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('prefix', data)
         self.assertIn('total', data)
 
-    def test_xml(self):
-        """Test XML."""
+    def test_wikisource(self):
+        """Test WikiStats wikisource data content."""
         ws = WikiStats()
-        data = ws.get_dict('wikisource', 'xml')
+        data = ws.get_dict('wikisource')
         self.assertIsInstance(data, dict)
         self.assertIn('en', data)
         self.assertIn('id', data)
