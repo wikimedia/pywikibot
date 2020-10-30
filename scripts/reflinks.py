@@ -624,7 +624,6 @@ class ReferencesRobot(SingleSiteBot):
             linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
             meta_content = self.META_CONTENT.search(linkedpagetext)
-            enc = []
             s = None
             if content_type:
                 # use charset from http header
@@ -638,20 +637,15 @@ class ReferencesRobot(SingleSiteBot):
                     # use charset from html
                     s = self.CHARSET.search(tag)
             if s:
-                tmp = s.group('enc').strip('"\' ').lower()
-                naked = re.sub(r'[ _\-]', '', tmp)
+                encoding = s.group('enc').strip('"\' ').lower()
+                naked = re.sub(r'[ _\-]', '', encoding)
                 # Convert to python correct encoding names
-                if naked == 'gb2312':
-                    enc.append('gbk')
-                elif naked == 'shiftjis':
-                    enc.append('shift jis 2004')
-                    enc.append('cp932')
-                elif naked == 'xeucjp':
-                    enc.append('euc-jp')
-                else:
-                    enc.append(tmp)
+                if naked == 'xeucjp':
+                    encoding = 'euc_jp'
+                f.data.encoding = encoding
             else:
                 pywikibot.output('No charset found for ' + ref.link)
+                f.data.encoding = None
 
             if not content_type:
                 pywikibot.output('No content-type found for ' + ref.link)
@@ -665,30 +659,7 @@ class ReferencesRobot(SingleSiteBot):
                 new_text = new_text.replace(match.group(), repl)
                 return
 
-            # Ugly hacks to try to survive when both server and page
-            # return no encoding.
-            # Uses most used encodings for each national suffix
-            if '.ru' in ref.link or '.su' in ref.link:
-                # see http://www.sci.aha.ru/ATL/ra13a.htm : no server
-                # encoding, no page encoding
-                enc = enc + ['koi8-r', 'windows-1251']
-            elif '.jp' in ref.link:
-                enc.append('shift jis 2004')
-                enc.append('cp932')
-            elif '.kr' in ref.link:
-                enc.append('euc-kr')
-                enc.append('cp949')
-            elif '.zh' in ref.link:
-                enc.append('gbk')
-
-            if 'utf-8' not in enc:
-                enc.append('utf-8')
-            try:
-                u = linkedpagetext.decode(enc[0])   # Bug T69410
-            except (UnicodeDecodeError, LookupError) as e:
-                pywikibot.output('{} : Decoding error - {}'
-                                 .format(ref.link, e))
-                return
+            u = f.data.text
 
             # Retrieves the first non empty string inside <title> tags
             for m in self.TITLE.finditer(u):
@@ -703,14 +674,6 @@ class ReferencesRobot(SingleSiteBot):
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
                 pywikibot.output('{} : No title found...'.format(ref.link))
-                return
-
-            # XXX Ugly hack
-            if 'Ã©' in ref.title:
-                repl = ref.refLink()
-                new_text = new_text.replace(match.group(), repl)
-                pywikibot.output('{} : Hybrid encoding...'
-                                 .format(ref.link))
                 return
 
             if self.titleBlackList.match(ref.title):
