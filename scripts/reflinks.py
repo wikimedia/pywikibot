@@ -58,7 +58,7 @@ from requests import codes
 import pywikibot
 
 from pywikibot import comms, i18n, pagegenerators, textlib
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
@@ -393,7 +393,7 @@ class DuplicateReferences:
         return text
 
 
-class ReferencesRobot(SingleSiteBot):
+class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """References bot."""
 
@@ -507,23 +507,17 @@ class ReferencesRobot(SingleSiteBot):
                 'http://www.twoevils.org/files/wikipedia/404-links.txt.gz\n'
                 'and to unzip it in the same directory')
 
+    def skip_page(self, page):
+        """Skip unwanted pages."""
+        if not page.has_permission():
+            pywikibot.warning("You can't edit page {page}" .format(page=page))
+            return True
+        return super().skip_page(page)
+
     def treat(self, page):
         """Process one page."""
-        try:
-            # Load the page's text from the wiki
-            new_text = page.get()
-            if not page.has_permission():
-                pywikibot.output("You can't edit page "
-                                 + page.title(as_link=True))
-                return
-        except pywikibot.NoPage:
-            pywikibot.output('Page {} not found'
-                             .format(page.title(as_link=True)))
-            return
-        except pywikibot.IsRedirectPage:
-            pywikibot.output('Page {} is a redirect'
-                             .format(page.title(as_link=True)))
-            return
+        # Load the page's text from the wiki
+        new_text = page.text
 
         # for each link to change
         for match in linksInRef.finditer(
@@ -545,42 +539,43 @@ class ReferencesRobot(SingleSiteBot):
                 # Try to get Content-Type from server
                 content_type = f.response_headers.get('content-type')
                 if content_type and not self.MIME.search(content_type):
-                    if ref.link.lower().endswith('.pdf') and \
-                       not self.opt.ignorepdf:
+                    if ref.link.lower().endswith('.pdf') \
+                       and not self.opt.ignorepdf:
                         # If file has a PDF suffix
                         self.getPDFTitle(ref, f)
                     else:
                         pywikibot.output(color_format(
-                            '{lightyellow}WARNING{default} : '
-                            'media : {0} ', ref.link))
-                    if ref.title:
-                        if not re.match(
-                                '(?i) *microsoft (word|excel|visio)',
-                                ref.title):
-                            ref.transform(ispdf=True)
-                            repl = ref.refTitle()
-                        else:
-                            pywikibot.output(color_format(
-                                '{lightyellow}WARNING{default} : '
-                                'PDF title blacklisted : {0} ', ref.title))
-                            repl = ref.refLink()
-                    else:
+                            '{lightyellow}WARNING{default} : media : {} ',
+                            ref.link))
+
+                    if not ref.title:
                         repl = ref.refLink()
+                    elif not re.match('(?i) *microsoft (word|excel|visio)',
+                                      ref.title):
+                        ref.transform(ispdf=True)
+                        repl = ref.refTitle()
+                    else:
+                        pywikibot.output(color_format(
+                            '{lightyellow}WARNING{default} : '
+                            'PDF title blacklisted : {0} ', ref.title))
+                        repl = ref.refLink()
+
                     new_text = new_text.replace(match.group(), repl)
                     return
 
                 # Get the real url where we end (http redirects !)
                 redir = f.data.url
-                if redir != ref.link and \
-                   domain.findall(redir) == domain.findall(link):
-                    if soft404.search(redir) and \
-                       not soft404.search(ref.link):
+                if redir != ref.link \
+                   and domain.findall(redir) == domain.findall(link):
+                    if soft404.search(redir) \
+                       and not soft404.search(ref.link):
                         pywikibot.output(color_format(
                             '{lightyellow}WARNING{default} : '
                             'Redirect 404 : {0} ', ref.link))
                         return
-                    if dirIndex.match(redir) and \
-                       not dirIndex.match(ref.link):
+
+                    if dirIndex.match(redir) \
+                       and not dirIndex.match(ref.link):
                         pywikibot.output(color_format(
                             '{lightyellow}WARNING{default} : '
                             'Redirect to root : {0} ', ref.link))
@@ -601,6 +596,7 @@ class ReferencesRobot(SingleSiteBot):
                     return
 
                 linkedpagetext = f.raw
+
             except UnicodeError:
                 # example:
                 # http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
@@ -609,6 +605,7 @@ class ReferencesRobot(SingleSiteBot):
                     '{lightred}Bad link{default} : {0} in {1}',
                     ref.url, page.title(as_link=True)))
                 return
+
             except (URLError,
                     socket.error,
                     IOError,
