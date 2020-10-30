@@ -601,8 +601,7 @@ def replace_links(text: str, replace, site=None) -> str:
     If it's a string and the replacement was a sequence it converts it into a
     Page instance. If the replacement is done via a callable it'll use it like
     unlinking and directly replace the link with the text itself. It only
-    supports unicode when used by the callable and bytes (str in Python 2) are
-    not allowed.
+    supports unicode when used by the callable and bytes are not allowed.
 
     If either the section or label should be used the replacement can be a
     function which returns a Link instance and copies the value which should
