@@ -2380,14 +2380,20 @@ class Page(BasePage):
         if not self.site.has_data_repository:
             raise UnknownExtension(
                 'Wikibase is not implemented for {}.'.format(self.site))
-        try:
-            item_page = pywikibot.ItemPage.fromPage(self)
-        except pywikibot.NoPage:
-            pass
-        else:
-            item_page.get()
-            if prop in item_page.claims:
-                return find_best_claim(item_page.claims[prop])
+
+        def get_item_page(func, *args):
+            try:
+                item_p = func(*args)
+                item_p.get()
+                return item_p
+            except pywikibot.NoPage:
+                return None
+            except pywikibot.IsRedirectPage:
+                return get_item_page(item_p.getRedirectTarget)
+
+        item_page = get_item_page(pywikibot.ItemPage.fromPage, self)
+        if item_page and prop in item_page.claims:
+            return find_best_claim(item_page.claims[prop])
         return None
 
 
