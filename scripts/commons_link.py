@@ -48,7 +48,7 @@ class CommonsLinkBot(Bot):
 
     def __init__(self, generator, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'action': None,
         })
         super(CommonsLinkBot, self).__init__(**kwargs)
@@ -60,9 +60,9 @@ class CommonsLinkBot(Bot):
 
     def run(self):
         """Run the bot."""
-        if not all((self.getOption('action'), self.generator)):
+        if not all((self.opt.action, self.generator)):
             return
-        catmode = (self.getOption('action') == 'categories')
+        catmode = (self.opt.action == 'categories')
         for page in self.generator:
             try:
                 self.current_page = page

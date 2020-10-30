@@ -62,12 +62,12 @@ class CoordImportRobot(WikidataBot):
 
         @param generator: A generator that yields Page objects.
         """
-        self.availableOptions['create'] = False
+        self.available_options['create'] = False
         super().__init__(**kwargs)
         self.generator = generator
         self.cacheSources()
         self.prop = 'P625'
-        self.create_missing_item = self.getOption('create')
+        self.create_missing_item = self.opt.create
 
     def has_coord_qualifier(self, claims) -> Optional[str]:
         """

@@ -56,7 +56,7 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
             @kwarg titlecase: create a titlecased redirect page instead a
                               capitalized one.
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'titlecase': False,
         })
 
@@ -66,7 +66,7 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
         """Capitalize redirects of the current page."""
         page_t = self.current_page.title()
         site = self.current_page.site
-        if self.getOption('titlecase'):
+        if self.opt.titlecase:
             page_cap = pywikibot.Page(site, page_t.title())
         else:
             page_cap = pywikibot.Page(site, page_t.capitalize())

@@ -181,7 +181,7 @@ class NowCommonsDeleteBot(Bot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'replace': False,
             'replacealways': False,
             'replaceloose': False,
@@ -284,7 +284,7 @@ class NowCommonsDeleteBot(Bot):
                             'is still used in {1} pages.',
                             localImagePage.title(with_ns=False),
                             len(usingPages)))
-                        if self.getOption('replace') is True:
+                        if self.opt.replace is True:
                             pywikibot.output(color_format(
                                 'Replacing "{lightred}{0}{default}" by '
                                 '"{lightgreen}{1}{default}\".',
@@ -294,23 +294,23 @@ class NowCommonsDeleteBot(Bot):
                                 pg.FileLinksGenerator(localImagePage),
                                 localImagePage.title(with_ns=False),
                                 commonsImagePage.title(with_ns=False),
-                                '', self.getOption('replacealways'),
-                                self.getOption('replaceloose'))
+                                '', self.opt.replacealways,
+                                self.opt.replaceloose)
                             bot.run()
                             # If the image is used with the urlname the
                             # previous function won't work
                             is_used = bool(list(pywikibot.FilePage(
                                 self.site,
                                 page.title()).usingPages(total=1)))
-                            if is_used and self.getOption('replaceloose'):
+                            if is_used and self.opt.replaceloose:
                                 bot = ImageBot(
                                     pg.FileLinksGenerator(
                                         localImagePage),
                                     localImagePage.title(
                                         with_ns=False, as_url=True),
                                     commonsImagePage.title(with_ns=False),
-                                    '', self.getOption('replacealways'),
-                                    self.getOption('replaceloose'))
+                                    '', self.opt.replacealways,
+                                    self.opt.replaceloose)
                                 bot.run()
                             # refresh because we want the updated list
                             usingPages = len(list(pywikibot.FilePage(
@@ -325,7 +325,7 @@ class NowCommonsDeleteBot(Bot):
                             'anymore.',
                             localImagePage.title(with_ns=False)))
                 commonsText = commonsImagePage.get()
-                if self.getOption('replaceonly') is False:
+                if self.opt.replaceonly is False:
                     if sha1 == commonsImagePage.latest_file_info.sha1:
                         pywikibot.output(
                             'The image is identical to the one on Commons.')
@@ -335,7 +335,7 @@ class NowCommonsDeleteBot(Bot):
                                 'delete it manually after making sure that '
                                 'the old versions are not worth keeping.')
                             continue
-                        if self.getOption('always') is False:
+                        if self.opt.always is False:
                             format_str = color_format(
                                 '\n\n>>>> Description on {lightpurple}%s'
                                 '{default} <<<<\n')

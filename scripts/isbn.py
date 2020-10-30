@@ -159,15 +159,14 @@ class IsbnBot(Bot):
 
     """ISBN bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'to13': False,
             'format': False,
         })
         super().__init__(**kwargs)
 
-        self.generator = generator
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
         self.comment = i18n.twtranslate(self.site, 'isbn-formatting')
 
@@ -183,10 +182,10 @@ class IsbnBot(Bot):
                     pywikibot.output(e)
 
             new_text = old_text
-            if self.getOption('to13'):
+            if self.opt.to13:
                 new_text = self.isbnR.sub(_isbn10toIsbn13, new_text)
 
-            if self.getOption('format'):
+            if self.opt.format:
                 new_text = self.isbnR.sub(_hyphenateIsbnNumber, new_text)
             try:
                 self.userPut(page, page.text, new_text, summary=self.comment)
@@ -214,9 +213,9 @@ class IsbnWikibaseBot(WikidataBot):
 
     use_from_page = None
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'to13': False,
             'format': False,
         })
@@ -225,7 +224,6 @@ class IsbnWikibaseBot(WikidataBot):
 
         super().__init__(**kwargs)
 
-        self.generator = generator
         if self.isbn_10_prop_id is None:
             self.isbn_10_prop_id = self.get_property_by_name('ISBN-10')
         if self.isbn_13_prop_id is None:
@@ -247,10 +245,10 @@ class IsbnWikibaseBot(WikidataBot):
 
                 old_isbn = 'ISBN ' + isbn
 
-                if self.getOption('format'):
+                if self.opt.format:
                     new_isbn = hyphenateIsbnNumbers(old_isbn)
 
-                if self.getOption('to13'):
+                if self.opt.to13:
                     new_isbn = convertIsbn10toIsbn13(old_isbn)
 
                     item.claims[claim.getID()].remove(claim)
@@ -279,7 +277,7 @@ class IsbnWikibaseBot(WikidataBot):
                                         new_isbn))
 
         # -format is the only option that has any effect on ISBN13
-        if self.getOption('format') and self.isbn_13_prop_id in item.claims:
+        if self.opt.format and self.isbn_13_prop_id in item.claims:
             for claim in item.claims[self.isbn_13_prop_id]:
                 isbn = claim.getTarget()
                 try:
@@ -347,9 +345,9 @@ def main(*args):
         return
 
     if use_wikibase:
-        bot = IsbnWikibaseBot(gen, **options)
+        bot = IsbnWikibaseBot(generator=gen, **options)
     else:
-        bot = IsbnBot(gen, **options)
+        bot = IsbnBot(generator=gen, **options)
     bot.run()
 
 

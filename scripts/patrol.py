@@ -89,7 +89,7 @@ class PatrolBot(SingleSiteBot):
         @kwarg autopatroluserns: Takes user consent to automatically patrol
         @kwarg versionchecktime: Check versionchecktime lapse in sec
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'ask': False,
             'whitelist': None,
             'versionchecktime': 300,
@@ -98,8 +98,8 @@ class PatrolBot(SingleSiteBot):
         super().__init__(site, **kwargs)
         self.recent_gen = True
         self.user = None
-        if self.getOption('whitelist'):
-            self.whitelist_pagename = self.getOption('whitelist')
+        if self.opt.whitelist:
+            self.whitelist_pagename = self.opt.whitelist
         else:
             local_whitelist_subpage_name = pywikibot.translate(
                 self.site, self.whitelist_subpage_name, fallback=True)
@@ -130,7 +130,7 @@ class PatrolBot(SingleSiteBot):
             raise mwparserfromhell
         # Check for a more recent version after versionchecktime in sec.
         if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts
-                                        < self.getOption('versionchecktime'))):
+                                        < self.opt.versionchecktime)):
             verbose_output('Whitelist not stale yet')
             return
 
@@ -308,11 +308,11 @@ class PatrolBot(SingleSiteBot):
                 self.load_whitelist()
                 self.repeat_start_ts = time.time()
 
-            if pywikibot.config.verbose_output or self.getOption('ask'):
+            if pywikibot.config.verbose_output or self.opt.ask:
                 pywikibot.output('User {0} has created or modified page {1}'
                                  .format(username, title))
 
-            if (self.getOption('autopatroluserns')
+            if (self.opt.autopatroluserns
                     and page['ns'] in (2, 3)):
                 # simple rule to whitelist any user editing their own userspace
                 if title.partition(':')[2].split('/')[0].startswith(username):
@@ -326,7 +326,7 @@ class PatrolBot(SingleSiteBot):
                                    .format(username, title))
                     choice = True
 
-            if self.getOption('ask'):
+            if self.opt.ask:
                 choice = pywikibot.input_yn(
                     'Do you want to mark page as patrolled?')
 

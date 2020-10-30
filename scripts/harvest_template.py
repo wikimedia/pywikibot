@@ -124,7 +124,7 @@ class PropertyOptionHandler(OptionHandler):
 
     """Class holding options for a param-property pair."""
 
-    availableOptions = {
+    available_options = {
         'exists': '',
         'islink': False,
         'multi': False,
@@ -156,7 +156,7 @@ class HarvestRobot(WikidataBot):
             single parameter
         @type multi: bool
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'always': True,
             'create': False,
             'exists': '',
@@ -176,7 +176,7 @@ class HarvestRobot(WikidataBot):
         template_title = template_title.replace('_', ' ')
         self.templateTitles = self.getTemplateSynonyms(template_title)
         self.linkR = textlib.compileLinkR()
-        self.create_missing_item = self.getOption('create')
+        self.create_missing_item = self.opt.create
 
     def getTemplateSynonyms(self, title) -> List[str]:
         """Fetch redirects of the title, so we can check against them."""
@@ -239,7 +239,7 @@ class HarvestRobot(WikidataBot):
 
         @see: L{OptionHandler.getOption}
         """
-        default = self.getOption(option)
+        default = self.opt.option
         local = handler.getOption(option)
         if isinstance(default, bool) and isinstance(local, bool):
             return default is not local
