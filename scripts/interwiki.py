@@ -1352,7 +1352,7 @@ class Subject(interwiki_graph.Subject):
 
     def isDone(self):
         """Return True if all the work for this subject has completed."""
-        return bool(self.todo)
+        return len(self.todo) == 0
 
     def problem(self, txt, createneed=True):
         """Report a problem with the resolution of this subject."""
