@@ -123,6 +123,7 @@ import math
 import os
 import pickle
 import re
+from textwrap import fill
 
 from contextlib import suppress
 from operator import methodcaller
@@ -893,46 +894,38 @@ class CategoryListifyRobot:
 
     def run(self) -> None:
         """Start bot."""
-        setOfArticles = set(self.cat.articles(recurse=self.recurse))
-        if self.subCats:
-            setOfArticles = setOfArticles.union(set(self.cat.subcategories()))
-        if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site,
-                                                'category-listifying',
-                                                {'fromcat': self.cat.title(),
-                                                 'num': len(setOfArticles)})
+        if self.list.exists() and not (self.append or self.overwrite):
+            pywikibot.output('Page {} already exists, aborting.\n'
+                             .format(self.list.title()))
+            pywikibot.output(fill(
+                'Use -append option to append the list to the output page or '
+                '-overwrite option to overwrite the output page.'))
+            return
 
-        listString = ''
-        for article in setOfArticles:
-            if (not article.is_filepage()
-                    or self.showImages) and not article.is_categorypage():
-                if self.talkPages and not article.isTalkPage():
-                    listString += '{0} [[{1}]] -- [[{2}|talk]]\n'.format(
-                        self.prefix, article.title(),
-                        article.toggleTalkPage().title())
-                else:
-                    listString += '{0} [[{1}]]\n'.format(self.prefix,
-                                                         article.title())
-            else:
-                if self.talkPages and not article.isTalkPage():
-                    listString += '{0} [[:{1}]] -- [[{2}|talk]]\n'.format(
-                        self.prefix, article.title(),
-                        article.toggleTalkPage().title())
-                else:
-                    listString += '{0} [[:{1}]]\n'.format(self.prefix,
-                                                          article.title())
-        if self.list.exists():
-            if self.append:
-                # append content by default at the bottom
-                listString = self.list.text + '\n' + listString
-                pywikibot.output('Category list appending...')
-            elif not self.overwrite:
-                pywikibot.output(
-                    'Page {} already exists, aborting.\n'
-                    'Use -overwrite option to overwrite the output page.'
-                    .format(self.list.title()))
-                return
-        self.list.put(listString, summary=self.editSummary)
+        set_of_articles = set(self.cat.articles(recurse=self.recurse))
+        if self.subCats:
+            set_of_articles |= set(self.cat.subcategories())
+
+        list_string = ''
+        for article in set_of_articles:
+            textlink = not (article.is_filepage() and self.showImages)
+            list_string += '{} {}'.format(
+                self.prefix, article.title(as_link=True, textlink=textlink))
+            if self.talkPages and not article.isTalkPage():
+                list_string += ' -- [[{}|talk]]'.format(
+                    article.toggleTalkPage().title())
+            list_string += '\n'
+
+        if self.list.text and self.append:
+            # append content by default at the bottom
+            list_string = self.list.text + '\n' + list_string
+            pywikibot.output('Category list appending...')
+
+        if not self.editSummary:
+            self.editSummary = i18n.twtranslate(
+                self.site, 'category-listifying',
+                {'fromcat': self.cat.title(), 'num': len(set_of_articles)})
+        self.list.put(list_string, summary=self.editSummary)
 
 
 class CategoryTidyRobot(Bot, CategoryPreprocess):
