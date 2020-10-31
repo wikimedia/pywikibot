@@ -24,20 +24,17 @@ _logger = 'comms.threadedhttp'
 
 class HttpRequest:
 
-    """Object wrapper for HTTP requests that need to block origin thread.
+    """Object wrapper for HTTP requests.
 
     self.data will be either:
-    * a tuple of (dict, str) if the request was successful
+    * requests.Response object if the request was successful
     * an exception
     """
 
     @deprecated_args(headers='all_headers', uri='url')
     def __init__(self, url, method='GET', params=None, body=None,
                  all_headers=None, callbacks=None, charset=None, **kwargs):
-        """Initializer.
-
-        See C{Http.request} for parameters.
-        """
+        """Initializer."""
         self.url = url
         self.method = method
         self.params = params
