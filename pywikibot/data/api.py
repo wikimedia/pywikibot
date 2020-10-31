@@ -1181,15 +1181,17 @@ class Request(MutableMapping):
             self['assert'] = 'user'  # make sure user is logged in
 
     @classmethod
-    def create_simple(cls, site, **kwargs):
+    def create_simple(cls, req_site, **kwargs):
         """Create a new instance using all args except site for the API."""
         # This ONLY support site so that any caller can be sure there will be
         # no conflict with PWB parameters
+        # req_site is needed to avoid conflicts with possible site keyword in
+        # kwarg, see T262926
         # TODO: Use ParamInfo request to determine valid parameters
         if isinstance(kwargs.get('parameters'), dict):
             warn('The request contains already a "parameters" entry which is '
                  'a dict.')
-        return cls(site, parameters=kwargs)
+        return cls(req_site, parameters=kwargs)
 
     @classmethod
     def _warn_both(cls):

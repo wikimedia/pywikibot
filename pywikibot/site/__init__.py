@@ -1414,7 +1414,7 @@ class APISite(BaseSite):
     def _simple_request(self, **kwargs):
         """Create a request by defining all kwargs as parameters."""
         return self._request_class({'parameters': kwargs}).create_simple(
-            site=self, **kwargs)
+            self, **kwargs)
 
     @remove_last_args(['sysop'])
     def logged_in(self):
