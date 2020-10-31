@@ -182,7 +182,7 @@ class TemplateRobot(ReplaceBot):
             names of the templates that should be removed/resolved to None.
         @type templates: dict
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'addcat': None,
             'remove': False,
             'subst': False,

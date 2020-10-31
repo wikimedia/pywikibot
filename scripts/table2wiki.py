@@ -87,7 +87,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'quiet': False,       # quiet mode, less output
             'skipwarning': False  # on warning skip that page
         })
@@ -478,12 +478,12 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             return
 
         if warnings:
-            if self.getOption('always') and self.getOption('skipwarning'):
+            if self.opt.always and self.opt.skipwarning:
                 pywikibot.output(
                     'There were {0} replacements that might lead to bad '
                     'output. Skipping.'.format(warnings))
                 return
-            if not self.getOption('always'):
+            if not self.opt.always:
                 pywikibot.output(
                     'There were {0} replacements that might lead to bad '
                     'output.'.format(warnings))
@@ -501,8 +501,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 {'count': warnings}
             )
         self.put_current(new_text, summary=edit_summary,
-                         show_diff=not (self.getOption('quiet')
-                                        and self.getOption('always')))
+                         show_diff=not (self.opt.quiet
+                                        and self.opt.always))
 
 
 _marked_table_start_search = re.compile('<##table##', re.IGNORECASE).search

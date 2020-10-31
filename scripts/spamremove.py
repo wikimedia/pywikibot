@@ -66,7 +66,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
 
     def __init__(self, generator, spam_external_url, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'summary': None,
         })
         super(SpamRemoveBot, self).__init__(**kwargs)
@@ -99,7 +99,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                     if lastok is None:
                         pywikibot.output(line)
                     lastok = line
-        if self.getOption('always'):
+        if self.opt.always:
             answer = 'y'
         else:
             answer = pywikibot.input_choice(
@@ -115,7 +115,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
         else:
             newtext = '\n'.join(newpage)
         if newtext != text:
-            self.put_current(newtext, summary=self.getOption('summary'))
+            self.put_current(newtext, summary=self.opt.summary)
 
 
 def main(*args):

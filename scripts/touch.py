@@ -43,7 +43,7 @@ class TouchBot(MultipleSitesBot):
 
     def __init__(self, generator, **kwargs) -> None:
         """Initialize a TouchBot instance with the options and generator."""
-        self.availableOptions.update({
+        self.available_options.update({
             'botflag': False,
         })
         super().__init__(generator=generator, **kwargs)
@@ -51,7 +51,7 @@ class TouchBot(MultipleSitesBot):
     def treat(self, page) -> None:
         """Touch the given page."""
         try:
-            page.touch(botflag=self.getOption('botflag'))
+            page.touch(botflag=self.opt.botflag)
         except (pywikibot.NoCreateError, pywikibot.NoPage):
             pywikibot.error('Page {0} does not exist.'
                             .format(page.title(as_link=True)))
@@ -69,7 +69,7 @@ class PurgeBot(MultipleSitesBot):
 
     def __init__(self, generator, **kwargs) -> None:
         """Initialize a PurgeBot instance with the options and generator."""
-        self.availableOptions = {
+        self.available_options = {
             'converttitles': None,
             'forcelinkupdate': None,
             'forcerecursivelinkupdate': None,
