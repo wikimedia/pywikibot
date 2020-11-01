@@ -106,7 +106,6 @@ import io
 import os
 import posixpath
 
-from typing import Tuple
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -115,7 +114,12 @@ import pywikibot
 from pywikibot.comms.http import fetch
 from pywikibot import pagegenerators
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class Photo(pywikibot.FilePage):

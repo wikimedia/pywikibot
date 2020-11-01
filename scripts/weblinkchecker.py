@@ -120,7 +120,7 @@ import time
 
 from contextlib import suppress
 from functools import partial
-from typing import Optional, Tuple
+from typing import Optional
 from urllib.parse import urlsplit
 from urllib.request import quote
 
@@ -134,8 +134,13 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated, ThreadList
+from pywikibot.tools import deprecated, PYTHON_VERSION, ThreadList
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 try:
     import memento_client

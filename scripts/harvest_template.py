@@ -94,13 +94,19 @@ will not add duplicate claims for the same member:
 #
 import signal
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import pywikibot
 
 from pywikibot import pagegenerators as pg, textlib
 from pywikibot.bot import WikidataBot, OptionHandler
 
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    List = tuple
+else:
+    from typing import List
 
 willstop = False
 

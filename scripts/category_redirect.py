@@ -35,12 +35,17 @@ import time
 
 from contextlib import suppress
 from datetime import timedelta
-from typing import Tuple
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, config
 from pywikibot.bot import SingleSiteBot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class CategoryRedirectBot(SingleSiteBot):

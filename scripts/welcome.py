@@ -172,7 +172,7 @@ from datetime import timedelta
 from enum import Enum
 from random import choice
 from textwrap import fill
-from typing import Generator, List
+from typing import Generator
 
 import pywikibot
 
@@ -181,6 +181,12 @@ from pywikibot import config, i18n
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 locale.setlocale(locale.LC_ALL, '')
 

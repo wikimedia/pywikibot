@@ -33,13 +33,17 @@ The following generators and filters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Tuple
-
 import pywikibot
 from pywikibot import pagegenerators
 
 from pywikibot.bot import (
     SingleSiteBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot)
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

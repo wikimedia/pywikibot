@@ -23,21 +23,24 @@ and pagegenerator can be one of these:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
 # Ported by Geoffrey "GEOFBOT" Mon for Google Code-In 2013
 # User:Sn1per
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
-from typing import Tuple
 
 import pywikibot
 
 from pywikibot import textlib, pagegenerators, i18n, Bot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -51,7 +54,7 @@ class CommonsLinkBot(Bot):
         self.available_options.update({
             'action': None,
         })
-        super(CommonsLinkBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.generator = generator
         self.findTemplate = re.compile(r'\{\{[Ss]isterlinks')

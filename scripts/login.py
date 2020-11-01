@@ -58,13 +58,18 @@ subdirectory.
 # Distributed under the terms of the MIT license.
 #
 from os.path import join
-from typing import Tuple
 
 import pywikibot
 
 from pywikibot import config
 from pywikibot.exceptions import SiteDefinitionError
 from pywikibot.login import OauthLoginManager
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 def _get_consumer_token(site) -> Tuple[str, str]:

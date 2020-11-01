@@ -34,8 +34,6 @@ The following parameters are supported:
 #
 import os.path
 
-from typing import Tuple
-
 import pywikibot
 
 from pywikibot import i18n
@@ -43,6 +41,12 @@ from pywikibot import i18n
 from pywikibot.bot import SingleSiteBot
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.djvu import DjVuFile
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class DjVuTextBot(SingleSiteBot):
