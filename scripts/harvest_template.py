@@ -237,10 +237,10 @@ class HarvestRobot(WikidataBot):
         """
         Compare bot's (global) and provided (local) options.
 
-        @see: L{OptionHandler.getOption}
+        @see: L{OptionHandler}
         """
-        default = self.opt.option
-        local = handler.getOption(option)
+        default = self.opt[option]
+        local = handler.opt[option]
         if isinstance(default, bool) and isinstance(local, bool):
             return default is not local
         else:
