@@ -170,7 +170,7 @@ badtitles = {
     'fr': '.*(404|page|site).*en +travaux.*',
     'es': '.*sitio.*no +disponible.*',
     'it': '((pagina|sito) (non trovat[ao]|inesistente)|accedi|errore)',
-    'ru': '.*(Страница|страница).*(не[ ]*найдена|осутствует).*',
+    'ru': '.*(Страница|страница).*(не[ ]*найдена|отсутствует).*',
 }
 
 # Regex that match bare references
