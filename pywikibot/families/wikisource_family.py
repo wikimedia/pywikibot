@@ -27,12 +27,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
-        'mul', 'gu', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
+        'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
         'sl', 'te', 'hy', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
         'tr', 'az', 'br', 'la', 'ca', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
         'vec', 'pms', 'et', 'be', 'id', 'da', 'lij', 'mk', 'hi', 'yi', 'mr',
-        'bg', 'as', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'bs', 'sah', 'sk',
-        'cy', 'zh-min-nan', 'fo',
+        'bg', 'as', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'bs', 'sah', 'cy',
+        'sk', 'zh-min-nan', 'fo',
     ]
 
     # Sites we want to edit but not count as real languages
