@@ -16,7 +16,16 @@
 .. image:: https://img.shields.io/pypi/v/pywikibot.svg
    :alt: Pywikibot release
    :target: https://pypi.org/project/pywikibot/
-
+.. image:: https://pepy.tech/badge/pywikibot
+   :alt: Total downloads
+   :target: https://pepy.tech/project/pywikibot
+.. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
+   :alt: Monthly downloads
+   :target: https://pepy.tech/project/pywikibot
+.. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=week&units=international_system&left_color=black&right_color=blue&left_text=weekly
+   :alt: Weekly downloads
+   :target: https://pepy.tech/project/pywikibot
+ 
 Pywikibot
 =========
 
