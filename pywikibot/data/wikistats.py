@@ -146,8 +146,14 @@ class WikiStats:
         if table in self._data:
             return self._data[table]
 
-        raw = self.raw_cached(table)
-        f = StringIO(raw.decode('utf8'))
+        if table not in self.ALL_KEYS:
+            pywikibot.warning('WikiStats unknown table ' + table)
+
+        table = self.FAMILY_MAPPING.get(table, table)
+        path = '/api.php?action=dump&table={table}&format=csv'
+        url = self.url + path
+        r = http.fetch(url.format(table=table))
+        f = StringIO(r.text)
         reader = DictReader(f)
         data = list(reader)
         self._data[table] = data
