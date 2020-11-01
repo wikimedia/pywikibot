@@ -1186,12 +1186,12 @@ class Request(MutableMapping):
         # This ONLY support site so that any caller can be sure there will be
         # no conflict with PWB parameters
         # req_site is needed to avoid conflicts with possible site keyword in
-        # kwarg, see T262926
+        # kwarg until positional-only parameters are supported, see T262926
         # TODO: Use ParamInfo request to determine valid parameters
         if isinstance(kwargs.get('parameters'), dict):
             warn('The request contains already a "parameters" entry which is '
                  'a dict.')
-        return cls(req_site, parameters=kwargs)
+        return cls(site=req_site, parameters=kwargs)
 
     @classmethod
     def _warn_both(cls):
@@ -2020,7 +2020,7 @@ class CachedRequest(Request):
         self._cachetime = None
 
     @classmethod
-    def create_simple(cls, site, **kwargs):
+    def create_simple(cls, req_site, **kwargs):
         """Unsupported as it requires at least two parameters."""
         raise NotImplementedError('CachedRequest cannot be created simply.')
 
