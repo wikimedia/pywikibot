@@ -485,7 +485,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     if not modules:
         modules = sys.modules.keys()
 
-    std_lib_dir = get_python_lib(standard_lib=True)
+    std_lib_dir = pathlib.Path(get_python_lib(standard_lib=True))
 
     root_packages = {key.split('.')[0] for key in modules}
 
@@ -516,17 +516,26 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
         if '__file__' in package.__dict__:
             # Determine if this file part is of the standard library.
-            if os.path.normcase(package.__file__).startswith(
-                    os.path.normcase(std_lib_dir)):
+            # possible Namespace package
+            if not hasattr(package, '__file__') or package.__file__ is None:
+                _file = None
+                _path = pathlib.Path(package.__path__[0])
+            else:
+                _file = pathlib.Path(package.__file__)
+                _path = _file.parent
+            if _path == std_lib_dir:
                 std_lib_packages.append(name)
                 if standard_lib is False:
                     continue
-                info['type'] = 'standard libary'
+                info['type'] = 'standard library'
 
             # Strip '__init__.py' from the filename.
-            path = package.__file__
-            if '__init__.py' in path:
-                path = path[0:path.index('__init__.py')]
+            if (not hasattr(package, '__file__')
+                    or package.__file__ is None
+                    or _file.name == '__init__.py'):
+                path = _path
+            else:
+                path = _file
 
             info['path'] = path
             assert path not in paths, \
@@ -557,7 +566,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     dir_parts = pathlib.Path(_program_dir).parts
     length = len(dir_parts)
     for path, name in paths.items():
-        lib_parts = pathlib.Path(path).parts
+        lib_parts = path.parts
         if dir_parts != lib_parts[:length]:
             continue
         if lib_parts[length] != '.tox':

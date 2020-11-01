@@ -61,6 +61,11 @@ scripts.category\_redirect script
 
 .. automodule:: scripts.category_redirect
 
+scripts.change\_pagelang script
+-------------------------------
+
+.. automodule:: scripts.change_pagelang
+
 scripts.checkimages script
 --------------------------
 

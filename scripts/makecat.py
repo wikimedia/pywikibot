@@ -63,7 +63,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'all': False,
             'exist': False,
             'forward': False,
@@ -71,13 +71,13 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
             'nodate': False,
         })
         super(MakeCatBot, self).__init__(**kwargs)
-        self.skipdates = self.getOption('nodate')
+        self.skipdates = self.opt.nodate
         self.checkforward = True
-        self.checkbackward = not self.getOption('forward')
-        self.checkbroken = not (self.getOption('forward')
-                                and self.getOption('exist'))
-        self.removeparent = not self.getOption('keepparent')
-        self.main = not self.getOption('all')
+        self.checkbackward = not self.opt.forward
+        self.checkbroken = not (self.opt.forward
+                                and self.opt.exist)
+        self.removeparent = not self.opt.keepparent
+        self.main = not self.opt.all
 
     def needcheck(self, page):
         """Verify whether the current page may be processed."""

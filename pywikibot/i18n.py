@@ -30,7 +30,7 @@ from collections.abc import Mapping
 from collections import defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import List, Optional
+from typing import Optional
 from warnings import warn
 
 import pywikibot
@@ -44,8 +44,10 @@ from pywikibot.tools import (
 
 if PYTHON_VERSION >= (3, 9, 0):
     from functools import cache
+    List = list
 else:
     from functools import lru_cache
+    from typing import List
     cache = lru_cache(None)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'

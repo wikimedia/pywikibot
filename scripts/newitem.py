@@ -27,13 +27,18 @@ This script understands various command-line arguments:
 #
 from datetime import timedelta
 from textwrap import fill
-from typing import Set
 
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import NoRedirectPageBot, WikidataBot
 from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
                                   PageNotSaved)
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Set = set
+else:
+    from typing import Set
 
 
 DELETION_TEMPLATES = ('Q4847311', 'Q6687153', 'Q21528265')

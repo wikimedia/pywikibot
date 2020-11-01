@@ -22,7 +22,7 @@ from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
 from inspect import getfullargspec
 from io import BytesIO
-from typing import Optional, Set, Tuple, Union
+from typing import Optional, Union
 from warnings import warn
 from urllib.parse import urlencode, unquote
 
@@ -38,9 +38,17 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.tools import (
-    deprecated, itergroup, PYTHON_VERSION, remove_last_args
+    deprecated, issue_deprecation_warning, itergroup, PYTHON_VERSION,
+    remove_last_args,
 )
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Set = set
+    Tuple = tuple
+    FrozenSet = frozenset
+else:
+    from typing import Set, Tuple, FrozenSet
 
 
 _logger = 'data.api'
@@ -142,8 +150,8 @@ class UploadWarning(APIError):
         """
         Create a new UploadWarning instance.
 
-        @param filekey: The filekey of the uploaded file to reuse it later. If
-            no key is known or it is an incomplete file it may be None.
+        @param file_key: The file_key of the uploaded file to reuse it later.
+            If no key is known or it is an incomplete file it may be None.
         @param offset: The starting offset for a chunked upload. Is False when
             there is no offset.
         """
@@ -256,9 +264,9 @@ class ParamInfo(Sized, Container):
         self._fetch(self.preloaded_modules)
 
         main_modules_param = self.parameter('main', 'action')
-        assert(main_modules_param)
-        assert('type' in main_modules_param)
-        assert(isinstance(main_modules_param['type'], list))
+        assert main_modules_param
+        assert 'type' in main_modules_param
+        assert isinstance(main_modules_param['type'], list)
         assert self._action_modules == set(main_modules_param['type'])
 
         # While deprecated with warning in 1.25, paraminfo param 'querymodules'
@@ -334,7 +342,7 @@ class ParamInfo(Sized, Container):
 
         self._fetch(modules)
 
-    def _fetch(self, modules: set) -> None:
+    def _fetch(self, modules: Union[set, frozenset]) -> None:
         """
         Fetch paraminfo for multiple modules without initializing beforehand.
 
@@ -423,7 +431,7 @@ class ParamInfo(Sized, Container):
                 normalized_result = {missing_modules[0]: normalized_result}
             elif len(module_batch) > 1 and missing_modules:
                 # Rerequest the missing ones separately
-                pywikibot.log('Inconsitency in batch "{0}"; rerequest '
+                pywikibot.log('Inconsistency in batch "{0}"; rerequest '
                               'separately'.format(missing_modules))
                 failed_modules.extend(missing_modules)
 
@@ -491,6 +499,8 @@ class ParamInfo(Sized, Container):
                 for param in parameters:
                     if param['name'] == 'generator':
                         break
+                else:
+                    param = {}
                 assert param['name'] == 'generator' and \
                     submodules >= set(param['type'])
 
@@ -499,7 +509,7 @@ class ParamInfo(Sized, Container):
         # Users will supply the wrong type, and expect it to work.
         modules = self._modules_to_set(modules)
 
-        assert(self._action_modules)
+        assert self._action_modules
 
         return {'query+' + mod
                 if '+' not in mod and mod in self.query_modules
@@ -648,7 +658,7 @@ class ParamInfo(Sized, Container):
 
     @property
     @deprecated('submodules() or module_paths', since='20150715')
-    def modules(self) -> Set[str]:
+    def modules(self) -> Union[Set[str], FrozenSet[str]]:
         """
         Set of all main and query modules without path prefixes.
 
@@ -845,11 +855,11 @@ class OptionSet(MutableMapping):
         self._valid_disable = set()
         if site is None:
             return
-        for type in site._paraminfo.parameter(module, param)['type']:
-            if type[0] == '!':
-                self._valid_disable.add(type[1:])
+        for type_value in site._paraminfo.parameter(module, param)['type']:
+            if type_value[0] == '!':
+                self._valid_disable.add(type_value[1:])
             else:
-                self._valid_enable.add(type)
+                self._valid_enable.add(type_value)
         if clear_invalid:
             self._enabled &= self._valid_enable
             self._disabled &= self._valid_disable
@@ -861,7 +871,7 @@ class OptionSet(MutableMapping):
                                '"{0}"'.format('", "'.join(invalid_names)))
         self._site_set = True
 
-    def from_dict(self, dict):
+    def from_dict(self, dictionary):
         """
         Load options from the dict.
 
@@ -869,16 +879,17 @@ class OptionSet(MutableMapping):
         previously, but only the dict values should be applied it needs to be
         cleared first.
 
-        @param dict: A dictionary containing for each entry either the value
+        @param dictionary:
+            a dictionary containing for each entry either the value
             False, True or None. The names must be valid depending on whether
             they enable or disable the option. All names with the value None
             can be in either of the list.
-        @type dict: dict (keys are strings, values are bool/None)
+        @type dictionary: dict (keys are strings, values are bool/None)
         """
         enabled = set()
         disabled = set()
         removed = set()
-        for name, value in dict.items():
+        for name, value in dictionary.items():
             if value is True:
                 enabled.add(name)
             elif value is False:
@@ -984,7 +995,7 @@ class Request(MutableMapping):
     details on what parameters are accepted for each request type.
 
     Uploading files is a special case: to upload, the parameter "mime" must
-    be true, and the parameter "file" must be set equal to a valid
+    contain a dict, and the parameter "file" must be set equal to a valid
     filename on the local computer, _not_ to the content of the file.
 
     Returns a dict containing the JSON data returned by the wiki. Normally,
@@ -1026,7 +1037,7 @@ class Request(MutableMapping):
     # To make sure the default value of 'parameters' can be identified.
     _PARAM_DEFAULT = object()
 
-    def __init__(self, site=None, mime=None, throttle=True, mime_params=None,
+    def __init__(self, site=None, mime=None, throttle=True,
                  max_retries=None, retry_wait=None, use_get=None,
                  parameters=_PARAM_DEFAULT, **kwargs):
         """
@@ -1055,14 +1066,11 @@ class Request(MutableMapping):
 
         @param site: The Site to which the request will be submitted. If not
                supplied, uses the user's configured default Site.
-        @param mime: If true, send in "multipart/form-data" format (default
-               False). Parameters which should only be transferred via mime
-               mode can be defined via that parameter too (an empty dict acts
-               like 'True' not like 'False'!).
-        @type mime: bool or dict
-        @param mime_params: DEPRECATED! A dictionary of parameter which should
-               only be transferred via mime mode. If not None sets mime to
-               True.
+        @param mime: If not None, send in "multipart/form-data" format (default
+               None). Parameters which should only be transferred via mime
+               mode are defined via this parameter (even an empty dict means
+               mime shall be used).
+        @type mime: None or dict
         @param max_retries: (optional) Maximum number of times to retry after
                errors, defaults to config.max_retries.
         @param retry_wait: (optional) Minimum time in seconds to wait after an
@@ -1081,14 +1089,12 @@ class Request(MutableMapping):
                  .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
-        if mime_params is not None:
-            # mime may not be different from mime_params
-            if mime is not None and mime is not True:
-                raise ValueError('If mime_params is set, mime may not differ '
-                                 'from it.')
-            warn('Use the "mime" parameter instead of the "mime_params".')
-            mime = mime_params
-        self.mime = mime  # this also sets self.mime_params
+        self.mime = mime
+        if isinstance(mime, bool):  # type(mime) == bool is deprecated.
+            issue_deprecation_warning(
+                'Bool values of mime param in api.Request()',
+                depth=3, warning_class=FutureWarning, since='20201028')
+            self.mime = {} if mime is True else None
         self.throttle = throttle
         self.use_get = use_get
         if max_retries is None:
@@ -1175,15 +1181,17 @@ class Request(MutableMapping):
             self['assert'] = 'user'  # make sure user is logged in
 
     @classmethod
-    def create_simple(cls, site, **kwargs):
+    def create_simple(cls, req_site, **kwargs):
         """Create a new instance using all args except site for the API."""
         # This ONLY support site so that any caller can be sure there will be
         # no conflict with PWB parameters
+        # req_site is needed to avoid conflicts with possible site keyword in
+        # kwarg until positional-only parameters are supported, see T262926
         # TODO: Use ParamInfo request to determine valid parameters
         if isinstance(kwargs.get('parameters'), dict):
             warn('The request contains already a "parameters" entry which is '
                  'a dict.')
-        return cls(site, parameters=kwargs)
+        return cls(site=req_site, parameters=kwargs)
 
     @classmethod
     def _warn_both(cls):
@@ -1326,23 +1334,6 @@ class Request(MutableMapping):
         """Return a list of tuples containing the parameters in any order."""
         return list(self._params.items())
 
-    @property
-    def mime(self):
-        """Return whether mime parameters are defined."""
-        return self.mime_params is not None
-
-    @mime.setter
-    def mime(self, value):
-        """
-        Change whether mime parameter should be defined.
-
-        This will clear the mime parameters.
-        """
-        try:
-            self.mime_params = dict(value)
-        except TypeError:
-            self.mime_params = {} if value else None
-
     @deprecated(since='20141006', future_warning=True)
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
@@ -1361,9 +1352,9 @@ class Request(MutableMapping):
         if hasattr(self, '__defaulted'):
             return
 
-        if self.mime_params \
-           and set(self._params.keys()) & set(self.mime_params.keys()):
-            raise ValueError('The mime_params and params may not share the '
+        if self.mime is not None \
+           and set(self._params.keys()) & set(self.mime.keys()):
+            raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
         if self.action == 'query':
@@ -1488,7 +1479,8 @@ class Request(MutableMapping):
             return {action: {'result': 'Success', 'nochange': ''}}
         return None
 
-    def _is_wikibase_error_retryable(self, error):
+    @staticmethod
+    def _is_wikibase_error_retryable(error):
         ERR_MSG = (
             'edit-already-exists',
             'actionthrottledtext',  # T192912
@@ -1510,7 +1502,7 @@ class Request(MutableMapping):
         return message in ERR_MSG
 
     @staticmethod
-    def _generate_MIME_part(key, content, keytype=None, headers=None):
+    def _generate_mime_part(key, content, keytype=None, headers=None):
         if not keytype:
             try:
                 content.encode('ascii')
@@ -1558,7 +1550,7 @@ class Request(MutableMapping):
 
     @classmethod
     def _build_mime_request(cls, params: dict,
-                            mime_params) -> Tuple[dict, str]:
+                            mime_params: dict) -> Tuple[dict, bytes]:
         """
         Construct a MIME multipart form post.
 
@@ -1570,10 +1562,10 @@ class Request(MutableMapping):
         # construct a MIME message containing all API key/values
         container = MIMEMultipart(_subtype='form-data')
         for key, value in params.items():
-            submsg = cls._generate_MIME_part(key, value)
+            submsg = cls._generate_mime_part(key, value)
             container.attach(submsg)
         for key, value in mime_params.items():
-            submsg = cls._generate_MIME_part(key, *value)
+            submsg = cls._generate_mime_part(key, *value)
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
@@ -1588,9 +1580,9 @@ class Request(MutableMapping):
     def _get_request_params(self, use_get, paramstring):
         """Get request parameters."""
         uri = self.site.apipath()
-        if self.mime:
+        if self.mime is not None:
             (headers, body) = Request._build_mime_request(
-                self._encoded_items(), self.mime_params)
+                self._encoded_items(), self.mime)
             use_get = False  # MIME requests require HTTP POST
         else:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -1643,7 +1635,7 @@ class Request(MutableMapping):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, data: str) -> dict:
+    def _json_loads(self, data: Union[str, bytes]) -> Optional[dict]:
         """Read source text and return a dict.
 
         @param data: raw data string
@@ -1988,19 +1980,14 @@ class Request(MutableMapping):
                 param_repr = str(self._params)
                 pywikibot.log('API Error: query=\n%s'
                               % pprint.pformat(param_repr))
-                pywikibot.log('           response=\n%s'
-                              % result)
+                pywikibot.log('           response=\n{}'.format(result))
 
                 raise APIError(**result['error'])
             except TypeError:
                 raise RuntimeError(result)
 
-        msg = 'Maximum retries attempted due to maxlag without success.'
-        if os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1':
-            import unittest
-            raise unittest.SkipTest(msg)
-
-        raise MaxlagTimeoutError(msg)
+        raise MaxlagTimeoutError(
+            'Maximum retries attempted due to maxlag without success.')
 
     def wait(self, delay=None):
         """Determine how long to wait after a failed request."""
@@ -2033,7 +2020,7 @@ class CachedRequest(Request):
         self._cachetime = None
 
     @classmethod
-    def create_simple(cls, site, **kwargs):
+    def create_simple(cls, req_site, **kwargs):
         """Unsupported as it requires at least two parameters."""
         raise NotImplementedError('CachedRequest cannot be created simply.')
 
@@ -2046,7 +2033,7 @@ class CachedRequest(Request):
 
         @return: base directory path for cache entries
         """
-        path = os.path.join(pywikibot.config2.base_dir,
+        path = os.path.join(config.base_dir,
                             'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
@@ -2517,7 +2504,7 @@ class QueryGenerator(_RequestWrapper):
 
         @return: True if yes, False otherwise
         """
-        assert(self.limited_module)  # some modules do not have a prefix
+        assert self.limited_module  # some modules do not have a prefix
         return bool(
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
@@ -2538,7 +2525,7 @@ class QueryGenerator(_RequestWrapper):
         #    type such as NoneType or bool, or more than one namespace
         #    if the API module does not support multiple namespaces
         """
-        assert(self.limited_module)  # some modules do not have a prefix
+        assert self.limited_module  # some modules do not have a prefix
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
         if not param:
@@ -2780,7 +2767,7 @@ class PageGenerator(QueryGenerator):
 
         """
         # If possible, use self.request after __init__ instead of appendParams
-        def appendParams(params, key, value):
+        def append_params(params, key, value):
             if key in params:
                 params[key] += '|' + value
             else:
@@ -2788,18 +2775,18 @@ class PageGenerator(QueryGenerator):
         kwargs = self._clean_kwargs(kwargs)
         parameters = kwargs['parameters']
         # get some basic information about every page generated
-        appendParams(parameters, 'prop', 'info|imageinfo|categoryinfo')
+        append_params(parameters, 'prop', 'info|imageinfo|categoryinfo')
         if g_content:
             # retrieve the current revision
-            appendParams(parameters, 'prop', 'revisions')
-            appendParams(parameters, 'rvprop',
-                         'ids|timestamp|flags|comment|user|content')
+            append_params(parameters, 'prop', 'revisions')
+            append_params(parameters, 'rvprop',
+                          'ids|timestamp|flags|comment|user|content')
         if not ('inprop' in parameters
                 and 'protection' in parameters['inprop']):
-            appendParams(parameters, 'inprop', 'protection')
-        appendParams(parameters, 'iiprop',
-                     'timestamp|user|comment|url|size|sha1|metadata')
-        appendParams(parameters, 'iilimit', 'max')  # T194233
+            append_params(parameters, 'inprop', 'protection')
+        append_params(parameters, 'iiprop',
+                      'timestamp|user|comment|url|size|sha1|metadata')
+        append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)
         self.resultkey = 'pages'  # element to look for in result
@@ -3069,6 +3056,8 @@ class LoginManager(login.LoginManager):
                 if match:
                     delta = datetime.timedelta(
                         **{match.group(2): int(match.group(1))})
+                else:
+                    delta = 0
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
@@ -3224,7 +3213,7 @@ def _update_coordinates(page, coordinates):
     page._coords = coords
 
 
-def update_page(page, pagedict: dict, props=[]):
+def update_page(page, pagedict: dict, props=None):
     """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
@@ -3242,6 +3231,7 @@ def update_page(page, pagedict: dict, props=[]):
     _update_pageid(page, pagedict)
     _update_contentmodel(page, pagedict)
 
+    props = props or []
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
 

@@ -283,11 +283,11 @@ class DryMimeTests(TestCase):
     net = False
 
     def test_mime_file_payload(self):
-        """Test Request._generate_MIME_part loads binary as binary."""
+        """Test Request._generate_mime_part loads binary as binary."""
         local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
-        submsg = Request._generate_MIME_part(
+        submsg = Request._generate_mime_part(
             'file', file_content, ('image', 'png'),
             {'filename': local_filename})
         self.assertEqual(file_content, submsg.get_payload(decode=True))
@@ -297,10 +297,10 @@ class DryMimeTests(TestCase):
         local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
-        body = Request._build_mime_request({}, {
+        _, body = Request._build_mime_request({}, {
             'file': (file_content, ('image', 'png'),
                      {'filename': local_filename})
-        })[1]
+        })
         self.assertNotEqual(body.find(file_content), -1)
 
 
@@ -317,7 +317,9 @@ class MimeTests(DefaultDrySiteTestCase):
         parameters = {'action': 'upload', 'file': 'MP_sounds.png',
                       'filename': join_images_path('MP_sounds.png')}
         req = Request(site=site, mime=True, parameters=parameters)
-        self.assertEqual(req.mime, True)
+        with self.assertRaises(AssertionError):
+            assert req.mime is True
+        self.assertEqual(req.mime, {})
 
 
 class ParamInfoDictTests(DefaultDrySiteTestCase):

@@ -65,7 +65,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
             to work on.
         @type generator: generator
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'filters': [],
         })
         super().__init__(generator=generator, **kwargs)
@@ -73,7 +73,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
     @property
     def summary_parameters(self) -> dict:
         """Return the filter parameter."""
-        return {'filters': ', '.join(self.getOption('filters'))}
+        return {'filters': ', '.join(self.opt.filters)}
 
     def pipe(self, program: str, text: str) -> str:
         """Pipe a given text through a given program.
@@ -103,7 +103,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         text = self.current_page.text
 
         # Munge!
-        for program in self.getOption('filters'):
+        for program in self.opt.filters:
             text = self.pipe(program, text)
 
         # only save if something was changed

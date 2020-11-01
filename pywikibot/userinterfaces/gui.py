@@ -12,7 +12,7 @@ Useful for editing the contents of an article.
 import tkinter
 from tkinter.scrolledtext import ScrolledText
 from tkinter import simpledialog as tkSimpleDialog
-from typing import Optional, Tuple
+from typing import Optional
 
 import pywikibot
 from pywikibot import __url__
@@ -33,6 +33,11 @@ else:
     from idlelib.configDialog import ConfigDialog
     from idlelib.configHandler import idleConf
     from idlelib.MultiCall import MultiCallCreator
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class TextEditor(ScrolledText):

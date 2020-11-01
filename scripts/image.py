@@ -71,7 +71,7 @@ class ImageRobot(ReplaceBot):
                           None if you want to remove the image
         @type new_image: str or None
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'summary': None,
             'loose': False,
         })
@@ -86,7 +86,7 @@ class ImageRobot(ReplaceBot):
             'file': self.old_image,
         }
 
-        summary = self.getOption('summary') or i18n.twtranslate(
+        summary = self.opt.summary or i18n.twtranslate(
             self.site, 'image-replace' if self.new_image else 'image-remove',
             param)
 
@@ -100,7 +100,7 @@ class ImageRobot(ReplaceBot):
 
         # Be careful, spaces and _ have been converted to '\ ' and '\_'
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
-        if not self.getOption('loose') or not self.new_image:
+        if not self.opt.loose or not self.new_image:
             image_regex = re.compile(
                 r'\[\[ *(?:%s)\s*:\s*%s *(?P<parameters>\|[^\n]+|) *\]\]'
                 % ('|'.join(namespace), escaped))
@@ -109,7 +109,7 @@ class ImageRobot(ReplaceBot):
 
         replacements = []
         if self.new_image:
-            if not self.getOption('loose'):
+            if not self.opt.loose:
                 replacements.append((image_regex,
                                      '[[{}:{}\\g<parameters>]]'
                                      .format(
@@ -121,7 +121,7 @@ class ImageRobot(ReplaceBot):
             replacements.append((image_regex, ''))
 
         super(ImageRobot, self).__init__(self.generator, replacements,
-                                         always=self.getOption('always'),
+                                         always=self.opt.always,
                                          site=self.site,
                                          summary=summary)
 

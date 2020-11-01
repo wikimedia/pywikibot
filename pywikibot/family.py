@@ -16,16 +16,23 @@ import warnings
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
-    ModuleDeprecationWrapper, FrozenDict, classproperty,
+    classproperty, deprecated, deprecated_args, FrozenDict,
+    issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
+    remove_last_args,
 )
 
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+    List = list
+    Tuple = tuple
+else:
+    from typing import Dict, List, Tuple
 
 logger = logging.getLogger('pywiki.wiki.family')
 
@@ -45,21 +52,18 @@ class Family:
         # any Family class defined in this file are abstract
         if cls in globals().values():
             raise TypeError(
-                'Abstract Family class {0} cannot be instantiated; '
+                'Abstract Family class {} cannot be instantiated; '
                 'subclass it instead'.format(cls.__name__))
 
         # Override classproperty
         cls.instance = super().__new__(cls)
-        # staticmethod is because python 2.7 binds the lambda to the class
-        cls.__new__ = staticmethod(lambda cls: cls.instance)  # shortcut
+        cls.__new__ = lambda cls: cls.instance  # shortcut
 
         # don't use hasattr() here. consider only the class itself
         if '__init__' in cls.__dict__:
             # Initializer deprecated. Families should be immutable and any
             # instance / class modification should go to allocator (__new__).
-            # The function is read from __dict__ because deprecated expect a
-            # function and python 2.7 binds the method to the class.
-            cls.__init__ = deprecated(cls.__dict__['__init__'])
+            cls.__init__ = deprecated(cls.__init__)
 
             # Invoke initializer immediately and make initializer no-op.
             # This is to avoid repeated initializer invocation on repeated
@@ -86,45 +90,45 @@ class Family:
     # The sorting order by language name from meta
     # MediaWiki:Interwiki_config-sorting_order-native-languagename
     alphabetic = [
-        'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av', 'ay',
-        'az', 'ban', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba',
-        'be', 'be-tarask', 'mnw', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo', 'bs',
-        'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn',
-        'tum', 'cho', 'co', 'cy', 'da', 'dk', 'ary', 'pdc', 'de', 'dv', 'nv',
-        'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo',
-        'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga',
-        'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'gor', 'got', 'hak',
-        'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io',
-        'ig', 'ilo', 'inh', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh',
-        'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam', 'krc',
-        'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg', 'gom',
-        'avk', 'ht', 'gcr', 'ku', 'kj', 'ky', 'mrj', 'lld', 'lad', 'lbe', 'lo',
-        'ltg', 'la', 'lv', 'lb', 'lez', 'lfn', 'lt', 'lij', 'li', 'ln', 'olo',
-        'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi',
-        'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo',
-        'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
-        'new', 'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
-        'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
-        'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pms',
-        'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro',
-        'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se', 'sm', 'sa', 'sg',
-        'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si',
-        'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn',
-        'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara',
-        'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy',
-        'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug',
-        'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls',
-        'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
-        'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+        'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'smn', 'ang', 'ab', 'ar',
+        'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av',
+        'ay', 'az', 'ban', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms',
+        'ba', 'be', 'be-tarask', 'mnw', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo',
+        'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny',
+        'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'ary', 'pdc', 'de', 'dv',
+        'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es',
+        'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur',
+        'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'gor', 'got',
+        'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw',
+        'io', 'ig', 'ilo', 'inh', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os',
+        'xh', 'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam',
+        'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg',
+        'gom', 'avk', 'ht', 'gcr', 'ku', 'kj', 'ky', 'mrj', 'lld', 'lad',
+        'lbe', 'lo', 'ltg', 'la', 'lv', 'lb', 'lez', 'lfn', 'lt', 'lij', 'li',
+        'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml',
+        'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl',
+        'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl',
+        'cr', 'ne', 'new', 'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb',
+        'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz',
+        'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km',
+        'pcd', 'pms', 'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh',
+        'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se',
+        'sm', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
+        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'shn', 'ta', 'kab',
+        'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy',
+        've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk',
+        'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa',
+        'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue',
+        'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
 
     # The revised sorting order by first word from meta
     # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
     alphabetic_revised = [
-        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-        'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av', 'ay',
-        'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn', 'zh-min-nan', 'nan',
+        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'smn', 'ang', 'ab', 'ar',
+        'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa', 'gn', 'av',
+        'ay', 'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn', 'zh-min-nan', 'nan',
         'map-bms', 'jv', 'su', 'ba', 'min', 'be', 'be-tarask', 'mnw', 'bh',
         'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb',
         'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',

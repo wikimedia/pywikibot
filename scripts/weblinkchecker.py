@@ -120,7 +120,7 @@ import time
 
 from contextlib import suppress
 from functools import partial
-from typing import Optional, Tuple
+from typing import Optional
 from urllib.parse import urlsplit
 from urllib.request import quote
 
@@ -134,8 +134,13 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated, ThreadList
+from pywikibot.tools import deprecated, PYTHON_VERSION, ThreadList
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 try:
     import memento_client
@@ -541,11 +546,11 @@ class LinkChecker:
             # read the server's encoding, in case we need it later
             self.readEncodingFromResponse(self.response)
             # site down if the server status is between 400 and 499
-            alive = not (400 <= self.response.status < 500)
-            if self.response.status in self.HTTPignore:
+            alive = not (400 <= self.response.status_code < 500)
+            if self.response.status_code in self.HTTPignore:
                 alive = False
-            return alive, '{0} {1}'.format(self.response.status,
-                                           self.response.reason)
+            return alive, '{} {}'.format(self.response.status_code,
+                                         self.response.reason)
 
 
 class LinkCheckThread(threading.Thread):
@@ -579,7 +584,6 @@ class LinkCheckThread(threading.Thread):
 
     def run(self):
         """Run the bot."""
-        ok = False
         try:
             header = self.header
             r = comms.http.fetch(
@@ -593,20 +597,19 @@ class LinkCheckThread(threading.Thread):
             pywikibot.output('Exception while processing URL {0} in page {1}'
                              .format(self.url, self.page.title()))
             raise
-        if (r.status == requests.codes.ok
-                and str(r.status) not in self.HTTPignore):
-            ok = True
-        else:
-            message = '{0}'.format(r.status)
-        if ok:
-            if self.history.setLinkAlive(self.url):
-                pywikibot.output('*Link to {0} in [[{1}]] is back alive.'
-                                 .format(self.url, self.page.title()))
-        else:
-            pywikibot.output('*[[{0}]] links to {1} - {2}.'
-                             .format(self.page.title(), self.url, message))
+
+        if r.status_code_code != requests.codes.ok \
+           or r.status_code in self.HTTPignore:
+            message = str(r.status_code)
+            pywikibot.output('*{} links to {} - {}.'
+                             .format(self.page.title(as_link=True), self.url,
+                                     message))
             self.history.setLinkDead(self.url, message, self.page,
                                      config.weblink_dead_days)
+        elif self.history.setLinkAlive(self.url):
+            pywikibot.output(
+                '*Link to {} in {} is back alive.'
+                .format(self.url, self.page.title(as_link=True)))
 
 
 class History:
@@ -851,10 +854,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
         else:
             reportThread = None
         self.history = History(reportThread, site=self.site)
-        if HTTPignore is None:
-            self.HTTPignore = []
-        else:
-            self.HTTPignore = HTTPignore
+        self.HTTPignore = HTTPignore or []
         self.day = day
 
         # Limit the number of threads started at the same time

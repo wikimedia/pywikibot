@@ -62,9 +62,6 @@ class TestDeletionBotUser(ScriptMainTestCase):
     def test_delete_mark(self):
         """Test marking User:Unicodesnowman/DeleteMark for deletion."""
         site = self.get_site()
-        if site.username(sysop=True):
-            self.skipTest("can't test mark with sysop account")
-
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteMark')
         if not p1.exists():
             p1.text = 'foo'

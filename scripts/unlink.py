@@ -45,7 +45,7 @@ class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
         super(UnlinkBot, self).__init__(**kwargs)
         self.pageToUnlink = pageToUnlink
         self.generator = pageToUnlink.getReferences(
-            namespaces=self.getOption('namespaces'), content=True)
+            namespaces=self.opt.namespaces, content=True)
 
     @property
     def summary_parameters(self):

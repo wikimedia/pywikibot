@@ -54,14 +54,13 @@ The following parameters are supported:
     -always     don't bother asking to confirm any of the changes.
 """
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import collections
 import itertools
+import queue
 import threading
 import time
 
@@ -71,12 +70,6 @@ from pywikibot import i18n
 
 from pywikibot.bot import SingleSiteBot
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
-from pywikibot.tools import PY2
-
-if not PY2:
-    import queue
-else:
-    import Queue as queue  # noqa: N813
 
 
 class UploadTextBot(SingleSiteBot):
@@ -151,8 +144,7 @@ class UploadTextBot(SingleSiteBot):
             try:
                 text_body = page.ocr(ocr_tool=self.opt.ocr)
             except ValueError as e:
-                # TODO: is it a problem in PY2?
-                pywikibot.error(str(e))
+                pywikibot.error(e)
                 text_body = None  # Sentinel: signal exception to self.treat()
 
             self._queue_out.put((idx, text_body))

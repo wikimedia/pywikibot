@@ -22,11 +22,16 @@ import binascii
 import os.path
 
 from os import remove, replace, symlink, urandom
-from typing import Tuple
 
 import pywikibot
 from pywikibot import Bot
 from pywikibot.comms.http import fetch
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class DownloadDumpBot(Bot):
@@ -40,19 +45,29 @@ class DownloadDumpBot(Bot):
         'dumpdate': 'latest',
     }
 
-    def get_dump_name(self, db_name, typ):
+    @staticmethod
+    def get_dump_name(db_name, typ, dumpdate):
         """Check if dump file exists locally in a Toolforge server."""
         db_path = '/public/dumps/public/{}/'.format(db_name)
         if os.path.isdir(db_path):
-            dirs = [directory for directory in os.listdir(db_path) if
-                    directory.isdigit()]
-            dates = map(int, dirs)
-            dates = sorted(dates, reverse=True)
-            for date in dates:
-                dump_filepath = '/public/dumps/public/{}/{}/{}-{}-{}'.format(
-                    db_name, date, db_name, date, typ)
+            dump_filepath_template = (
+                '/public/dumps/public/{db_name}/{date}/{db_name}-{date}-{typ}')
+            if dumpdate != 'latest':
+                dump_filepath = dump_filepath_template.format(
+                    db_name=db_name, date=dumpdate, typ=typ)
                 if os.path.isfile(dump_filepath):
                     return dump_filepath
+            else:
+                # Search for the "latest" dump
+                dirs = [directory for directory in os.listdir(db_path) if
+                        directory.isdigit()]
+                dates = map(int, dirs)
+                dates = sorted(dates, reverse=True)
+                for date in dates:
+                    dump_filepath = dump_filepath_template.format(
+                        db_name=db_name, date=date, typ=typ)
+                    if os.path.isfile(dump_filepath):
+                        return dump_filepath
         return None
 
     def run(self):
@@ -78,7 +93,7 @@ class DownloadDumpBot(Bot):
 
         # https://wikitech.wikimedia.org/wiki/Help:Toolforge#Dumps
         toolforge_dump_filepath = self.get_dump_name(
-            self.opt.wikiname, self.opt.filename)
+            self.opt.wikiname, self.opt.filename, self.opt.dumpdate)
 
         # First iteration for atomic download with temporary file
         # Second iteration for fallback non-atomic download
@@ -97,7 +112,7 @@ class DownloadDumpBot(Bot):
                         download_filename)
                     pywikibot.output('Downloading file from ' + url)
                     response = fetch(url, stream=True)
-                    if response.status == 200:
+                    if response.status_code == 200:
                         with open(file_current_storepath, 'wb') as result_file:
                             try:
                                 total = int(response.response_headers[
@@ -134,7 +149,7 @@ class DownloadDumpBot(Bot):
                                 pywikibot.output(display_string, newline=False)
                             pywikibot.output('')
                     else:
-                        if response.status == 404:
+                        if response.status_code == 404:
                             pywikibot.output(
                                 'File with name "{filename}", '
                                 'from dumpdate "{dumpdate}", '

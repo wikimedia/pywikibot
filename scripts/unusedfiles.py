@@ -44,7 +44,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'nouserwarning': False  # do not warn uploader
         })
         super().__init__(**kwargs)
@@ -54,7 +54,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         self.template_user = i18n.translate(self.site,
                                             template_to_the_user)
         if not (self.template_image
-                and (self.template_user or self.getOption('nouserwarning'))):
+                and (self.template_user or self.opt.nouserwarning)):
             raise i18n.TranslationError('This script is not localized for {0} '
                                         'site.'.format(self.site))
 
@@ -70,7 +70,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
                 return
 
             self.append_text(image, '\n\n' + self.template_image)
-            if self.getOption('nouserwarning'):
+            if self.opt.nouserwarning:
                 return
             uploader = image.get_file_history().pop(0)['user']
             user = pywikibot.User(image.site, uploader)

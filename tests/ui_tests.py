@@ -702,7 +702,7 @@ class FakeUITest(TestCase):
                          len(self._colors) if self.expect_color else 0)
 
     def _getvalue(self):
-        """Get the value of the stream and also decode it on Python 2."""
+        """Get the value of the stream."""
         return self.stream.getvalue()
 
     def _encounter_color(self, color, target_stream):

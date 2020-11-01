@@ -1,54 +1,29 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* callback parameter of comms.http.fetch() is desupported
-* Fix api.APIError() calls for Flow and Thanks extension
-* edit, move, create, upload, unprotect and prompt parameters of Page.protect() are deprecated (T227610)
-* Accept only valid names in generate_family_file.py (T265328, T265353)
-* New plural.plural_rule() function returns a rule for a given language
-* Replace deprecated urllib.request.URLopener with http.fetch (T255575)
-* OptionHandler/BaseBot options are accessable as OptionHandler.opt attributes or keyword item (see also T264721)
-* pywikibot.setAction() function was removed
-* A namedtuple is the result of textlib.extract_sections()
-* Prevent circular imports in config2.py and http.py (T264500)
-* version.get_module_version() is deprecated and gives no meaningfull result
-* Fix version.get_module_filename() and update log lines (T264235)
-* Re-enable printing log header (T264235)
-* Fix result of tools.intersect_generators() (T263947)
-* Only show _GLOBAL_HELP options if explicitly wanted
-* Deprecated Family.version() methods were removed
-* Unused parameters of page methods like forceReload, insite, throttle, step was removed
-* Raise RuntimeError instead of AttributeError for old wikis (T263951)
-* Deprecated script options were removed
-* lyricwiki_family was removed (T245439)
-* RecentChangesPageGenerator parameters has been synced with APISite.recentchanges
-* APISite.recentchanges accepts keyword parameters only
-* LoginStatus enum class was moved from site to login.py
-* WbRepresentation derives from abstract base class abc.ABC
-* Update characters in the Cf category to Unicode version 12.1.0
-* Update __all__ variable in pywikibot (T122879)
-* Use api.APIGenerator through site._generator (T129013)
-* Support of MediaWiki releases below 1.19 has been dropped (T245350)
-* Page.get_best_claim () retrieves preferred Claim of a property referring to the given page (T175207)
-* Check whether _putthead is current_thread() to join() (T263331)
-* Add BasePage.has_deleted_revisions() method
-* Allow querying deleted revs without the deletedhistory right
-* Use ignore_discard for login cookie container (T261066)
-* Siteinfo.get() loads data via API instead from cache if expiry parameter is True (T260490)
-* Move latest revision id handling to WikibaseEntity (T233406)
-* Load wikibase entities when necessary (T245809)
-* Fix path for stable release in version.getversion() (T262558)
-* "since" parameter in EventStreams given as Timestamp or MediaWiki timestamp string has been fixed
-* Methods deprecated for 6 years or longer were removed
-* Page.getVersionHistory and Page.fullVersionHistory() methods were removed (T136513, T151110)
-* Allow multiple types of contributors parameter given for Page.revision_count()
-* Deprecated tools.UnicodeMixin and tools.IteratorNextMixin has been removed
-* Localisation updates
+* Avoid conflicts between site and possible site keyword in api.Request.create_simple() (T262926)
+* Remove wrong param of rvision() call in Page.latest_revision_id
+* Do not raise Exception in Page.get_best_claim() but follow redirect (T265839)
+* xml-support of wikistats will be dropped
+* Remove deprecated mime_params in api.Request()
+* cleanup interwiki_graph.py and replace deprecated originPage by origin in Subjects
+* Upload a file that ends with the '\r' byte (T132676)
+* Fix incorrect server time (T266084)
+* L10N-Updates
+* Support Namespace packages in version.py (T265946)
+* Server414Error was added to pywikibot (T266000)
+* Deprecated editor.command() method was removed
+* comms.PywikibotCookieJar and comms.mode_check_decorator were deleted
+* Remove deprecated tools classes Stringtypes and UnicodeType
+* Remove deprecated tools function open_compressed and signature and UnicodeType class
+* Fix http_tests.LiveFakeUserAgentTestCase (T265842)
+* HttpRequest properties were renamed to request.Response identifiers (T265206)
 
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 5.0.0: wikistats methods fetch, raw_cached, csv, xml will be removed
 * 5.0.0: PageRelatedError.getPage() will be removes in favour of PageRelatedError.page
 * 5.0.0: HttpRequest result of http.fetch() will be replaced by requests.Response (T265206)
 * 5.0.0: edit, move, create, upload, unprotect and prompt parameters of Page.protect() will be removed (T227610)
@@ -62,9 +37,5 @@ Future release notes
 * 5.0.0: DataSite.get_item() method will be removed
 * 5.0.0: date.MakeParameter() function will be removed
 * 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed
-* 4.3.0: Unsused UserBlocked exception will be removed
+* 4.3.0: Unused UserBlocked exception will be removed
 * 4.3.0: Deprecated Page.contributingUsers() will be removed
-* 4.2.0: tools.StringTypes will be removed
-* 4.1.0: Deprecated editor.command will be removed
-* 4.1.0: tools.open_compressed, tools.UnicodeType and tools.signature will be removed
-* 4.1.0: comms.PywikibotCookieJar and comms.mode_check_decorator will be removed

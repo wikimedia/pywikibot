@@ -252,14 +252,13 @@ class FrozenDict(dict):
     Raises TypeError if write attempted.
     """
 
-    def __init__(self, data=None, error=None):
+    def __init__(self, data=None, error: Optional[str] = None):
         """
         Initializer.
 
         @param data: mapping to freeze
         @type data: mapping
         @param error: error message
-        @type error: basestring
         """
         if data:
             args = [data]
@@ -1538,8 +1537,11 @@ def remove_last_args(arg_names):
     return decorator
 
 
-def redirect_func(target, source_module=None, target_module=None,
-                  old_name=None, class_name=None, since=None,
+def redirect_func(target, source_module: Optional[str] = None,
+                  target_module: Optional[str] = None,
+                  old_name: Optional[str] = None,
+                  class_name: Optional[str] = None,
+                  since: Optional[str] = None,
                   future_warning=False):
     """
     Return a function which can be used to redirect to 'target'.
@@ -1552,20 +1554,15 @@ def redirect_func(target, source_module=None, target_module=None,
     @param source_module: The module of the old function. If '.' defaults
         to target_module. If 'None' (default) it tries to guess it from the
         executing function.
-    @type source_module: basestring
     @param target_module: The module of the target function. If
         'None' (default) it tries to get it from the target. Might not work
         with nested classes.
-    @type target_module: basestring
     @param old_name: The old function name. If None it uses the name of the
         new function.
-    @type old_name: basestring
     @param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
-    @type class_name: basestring
     @param since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
-    @type since: str
     @param future_warning: if True a FutureWarning will be thrown,
         otherwise it defaults to DeprecationWarning
     @type future_warning: bool
@@ -1623,8 +1620,10 @@ class ModuleDeprecationWrapper(types.ModuleType):
             sys.modules[module.__name__] = self
 
     def _add_deprecated_attr(self, name: str, replacement=None,
-                             replacement_name=None, warning_message=None,
-                             since=None, future_warning=False):
+                             replacement_name: Optional[str] = None,
+                             warning_message: Optional[str] = None,
+                             since: Optional[str] = None,
+                             future_warning: bool = False):
         """
         Add the name to the local deprecated names dict.
 
@@ -1638,16 +1637,12 @@ class ModuleDeprecationWrapper(types.ModuleType):
             if C{replacement} is not None and it has no __name__ attribute.
             If it contains a '.', it will be interpreted as a Python dotted
             object name, and evaluated when the deprecated object is needed.
-        @type replacement_name: str
         @param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
-        @type warning_message: basestring
         @param since: a timestamp string of the date when the method was
             deprecated (form 'YYYYMMDD') or a version string.
-        @type since: str
         @param future_warning: if True a FutureWarning will be thrown,
             otherwise it defaults to DeprecationWarning
-        @type future_warning: bool
         """
         if '.' in name:
             raise ValueError('Deprecated name "{}" may not contain '
@@ -1773,12 +1768,6 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-@deprecated('open_archive()', since='20150915', future_warning=True)
-def open_compressed(filename, use_extension=False):
-    """DEPRECATED: Open a file and uncompress it if needed."""
-    return open_archive(filename, use_extension=use_extension)
-
-
 @deprecated('bot_choice.Option and its subclasses', since='20181217')
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
@@ -1801,17 +1790,3 @@ def concat_options(message, line_length, options):
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
     return '{} ({}):'.format(message, option_msg)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('getargspec', inspect.getargspec,
-                             since='20200712', future_warning=True)
-wrapper._add_deprecated_attr('ArgSpec', inspect.ArgSpec,
-                             since='20200712', future_warning=True)
-wrapper._add_deprecated_attr('UnicodeType', str,
-                             since='20200813', future_warning=True)
-wrapper._add_deprecated_attr('StringTypes', (str, bytes),
-                             replacement_name='(str, bytes)',
-                             since='20200813', future_warning=True)
-wrapper._add_deprecated_attr('signature', inspect.signature,
-                             since='20200813', future_warning=True)

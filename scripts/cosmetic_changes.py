@@ -32,12 +32,16 @@ For further information see pywikibot/cosmetic_changes.py
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Tuple
-
 import pywikibot
 
 from pywikibot import config, cosmetic_changes, i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 warning = """
@@ -58,7 +62,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     def __init__(self, generator, **kwargs) -> None:
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'async': False,
             'summary': 'Robot: Cosmetic changes',
             'ignore': cosmetic_changes.CANCEL_ALL,
@@ -70,12 +74,12 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit."""
         cc_toolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
-            self.current_page, ignore=self.getOption('ignore'))
+            self.current_page, ignore=self.opt.ignore)
         changed_text = cc_toolkit.change(self.current_page.get())
         if changed_text is not False:
             self.put_current(new_text=changed_text,
-                             summary=self.getOption('summary'),
-                             asynchronous=self.getOption('async'))
+                             summary=self.opt.summary,
+                             asynchronous=self.opt['async'])
 
 
 def main(*args: Tuple[str, ...]) -> None:

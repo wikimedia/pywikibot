@@ -21,7 +21,7 @@ import sys
 
 from http import cookiejar
 from string import Formatter
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 from urllib.parse import quote, urlparse
 from warnings import warn
 
@@ -39,8 +39,13 @@ from pywikibot.tools import (
     deprecate_arg,
     file_mode_checker,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
+    PYTHON_VERSION,
 )
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 try:
     import requests_oauthlib
@@ -52,7 +57,7 @@ except ImportError as e:
 # 'certificate verify failed' is a commonly detectable string
 SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
-_logger = 'comm.http'
+_logger = 'comms.http'
 
 cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
@@ -303,7 +308,7 @@ def _http_process(session, http_request) -> None:
     uri = http_request.uri
     params = http_request.params
     body = http_request.body
-    headers = http_request.headers
+    headers = http_request.all_headers
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
@@ -342,20 +347,21 @@ def error_handling_callback(request):
         if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
             raise FatalServerError(str(request.data))
 
-    if request.status == 504:
-        raise Server504Error('Server %s timed out' % request.hostname)
+    if request.status_code == 504:
+        raise Server504Error('Server {} timed out'
+                             .format(urlparse(request.url).netloc))
 
-    if request.status == 414:
+    if request.status_code == 414:
         raise Server414Error('Too long GET request')
 
     if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.uri)
+        error('An error occurred for uri ' + request.url)
         raise request.data from None
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
-    if request.status not in (200, 207):
-        warning('Http response status {0}'.format(request.data.status_code))
+    if request.status_code not in (200, 207):
+        warning('Http response status {}'.format(request.status_code))
 
 
 @deprecated(since='20201015', future_warning=True)
@@ -450,21 +456,35 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     headers = headers or {}
     headers.update(config.extra_headers.copy() or {})
 
-    if headers.get('user-agent', False):
-        user_agent_format_string = headers.get('user-agent')
-        if not user_agent_format_string or '{' in user_agent_format_string:
-            headers['user-agent'] = user_agent(None, user_agent_format_string)
-    else:
-        # if not already specified,
-        # get fake UA exceptions from `fake_user_agent_exceptions` config.
+    def assign_fake_user_agent(use_fake_user_agent, uri):
         uri_domain = urlparse(uri).netloc
         use_fake_user_agent = config.fake_user_agent_exceptions.get(
             uri_domain, use_fake_user_agent)
 
+        if use_fake_user_agent is False:
+            return user_agent()
+        if use_fake_user_agent is True:
+            return fake_user_agent()
         if use_fake_user_agent and isinstance(use_fake_user_agent, str):
-            headers['user-agent'] = use_fake_user_agent  # Custom UA.
-        elif use_fake_user_agent is True:
-            headers['user-agent'] = fake_user_agent()
+            return use_fake_user_agent  # Custom UA.
+        raise ValueError('Invalid parameter: '
+                         'use_fake_user_agent={}'.format(use_fake_user_agent))
+
+    def assign_user_agent(user_agent_format_string):
+        if not user_agent_format_string or '{' in user_agent_format_string:
+            return user_agent(None, user_agent_format_string)
+        else:
+            # do nothing, it is already a UA
+            return user_agent_format_string
+
+    # If not already specified.
+    if 'user-agent' not in headers:
+        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+        headers['user-agent'] = assign_fake_user_agent(use_fake_user_agent,
+                                                       uri)
+    # Already specified.
+    else:
+        headers['user-agent'] = assign_user_agent(headers.get('user-agent'))
 
     callbacks = kwargs.pop('callbacks', [])
     if default_error_handling:
@@ -508,45 +528,3 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         raise e
 
     return request
-
-# Deprecated parts ############################################################
-
-
-def _mode_check_decorator(func):
-    """DEPRECATED. Decorate load()/save() CookieJar methods."""
-    def wrapper(cls, **kwargs):
-        try:
-            filename = kwargs['filename']
-        except KeyError:
-            filename = cls.filename
-        res = func(cls, **kwargs)
-        file_mode_checker(filename, mode=0o600)
-        return res
-    return wrapper
-
-
-class PywikibotCookieJar(cookiejar.LWPCookieJar):
-
-    """DEPRECATED. CookieJar which checks file permissions."""
-
-    @deprecated(since='20181007', future_warning=True)
-    def __init__(self, *args, **kwargs):
-        """Initialize the class."""
-        super().__init__(*args, **kwargs)
-
-    @_mode_check_decorator
-    def load(self, **kwargs):
-        """Load cookies from file."""
-        super().load()
-
-    @_mode_check_decorator
-    def save(self, **kwargs):
-        """Save cookies to file."""
-        super().save()
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('PywikibotCookieJar', replacement_name='',
-                             since='20181007', future_warning=True)
-wrapper._add_deprecated_attr('mode_check_decorator', _mode_check_decorator,
-                             since='20200724', future_warning=True)

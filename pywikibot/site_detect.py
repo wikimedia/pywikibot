@@ -208,7 +208,11 @@ class WikiHTMLPageParser(HTMLParser):
     def set_api_url(self, url):
         """Set api_url."""
         url = url.split('.php', 1)[0]
-        (value, script_name) = url.rsplit('/', 1)
+        try:
+            value, script_name = url.rsplit('/', 1)
+        except ValueError:
+            return
+
         if script_name not in ('api', 'load', 'opensearch_desc'):
             return
 
@@ -269,11 +273,11 @@ class WikiHTMLPageParser(HTMLParser):
 
 def check_response(response):
     """Raise ServerError if the response indicates a server error."""
-    if response.status == 503:
+    if response.status_code == 503:
         raise ServerError('Service Unavailable')
-    elif response.status == 502:
+    elif response.status_code == 502:
         raise ServerError('Bad Gateway')
-    elif response.status == 500:
+    elif response.status_code == 500:
         raise ServerError('Internal Server Error')
-    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.text:
+    elif response.status_code == 200 and SERVER_DB_ERROR_MSG in response.text:
         raise ServerError('Server cannot access the database')

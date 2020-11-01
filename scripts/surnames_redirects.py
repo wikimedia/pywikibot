@@ -46,7 +46,7 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
             @kwarg surnames-last: Redirect "Surnames, Given Names" to
                                   "Given Names Surnames".
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'surnames_last': False,
         })
 
@@ -63,7 +63,7 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
         site = self.current_page.site
 
         possible_names = []
-        if self.getOption('surnames_last'):
+        if self.opt.surnames_last:
             name_parts = name.split(', ')
             if len(name_parts) == 2 and len(name.split(' ')) <= 3:
                 possible_names.append('{1} {0}'.format(*name_parts))

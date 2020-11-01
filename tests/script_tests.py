@@ -117,6 +117,7 @@ auto_run_script_list = [
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
+    'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',
     'editarticle': 'Nothing changed',
     'freebasemappingupload': 'Cannot find ',

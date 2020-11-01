@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for the redirect.py script."""
 #
-# (C) Pywikibot team, 2017-2019
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
-from pywikibot import site, Page, i18n
+from pywikibot import Page, i18n
 
 from scripts.redirect import RedirectRobot
 
@@ -16,8 +16,6 @@ from tests import Mock, patch, unittest
 from tests.aspects import DefaultSiteTestCase
 
 
-# To make `self.site.logged_in(sysop=True)` always return False
-@patch.object(site.APISite, 'logged_in', new=Mock(return_value=False))
 @patch.object(Page, 'exists', new=Mock(return_value=True))
 class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
 
@@ -55,7 +53,5 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

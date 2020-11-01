@@ -622,8 +622,8 @@ class ProofreadPage(pywikibot.Page):
         else:
             return True, ReadTimeout
 
-        if 400 <= response.status < 600:
-            return True, 'Http response status {}'.format(response.status)
+        if 400 <= response.status_code < 600:
+            return True, 'Http response status {}'.format(response.status_code)
 
         data = json.loads(response.text)
 
@@ -701,7 +701,7 @@ class ProofreadPage(pywikibot.Page):
 
         return self._ocr_callback(cmd_uri, ocr_tool=ocr_tool)
 
-    def ocr(self, ocr_tool=None):
+    def ocr(self, ocr_tool: Optional[str] = None):
         """Do OCR of ProofreadPage scan.
 
         The text returned by this function shall be assigned to self.body,
@@ -710,7 +710,6 @@ class ProofreadPage(pywikibot.Page):
         It is the user's responsibility to reset quality level accordingly.
 
         @param ocr_tool: 'phetools' or 'googleOCR', default is 'phetools'
-        @type ocr_tool: basestring
 
         @return: OCR text for the page.
 

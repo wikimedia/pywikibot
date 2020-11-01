@@ -63,7 +63,7 @@ __all__ = (
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
     'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
     'init_handlers', 'writelogheader',
-    'input', 'input_choice', 'input_yn', 'input_list_choice',
+    'input', 'input_choice', 'input_yn', 'input_list_choice', 'ui',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
@@ -99,7 +99,7 @@ from contextlib import closing
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
-from typing import Any, Dict
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -129,6 +129,11 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
+
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+else:
+    from typing import Dict
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -427,20 +432,16 @@ add_init_routine(init_handlers)
 # User input functions
 
 
-def input(question, password=False, default='', force=False):
+def input(question: str, password: bool = False,
+          default: str = '', force: bool = False) -> str:
     """Ask the user a question, return the user's answer.
 
     @param question: a string that will be shown to the user. Don't add a
         space after the question mark/colon, this method will do this for you.
-    @type question: str
     @param password: if True, hides the user's input (for password entry).
-    @type password: bool
     @param default: The default answer if none was entered. None to require
         an answer.
-    @type default: basestring
     @param force: Automatically use the default
-    @type force: bool
-    @rtype: str
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
@@ -450,13 +451,13 @@ def input(question, password=False, default='', force=False):
     return data
 
 
-def input_choice(question, answers, default=None, return_shortcut=True,
-                 automatic_quit=True, force=False):
+def input_choice(question: str, answers, default: Optional[str] = None,
+                 return_shortcut: bool = True,
+                 automatic_quit: bool = True, force: bool = False):
     """
     Ask the user the question and return one of the valid answers.
 
     @param question: The question asked without trailing spaces.
-    @type question: basestring
     @param answers: The valid answers each containing a full length answer and
         a shortcut. Each value must be unique.
     @type answers: iterable containing a sequence of length two or instances of
@@ -464,19 +465,15 @@ def input_choice(question, answers, default=None, return_shortcut=True,
     @param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None. If it should
         be linked with the valid answers it must be its shortcut.
-    @type default: basestring
     @param return_shortcut: Whether the shortcut or the index of the answer is
         returned.
-    @type return_shortcut: bool
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
         L{QuitKeyboardInterrupt} if selected.
-    @type automatic_quit: bool
     @param force: Automatically use the default
-    @type force: bool
     @return: The selected answer shortcut or index. Is -1 if the default is
         selected, it does not return the shortcut and the default is not a
         valid shortcut.
-    @rtype: int (if not return shortcut), basestring (otherwise)
+    @rtype: int (if not return shortcut), str (otherwise)
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
@@ -486,24 +483,22 @@ def input_choice(question, answers, default=None, return_shortcut=True,
                            automatic_quit=automatic_quit, force=force)
 
 
-def input_yn(question, default=None, automatic_quit=True, force=False):
+def input_yn(question: str,
+             default: Union[str, bool, None] = None,
+             automatic_quit: bool = True,
+             force: bool = False) -> bool:
     """
     Ask the user a yes/no question and return the answer as a bool.
 
     @param question: The question asked without trailing spaces.
-    @type question: basestring
     @param default: The result if no answer was entered. It must be a bool or
         'y' or 'n' and can be disabled by setting it to None.
-    @type default: basestring or bool
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
         L{QuitKeyboardInterrupt} if selected.
-    @type automatic_quit: bool
     @param force: Automatically use the default
-    @type force: bool
     @return: Return True if the user selected yes and False if the user
         selected no. If the default is not None it'll return True if default
         is True or 'y' and False if default is False or 'n'.
-    @rtype: bool
     """
     if default not in ['y', 'Y', 'n', 'N']:
         if default:
@@ -517,21 +512,19 @@ def input_yn(question, default=None, automatic_quit=True, force=False):
                         automatic_quit=automatic_quit, force=force) == 'y'
 
 
-def input_list_choice(question, answers, default=None, force=False):
+def input_list_choice(question: str, answers,
+                      default: Optional[str] = None,
+                      force: bool = False) -> str:
     """
     Ask the user the question and return one of the valid answers.
 
     @param question: The question asked without trailing spaces.
-    @type question: basestring
     @param answers: The valid answers each containing a full length answer.
-    @type answers: Iterable of basestring
+    @type answers: Iterable of str
     @param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None.
-    @type default: basestring
     @param force: Automatically use the default
-    @type force: bool
     @return: The selected answer.
-    @rtype: basestring
     """
     if not _handlers_initialized:
         init_handlers()
@@ -565,7 +558,8 @@ class InteractiveReplace:
     the Choice instance returned and created by this class are too.
     """
 
-    def __init__(self, old_link, new_link, default=None, automatic_quit=True):
+    def __init__(self, old_link, new_link, default: Optional[str] = None,
+                 automatic_quit: bool = True):
         """
         Initializer.
 
@@ -578,10 +572,8 @@ class InteractiveReplace:
             with allow_replace are ignored.
         @type new_link: pywikibot.page.Link or pywikibot.page.Page or False
         @param default: The default answer as the shortcut
-        @type default: None or str
         @param automatic_quit: Add an option to quit and raise a
             QuitKeyboardException.
-        @type automatic_quit: bool
         """
         if isinstance(old_link, pywikibot.Page):
             self._old = old_link._link
@@ -722,13 +714,12 @@ class InteractiveReplace:
 
 
 # Command line parsing and help
-def calledModuleName():
+def calledModuleName() -> str:
     """Return the name of the module calling this function.
 
     This is required because the -help option loads the module's docstring
     and because the module name will be used for the filename of the log.
 
-    @rtype: str
     """
     return Path(pywikibot.argvu[0]).stem
 
@@ -912,8 +903,8 @@ def showHelp(module_name=None):
 
 def suggest_help(missing_parameters=[], missing_generator=False,
                  unknown_parameters=[], exception=None,
-                 missing_action=False, additional_text='',
-                 missing_dependencies=[]):
+                 missing_action=False, additional_text: str = '',
+                 missing_dependencies=[]) -> bool:
     """
     Output error message to use -help with additional text before it.
 
@@ -928,12 +919,10 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     @param missing_action: Add an entry that no action was defined.
     @type missing_action: bool
     @param additional_text: Additional text added to the end.
-    @type additional_text: str
     @param missing_dependencies: A list of dependencies which can not
         be imported.
     @type missing_dependencies: list of str
     @return: True if an error message was printed, False otherwise
-    @rtype: bool
     """
     messages = []
     if exception:
@@ -1777,15 +1766,14 @@ class CurrentPageBot(BaseBot):
         self.treat_page()
 
     @deprecated_args(comment='summary')
-    def put_current(self, new_text, ignore_save_related_errors=None,
-                    ignore_server_errors=None, **kwargs):
+    def put_current(self, new_text: str, ignore_save_related_errors=None,
+                    ignore_server_errors=None, **kwargs) -> bool:
         """
         Call L{Bot.userPut} but use the current page.
 
         It compares the new_text to the current page text.
 
         @param new_text: The new text
-        @type new_text: basestring
         @param ignore_save_related_errors: Ignore save related errors and
             automatically print a message. If None uses this instances default.
         @type ignore_save_related_errors: bool or None
@@ -1794,7 +1782,6 @@ class CurrentPageBot(BaseBot):
         @type ignore_server_errors: bool or None
         @param kwargs: Additional parameters directly given to L{Bot.userPut}.
         @return: whether the page was saved successfully
-        @rtype: bool
         """
         if ignore_save_related_errors is None:
             ignore_save_related_errors = self.ignore_save_related_errors

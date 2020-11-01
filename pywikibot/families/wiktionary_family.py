@@ -37,7 +37,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'fj', 'la', 'tg', 'ky', 'sk', 'bg', 'wa', 'ur', 'ps', 'cy', 'vo', 'af',
         'zh-min-nan', 'he', 'shn', 'scn', 'tl', 'pa', 'sw', 'fy', 'bn', 'nn',
         'lv', 'sl', 'ka', 'sq', 'co', 'mn', 'pnb', 'min', 'lb', 'nds', 'bs',
-        'nah', 'sa', 'kk', 'yue', 'ms', 'km', 'vec', 'tk', 'mk', 'be', 'sm',
+        'nah', 'sa', 'kk', 'ms', 'yue', 'km', 'vec', 'tk', 'mk', 'be', 'sm',
         'hsb', 'shy', 'gd', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt', 'mt',
         'sd', 'gn', 'mr', 'fo', 'ie', 'so', 'csb', 'ug', 'st', 'roa-rup', 'si',
         'hif', 'zu', 'kl', 'su', 'ay', 'mi', 'jbo', 'ln', 'yi', 'gu', 'na',

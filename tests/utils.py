@@ -314,9 +314,9 @@ class DryRequest(CachedRequest):
         _original_Request.__init__(self, *args, **kwargs)
 
     @classmethod
-    def create_simple(cls, **kwargs):
+    def create_simple(cls, req_site, **kwargs):
         """Skip CachedRequest implementation."""
-        return _original_Request.create_simple(**kwargs)
+        return _original_Request.create_simple(req_site, **kwargs)
 
     def _expired(self, dt):
         """Never invalidate cached data."""

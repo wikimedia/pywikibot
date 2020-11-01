@@ -31,7 +31,7 @@ from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import pywikibot
 
@@ -52,7 +52,12 @@ from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import PYTHON_VERSION
 
+if PYTHON_VERSION >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 _logger = 'pagegenerators'
 
@@ -2888,10 +2893,10 @@ class PetScanPageGenerator:
             req = http.fetch(url, params=self.opts)
         except ReadTimeout:
             raise ServerError(
-                'received ReadTimeout from {0}'.format(url))
-        if 500 <= req.status < 600:
+                'received ReadTimeout from {}'.format(url))
+        if 500 <= req.status_code < 600:
             raise ServerError(
-                'received {0} status from {1}'.format(req.status, req.uri))
+                'received {} status from {}'.format(req.status_code, req.url))
         j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
         yield from raw_pages

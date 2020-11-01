@@ -37,6 +37,7 @@ import sys
 
 import pywikibot
 
+from pywikibot.bot import SingleSiteBot
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.specialbots import UploadRobot
 
@@ -127,7 +128,7 @@ licenseTemplates = {
 }
 
 
-class ImageTransferBot(object):
+class ImageTransferBot(SingleSiteBot):
 
     """Image transfer bot."""
 
@@ -145,13 +146,13 @@ class ImageTransferBot(object):
             while replacing, default false
         @type keep_name: boolean
         """
-        self.generator = generator
+        super().__init__(generator=generator)
         self.interwiki = interwiki
         self.targetSite = targetSite
         self.keep_name = keep_name
         self.ignore_warning = ignore_warning
 
-    def transferImage(self, sourceImagePage):
+    def transfer_image(self, sourceImagePage):
         """
         Download image and its description, and upload it to another site.
 
@@ -219,7 +220,7 @@ class ImageTransferBot(object):
                                         % targetFilename,
                                         summary=reason)
 
-    def showImageList(self, imagelist):
+    def show_image_list(self, imagelist):
         """Print image list."""
         for i, image in enumerate(imagelist):
             pywikibot.output('-' * 60)
@@ -253,47 +254,43 @@ class ImageTransferBot(object):
                 break
         pywikibot.output('=' * 60)
 
-    def run(self):
-        """Run the bot."""
-        for page in self.generator:
-            if self.interwiki:
-                imagelist = []
-                for linkedPage in page.interwiki():
-                    linkedPage = pywikibot.Page(linkedPage)
-                    imagelist.extend(
-                        linkedPage.imagelinks(
-                            followRedirects=True))
-            elif page.is_filepage():
-                imagePage = pywikibot.FilePage(page.site, page.title())
-                imagelist = [imagePage]
-            else:
-                imagelist = list(page.imagelinks(followRedirects=True))
+    def treat(self, page):
+        """Treat a single page."""
+        if self.interwiki:
+            imagelist = []
+            for linkedPage in page.interwiki():
+                linkedPage = pywikibot.Page(linkedPage)
+                imagelist.extend(linkedPage.imagelinks())
+        elif page.is_filepage():
+            imagePage = pywikibot.FilePage(page.site, page.title())
+            imagelist = [imagePage]
+        else:
+            imagelist = list(page.imagelinks())
 
-            while imagelist:
-                self.showImageList(imagelist)
-                if len(imagelist) == 1:
-                    # no need to query the user, only one possibility
-                    todo = 0
-                else:
+        while imagelist:
+            self.show_image_list(imagelist)
+            if len(imagelist) == 1:
+                # no need to query the user, only one possibility
+                todo = 0
+            else:
+                pywikibot.output('Give the number of the image to transfer.')
+                todo = pywikibot.input('To end uploading, press enter:')
+                if not todo:
+                    break
+                todo = int(todo)
+            if 0 <= todo < len(imagelist):
+                if (imagelist[todo].file_is_shared()
+                        and imagelist[todo].site.image_repository()
+                        == self.targetSite.image_repository()):
                     pywikibot.output(
-                        'Give the number of the image to transfer.')
-                    todo = pywikibot.input('To end uploading, press enter:')
-                    if not todo:
-                        break
-                    todo = int(todo)
-                if 0 <= todo < len(imagelist):
-                    if (imagelist[todo].file_is_shared()
-                            and imagelist[todo].site.image_repository()
-                            == self.targetSite.image_repository()):
-                        pywikibot.output(
-                            'The image is already shared on {0}.'
-                            .format(self.targetSite.image_repository()))
-                    else:
-                        self.transferImage(imagelist[todo])
-                    # remove the selected image from the list
-                    imagelist = imagelist[:todo] + imagelist[todo + 1:]
+                        'The image is already shared on {}.'
+                        .format(self.targetSite.image_repository()))
                 else:
-                    pywikibot.output('No such image number.')
+                    self.transfer_image(imagelist[todo])
+                # remove the selected image from the list
+                imagelist.pop(todo)
+            else:
+                pywikibot.output('No such image number.')
 
 
 def main(*args):

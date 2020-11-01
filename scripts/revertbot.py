@@ -58,7 +58,7 @@ class BaseRevertBot(OptionHandler):
     Subclass this bot and override callback to get it to do something useful.
     """
 
-    availableOptions = {
+    available_options = {
         'comment': '',
         'rollback': False,
         'limit': 500
@@ -81,7 +81,7 @@ class BaseRevertBot(OptionHandler):
         if callback is None:
             callback = self.callback
 
-        for item in self.get_contributions(total=self.getOption('limit')):
+        for item in self.get_contributions(total=self.opt.limit):
             if callback(item):
                 result = self.revert(item)
                 if result:
@@ -109,15 +109,15 @@ class BaseRevertBot(OptionHandler):
             {'revid': rev.revid,
              'author': rev.user,
              'timestamp': rev.timestamp})
-        additional_comment = self.getOption('comment')
-        if additional_comment:
-            comment += ': ' + additional_comment
+
+        if self.opt.comment:
+            comment += ': ' + self.opt.comment
 
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<',
             page.title(as_link=True, force_interwiki=True, textlink=True)))
 
-        if not self.getOption('rollback'):
+        if not self.opt.rollback:
             old = page.text
             page.text = page.getOldVersion(rev.revid)
             pywikibot.showDiff(old, page.text)

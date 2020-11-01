@@ -69,12 +69,18 @@ import codecs
 import os
 import re
 
-from typing import Generator, Tuple
+from typing import Generator
 
 import pywikibot
 
 from pywikibot import config, i18n
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class NoTitle(Exception):
@@ -97,7 +103,7 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'always': True,
             'force': False,
             'append': None,
@@ -110,8 +116,8 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         })
 
         super().__init__(**kwargs)
-        self.availableOptions.update(
-            {'always': not self.getOption('showdiff')})
+        self.available_options.update(
+            {'always': not self.opt.showdiff})
 
     def init_page(self, item) -> pywikibot.Page:
         """Get the tuple and return the page object to be processed."""
@@ -129,8 +135,8 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         # delete page's text to get it from live wiki
         del page.text
 
-        if self.getOption('summary'):
-            comment = self.getOption('summary')
+        if self.opt.summary:
+            comment = self.opt.summary
         else:
             comment = i18n.twtranslate(self.site, 'pagefromfile-msg')
 
@@ -142,32 +148,32 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             comment, i18n.twtranslate(self.site, 'pagefromfile-msg_force'))
 
         if page.exists():
-            if not self.getOption('redirect') and page.isRedirectPage():
+            if not self.opt.redirect and page.isRedirectPage():
                 pywikibot.output('Page {0} is redirect, skipping!'
                                  .format(title))
                 return
             pagecontents = page.text
-            nocontent = self.getOption('nocontent')
+            nocontent = self.opt.nocontent
             if (nocontent
                     and (nocontent in pagecontents
                          or nocontent.lower() in pagecontents)):
                 pywikibot.output('Page has {0} so it is skipped'
                                  .format(nocontent))
                 return
-            if self.getOption('append'):
-                separator = self.getOption('append')[1]
+            if self.opt.append:
+                separator = self.opt.append[1]
                 if separator == r'\n':
                     separator = '\n'
-                if self.getOption('append')[0] == 'top':
+                if self.opt.append[0] == 'top':
                     above, below = contents, pagecontents
                     comment = comment_top
                 else:
                     above, below = pagecontents, contents
                     comment = comment_bottom
                 pywikibot.output('Page {0} already exists, appending on {1}!'
-                                 .format(title, self.getOption('append')[0]))
+                                 .format(title, self.opt.append[0]))
                 contents = above + separator + below
-            elif self.getOption('force'):
+            elif self.opt.force:
                 pywikibot.output('Page {0} already exists, ***overwriting!'
                                  .format(title))
                 comment = comment_force
@@ -176,12 +182,12 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
                                  .format(title))
                 return
         else:
-            if self.getOption('autosummary'):
+            if self.opt.autosummary:
                 comment = config.default_edit_summary = ''
 
         self.put_current(contents, summary=comment,
-                         minor=self.getOption('minor'),
-                         show_diff=self.getOption('showdiff'))
+                         minor=self.opt.minor,
+                         show_diff=self.opt.showdiff)
 
 
 class PageFromFileReader(OptionHandler):
@@ -193,7 +199,7 @@ class PageFromFileReader(OptionHandler):
     # should be included and does not occur elsewhere in the text.
 
     # TODO: make config variables for these.
-    availableOptions = {
+    available_options = {
         'begin': '{{-start-}}',
         'end': '{{-stop-}}',
         'titlestart': "'''",
@@ -213,12 +219,6 @@ class PageFromFileReader(OptionHandler):
         """
         super().__init__(**kwargs)
         self.filename = filename
-        self.pageStartMarker = self.getOption('begin')
-        self.pageEndMarker = self.getOption('end')
-        self.titleStartMarker = self.getOption('titlestart')
-        self.titleEndMarker = self.getOption('titleend')
-        self.include = self.getOption('include')
-        self.notitle = self.getOption('notitle')
 
     def __iter__(self) -> Generator[Tuple[str, str], None, None]:
         """Read file and yield a tuple of page title and content."""
@@ -254,26 +254,26 @@ class PageFromFileReader(OptionHandler):
 
     def findpage(self, text) -> Tuple[int, str, str]:
         """Find page to work on."""
-        if self.getOption('textonly'):
+        if self.opt.textonly:
             pattern = '^(.*)$'
         else:
-            pattern = (re.escape(self.pageStartMarker) + '(.*?)'
-                       + re.escape(self.pageEndMarker))
+            pattern = (re.escape(self.opt.begin) + '(.*?)'
+                       + re.escape(self.opt.end))
         page_regex = re.compile(pattern, re.DOTALL)
         title_regex = re.compile(
-            re.escape(self.titleStartMarker) + '(.*?)'
-            + re.escape(self.titleEndMarker))
+            re.escape(self.opt.titlestart) + '(.*?)'
+            + re.escape(self.opt.titleend))
         location = page_regex.search(text)
-        if self.include:
+        if self.opt.include:
             contents = location.group()
         else:
             contents = location.group(1)
 
-        title = self.getOption('title')
+        title = self.opt.title
         if not title:
             try:
                 title = title_regex.search(contents).group(1)
-                if self.notitle:
+                if self.opt.notitle:
                     # Remove title (to allow creation of redirects)
                     contents = title_regex.sub('', contents, count=1)
             except AttributeError:

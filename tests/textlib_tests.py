@@ -179,8 +179,8 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
     with both a newline and an empty string as separators.
     """
 
-    old = ('[[Category:Cat1]]\n[[Category:Cat2|]]\n'
-           '[[Category:Cat1| ]]\n[[Category:Cat2|key]]')
+    old = '[[Category:Cat1]]\n[[Category:Cat2|]]\n' \
+          '[[Category:Cat1| ]]\n[[Category:Cat2|key]]'
 
     def test_standard_links(self):
         """Test getting and replacing categories."""
@@ -209,34 +209,18 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
         cats = textlib.getCategoryLinks(self.old, site=self.site)
 
-        # Sanity checking
-        temp = textlib.replaceCategoryInPlace(self.old, cats[0], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[0],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[1], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[1],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[2], dummy,
-                                              site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[2],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
-
-        temp = textlib.replaceCategoryInPlace(self.old, cats[3],
-                                              dummy, site=self.site)
-        self.assertNotEqual(temp, self.old)
-        new = textlib.replaceCategoryInPlace(temp, dummy, cats[3],
-                                             site=self.site)
-        self.assertEqual(self.old, new)
+        for count, cat in enumerate(textlib.getCategoryLinks(self.old,
+                                                             site=self.site)):
+            with self.subTest(category=cat):
+                # Sanity checking
+                temp = textlib.replaceCategoryInPlace(self.old, cat, dummy,
+                                                      site=self.site)
+                self.assertNotEqual(temp, self.old)
+                new = textlib.replaceCategoryInPlace(temp, dummy, cat,
+                                                     site=self.site)
+                self.assertEqual(self.old, new)
+        else:
+            self.assertEqual(count, 3)
 
         # Testing removing categories
         temp = textlib.replaceCategoryInPlace(self.old, cats[0],
@@ -293,16 +277,6 @@ class TestTemplatesInCategory(TestCase):
             '[[Category:{{P1|Foo}}]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|Foo}}|bar]]', self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
-            self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:Foo{{!}}bar]]', self.site, expand_text=True),
-            [pywikibot.page.Category(self.site, 'Foo', sort_key='bar')])
-        self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}bar]][[Category:Wiki{{P2||pedia}}]]',
             self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sort_key='bar'),
@@ -310,6 +284,16 @@ class TestTemplatesInCategory(TestCase):
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}and{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sort_key='and|bar')])
+
+        for pattern in ('[[Category:{{P1|Foo}}|bar]]',
+                        '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
+                        '[[Category:Foo{{!}}bar]]'):
+            with self.subTest(pattern=pattern):
+                self.assertEqual(textlib.getCategoryLinks(
+                    pattern, self.site, expand_text=True),
+                    [pywikibot.page.Category(self.site, 'Foo',
+                                             sort_key='bar')])
+
         with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
             textlib.getCategoryLinks('[[Category:nasty{{{!}}]]', self.site)
             warn.assert_called_once_with(
@@ -622,8 +606,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
-    def test_nested_template_regex(self):
-        """Test NESTED_TEMPLATE_REGEX."""
+    def test_nested_template_regex_search(self):
+        """Test NESTED_TEMPLATE_REGEX search."""
         func = textlib.NESTED_TEMPLATE_REGEX.search
 
         # Numerically named templates are rejected
@@ -637,6 +621,8 @@ class TestTemplateParams(TestCase):
 
         self.assertIsNone(func('{{{1|{{2|a}} }}}'))
 
+    def test_nested_template_regex_match(self):
+        """Test NESTED_TEMPLATE_REGEX match."""
         func = textlib.NESTED_TEMPLATE_REGEX.match
 
         self.assertIsNotNone(func('{{CURRENTYEAR}}'))
@@ -654,25 +640,18 @@ class TestTemplateParams(TestCase):
         self.assertIsNotNone(func('{{a|{{c|d}} }}'))
 
         # All templates are captured when template depth is greater than 2
-        m = func('{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz')
-        self.assertIsNotNone(m)
-        self.assertIsNotNone(m.group(0))
-        self.assertIsNone(m.group('name'))
-        self.assertIsNone(m.group(1))
-        self.assertIsNone(m.group('params'))
-        self.assertIsNone(m.group(2))
-        self.assertIsNotNone(m.group('unhandled_depth'))
-        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
-
-        m = func('{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz')
-        self.assertIsNotNone(m)
-        self.assertIsNotNone(m.group(0))
-        self.assertIsNone(m.group('name'))
-        self.assertIsNone(m.group(1))
-        self.assertIsNone(m.group('params'))
-        self.assertIsNone(m.group(2))
-        self.assertIsNotNone(m.group('unhandled_depth'))
-        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+        patterns = '{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz', \
+                   '{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz'
+        for pattern in patterns:
+            m = func(pattern)
+            self.assertIsNotNone(m)
+            self.assertIsNotNone(m.group(0))
+            self.assertIsNone(m.group('name'))
+            self.assertIsNone(m.group(1))
+            self.assertIsNone(m.group('params'))
+            self.assertIsNone(m.group(2))
+            self.assertIsNotNone(m.group('unhandled_depth'))
+            self.assertTrue(m.group(0).endswith('foo {{bar}}'))
 
 
 class TestGenericTemplateParams(PatchingTestCase):

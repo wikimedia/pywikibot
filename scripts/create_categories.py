@@ -35,12 +35,16 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Tuple
-
 import pywikibot
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
 from pywikibot import pagegenerators
 from pywikibot.site import Namespace
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 
 class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
@@ -51,7 +55,7 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.availableOptions.update({
+        self.available_options.update({
             'basename': None,
             'parent': None,
             'overwrite': False,
@@ -67,11 +71,11 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
             return title
 
         category = pywikibot.Category(
-            page.site, '{} {}'.format(self.getOption('basename'), title))
+            page.site, '{} {}'.format(self.opt.basename, title))
 
         text = '[[{namespace}:{parent}|{title}]]\n{category}\n'.format(
             namespace=page.site.namespace(Namespace.CATEGORY),
-            parent=self.getOption('parent'),
+            parent=self.opt.parent,
             title=title,
             category=page)
         category.text = text
@@ -88,7 +92,7 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         if isinstance(page, str):
             pywikibot.warning(page + ' is not a category, skipping')
             return True
-        if page.exists() and not self.getOption('overwrite'):
+        if page.exists() and not self.opt.overwrite:
             pywikibot.warning('{} already exists, skipping'.format(page))
             return True
         return super().skip_page(page)

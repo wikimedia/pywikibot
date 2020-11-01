@@ -1,6 +1,57 @@
 Release history
 ===============
 
+5.0.0
+-----
+
+*19 October 2020*
+
+* Add support for smn-wiki (T264962)
+* callback parameter of comms.http.fetch() is desupported
+* Fix api.APIError() calls for Flow and Thanks extension
+* edit, move, create, upload, unprotect and prompt parameters of Page.protect() are deprecated (T227610)
+* Accept only valid names in generate_family_file.py (T265328, T265353)
+* New plural.plural_rule() function returns a rule for a given language
+* Replace deprecated urllib.request.URLopener with http.fetch (T255575)
+* OptionHandler/BaseBot options are accessable as OptionHandler.opt attributes or keyword item (see also T264721)
+* pywikibot.setAction() function was removed
+* A namedtuple is the result of textlib.extract_sections()
+* Prevent circular imports in config2.py and http.py (T264500)
+* version.get_module_version() is deprecated and gives no meaningfull result
+* Fix version.get_module_filename() and update log lines (T264235)
+* Re-enable printing log header (T264235)
+* Fix result of tools.intersect_generators() (T263947)
+* Only show _GLOBAL_HELP options if explicitly wanted
+* Deprecated Family.version() methods were removed
+* Unused parameters of page methods like forceReload, insite, throttle, step was removed
+* Raise RuntimeError instead of AttributeError for old wikis (T263951)
+* Deprecated script options were removed
+* lyricwiki_family was removed (T245439)
+* RecentChangesPageGenerator parameters has been synced with APISite.recentchanges
+* APISite.recentchanges accepts keyword parameters only
+* LoginStatus enum class was moved from site to login.py
+* WbRepresentation derives from abstract base class abc.ABC
+* Update characters in the Cf category to Unicode version 12.1.0
+* Update __all__ variable in pywikibot (T122879)
+* Use api.APIGenerator through site._generator (T129013)
+* Support of MediaWiki releases below 1.19 has been dropped (T245350)
+* Page.get_best_claim () retrieves preferred Claim of a property referring to the given page (T175207)
+* Check whether _putthead is current_thread() to join() (T263331)
+* Add BasePage.has_deleted_revisions() method
+* Allow querying deleted revs without the deletedhistory right
+* Use ignore_discard for login cookie container (T261066)
+* Siteinfo.get() loads data via API instead from cache if expiry parameter is True (T260490)
+* Move latest revision id handling to WikibaseEntity (T233406)
+* Load wikibase entities when necessary (T245809)
+* Fix path for stable release in version.getversion() (T262558)
+* "since" parameter in EventStreams given as Timestamp or MediaWiki timestamp string has been fixed
+* Methods deprecated for 6 years or longer were removed
+* Page.getVersionHistory and Page.fullVersionHistory() methods were removed (T136513, T151110)
+* Allow multiple types of contributors parameter given for Page.revision_count()
+* Deprecated tools.UnicodeMixin and tools.IteratorNextMixin has been removed
+* Localisation updates
+
+
 4.3.0
 -----
 

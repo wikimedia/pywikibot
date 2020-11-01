@@ -26,12 +26,10 @@ The following generators and filters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 
@@ -62,13 +60,13 @@ class DashRedirectBot(
         @type generator: generator
         """
         # -always option is predefined by BaseBot class
-        self.availableOptions.update({
+        self.available_options.update({
             'summary': None,  # custom bot summary
             'reversed': False,  # switch bot behavior
         })
 
         # call initializer of the super class
-        super(DashRedirectBot, self).__init__(site=True, **kwargs)
+        super().__init__(site=True, **kwargs)
 
         # assign the generator to the bot
         self.generator = generator
@@ -80,7 +78,7 @@ class DashRedirectBot(
         site = self.current_page.site
 
         # create redirect title
-        if not self.getOption('reversed'):
+        if not self.opt.reversed:
             redir = pywikibot.Page(site, origin.replace('–', '-')
                                                .replace('—', '-'))
         else:
@@ -91,7 +89,7 @@ class DashRedirectBot(
             pywikibot.output('No need to process {0}, skipping...'
                              .format(redir.title()))
             # suggest -reversed parameter
-            if '-' in origin and not self.getOption('reversed'):
+            if '-' in origin and not self.opt.reversed:
                 pywikibot.output('Consider using -reversed parameter '
                                  'for this particular page')
         else:
@@ -108,12 +106,8 @@ class DashRedirectBot(
                         redir.title())):
                     # If summary option is None, it takes the default
                     # i18n summary from i18n subdirectory with summary key.
-                    if self.getOption('summary'):
-                        summary = self.getOption('summary')
-                    else:
-                        summary = i18n.twtranslate(site,
-                                                   'ndashredir-create',
-                                                   {'title': origin})
+                    summary = self.opt.summary or i18n.twtranslate(
+                        site, 'ndashredir-create', {'title': origin})
                     redir.set_redirect_target(self.current_page, create=True,
                                               summary=summary)
 

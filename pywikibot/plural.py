@@ -5,7 +5,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Callable, Dict, Union
+import sys
+
+from typing import Callable, Union
+
+if sys.version_info[:2] >= (3, 9):
+    Dict = dict
+else:
+    from typing import Dict
+
 
 PluralRule = Dict[str, Union[int, Callable]]
 

@@ -40,8 +40,10 @@ from functools import partial
 
 import pywikibot
 
-from pywikibot import Bot, i18n, pagegenerators, textlib
+from pywikibot import i18n, pagegenerators, textlib
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
+from pywikibot.tools import remove_last_args
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -495,7 +497,7 @@ referencesSubstitute = {
 # as it is already included there
 noTitleRequired = ['be', 'szl']
 
-maintenance_category = 'cite_error_refs_without_references_category'
+maintenance_category = 'Q6483427'
 
 _ref_regex = re.compile('</ref>', re.IGNORECASE)
 _references_regex = re.compile('<references.*?/>', re.IGNORECASE)
@@ -511,19 +513,17 @@ XmlDumpNoReferencesPageGenerator = partial(
     XMLDumpPageGenerator, text_predicate=_match_xml_page_text)
 
 
-class NoReferencesBot(Bot):
+class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """References section bot."""
 
-    def __init__(self, generator, **kwargs) -> None:
+    @remove_last_args(['gen'])
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         self.available_options.update({
             'verbose': True,
         })
         super().__init__(**kwargs)
-
-        self.generator = pagegenerators.PreloadingGenerator(generator)
-        self.site = pywikibot.Site()
 
         self.refR = _ref_regex
         self.referencesR = _references_regex
@@ -707,48 +707,33 @@ class NoReferencesBot(Bot):
                 ident=ident, text=self.referencesText)
         return oldText[:index].rstrip() + ref_section + oldText[index:]
 
-    def run(self) -> None:
+    def skip_page(self, page):
+        """Check whether the page could be processed."""
+        if page.isDisambig():
+            pywikibot.output('Page {} is a disambig; skipping.'
+                             .format(page.title(as_link=True)))
+            return True
+
+        if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
+            pywikibot.warning(
+                'Page {} is edited by IP. Possible vandalized'
+                .format(page.title(as_link=True)))
+            return True
+
+        return super().skip_page(page)
+
+    def treat_page(self) -> None:
         """Run the bot."""
-        for page in self.generator:
-            self.current_page = page
-            try:
-                text = page.text
-            except pywikibot.NoPage:
-                pywikibot.warning('Page {0} does not exist?!'
-                                  .format(page.title(as_link=True)))
-                continue
-            except pywikibot.IsRedirectPage:
-                pywikibot.output('Page {0} is a redirect; skipping.'
-                                 .format(page.title(as_link=True)))
-                continue
-            except pywikibot.LockedPage:
-                pywikibot.warning('Page {0} is locked?!'
-                                  .format(page.title(as_link=True)))
-                continue
-            if page.isDisambig():
-                pywikibot.output('Page {0} is a disambig; skipping.'
-                                 .format(page.title(as_link=True)))
-                continue
-            if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
-                pywikibot.warning(
-                    'Page {0} is edited by IP. Possible vandalized'
-                    .format(page.title(as_link=True)))
-                continue
-            if self.lacksReferences(text):
-                newText = self.addReferences(text)
-                try:
-                    self.userPut(
-                        page, page.text, newText, summary=self.comment)
-                except pywikibot.EditConflict:
-                    pywikibot.warning('Skipping {0} because of edit conflict'
-                                      .format(page.title(as_link=True)))
-                except pywikibot.SpamblacklistError as e:
-                    pywikibot.warning(
-                        'Cannot change {0} because of blacklist entry {1}'
-                        .format(page.title(as_link=True), e.url))
-                except pywikibot.LockedPage:
-                    pywikibot.warning('Skipping {0} (locked page)'
-                                      .format(page.title(as_link=True)))
+        page = self.current_page
+        try:
+            text = page.text
+        except pywikibot.LockedPage:
+            pywikibot.warning('Page {} is locked?!'
+                              .format(page.title(as_link=True)))
+            return
+
+        if self.lacksReferences(text):
+            self.put_current(self.addReferences(text), summary=self.comment)
 
 
 def main(*args) -> None:
@@ -761,39 +746,33 @@ def main(*args) -> None:
     @type args: str
     """
     options = {}
+    gen = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
-            else:
-                xmlFilename = arg[5:]
-            genFactory.gens.append(
-                XmlDumpNoReferencesPageGenerator(xmlFilename))
-        elif arg == '-always':
+        opt, _, value = arg.partition(':')
+        if opt == '-xml':
+            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
+            gen = XmlDumpNoReferencesPageGenerator(xmlFilename)
+        elif opt == '-always':
             options['always'] = True
-        elif arg == '-quiet':
+        elif opt == '-quiet':
             options['verbose'] = False
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(gen, preload=True)
     if not gen:
         site = pywikibot.Site()
-        try:
-            cat = site.expand_text(
-                site.mediawiki_message(maintenance_category))
-        except Exception:
-            pass
-        else:
-            cat = pywikibot.Category(site, 'Category:' + cat)
+        cat = site.page_from_repository(maintenance_category)
+        if cat:
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
+
     if gen:
-        bot = NoReferencesBot(gen, **options)
+        bot = NoReferencesBot(generator=gen, **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

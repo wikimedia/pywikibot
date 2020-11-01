@@ -275,6 +275,10 @@ class Siteinfo(Container):
             get_default option is set to False.
         @see: L{_get_siteinfo}
         """
+        # If expiry is True, convert it to 0 to be coherent with
+        # _get_siteinfo() and _get_general() docstring.
+        if expiry is True:
+            expiry = 0
         # If expiry is a float or int convert to timedelta
         # Note: bool is an instance of int
         if isinstance(expiry, float) or type(expiry) == int:

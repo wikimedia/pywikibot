@@ -77,7 +77,7 @@ and arguments can be:
 import datetime
 
 from contextlib import suppress
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple, Union
+from typing import Any, Generator, Optional, Union
 
 import pywikibot
 
@@ -85,6 +85,15 @@ from pywikibot import i18n, xmlreader
 from pywikibot.bot import (ExistingPageBot, OptionHandler, RedirectPageBot,
                            SingleSiteBot)
 from pywikibot.textlib import extract_templates_and_params_regex_simple
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Dict = dict
+    List = list
+    Set = set
+    Tuple = tuple
+else:
+    from typing import Dict, List, Set, Tuple
 
 
 def space_to_underscore(link) -> str:

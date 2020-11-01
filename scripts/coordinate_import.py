@@ -41,11 +41,17 @@ The following command line parameters are supported:
 #
 # Distributed under the terms of MIT License.
 #
-from typing import Optional, Tuple
+from typing import Optional
 
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownException
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -62,12 +68,12 @@ class CoordImportRobot(WikidataBot):
 
         @param generator: A generator that yields Page objects.
         """
-        self.availableOptions['create'] = False
+        self.available_options['create'] = False
         super().__init__(**kwargs)
         self.generator = generator
         self.cacheSources()
         self.prop = 'P625'
-        self.create_missing_item = self.getOption('create')
+        self.create_missing_item = self.opt.create
 
     def has_coord_qualifier(self, claims) -> Optional[str]:
         """

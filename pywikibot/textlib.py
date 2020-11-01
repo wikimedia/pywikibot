@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from collections import OrderedDict, namedtuple
 from contextlib import suppress
 from html.parser import HTMLParser
-from typing import List, NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Optional, Union
 
 import pywikibot
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
@@ -27,7 +27,14 @@ from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     issue_deprecation_warning,
+    PYTHON_VERSION,
 )
+
+if PYTHON_VERSION >= (3, 9):
+    List = list
+    Tuple = tuple
+else:
+    from typing import List, Tuple
 
 try:
     import mwparserfromhell
@@ -594,8 +601,7 @@ def replace_links(text: str, replace, site=None) -> str:
     If it's a string and the replacement was a sequence it converts it into a
     Page instance. If the replacement is done via a callable it'll use it like
     unlinking and directly replace the link with the text itself. It only
-    supports unicode when used by the callable and bytes (str in Python 2) are
-    not allowed.
+    supports unicode when used by the callable and bytes are not allowed.
 
     If either the section or label should be used the replacement can be a
     function which returns a Link instance and copies the value which should

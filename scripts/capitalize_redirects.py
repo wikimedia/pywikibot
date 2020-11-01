@@ -21,7 +21,7 @@ Example:
     python pwb.py capitalize_redirects -start:B -always
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,15 +30,17 @@ Example:
 #
 # Automatically converted from compat branch by compat2core.py script
 #
-from __future__ import absolute_import, division, unicode_literals
-
-from typing import Tuple
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import (
     MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot
 )
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -56,17 +58,17 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
             @kwarg titlecase: create a titlecased redirect page instead a
                               capitalized one.
         """
-        self.availableOptions.update({
+        self.available_options.update({
             'titlecase': False,
         })
 
-        super(CapitalizeBot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
     def treat_page(self):
         """Capitalize redirects of the current page."""
         page_t = self.current_page.title()
         site = self.current_page.site
-        if self.getOption('titlecase'):
+        if self.opt.titlecase:
             page_cap = pywikibot.Page(site, page_t.title())
         else:
             page_cap = pywikibot.Page(site, page_t.capitalize())

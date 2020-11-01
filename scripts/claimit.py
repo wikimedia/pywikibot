@@ -76,7 +76,7 @@ class ClaimRobot(WikidataBot):
         @param exists_arg: String specifying how to handle duplicate claims
         @type exists_arg: str
         """
-        self.availableOptions['always'] = True
+        self.available_options['always'] = True
         super().__init__()
         self.generator = generator
         self.claims = claims
