@@ -11,12 +11,10 @@ If no starting name is provided, the bot starts at '!'.
 
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import textlib, pagegenerators
