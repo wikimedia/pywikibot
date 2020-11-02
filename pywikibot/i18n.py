@@ -463,7 +463,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
             issue_deprecation_warning(
                 'type {0} for value {1} ({2})'
                 .format(type(num), selector, num),
-                'an int', 1, since='20151009')
+                'an int', 1,
+                warning_class=FutureWarning, since='20151009')
             num = int(num)
 
         plural_entries = []
@@ -616,6 +617,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     if not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a mapping',
+                                  warning_class=FutureWarning,
                                   since='20151008')
         plural_parameters = _PluralMappingAlias(parameters)
     else:
@@ -763,6 +765,7 @@ def twtranslate(source,
 
     if parameters is not None and not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a Mapping',
+                                  warning_class=FutureWarning,
                                   since='20151008')
 
     if not only_plural and parameters:
