@@ -26,7 +26,7 @@ Command line options:
 # Distributed under the terms of the MIT license.
 #
 from itertools import chain
-from typing import Generator
+from typing import Generator, Tuple
 
 import pywikibot
 
@@ -34,7 +34,7 @@ from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
 from pywikibot.tools.formatter import color_format
 
-from scripts.solve_disambiguation import DisambiguationRobot
+from scripts.solve_disambiguation import DisambiguationRobot as DisambigBotBase
 
 HELP_MSG = """\n
 misspelling.py does not support site {site}.
@@ -46,7 +46,7 @@ with category containing misspelling pages or a template for
 these misspellings.\n"""
 
 
-class MisspellingRobot(DisambiguationRobot):
+class MisspellingRobot(DisambigBotBase):
 
     """Spelling bot."""
 
@@ -117,19 +117,19 @@ class MisspellingRobot(DisambiguationRobot):
         preloadingGen = pagegenerators.PreloadingGenerator(generator)
         yield from preloadingGen
 
-    def findAlternatives(self, disambPage) -> bool:
+    def findAlternatives(self, page) -> bool:
         """
         Append link target to a list of alternative links.
 
-        Overrides the DisambiguationRobot method.
+        Overrides the DisambigBotBase method.
 
         @return: True if alternate link was appended
         """
-        if disambPage.isRedirectPage():
-            self.alternatives.append(disambPage.getRedirectTarget().title())
+        if page.isRedirectPage():
+            self.alternatives.append(page.getRedirectTarget().title())
             return True
 
-        sitename = disambPage.site.sitename
+        sitename = page.site.sitename
         templates = self.misspelling_templates.get(sitename)
         if templates is None:
             return False
@@ -137,7 +137,7 @@ class MisspellingRobot(DisambiguationRobot):
         if isinstance(templates, str):
             templates = (templates, )
 
-        for template, params in disambPage.templatesWithParams():
+        for template, params in page.templatesWithParams():
             if template.title(with_ns=False) in templates:
                 # The correct spelling is in the last parameter.
                 correct_spelling = params[-1]
@@ -154,7 +154,7 @@ class MisspellingRobot(DisambiguationRobot):
                 return True
         return False
 
-    def setSummaryMessage(self, disambPage, *args, **kwargs) -> None:
+    def setSummaryMessage(self, page, *args, **kwargs) -> None:
         """
         Setup the summary message.
 
@@ -163,17 +163,16 @@ class MisspellingRobot(DisambiguationRobot):
         # TODO: setSummaryMessage() in solve_disambiguation now has parameters
         # new_targets and unlink. Make use of these here.
         self.comment = i18n.twtranslate(self.site, 'misspelling-fixing',
-                                        {'page': disambPage.title()})
+                                        {'page': page.title()})
 
 
-def main(*args) -> None:
+def main(*args: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: str
     """
     options = {}
     for arg in pywikibot.handle_args(args):
