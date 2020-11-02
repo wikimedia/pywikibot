@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 """Unit tests for checkimages script."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-
 from scripts import checkimages
 
 from tests.aspects import unittest, TestCase
