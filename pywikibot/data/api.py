@@ -3157,23 +3157,19 @@ def _update_protection(page, pagedict: dict):
 
 def _update_revisions(page, revisions):
     """Update page revisions."""
-    # TODO: T102735: Use the page content model for <1.21
+    content_model = {'.js': 'javascript', '.css': 'css'}
     for rev in revisions:
-        revision = pywikibot.page.Revision(
-            revid=rev['revid'],
-            timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
-            user=rev.get('user', ''),
-            anon='anon' in rev,
-            comment=rev.get('comment', ''),
-            minor='minor' in rev,
-            slots=rev.get('slots'),  # MW 1.32+
-            text=rev.get('*'),  # b/c
-            rollbacktoken=rev.get('rollbacktoken'),
-            parentid=rev.get('parentid'),
-            contentmodel=rev.get('contentmodel'),  # b/c
-            sha1=rev.get('sha1')
-        )
-        page._revisions[revision.revid] = revision
+        if page.site.mw_version < '1.21':
+            # T102735: use content model depending on the page suffix
+            title = page.title(with_ns=False)
+            for suffix, cm in content_model.items():
+                if title.endswith(suffix):
+                    rev['contentmodel'] = cm
+                    break
+            else:
+                rev['contentmodel'] = 'wikitext'
+
+        page._revisions[rev['revid']] = pywikibot.page.Revision(**rev)
 
 
 def _update_templates(page, templates):
