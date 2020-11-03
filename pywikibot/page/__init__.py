@@ -587,12 +587,12 @@ class BasePage(ComparableMixin):
         self._revid = value
 
     @deprecated('latest_revision_id', since='20150727', future_warning=True)
-    def latestRevision(self):
+    def latestRevision(self):  # pragma: no cover
         """Return the current revision id for this page."""
         return self.latest_revision_id
 
     @deprecated('latest_revision_id', since='20150407', future_warning=True)
-    def pageAPInfo(self):
+    def pageAPInfo(self):  # pragma: no cover
         """Return the current revision id for this page."""
         if self.isRedirectPage():
             raise pywikibot.IsRedirectPage(self)
@@ -740,7 +740,7 @@ class BasePage(ComparableMixin):
     @property
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609', future_warning=True)
-    def previous_revision_id(self) -> int:
+    def previous_revision_id(self) -> int:  # pragma: no cover
         """
         Return the revision id for the previous revision of this Page.
 
@@ -750,7 +750,7 @@ class BasePage(ComparableMixin):
 
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609', future_warning=True)
-    def previousRevision(self) -> int:
+    def previousRevision(self) -> int:  # pragma: no cover
         """
         Return the revision id for the previous revision.
 
@@ -835,7 +835,7 @@ class BasePage(ComparableMixin):
         raise pywikibot.IsNotRedirectPage(self)
 
     @deprecated(since='20151207', future_warning=True)
-    def isEmpty(self) -> bool:
+    def isEmpty(self) -> bool:  # pragma: no cover
         """
         Return True if the page text has less than 4 characters.
 
@@ -1080,7 +1080,7 @@ class BasePage(ComparableMixin):
         return self.site.page_can_be_edited(self, action)
 
     @deprecated("Page.has_permission('edit')", since='20200208')
-    def canBeEdited(self):
+    def canBeEdited(self):  # pragma: no cover
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
@@ -1332,11 +1332,13 @@ class BasePage(ComparableMixin):
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
-    @deprecated('put(asynchronous=True) or save(asynchronous=True)')
+    @deprecated('put(asynchronous=True) or save(asynchronous=True)',
+                since='20180501')
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
-                  botflag=None, force=False, callback=None, **kwargs):
+                  botflag=None, force=False, callback=None,
+                  **kwargs):  # pragma: no cover
         """
         Put page on queue to be saved to wiki asynchronously.
 
@@ -1646,7 +1648,7 @@ class BasePage(ComparableMixin):
         return self.site.getredirtarget(self)
 
     @deprecated('moved_target()', since='20150524', future_warning=True)
-    def getMovedTarget(self):
+    def getMovedTarget(self):  # pragma: no cover
         """
         Return a Page object for the target this Page was moved to.
 
@@ -1727,7 +1729,8 @@ class BasePage(ComparableMixin):
                                       starttime=starttime, endtime=endtime))
 
     @deprecated('contributors().keys()', since='20150206', future_warning=True)
-    def contributingUsers(self, total: Optional[int] = None):
+    def contributingUsers(self,
+                          total: Optional[int] = None):  # pragma: no cover
         """
         Return a set of usernames (or IPs) of users who edited this page.
 
@@ -1761,7 +1764,7 @@ class BasePage(ComparableMixin):
 
     @deprecated('contributors() or revisions()', since='20150206',
                 future_warning=True)
-    @deprecated_args(limit='total')
+    @deprecated_args(limit='total')  # pragma: no cover
     def getLatestEditors(self, total=1) -> list:
         """
         Get a list of revision information of the last total edits.
@@ -2156,7 +2159,7 @@ class BasePage(ComparableMixin):
         return False
 
     @deprecated('Page.is_flow_page()', since='20150128', future_warning=True)
-    def isFlowPage(self):
+    def isFlowPage(self):  # pragma: no cover
         """DEPRECATED: use self.is_flow_page instead."""
         return self.is_flow_page()
 
@@ -2197,7 +2200,7 @@ class BasePage(ComparableMixin):
 # ####### DEPRECATED METHODS ########
 
     @deprecated('Page.protection()', since='20150725', future_warning=True)
-    def getRestrictions(self):
+    def getRestrictions(self):  # pragma: no cover
         """DEPRECATED. Use self.protection() instead."""
         restrictions = self.protection()
         return {k: list(restrictions[k]) for k in restrictions}
@@ -2479,7 +2482,7 @@ class FilePage(Page):
         return self._imagePageHtml
 
     @deprecated('get_file_url', since='20160609')
-    def fileUrl(self):
+    def fileUrl(self):  # pragma: no cover
         """Return the URL for the file described on this page."""
         return self.latest_file_info.url
 
@@ -2515,7 +2518,7 @@ class FilePage(Page):
         return self.latest_file_info.thumburl
 
     @deprecated('file_is_shared', since='20200618')
-    def fileIsShared(self) -> bool:
+    def fileIsShared(self) -> bool:  # pragma: no cover
         """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
         return self.file_is_shared()
 
@@ -3011,7 +3014,7 @@ class User(Page):
                 'This is an autoblock ID, you can only use to unblock it.')
 
     @deprecated('User.username', since='20160504')
-    def name(self) -> str:
+    def name(self) -> str:  # pragma: no cover
         """
         The username.
 
@@ -4817,7 +4820,7 @@ class Property:
         return self._type
 
     @deprecated('Property.type', since='20140607', future_warning=True)
-    def getType(self):
+    def getType(self):  # pragma: no cover
         """
         Return the type of this property.
 

@@ -392,7 +392,7 @@ class Namespace(Iterable, ComparableMixin):
     @classmethod
     @deprecated('NamespacesDict.lookup_name', since='20150703',
                 future_warning=True)
-    def lookup_name(cls, name: str, namespaces=None):
+    def lookup_name(cls, name: str, namespaces=None):  # pragma: no cover
         """
         Find the Namespace for a name.
 
@@ -410,7 +410,7 @@ class Namespace(Iterable, ComparableMixin):
     @staticmethod
     @deprecated('NamespacesDict.resolve', since='20150703',
                 future_warning=True)
-    def resolve(identifiers, namespaces=None):
+    def resolve(identifiers, namespaces=None):  # pragma: no cover
         """
         Resolve namespace identifiers to obtain Namespace objects.
 
@@ -948,7 +948,7 @@ class BaseSite(ComparableMixin):
 
     @deprecated('APISite.namespaces.lookup_name', since='20150703',
                 future_warning=True)
-    def ns_index(self, namespace):
+    def ns_index(self, namespace):  # pragma: no cover
         """
         Return the Namespace for a given namespace name.
 
@@ -961,7 +961,7 @@ class BaseSite(ComparableMixin):
 
     @deprecated('APISite.namespaces.lookup_name', since='20150703',
                 future_warning=True)
-    def getNamespaceIndex(self, namespace):
+    def getNamespaceIndex(self, namespace):  # pragma: no cover
         """DEPRECATED: Return the Namespace for a given namespace name."""
         return self.namespaces.lookup_name(namespace)
 
@@ -1159,7 +1159,7 @@ class BaseSite(ComparableMixin):
 
     @deprecated('list(namespaces.CATEGORY)', since='20150829',
                 future_warning=True)
-    def category_namespaces(self):
+    def category_namespaces(self):  # pragma: no cover
         """Return names for the Category namespace."""
         return list(self.namespace(14, all=True))
 
@@ -1182,7 +1182,7 @@ class BaseSite(ComparableMixin):
 
     @deprecated('pywikibot.data.api.encode_url', since='20151211',
                 future_warning=True)
-    def urlEncode(self, query):
+    def urlEncode(self, query):  # pragma: no cover
         """DEPRECATED."""
         return api.encode_url(query)
 
@@ -1986,7 +1986,7 @@ class APISite(BaseSite):
             return [word]
 
     @deprecated('expand_text', since='20150831', future_warning=True)
-    def resolvemagicwords(self, wikitext):
+    def resolvemagicwords(self, wikitext):  # pragma: no cover
         """
         Replace the {{ns:xx}} marks in a wikitext with the namespace names.
 
@@ -2082,7 +2082,7 @@ class APISite(BaseSite):
 
     @deprecated('siteinfo or Namespace instance', since='20150830',
                 future_warning=True)
-    def case(self):
+    def case(self):  # pragma: no cover
         """Return this site's capitalization rule."""
         # This is the global setting via $wgCapitalLinks, it is used whenever
         # the namespaces don't propagate the namespace specific value.
@@ -2093,7 +2093,7 @@ class APISite(BaseSite):
         return self.siteinfo['wikiid']
 
     @deprecated('APISite.lang', since='20150629', future_warning=True)
-    def language(self):
+    def language(self):  # pragma: no cover
         """Return the code for the language of this Site."""
         return self.lang
 
@@ -2474,7 +2474,7 @@ class APISite(BaseSite):
 
     @deprecated('Check the content model instead', since='20150128',
                 future_warning=True)
-    def loadflowinfo(self, page):
+    def loadflowinfo(self, page):  # pragma: no cover
         """
         Load Flow-related information about a given page.
 
@@ -2943,7 +2943,7 @@ class APISite(BaseSite):
 
     @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
-    def getToken(self, getalways=True, getagain=False):
+    def getToken(self, getalways=True, getagain=False):  # pragma: no cover
         """DEPRECATED: Get edit token."""
         if self.username() != self.user():
             raise ValueError('The token for {0} was requested but only the '
@@ -2960,7 +2960,7 @@ class APISite(BaseSite):
 
     @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
-    def getPatrolToken(self):
+    def getPatrolToken(self):  # pragma: no cover
         """DEPRECATED: Get patrol token."""
         if self.username() != self.user():
             raise ValueError('The token for {0} was requested but only the '
@@ -7002,7 +7002,7 @@ class DataSite(APISite):
         return wbdata[props]
 
     @deprecated('pywikibot.ItemPage', since='20130307', future_warning=True)
-    def get_item(self, source, **params):
+    def get_item(self, source, **params):  # pragma: no cover
         """Get the data for multiple Wikibase items."""
         return self._get_item(source, **params)
 

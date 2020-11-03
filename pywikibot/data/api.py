@@ -1335,7 +1335,7 @@ class Request(MutableMapping):
         return list(self._params.items())
 
     @deprecated(since='20141006', future_warning=True)
-    def http_params(self):
+    def http_params(self):  # pragma: no cover
         """Return the parameters formatted for inclusion in an HTTP request.
 
         DEPRECATED. See _encoded_items for explanation of encoding used.

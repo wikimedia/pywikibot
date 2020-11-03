@@ -80,7 +80,7 @@ class WikiStats:
         self._data = {}
 
     @deprecated('get', since='20201017', future_warning=True)
-    def fetch(self, table: str, format='xml') -> bytes:
+    def fetch(self, table: str, format='xml') -> bytes:  # pragma: no cover
         """
         DEPRECATED. Fetch data from WikiStats.
 
@@ -104,7 +104,8 @@ class WikiStats:
         return r.raw
 
     @deprecated('get', since='20201017', future_warning=True)
-    def raw_cached(self, table: str, format='csv') -> bytes:
+    def raw_cached(self, table: str,
+                   format='csv') -> bytes:  # pragma: no cover
         """
         DEPRECATED. Cache raw data.
 
@@ -120,7 +121,7 @@ class WikiStats:
         return data
 
     @deprecated('get', since='20201017', future_warning=True)
-    def csv(self, table: str) -> list:
+    def csv(self, table: str) -> list:  # pragma: no cover
         """
         DEPRECATED. Get a list of a table of data.
 
