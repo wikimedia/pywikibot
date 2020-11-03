@@ -1,7 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Rewrite Revision class (T102735, T259428)
+* Rewrite Revision class; each data can be accessed either by key or as an attribute (T102735, T259428)
 * L10N-Updates
 
 
