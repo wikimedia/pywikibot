@@ -1,7 +1,8 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* Rewrite Revision class (T102735, T259428)
+* L10N-Updates
 
 
 Future release notes
