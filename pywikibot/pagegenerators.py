@@ -1622,19 +1622,17 @@ def RedirectFilterPageGenerator(generator, no_redirects: bool = True,
         redirects.
     @param show_filtered: Output a message for each page not yielded
     """
-    for page in generator or []:
-        if no_redirects:
-            if not page.isRedirectPage():
-                yield page
-            elif show_filtered:
-                pywikibot.output('%s is a redirect page. Skipping.' % page)
+    fmt = '{page} is {what} redirect page. Skipping.'
+    what = 'a' if no_redirects else 'not a'
 
-        else:
-            if page.isRedirectPage():
-                yield page
-            elif show_filtered:
-                pywikibot.output('%s is not a redirect page. Skipping.'
-                                 % page)
+    for page in generator or []:
+        is_redirect = page.isRedirectPage()
+        if bool(no_redirects) != bool(is_redirect):  # xor
+            yield page
+            continue
+
+        if show_filtered:
+            pywikibot.output(fmt.format(what=what, page=page))
 
 
 class ItemClaimFilter:

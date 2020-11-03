@@ -316,6 +316,27 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         self.assertIsEmpty(list(gen))
 
 
+class RedirectFilterPageGeneratorTestCase(TestCase):
+
+    """Test RedirectFilterPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_redirect_filter(self):
+        """Test RedirectFilterPageGenerator."""
+        from pywikibot.pagegenerators import RedirectFilterPageGenerator
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-randomredirect:3')
+        gf.handleArg('-page:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = RedirectFilterPageGenerator(pages, no_redirects=True)
+        self.assertLength(list(gen), 1)
+        gen = RedirectFilterPageGenerator(pages, no_redirects=False)
+        self.assertLength(list(gen), 3)
+
+
 class SubpageFilterGeneratorTestCase(TestCase):
 
     """Test SubpageFilterGenerator."""
