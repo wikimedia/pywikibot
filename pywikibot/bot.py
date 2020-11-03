@@ -861,7 +861,7 @@ def handle_args(args=None, do_help=True):
 
 
 @deprecated('handle_args', since='20150409', future_warning=True)
-def handleArgs(*args):
+def handleArgs(*args):  # pragma: no cover
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)
 
@@ -896,7 +896,7 @@ def show_help(module_name=None, show_global=False):
 
 
 @deprecated('show_help', since='20200705')
-def showHelp(module_name=None):
+def showHelp(module_name=None):  # pragma: no cover
     """DEPRECATED. Use show_help()."""
     return show_help(module_name)
 
@@ -1092,7 +1092,7 @@ class OptionHandler:
         return cls.available_options
 
     @deprecated('set_options', since='20201006')
-    def setOptions(self, **kwargs):
+    def setOptions(self, **kwargs):  # pragma: no cover
         """DEPRECATED. Set the instance options."""
         self.set_options(**kwargs)
 
@@ -1122,7 +1122,7 @@ class OptionHandler:
                               .format(opt))
 
     @deprecated(_DEPRECATION_MSG, since='20201006')
-    def getOption(self, option):
+    def getOption(self, option):  # pragma: no cover
         """DEPRECATED. Get the current value of an option.
 
         @param option: key defined in OptionHandler.available_options
@@ -1133,13 +1133,13 @@ class OptionHandler:
 
     @property
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self):
+    def options(self):  # pragma: no cover
         """DEPRECATED. Return changed options."""
         return self.opt._options
 
     @options.setter
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self, options):
+    def options(self, options):  # pragma: no cover
         """DEPRECATED. Return changed options."""
         self.set_options(**options)
 
@@ -1347,7 +1347,7 @@ class BaseBot(OptionHandler):
         return False
 
     @deprecated('generator.close()', since='20200804')
-    def stop(self):
+    def stop(self):  # pragma: no cover
         """Stop iterating."""
         pywikibot.output('Generator has been stopped.')
         self.generator.close()

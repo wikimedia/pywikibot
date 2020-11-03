@@ -294,7 +294,7 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
 
 
 @deprecated(since='20201015', future_warning=True)
-def _http_process(session, http_request) -> None:
+def _http_process(session, http_request) -> None:  # pragma: no cover
     """DEPRECATED.
 
     Process an `threadedhttp.HttpRequest` instance.
@@ -366,7 +366,7 @@ def error_handling_callback(request):
 
 @deprecated(since='20201015', future_warning=True)
 def _enqueue(uri, method='GET', params=None, body=None, headers=None,
-             data=None, **kwargs):
+             data=None, **kwargs):  # pragma: no cover
     """DEPRECATED.
 
     Enqueue non-blocking threaded HTTP request with callback.
