@@ -58,7 +58,6 @@ from pywikibot.site import BaseSite, DataSite, APISite, ClosedSite
 from pywikibot.tools import (
     classproperty,
     deprecate_arg as _deprecate_arg,
-    issue_deprecation_warning,
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
@@ -1087,8 +1086,8 @@ def _code_fam_from_url(url: str):
 
 
 @_deprecate_arg('sysop', None)
-def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
-         sysop=None, interface=None,
+def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
+         interface=None,
          url: Optional[str] = None) -> Union[APISite, DataSite, ClosedSite]:
     """A factory method to obtain a Site object.
 
@@ -1112,10 +1111,6 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
     """
     _logger = 'wiki'
 
-    if sysop is not None:
-        issue_deprecation_warning('positional argument of "sysop"', depth=3,
-                                  warning_class=DeprecationWarning,
-                                  since='20190907')
     if url:
         # Either code and fam or only url
         if code or fam:
