@@ -3,7 +3,7 @@
 Bot for getting multiple images from an external site.
 
 It takes a URL as an argument and finds all images (and other files specified
-by the extensions in 'fileformats') that URL is referring to, asking whether to
+by the extensions in 'file_formats' that URL is referring to, asking whether to
 upload them. If further arguments are given, they are considered to be the text
 that is common to the descriptions. BeautifulSoup is needed only in this case.
 
@@ -37,20 +37,18 @@ try:
 except ImportError as e:
     BeautifulSoup = e
 
-fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
+file_formats = ('.jpg', '.jpeg', '.png', '.gif', '.svg', '.ogg')
 
 
-def get_imagelinks(url):
+def get_imagelinks(url, shown):
     """Given a URL, get all images linked to by the page at that URL."""
-    # Check if BeautifulSoup is imported.
-    if isinstance(BeautifulSoup, ImportError):
-        raise BeautifulSoup
+    links = []
 
     response = fetch(url)
     if response.status_code != 200:
         pywikibot.output('Skipping url: {}'
                          .format(url))
-        return []
+        return links
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -61,31 +59,35 @@ def get_imagelinks(url):
     else:
         tagname = ['a', 'img']
 
-    links = []
     for tag in soup.findAll(tagname):
         link = tag.get('src', tag.get('href', None))
-        if link:
-            ext = os.path.splitext(link)[1].lower().strip('.')
-            if ext in fileformats:
-                links.append(urljoin(url, link))
+        if not link:
+            continue
+        _, ext = os.path.splitext(link)
+        if ext.lower() in file_formats:
+            links.append(urljoin(url, link))
     return links
 
 
-def run_bot(give_url, image_url, desc):
+def get_categories(site):
+    """Get list of categories, if any."""
+    categories = []
+    while True:
+        cat = pywikibot.input('Specify a category (or press enter to '
+                              'end adding categories)')
+        if not cat.strip():
+            break
+        fmt = '[[{cat}]]' if ':' in cat else '[[{ns}:{cat}]]'
+        categories.append(fmt.format(ns=site.namespace(14), cat=cat))
+
+    return categories
+
+
+def run_bot(give_url, image_url, desc, shown):
     """Run the bot."""
-    url = give_url
-    if not url:
-        if image_url:
-            url = pywikibot.input('What URL range should I check '
-                                  '(use $ for the part that is changeable)')
-        else:
-            url = pywikibot.input('From what URL should I get the images?')
-
-    basicdesc = desc or pywikibot.input(
-        'What text should be added at the end of '
-        'the description of each image from this url?')
-
-    if image_url:
+    if not give_url and image_url:
+        url = pywikibot.input('What URL range should I check '
+                              '(use $ for the part that is changeable)')
         minimum = int(pywikibot.input(
             'What is the first number to check (default: 1)') or 1)
         maximum = int(pywikibot.input(
@@ -93,8 +95,15 @@ def run_bot(give_url, image_url, desc):
         ilinks = (url.replace('$', str(i))
                   for i in range(minimum, maximum + 1))
     else:
-        ilinks = get_imagelinks(url)
+        url = (give_url
+               or pywikibot.input('From what URL should I get the images?'))
+        ilinks = get_imagelinks(url, shown)
 
+    basicdesc = desc or pywikibot.input(
+        'What text should be added at the end of '
+        'the description of each image from this url?')
+
+    mysite = pywikibot.Site()
     for image in ilinks:
         try:
             include = pywikibot.input_yn('Include image {}?'.format(image),
@@ -104,32 +113,21 @@ def run_bot(give_url, image_url, desc):
         if not include:
             continue
 
+        categories = get_categories(mysite)
         desc = pywikibot.input('Give the description of this image:')
-        categories = []
-        mysite = pywikibot.Site()
-        while True:
-            cat = pywikibot.input('Specify a category (or press enter to '
-                                  'end adding categories)')
-            if not cat.strip():
-                break
-            if ':' in cat:
-                categories.append('[[{}]]'.format(cat))
-            else:
-                categories.append('[[{}:{}]]'
-                                  .format(mysite.namespace(14), cat))
+
         desc += '\n\n' + basicdesc + '\n\n' + '\n'.join(categories)
         UploadRobot(image, description=desc).run()
 
 
 def main(*args):
     """Process command line arguments and invoke bot."""
-    global shown
     url = ''
     image_url = False
     shown = False
     desc = []
 
-    for arg in pywikibot.handle_args():
+    for arg in pywikibot.handle_args(args):
         if arg == '-pattern':
             image_url = True
         elif arg == '-shown':
@@ -143,9 +141,9 @@ def main(*args):
     desc = ' '.join(desc)
 
     if isinstance(BeautifulSoup, ImportError):
-        pywikibot.bot.suggest_help(missing_dependencies=('beautifulsoup4',))
+        pywikibot.bot.suggest_help(missing_dependencies=['beautifulsoup4'])
     else:
-        run_bot(url, image_url, desc)
+        run_bot(url, image_url, desc, shown)
 
 
 if __name__ == '__main__':
