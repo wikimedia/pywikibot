@@ -67,8 +67,11 @@ class Revision(Mapping):
         map_['timestamp'] = Timestamp.fromISOformat(map_['timestamp'])
 
         map_.update(anon='anon' in map_)
-        map_.setdefault('comment', '')
         map_.update(minor='minor' in map_)
+        map_.update(userhidden='userhidden' in map_)
+
+        map_.setdefault('comment', '')
+        map_.setdefault('user', '')
 
         if 'slots' in map_:  # mw 1.32+
             mainslot = map_['slots'].get('main', {})
