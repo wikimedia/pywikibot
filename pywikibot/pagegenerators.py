@@ -1939,12 +1939,11 @@ def UserEditFilterGenerator(generator, username: str, timestamp=None,
         max_revision_depth
     @param show_filtered: Output a message for each page not yielded
     """
-    ts = None
-    if timestamp:
-        if isinstance(timestamp, str):
-            ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
-        else:
-            ts = timestamp
+    if isinstance(timestamp, str):
+        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    else:
+        ts = timestamp
+
     for page in generator:
         contribs = page.contributors(total=max_revision_depth, endtime=ts)
         if bool(contribs[username]) is not bool(skip):  # xor operation
