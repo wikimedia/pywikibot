@@ -29,7 +29,7 @@ from collections.abc import Mapping
 from collections import defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional
+from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -545,7 +545,10 @@ class _PluralMappingAlias(Mapping):
 DEFAULT_FALLBACK = ('_default', )
 
 
-def translate(code, xdict, parameters=None, fallback=False):
+def translate(code,
+              xdict: Union[dict, str],
+              parameters: Union[dict, str, int, None] = None,
+              fallback=False) -> str:
     """Return the most appropriate localization from a localization dict.
 
     Given a site code and a dictionary, returns the dictionary's value for
@@ -569,14 +572,11 @@ def translate(code, xdict, parameters=None, fallback=False):
         dictionary with family names as keys containing code dictionaries
         or a single string. May contain PLURAL tags as described in
         twtranslate
-    @type xdict: dict, string, unicode
     @param parameters: For passing (plural) parameters
-    @type parameters: dict, string, unicode, int
     @param fallback: Try an alternate language code. If it's iterable it'll
         also try those entries and choose the first match.
     @type fallback: boolean or iterable
     @return: the localized string
-    @rtype: str
     @raise IndexError: If the language supports and requires more plurals
         than defined for the given PLURAL pattern.
     @raise KeyError: No fallback key found if fallback is not False
@@ -589,7 +589,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     try:
         lookup = xdict[code]
-    except KeyError:
+    except (KeyError, TypeError):
         # Check whether xdict has multiple projects
         if isinstance(xdict, dict) and family in xdict:
             lookup = xdict[family]
