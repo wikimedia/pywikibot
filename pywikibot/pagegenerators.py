@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -327,6 +327,9 @@ FILTER OPTIONS
                     Case insensitive regular expressions will be used and
                     dot matches any character, including a newline.
 
+-grepnot            Like -grep, but return the page only if the regular
+                    expression does not match.
+
 -intersect          Work on the intersection of all the provided generators.
 
 -limit              When used with any other argument -limit:n specifies a set
@@ -446,6 +449,7 @@ class GeneratorFactory:
         self.limit = None
         self.qualityfilter_list = []
         self.articlefilter_list = []
+        self.articlenotfilter_list = []
         self.titlefilter_list = []
         self.titlenotfilter_list = []
         self.claimfilter_list = []
@@ -532,6 +536,7 @@ class GeneratorFactory:
             if any((self.titlefilter_list,
                     self.titlenotfilter_list,
                     self.articlefilter_list,
+                    self.articlenotfilter_list,
                     self.claimfilter_list,
                     self.catfilter_list,
                     self.qualityfilter_list,
@@ -588,6 +593,10 @@ class GeneratorFactory:
         if self.articlefilter_list:
             dupfiltergen = RegexBodyFilterPageGenerator(
                 dupfiltergen, self.articlefilter_list)
+
+        if self.articlenotfilter_list:
+            dupfiltergen = RegexBodyFilterPageGenerator(
+                dupfiltergen, self.articlenotfilter_list, 'none')
 
         return dupfiltergen
 
@@ -1085,6 +1094,13 @@ class GeneratorFactory:
         if not value:
             value = pywikibot.input('Which pattern do you want to grep?')
         self.articlefilter_list.append(value)
+        return True
+
+    def _handle_grepnot(self, value):
+        """Handle `-grepnot` argument."""
+        if not value:
+            value = pywikibot.input('Which pattern do you want to skip?')
+        self.articlenotfilter_list.append(value)
         return True
 
     def _handle_ql(self, value):
