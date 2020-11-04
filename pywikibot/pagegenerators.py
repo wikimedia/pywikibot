@@ -27,6 +27,7 @@ import re
 import sys
 
 from collections.abc import Iterator
+from collections import namedtuple
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
@@ -1877,49 +1878,50 @@ def EdittimeFilterPageGenerator(generator,
     @type show_filtered: bool
 
     """
-    do_last_edit = last_edit_start or last_edit_end
-    do_first_edit = first_edit_start or first_edit_end
+    def output_if(predicate, msg):
+        if predicate:
+            pywikibot.output(msg)
 
-    last_edit_start = last_edit_start or datetime.datetime.min
-    last_edit_end = last_edit_end or datetime.datetime.max
-    first_edit_start = first_edit_start or datetime.datetime.min
-    first_edit_end = first_edit_end or datetime.datetime.max
+    def to_be_yielded(edit, page, show_filtered):
+        if not edit.do_edit:
+            return True
+
+        if isinstance(edit, Latest):
+            edit_time = page.latest_revision.timestamp
+        else:
+            edit_time = page.oldest_revision.timestamp
+
+        msg = '{prefix} edit on {page} was on {time}.\n' \
+              'Too {{when}}. Skipping.' \
+              .format(prefix=edit.__class__.__name__,  # prefix = Class name.
+                      page=page,
+                      time=edit_time.isoformat())
+
+        if edit_time < edit.edit_start:
+            output_if(show_filtered, msg.format(when='old'))
+            return False
+
+        if edit_time > edit.edit_end:
+            output_if(show_filtered, msg.format(when='recent'))
+            return False
+
+        return True
+
+    First = namedtuple('First', ['do_edit', 'edit_start', 'edit_end'])
+    Latest = namedtuple('Latest', First._fields)
+
+    latest_edit = Latest(do_edit=last_edit_start or last_edit_end,
+                         edit_start=last_edit_start or datetime.datetime.min,
+                         edit_end=last_edit_end or datetime.datetime.max)
+
+    first_edit = First(do_edit=first_edit_start or first_edit_end,
+                       edit_start=first_edit_start or datetime.datetime.min,
+                       edit_end=first_edit_end or datetime.datetime.max)
 
     for page in generator or []:
-        if do_last_edit:
-            last_edit = page.editTime()
-
-            if last_edit < last_edit_start:
-                if show_filtered:
-                    pywikibot.output(
-                        'Last edit on %s was on %s.\nToo old. Skipping.'
-                        % (page, last_edit.isoformat()))
-                continue
-
-            if last_edit > last_edit_end:
-                if show_filtered:
-                    pywikibot.output(
-                        'Last edit on %s was on %s.\nToo recent. Skipping.'
-                        % (page, last_edit.isoformat()))
-                continue
-
-        if do_first_edit:
-            first_edit = page.oldest_revision.timestamp
-
-            if first_edit < first_edit_start:
-                if show_filtered:
-                    pywikibot.output(
-                        'First edit on %s was on %s.\nToo old. Skipping.'
-                        % (page, first_edit.isoformat()))
-
-            if first_edit > first_edit_end:
-                if show_filtered:
-                    pywikibot.output(
-                        'First edit on %s was on %s.\nToo recent. Skipping.'
-                        % (page, first_edit.isoformat()))
-                continue
-
-        yield page
+        if (to_be_yielded(latest_edit, page, show_filtered)
+                and to_be_yielded(first_edit, page, show_filtered)):
+            yield page
 
 
 def UserEditFilterGenerator(generator, username: str, timestamp=None,
