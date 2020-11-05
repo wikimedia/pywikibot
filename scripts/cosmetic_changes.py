@@ -34,8 +34,12 @@ For further information see pywikibot/cosmetic_changes.py
 #
 import pywikibot
 
-from pywikibot import config, cosmetic_changes, i18n, pagegenerators
+from pywikibot import config, i18n, pagegenerators
 from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.cosmetic_changes import (
+    CANCEL_ALL, CANCEL_MATCH, CANCEL_METHOD, CANCEL_PAGE,
+    CosmeticChangesToolkit,
+)
 from pywikibot.tools import PYTHON_VERSION
 
 if PYTHON_VERSION >= (3, 9):
@@ -65,7 +69,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
         self.available_options.update({
             'async': False,
             'summary': 'Robot: Cosmetic changes',
-            'ignore': cosmetic_changes.CANCEL_ALL,
+            'ignore': CANCEL_ALL,
         })
         super().__init__(**kwargs)
 
@@ -73,8 +77,8 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit."""
-        cc_toolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
-            self.current_page, ignore=self.opt.ignore)
+        cc_toolkit = CosmeticChangesToolkit(self.current_page,
+                                            ignore=self.opt.ignore)
         changed_text = cc_toolkit.change(self.current_page.get())
         if changed_text is not False:
             self.put_current(new_text=changed_text,
@@ -106,11 +110,11 @@ def main(*args: Tuple[str, ...]) -> None:
         elif arg.startswith('-ignore:'):
             ignore_mode = arg[len('-ignore:'):].lower()
             if ignore_mode == 'method':
-                options['ignore'] = cosmetic_changes.CANCEL_METHOD
+                options['ignore'] = CANCEL_METHOD
             elif ignore_mode == 'page':
-                options['ignore'] = cosmetic_changes.CANCEL_PAGE
+                options['ignore'] = CANCEL_PAGE
             elif ignore_mode == 'match':
-                options['ignore'] = cosmetic_changes.CANCEL_MATCH
+                options['ignore'] = CANCEL_MATCH
             else:
                 raise ValueError(
                     'Unknown ignore mode "{0}"!'.format(ignore_mode))
