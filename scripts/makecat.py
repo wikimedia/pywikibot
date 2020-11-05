@@ -41,12 +41,10 @@ Other possibilities
 * [l]ist     - show current list of pages to include or to check
 
 """
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import codecs
 
 import pywikibot
@@ -70,7 +68,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
             'keepparent': False,
             'nodate': False,
         })
-        super(MakeCatBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.skipdates = self.opt.nodate
         self.checkforward = True
         self.checkbackward = not self.opt.forward

@@ -22,12 +22,10 @@ Example:
     python pwb.py lonelypages -enable:User:Bot/CheckBot -always
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 import sys
 
@@ -40,7 +38,7 @@ from pywikibot.bot import suggest_help, SingleSiteBot
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class OrphanTemplate(object):
+class OrphanTemplate:
 
     """The orphan template configuration."""
 
