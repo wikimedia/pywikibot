@@ -1162,13 +1162,16 @@ class GeneratorFactory:
             value = None
 
         handler = getattr(self, '_handle_' + arg[1:], None)
-        if handler:
-            handler_result = handler(value)
-            if isinstance(handler_result, bool):
-                return handler_result
-            if handler_result:
-                self.gens.append(handler_result)
-                return True
+        if not handler:
+            return False
+
+        handler_result = handler(value)
+        if isinstance(handler_result, bool):
+            return handler_result
+        if handler_result:
+            self.gens.append(handler_result)
+            return True
+
         return False
 
 
@@ -1480,14 +1483,16 @@ def TextfilePageGenerator(filename: Optional[str] = None, site=None):
             # inadvertently change pages on another wiki!
             yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
                                                 site))
-        if linkmatch is None:
-            f.seek(0)
-            for title in f:
-                title = title.strip()
-                if '|' in title:
-                    title = title[:title.index('|')]
-                if title:
-                    yield pywikibot.Page(site, title)
+        if linkmatch is not None:
+            return
+
+        f.seek(0)
+        for title in f:
+            title = title.strip()
+            if '|' in title:
+                title = title[:title.index('|')]
+            if title:
+                yield pywikibot.Page(site, title)
 
 
 def PagesFromTitlesGenerator(iterable, site=None):
