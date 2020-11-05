@@ -1097,6 +1097,7 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
     using the method parameters.
 
     @param code: language code (override config.mylang)
+        code may also be a sitename like 'wikipedia:test'
     @param fam: family name or object (override config.family)
     @type fam: str or pywikibot.family.Family
     @param user: bot user name to use on this site (override config.usernames)
@@ -1118,13 +1119,19 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
                 'URL to the wiki OR a pair of code and family name '
                 'should be provided')
         code, fam = _code_fam_from_url(url)
+    elif code and ':' in code:
+        if fam:
+            raise ValueError(
+                'sitename OR a pair of code and family name '
+                'should be provided')
+        fam, _, code = code.partition(':')
     else:
         # Fallback to config defaults
         code = code or config.mylang
         fam = fam or config.family
 
-        if not isinstance(fam, Family):
-            fam = Family.load(fam)
+    if not isinstance(fam, Family):
+        fam = Family.load(fam)
 
     interface = interface or fam.interface(code)
 
