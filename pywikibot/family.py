@@ -748,7 +748,7 @@ class Family:
         return list(cls.langs.keys())
 
     @deprecated('APISite.interwiki', since='20151014', future_warning=True)
-    def get_known_families(self, site):
+    def get_known_families(self, code):
         """DEPRECATED: Return dict of inter-family interwiki links."""
         return self.known_families
 
