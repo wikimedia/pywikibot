@@ -16,12 +16,10 @@ PRE-REQUISITE : Need to install python-pycountry library.
 * Install with pip: pip install pycountry
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 import pywikibot
@@ -39,15 +37,13 @@ class StatesRedirectBot(SingleSiteBot):
 
     """Bot class used for implementation of re-direction norms."""
 
-    def __init__(self, start, force):
+    def __init__(self, start: str, force: bool):
         """Initializer.
 
         @param start:xxx Specify the place in the alphabet to start searching.
-        @type start: str
         @param force: Don't ask whether to create pages, just create them.
-        @type force: bool
         """
-        super(StatesRedirectBot, self).__init__()
+        super().__init__()
         self.start = start
         self.force = force
 
@@ -71,7 +67,7 @@ class StatesRedirectBot(SingleSiteBot):
         if so, create a redirect from Something, ST..
         """
         for sn in self.abbrev:
-            if re.search(r', %s$' % sn, page.title()):
+            if re.fullmatch(r', %s' % sn, page.title()):
                 pl = pywikibot.Page(self.site, page.title().replace(sn,
                                     self.abbrev[sn]))
                 # A bit hacking here - the real work is done in the

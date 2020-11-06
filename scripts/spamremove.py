@@ -29,12 +29,10 @@ In addition, these arguments can be used to restrict changes to some pages:
 &params;
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import pagegenerators
@@ -54,22 +52,20 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     @param generator: page generator with preloaded pages.
     @type generator: generator
     @param spam_external_url: an external url
-    @type spam_external_url: str
     @keyword summary: summary message when given. Otherwise the default
         summary will be used
-    @type summary: str
     @keyword always: Don't ask for text replacements
     @type always: bool
     """
 
     summary_key = 'spamremove-remove'
 
-    def __init__(self, generator, spam_external_url, **kwargs):
+    def __init__(self, generator, spam_external_url: str, **kwargs):
         """Initializer."""
         self.available_options.update({
             'summary': None,
         })
-        super(SpamRemoveBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
         self.spam_external_url = spam_external_url
         self.changed_pages = 0
