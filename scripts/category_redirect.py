@@ -89,7 +89,6 @@ class CategoryRedirectBot(SingleSiteBot):
             'no': 'Kategori:Wikipedia omdirigertekategorier',
             'pl': 'Kategoria:Przekierowania kategorii',
             'pt': 'Categoria:!Redirecionamentos de categorias',
-            'ru': 'Категория:Википедия:Категории-дубликаты',
             'sco': 'Category:Wikipaedia soft redirectit categories',
             'simple': 'Category:Category redirects',
             'sh': 'Kategorija:Preusmjerene kategorije Wikipedije',
