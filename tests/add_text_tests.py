@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Test add_text bot module."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from scripts.add_text import add_text, get_text
@@ -25,12 +23,12 @@ class TestAdding(TestCase):
 
     def setUp(self):
         """Setup test."""
-        super(TestAdding, self).setUp()
+        super().setUp()
         self.page = pywikibot.Page(self.site, 'foo')
 
     def test_basic(self):
         """Test adding text."""
-        (text, newtext, always) = add_text(
+        (_, newtext, _) = add_text(
             self.page, 'bar', putText=False,
             oldTextGiven='foo\n{{linkfa}}')
         self.assertEqual(
@@ -39,7 +37,7 @@ class TestAdding(TestCase):
 
     def test_with_category(self):
         """Test adding text before categories."""
-        (text, newtext, always) = add_text(
+        (_, newtext, _) = add_text(
             self.page, 'bar', putText=False,
             oldTextGiven='foo\n[[Category:Foo]]')
         self.assertEqual(

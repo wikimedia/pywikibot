@@ -23,11 +23,10 @@ descriptions:
     python pwb.py unlink "Foo bar" -namespace:0 -namespace:6
 """
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 from pywikibot.bot import SingleSiteBot
@@ -42,7 +41,7 @@ class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
 
     def __init__(self, pageToUnlink, **kwargs):
         """Initialize a UnlinkBot instance with the given page to unlink."""
-        super(UnlinkBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.pageToUnlink = pageToUnlink
         self.generator = pageToUnlink.getReferences(
             namespaces=self.opt.namespaces, content=True)
