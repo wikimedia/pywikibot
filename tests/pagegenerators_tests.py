@@ -236,7 +236,7 @@ class TestCategoryFilterPageGenerator(BasetitleTestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.CategoryFilterPageGenerator(
-            gen, self.catfilter_list, site)
+            gen, self.catfilter_list)
         self.assertLength(tuple(gen), 10)
 
 

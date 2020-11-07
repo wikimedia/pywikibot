@@ -571,7 +571,7 @@ class GeneratorFactory:
 
         if self.catfilter_list:
             dupfiltergen = CategoryFilterPageGenerator(
-                dupfiltergen, self.catfilter_list, self.site)
+                dupfiltergen, self.catfilter_list)
 
         if (preload or self.articlefilter_list) and not self.nopreload:
             if isinstance(dupfiltergen, DequeGenerator):
@@ -1833,7 +1833,8 @@ def QualityFilterPageGenerator(generator, quality: List[int]):
             yield page
 
 
-def CategoryFilterPageGenerator(generator, category_list, site=None):
+@deprecated_args(site=None, since='20201107')
+def CategoryFilterPageGenerator(generator, category_list):
     """
     Wrap a generator to filter pages by categories specified.
 
@@ -1842,10 +1843,8 @@ def CategoryFilterPageGenerator(generator, category_list, site=None):
     @type category_list: list of category objects
 
     """
-    if site is None:
-        site = pywikibot.Site()
     for page in generator:
-        if all(x in site.pagecategories(page) for x in category_list):
+        if all(x in page.categories() for x in category_list):
             yield page
 
 
