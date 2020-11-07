@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Collection of fixes for tests."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 # flake8 cannot detect that fixes is defined via pywikibot.fixes
 if 'fixes' not in globals():
     fixes = {}
