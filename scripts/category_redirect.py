@@ -247,36 +247,36 @@ class CategoryRedirectBot(SingleSiteBot):
                 # race condition: someone else removed the redirect while we
                 # were checking for it
                 continue
-            if target.is_categorypage():
-                # this is a hard-redirect to a category page
-                newtext = ('{{%(template)s|%(cat)s}}'
-                           % {'cat': target.title(with_ns=False),
-                              'template': self.template_list[0]})
-                try:
-                    page.text = newtext
-                    page.save(comment)
-                    message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-added', {
-                            'ns': self.site.namespaces.TEMPLATE,
-                            'template': self.template_list[0],
-                            'oldcat': page.title(as_link=True, textlink=True)
-                        })
-                    self.log_text.append(message)
-                except pywikibot.Error:
-                    message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-add-failed', {
-                            'ns': self.site.namespaces.TEMPLATE,
-                            'template': self.template_list[0],
-                            'oldcat': page.title(as_link=True, textlink=True)
-                        })
-                    self.log_text.append(message)
-            else:
+
+            if not target.is_categorypage():
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-problem-hard', {
                         'oldcat': page.title(as_link=True, textlink=True),
                         'page': target.title(as_link=True, textlink=True)
                     })
                 self.problems.append(message)
+                continue
+
+            # this is a hard-redirect to a category page
+            newtext = ('{{%(template)s|%(cat)s}}'
+                       % {'cat': target.title(with_ns=False),
+                          'template': self.template_list[0]})
+            params = {
+                'ns': self.site.namespaces.TEMPLATE,
+                'template': self.template_list[0],
+                'oldcat': page.title(as_link=True, textlink=True)
+            }
+            try:
+                page.text = newtext
+                page.save(comment)
+                message = i18n.twtranslate(
+                    self.site, 'category_redirect-log-added', params)
+                self.log_text.append(message)
+            except pywikibot.Error:
+                pywikibot.exception()
+                message = i18n.twtranslate(
+                    self.site, 'category_redirect-log-add-failed', params)
+                self.log_text.append(message)
 
     def run(self):
         """Run the bot."""

@@ -724,7 +724,7 @@ class TestPageBotMayEdit(TestCase):
     """Test Page.botMayEdit() method."""
 
     family = 'wikipedia'
-    code = 'en'
+    code = 'test'
 
     cached = True
     user = True
@@ -869,12 +869,22 @@ class TestPageBotMayEdit(TestCase):
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_inuse(self):
-        """Test with {{inuse}} that bot is allowed to edit."""
+        """Test with {{in use}} that bot is allowed to edit."""
         self.page._templates = [pywikibot.Page(self.site, 'Template:In use')]
 
         # Ban all users including bots.
         self.page.text = '{{in use}}'
         self.assertFalse(self.page.botMayEdit())
+
+    def test_bot_may_edit_page(self):
+        """Test botMayEdit when changing content."""
+        self.assertTrue(self.page.botMayEdit())
+        self.page.text = '{{nobots}}'
+        self.assertTrue(self.page.botMayEdit())
+        page = pywikibot.Page(self.site, 'Pywikibot nobots test')
+        self.assertFalse(page.botMayEdit())
+        page.text = ''
+        self.assertFalse(page.botMayEdit())
 
 
 class TestPageHistory(DefaultSiteTestCase):
