@@ -5,12 +5,10 @@ Tests for LoginManager classes.
 e.g. used to test password-file based login.
 """
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from collections import defaultdict
 from io import StringIO
 
@@ -94,7 +92,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
 
     def setUp(self):
         """Patch a variety of dependencies."""
-        super(TestPasswordFile, self).setUp()
+        super().setUp()
         self.config = self.patch('pywikibot.login.config')
         self.config.usernames = FakeConfig.usernames
         self.config.password_file = '~FakeFile'

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for imagecopy script."""
 #
-# (C) Pywikibot team, 2018
+# (C) Pywikibot team, 2018-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 
 from scripts.imagecopy import pageTextPost

@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot.tools import deprecated
 from pywikibot.site._decorators import must_be, need_right, need_version
 from pywikibot.exceptions import UserRightsError
@@ -31,7 +29,7 @@ class TestMustBe(DebugOnlyTestCase):
         self._logged_in_as = None
         self._userinfo = []
         self.obsolete = False
-        super(TestMustBe, self).setUp()
+        super().setUp()
         self.version = lambda: '1.19'  # lowest supported release
 
     def login(self, group):
@@ -143,7 +141,7 @@ class TestNeedRight(DebugOnlyTestCase):
         self._logged_in_as = None
         self._userinfo = []
         self.obsolete = False
-        super(TestNeedRight, self).setUp()
+        super().setUp()
         self.version = lambda: '1.14'  # lowest supported release
 
     def login(self, group, right):
@@ -200,7 +198,7 @@ class TestNeedVersion(DeprecationTestCase):
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
         """Set up test method."""
-        super(TestNeedVersion, self).setUp()
+        super().setUp()
         self.version = lambda: '1.23'
 
     @need_version('1.24')

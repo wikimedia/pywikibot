@@ -11,8 +11,6 @@ https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import io
 import sys
 
