@@ -116,6 +116,11 @@ GENERATOR OPTIONS
 
                         logevent,username,total
 
+                    Note: 'start' is the most recent date and log events are
+                    iterated from present to past. If 'start'' is not provided,
+                    it means 'now'; if 'end' is not provided, it means 'since
+                    the beginning'.
+
                     To use the default value, use an empty string.
                     You have options for every type of logs given by the
                     log event parameter which could be one of the following:
@@ -649,34 +654,50 @@ class GeneratorFactory:
             compatibility, this can also be the total amount of pages
             that should be returned. It is taken as 'total' if the value does
             not have 8 digits.
-        @type start: str convertible to Timestamp in the format YYYYMMDD. If
-            the length is not 8: for backward compatibility to use this as
-            'total', it can also be a str (castable to int) or int (positive).
+        @type start: str convertible to Timestamp matching '%Y%m%d%H%M%S'.
+            If the length is not 8: for backward compatibility to use this as
+            'total', it can also be a str (castable to int).
         @param end: Timestamp to end listing at
-        @type end: str convertible to Timestamp in the format YYYYMMDD
-        @return: The generator or None if invalid 'total' value.
+        @type end: str convertible to Timestamp matching '%Y%m%d%H%M%S'
+        @return: The generator or None if invalid 'start/total' or 'end' value.
         @rtype: LogeventsPageGenerator
         """
-        total = None
-        start = start or None  # because start might be an empty string
-        if isinstance(start, str) and len(start) == 8:
-            start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
-        elif start is not None:
-            try:
-                total = int(start)
-                if total <= 0:
-                    raise ValueError
-            except ValueError:
-                pywikibot.error('Total number of log ({0}) events must be a '
-                                'positive int.'.format(total))
-                return None
-            start = None
-
-        if end is not None:
+        def parse_start(start):
+            """Parse start and return (start, total)."""
             if start is None:
-                pywikibot.error('End cannot be given if start is not given.')
-                return None
-            end = pywikibot.Timestamp.strptime(end, '%Y%m%d')
+                return None, None
+
+            if len(start) >= 8:
+                return pywikibot.Timestamp.fromtimestampformat(start), None
+
+            return None, int(start)
+
+        start = start or None  # because start might be an empty string
+        try:
+            start, total = parse_start(start)
+            assert total is None or total > 0
+        except ValueError as err:
+            pywikibot.error(
+                '{}. Start parameter has wrong format!'.format(err))
+            return None
+        except AssertionError:
+            pywikibot.error('Total number of log ({0}) events must be a '
+                            'positive int.'.format(start))
+            return None
+
+        try:
+            end = pywikibot.Timestamp.fromtimestampformat(end)
+        except ValueError as err:
+            pywikibot.error(
+                '{}. End parameter has wrong format!'.format(err))
+            return None
+        except TypeError:  # end is None
+            pass
+
+        if start or end:
+            pywikibot.output('Fetching log events in range: {} - {}.'
+                             .format(end or 'beginning of time',
+                                     start or 'now'))
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
