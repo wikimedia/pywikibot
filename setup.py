@@ -64,7 +64,8 @@ extra_deps = {
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': [  # vulnerability found in Pillow<6.2.2
         'Pillow>=6.2.2,<8.0.0;python_version<"3.6"',
-        'Pillow>=6.2.2;python_version>="3.6"',
+        'Pillow>=6.2.2;python_version>="3.6" and python_version<"3.9"',
+        'Pillow>=8.0.0;python_version>="3.9"',
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
