@@ -278,6 +278,10 @@ class UI:
         while True:
             self.output(question + ' ')
             text = self._input_reraise_cntl_c(password)
+
+            if text is None:
+                continue
+
             if text:
                 return text
 
@@ -296,6 +300,8 @@ class UI:
                 text = self._raw_input()
         except KeyboardInterrupt:
             raise QuitKeyboardInterrupt()
+        except UnicodeDecodeError:
+            return None  # wrong terminal encoding, T258143
         return text
 
     def input_choice(self, question: str, options, default: str = None,
