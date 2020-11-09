@@ -2605,18 +2605,12 @@ def MySQLPageGenerator(query, site=None, verbose=None):
                                 dbname=site.dbName(),
                                 encoding=site.encoding(),
                                 verbose=verbose)
+
     for row in row_gen:
-        namespaceNumber, pageName = row
-        if pageName:
-            # Namespace Dict only supports int
-            namespace = site.namespace(int(namespaceNumber))
-            pageName = pageName.decode(site.encoding())
-            if namespace:
-                pageTitle = '%s:%s' % (namespace, pageName)
-            else:
-                pageTitle = pageName
-            page = pywikibot.Page(site, pageTitle)
-            yield page
+        namespace_number, page_name = row
+        page_name = page_name.decode(site.encoding())
+        page = pywikibot.Page(site, page_name, ns=int(namespace_number))
+        yield page
 
 
 class XMLDumpOldPageGenerator(Iterator):
