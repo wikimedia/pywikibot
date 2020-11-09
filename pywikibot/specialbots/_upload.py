@@ -112,9 +112,9 @@ class UploadRobot(BaseBot):
         self.filename_prefix = filename_prefix
 
         if config.upload_to_commons:
-            default_site = pywikibot.Site('commons', 'commons')
+            default_site = pywikibot.Site('commons:commons')
         else:
-            default_site = self.site
+            default_site = pywikibot.Site()
         self.target_site = target_site or default_site
 
     def read_file_content(self, file_url: str):
