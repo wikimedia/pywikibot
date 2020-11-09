@@ -419,6 +419,11 @@ _filter_unique_pages = partial(
     filter_unique, key=lambda page: '{}:{}:{}'.format(*page._cmpkey()))
 
 
+def _output_if(predicate, msg):
+    if predicate:
+        pywikibot.output(msg)
+
+
 class GeneratorFactory:
 
     """Process command line arguments and return appropriate page generator.
@@ -1878,10 +1883,6 @@ def EdittimeFilterPageGenerator(generator,
     @type show_filtered: bool
 
     """
-    def output_if(predicate, msg):
-        if predicate:
-            pywikibot.output(msg)
-
     def to_be_yielded(edit, page, show_filtered):
         if not edit.do_edit:
             return True
@@ -1898,11 +1899,11 @@ def EdittimeFilterPageGenerator(generator,
                       time=edit_time.isoformat())
 
         if edit_time < edit.edit_start:
-            output_if(show_filtered, msg.format(when='old'))
+            _output_if(show_filtered, msg.format(when='old'))
             return False
 
         if edit_time > edit.edit_end:
-            output_if(show_filtered, msg.format(when='recent'))
+            _output_if(show_filtered, msg.format(when='recent'))
             return False
 
         return True
@@ -2162,24 +2163,19 @@ def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
     @return: Wrapped generator
     @rtype: generator
     """
+    why = "doesn't" if has_item else 'has'
+    msg = '{{page}} {why} a wikidata item. Skipping.'.format(why=why)
+
     for page in generator or []:
         try:
             page_item = pywikibot.ItemPage.fromPage(page, lazy_load=False)
         except pywikibot.NoPage:
             page_item = None
 
-        if page_item:
-            if not has_item:
-                if show_filtered:
-                    pywikibot.output(
-                        '%s has a wikidata item. Skipping.' % page)
-                continue
-        else:
-            if has_item:
-                if show_filtered:
-                    pywikibot.output(
-                        "%s doesn't have a wikidata item. Skipping." % page)
-                continue
+        to_be_skipped = bool(page_item) != has_item
+        if to_be_skipped:
+            _output_if(show_filtered, msg.format(page=page))
+            continue
 
         yield page
 
