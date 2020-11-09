@@ -197,9 +197,13 @@ class ImageTransferBot(SingleSiteBot):
                               keep_filename=self.keep_name,
                               verify_description=not self.keep_name,
                               ignore_warning=self.ignore_warning)
+
             # try to upload
-            targetFilename = bot.run()
-            if targetFilename and self.targetSite.family.name == 'commons' \
+            if bot.self.skip_run():
+                return
+            target_filename = bot.upload_file(url)
+
+            if target_filename and self.targetSite.family.name == 'commons' \
                and self.targetSite.code == 'commons':
                 # upload to Commons was successful
                 reason = i18n.twtranslate(sourceSite,
@@ -217,7 +221,7 @@ class ImageTransferBot(SingleSiteBot):
                                      + sourceImagePage.title())
                     sourceImagePage.put(sourceImagePage.get() + '\n\n'
                                         + nowCommonsTemplate[sourceSite.lang]
-                                        % targetFilename,
+                                        % target_filename,
                                         summary=reason)
 
     def show_image_list(self, imagelist):
