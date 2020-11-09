@@ -1,6 +1,13 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Fix get_known_families() for wikipedia_family (T267196)
+* Move _InterwikiMap class to site/_interwikimap.py
+* instantiate a CosmeticChangesToolkit by passing a page
+* Create a Site from sitename
+* pywikibot.Site() parameters "interface" and "url" must be keyworded
+* Lookup the code parameter in xdict first (T255917)
+* Remove interwiki_forwarded_from list from family files (T104125)
 * Rewrite Revision class; each data can be accessed either by key or as an attribute (T102735, T259428)
 * L10N-Updates
 
