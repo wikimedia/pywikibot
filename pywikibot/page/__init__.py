@@ -321,8 +321,9 @@ class BasePage(ComparableMixin):
         @param as_filename: (not used with as_link) if true, replace any
             characters that are unsafe in filenames
         @param insite: (only used if as_link is true) a site object where the
-            title is to be shown. default is the current family/lang given by
-            -family and -lang option i.e. config.family and config.mylang
+            title is to be shown. Default is the current family/lang given by
+            -family and -lang or -site option i.e. config.family and
+            config.mylang
         @param without_brackets: (cannot be used with as_link) if true, remove
             the last pair of brackets(usually removes disambiguation brackets).
         """

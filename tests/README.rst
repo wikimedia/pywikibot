@@ -67,7 +67,7 @@ Specific tests
 --------------
 
 Individual test components can be run using unittest, nosetests, or pwb.
-With -lang and -family options pwb can be used to specify a site.
+With -lang and -family or -site options pwb can be used to specify a site.
 
 
 unittest

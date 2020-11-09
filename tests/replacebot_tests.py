@@ -92,9 +92,8 @@ class TestReplacementsMain(TWNBotTestCase):
     def _run(self, *args):
         """Run the L{replace.main} with the given args and summary and page."""
         # -page to not have an empty generator
-        # -lang and -family as it will use Site() otherwise
-        return replace.main(*(args + ('-lang:test', '-family:wikipedia',
-                                      '-page:TEST')))
+        # -site as it will use Site() otherwise
+        return replace.main(*(args + ('-site:wikipedia:test', '-page:TEST')))
 
     def test_invalid_replacements(self):
         """Test invalid command line replacement configurations."""
