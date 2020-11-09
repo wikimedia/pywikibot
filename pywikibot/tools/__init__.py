@@ -244,7 +244,7 @@ class DotReadableDict:
         return repr(self.__dict__)
 
 
-class FrozenDict(dict):
+class _FrozenDict(dict):
 
     """
     Frozen dict, preventing write after initialisation.
@@ -272,6 +272,38 @@ class FrozenDict(dict):
         raise TypeError(self._error)
 
     __setitem__ = update
+
+
+class frozenmap(Mapping):  # noqa:  N801
+
+    """Frozen mapping, preventing write after initialisation."""
+
+    def __init__(self, data=(), **kwargs):
+        """Initialize data in same ways like a dict."""
+        self.__data = {}
+        if isinstance(data, Mapping):
+            for key in data:
+                self.__data[key] = data[key]
+        elif hasattr(data, 'keys'):
+            for key in data.keys():
+                self.__data[key] = data[key]
+        else:
+            for key, value in data:
+                self.__data[key] = value
+        for key, value in kwargs.items():
+            self.__data[key] = value
+
+    def __getitem__(self, key):
+        return self.__data[key]
+
+    def __iter__(self):
+        return iter(self.__data)
+
+    def __len__(self):
+        return len(self.__data)
+
+    def __repr__(self):
+        return '{}({!r})'.format(self.__class__.__name__, self.__data)
 
 
 class LazyRegex:
@@ -1790,3 +1822,9 @@ def concat_options(message, line_length, options):
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
     return '{} ({}):'.format(message, option_msg)
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
+                             replacement_name='tools.frozenmap',
+                             since='20201109', future_warning=True)
