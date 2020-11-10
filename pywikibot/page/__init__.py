@@ -615,11 +615,19 @@ class BasePage(ComparableMixin):
         """
         if getattr(self, '_text', None) is not None:
             return self._text
+
+        if hasattr(self, '_revid'):
+            return self.latest_revision.text
+
         try:
-            return self.get(get_redirect=True)
+            self.get(get_redirect=True)
         except pywikibot.NoPage:
             # TODO: what other exceptions might be returned?
             return ''
+
+        # check botMayEdit on a very early state (T262136)
+        self._bot_may_edit = self.botMayEdit()
+        return self.latest_revision.text
 
     @text.setter
     def text(self, value: str):
@@ -1099,6 +1107,9 @@ class BasePage(ComparableMixin):
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
         """
+        if hasattr(self, '_bot_may_edit'):
+            return self._bot_may_edit
+
         if not hasattr(self, 'templatesWithParams'):
             return True
 
