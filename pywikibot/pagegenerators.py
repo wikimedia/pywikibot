@@ -1646,8 +1646,13 @@ class ItemClaimFilter:
 
     """Item claim filter."""
 
+    page_classes = {
+        True: pywikibot.PropertyPage,
+        False: pywikibot.ItemPage,
+    }
+
     @classmethod
-    def __filter_match(cls, page, prop, claim, qualifiers=None):
+    def __filter_match(cls, page, prop, claim, qualifiers):
         """
         Return true if the page contains the claim given.
 
@@ -1655,34 +1660,27 @@ class ItemClaimFilter:
         @return: true if page contains the claim, false otherwise
         @rtype: bool
         """
-        if not isinstance(page, pywikibot.page.WikibasePage):
-            if isinstance(page.site, pywikibot.site.DataSite):  # T175151
-                on_repo = page.namespace() in (
-                    page.site.item_namespace, page.site.property_namespace)
-            else:
-                on_repo = False
-            if on_repo:
-                if page.namespace() == page.site.property_namespace:
-                    page_cls = pywikibot.PropertyPage
-                else:
-                    page_cls = pywikibot.ItemPage
+        if not isinstance(page, pywikibot.page.WikibasePage):  # T175151
+            try:
+                assert page.site.property_namespace
+                assert page.site.item_namespace
+                key = page.namespace() == page.site.property_namespace
+                page_cls = cls.page_classes[key]
                 page = page_cls(page.site, page.title(with_ns=False))
-            else:
+            except (AttributeError, AssertionError):
                 try:
                     page = pywikibot.ItemPage.fromPage(page)
                 except pywikibot.NoPage:
                     return False
 
-        for page_claim in page.get()['claims'].get(prop, []):
-            if page_claim.target_equals(claim):
-                if not qualifiers:
-                    return True
+        def match_qualifiers(page_claim, qualifiers):
+            return all(page_claim.has_qualifier(prop, val)
+                       for prop, val in qualifiers.items())
 
-                for prop, val in qualifiers.items():
-                    if not page_claim.has_qualifier(prop, val):
-                        return False
-                return True
-        return False
+        page_claims = page.get()['claims'].get(prop, [])
+        return any(
+            p_cl.target_equals(claim) and match_qualifiers(p_cl, qualifiers)
+            for p_cl in page_claims)
 
     @classmethod
     def filter(cls, generator, prop: str, claim,
@@ -1699,6 +1697,7 @@ class ItemClaimFilter:
         @param negate: true if pages that do *not* contain specified claim
             should be yielded, false otherwise
         """
+        qualifiers = qualifiers or {}
         for page in generator:
             if cls.__filter_match(page, prop, claim, qualifiers) is not negate:
                 yield page

@@ -822,6 +822,15 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P463', 'Q37470', None, False, True)
         self._simple_claim_test('P463', 'Q37471', None, True, True)
 
+    def test_item_from_page(self):
+        """Test ItemPage can be obtained form Page."""
+        site = pywikibot.Site('en', 'wikipedia')
+        page = pywikibot.Page(site, 'India')
+        gen = pagegenerators.ItemClaimFilterPageGenerator(
+            [page], 'P463', self._get_council_page())
+        pages = set(gen)
+        self.assertEqual(pages.pop(), page)
+
 
 class TestFactoryGenerator(DefaultSiteTestCase):
 
