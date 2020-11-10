@@ -4871,27 +4871,30 @@ class APISite(BaseSite):
         one that is not by the same user who made the last edit.
 
         @param page: the Page to be rolled back (must exist)
-
+        @keyword user: the last user to be rollbacked;
+            default is page.latest_revision.user
         """
         if len(page._revisions) < 2:
             raise Error(
-                'Rollback of %s aborted; load revision history first.'
-                % page.title(as_link=True))
-        last_rev = page.latest_revision
-        last_user = last_rev.user
+                'Rollback of {} aborted; load revision history first.'
+                .format(page))
+
+        user = kwargs.pop('user', page.latest_revision.user)
         for rev in sorted(page._revisions.values(), reverse=True,
                           key=lambda r: r.timestamp):
             # start with most recent revision first
-            if rev.user != last_user:
+            if rev.user != user:
                 break
         else:
             raise Error(
-                'Rollback of %s aborted; only one user in revision history.'
-                % page.title(as_link=True))
-        parameters = merge_unique_dicts(kwargs, action='rollback',
+                'Rollback of {} aborted; only one user in revision history.'
+                .format(page))
+
+        parameters = merge_unique_dicts(kwargs,
+                                        action='rollback',
                                         title=page,
                                         token=self.tokens['rollback'],
-                                        user=last_user)
+                                        user=user)
         self.lock_page(page)
         req = self._simple_request(**parameters)
         try:

@@ -46,6 +46,8 @@ from typing import Union
 import pywikibot
 
 from pywikibot.bot import OptionHandler
+from pywikibot.data import api
+from pywikibot.exceptions import Error
 from pywikibot import i18n
 from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
@@ -123,25 +125,21 @@ class BaseRevertBot(OptionHandler):
             page.save(comment)
             return comment
 
-        params = {
-            'action': 'rollback',
-            'title': page,
-            'user': self.user,
-            'token': self.site.tokens['rollback'],
-            'markbot': True,
-        }
         try:
-            r = pywikibot.data.api.Request(self.site, parameters=params)
-            r.submit()
-        except pywikibot.data.api.APIError as e:
+            self.site.rollbackpage(page, user=self.user, markbot=True)
+        except api.APIError as e:
             if e.code == 'badtoken':
                 pywikibot.error(
                     'There was an API token error rollbacking the edit')
-            else:
-                pywikibot.exception()
-            return False
-        return 'The edit(s) made in {} by {} was rollbacked'.format(
-            page.title(), self.user)
+                return False
+        except Error:
+            pass
+        else:
+            return 'The edit(s) made in {} by {} was rollbacked'.format(
+                page.title(), self.user)
+
+        pywikibot.exception()
+        return False
 
     def log(self, msg) -> None:
         """Log the message msg."""
