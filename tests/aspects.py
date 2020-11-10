@@ -93,21 +93,6 @@ class TestCaseBase(unittest.TestCase):
                 msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
             self.fail(msg)
 
-    def assertMethod(self, method, *args):
-        """Generic method assertion."""
-        if not method(*args):
-            self.fail('{0!r} ({1!r}) fails'.format(method, args))
-
-    def assertStringMethod(self, method, *args):
-        """
-        Generic string method assertion.
-
-        All args must be already converted to a string.
-        """
-        for arg in args:
-            self.assertIsInstance(arg, str)
-        self.assertMethod(method, *args)
-
     def assertPageInNamespaces(self, page, namespaces):
         """
         Assert that Pages is in namespaces.

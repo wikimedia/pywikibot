@@ -227,8 +227,8 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = 'Site("{0}", "{1}")'.format(code, self.family)
-        self.assertStringMethod(str.endswith, repr(self.site), expect)
+        expect = 'Site("{}", "{}")'.format(code, self.family)
+        self.assertTrue(repr(self.site).endswith(expect))
 
     def test_base_methods(self):
         """Test cases for BaseSite methods."""
