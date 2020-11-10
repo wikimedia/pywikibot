@@ -20,3 +20,8 @@ pywikibot.site.\_siteinfo module
 --------------------------------
 
 .. automodule:: pywikibot.site._siteinfo
+
+pywikibot.site.\_tokenwallet module
+-----------------------------------
+
+.. automodule:: pywikibot.site._tokenwallet
