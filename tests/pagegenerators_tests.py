@@ -21,7 +21,8 @@ from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
     PreloadingGenerator,
-    CategorizedPageGenerator
+    CategorizedPageGenerator,
+    WikibaseItemFilterPageGenerator,
 )
 
 from pywikibot.tools import has_module, suppress_warnings
@@ -631,6 +632,36 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
         self.assertTrue(all(isinstance(item,
                                        pywikibot.ItemPage) for item in gen))
+
+
+class WikibaseItemFilterPageGeneratorTestCase(TestCase):
+
+    """Test WikibaseItemFilterPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_filter_pages_with_item(self):
+        """Test WikibaseItemFilterPageGenerator on pages with item."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
+        self.assertLength(list(gen), 1)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
+        self.assertLength(list(gen), 0)
+
+    def test_filter_pages_without_item(self):
+        """Test WikibaseItemFilterPageGenerator on pages without item."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Talk:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
+        self.assertLength(list(gen), 0)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
+        self.assertLength(list(gen), 1)
 
 
 class DryFactoryGeneratorTest(TestCase):
