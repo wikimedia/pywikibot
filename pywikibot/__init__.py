@@ -36,18 +36,16 @@ from pywikibot import config2 as config
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
-    Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
-    SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
-    UnknownExtension,
-    NoUsername, UserBlocked,
-    PageRelatedError, UnsupportedPage, IsRedirectPage, IsNotRedirectPage,
-    PageSaveRelatedError, PageNotSaved, OtherPageSaveError,
-    LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
-    EditConflict, PageDeletedConflict, PageCreatedConflict,
-    ServerError, FatalServerError, Server414Error, Server504Error,
-    CaptchaError, SpamblacklistError, TitleblacklistError,
-    CircularRedirect, InterwikiRedirectPage, WikiBaseError, NoWikibaseEntity,
-    CoordinateGlobeUnknownException,
+    BadTitle, CaptchaError, CascadeLockedPage, CircularRedirect,
+    CoordinateGlobeUnknownException, EditConflict, Error, FatalServerError,
+    InterwikiRedirectPage, InvalidTitle, IsNotRedirectPage, IsRedirectPage,
+    LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage, NoSuchSite,
+    NoUsername, NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
+    PageDeletedConflict, PageNotSaved, PageRelatedError, PageSaveRelatedError,
+    SectionError, Server414Error, Server504Error, ServerError,
+    SiteDefinitionError, SpamblacklistError, TitleblacklistError,
+    UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
+    WikiBaseError,
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
@@ -88,15 +86,14 @@ __all__ = (
     'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
     'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
     'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    'QuitKeyboardInterrupt', 'SectionError',
-    'ServerError', 'FatalServerError', 'Server414Error', 'Server504Error',
-    'showDiff', 'show_help', 'showHelp', 'Site', 'SiteDefinitionError',
-    'SiteLink', 'SpamblacklistError', 'stdout', 'Timestamp',
-    'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
+    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'showHelp',
+    'Site', 'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
+    'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
     'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'UserBlocked', 'warning',
-    'WbGeoShape', 'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime',
-    'WbUnknown', 'WikiBaseError', 'WikidataBot',
+    'UploadWarning', 'url2unicode', 'User', 'warning', 'WbGeoShape',
+    'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
+    'WikiBaseError', 'WikidataBot',
 )
 
 

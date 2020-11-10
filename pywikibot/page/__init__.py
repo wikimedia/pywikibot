@@ -1726,18 +1726,6 @@ class BasePage(ComparableMixin):
                        self.revisions(total=total,
                                       starttime=starttime, endtime=endtime))
 
-    @deprecated('contributors().keys()', since='20150206', future_warning=True)
-    def contributingUsers(self,
-                          total: Optional[int] = None):  # pragma: no cover
-        """
-        Return a set of usernames (or IPs) of users who edited this page.
-
-        @param total: iterate no more than this number of revisions in total
-
-        @rtype: dict_keys
-        """
-        return self.contributors(total=total).keys()
-
     def revision_count(self, contributors=None) -> int:
         """Determine number of edits from contributors.
 

@@ -793,7 +793,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         pywikibot.output('Moving text from {} to {}.'.format(
             self.oldcat.title(), self.newcat.title()))
         comma = self.site.mediawiki_message('comma-separator')
-        authors = comma.join(self.oldcat.contributingUsers())
+        authors = comma.join(self.oldcat.contributors().keys())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
         summary = i18n.twtranslate(self.site, 'category-renamed',
                                    template_vars)
