@@ -107,7 +107,7 @@ The contents of the package
     | image.py               | This script can be used to change one image to another  |
     |                        | or remove an image entirely.                            |
     +------------------------+---------------------------------------------------------+
-    | imagecopy.py           | Copies images from a wikimedia wiki to Commons          |
+    | imagecopy.py           | Copies images from a Wikimedia wiki to Commons          |
     +------------------------+---------------------------------------------------------+
     | imagecopy_self.py      | Copy self published files from the English Wikipedia to |
     |                        | Commons.                                                |

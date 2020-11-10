@@ -89,7 +89,7 @@ class EventStreams:
             Multiple streams may be given as a string with comma separated
             stream types or an iterable of strings
             Refer https://stream.wikimedia.org/?doc for available
-            wikimedia stream types.
+            Wikimedia stream types.
         @type streams: str or iterable
         @keyword timeout: a timeout value indication how long to wait to send
             data before giving up

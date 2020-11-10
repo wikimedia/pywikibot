@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-# The new wikivoyage family that is hosted at wikimedia
+# The new Wikivoyage family that is hosted at Wikimedia
 from pywikibot import family
 
 

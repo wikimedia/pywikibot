@@ -5,7 +5,7 @@ Correct all redirect links in featured pages or only one page of each wiki.
 
 Can be used with:
 
--featured         Run over featured pages (for some wikimedia wikis only)
+-featured         Run over featured pages (for some Wikimedia wikis only)
 
 &params;
 """

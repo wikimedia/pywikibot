@@ -8,7 +8,7 @@
 from pywikibot import family
 
 
-# The meta wikimedia family
+# The Wikimedia Meta-Wiki family
 class Family(family.WikimediaOrgFamily):
 
     """Family class for Meta Wiki."""
