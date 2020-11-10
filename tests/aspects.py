@@ -78,7 +78,7 @@ class TestCaseBase(unittest.TestCase):
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
-        """Verify that a sequence expr has the length of other."""
+        """Verify that a sequence seq has the length of other."""
         # the other parameter may be given as a sequence too
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
