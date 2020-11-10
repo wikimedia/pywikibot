@@ -16,6 +16,8 @@ Can be used with:
 #
 import re
 
+from contextlib import suppress
+
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
@@ -129,36 +131,45 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             continue
         return text
 
+    @staticmethod
+    def get_target(page):
+        """Get the target page for a given page."""
+        target = None
+        if not page.exists():
+            with suppress(pywikibot.NoMoveTarget,
+                          pywikibot.CircularRedirect,
+                          pywikibot.InvalidTitle):
+                target = page.moved_target()
+        elif page.isRedirectPage():
+            try:
+                target = page.getRedirectTarget()
+            except (pywikibot.CircularRedirect,
+                    pywikibot.InvalidTitle):
+                pass
+            except RuntimeError:
+                pywikibot.exception()
+            else:
+                section = target.section()
+                if section and not does_text_contain_section(target.text,
+                                                             section):
+                    pywikibot.warning(
+                        'Section #{} not found on page {}'
+                        .format(section, target.title(as_link=True,
+                                                      with_section=False)))
+                    target = None
+        return target
+
     def treat_page(self):
         """Change all redirects from the current page to actual links."""
         links = self.current_page.linkedPages()
         newtext = self.current_page.text
         i = None
         for i, page in enumerate(links):
-            if not page.exists():
-                try:
-                    target = page.moved_target()
-                except (pywikibot.NoMoveTarget,
-                        pywikibot.CircularRedirect,
-                        pywikibot.InvalidTitle):
-                    continue
-            elif page.isRedirectPage():
-                try:
-                    target = page.getRedirectTarget()
-                except (pywikibot.CircularRedirect,
-                        pywikibot.InvalidTitle):
-                    continue
-                else:
-                    section = target.section()
-                    if section and not does_text_contain_section(target.text,
-                                                                 section):
-                        pywikibot.warning(
-                            'Section #{0} not found on page {1}'.format(
-                                section, target.title(as_link=True,
-                                                      with_section=False)))
-                        continue
-            else:
+            target = self.get_target(page)
+
+            if target is None:
                 continue
+
             # no fix to user namespaces
             if target.namespace() in [2, 3] and page.namespace() not in [2, 3]:
                 continue
