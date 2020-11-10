@@ -38,13 +38,13 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
+
+from typing import Optional
 
 import pywikibot
 
@@ -59,17 +59,16 @@ class ImageRobot(ReplaceBot):
 
     """This bot will replace or remove all occurrences of an old image."""
 
-    def __init__(self, generator, old_image, new_image=None, **kwargs):
+    def __init__(self, generator, old_image: str,
+                 new_image: Optional[str] = None, **kwargs):
         """
         Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable
         @param old_image: the title of the old image (without namespace)
-        @type old_image: str
         @param new_image: the title of the new image (without namespace), or
                           None if you want to remove the image
-        @type new_image: str or None
         """
         self.available_options.update({
             'summary': None,
@@ -120,10 +119,10 @@ class ImageRobot(ReplaceBot):
         else:
             replacements.append((image_regex, ''))
 
-        super(ImageRobot, self).__init__(self.generator, replacements,
-                                         always=self.opt.always,
-                                         site=self.site,
-                                         summary=summary)
+        super().__init__(self.generator, replacements,
+                         always=self.opt.always,
+                         site=self.site,
+                         summary=summary)
 
 
 def main(*args):

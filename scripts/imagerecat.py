@@ -12,12 +12,10 @@ The following command line parameters are supported:
                 working on an image multiple times.
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import pagegenerators, textlib

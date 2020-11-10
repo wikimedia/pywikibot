@@ -19,8 +19,6 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import datetime
 
 import pywikibot
@@ -435,7 +433,7 @@ d) delete page (needs deletion right)
 q) quit cleaningbot
 Enter) OK
 What is it? """
-        super(CleaningBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = self.site.newpages()
 
     def show_page_info(self):
@@ -574,7 +572,7 @@ What is it? """
         """
         self.page, self.date, self.length, _, user, comment = item
         self.user = pywikibot.User(self.site, user)
-        return super(CleaningBot, self).init_page(self.page)
+        return super().init_page(self.page)
 
     def setup(self):
         """Setup bot before running."""

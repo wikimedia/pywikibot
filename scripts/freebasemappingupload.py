@@ -14,12 +14,10 @@ The script takes a single parameter:
            default: fb2w.nt.gz
 """
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import gzip
 import os
 import sys
@@ -27,7 +25,7 @@ import sys
 import pywikibot
 
 
-class FreebaseMapperRobot(object):
+class FreebaseMapperRobot:
 
     """Freebase Mapping bot."""
 
