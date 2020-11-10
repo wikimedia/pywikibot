@@ -133,7 +133,7 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
     (cur table), and may not still transclude the template.
     """
 
-    def __init__(self, templates, xmlfilename) -> None:
+    def __init__(self, templates, xmlfilename: str) -> None:
         """
         Initializer.
 
@@ -141,7 +141,6 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
             templates
         @type templateNames: list
         @param xmlfilename: The dump's path, either absolute or relative
-        @type xmlfilename: str
 
         """
         self.templates = templates
@@ -171,7 +170,7 @@ class TemplateRobot(ReplaceBot):
 
     """This bot will replace, remove or subst all occurrences of a template."""
 
-    def __init__(self, generator, templates, **kwargs) -> None:
+    def __init__(self, generator, templates: dict, **kwargs) -> None:
         """
         Initializer.
 
@@ -180,7 +179,6 @@ class TemplateRobot(ReplaceBot):
         @param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
-        @type templates: dict
         """
         self.available_options.update({
             'addcat': None,

@@ -25,8 +25,6 @@ Command line options:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os
 
 import pywikibot
@@ -79,7 +77,7 @@ def refresh(site):
 def refresh_all():
     """Reload watchlists for all wikis where a watchlist is already present."""
     cache_path = CachedRequest._get_cache_dir()
-    files = os.listdir(cache_path)
+    files = os.scandir(cache_path)
     seen = set()
     for filename in files:
         entry = CacheEntry(cache_path, filename)
