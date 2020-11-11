@@ -22,7 +22,7 @@ from typing import Optional
 
 from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
-from requests.packages.urllib3.response import httplib
+from requests.packages.urllib3.util.response import httplib
 
 try:
     from sseclient import SSEClient as EventSource
