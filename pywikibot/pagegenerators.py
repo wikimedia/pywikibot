@@ -703,19 +703,22 @@ class GeneratorFactory:
         cats = self.site.siteinfo.get('linter')  # Get linter categories.
         valid_cats = [c for _list in cats.values() for c in _list]
 
-        value = '' if value is None else value
+        value = value or ''
         cat, _, lint_from = value.partition('/')
-        if not lint_from:
-            lint_from = None
+        lint_from = lint_from or None
 
-        if cat == 'show':  # Display categories of lint errors.
+        def show_available_categories(cats):
             _i = ' ' * 4
+            _2i = 2 * _i
             txt = 'Available categories of lint errors:\n'
             for prio, _list in cats.items():
                 txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
-                for c in _list:
-                    txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
+                txt += ''.join(
+                    '{indent}{cat}\n'.format(indent=_2i, cat=c) for c in _list)
             pywikibot.output('%s' % txt)
+
+        if cat == 'show':  # Display categories of lint errors.
+            show_available_categories(cats)
             sys.exit(0)
 
         if not cat:
@@ -724,10 +727,8 @@ class GeneratorFactory:
             lint_cats = cats[cat]
         else:
             lint_cats = cat.split(',')
-            for lint_cat in lint_cats:
-                if lint_cat not in valid_cats:
-                    raise ValueError('Invalid category of lint errors: %s'
-                                     % cat)
+            assert set(lint_cats) <= set(valid_cats), \
+                'Invalid category of lint errors: %s' % cat
 
         return self.site.linter_pages(
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
