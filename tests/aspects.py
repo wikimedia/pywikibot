@@ -39,7 +39,7 @@ import tests
 from tests import (
     safe_repr, unittest, patch_request, unpatch_request, unittest_print)
 from tests.utils import (
-    execute_pwb, DrySite, DryRequest,
+    execute_pwb, DrySite, DryPage, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
 )
 
@@ -385,6 +385,7 @@ class DisconnectedSiteMixin(TestCaseBase):
         config.site_interface = SiteNotPermitted
 
         pywikibot.data.api.Request = DryRequest
+        pywikibot.Page = DryPage   # T267770
         self.old_convert = pywikibot.Claim.TARGET_CONVERTER['commonsMedia']
         pywikibot.Claim.TARGET_CONVERTER['commonsMedia'] = (
             lambda value, site: pywikibot.FilePage(

@@ -62,10 +62,13 @@ from pywikibot.tools import (
 from pywikibot.tools import is_IP
 
 if PYTHON_VERSION >= (3, 9):
+    from functools import cache
     Dict = dict
     List = list
 else:
+    from functools import lru_cache
     from typing import Dict, List
+    cache = lru_cache(None)
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'
@@ -616,18 +619,11 @@ class BasePage(ComparableMixin):
         if getattr(self, '_text', None) is not None:
             return self._text
 
-        if hasattr(self, '_revid'):
-            return self.latest_revision.text
-
         try:
-            self.get(get_redirect=True)
+            return self.get(get_redirect=True)
         except pywikibot.NoPage:
             # TODO: what other exceptions might be returned?
             return ''
-
-        # check botMayEdit on a very early state (T262136)
-        self._bot_may_edit = self.botMayEdit()
-        return self.latest_revision.text
 
     @text.setter
     def text(self, value: str):
@@ -636,6 +632,8 @@ class BasePage(ComparableMixin):
 
         @param value: New value or None
         """
+        self.botMayEdit()  # T262136, T267770
+
         del self.text
         self._text = None if value is None else str(value)
 
@@ -1092,6 +1090,7 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
+    @cache
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -1107,9 +1106,6 @@ class BasePage(ComparableMixin):
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
         """
-        if hasattr(self, '_bot_may_edit'):
-            return self._bot_may_edit
-
         if not hasattr(self, 'templatesWithParams'):
             return True
 
