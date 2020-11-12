@@ -1247,7 +1247,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('The site {0} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
+        self.assertRaises(AssertionError, gf.handleArg, '-linter:dummy')
 
     def test_linter_generator_show(self):
         """Test generator of pages with lint errors."""
