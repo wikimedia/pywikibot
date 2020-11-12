@@ -79,12 +79,11 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         super().__init__(**kwargs)
         self.skipdates = self.opt.nodate
         self.checkbackward = not self.opt.forward
-        self.checkbroken = not (self.opt.forward
-                                and self.opt.exist)
+        self.checkbroken = not (self.opt.forward and self.opt.exist)
         self.removeparent = not self.opt.keepparent
         self.main = not self.opt.all
 
-        self.workingcatname = self.getOption('catnames')
+        self.workingcatname = self.opt.catnames
         self._setup_menubar()
 
     @classmethod
