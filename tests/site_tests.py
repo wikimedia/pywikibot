@@ -3604,8 +3604,8 @@ class TestLoginLogout(DefaultSiteTestCase):
         self.assertIsNone(site.login())
 
         if site.is_oauth_token_available():
-            self.assertRaisesRegexp(api.APIError, 'cannotlogout.*OAuth',
-                                    site.logout)
+            with self.assertRaisesRegex(api.APIError, 'cannotlogout.*OAuth'):
+                site.logout()
             self.assertTrue(site.logged_in())
             self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
                                               loginstatus.AS_USER))
