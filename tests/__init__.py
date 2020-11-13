@@ -114,6 +114,7 @@ library_test_modules = {
     'timestamp',
     'timestripper',
     'tk',
+    'token',
     'tools',
     'tools_chars',
     'tools_formatter',
