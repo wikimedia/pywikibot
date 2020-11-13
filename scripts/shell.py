@@ -50,10 +50,12 @@ def main(*args):
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
+        import platform
         import subprocess
         subprocess.run('title Python {} Shell'
-                       .format(*sys.version.split(' ', 1)), shell=True)
+                       .format(platform.python_version()), shell=True)
         del subprocess
+        del platform
     args = []
     if sys.argv and sys.argv[0].endswith(('shell', 'shell.py')):
         args = sys.argv[1:]
