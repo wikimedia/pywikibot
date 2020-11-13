@@ -5988,9 +5988,9 @@ class Link(BaseLink):
 
         # "empty" local links can only be self-links
         # with a fragment identifier.
-        if not t.strip() and not self._is_interwiki:
-            raise pywikibot.InvalidTitle('The link does not contain a page '
-                                         'title')
+        if not t.strip(' ') and not self._is_interwiki:  # T197642
+            raise pywikibot.InvalidTitle(
+                'The link does not contain a page title')
 
         if self._site.namespaces[self._namespace].case == 'first-letter':
             t = first_upper(t)
