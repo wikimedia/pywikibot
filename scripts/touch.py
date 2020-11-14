@@ -58,7 +58,7 @@ class TouchBot(MultipleSitesBot):
         except pywikibot.LockedPage:
             pywikibot.error('Page {0} is locked.'
                             .format(page.title(as_link=True)))
-        except pywikibot.PageNotSaved:
+        except pywikibot.PageSaveRelatedError:
             pywikibot.error('Page {0} not saved.'
                             .format(page.title(as_link=True)))
 

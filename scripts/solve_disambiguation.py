@@ -786,7 +786,7 @@ class DisambiguationRobot(SingleSiteBot):
                     try:
                         refPage.put(redir_text, summary=self.comment,
                                     asynchronous=True)
-                    except pywikibot.PageNotSaved as error:
+                    except pywikibot.PageSaveRelatedError as error:
                         pywikibot.output('Page not saved: {0}'
                                          .format(error.args))
             else:
@@ -1031,7 +1031,7 @@ class DisambiguationRobot(SingleSiteBot):
                     refPage.put(text, summary=self.comment, asynchronous=True)
                 except pywikibot.LockedPage:
                     pywikibot.output('Page not saved: page is locked')
-                except pywikibot.PageNotSaved as error:
+                except pywikibot.PageSaveRelatedError as error:
                     pywikibot.output('Page not saved: {0}'.format(error.args))
 
         return 'done'
