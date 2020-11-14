@@ -131,9 +131,11 @@ from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
 
 if PYTHON_VERSION >= (3, 9):
+    from collections.abc import Iterable
     Dict = dict
+    List = list
 else:
-    from typing import Dict
+    from typing import Dict, Iterable, List
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -156,10 +158,14 @@ GLOBAL OPTIONS
 
 -lang:xx          Set the language of the wiki you want to work on, overriding
                   the configuration in user-config.py. xx should be the
-                  language code.
+                  site code.
 
 -family:xyz       Set the family of the wiki you want to work on, e.g.
-                  wikipedia, wiktionary, wikitravel, ...
+                  wikipedia, wiktionary, wikivoyage, ...
+                  This will override the configuration in user-config.py.
+
+-site:xyz:xx      Set the wiki site you want to work on, e.g.
+                  wikipedia:test, wiktionary:de, wikivoyage:en, ...
                   This will override the configuration in user-config.py.
 
 -user:xyz         Log in as user 'xyz' instead of the default username.
@@ -724,7 +730,8 @@ def calledModuleName() -> str:
     return Path(pywikibot.argvu[0]).stem
 
 
-def handle_args(args=None, do_help=True):
+def handle_args(args: Optional[Iterable[str]] = None,
+                do_help: bool = True) -> List[str]:
     """
     Handle standard command line arguments, and return the rest as a list.
 
@@ -738,11 +745,8 @@ def handle_args(args=None, do_help=True):
     args may be passed as an argument, thereby overriding sys.argv
 
     @param args: Command line arguments
-    @type args: typing.Iterable
     @param do_help: Handle parameter '-help' to show help and invoke sys.exit
-    @type do_help: bool
     @return: list of arguments not recognised globally
-    @rtype: list of str
     """
     if pywikibot._sites:
         warn('Site objects have been created before arguments were handled',
@@ -767,6 +771,8 @@ def handle_args(args=None, do_help=True):
             do_help = value or True
         elif option == '-dir':
             pass
+        elif option == '-site':
+            config.family, config.mylang = value.split(':')
         elif option == '-family':
             config.family = value
         elif option == '-lang':
