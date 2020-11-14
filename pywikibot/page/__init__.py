@@ -1283,7 +1283,7 @@ class BasePage(ComparableMixin):
         if not done:
             if not quiet:
                 pywikibot.warning('Page %s not saved' % link)
-            raise pywikibot.PageNotSaved(self)
+            raise pywikibot.PageSaveRelatedError(self)
         if not quiet:
             pywikibot.output('Page %s saved' % link)
 
