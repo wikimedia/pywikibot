@@ -95,6 +95,7 @@ import time
 import warnings
 import webbrowser
 
+from collections.abc import Generator
 from contextlib import closing
 from importlib import import_module
 from pathlib import Path
@@ -1468,6 +1469,9 @@ class BaseBot(OptionHandler):
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable {}.generator not set.'
                                       .format(self.__class__.__name__))
+        if not isinstance(self.generator, Generator):
+            # to provide close() method
+            self.generator = (item for item in self.generator)
         try:
             for item in self.generator:
                 # preprocessing of the page
