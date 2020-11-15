@@ -9,6 +9,7 @@ import math
 import threading
 import time
 
+from collections import namedtuple
 from contextlib import suppress
 from typing import Optional
 
@@ -19,6 +20,7 @@ from pywikibot.tools import deprecated
 _logger = 'wiki.throttle'
 
 FORMAT_LINE = '{pid} {time} {site}\n'
+ProcEntry = namedtuple('ProcEntry', ['pid', 'time', 'site'])
 
 # global process identifier
 #
@@ -48,15 +50,9 @@ class Throttle:
         self.lock_read = threading.RLock()
         self.mysite = str(site)
         self.ctrlfilename = config.datafilepath('throttle.ctrl')
-        self.mindelay = mindelay
-        if self.mindelay is None:
-            self.mindelay = config.minthrottle
-        self.maxdelay = maxdelay
-        if self.maxdelay is None:
-            self.maxdelay = config.maxthrottle
-        self.writedelay = writedelay
-        if self.writedelay is None:
-            self.writedelay = config.put_throttle
+        self.mindelay = mindelay or config.minthrottle
+        self.maxdelay = maxdelay or config.maxthrottle
+        self.writedelay = writedelay or config.put_throttle
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
@@ -84,6 +80,40 @@ class Throttle:
         """DEPRECATED property."""
         return 0.0
 
+    def _read_file(self, raise_exc=False):
+        """Yield process entries from file."""
+        try:
+            with open(self.ctrlfilename, 'r') as f:
+                lines = f.readlines()
+        except IOError:
+            if raise_exc and pid:
+                raise
+            return
+
+        for line in lines:
+            # parse line; format is "pid timestamp site"
+            try:
+                _pid, _time, _site = line.split(' ')
+                proc_entry = ProcEntry(
+                    pid=int(_pid),
+                    time=int(float(_time)),
+                    site=_site.rstrip()
+                )
+            except (IndexError, ValueError):
+                # Sometimes the file gets corrupted ignore that line
+                continue
+            yield proc_entry
+
+    def _write_file(self, processes):
+        """Write process entries to file."""
+        if not isinstance(processes, list):
+            processes = list(processes)
+        processes.sort(key=lambda p: (p.pid, p.site))
+
+        with suppress(IOError), open(self.ctrlfilename, 'w') as f:
+            for p in processes:
+                f.write(FORMAT_LINE.format_map(p._asdict()))
+
     def checkMultiplicity(self):
         """Count running processes for site and set process_multiplicity."""
         global pid
@@ -94,48 +124,28 @@ class Throttle:
             processes = []
             my_pid = pid or 1  # start at 1 if global pid not yet set
             count = 1
-            # open throttle.log
-            try:
-                f = open(self.ctrlfilename, 'r')
-            except IOError:
-                if pid:
-                    raise
-            else:
-                now = time.time()
-                for line in f.readlines():
-                    # parse line; format is "pid timestamp site"
-                    try:
-                        line = line.split(' ')
-                        this_pid = int(line[0])
-                        ptime = int(line[1].split('.')[0])
-                        this_site = line[2].rstrip()
-                    except (IndexError, ValueError):
-                        # Sometimes the file gets corrupted ignore that line
-                        continue
-                    if now - ptime > self.releasepid:
-                        continue    # process has expired, drop from file
-                    if now - ptime <= self.dropdelay \
-                       and this_site == mysite \
-                       and this_pid != pid:
-                        count += 1
-                    if this_site != self.mysite or this_pid != pid:
-                        processes.append({'pid': this_pid,
-                                          'time': ptime,
-                                          'site': this_site})
-                    if not pid and this_pid >= my_pid:
-                        my_pid = this_pid + 1  # next unused process id
-                f.close()
+
+            now = time.time()
+            for proc in self._read_file(raise_exc=True):
+                if now - proc.time > self.releasepid:
+                    continue    # process has expired, drop from file
+                if now - proc.time <= self.dropdelay \
+                   and proc.site == mysite \
+                   and proc.pid != pid:
+                    count += 1
+                if proc.site != self.mysite or proc.pid != pid:
+                    processes.append(proc)
+                if not pid and proc.pid >= my_pid:
+                    my_pid = proc.pid + 1  # next unused process id
 
             if not pid:
                 pid = my_pid
             self.checktime = time.time()
-            processes.append({'pid': pid,
-                              'time': self.checktime,
-                              'site': mysite})
-            processes.sort(key=lambda p: (p['pid'], p['site']))
-            with suppress(IOError), open(self.ctrlfilename, 'w') as f:
-                for p in processes:
-                    f.write(FORMAT_LINE.format_map(p))
+            processes.append(
+                ProcEntry(pid=pid, time=self.checktime, site=mysite))
+
+            self._write_file(processes)
+
             self.process_multiplicity = count
             pywikibot.log('Found {} {} processes running, including this one.'
                           .format(count, mysite))
@@ -143,10 +153,8 @@ class Throttle:
     def setDelays(self, delay=None, writedelay=None, absolute=False):
         """Set the nominal delays in seconds. Defaults to config values."""
         with self.lock:
-            if delay is None:
-                delay = self.mindelay
-            if writedelay is None:
-                writedelay = config.put_throttle
+            delay = delay or self.mindelay
+            writedelay = writedelay or config.put_throttle
             if absolute:
                 self.maxdelay = delay
                 self.mindelay = delay
@@ -160,21 +168,24 @@ class Throttle:
         """Return the actual delay, accounting for multiple processes.
 
         This value is the maximum wait between reads/writes, not taking
-        account of how much time has elapsed since the last access.
+        into account of how much time has elapsed since the last access.
 
         """
         if write:
             thisdelay = self.writedelay
         else:
             thisdelay = self.delay
-        if self.multiplydelay:  # We're checking for multiple processes
-            if time.time() > self.checktime + self.checkdelay:
-                self.checkMultiplicity()
-            if thisdelay < (self.mindelay * self.next_multiplicity):
-                thisdelay = self.mindelay * self.next_multiplicity
-            elif thisdelay > self.maxdelay:
-                thisdelay = self.maxdelay
-            thisdelay *= self.process_multiplicity
+        if not self.multiplydelay:
+            return thisdelay
+
+        # We're checking for multiple processes
+        if time.time() > self.checktime + self.checkdelay:
+            self.checkMultiplicity()
+        if thisdelay < (self.mindelay * self.next_multiplicity):
+            thisdelay = self.mindelay * self.next_multiplicity
+        elif thisdelay > self.maxdelay:
+            thisdelay = self.maxdelay
+        thisdelay *= self.process_multiplicity
         return thisdelay
 
     def waittime(self, write=False):
@@ -193,33 +204,12 @@ class Throttle:
         """Remove me from the list of running bot processes."""
         # drop all throttles with this process's pid, regardless of site
         self.checktime = 0
-        processes = []
-        try:
-            with open(self.ctrlfilename, 'r') as f:
-                lines = f.readlines()
-        except IOError:
-            return
 
         now = time.time()
-        for line in lines:
-            try:
-                line = line.split(' ')
-                this_pid = int(line[0])
-                ptime = int(line[1].split('.')[0])
-                this_site = line[2].rstrip()
-            except (IndexError, ValueError):
-                # Sometimes the file gets corrupted ignore that line
-                continue
-            if now - ptime <= self.releasepid \
-               and this_pid != pid:
-                processes.append({'pid': this_pid,
-                                  'time': ptime,
-                                  'site': this_site})
+        processes = [p for p in self._read_file()
+                     if now - p.time <= self.releasepid and p.pid != pid]
 
-        processes.sort(key=lambda p: p['pid'])
-        with suppress(IOError), open(self.ctrlfilename, 'w') as f:
-            for p in processes:
-                f.write(FORMAT_LINE.format_map(p))
+        self._write_file(processes)
 
     def wait(self, seconds):
         """Wait for seconds seconds.
