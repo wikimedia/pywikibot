@@ -23,8 +23,22 @@ The following parameters are supported:
 
 -summary:         Set the action summary message for the edit.
 
+All settings can be made either by giving option with the command line
+or with a settings file which is scripts.ini by default. If you don't
+want the default values you can add any option you want to change to
+that settings file below the [basic] section like:
 
-The following generators and filters are supported:
+    [basic] ; inline comments starts with colon
+    # This is a commend line. Assignments may be done with '=' or ':'
+    text: A text with line break and
+        continuing on next line to be put
+    replace: yes ; yes/no, on/off, true/false and 1/0 is also valid
+    summary = Bot: My first test edit with pywikibot
+
+Every script has its own section with the script name as header.
+
+In addition the following generators and filters are supported but
+cannot be set by settings file:
 
 &params;
 """
@@ -37,7 +51,8 @@ import pywikibot
 from pywikibot import pagegenerators
 
 from pywikibot.bot import (
-    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot)
+    SingleSiteBot, ConfigParserBot, ExistingPageBot, NoRedirectPageBot,
+    AutomaticTWSummaryBot)
 from pywikibot.tools import PYTHON_VERSION
 
 if PYTHON_VERSION >= (3, 9):
@@ -53,6 +68,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 class BasicBot(
     # Refer pywikobot.bot for generic bot classes
     SingleSiteBot,  # A bot only working on one site
+    ConfigParserBot,  # A bot which reads options from scripts.ini setting file
     # CurrentPageBot,  # Sets 'current_page'. Process it in treat_page method.
     #                  # Not needed here because we have subclasses
     ExistingPageBot,  # CurrentPageBot which only treats existing pages
