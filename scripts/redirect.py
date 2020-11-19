@@ -369,7 +369,7 @@ class RedirectGenerator(OptionHandler):
             try:
                 if not moved_page.isRedirectPage():
                     continue
-            except (pywikibot.BadTitle, pywikibot.ServerError):
+            except pywikibot.ServerError:
                 continue
             # moved_page is now a redirect, so any redirects pointing
             # to it need to be changed
@@ -492,10 +492,6 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
         else:
             try:
                 targetPage.get()
-            except pywikibot.BadTitle as e:
-                pywikibot.warning(
-                    'Redirect target {0} is not a valid page title.'
-                    .format(str(e)[10:]))
             except pywikibot.InvalidTitle:
                 pywikibot.exception()
             except pywikibot.NoPage:
@@ -576,12 +572,6 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                 pywikibot.exception()
                 pywikibot.output('Skipping {0}.'.format(newRedir))
                 break
-            except pywikibot.BadTitle as e:
-                # str(e) is in the format 'BadTitle: [[Foo]]'
-                pywikibot.warning(
-                    'Redirect target {0} is not a valid page title.'
-                    .format(str(e)[10:]))
-                break
             except pywikibot.NoPage:
                 if self.opt.always:
                     pywikibot.output(
@@ -634,11 +624,7 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                     else:
                         newRedir = targetPage
                         continue
-            try:
-                oldText = redir.get(get_redirect=True)
-            except pywikibot.BadTitle:
-                pywikibot.output('Bad Title Error')
-                break
+            oldText = redir.get(get_redirect=True)
             if self.is_repo and redir.namespace() == self.repo.item_namespace:
                 redir = pywikibot.ItemPage(self.repo, redir.title())
                 targetPage = pywikibot.ItemPage(self.repo, targetPage.title())
