@@ -3397,6 +3397,9 @@ class BaseDataDict(MutableMapping):
         key = self.normalizeKey(key)
         return key in self._data
 
+    def __repr__(self):
+        return '{}({})'.format(type(self), self._data)
+
     @staticmethod
     def normalizeKey(key) -> str:
         """Helper function to return language codes of a site object."""
@@ -3530,6 +3533,9 @@ class ClaimCollection(MutableMapping):
 
     def __contains__(self, key):
         return key in self._data
+
+    def __repr__(self):
+        return '{}({})'.format(type(self), self._data)
 
     @classmethod
     def normalizeData(cls, data):
