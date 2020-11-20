@@ -735,7 +735,7 @@ class CaseChecker:
                         self.site.mediawiki_message(
                             'comma-separator').join(msg)))
                 return True
-            except (pywikibot.LockedPage, pywikibot.PageNotSaved):
+            except (pywikibot.LockedPage, pywikibot.PageSaveRelatedError):
                 self.WikiLog('* Error: Could not save updated page {} ({})'
                              .format(self.MakeLink(title, False), coloredMsg))
         return False

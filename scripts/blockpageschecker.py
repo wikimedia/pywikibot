@@ -498,7 +498,7 @@ def save_page(page, text, comment):
         except pywikibot.LockedPage:
             pywikibot.output('The page is still protected. '
                              'Skipping...')
-        except pywikibot.PageNotSaved as error:
+        except pywikibot.PageSaveRelatedError as error:
             pywikibot.output('Error putting page: %s'
                              % (error.args,))
         break

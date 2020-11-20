@@ -144,7 +144,7 @@ def put_text(page, new: str, summary: str, count: int,
             .format(page.title(), e.url))
     except pywikibot.LockedPage:
         pywikibot.output('Skipping {} (locked page)'.format(page.title()))
-    except pywikibot.PageNotSaved as error:
+    except pywikibot.PageSaveRelatedError as error:
         pywikibot.output('Error putting page: {}'.format(error.args))
     else:
         return True

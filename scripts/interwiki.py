@@ -1803,10 +1803,10 @@ class Subject(interwiki_graph.Subject):
                         'ERROR putting page: {0} blacklisted by spamfilter. '
                         'Giving up.'.format(error.url))
                     raise SaveError('Spam filter')
-                except pywikibot.PageNotSaved as error:
+                except pywikibot.PageSaveRelatedError as error:
                     pywikibot.output('ERROR putting page: {}'
                                      .format(error.args,))
-                    raise SaveError('PageNotSaved')
+                    raise SaveError('PageSaveRelatedError')
                 except (socket.error, IOError) as error:
                     if timeout > 3600:
                         raise
