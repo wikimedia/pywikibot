@@ -3356,13 +3356,13 @@ class User(Page):
         return self.isRegistered() and 'bot' not in self.groups()
 
 
-class LanguageDict(MutableMapping):
+class BaseDataDict(MutableMapping):
 
     """
-    A structure holding language data for a Wikibase entity.
+    Base structure holding data for a Wikibase entity.
 
-    Language data are mappings from a language to a string. It can be
-    labels, descriptions and others.
+    Data are mappings from a language to a value. It will be
+    specialised in subclasses.
     """
 
     def __init__(self, data=None):
@@ -3370,11 +3370,6 @@ class LanguageDict(MutableMapping):
         self._data = {}
         if data:
             self.update(data)
-
-    @classmethod
-    def fromJSON(cls, data, repo=None):
-        this = cls({key: value['value'] for key, value in data.items()})
-        return this
 
     @classmethod
     def new_empty(cls, repo):
@@ -3409,6 +3404,21 @@ class LanguageDict(MutableMapping):
             key = key.lang
         return key
 
+
+class LanguageDict(BaseDataDict):
+
+    """
+    A structure holding language data for a Wikibase entity.
+
+    Language data are mappings from a language to a string. It can be
+    labels, descriptions and others.
+    """
+
+    @classmethod
+    def fromJSON(cls, data, repo=None):
+        this = cls({key: value['value'] for key, value in data.items()})
+        return this
+
     @classmethod
     def normalizeData(cls, data):
         norm_data = {}
@@ -3436,7 +3446,7 @@ class LanguageDict(MutableMapping):
         return data
 
 
-class AliasesDict(MutableMapping):
+class AliasesDict(BaseDataDict):
 
     """
     A structure holding aliases for a Wikibase entity.
@@ -3444,44 +3454,12 @@ class AliasesDict(MutableMapping):
     It is a mapping from a language to a list of strings.
     """
 
-    def __init__(self, data=None):
-        super().__init__()
-        self._data = {}
-        if data:
-            self.update(data)
-
     @classmethod
     def fromJSON(cls, data, repo=None):
         this = cls()
         for key, value in data.items():
             this[key] = [val['value'] for val in value]
         return this
-
-    @classmethod
-    def new_empty(cls, repo):
-        return cls()
-
-    def __getitem__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        return self._data[key]
-
-    def __setitem__(self, key, value):
-        key = LanguageDict.normalizeKey(key)
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        del self._data[key]
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def __len__(self):
-        return len(self._data)
-
-    def __contains__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        return key in self._data
 
     @classmethod
     def normalizeData(cls, data):
