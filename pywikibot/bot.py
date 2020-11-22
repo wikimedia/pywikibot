@@ -119,15 +119,13 @@ from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING
 from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
 from pywikibot.logging import (
     add_init_routine,
-    debug, error, exception, log, output, stdout, warning,
+    critical, debug, error, exception, log, output, stdout, warning,
 )
-from pywikibot.logging import critical
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    PYTHON_VERSION,
+    PYTHON_VERSION, suppress_warnings
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
-from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
 
 if PYTHON_VERSION >= (3, 9):
@@ -1091,11 +1089,11 @@ class OptionHandler:
         """
         self.set_options(**kwargs)
 
-    @classproperty
+    @property
     @deprecated('available_options', since='20201006')
-    def availableOptions(cls):
+    def availableOptions(self):
         """DEPRECATED. Available_options class property."""
-        return cls.available_options
+        return self.available_options
 
     @deprecated('set_options', since='20201006')
     def setOptions(self, **kwargs):  # pragma: no cover
