@@ -16,6 +16,11 @@ pywikibot.site.\_interwikimap module
 
 .. automodule:: pywikibot.site._interwikimap
 
+pywikibot.site.\_namespace module
+---------------------------------
+
+.. automodule:: pywikibot._namespace
+
 pywikibot.site.\_siteinfo module
 --------------------------------
 

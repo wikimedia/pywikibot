@@ -117,6 +117,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+
+    | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
+    +----------------------------+------------------------------------------------------+
     | _siteinfo.py               | Objects representing site info data contents.        |
     +----------------------------+------------------------------------------------------+
     | _tokenwallet.py            | Objects representing api tokens.                     |
