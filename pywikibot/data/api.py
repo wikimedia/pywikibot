@@ -3034,7 +3034,8 @@ class LoginManager(login.LoginManager):
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
                 return ''
-            elif status in ('NeedToken', 'WrongToken', 'badtoken'):
+
+            if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
                 if token and below_mw_1_27:
                     # fetched token using action=login
@@ -3049,22 +3050,24 @@ class LoginManager(login.LoginManager):
                     # invalidate superior wiki cookies (T224712)
                     _invalidate_superior_cookies(self.site.family)
                 continue
-            elif (status == 'Throttled' or status == self.keyword('fail')
-                  and (response['messagecode'] == 'login-throttled'
-                  or 'wait' in fail_reason)):
-                match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
-                if match:
-                    delta = datetime.timedelta(
-                        **{match.group(2): int(match.group(1))})
-                else:
-                    delta = 0
+
+            if (status == 'Throttled' or status == self.keyword('fail')
+                and (response['messagecode'] == 'login-throttled'
+                     or 'wait' in fail_reason)):
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
+                else:
+                    match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
+                    if match:
+                        delta = datetime.timedelta(
+                            **{match.group(2): int(match.group(1))})
+                    else:
+                        delta = datetime.timedelta()
                 self._waituntil = datetime.datetime.now() + delta
-                break
-            else:
-                break
+
+            break
+
         if 'error' in login_result:
             raise APIError(**response)
         info = fail_reason
