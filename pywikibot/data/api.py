@@ -1479,12 +1479,13 @@ class Request(MutableMapping):
             return {action: {'result': 'Success', 'nochange': ''}}
         return None
 
-    @staticmethod
-    def _is_wikibase_error_retryable(error):
-        ERR_MSG = (
-            'edit-already-exists',
-            'actionthrottledtext',  # T192912
-        )
+    def _is_wikibase_error_retryable(self, error):
+        # dict of error message and current action.
+        # Value is True if action type is to be ignored
+        ERR_MSG = {
+            'edit-already-exists': 'wbeditentity',
+            'actionthrottledtext': True,  # T192912, T268645
+        }
         messages = error.get('messages')
         message = None
         # bug T68619; after Wikibase breaking change 1ca9cee change we have a
@@ -1492,14 +1493,19 @@ class Request(MutableMapping):
         if isinstance(messages, list):
             for item in messages:
                 message = item['name']
-                if message in ERR_MSG:
+                action = ERR_MSG.get(message)
+                if action is True or action == self.action:
                     return True
-        elif isinstance(messages, dict):
+            else:
+                return False
+
+        if isinstance(messages, dict):
             try:  # behaviour before gerrit 124323 breaking change
                 message = messages['0']['name']
             except KeyError:  # unsure the new output is always a list
                 message = messages['name']
-        return message in ERR_MSG
+        action = ERR_MSG.get(message)
+        return action is True or action == self.action
 
     @staticmethod
     def _generate_mime_part(key, content, keytype=None, headers=None):
@@ -1935,7 +1941,6 @@ class Request(MutableMapping):
 
             # Phab. tickets T48535, T64126, T68494, T68619
             if code == 'failed-save' and \
-               self.action == 'wbeditentity' and \
                self._is_wikibase_error_retryable(result['error']):
                 self.wait()
                 continue
