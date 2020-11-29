@@ -6,6 +6,11 @@ pywikibot.site package
 Submodules
 ----------
 
+pywikibot.site.\_basesite module
+--------------------------------
+
+.. automodule:: pywikibot.site._basesite
+
 pywikibot.site.\_decorators module
 ----------------------------------
 
