@@ -46,7 +46,7 @@ class TestLogentriesBase(TestCase):
         },
         'old': {
             'family': 'wowwiki',
-            'code': 'en',
+            'code': 'cs',
             'target': None,
         }
     }
