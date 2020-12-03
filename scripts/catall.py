@@ -32,12 +32,17 @@ from pywikibot.tools import PYTHON_VERSION
 
 if PYTHON_VERSION >= (3, 9):
     Tuple = tuple
+    List = list
 else:
-    from typing import Tuple
+    from typing import List, Tuple
 
 
-def choosecats(pagetext):
-    """Coose categories."""
+def choosecats(pagetext: str) -> List[str]:
+    """Choose categories.
+
+    @param pagetext: The text of the page
+    @return: chosen list which contains all the choices
+    """
     chosen = []
     done = False
     length = 1000
@@ -73,8 +78,13 @@ q: quit.""")
     return chosen
 
 
-def make_categories(page, list, site=None):
-    """Make categories."""
+def make_categories(page, list: list, site=None):
+    """Make categories.
+
+    @param page: The page to update and save
+    @type page: pywikibot.page.BasePage
+    @param list: The list which contains categories
+    """
     if site is None:
         site = pywikibot.Site()
     pllist = []
