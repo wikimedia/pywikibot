@@ -698,9 +698,9 @@ class TestPageRepr(TestPageBaseUnicode):
 
     def test_unicode_value(self):
         """Test to capture actual Python result pre unicode_literals."""
-        self.assertEqual(repr(self.page), "Page('Ō')")
-        self.assertEqual('%r' % self.page, "Page('Ō')")
-        self.assertEqual('{0!r}'.format(self.page), "Page('Ō')")
+        self.assertEqual(repr(self.page), "DryPage('Ō')")
+        self.assertEqual('%r' % self.page, "DryPage('Ō')")
+        self.assertEqual('{0!r}'.format(self.page), "DryPage('Ō')")
 
 
 class TestPageReprASCII(TestPageBaseUnicode):
@@ -739,133 +739,116 @@ class TestPageBotMayEdit(TestCase):
                 'Page {} exists! Change page name in tests/page_tests.py'
                 .format(self.page.title()))
 
+    def tearDown(self):
+        """Cleanup cache."""
+        self.page.botMayEdit.cache_clear()
+        super().tearDown()
+
     @mock.patch.object(config, 'ignore_bot_templates', False)
-    def test_bot_may_edit_nobots(self):
+    def test_bot_may_edit_nobots_ok(self):
         """Test with {{nobots}} that bot is allowed to edit."""
+        templates = (
+            # Ban all compliant bots not in the list, syntax for de wp.
+            '{{nobots|HagermanBot,Werdnabot}}',
+            # Ignore second parameter
+            '{{nobots|MyBot|%(user)s}}',
+        )
+
         self.page._templates = [pywikibot.Page(self.site, 'Template:Nobots')]
         user = self.site.user()
-
-        # Ban all compliant bots (shortcut).
-        self.page.text = '{{nobots}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ban all compliant bots not in the list, syntax for de wp.
-        self.page.text = '{{nobots|HagermanBot,Werdnabot}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ban all compliant bots not in the list, syntax for de wp.
-        self.page.text = '{{nobots|%s, HagermanBot,Werdnabot}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ban all bots, syntax for de wp.
-        self.page.text = '{{nobots|all}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Decline wrong nobots parameter
-        self.page.text = '{{nobots|allow=%s}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Decline wrong nobots parameter
-        self.page.text = '{{nobots|deny=%s}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Decline wrong nobots parameter
-        self.page.text = '{{nobots|decline=%s}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Decline empty keyword parameter with nobots
-        self.page.text = '{{nobots|with_empty_parameter=}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ignore second parameter
-        self.page.text = '{{nobots|%s|MyBot}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ignore second parameter
-        self.page.text = '{{nobots|MyBot|%s}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
+        for template in templates:
+            del self.page.text
+            self.page._text = template % {'user': user}
+            with self.subTest(template=template, user=user):
+                self.assertTrue(self.page.botMayEdit())
+            self.page.botMayEdit.cache_clear()
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
-    def test_bot_may_edit_bots(self):
+    def test_bot_may_edit_nobots_nok(self):
+        """Test with {{nobots}} that bot is not allowed to edit."""
+        templates = (
+            # Ban all compliant bots (shortcut)
+            '{{nobots}}',
+            # Ban all compliant bots not in the list, syntax for de wp
+            '{{nobots|%(user)s, HagermanBot,Werdnabot}}',
+            # Ban all bots, syntax for de wp
+            '{{nobots|all}}',
+            # Decline wrong nobots parameter
+            '{{nobots|allow=%(user)s}}',
+            '{{nobots|deny=%(user)s}}',
+            '{{nobots|decline=%(user)s}}',
+            # Decline empty keyword parameter with nobots
+            '{{nobots|with_empty_parameter=}}',
+            # Ignore second parameter
+            '{{nobots|%(user)s|MyBot}}',
+        )
+
+        self.page._templates = [pywikibot.Page(self.site, 'Template:Nobots')]
+        user = self.site.user()
+        for template in templates:
+            del self.page.text
+            self.page._text = template % {'user': user}
+            with self.subTest(template=template, user=user):
+                self.assertFalse(self.page.botMayEdit())
+            self.page.botMayEdit.cache_clear()
+
+    @mock.patch.object(config, 'ignore_bot_templates', False)
+    def test_bot_may_edit_bots_ok(self):
         """Test with {{bots}} that bot is allowed to edit."""
+        templates = (
+            '{{bots}}',  # Allow all bots (shortcut)
+            # Ban all compliant bots in the list
+            '{{bots|deny=HagermanBot,Werdnabot}}',
+            # Ban all compliant bots not in the list
+            '{{bots|allow=%(user)s, HagermanBot}}',
+            # Allow all bots
+            '{{bots|allow=all}}',
+            '{{bots|deny=none}}',
+            # Ignore missing named parameter
+            '{{bots|%(user)s}}',  # Ignore missing named parameter
+            # Ignore unknown keyword parameter with bots
+            '{{bots|with=unknown_parameter}}',
+            # Ignore unknown empty parameter keyword with bots
+            '{{bots|with_empty_parameter=}}',
+        )
+
         self.page._templates = [pywikibot.Page(self.site, 'Template:Bots')]
         user = self.site.user()
-
-        # Allow all bots (shortcut).
-        self.page.text = '{{bots}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ban all compliant bots not in the list.
-        self.page.text = '{{bots|allow=HagermanBot,Werdnabot}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ban all compliant bots in the list.
-        self.page.text = '{{bots|deny=HagermanBot,Werdnabot}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ban all compliant bots not in the list.
-        self.page.text = '{{bots|allow=%s, HagermanBot}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ban all compliant bots in the list.
-        self.page.text = '{{bots|deny=%s, HagermanBot}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Allow all bots.
-        self.page.text = '{{bots|allow=all}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ban all compliant bots.
-        self.page.text = '{{bots|allow=none}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Ban all compliant bots.
-        self.page.text = '{{bots|deny=all}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertFalse(self.page.botMayEdit())
-
-        # Allow all bots.
-        self.page.text = '{{bots|deny=none}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ignore missing named parameter.
-        self.page.text = '{{bots|%s}}' % user
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
+        for template in templates:
+            del self.page.text
+            self.page._text = template % {'user': user}
+            with self.subTest(template=template, user=user):
+                self.assertTrue(self.page.botMayEdit())
+            self.page.botMayEdit.cache_clear()
 
         # Ignore empty keyword parameter with bots
         for param in ('allow', 'deny', 'empty_parameter'):
-            self.page.text = '{{bots|%s=}}' % param
+            del self.page.text
+            self.page._text = '{{bots|%s=}}' % param
             with self.subTest(template=self.page.text, user=user, param=param):
                 self.assertTrue(self.page.botMayEdit())
+            self.page.botMayEdit.cache_clear()
 
-        # Ignore unknown keyword parameter with bots
-        self.page.text = '{{bots|with=unknown_parameter}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
-
-        # Ignore unknown empty parameter keyword with bots
-        self.page.text = '{{bots|with_empty_parameter=}}'
-        with self.subTest(template=self.page.text, user=user):
-            self.assertTrue(self.page.botMayEdit())
+    @mock.patch.object(config, 'ignore_bot_templates', False)
+    def test_bot_may_edit_bots_nok(self):
+        """Test with {{bots}} that bot is not allowed to edit."""
+        templates = (
+            # Ban all compliant bots not in the list
+            '{{bots|allow=HagermanBot,Werdnabot}}',
+            # Ban all compliant bots in the list
+            '{{bots|deny=%(user)s, HagermanBot}}',
+            # Ban all compliant bots
+            '{{bots|allow=none}}',
+            '{{bots|deny=all}}',
+        )
+        self.page._templates = [pywikibot.Page(self.site, 'Template:Bots')]
+        user = self.site.user()
+        for template in templates:
+            del self.page.text
+            self.page._text = template % {'user': user}
+            with self.subTest(template=template, user=user):
+                self.assertFalse(self.page.botMayEdit())
+            self.page.botMayEdit.cache_clear()
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_inuse(self):
@@ -873,18 +856,36 @@ class TestPageBotMayEdit(TestCase):
         self.page._templates = [pywikibot.Page(self.site, 'Template:In use')]
 
         # Ban all users including bots.
-        self.page.text = '{{in use}}'
+        self.page._text = '{{in use}}'
         self.assertFalse(self.page.botMayEdit())
 
-    def test_bot_may_edit_page(self):
-        """Test botMayEdit when changing content."""
+    def test_bot_may_edit_missing_page(self):
+        """Test botMayEdit for not existent page."""
         self.assertTrue(self.page.botMayEdit())
         self.page.text = '{{nobots}}'
         self.assertTrue(self.page.botMayEdit())
+
+    def test_bot_may_edit_page_nobots(self):
+        """Test botMayEdit for existing page with nobots template."""
         page = pywikibot.Page(self.site, 'Pywikibot nobots test')
         self.assertFalse(page.botMayEdit())
         page.text = ''
         self.assertFalse(page.botMayEdit())
+
+    def test_bot_may_edit_page_set_text(self):
+        """Test botMayEdit for existing page when assigning text first."""
+        contents = (
+            'Does page may be changed if content is not read first?',
+            'Does page may be changed if {{bots}} template is found?',
+            'Does page may be changed if {{nobots}} template is found?'
+        )
+        # test the page with assigning text first
+        for content in contents:
+            with self.subTest(content=content):
+                page = pywikibot.Page(self.site, 'Pywikibot nobots test')
+                page.text = content
+                self.assertFalse(page.botMayEdit())
+                del page
 
 
 class TestPageHistory(DefaultSiteTestCase):
