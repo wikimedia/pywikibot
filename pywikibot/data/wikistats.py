@@ -7,6 +7,7 @@
 from collections import defaultdict
 from csv import DictReader
 from io import StringIO
+from typing import Optional
 
 import pywikibot
 
@@ -168,14 +169,30 @@ class WikiStats:
         """
         return {data['prefix']: data for data in self.get(table)}
 
-    def sorted(self, table, key) -> list:
+    def sorted(self, table: str, key: str,
+               reverse: Optional[bool] = None) -> list:
         """
         Reverse numerical sort of data.
 
         @param table: name of table of data
-        @param key: numerical key, such as id, total, good
+        @param key: data table key
+        @param reverse: If set to True the sorting order is reversed.
+            If None the sorting order for numeric keys are reversed whereas
+            alphanumeric keys are sorted in normal way.
+        @return: The sorted table
         """
-        return sorted(self.get(table), key=lambda d: int(d[key]), reverse=True)
+        table = self.get(table)
+
+        # take the first entry to determine the sorting key
+        first_entry = table[0]
+        if first_entry[key].isdigit():
+            sort_key = lambda d: int(d[key])  # noqa: E731
+            reverse = reverse if reverse is not None else True
+        else:
+            sort_key = lambda d: d[key]  # noqa: E731
+            reverse = reverse if reverse is not None else False
+
+        return sorted(table, key=sort_key, reverse=reverse)
 
     def languages_by_size(self, table: str):
         """Return ordered list of languages by size from WikiStats."""
