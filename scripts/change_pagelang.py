@@ -51,7 +51,11 @@ class ChangeLangBot(SingleSiteBot):
             'Either "always" or "never" must be set but not both'
 
     def changelang(self, page):
-        """Set page language."""
+        """Set page language.
+
+        @param page: The page to update and save
+        @type page: pywikibot.page.BasePage
+        """
         token = self.site.get_tokens(['csrf']).get('csrf')
         parameters = {'action': 'setpagelanguage',
                       'title': page.title(),
@@ -65,7 +69,11 @@ class ChangeLangBot(SingleSiteBot):
             page.title(as_link=True), self.opt.setlang))
 
     def treat(self, page):
-        """Treat a page."""
+        """Treat a page.
+
+        @param page: The page to treat
+        @type page: pywikibot.page.BasePage
+        """
         # Current content language of the page and site language
         parameters = {'action': 'query',
                       'prop': 'info',
