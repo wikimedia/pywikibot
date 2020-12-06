@@ -603,7 +603,7 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a pywikibot.Timestamp.
 
-        @raises ValueError: instance value can not be represented using
+        @raises ValueError: instance value cannot be represented using
             Timestamp
         """
         if self.year <= 0:

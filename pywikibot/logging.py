@@ -166,7 +166,7 @@ def warning(text: str, decoder: Optional[str] = None,
 def error(text, decoder=None, newline=True, **kwargs):
     """Output an error message to the user via the userinterface.
 
-    @param text: the message containing the error which occured.
+    @param text: the message containing the error which occurred.
     @param decoder: If None, text should be a unicode string else it should
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
@@ -235,7 +235,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
 
     This function should only be called from an Exception handler.
 
-    @param msg: If not None,contains the description of the exception occured.
+    @param msg: If not None,contains the description of the exception occurred.
     @param decoder: If None, text should be a unicode string else it should
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.

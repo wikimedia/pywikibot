@@ -468,7 +468,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
 
         plural_entries = []
         specific_entries = {}
-        # A plural entry can not start at the end of the variants list,
+        # A plural entry cannot start at the end of the variants list,
         # and must end with | or the end of the variants list.
         for number, plural in re.findall(
             r'(?!$)(?: *(\d+) *= *)?(.*?)(?:\||$)', variants
@@ -823,7 +823,7 @@ def twget_keys(twtitle: str) -> List[str]:
 
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
 
-    @raises OSError: the package i18n can not be loaded
+    @raises OSError: the package i18n cannot be loaded
     """
     # obtain the directory containing all the json files for this package
     package = twtitle.split('-')[0]

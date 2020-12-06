@@ -261,7 +261,7 @@ class DjVuFile:
 
         # Convert white_page to djvu.
         res, data = _call_cmd(['c44', white_ppm, '-dpi', dpi])
-        os.unlink(white_ppm)  # rm white_page.ppm before retuning.
+        os.unlink(white_ppm)  # rm white_page.ppm before returning.
         if not res:
             return False
 

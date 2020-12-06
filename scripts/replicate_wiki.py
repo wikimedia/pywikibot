@@ -11,7 +11,7 @@ or:
 
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
-to copy all templates from an nlwiki to liwiki and fywiki. It will show which
+to copy all templates from nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write
 pages if -r /is/ present.
 

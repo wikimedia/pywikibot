@@ -1167,7 +1167,7 @@ class TestItemLoad(WikidataTestCase):
         """Helper function to test a page without an associated item.
 
         It tests two of the ways to fetch an item:
-        1. the Page already has props, which should contain a item id if
+        1. the Page already has props, which should contain an item id if
            present, and that item id is used to instantiate the item, and
         2. the page doesn't have props, in which case the site&titles is
            used to lookup the item id, but that lookup occurs after

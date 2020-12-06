@@ -141,7 +141,7 @@ def getversiondict():
 
 
 def svn_rev_info(path):
-    """Fetch information about the current revision of an Subversion checkout.
+    """Fetch information about the current revision of a Subversion checkout.
 
     @param path: directory of the Subversion checkout
     @return:

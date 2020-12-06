@@ -7,7 +7,7 @@ may be located in directory specified by the environment variable
 PYWIKIBOT_DIR, or the same directory as pwb.py, or in a directory within
 the users home. See get_base_dir for more information.
 
-If user-config.py can not be found in any of those locations, this module
+If user-config.py cannot be found in any of those locations, this module
 will fail to load unless the environment variable PYWIKIBOT_NO_USER_CONFIG
 is set to a value other than '0'. i.e. PYWIKIBOT_NO_USER_CONFIG=1 will
 allow config to load without a user-config.py. However, warnings will be

@@ -287,7 +287,7 @@ class ProofreadPage(pywikibot.Page):
     @index.setter
     def index(self, value):
         if not isinstance(value, IndexPage):
-            raise TypeError('value {} must be a IndexPage object.'
+            raise TypeError('value {} must be an IndexPage object.'
                             .format(value))
         self._index = (value, None)
 
@@ -766,7 +766,7 @@ class IndexPage(pywikibot.Page):
     INDEX_TEMPLATE = ':MediaWiki:Proofreadpage_index_template'
 
     def __init__(self, source, title=''):
-        """Instantiate a IndexPage object.
+        """Instantiate an IndexPage object.
 
         In this class:
         page number is the number in the page title in the Page namespace, if

@@ -3907,11 +3907,11 @@ class APISite(BaseSite):
 
         if text_overrides:
             if 'text' in kwargs:
-                raise ValueError('text can not be used with any of %s'
-                                 % ', '.join(text_overrides))
+                raise ValueError('text cannot be used with any of {}'
+                                 .format(', '.join(text_overrides)))
             if len(text_overrides) > 1:
-                raise ValueError('Multiple text overrides used: %s'
-                                 % ', '.join(text_overrides))
+                raise ValueError('Multiple text overrides used: {}'
+                                 .format(', '.join(text_overrides)))
             text = None
             basetimestamp = False
         elif 'text' in kwargs:
