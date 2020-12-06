@@ -3434,17 +3434,13 @@ class LanguageDict(BaseDataDict):
 
     def toJSON(self, diffto=None):
         data = {}
-        if diffto:
-            for key in diffto:
-                if key not in self:
-                    data[key] = {'language': key, 'value': ''}
-                elif self[key] != diffto[key]['value']:
-                    data[key] = {'language': key, 'value': self[key]}
-            for key in self:
-                if key not in diffto:
-                    data[key] = {'language': key, 'value': self[key]}
-        else:
-            for key in self:
+        diffto = diffto or {}
+        for key in diffto.keys() - self.keys():
+            data[key] = {'language': key, 'value': ''}
+        for key in self.keys() - diffto.keys():
+            data[key] = {'language': key, 'value': self[key]}
+        for key in self.keys() & diffto.keys():
+            if self[key] != diffto[key]['value']:
                 data[key] = {'language': key, 'value': self[key]}
         return data
 
@@ -3480,20 +3476,18 @@ class AliasesDict(BaseDataDict):
 
     def toJSON(self, diffto=None):
         data = {}
-        if diffto:
-            for lang, strings in diffto.items():
-                if len(self.get(lang, [])) > 0:
-                    if tuple(sorted(val['value'] for val in strings)) != tuple(
-                            sorted(self[lang])):
-                        data[lang] = [{'language': lang, 'value': i}
-                                      for i in self[lang]]
-                else:
-                    data[lang] = [
-                        {'language': lang, 'value': i['value'], 'remove': ''}
-                        for i in strings]
-        else:
-            for lang, values in self.items():
-                data[lang] = [{'language': lang, 'value': i} for i in values]
+        diffto = diffto or {}
+        for lang in diffto.keys() & self.keys():
+            if (sorted(val['value'] for val in diffto[lang])
+                    != sorted(self[lang])):
+                data[lang] = [{'language': lang, 'value': i}
+                              for i in self[lang]]
+        for lang in diffto.keys() - self.keys():
+            data[lang] = [
+                {'language': lang, 'value': i['value'], 'remove': ''}
+                for i in diffto[lang]]
+        for lang in self.keys() - diffto.keys():
+            data[lang] = [{'language': lang, 'value': i} for i in self[lang]]
         return data
 
 
