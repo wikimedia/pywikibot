@@ -435,10 +435,6 @@ class DryPage(pywikibot.Page):
         """Return disambig status stored in _disambig."""
         return self._disambig
 
-    def botMayEdit(self):
-        """Ignore botMayEdit life content call with text setter (T267770)."""
-        return None
-
 
 class FakeLoginManager(pywikibot.data.api.LoginManager):
 
