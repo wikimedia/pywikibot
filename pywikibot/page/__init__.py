@@ -620,26 +620,26 @@ class BasePage(ComparableMixin):
         if getattr(self, '_text', None) is not None:
             return self._text
 
-        if hasattr(self, '_revid'):
-            return self.latest_revision.text
-
         try:
-            self.get(get_redirect=True)
+            return self.get(get_redirect=True)
         except pywikibot.NoPage:
             # TODO: what other exceptions might be returned?
             return ''
 
-        # check botMayEdit on a very early state (T262136)
-        self.botMayEdit()
-        return self.latest_revision.text
-
     @text.setter
-    def text(self, value: str):
-        """
-        Update the current (edited) wikitext.
+    def text(self, value: Optional[str]):
+        """Update the current (edited) wikitext.
 
         @param value: New value or None
         """
+        try:
+            self.botMayEdit()  # T262136, T267770
+        except Exception as e:
+            # dry tests aren't able to make an API call but are
+            # but are rejected by an Exception; ignore it then.
+            if not str(e).startswith('DryRequest rejecting request:'):
+                raise
+
         del self.text
         self._text = None if value is None else str(value)
 
