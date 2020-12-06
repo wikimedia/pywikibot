@@ -876,15 +876,42 @@ class TestPageBotMayEdit(TestCase):
         self.page.text = '{{in use}}'
         self.assertFalse(self.page.botMayEdit())
 
-    def test_bot_may_edit_page(self):
-        """Test botMayEdit when changing content."""
+    def test_bot_may_edit_missing_page(self):
+        """Test botMayEdit for not existent page."""
         self.assertTrue(self.page.botMayEdit())
         self.page.text = '{{nobots}}'
         self.assertTrue(self.page.botMayEdit())
+
+    def test_bot_may_edit_page_nobots(self):
+        """Test botMayEdit for existing page with nobots template."""
         page = pywikibot.Page(self.site, 'Pywikibot nobots test')
         self.assertFalse(page.botMayEdit())
         page.text = ''
         self.assertFalse(page.botMayEdit())
+
+    def test_bot_may_edit_page_set_text(self):
+        """Test botMayEdit for existing page when assigning text first."""
+        content = 'Does page may be changed if {{nobots}} template is found?'
+        # test the page with assigning text first
+        with self.subTest(content=content):
+            page = pywikibot.Page(self.site, 'Pywikibot nobots test')
+            page.text = content
+            self.assertFalse(page.botMayEdit())
+
+    @unittest.expectedFailure
+    def test_bot_may_edit_page_set_text_failing(self):
+        """Test botMayEdit for existing page when assigning text first."""
+        contents = (
+            'Does page may be changed if content is not read first?',
+            'Does page may be changed if {{bots}} template is found?',
+        )
+        # test the page with assigning text first
+        for content in contents:
+            with self.subTest(content=content):
+                page = pywikibot.Page(self.site, 'Pywikibot nobots test')
+                page.text = content
+                self.assertFalse(page.botMayEdit())
+                del page
 
 
 class TestPageHistory(DefaultSiteTestCase):
