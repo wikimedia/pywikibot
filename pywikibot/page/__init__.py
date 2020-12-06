@@ -62,10 +62,13 @@ from pywikibot.tools import (
 from pywikibot.tools import is_IP
 
 if PYTHON_VERSION >= (3, 9):
+    from functools import cache
     Dict = dict
     List = list
 else:
+    from functools import lru_cache
     from typing import Dict, List
+    cache = lru_cache(None)
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'
@@ -627,7 +630,7 @@ class BasePage(ComparableMixin):
             return ''
 
         # check botMayEdit on a very early state (T262136)
-        self._bot_may_edit = self.botMayEdit()
+        self.botMayEdit()
         return self.latest_revision.text
 
     @text.setter
@@ -1093,6 +1096,7 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
+    @cache
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -1108,9 +1112,6 @@ class BasePage(ComparableMixin):
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
         """
-        if hasattr(self, '_bot_may_edit'):
-            return self._bot_may_edit
-
         if not hasattr(self, 'templatesWithParams'):
             return True
 
