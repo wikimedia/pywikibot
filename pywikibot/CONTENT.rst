@@ -113,6 +113,9 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
+    | _basesite.py               | Objects representingsite methods independent of the  |
+    |                            | communication interface.                             |
+    +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models.                      |
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |

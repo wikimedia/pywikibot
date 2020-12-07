@@ -51,7 +51,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         self.assertIs(self.site.nocapitalize,
                       self.site.siteinfo['case'] == 'case-sensitive')
         self.assertOneDeprecationParts(
-            'pywikibot.site.BaseSite.nocapitalize',
+            'pywikibot.site._basesite.BaseSite.nocapitalize',
             "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
 
     def test_siteinfo_normal_call(self):
@@ -127,61 +127,6 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
                                        'it directly')
 
 
-class TestBaseSiteProperties(TestCase):
-
-    """Test properties for BaseSite."""
-
-    sites = {
-        'enwikinews': {
-            'family': 'wikinews',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwikibooks': {
-            'family': 'wikibooks',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwikiquote': {
-            'family': 'wikiquote',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwiktionary': {
-            'family': 'wiktionary',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enws': {
-            'family': 'wikisource',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'dews': {
-            'family': 'wikisource',
-            'code': 'de',
-            'result': ('/Doku', '/Meta'),
-        },
-        'commons': {
-            'family': 'commons',
-            'code': 'commons',
-            'result': ('/doc', ),
-        },
-        'wikidata': {
-            'family': 'wikidata',
-            'code': 'wikidata',
-            'result': ('/doc', ),
-        },
-    }
-
-    dry = True
-
-    def test_properties(self, key):
-        """Test cases for BaseSite properties."""
-        mysite = self.get_site(key)
-        self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
-
-
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
@@ -200,54 +145,6 @@ class TestSiteObject(DefaultSiteTestCase):
         code = self.site.family.obsolete.get(self.code) or self.code
         expect = 'Site("{}", "{}")'.format(code, self.family)
         self.assertTrue(repr(self.site).endswith(expect))
-
-    def test_base_methods(self):
-        """Test cases for BaseSite methods."""
-        mysite = self.get_site()
-        code = self.site.family.obsolete.get(self.code) or self.code
-        self.assertEqual(mysite.family.name, self.family)
-        self.assertEqual(mysite.code, code)
-        self.assertIsInstance(mysite.lang, str)
-        self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
-        self.assertIsInstance(mysite.user(), (str, type(None)))
-        self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
-        self.assertIsInstance(mysite.linktrail(), str)
-        self.assertIsInstance(mysite.redirect(), str)
-        try:
-            dabcat = mysite.disambcategory()
-        except pywikibot.Error as e:
-            try:
-                self.assertIn('No disambiguation category name found', str(e))
-            except AssertionError:
-                self.assertIn(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(
-                        repo=mysite.data_repository().family.name,
-                        fam=mysite.family.name),
-                    str(e))
-        else:
-            self.assertIsInstance(dabcat, pywikibot.Category)
-
-        foo = str(pywikibot.Link('foo', source=mysite))
-        if self.site.namespaces[0].case == 'case-sensitive':
-            self.assertEqual(foo, '[[foo]]')
-        else:
-            self.assertEqual(foo, '[[Foo]]')
-
-        self.assertFalse(mysite.isInterwikiLink('foo'))
-        self.assertIsInstance(mysite.redirectRegex().pattern, str)
-        self.assertIsInstance(mysite.category_on_one_line(), bool)
-        self.assertTrue(mysite.sametitle('Template:Test', 'Template:Test'))
-        self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))
-        self.assertTrue(mysite.sametitle('Test name', 'Test name'))
-        self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
-        # User, MediaWiki and Special are always
-        # first-letter (== only first non-namespace letter is case insensitive)
-        # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
-        self.assertTrue(mysite.sametitle('Special:Always', 'Special:always'))
-        self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
-        self.assertTrue(mysite.sametitle('MediaWiki:Always',
-                                         'MediaWiki:always'))
 
     def test_constructors(self):
         """Test cases for site constructors."""
