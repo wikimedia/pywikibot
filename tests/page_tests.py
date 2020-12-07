@@ -1116,6 +1116,20 @@ class TestPageProtect(TestCase):
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
+    def test_protect_with_empty_parameters(self):
+        """Test Page.protect."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
+
+        p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                   reason='Pywikibot unit test')
+        self.assertEqual(p1.protection(),
+                         {'edit': ('sysop', 'infinity'),
+                          'move': ('autoconfirmed', 'infinity')})
+
+        p1.protect(reason='Pywikibot unit test')
+        self.assertEqual(p1.protection(), {})
+
     def test_protect_alt(self):
         """Test of Page.protect that works around T78522."""
         site = self.get_site()

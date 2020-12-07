@@ -1979,89 +1979,36 @@ class BasePage(ComparableMixin):
         self.site.undelete_page(self, reason, undelete_revs)
 
     def protect(self,
-                edit: bool = False,
-                move: bool = False,
-                create=None, upload=None,
-                unprotect: bool = False,
                 reason: Optional[str] = None,
-                prompt: Optional[bool] = None,
                 protections: Optional[dict] = None,
                 **kwargs):
         """
         Protect or unprotect a wiki page. Requires administrator status.
 
         Valid protection levels are '' (equivalent to 'none'),
-        'autoconfirmed', and 'sysop'. If None is given, however,
-        that protection will be skipped.
+        'autoconfirmed', 'sysop' and 'all'. 'all' means 'everyone is allowed',
+        i.e. that protection type will be unprotected.
+
+        In order to unprotect a type of permission, the protection level shall
+        be either set to 'all' or '' or skipped in the protections dictionary.
+
+        Expiry of protections can be set via kwargs, see Site.protect() for
+        details. By default there is no expiry for the protection types.
 
         @param protections: A dict mapping type of protection to protection
-            level of that type.
-        @param reason: Reason for the action
-        @param prompt: Whether to ask user for confirmation (deprecated).
-                       Defaults to protections is None
+            level of that type. Allowed protection types for a page can be
+            retrieved by Page.self.applicable_protections()
+            Defaults to protections is None, which means unprotect all
+            protection types.
+            Example: {'move': 'sysop', 'edit': 'autoconfirmed'}
+
+        @param reason: Reason for the action, default is None and will set an
+            empty string.
         """
-        def process_deprecated_arg(value, arg_name):
-            # if protections was set and value is None, don't interpret that
-            # argument. But otherwise warn that the parameter was set
-            # (even implicit)
-            if called_using_deprecated_arg:
-                if value is False:  # explicit test for False (don't use not)
-                    value = 'sysop'
-                if value == 'none':  # 'none' doesn't seem do be accepted
-                    value = ''
-                if value is not None:  # empty string is allowed
-                    protections[arg_name] = value
-                    issue_deprecation_warning(
-                        '"{}" argument of protect()'.format(arg_name),
-                        '"protections" dict',
-                        warning_class=FutureWarning,
-                        since='20140815')
+        protections = protections or {}  # protections is converted to {}
+        reason = reason or ''  # None is converted to ''
 
-            else:
-                if value:
-                    warn('"protections" argument of protect() replaces "{0}";'
-                         ' cannot use both.'.format(arg_name),
-                         RuntimeWarning)
-
-        # buffer that, because it might get changed
-        called_using_deprecated_arg = protections is None
-        if called_using_deprecated_arg:
-            protections = {}
-        process_deprecated_arg(edit, 'edit')
-        process_deprecated_arg(move, 'move')
-        process_deprecated_arg(create, 'create')
-        process_deprecated_arg(upload, 'upload')
-
-        if reason is None:
-            pywikibot.output('Preparing to protection change of %s.'
-                             % (self.title(as_link=True)))
-            reason = pywikibot.input('Please enter a reason for the action:')
-        if unprotect:
-            issue_deprecation_warning(
-                '"unprotect" argument of protect()',
-                warning_class=FutureWarning,
-                since='20140815')
-            protections = {p_type: ''
-                           for p_type in self.applicable_protections()}
-        answer = 'y'
-        if called_using_deprecated_arg and prompt is None:
-            prompt = True
-        if prompt:
-            issue_deprecation_warning(
-                '"prompt" argument of protect()',
-                warning_class=FutureWarning,
-                since='20140815')
-        if prompt and not hasattr(self.site, '_noProtectPrompt'):
-            answer = pywikibot.input_choice(
-                'Do you want to change the protection level of %s?'
-                % self.title(as_link=True, force_interwiki=True),
-                [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
-                'n', automatic_quit=False)
-            if answer == 'a':
-                answer = 'y'
-                self.site._noProtectPrompt = True
-        if answer == 'y':
-            self.site.protect(self, protections, reason, **kwargs)
+        self.site.protect(self, protections, reason, **kwargs)
 
     @deprecated_args(
         comment='summary', oldCat='old_cat', newCat='new_cat',
