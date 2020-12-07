@@ -38,7 +38,6 @@ from pywikibot.tools import (
     deprecated,
     deprecate_arg,
     file_mode_checker,
-    issue_deprecation_warning,
     PYTHON_VERSION,
 )
 
@@ -217,8 +216,7 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-@deprecate_arg('ssl', None)
-def request(site=None, uri: Optional[str] = None, method='GET', params=None,
+def request(site, uri: Optional[str] = None, method='GET', params=None,
             body=None, headers=None, data=None, **kwargs) -> str:
     """
     Request to Site with default error handling and response decoding.
@@ -243,15 +241,6 @@ def request(site=None, uri: Optional[str] = None, method='GET', params=None,
     # requests.Session.request.
     if data:
         body = data
-
-    assert(site or uri)
-    if not site:
-        # +1 because of @deprecate_arg
-        issue_deprecation_warning(
-            'Invoking http.request without argument site', 'http.fetch()', 3,
-            warning_class=FutureWarning, since='20150814')
-        r = fetch(uri, method, params, body, headers, **kwargs)
-        return r.text
 
     kwargs.setdefault('disable_ssl_certificate_validation',
                       site.ignore_certificate_error())
