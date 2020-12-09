@@ -1,7 +1,51 @@
 # Schripts Changelog
 
+## 5.2.0
+*10 December 2020*
+
+### general
+* Removed unsupported BadTitle Exception (T267768)
+* Replaced PageNotSaved by PageSaveRelatedError (T267821)
+* Update scripts to support Python 3.5+ only
+* i18n updates
+* L10N updates
+
+### basic
+* Make BasicBot example a ConfigParserBot to explain the usage
+
+### clean_sandbox
+* Fix TypeError (T267717)
+
+### fixing_redirects
+*  Ignore RuntimeError for missing 'redirects' in api response (T267567)
+
+### imagetransfer
+* Implement -tosite command and other improvements
+* Do not use UploadRobot.run() with imagetransfer (T267579)
+
+### interwiki
+* Use textfile for interwiki dumps and enable -restore:all option (T74943, T213624)
+
+### makecat
+* Use input_choice for options
+* New option handling
+* Other improvements
+
+### revertbot
+* Take rollbacktoken to revert (T250509)
+
+### solve_disambiguation
+* Write ignoring pages as a whole
+
+### touch
+* Fix available_options and purge options (T268394)
+
+### weblinkchecker
+* Fix AttributeError of HttpRequest (T269821)
+
+
 ## 5.1.0
-*(current)*
+*1 November 2020*
 
 ### general
 * i18n updates
@@ -27,6 +71,8 @@
 * Use wikidata item instead of dropped MediaWiki message for default categoy (T266413)
 
 ### reflinks
+* Derive ReferencesRobot from ExistingPageBot and NoRedirectPageBot
+* Use chardet to find a valid encoding (266862)
 * Rename ReferencesRobot.run to treat (T196851, T171713)
 * Ignore duplication replacements inside templates (T266411)
 * Fix edit summary (T265968)
