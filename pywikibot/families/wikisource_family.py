@@ -30,7 +30,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
         'te', 'sl', 'hy', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
         'tr', 'az', 'br', 'la', 'nl', 'ca', 'kn', 'hr', 'eo', 'no', 'is',
-        'vec', 'pms', 'id', 'et', 'be', 'da', 'lij', 'hi', 'mk', 'yi', 'mr',
+        'vec', 'pms', 'id', 'et', 'be', 'da', 'hi', 'lij', 'mk', 'yi', 'mr',
         'bg', 'as', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'cy', 'bs', 'sah',
         'sk', 'zh-min-nan', 'fo',
     ]
