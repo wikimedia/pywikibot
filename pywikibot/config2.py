@@ -48,7 +48,7 @@ import types
 from locale import getdefaultlocale
 from os import getenv, environ
 from textwrap import fill
-from typing import Optional
+from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
@@ -636,7 +636,7 @@ maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
-put_throttle = 10
+put_throttle = 10  # type: Union[int, float]
 
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.

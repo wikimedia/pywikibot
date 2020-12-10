@@ -1245,7 +1245,7 @@ def _flush(stop=True):
             remainingPages -= 1
 
         remainingSeconds = datetime.timedelta(
-            seconds=(remainingPages * config.put_throttle))
+            seconds=round(remainingPages * config.put_throttle))
         return (remainingPages, remainingSeconds)
 
     if stop:
