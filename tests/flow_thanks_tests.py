@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from pywikibot.flow import Topic
 
 from tests.aspects import TestCase
@@ -28,7 +26,7 @@ class TestThankFlowPost(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up class."""
-        super(TestThankFlowPost, cls).setUpClass()
+        super().setUpClass()
         cls._topic_title = 'Topic:Tvkityksg1ukyrrw'
 
     def test_thank_post(self):

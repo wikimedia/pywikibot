@@ -33,7 +33,9 @@ pydot >= 1.2
 python-stdnum >= 1.14
 
 # GUI
-Pillow >= 6.2.2
+Pillow >= 6.2.2, < 8.0.0 ; python_version < '3.6'
+Pillow >= 6.2.2 ; python_version >= '3.6' and python_version < '3.9' 
+Pillow >= 8.0.0 ; python_version >= '3.9'
 
 # core pagegenerators
 google >= 1.7

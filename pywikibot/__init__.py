@@ -36,18 +36,16 @@ from pywikibot import config2 as config
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
-    Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
-    SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
-    UnknownExtension,
-    NoUsername, UserBlocked,
-    PageRelatedError, UnsupportedPage, IsRedirectPage, IsNotRedirectPage,
-    PageSaveRelatedError, PageNotSaved, OtherPageSaveError,
-    LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
-    EditConflict, PageDeletedConflict, PageCreatedConflict,
-    ServerError, FatalServerError, Server414Error, Server504Error,
-    CaptchaError, SpamblacklistError, TitleblacklistError,
-    CircularRedirect, InterwikiRedirectPage, WikiBaseError, NoWikibaseEntity,
-    CoordinateGlobeUnknownException,
+    BadTitle, CaptchaError, CascadeLockedPage, CircularRedirect,
+    CoordinateGlobeUnknownException, EditConflict, Error, FatalServerError,
+    InterwikiRedirectPage, InvalidTitle, IsNotRedirectPage, IsRedirectPage,
+    LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage, NoSuchSite,
+    NoUsername, NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
+    PageDeletedConflict, PageNotSaved, PageRelatedError, PageSaveRelatedError,
+    SectionError, Server414Error, Server504Error, ServerError,
+    SiteDefinitionError, SpamblacklistError, TitleblacklistError,
+    UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
+    WikiBaseError,
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
@@ -58,7 +56,6 @@ from pywikibot.site import BaseSite, DataSite, APISite, ClosedSite
 from pywikibot.tools import (
     classproperty,
     deprecate_arg as _deprecate_arg,
-    issue_deprecation_warning,
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
@@ -89,15 +86,14 @@ __all__ = (
     'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
     'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
     'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    'QuitKeyboardInterrupt', 'SectionError',
-    'ServerError', 'FatalServerError', 'Server414Error', 'Server504Error',
-    'showDiff', 'show_help', 'showHelp', 'Site', 'SiteDefinitionError',
-    'SiteLink', 'SpamblacklistError', 'stdout', 'Timestamp',
-    'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
+    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'showHelp',
+    'Site', 'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
+    'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
     'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'UserBlocked', 'warning',
-    'WbGeoShape', 'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime',
-    'WbUnknown', 'WikiBaseError', 'WikidataBot',
+    'UploadWarning', 'url2unicode', 'User', 'warning', 'WbGeoShape',
+    'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
+    'WikiBaseError', 'WikidataBot',
 )
 
 
@@ -1087,8 +1083,8 @@ def _code_fam_from_url(url: str):
 
 
 @_deprecate_arg('sysop', None)
-def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
-         sysop=None, interface=None,
+def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
+         interface=None,
          url: Optional[str] = None) -> Union[APISite, DataSite, ClosedSite]:
     """A factory method to obtain a Site object.
 
@@ -1098,6 +1094,7 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
     using the method parameters.
 
     @param code: language code (override config.mylang)
+        code may also be a sitename like 'wikipedia:test'
     @param fam: family name or object (override config.family)
     @type fam: str or pywikibot.family.Family
     @param user: bot user name to use on this site (override config.usernames)
@@ -1112,10 +1109,6 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
     """
     _logger = 'wiki'
 
-    if sysop is not None:
-        issue_deprecation_warning('positional argument of "sysop"', depth=3,
-                                  warning_class=DeprecationWarning,
-                                  since='20190907')
     if url:
         # Either code and fam or only url
         if code or fam:
@@ -1123,13 +1116,19 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None,
                 'URL to the wiki OR a pair of code and family name '
                 'should be provided')
         code, fam = _code_fam_from_url(url)
+    elif code and ':' in code:
+        if fam:
+            raise ValueError(
+                'sitename OR a pair of code and family name '
+                'should be provided')
+        fam, _, code = code.partition(':')
     else:
         # Fallback to config defaults
         code = code or config.mylang
         fam = fam or config.family
 
-        if not isinstance(fam, Family):
-            fam = Family.load(fam)
+    if not isinstance(fam, Family):
+        fam = Family.load(fam)
 
     interface = interface or fam.interface(code)
 

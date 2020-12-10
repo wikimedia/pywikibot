@@ -5,7 +5,6 @@ Exception and warning classes used throughout the framework.
 Error: Base class, all exceptions should the subclass of this class.
 
   - NoUsername: Username is not in user-config.py, or it is invalid.
-  - UserBlocked: Username or IP has been blocked
   - AutoblockUser: requested action on a virtual autoblock user not valid
   - UserRightsError: insufficient rights for requested action
   - BadTitle: Server responded with BadTitle
@@ -561,15 +560,5 @@ class TimeoutError(Error):
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
-
-    pass
-
-# DEPRECATED exceptions which will be removed ##########################
-
-
-# UserBlocked exceptions is not used by the framework.
-class UserBlocked(Error):
-
-    """DEPRECATED. Your username or IP has been blocked."""
 
     pass

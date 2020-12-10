@@ -22,10 +22,20 @@ scripts.maintenance.compat2core script
 
 .. automodule:: scripts.maintenance.compat2core
 
+scripts.maintenance.interwikidumps script
+-----------------------------------------
+
+.. automodule:: scripts.maintenance.interwikidumps
+
 scripts.maintenance.make\_i18n\_dict script
 -------------------------------------------
 
 .. automodule:: scripts.maintenance.make_i18n_dict
+
+scripts.maintenance.sorting\_order script
+-----------------------------------------
+
+.. automodule:: scripts.maintenance.sorting_order
 
 scripts.maintenance.update\_linktrails script
 ---------------------------------------------

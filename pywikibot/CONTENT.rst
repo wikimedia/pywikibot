@@ -43,7 +43,7 @@ The contents of the package
     | i18n.py                    | Helper functions for both the internal translation   |
     |                            | system and for TranslateWiki-based translations      |
     +----------------------------+------------------------------------------------------+
-    | interwiki_graph.py         | Possible create graph with interwiki.py.             |
+    | interwiki_graph.py         | Possible create graph with interwiki.py script       |
     +----------------------------+------------------------------------------------------+
     | logentries.py              | Objects representing Mediawiki log entries           |
     +----------------------------+------------------------------------------------------+
@@ -104,6 +104,8 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
+    | _revision.py               | Object representing page revision                    |
+    +----------------------------+------------------------------------------------------+
 
 
     +----------------------------+------------------------------------------------------+
@@ -111,9 +113,18 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
+    | _basesite.py               | Objects representingsite methods independent of the  |
+    |                            | communication interface.                             |
+    +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models.                      |
     +----------------------------+------------------------------------------------------+
+    | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
+    +----------------------------+------------------------------------------------------+
+    | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
+    +----------------------------+------------------------------------------------------+
     | _siteinfo.py               | Objects representing site info data contents.        |
+    +----------------------------+------------------------------------------------------+
+    | _tokenwallet.py            | Objects representing api tokens.                     |
     +----------------------------+------------------------------------------------------+
 
 

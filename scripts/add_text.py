@@ -144,7 +144,7 @@ def put_text(page, new: str, summary: str, count: int,
             .format(page.title(), e.url))
     except pywikibot.LockedPage:
         pywikibot.output('Skipping {} (locked page)'.format(page.title()))
-    except pywikibot.PageNotSaved as error:
+    except pywikibot.PageSaveRelatedError as error:
         pywikibot.output('Error putting page: {}'.format(error.args))
     else:
         return True
@@ -170,13 +170,13 @@ def add_text(page, addText: str, summary: Optional[str] = None,
     @param always: Always add text without user confirmation
     @param up: If True, add text to top of page, else add at bottom.
     @param putText: If True, save changes to the page, else return
-        (text, newtext, always)
+        (_, newtext, _)
     @param oldTextGiven: If None fetch page text, else use this text
     @param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
     @param create: Create page if it does not exist
     @return: If putText=True: (success, success, always)
-        else: (text, newtext, always)
+        else: (_, newtext, _)
     """
     site = page.site
     if not summary:
@@ -339,10 +339,10 @@ def main(*args: Tuple[str, ...]) -> None:
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
     for page in generator:
-        (text, newtext, always) = add_text(page, addText, summary, regexSkip,
-                                           regexSkipUrl, always, up, True,
-                                           reorderEnabled=reorderEnabled,
-                                           create=talkPage)
+        (_, newtext, _) = add_text(page, addText, summary, regexSkip,
+                                   regexSkipUrl, always, up, True,
+                                   reorderEnabled=reorderEnabled,
+                                   create=talkPage)
 
 
 if __name__ == '__main__':

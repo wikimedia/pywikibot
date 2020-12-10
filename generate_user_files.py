@@ -440,9 +440,9 @@ def main(*args: Tuple[str, ...]):
     """
     # set the config family and mylang values to an invalid state so that
     # the script can detect that the command line arguments -family & -lang
-    # were used and and handle_args has updated these config values,
+    # or -site were used and handle_args has updated these config values,
     # and 'force' mode can be activated below.
-    (config.family, config.mylang) = ('wikipedia', None)
+    config.family, config.mylang = 'wikipedia', None
 
     local_args = pywikibot.handle_args(args)
     if local_args:

@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-Various i18n functions.
+"""Various i18n functions.
 
-Helper functions for both the internal translation system
-and for TranslateWiki-based translations.
+Helper functions for both the internal localization system and for
+TranslateWiki-based translations.
 
 By default messages are assumed to reside in a package called
-'scripts.i18n'. In pywikibot 3+, that package is not packaged
-with pywikibot, and pywikibot 3+ does not have a hard dependency
-on any i18n messages. However, there are three user input questions
-in pagegenerators which will use i18n messages if they can be loaded.
+'scripts.i18n'. In pywikibot 3+, that package is not packaged with
+pywikibot, and pywikibot 3+ does not have a hard dependency on any i18n
+messages. However, there are three user input questions in pagegenerators
+which will use i18n messages if they can be loaded.
 
 The default message location may be changed by calling
-L{set_message_package} with a package name. The package must contain
-an __init__.py, and a message bundle called 'pywikibot' containing
-messages. See L{twtranslate} for more information on the messages.
+L{set_message_package} with a package name. The package must contain an
+__init__.py, and a message bundle called 'pywikibot' containing messages.
+See L{twtranslate} for more information on the messages.
 """
 #
 # (C) Pywikibot team, 2004-2020
@@ -30,7 +29,7 @@ from collections.abc import Mapping
 from collections import defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional
+from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -463,7 +462,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
             issue_deprecation_warning(
                 'type {0} for value {1} ({2})'
                 .format(type(num), selector, num),
-                'an int', 1, since='20151009')
+                'an int', 1,
+                warning_class=FutureWarning, since='20151009')
             num = int(num)
 
         plural_entries = []
@@ -536,45 +536,50 @@ class _PluralMappingAlias(Mapping):
         return self.source
 
     def __iter__(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def __len__(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 DEFAULT_FALLBACK = ('_default', )
 
 
-def translate(code, xdict, parameters=None, fallback=False):
-    """Return the most appropriate translation from a translation dict.
+def translate(code,
+              xdict: Union[dict, str],
+              parameters: Union[dict, str, int, None] = None,
+              fallback=False) -> str:
+    """Return the most appropriate localization from a localization dict.
 
-    Given a language code and a dictionary, returns the dictionary's value for
+    Given a site code and a dictionary, returns the dictionary's value for
     key 'code' if this key exists; otherwise tries to return a value for an
-    alternative language that is most applicable to use on the wiki in
-    language 'code' except fallback is False.
+    alternative code that is most applicable to use on the wiki in language
+    'code' except fallback is False.
 
-    The language itself is always checked first, then languages that
-    have been defined to be alternatives, and finally English. If none of
-    the options gives result, we just take the one language from xdict which
-    may not be always the same. When fallback is iterable it'll return None if
-    no code applies (instead of returning one).
+    The code itself is always checked first, then these codes that have
+    been defined to be alternatives, and finally English.
+
+    If fallback is False and the code is not found in the
 
     For PLURAL support have a look at the twtranslate method.
 
-    @param code: The language code
+    @param code: The site code as string or Site object. If xdict is an
+        extended dictionary the Site object should be used in favour of the
+        code string. Otherwise localizations from a wrong family might be
+        used.
     @type code: str or Site object
-    @param xdict: dictionary with language codes as keys or extended dictionary
-                  with family names as keys containing language dictionaries or
-                  a single (unicode) string. May contain PLURAL tags as
-                  described in twtranslate
-    @type xdict: dict, string, unicode
+    @param xdict: dictionary with language codes as keys or extended
+        dictionary with family names as keys containing code dictionaries
+        or a single string. May contain PLURAL tags as described in
+        twtranslate
     @param parameters: For passing (plural) parameters
-    @type parameters: dict, string, unicode, int
     @param fallback: Try an alternate language code. If it's iterable it'll
         also try those entries and choose the first match.
     @type fallback: boolean or iterable
-    @raise IndexError: If the language supports and requires more plurals than
-        defined for the given translation template.
+    @return: the localized string
+    @raise IndexError: If the language supports and requires more plurals
+        than defined for the given PLURAL pattern.
+    @raise KeyError: No fallback key found if fallback is not False
     """
     family = pywikibot.config.family
     # If a site is given instead of a code, use its language
@@ -582,17 +587,19 @@ def translate(code, xdict, parameters=None, fallback=False):
         family = code.family.name
         code = code.code
 
-    # Check whether xdict has multiple projects
-    if isinstance(xdict, dict):
-        if family in xdict:
-            xdict = xdict[family]
-        elif 'wikipedia' in xdict:
-            xdict = xdict['wikipedia']
+    try:
+        lookup = xdict[code]
+    except (KeyError, TypeError):
+        # Check whether xdict has multiple projects
+        if isinstance(xdict, dict) and family in xdict:
+            lookup = xdict[family]
+        else:
+            lookup = xdict
 
     # Get the translated string
-    if not isinstance(xdict, dict):
-        trans = xdict
-    elif not xdict:
+    if not isinstance(lookup, dict):
+        trans = lookup
+    elif not lookup:
         trans = None
     else:
         codes = [code]
@@ -601,21 +608,28 @@ def translate(code, xdict, parameters=None, fallback=False):
         elif fallback is not False:
             codes.extend(fallback)
         for code in codes:
-            if code in xdict:
-                trans = xdict[code]
+            if code in lookup:
+                trans = lookup[code]
                 break
         else:
-            if fallback is False:
-                return None
-            raise KeyError('No fallback key found in lookup dict for "{}"'
-                           .format(code))
+            if fallback is not False:
+                raise KeyError('No fallback key found in lookup dict for "{}"'
+                               .format(code))
+            trans = None
+
     if trans is None:
+        if 'wikipedia' in xdict:
+            # fallback to wikipedia family
+            return translate(code, xdict['wikipedia'],
+                             parameters=parameters, fallback=fallback)
         return None  # return None if we have no translation found
+
     if parameters is None:
         return trans
 
     if not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a mapping',
+                                  warning_class=FutureWarning,
                                   since='20151008')
         plural_parameters = _PluralMappingAlias(parameters)
     else:
@@ -627,7 +641,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         # On error: parameter is for PLURAL variants only,
         # don't change the string
         with suppress(KeyError, TypeError):
-            return trans % parameters
+            trans = trans % parameters
     return trans
 
 
@@ -763,6 +777,7 @@ def twtranslate(source,
 
     if parameters is not None and not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a Mapping',
+                                  warning_class=FutureWarning,
                                   since='20151008')
 
     if not only_plural and parameters:

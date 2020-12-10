@@ -8,12 +8,10 @@ Parameters:
 -start:     - Set from what page you want to start
 """
 #
-# (C) Pywikibot team, 2003-2019
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot import i18n, textlib

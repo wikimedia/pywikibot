@@ -13,6 +13,8 @@ The following parameters are supported:
                 Example: -family:wiktionary -lang:fr will log you in at
                 fr.wiktionary.org.
 
+   -site:FF:LL  Log in to the LL language of the FF family
+
    -all         Try to log in on all sites where a username is defined in
                 user-config.py.
 

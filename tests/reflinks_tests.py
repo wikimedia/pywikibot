@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
 from tests import join_xml_data_path
@@ -137,7 +135,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     def setUp(self):
         """Set up the script by patching the bot class."""
-        super(TestReferencesBotConstructor, self).setUp()
+        super().setUp()
         self._original_constructor = ReferencesRobot.__init__
         self._original_run = ReferencesRobot.run
         ReferencesRobot.__init__ = dummy_constructor
@@ -148,7 +146,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         ReferencesRobot.__init__ = self._original_constructor
         ReferencesRobot.run = self._original_run
         with empty_sites():
-            super(TestReferencesBotConstructor, self).tearDown()
+            super().tearDown()
 
     def test_xml_simple(self):
         """Test the generator without any narrowing."""

@@ -67,13 +67,10 @@ class TestMonthName(TestCase):
     net = True
 
     def test_month_name_formats(self):
-        """Test MonthName format."""
+        """Test MonthName format for codes retrieved via mediawiki message."""
         formatname = 'MonthName'
         for code in date.formats['Cat_BirthsAD']:
-            try:
-                convert = date.formats[formatname][code]
-            except KeyError:  # Not all month names are available yet
-                continue
+            convert = date.formats[formatname][code]
             predicate, start, stop = date.formatLimits[formatname]
             for value in range(start, stop):
                 with self.subTest(code=code, month=value):

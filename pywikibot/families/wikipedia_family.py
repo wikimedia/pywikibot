@@ -29,34 +29,34 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'ceb', 'sv', 'de', 'fr', 'nl', 'ru', 'it', 'es', 'pl', 'war',
-        'vi', 'ja', 'zh', 'arz', 'ar', 'uk', 'pt', 'fa', 'ca', 'sr', 'id',
+        'vi', 'ja', 'arz', 'zh', 'ar', 'uk', 'pt', 'fa', 'ca', 'sr', 'id',
         'no', 'ko', 'fi', 'hu', 'cs', 'sh', 'zh-min-nan', 'ro', 'tr', 'eu',
-        'ms', 'ce', 'eo', 'he', 'hy', 'bg', 'da', 'azb', 'sk', 'kk', 'min',
-        'hr', 'et', 'tt', 'lt', 'be', 'el', 'simple', 'az', 'sl', 'gl', 'ur',
-        'nn', 'ka', 'hi', 'th', 'uz', 'la', 'cy', 'ta', 'vo', 'mk', 'ast',
-        'lv', 'zh-yue', 'tg', 'bn', 'af', 'mg', 'oc', 'bs', 'sq', 'ky', 'nds',
-        'new', 'be-tarask', 'ml', 'te', 'br', 'vec', 'pms', 'mr', 'tl', 'su',
-        'ht', 'sw', 'jv', 'lb', 'pnb', 'ba', 'ga', 'szl', 'is', 'my', 'fy',
-        'cv', 'lmo', 'sco', 'wuu', 'an', 'diq', 'pa', 'ku', 'yo', 'ne', 'bar',
-        'io', 'gu', 'ckb', 'als', 'kn', 'scn', 'bpy', 'qu', 'ia', 'mn',
+        'ce', 'ms', 'eo', 'he', 'hy', 'bg', 'da', 'azb', 'tt', 'sk', 'kk',
+        'min', 'hr', 'et', 'lt', 'be', 'el', 'simple', 'az', 'sl', 'gl', 'ur',
+        'nn', 'ka', 'hi', 'th', 'uz', 'la', 'ta', 'cy', 'vo', 'mk', 'ast',
+        'zh-yue', 'lv', 'tg', 'bn', 'af', 'mg', 'oc', 'bs', 'sq', 'nds', 'ky',
+        'new', 'be-tarask', 'ml', 'te', 'br', 'vec', 'mr', 'pms', 'tl', 'jv',
+        'su', 'ht', 'sw', 'lb', 'pnb', 'ba', 'ga', 'my', 'szl', 'is', 'fy',
+        'lmo', 'cv', 'sco', 'wuu', 'diq', 'an', 'pa', 'ku', 'yo', 'ne', 'bar',
+        'io', 'gu', 'ckb', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn',
         'bat-smg', 'si', 'nv', 'or', 'cdo', 'ilo', 'gd', 'xmf', 'yi', 'am',
         'nap', 'bug', 'wa', 'sd', 'hsb', 'mai', 'fo', 'map-bms', 'mzn', 'li',
-        'sah', 'eml', 'os', 'ps', 'sa', 'frr', 'bcl', 'zh-classical', 'ace',
-        'avk', 'gor', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'hyw',
-        'km', 'nso', 'rue', 'crh', 'se', 'as', 'bh', 'shn', 'vls', 'mi',
-        'nds-nl', 'nah', 'sc', 'vep', 'gan', 'sn', 'myv', 'lrc', 'ab', 'glk',
-        'bo', 'so', 'co', 'tk', 'fiu-vro', 'ha', 'csb', 'kv', 'ie', 'gv',
-        'udm', 'pcd', 'kab', 'ay', 'sat', 'zea', 'zu', 'ban', 'nrm', 'ug',
-        'lij', 'kw', 'lez', 'frp', 'lfn', 'stq', 'gn', 'mwl', 'gom', 'rm',
-        'mt', 'lo', 'lad', 'koi', 'olo', 'fur', 'ang', 'dsb', 'dty', 'bjn',
-        'ext', 'ln', 'cbk-zam', 'dv', 'tyv', 'ary', 'ksh', 'gag', 'pfl', 'pag',
-        'pi', 'av', 'awa', 'haw', 'bxr', 'xal', 'krc', 'pap', 'za', 'rw',
-        'pdc', 'kaa', 'szy', 'arc', 'to', 'nov', 'jam', 'tpi', 'kbp', 'ig',
-        'kbd', 'inh', 'na', 'tet', 'smn', 'wo', 'tcy', 'ki', 'atj', 'ak',
-        'jbo', 'bi', 'roa-rup', 'lbe', 'kg', 'ty', 'lg', 'mdf', 'lld', 'fj',
-        'srn', 'xh', 'gcr', 'ltg', 'chr', 'sm', 'om', 'got', 'kl', 'pih', 'st',
-        'ny', 'cu', 'nqo', 'mnw', 'tn', 'tw', 'ts', 'rmy', 'bm', 'chy', 'rn',
-        'tum', 'ss', 'ch', 'iu', 'pnt', 'ks', 'ady', 've', 'ee', 'ik', 'ff',
+        'sah', 'os', 'eml', 'frr', 'ps', 'sa', 'avk', 'gor', 'bcl',
+        'zh-classical', 'ace', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam',
+        'hyw', 'km', 'crh', 'nso', 'rue', 'shn', 'se', 'as', 'bh', 'vls', 'mi',
+        'nds-nl', 'nah', 'sc', 'ha', 'vep', 'lrc', 'gan', 'sn', 'myv', 'ab',
+        'glk', 'bo', 'so', 'co', 'tk', 'kab', 'fiu-vro', 'sat', 'zu', 'kv',
+        'csb', 'ban', 'ie', 'pcd', 'gv', 'udm', 'ay', 'ug', 'zea', 'nrm',
+        'lij', 'kw', 'frp', 'lez', 'gn', 'lfn', 'stq', 'mwl', 'gom', 'rm',
+        'mt', 'lo', 'lad', 'olo', 'koi', 'fur', 'bjn', 'ang', 'dty', 'dsb',
+        'ext', 'ln', 'cbk-zam', 'ary', 'tyv', 'dv', 'ksh', 'gag', 'pfl', 'pi',
+        'pag', 'av', 'awa', 'haw', 'bxr', 'xal', 'ig', 'krc', 'pap', 'za',
+        'rw', 'pdc', 'smn', 'kaa', 'szy', 'arc', 'to', 'nov', 'jam', 'wo',
+        'tpi', 'kbp', 'kbd', 'inh', 'na', 'tet', 'tcy', 'atj', 'ki', 'ak',
+        'jbo', 'bi', 'roa-rup', 'lbe', 'kg', 'lg', 'ty', 'mdf', 'xh', 'lld',
+        'fj', 'srn', 'gcr', 'om', 'ltg', 'ny', 'sm', 'chr', 'got', 'kl', 'pih',
+        'st', 'mnw', 'nqo', 'cu', 'tw', 'tn', 'ts', 'rmy', 'bm', 'chy', 'rn',
+        'tum', 'ss', 'ch', 'ks', 'iu', 'pnt', 'ady', 've', 'ee', 'ik', 'ff',
         'sg', 'din', 'dz', 'ti', 'cr',
     ]
 
@@ -110,18 +110,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'zh': ('分类重定向',),
         'zh-yue': ('分類彈去',),
     }
-
-    # families that redirect their interlanguage links here.
-    interwiki_forwarded_from = [
-        'commons',
-        'incubator',
-        'mediawiki',
-        'meta',
-        'outreach',
-        'species',
-        'test',
-        'wikimania'
-    ]
 
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
@@ -214,6 +202,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'he': ('בעבודה',),
         'hr': ('Radovi',),
         'sr': ('Радови у току', 'Рут',),
+        'test': ('In use',),
         'ur': ('زیر ترمیم',),
         'zh': ('Inuse',),
     }
@@ -229,17 +218,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'de': ('Archiv',),
     }
 
-    def get_known_families(self, site):
+    def get_known_families(self, code):
         """Override the family interwiki prefixes for each site."""
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.
-        if site.code == 'sv':
+        if code == 'sv':
             d = self.known_families.copy()
             d.pop('s')
             d['src'] = 'wikisource'
             return d
-        else:
-            return self.known_families
+
+        return self.known_families
 
     def encodings(self, code):
         """Return a list of historical encodings for a specific site."""

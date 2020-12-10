@@ -166,10 +166,10 @@ class SandboxBot(Bot, ConfigParserBot):
         super().__init__(**kwargs)
         if self.opt.delay < 0:
             d = min(15, max(5, int(self.opt.hours * 60)))
-            self.available_options['delay_td'] = datetime.timedelta(minutes=d)
+            self.opt.delay_td = datetime.timedelta(minutes=d)
         else:
             d = max(5, self.opt.delay)
-            self.available_options['delay_td'] = datetime.timedelta(minutes=d)
+            self.opt.delay_td = datetime.timedelta(minutes=d)
 
         self.site = pywikibot.Site()
         self.translated_content = self.opt.text or i18n.translate(

@@ -6,8 +6,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from scripts import data_ingestion
 
 from tests import join_data_path, join_images_path
@@ -31,7 +29,7 @@ class TestPhoto(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(TestPhoto, self).setUp()
+        super().setUp()
         url = ('http://upload.wikimedia.org/wikipedia/commons/f/'
                'fc/MP_sounds.png')
 
@@ -84,7 +82,7 @@ class TestCSVReader(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(TestCSVReader, self).setUp()
+        super().setUp()
         with open(join_data_path('csv_ingestion.csv')) as fileobj:
             self.iterator = data_ingestion.CSVReader(fileobj, 'url',
                                                      site=self.get_site())

@@ -196,7 +196,8 @@ locale.setlocale(locale.LC_ALL, '')
 # FIXME: Not all language/project combinations have been defined yet.
 #        Add the following strings to customise for a language:
 #        logbook, netext, report_page, bad_pag, report_text, random_sign,
-#        whitelist_pg, final_new_text_additions, logpage_header
+#        whitelist_pg, final_new_text_additions, logpage_header if
+#        different from wikipedia entry
 
 ############################################################################
 
@@ -263,42 +264,30 @@ netext = {
         'zh-yue': '{{歡迎}}--%s',
     },
     'wikibooks': {
-        'ar': '{{subst:ترحيب}} %s',
-        'bs': '{{Dobrodošlica}} %s',
         'es': '{{subst:bienivenido usuario}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikinews': {
-        'ar': '{{subst:ترحيب}} %s',
-        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{خوشامد۲|%s}}',
         'it': '{{subst:benvenuto}}',
         'zh': '{{subst:welcome}} %s',
     },
     'wikiquote': {
-        'ar': '{{subst:ترحيب}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikisource': {
-        'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
-        'bs': '{{Dobrodošlica}} %s',
-        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
         'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
-        'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম|%s}}',
-        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{جا:خوشامد|%s}}',
-        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'it': '{{subst:Utente:Filnik/Benve|firma=%s}}',
         'ml': '{{subst:സ്വാഗതം}}',
         'ur': '{{جا:خوش آمدید}}%s',
     },
     'wikiversity': {
-        'ar': '{{subst:ترحيب}} %s',
         'de': '{{subst:Willkommen|%s}}',
         'el': '{{subst:καλωσόρισμα}} %s',
         'en': '{{subst:Welcome}}\n\n{{subst:Talktome}} %s',
@@ -665,10 +654,10 @@ class WelcomeBot(SingleSiteBot):
             pywikibot.output('Reported')
         self.BAQueue = []
 
-    def makelogpage(self, queue=None) -> bool:
+    def makelogpage(self):
         """Make log page."""
-        if not globalvar.makeWelcomeLog or not queue:
-            return False
+        if not globalvar.makeWelcomeLog or not self.welcomed_users:
+            return
 
         if self.site.code == 'it':
             pattern = '%d/%m/%Y'
@@ -696,7 +685,7 @@ class WelcomeBot(SingleSiteBot):
         text += '\n'.join(
             '{{WLE|user=%s|contribs=%d}}' % (
                 user.title(as_url=True, with_ns=False), user.editCount())
-            for user in queue)
+            for user in self.welcomed_users)
 
         # update log page.
         while True:
@@ -709,26 +698,39 @@ class WelcomeBot(SingleSiteBot):
                 time.sleep(10)
             else:
                 break
-        return True
+        self.welcomed_users = []
 
     @property
     def generator(self) -> Generator[pywikibot.User, None, None]:
         """Retrieve new users."""
-        if globalvar.timeoffset != 0:
-            start = self.site.server_time() - timedelta(
-                minutes=globalvar.timeoffset)
-        else:
-            start = globalvar.offset
-        for ue in self.site.logevents('newusers', total=globalvar.queryLimit,
-                                      start=start):
-            if ue.action() == 'create' or (
-                    ue.action() == 'autocreate' and globalvar.welcomeAuto):
-                try:
-                    user = ue.page()
-                except HiddenKeyError:
-                    pywikibot.exception()
-                else:
-                    yield user
+        while True:
+            if globalvar.timeoffset != 0:
+                start = self.site.server_time() - timedelta(
+                    minutes=globalvar.timeoffset)
+            else:
+                start = globalvar.offset
+            for ue in self.site.logevents('newusers',
+                                          total=globalvar.queryLimit,
+                                          start=start):
+                if ue.action() == 'create' \
+                   or ue.action() == 'autocreate' and globalvar.welcomeAuto:
+                    try:
+                        user = ue.page()
+                    except HiddenKeyError:
+                        pywikibot.exception()
+                    else:
+                        yield user
+
+            self.write_log()
+            if not globalvar.recursive:
+                break
+
+            # Wait some seconds and repeat retrieving new users
+            self.show_status()
+            strfstr = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
+            pywikibot.output('Sleeping {} seconds before rerun. {}'
+                             .format(globalvar.timeRecur, strfstr))
+            pywikibot.sleep(globalvar.timeRecur)
 
     def defineSign(self, force=False) -> List[str]:
         """Setup signature."""
@@ -801,104 +803,76 @@ class WelcomeBot(SingleSiteBot):
 
         return True
 
-    def run(self) -> None:
+    def treat(self, user) -> None:
         """Run the bot."""
-        while True:
-            welcomed_count = 0
-            for user in self.generator:
-                if self.skip_page(user):
-                    continue
+        self.show_status(Msg.MATCH)
+        pywikibot.output('{} has enough edits to be welcomed.'
+                         .format(user.username))
+        ustp = user.getUserTalkPage()
+        if ustp.exists():
+            self.show_status(Msg.SKIP)
+            pywikibot.output('{} has been already welcomed.'
+                             .format(user.username))
+            return
 
-                self.show_status(Msg.MATCH)
-                pywikibot.output('{} has enough edits to be welcomed.'
-                                 .format(user.username))
-                ustp = user.getUserTalkPage()
-                if ustp.exists():
-                    self.show_status(Msg.SKIP)
-                    pywikibot.output('{} has been already welcomed.'
-                                     .format(user.username))
-                    continue
+        if self.badNameFilter(user.username):
+            self.reportBadAccount(user.username)
+            return
 
-                if self.badNameFilter(user.username):
-                    self.reportBadAccount(user.username)
-                    continue
+        welcome_text = self.welcome_text
+        if globalvar.randomSign:
+            if self.site.family.name != 'wikinews':
+                welcome_text = welcome_text % choice(self.defineSign())
+            if self.site.sitename != 'wiktionary:it':
+                welcome_text += timeselected
+        elif self.site.sitename != 'wikinews:it':
+            welcome_text = welcome_text % globalvar.defaultSign
 
-                welcome_text = self.welcome_text
-                if globalvar.randomSign:
-                    if self.site.family.name != 'wikinews':
-                        welcome_text = welcome_text % choice(self.defineSign())
-                    if (self.site.family.name != 'wiktionary'
-                            or self.site.code != 'it'):
-                        welcome_text += timeselected
-                elif self.site.sitename != 'wikinews:it':
-                    welcome_text = welcome_text % globalvar.defaultSign
+        final_text = i18n.translate(self.site, final_new_text_additions)
+        if final_text:
+            welcome_text += final_text
+        welcome_comment = i18n.twtranslate(self.site, 'welcome-welcome')
+        try:
+            # append welcomed, welcome_count++
+            ustp.put(welcome_text, welcome_comment, minor=False)
+        except pywikibot.EditConflict:
+            self.show_status(Msg.WARN)
+            pywikibot.output(
+                'An edit conflict has occurred, skipping this user.')
+        else:
+            self.welcomed_users.append(user)
 
-                final_text = i18n.translate(self.site,
-                                            final_new_text_additions)
-                if final_text:
-                    welcome_text += final_text
-                welcome_comment = i18n.twtranslate(self.site,
-                                                   'welcome-welcome')
-                try:
-                    # append welcomed, welcome_count++
-                    ustp.put(welcome_text, welcome_comment, minor=False)
-                except pywikibot.EditConflict:
-                    self.show_status(Msg.WARN)
-                    pywikibot.output(
-                        'An edit conflict has occurred, skipping this user.')
-                else:
-                    self.welcomed_users.append(user)
+        welcomed_count = len(self.welcomed_users)
+        if globalvar.makeWelcomeLog:
+            self.show_status(Msg.DONE)
+            if welcomed_count == 0:
+                count = 'No users have'
+            elif welcomed_count == 1:
+                count = 'One user has'
+            else:
+                count = '{} users have'.format(welcomed_count)
+            pywikibot.output(count + ' been welcomed.')
 
-                welcomed_count = len(self.welcomed_users)
-                if globalvar.makeWelcomeLog:
-                    self.show_status(Msg.DONE)
-                    if welcomed_count == 0:
-                        count = 'No users have'
-                    elif welcomed_count == 1:
-                        count = 'One user has'
-                    else:
-                        count = '{} users have'.format(welcomed_count)
-                    pywikibot.output(count + ' been welcomed.')
+            if welcomed_count >= globalvar.dumpToLog:
+                self.makelogpage()
 
-                    if welcomed_count >= globalvar.dumpToLog:
-                        if self.makelogpage(self.welcomed_users):
-                            self.welcomed_users = []
-                            welcomed_count = 0
+    def write_log(self):
+        """Write logfile."""
+        welcomed_count = len(self.welcomed_users)
+        if globalvar.makeWelcomeLog and welcomed_count > 0:
+            self.show_status()
+            if welcomed_count == 1:
+                pywikibot.output('Putting the log of the latest user...')
+            else:
+                pywikibot.output(
+                    'Putting the log of the latest {} users...'
+                    .format(welcomed_count))
+            self.makelogpage()
 
-            if globalvar.makeWelcomeLog and welcomed_count > 0:
-                self.show_status()
-                if welcomed_count == 1:
-                    pywikibot.output('Putting the log of the latest user...')
-                else:
-                    pywikibot.output(
-                        'Putting the log of the latest {} users...'
-                        .format(welcomed_count))
-                if not self.makelogpage(self.welcomed_users):
-                    continue
-                self.welcomed_users = []
-            if hasattr(self, '_BAQueue'):
-                self.show_status()
-                pywikibot.output('Putting bad name to report page...')
-                self.report_bad_account()
-            try:
-                if globalvar.recursive:
-                    self.show_status()
-                    if locale.getlocale()[1]:
-                        strfstr = time.strftime(
-                            '%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-                        # py2-py3 compatibility
-                        if not isinstance(strfstr, str):
-                            strfstr = strfstr.decode(locale.getlocale()[1])
-                    else:
-                        strfstr = time.strftime(
-                            '%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-                    pywikibot.output('Sleeping {0} seconds before rerun. {1}'
-                                     .format(globalvar.timeRecur, strfstr))
-                    pywikibot.sleep(globalvar.timeRecur)
-                else:
-                    raise KeyboardInterrupt
-            except KeyboardInterrupt:
-                break
+        if hasattr(self, '_BAQueue'):
+            self.show_status()
+            pywikibot.output('Putting bad name to report page...')
+            self.reportBadAccount(None, final=True)
 
     @staticmethod
     def show_status(message=Msg.DEFAULT):
@@ -907,6 +881,25 @@ class WelcomeBot(SingleSiteBot):
         pywikibot.output(color_format('{color}[{msg:5}]{default} ',
                                       msg=msg, color=color),
                          newline=False)
+
+    def teardown(self):
+        """Some cleanups after run operation."""
+        if self.welcomed_users:
+            self.show_status()
+            pywikibot.output('Put welcomed users before quit...')
+            self.makelogpage()
+
+        # If there is the savedata, the script must save the number_user.
+        if globalvar.randomSign and globalvar.saveSignIndex \
+           and self.welcomed_users:
+            # Filename and Pywikibot path
+            # file where is stored the random signature index
+            filename = pywikibot.config.datafilepath(
+                'welcome-{}-{}.data'.format(self.site.family.name,
+                                            self.site.code))
+            with open(filename, 'wb') as f:
+                pickle.dump(self.welcomed_users, f,
+                            protocol=config.pickle_protocol)
 
 
 def load_word_function(raw) -> List[str]:
@@ -1008,11 +1001,6 @@ def main(*args) -> None:
     @type args: str
     """
     handle_args(args)
-    # Filename and Pywikibot path
-    # file where is stored the random signature index
-    filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
-                                             % (pywikibot.Site().family.name,
-                                                pywikibot.Site().code))
     if globalvar.offset and globalvar.timeoffset:
         pywikibot.warning(
             'both -offset and -timeoffset were provided, ignoring -offset')
@@ -1023,23 +1011,8 @@ def main(*args) -> None:
     except KeyError as error:
         # site not managed by welcome.py
         pywikibot.bot.suggest_help(exception=error)
-        return
-
-    try:
+    else:
         bot.run()
-    except KeyboardInterrupt:
-        if bot.welcomed_users:
-            bot.show_status()
-            pywikibot.output('Put welcomed users before quit...')
-            bot.makelogpage(bot.welcomed_users)
-        pywikibot.output('\nQuitting...')
-    finally:
-        # If there is the savedata, the script must save the number_user.
-        if globalvar.randomSign and globalvar.saveSignIndex and \
-           bot.welcomed_users:
-            with open(filename, 'wb') as f:
-                pickle.dump(bot.welcomed_users, f,
-                            protocol=config.pickle_protocol)
 
 
 if __name__ == '__main__':

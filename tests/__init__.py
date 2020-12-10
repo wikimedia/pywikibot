@@ -68,6 +68,7 @@ _pwb_py = join_root_path('pwb.py')
 
 library_test_modules = {
     'api',
+    'basesite',
     'bot',
     'category',
     'cosmetic_changes',
@@ -114,6 +115,7 @@ library_test_modules = {
     'timestamp',
     'timestripper',
     'tk',
+    'token',
     'tools',
     'tools_chars',
     'tools_formatter',

@@ -138,7 +138,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         """Test ItemPage save method inherited from superclass Page."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q6')
-        self.assertRaises(pywikibot.PageNotSaved, item.save)
+        self.assertRaises(pywikibot.PageSaveRelatedError, item.save)
 
     def _make_WbMonolingualText_claim(self, repo, text, language):
         """Make a WbMonolingualText and set its value."""

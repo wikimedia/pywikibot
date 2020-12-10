@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Test echo module."""
 #
-# (C) Pywikibot team, 2019
+# (C) Pywikibot team, 2019-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
 import pywikibot
 
@@ -64,7 +64,5 @@ class TestNotification(DefaultDrySiteTestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

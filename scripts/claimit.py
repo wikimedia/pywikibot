@@ -87,7 +87,13 @@ class ClaimRobot(WikidataBot):
                              .format(self.exists_arg))
 
     def treat_page_and_item(self, page, item) -> None:
-        """Treat each page."""
+        """Treat each page.
+
+        @param page: The page to update and change
+        @type page: pywikibot.page.BasePage
+        @param item: The item to treat
+        @type item: pywikibot.page.ItemPage
+        """
         for claim in self.claims:
             # The generator might yield pages from multiple sites
             site = page.site if page is not None else None

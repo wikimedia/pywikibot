@@ -10,8 +10,7 @@ from contextlib import suppress
 
 from pywikibot.site import Namespace, NamespacesDict
 
-from tests.aspects import (CapturingTestCase, DeprecationTestCase,
-                           TestCase, unittest)
+from tests.aspects import TestCase, unittest
 
 # Default namespaces which should work in any MW wiki
 _base_builtin_ns = {
@@ -213,101 +212,6 @@ class TestNamespaceObject(TestCase):
 
         b = eval(repr(a))
         self.assertEqual(a, b)
-
-
-class TestNamespaceDictDeprecated(CapturingTestCase, DeprecationTestCase):
-
-    """Test static/classmethods in Namespace replaced by NamespacesDict."""
-
-    CONTAINSINAPPROPRIATE_RE = (
-        r'identifiers contains inappropriate types: (.*?)'
-    )
-    INTARGNOTSTRINGORNUMBER_RE = (
-        r'int\(\) argument must be a string(, a bytes-like object)? '
-        r"or a number, not '(.*?)'"
-    )
-    NAMESPACEIDNOTRECOGNISED_RE = (
-        r'Namespace identifier\(s\) not recognised: (.*?)'
-    )
-
-    net = False
-
-    def test_resolve_equal(self):
-        """Test Namespace.resolve success."""
-        namespaces = Namespace.builtin_namespaces()
-        main_ns = namespaces[0]
-        file_ns = namespaces[6]
-        special_ns = namespaces[-1]
-
-        self.assertEqual(Namespace.resolve([6]), [file_ns])
-        self.assertEqual(Namespace.resolve(['File']), [file_ns])
-        self.assertEqual(Namespace.resolve(['6']), [file_ns])
-        self.assertEqual(Namespace.resolve([file_ns]), [file_ns])
-
-        self.assertEqual(Namespace.resolve([file_ns, special_ns]),
-                         [file_ns, special_ns])
-        self.assertEqual(Namespace.resolve([file_ns, file_ns]),
-                         [file_ns, file_ns])
-
-        self.assertEqual(Namespace.resolve(6), [file_ns])
-        self.assertEqual(Namespace.resolve('File'), [file_ns])
-        self.assertEqual(Namespace.resolve('6'), [file_ns])
-        self.assertEqual(Namespace.resolve(file_ns), [file_ns])
-
-        self.assertEqual(Namespace.resolve(0), [main_ns])
-        self.assertEqual(Namespace.resolve('0'), [main_ns])
-
-        self.assertEqual(Namespace.resolve(-1), [special_ns])
-        self.assertEqual(Namespace.resolve('-1'), [special_ns])
-
-        self.assertEqual(Namespace.resolve('File:'), [file_ns])
-        self.assertEqual(Namespace.resolve(':File'), [file_ns])
-        self.assertEqual(Namespace.resolve(':File:'), [file_ns])
-
-        self.assertEqual(Namespace.resolve('Image:'), [file_ns])
-        self.assertEqual(Namespace.resolve(':Image'), [file_ns])
-        self.assertEqual(Namespace.resolve(':Image:'), [file_ns])
-
-    def test_resolve_exceptions(self):
-        """Test Namespace.resolve failure."""
-        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
-                               Namespace.resolve, [True])
-        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
-                               Namespace.resolve, [False])
-        self.assertRaisesRegex(TypeError, self.INTARGNOTSTRINGORNUMBER_RE,
-                               Namespace.resolve, [None])
-        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
-                               Namespace.resolve, True)
-        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
-                               Namespace.resolve, False)
-        self.assertRaisesRegex(TypeError, self.INTARGNOTSTRINGORNUMBER_RE,
-                               Namespace.resolve, None)
-
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, -10)
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, '-10')
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, 'foo')
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, ['foo'])
-
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, [-10, 0])
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, [0, 'foo'])
-        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
-                               Namespace.resolve, [-10, 0, -11])
-
-    def test_lookup_name(self):
-        """Test Namespace.lookup_name."""
-        file_nses = Namespace.builtin_namespaces()
-
-        for name, ns_id in builtin_ns.items():
-            file_ns = Namespace.lookup_name(name, file_nses)
-            self.assertIsInstance(file_ns, Namespace)
-            with self.disable_assert_capture():
-                self.assertEqual(file_ns.id, ns_id)
 
 
 class TestNamespaceCollections(TestCase):

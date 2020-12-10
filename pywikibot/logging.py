@@ -137,7 +137,15 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
 
 
 def stdout(text, decoder=None, newline=True, **kwargs):
-    """Output script results to the user via the userinterface."""
+    """Output script results to the user via the userinterface.
+
+    @param text: the message printed via stdout logger to the user.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
+    """
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
 
@@ -146,7 +154,7 @@ def warning(text: str, decoder: Optional[str] = None,
     """Output a warning message to the user via the userinterface.
 
     @param text: the message the user wants to display.
-    @param decoder: If None, text should be a unicode string. Otherwise it
+    @param decoder: If None, text should be a unicode string else it
         should be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
@@ -156,23 +164,53 @@ def warning(text: str, decoder: Optional[str] = None,
 
 
 def error(text, decoder=None, newline=True, **kwargs):
-    """Output an error message to the user via the userinterface."""
+    """Output an error message to the user via the userinterface.
+
+    @param text: the message containing the error which occured.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
+    """
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
 
 def log(text, decoder=None, newline=True, **kwargs):
-    """Output a record to the log file."""
+    """Output a record to the log file.
+
+    @param text: the message which is to be logged to the log file.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
+    """
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
 
 def critical(text, decoder=None, newline=True, **kwargs):
-    """Output a critical record to the user via the userinterface."""
+    """Output a critical record to the user via the userinterface.
+
+    @param text: the critical message which is to be displayed to the user.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
+    """
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
 
 def debug(text, layer, decoder=None, newline=True, **kwargs):
     """Output a debug record to the log file.
 
+    @param text: the message of the debug record to be logged to the log file.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
     @param layer: The name of the logger that text will be sent to.
     """
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
@@ -195,6 +233,14 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
             pywikibot.exception(e)
         ...
 
+    This function should only be called from an Exception handler.
+
+    @param msg: If not None,contains the description of the exception occured.
+    @param decoder: If None, text should be a unicode string else it should
+        be encoded in the given encoding.
+    @param newline: If True, a line feed will be added after printing the text.
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/3/howto/logging-cookbook.html.
     @param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):

@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from collections.abc import Mapping
 from contextlib import suppress
 
 import pywikibot.site
@@ -22,11 +23,8 @@ class TestFamily(TestCase):
     """Test cases for Family methods."""
 
     UNKNOWNFAMILY_RE = 'Family unknown does not exist'
-    FAMILY_TYPEERROR_RE = (
-        'Family.obsolete not updatable; '
-        'use Family.interwiki_removals and Family.interwiki_replacements')
-    FROZENSET_TYPEERROR_RE = ("'frozenset' object does not support item "
-                              'assignment')
+    FROZEN_TYPEERROR_RE = r"'frozen\w+' object does not support item " \
+                          'assignment'
     net = False
 
     def test_family_load_valid(self):
@@ -110,7 +108,7 @@ class TestFamily(TestCase):
     def test_get_obsolete_wp(self):
         """Test three types of obsolete codes."""
         family = Family.load('wikipedia')
-        self.assertIsInstance(family.obsolete, dict)
+        self.assertIsInstance(family.obsolete, Mapping)
         # redirected code (see site tests test_alias_code_site)
         self.assertEqual(family.obsolete['dk'], 'da')
         # closed/locked site (see site tests test_locked_site)
@@ -136,27 +134,19 @@ class TestFamily(TestCase):
     def test_obsolete_readonly(self):
         """Test obsolete result not updatable."""
         family = Family.load('wikipedia')
-        self.assertRaisesRegex(
-            TypeError,
-            self.FAMILY_TYPEERROR_RE,
-            family.obsolete.update,
-            {})
-        self.assertRaisesRegex(
-            TypeError,
-            self.FAMILY_TYPEERROR_RE,
-            family.obsolete.__setitem__,
-            'a',
-            'b')
+        with self.assertRaisesRegex(
+            AttributeError,
+                "'frozenmap' object has no attribute 'update'"):
+            family.obsolete.update({})
+
+        with self.assertRaisesRegex(TypeError, self.FROZEN_TYPEERROR_RE):
+            family.obsolete['a'] = 'b'
 
     def test_WikimediaFamily_obsolete_readonly(self):
         """Test WikimediaFamily obsolete is readonly."""
         family = Family.load('wikipedia')
-        self.assertRaisesRegex(
-            TypeError,
-            self.FROZENSET_TYPEERROR_RE,
-            family.__setattr__,
-            'obsolete',
-            {'a': 'b', 'c': None})
+        with self.assertRaisesRegex(TypeError, self.FROZEN_TYPEERROR_RE):
+            family.obsolete = {'a': 'b', 'c': None}
 
 
 class TestFamilyUrlRegex(PatchingTestCase):

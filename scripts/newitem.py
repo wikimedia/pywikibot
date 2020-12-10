@@ -32,7 +32,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import NoRedirectPageBot, WikidataBot
 from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
-                                  PageNotSaved)
+                                  PageSaveRelatedError)
 from pywikibot.tools import PYTHON_VERSION
 
 if PYTHON_VERSION >= (3, 9):
@@ -92,7 +92,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         except LockedPage:
             pywikibot.error('Page {0} is locked.'.format(
                 page.title(as_link=True)))
-        except PageNotSaved:
+        except PageSaveRelatedError:
             pywikibot.error('Page {0} not saved.'.format(
                 page.title(as_link=True)))
 

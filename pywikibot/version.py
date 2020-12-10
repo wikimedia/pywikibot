@@ -386,7 +386,7 @@ def getversion_onlinerepo(path='branches/master'):
 
 @deprecated('get_module_version, get_module_filename and get_module_mtime',
             since='20150221', future_warning=True)
-def getfileversion(filename: str):
+def getfileversion(filename: str):  # pragma: no cover
     """Retrieve revision number of file.
 
     Extracts __version__ variable containing Id tag, without importing it.

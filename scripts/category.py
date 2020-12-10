@@ -481,7 +481,8 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
                         r'\1{0}\n\2'.format(categorytitle),
-                        ['nowiki', 'comment', 'math', 'pre', 'source'],
+                        ['comment', 'math', 'nowiki', 'pre',
+                         'syntaxhighlight'],
                         site=self.current_page.site)
                 else:
                     if self.includeonly == ['includeonly']:
@@ -792,7 +793,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         pywikibot.output('Moving text from {} to {}.'.format(
             self.oldcat.title(), self.newcat.title()))
         comma = self.site.mediawiki_message('comma-separator')
-        authors = comma.join(self.oldcat.contributingUsers())
+        authors = comma.join(self.oldcat.contributors().keys())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
         summary = i18n.twtranslate(self.site, 'category-renamed',
                                    template_vars)

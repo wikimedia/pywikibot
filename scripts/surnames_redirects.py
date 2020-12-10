@@ -18,12 +18,10 @@ Example:
     python pwb.py surnames_redirects -start:B
 """
 #
-# (C) Pywikibot team, 2017-2019
+# (C) Pywikibot team, 2017-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 from difflib import SequenceMatcher
 
 import pywikibot
@@ -50,7 +48,7 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
             'surnames_last': False,
         })
 
-        super(SurnamesBot, self).__init__(generator=generator, **kwargs)
+        super().__init__(generator=generator, **kwargs)
 
     def treat_page(self):
         """Suggest redirects by reordering names in titles."""

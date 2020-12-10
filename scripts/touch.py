@@ -58,7 +58,7 @@ class TouchBot(MultipleSitesBot):
         except pywikibot.LockedPage:
             pywikibot.error('Page {0} is locked.'
                             .format(page.title(as_link=True)))
-        except pywikibot.PageNotSaved:
+        except pywikibot.PageSaveRelatedError:
             pywikibot.error('Page {0} not saved.'
                             .format(page.title(as_link=True)))
 
@@ -67,22 +67,18 @@ class PurgeBot(MultipleSitesBot):
 
     """Purge each page on the generator."""
 
-    def __init__(self, generator, **kwargs) -> None:
-        """Initialize a PurgeBot instance with the options and generator."""
-        self.available_options = {
-            'converttitles': None,
-            'forcelinkupdate': None,
-            'forcerecursivelinkupdate': None,
-            'redirects': None
-        }
-        super().__init__(generator=generator, **kwargs)
+    available_options = {
+        'converttitles': None,
+        'forcelinkupdate': None,
+        'forcerecursivelinkupdate': None,
+        'redirects': None
+    }
 
     def treat(self, page) -> None:
         """Purge the given page."""
-        pywikibot.output('Page {0}{1} purged'.format(
-            page.title(as_link=True),
-            '' if page.purge(**self.options) else ' not'
-        ))
+        pywikibot.output('Page {}{} purged'
+                         .format(page,
+                                 '' if page.purge(**self.opt) else ' not'))
 
 
 def main(*args) -> None:

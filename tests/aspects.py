@@ -78,7 +78,7 @@ class TestCaseBase(unittest.TestCase):
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
-        """Verify that a sequence expr has the length of other."""
+        """Verify that a sequence seq has the length of other."""
         # the other parameter may be given as a sequence too
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
@@ -92,21 +92,6 @@ class TestCaseBase(unittest.TestCase):
             msg = self._formatMessage(
                 msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
             self.fail(msg)
-
-    def assertMethod(self, method, *args):
-        """Generic method assertion."""
-        if not method(*args):
-            self.fail('{0!r} ({1!r}) fails'.format(method, args))
-
-    def assertStringMethod(self, method, *args):
-        """
-        Generic string method assertion.
-
-        All args must be already converted to a string.
-        """
-        for arg in args:
-            self.assertIsInstance(arg, str)
-        self.assertMethod(method, *args)
 
     def assertPageInNamespaces(self, page, namespaces):
         """

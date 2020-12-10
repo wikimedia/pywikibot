@@ -18,13 +18,12 @@ import json
 import mimetypes
 import os
 import re
-import threading
 import time
 import typing
 import uuid
 
 from collections import defaultdict, namedtuple
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
 from contextlib import suppress
 from itertools import zip_longest
 from pywikibot.login import LoginStatus as _LoginStatus
@@ -46,7 +45,6 @@ from pywikibot.exceptions import (
     EditConflict,
     EntityTypeUnknownException,
     Error,
-    FamilyMaintenanceWarning,
     InconsistentTitleReceived,
     InterwikiRedirectPage,
     IsNotRedirectPage,
@@ -64,30 +62,27 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     TitleblacklistError,
     UnknownExtension,
-    UnknownSite,
 )
+from pywikibot.site._basesite import BaseSite, PageInUse
 from pywikibot.site._decorators import need_extension, need_right, need_version
+from pywikibot.site._interwikimap import _InterwikiMap
+from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.site._siteinfo import Siteinfo
-from pywikibot.throttle import Throttle
+from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
-    ComparableMixin,
     compute_file_hash,
     deprecated,
     deprecate_arg,
     deprecated_args,
     filter_unique,
-    first_upper,
     is_IP,
     issue_deprecation_warning,
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
     ModuleDeprecationWrapper,
-    normalize_username,
     PYTHON_VERSION,
     remove_last_args,
-    SelfCallMixin,
-    SelfCallString,
 )
 
 if PYTHON_VERSION >= (3, 9):
@@ -100,1172 +95,6 @@ __all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
            'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
-
-
-class PageInUse(pywikibot.Error):
-
-    """Page cannot be reserved for writing due to existing lock."""
-
-
-class Namespace(Iterable, ComparableMixin):
-
-    """
-    Namespace site data object.
-
-    This is backwards compatible with the structure of entries
-    in site._namespaces which were a list of::
-
-        [customised namespace,
-         canonical namespace name?,
-         namespace alias*]
-
-    If the canonical_name is not provided for a namespace between -2
-    and 15, the MediaWiki built-in names are used.
-    Image and File are aliases of each other by default.
-
-    If only one of canonical_name and custom_name are available, both
-    properties will have the same value.
-    """
-
-    MEDIA = -2
-    SPECIAL = -1
-    MAIN = 0
-    TALK = 1
-    USER = 2
-    USER_TALK = 3
-    PROJECT = 4
-    PROJECT_TALK = 5
-    FILE = 6
-    FILE_TALK = 7
-    MEDIAWIKI = 8
-    MEDIAWIKI_TALK = 9
-    TEMPLATE = 10
-    TEMPLATE_TALK = 11
-    HELP = 12
-    HELP_TALK = 13
-    CATEGORY = 14
-    CATEGORY_TALK = 15
-
-    # These are the MediaWiki built-in names for MW 1.14+.
-    # Namespace prefixes are always case-insensitive, but the
-    # canonical forms are capitalized.
-    canonical_namespaces = {
-        -2: 'Media',
-        -1: 'Special',
-        0: '',
-        1: 'Talk',
-        2: 'User',
-        3: 'User talk',
-        4: 'Project',
-        5: 'Project talk',
-        6: 'File',
-        7: 'File talk',
-        8: 'MediaWiki',
-        9: 'MediaWiki talk',
-        10: 'Template',
-        11: 'Template talk',
-        12: 'Help',
-        13: 'Help talk',
-        14: 'Category',
-        15: 'Category talk',
-    }
-
-    @deprecated_args(use_image_name=None)
-    def __init__(self, id, canonical_name=None, custom_name=None,
-                 aliases=None, **kwargs):
-        """Initializer.
-
-        @param custom_name: Name defined in server LocalSettings.php
-        @type custom_name: str
-        @param canonical_name: Canonical name
-        @type canonical_name: str
-        @param aliases: Aliases
-        @type aliases: list of str
-        """
-        self.id = id
-        canonical_name = canonical_name or self.canonical_namespaces.get(id)
-
-        assert custom_name is not None or canonical_name is not None, \
-            'Namespace needs to have at least one name'
-
-        self.custom_name = custom_name \
-            if custom_name is not None else canonical_name
-        self.canonical_name = canonical_name \
-            if canonical_name is not None else custom_name
-
-        if aliases:
-            self.aliases = aliases
-        elif id in (6, 7):
-            alias = 'Image'
-            if id == 7:
-                alias += ' talk'
-            self.aliases = [alias]
-        else:
-            self.aliases = []
-
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def _distinct(self):
-        if self.custom_name == self.canonical_name:
-            return [self.canonical_name] + self.aliases
-        else:
-            return [self.custom_name, self.canonical_name] + self.aliases
-
-    def _contains_lowercase_name(self, name):
-        """Determine a lowercase normalised name is a name of this namespace.
-
-        @rtype: bool
-        """
-        return name in (x.lower() for x in self._distinct())
-
-    def __contains__(self, item: str) -> bool:
-        """Determine if item is a name of this namespace.
-
-        The comparison is case insensitive, and item may have a single
-        colon on one or both sides of the name.
-
-        @param item: name to check
-        """
-        if item == '' and self.id == 0:
-            return True
-
-        name = Namespace.normalize_name(item)
-        if not name:
-            return False
-
-        return self._contains_lowercase_name(name.lower())
-
-    def __len__(self):
-        """Obtain length of the iterable."""
-        if self.custom_name == self.canonical_name:
-            return len(self.aliases) + 1
-        else:
-            return len(self.aliases) + 2
-
-    def __iter__(self):
-        """Return an iterator."""
-        return iter(self._distinct())
-
-    def __getitem__(self, index):
-        """Obtain an item from the iterable."""
-        if self.custom_name != self.canonical_name:
-            if index == 0:
-                return self.custom_name
-            index -= 1
-
-        return self.canonical_name if index == 0 else self.aliases[index - 1]
-
-    @staticmethod
-    def _colons(id, name):
-        """Return the name with required colons, depending on the ID."""
-        if id == 0:
-            return ':'
-
-        if id in (6, 14):
-            return ':' + name + ':'
-
-        return name + ':'
-
-    def __str__(self):
-        """Return the canonical string representation."""
-        return self.canonical_prefix()
-
-    def canonical_prefix(self):
-        """Return the canonical name with required colons."""
-        return Namespace._colons(self.id, self.canonical_name)
-
-    def custom_prefix(self):
-        """Return the custom name with required colons."""
-        return Namespace._colons(self.id, self.custom_name)
-
-    def __int__(self):
-        """Return the namespace id."""
-        return self.id
-
-    def __index__(self):
-        """Return the namespace id."""
-        return self.id
-
-    def __hash__(self):
-        """Return the namespace id."""
-        return self.id
-
-    def __eq__(self, other):
-        """Compare whether two namespace objects are equal."""
-        if isinstance(other, int):
-            return self.id == other
-
-        if isinstance(other, Namespace):
-            return self.id == other.id
-
-        if isinstance(other, str):
-            return other in self
-
-        return False
-
-    def __ne__(self, other):
-        """Compare whether two namespace objects are not equal."""
-        return not self.__eq__(other)
-
-    def __mod__(self, other):
-        """Apply modulo on the namespace id."""
-        return self.id.__mod__(other)
-
-    def __sub__(self, other):
-        """Apply subtraction on the namespace id."""
-        return self.id - other
-
-    def __add__(self, other):
-        """Apply addition on the namespace id."""
-        return self.id + other
-
-    def _cmpkey(self):
-        """Return the ID as a comparison key."""
-        return self.id
-
-    def __repr__(self):
-        """Return a reconstructable representation."""
-        standard_attr = ['id', 'custom_name', 'canonical_name', 'aliases']
-        extra = [(key, self.__dict__[key])
-                 for key in sorted(self.__dict__)
-                 if key not in standard_attr]
-
-        if extra:
-            kwargs = ', ' + ', '.join(
-                key + '=' + repr(value) for key, value in extra)
-        else:
-            kwargs = ''
-
-        return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r%s)' \
-               % (self.__class__.__name__, self.id, self.custom_name,
-                  self.canonical_name, self.aliases, kwargs)
-
-    @staticmethod
-    def default_case(id, default_case=None):
-        """Return the default fixed case value for the namespace ID."""
-        # https://www.mediawiki.org/wiki/Manual:$wgCapitalLinkOverrides#Warning
-        if id > 0 and id % 2 == 1:  # the talk ns has the non-talk ns case
-            id -= 1
-        if id in (-1, 2, 8):
-            return 'first-letter'
-        else:
-            return default_case
-
-    @classmethod
-    @deprecated_args(use_image_name=None)
-    def builtin_namespaces(cls, use_image_name=None, case='first-letter'):
-        """Return a dict of the builtin namespaces."""
-        if use_image_name is not None:
-            issue_deprecation_warning(
-                'positional argument of "use_image_name"', None, 3,
-                DeprecationWarning, since='20181015')
-
-        return {i: cls(i, case=cls.default_case(i, case))
-                for i in range(-2, 16)}
-
-    @staticmethod
-    def normalize_name(name):
-        """
-        Remove an optional colon before and after name.
-
-        TODO: reject illegal characters.
-        """
-        if name == '':
-            return ''
-
-        name = name.replace('_', ' ')
-        parts = name.split(':', 4)
-        count = len(parts)
-        if count > 3 or (count == 3 and parts[2]):
-            return False
-
-        # Discard leading colon
-        if count >= 2 and not parts[0] and parts[1]:
-            return parts[1].strip()
-
-        if parts[0]:
-            return parts[0].strip()
-
-        return False
-
-    @classmethod
-    @deprecated('NamespacesDict.lookup_name', since='20150703',
-                future_warning=True)
-    def lookup_name(cls, name: str, namespaces=None):
-        """
-        Find the Namespace for a name.
-
-        @param name: Name of the namespace.
-        @param namespaces: namespaces to search
-                           default: builtins only
-        @type namespaces: dict of Namespace
-        @rtype: Namespace or None
-        """
-        if not namespaces:
-            namespaces = cls.builtin_namespaces()
-
-        return NamespacesDict._lookup_name(name, namespaces)
-
-    @staticmethod
-    @deprecated('NamespacesDict.resolve', since='20150703',
-                future_warning=True)
-    def resolve(identifiers, namespaces=None):
-        """
-        Resolve namespace identifiers to obtain Namespace objects.
-
-        Identifiers may be any value for which int() produces a valid
-        namespace id, except bool, or any string which Namespace.lookup_name
-        successfully finds. A numerical string is resolved as an integer.
-
-        @param identifiers: namespace identifiers
-        @type identifiers: iterable of str or Namespace key,
-            or a single instance of those types
-        @param namespaces: namespaces to search (default: builtins only)
-        @type namespaces: dict of Namespace
-        @return: list of Namespace objects in the same order as the
-            identifiers
-        @rtype: list
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
-            type such as NoneType or bool
-        """
-        if not namespaces:
-            namespaces = Namespace.builtin_namespaces()
-
-        return NamespacesDict._resolve(identifiers, namespaces)
-
-
-class NamespacesDict(Mapping, SelfCallMixin):
-
-    """
-    An immutable dictionary containing the Namespace instances.
-
-    It adds a deprecation message when called as the 'namespaces' property of
-    APISite was callable.
-    """
-
-    _own_desc = 'the namespaces property'
-
-    def __init__(self, namespaces):
-        """Create new dict using the given namespaces."""
-        super().__init__()
-        self._namespaces = namespaces
-        self._namespace_names = {}
-        for namespace in self._namespaces.values():
-            for name in namespace:
-                self._namespace_names[name.lower()] = namespace
-
-    def __iter__(self):
-        """Iterate over all namespaces."""
-        return iter(self._namespaces)
-
-    def __getitem__(self, key):
-        """
-        Get the namespace with the given key.
-
-        @param key: namespace key
-        @type key: Namespace, int or str
-        @rtype: Namespace
-        """
-        if isinstance(key, (Namespace, int)):
-            return self._namespaces[key]
-        else:
-            namespace = self.lookup_name(key)
-            if namespace:
-                return namespace
-
-        return super().__getitem__(key)
-
-    def __getattr__(self, attr):
-        """
-        Get the namespace with the given key.
-
-        @param attr: namespace key
-        @type attr: Namespace, int or str
-        @rtype: Namespace
-        """
-        # lookup_name access _namespaces
-        if attr.isupper():
-            if attr == 'MAIN':
-                return self[0]
-
-            namespace = self.lookup_name(attr)
-            if namespace:
-                return namespace
-
-        return self.__getattribute__(attr)
-
-    def __len__(self):
-        """Get the number of namespaces."""
-        return len(self._namespaces)
-
-    def lookup_name(self, name: str):
-        """
-        Find the Namespace for a name also checking aliases.
-
-        @param name: Name of the namespace.
-        @rtype: Namespace or None
-        """
-        name = Namespace.normalize_name(name)
-        if name is False:
-            return None
-        return self.lookup_normalized_name(name.lower())
-
-    def lookup_normalized_name(self, name: str):
-        """
-        Find the Namespace for a name also checking aliases.
-
-        The name has to be normalized and must be lower case.
-
-        @param name: Name of the namespace.
-        @rtype: Namespace or None
-        """
-        return self._namespace_names.get(name)
-
-    # Temporary until Namespace.lookup_name can be removed
-    @staticmethod
-    def _lookup_name(name, namespaces):
-        name = Namespace.normalize_name(name)
-        if name is False:
-            return None
-        name = name.lower()
-
-        for namespace in namespaces.values():
-            if namespace._contains_lowercase_name(name):
-                return namespace
-
-        return None
-
-    def resolve(self, identifiers):
-        """
-        Resolve namespace identifiers to obtain Namespace objects.
-
-        Identifiers may be any value for which int() produces a valid
-        namespace id, except bool, or any string which Namespace.lookup_name
-        successfully finds. A numerical string is resolved as an integer.
-
-        @param identifiers: namespace identifiers
-        @type identifiers: iterable of str or Namespace key,
-            or a single instance of those types
-        @return: list of Namespace objects in the same order as the
-            identifiers
-        @rtype: list
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
-            type such as NoneType or bool
-        """
-        return self._resolve(identifiers, self._namespaces)
-
-    # Temporary until Namespace.resolve can be removed
-    @staticmethod
-    def _resolve(identifiers, namespaces):
-        if isinstance(identifiers, (str, Namespace)):
-            identifiers = [identifiers]
-        else:
-            # convert non-iterators to single item list
-            try:
-                iter(identifiers)
-            except TypeError:
-                identifiers = [identifiers]
-
-        # lookup namespace names, and assume anything else is a key.
-        # int(None) raises TypeError; however, bool needs special handling.
-        result = [NotImplemented if isinstance(ns, bool) else
-                  NamespacesDict._lookup_name(ns, namespaces)
-                  if isinstance(ns, str)
-                  and not ns.lstrip('-').isdigit() else
-                  namespaces[int(ns)] if int(ns) in namespaces
-                  else None
-                  for ns in identifiers]
-
-        if NotImplemented in result:
-            raise TypeError('identifiers contains inappropriate types: %r'
-                            % identifiers)
-
-        # Namespace.lookup_name returns None if the name is not recognised
-        if None in result:
-            raise KeyError(
-                'Namespace identifier(s) not recognised: {}'
-                .format(','.join(str(identifier)
-                                 for identifier, ns in zip(identifiers, result)
-                                 if ns is None)))
-
-        return result
-
-
-class _IWEntry:
-
-    """An entry of the _InterwikiMap with a lazy loading site."""
-
-    def __init__(self, local, url):
-        self._site = None
-        self.local = local
-        self.url = url
-
-    @property
-    def site(self):
-        if self._site is None:
-            try:
-                self._site = pywikibot.Site(url=self.url)
-            except Exception as e:
-                self._site = e
-        return self._site
-
-
-class _InterwikiMap:
-
-    """A representation of the interwiki map of a site."""
-
-    def __init__(self, site):
-        """
-        Create an empty uninitialized interwiki map for the given site.
-
-        @param site: Given site for which interwiki map is to be created
-        @type site: pywikibot.site.APISite
-        """
-        super().__init__()
-        self._site = site
-        self._map = None
-
-    def reset(self):
-        """Remove all mappings to force building a new mapping."""
-        self._map = None
-
-    @property
-    def _iw_sites(self):
-        """Fill the interwikimap cache with the basic entries."""
-        # _iw_sites is a local cache to return a APISite instance depending
-        # on the interwiki prefix of that site
-        if self._map is None:
-            self._map = {iw['prefix']: _IWEntry('local' in iw, iw['url'])
-                         for iw in self._site.siteinfo['interwikimap']}
-        return self._map
-
-    def __getitem__(self, prefix):
-        """
-        Return the site, locality and url for the requested prefix.
-
-        @param prefix: Interwiki prefix
-        @type prefix: Dictionary key
-        @rtype: _IWEntry
-        @raises KeyError: Prefix is not a key
-        @raises TypeError: Site for the prefix is of wrong type
-        """
-        if prefix not in self._iw_sites:
-            raise KeyError("'{0}' is not an interwiki prefix.".format(prefix))
-        if isinstance(self._iw_sites[prefix].site, BaseSite):
-            return self._iw_sites[prefix]
-        elif isinstance(self._iw_sites[prefix].site, Exception):
-            raise self._iw_sites[prefix].site
-        else:
-            raise TypeError('_iw_sites[%s] is wrong type: %s'
-                            % (prefix, type(self._iw_sites[prefix].site)))
-
-    def get_by_url(self, url):
-        """
-        Return a set of prefixes applying to the URL.
-
-        @param url: URL for the interwiki
-        @type url: str
-        @rtype: set
-        """
-        return {prefix for prefix, iw_entry in self._iw_sites
-                if iw_entry.url == url}
-
-
-class BaseSite(ComparableMixin):
-
-    """Site methods that are independent of the communication interface."""
-
-    @remove_last_args(['sysop'])
-    def __init__(self, code: str, fam=None, user=None) -> None:
-        """
-        Initializer.
-
-        @param code: the site's language code
-        @type code: str
-        @param fam: wiki family name (optional)
-        @type fam: str or pywikibot.family.Family
-        @param user: bot user name (optional)
-        @type user: str
-        """
-        if code.lower() != code:
-            # Note the Site function in __init__ also emits a UserWarning
-            # for this condition, showing the callers file and line no.
-            pywikibot.log('BaseSite: code "{}" converted to lowercase'
-                          .format(code))
-            code = code.lower()
-        if not all(x in pywikibot.family.CODE_CHARACTERS for x in code):
-            pywikibot.log('BaseSite: code "{}" contains invalid characters'
-                          .format(code))
-        self.__code = code
-        if isinstance(fam, str) or fam is None:
-            self.__family = pywikibot.family.Family.load(fam)
-        else:
-            self.__family = fam
-
-        self.obsolete = False
-        # if we got an outdated language code, use the new one instead.
-        if self.__code in self.__family.obsolete:
-            if self.__family.obsolete[self.__code] is not None:
-                self.__code = self.__family.obsolete[self.__code]
-                # Note the Site function in __init__ emits a UserWarning
-                # for this condition, showing the callers file and line no.
-                pywikibot.log('Site {} instantiated using aliases code of {}'
-                              .format(self, code))
-            else:
-                # no such language anymore
-                self.obsolete = True
-                pywikibot.log('Site %s instantiated and marked "obsolete" '
-                              'to prevent access' % self)
-        elif self.__code not in self.languages():
-            if self.__family.name in self.__family.langs and \
-               len(self.__family.langs) == 1:
-                self.__code = self.__family.name
-                if self.__family == pywikibot.config.family \
-                        and code == pywikibot.config.mylang:
-                    pywikibot.config.mylang = self.__code
-                    warn('Global configuration variable "mylang" changed to '
-                         '"%s" while instantiating site %s'
-                         % (self.__code, self), UserWarning)
-            else:
-                raise UnknownSite("Language '%s' does not exist in family %s"
-                                  % (self.__code, self.__family.name))
-
-        self._username = normalize_username(user)
-
-        self.use_hard_category_redirects = (
-            self.code in self.family.use_hard_category_redirects)
-
-        # following are for use with lock_page and unlock_page methods
-        self._pagemutex = threading.Condition()
-        self._locked_pages = set()
-
-    @property
-    @deprecated(
-        "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'",
-        since='20170504')
-    def nocapitalize(self):
-        """
-        Return whether this site's default title case is case-sensitive.
-
-        DEPRECATED.
-        """
-        return self.siteinfo['case'] == 'case-sensitive'
-
-    @property
-    def throttle(self):
-        """Return this Site's throttle. Initialize a new one if needed."""
-        if not hasattr(self, '_throttle'):
-            self._throttle = Throttle(self, multiplydelay=True)
-        return self._throttle
-
-    @property
-    def family(self):
-        """The Family object for this Site's wiki family."""
-        return self.__family
-
-    @property
-    def code(self):
-        """
-        The identifying code for this Site equal to the wiki prefix.
-
-        By convention, this is usually an ISO language code, but it does
-        not have to be.
-        """
-        return self.__code
-
-    @property
-    def lang(self):
-        """The ISO language code for this Site.
-
-        Presumed to be equal to the site code, but this can be overridden.
-        """
-        return self.__code
-
-    @property
-    def doc_subpage(self):
-        """
-        Return the documentation subpage for this Site.
-
-        @rtype: tuple
-        """
-        if not hasattr(self, '_doc_subpage'):
-            try:
-                doc, codes = self.family.doc_subpages.get('_default', ((), []))
-                if self.code not in codes:
-                    try:
-                        doc = self.family.doc_subpages[self.code]
-                    # Language not defined in doc_subpages in x_family.py file
-                    # It will use default for the family.
-                    # should it just raise an Exception and fail?
-                    # this will help to check the dictionary ...
-                    except KeyError:
-                        warn('Site {0} has no language defined in '
-                             'doc_subpages dict in {1}_family.py file'
-                             .format(self, self.family.name),
-                             FamilyMaintenanceWarning, 2)
-            # doc_subpages not defined in x_family.py file
-            except AttributeError:
-                doc = ()  # default
-                warn('Site {0} has no doc_subpages dict in {1}_family.py file'
-                     .format(self, self.family.name),
-                     FamilyMaintenanceWarning, 2)
-            self._doc_subpage = doc
-
-        return self._doc_subpage
-
-    def _cmpkey(self):
-        """Perform equality and inequality tests on Site objects."""
-        return (self.family.name, self.code)
-
-    def __getstate__(self):
-        """Remove Lock based classes before pickling."""
-        new = self.__dict__.copy()
-        del new['_pagemutex']
-        if '_throttle' in new:
-            del new['_throttle']
-        # site cache contains exception information, which can't be pickled
-        if '_iw_sites' in new:
-            del new['_iw_sites']
-        return new
-
-    def __setstate__(self, attrs):
-        """Restore things removed in __getstate__."""
-        self.__dict__.update(attrs)
-        self._pagemutex = threading.Condition()
-
-    def user(self):
-        """Return the currently-logged in bot username, or None."""
-        if self.logged_in():
-            return self.username()
-        else:
-            return None
-
-    @remove_last_args(['sysop'])
-    def username(self):
-        """Return the username used for the site."""
-        return self._username
-
-    def __getattr__(self, attr):
-        """Delegate undefined methods calls to the Family object."""
-        if hasattr(self.__class__, attr):
-            return getattr(self.__class__, attr)
-        try:
-            method = getattr(self.family, attr)
-            if not callable(method):
-                raise AttributeError
-            f = functools.partial(method, self.code)
-            if hasattr(method, '__doc__'):
-                f.__doc__ = method.__doc__
-            return f
-        except AttributeError:
-            raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr))
-
-    def __str__(self):
-        """Return string representing this Site's name and code."""
-        return self.family.name + ':' + self.code
-
-    @property
-    def sitename(self):
-        """String representing this Site's name and code."""
-        return SelfCallString(self.__str__())
-
-    def __repr__(self):
-        """Return internal representation."""
-        return '{0}("{1}", "{2}")'.format(
-            self.__class__.__name__, self.code, self.family)
-
-    def __hash__(self):
-        """Return hashable key."""
-        return hash(repr(self))
-
-    def languages(self):
-        """Return list of all valid language codes for this site's Family."""
-        return list(self.family.langs.keys())
-
-    def validLanguageLinks(self):
-        """Return list of language codes to be used in interwiki links."""
-        return [lang for lang in self.languages()
-                if self.namespaces.lookup_normalized_name(lang) is None]
-
-    def _interwiki_urls(self, only_article_suffixes=False):
-        base_path = self.path()
-        if not only_article_suffixes:
-            yield base_path
-        yield base_path + '/'
-        yield base_path + '?title='
-        yield self.article_path
-
-    def interwiki(self, prefix):
-        """
-        Return the site for a corresponding interwiki prefix.
-
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
-        """
-        return self._interwikimap[prefix].site
-
-    def interwiki_prefix(self, site):
-        """
-        Return the interwiki prefixes going to that site.
-
-        The interwiki prefixes are ordered first by length (shortest first)
-        and then alphabetically. L{interwiki(prefix)} is not guaranteed to
-        equal C{site} (i.e. the parameter passed to this function).
-
-        @param site: The targeted site, which might be it's own.
-        @type site: L{BaseSite}
-        @return: The interwiki prefixes
-        @rtype: list (guaranteed to be not empty)
-        @raises KeyError: if there is no interwiki prefix for that site.
-        """
-        assert site is not None, 'Site must not be None'
-        prefixes = set()
-        for url in site._interwiki_urls():
-            prefixes.update(self._interwikimap.get_by_url(url))
-        if not prefixes:
-            raise KeyError(
-                "There is no interwiki prefix to '{0}'".format(site))
-        return sorted(prefixes, key=lambda p: (len(p), p))
-
-    def local_interwiki(self, prefix):
-        """
-        Return whether the interwiki prefix is local.
-
-        A local interwiki prefix is handled by the target site like a normal
-        link. So if that link also contains an interwiki link it does follow
-        it as long as it's a local link.
-
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
-        """
-        return self._interwikimap[prefix].local
-
-    @deprecated('APISite.namespaces.lookup_name', since='20150703',
-                future_warning=True)
-    def ns_index(self, namespace):
-        """
-        Return the Namespace for a given namespace name.
-
-        @param namespace: name
-        @type namespace: str
-        @return: The matching Namespace object on this Site
-        @rtype: Namespace, or None if invalid
-        """
-        return self.namespaces.lookup_name(namespace)
-
-    @deprecated('APISite.namespaces.lookup_name', since='20150703',
-                future_warning=True)
-    def getNamespaceIndex(self, namespace):
-        """DEPRECATED: Return the Namespace for a given namespace name."""
-        return self.namespaces.lookup_name(namespace)
-
-    def _build_namespaces(self):
-        """Create default namespaces."""
-        return Namespace.builtin_namespaces()
-
-    @property
-    def namespaces(self):
-        """Return dict of valid namespaces on this wiki."""
-        if not hasattr(self, '_namespaces'):
-            self._namespaces = NamespacesDict(self._build_namespaces())
-        return self._namespaces
-
-    def ns_normalize(self, value):
-        """
-        Return canonical local form of namespace name.
-
-        @param value: A namespace name
-        @type value: str
-
-        """
-        index = self.namespaces.lookup_name(value)
-        return self.namespace(index)
-
-    @remove_last_args(('default', ))
-    def redirect(self):
-        """Return list of localized redirect tags for the site."""
-        return ['REDIRECT']
-
-    @remove_last_args(('default', ))
-    def pagenamecodes(self):
-        """Return list of localized PAGENAME tags for the site."""
-        return ['PAGENAME']
-
-    @remove_last_args(('default', ))
-    def pagename2codes(self):
-        """Return list of localized PAGENAMEE tags for the site."""
-        return ['PAGENAMEE']
-
-    def lock_page(self, page, block=True):
-        """
-        Lock page for writing. Must be called before writing any page.
-
-        We don't want different threads trying to write to the same page
-        at the same time, even to different sections.
-
-        @param page: the page to be locked
-        @type page: pywikibot.Page
-        @param block: if true, wait until the page is available to be locked;
-            otherwise, raise an exception if page can't be locked
-
-        """
-        title = page.title(with_section=False)
-        with self._pagemutex:
-            while title in self._locked_pages:
-                if not block:
-                    raise PageInUse(title)
-                self._pagemutex.wait()
-            self._locked_pages.add(title)
-
-    def unlock_page(self, page):
-        """
-        Unlock page. Call as soon as a write operation has completed.
-
-        @param page: the page to be locked
-        @type page: pywikibot.Page
-
-        """
-        with self._pagemutex:
-            self._locked_pages.discard(page.title(with_section=False))
-            self._pagemutex.notify_all()
-
-    def disambcategory(self):
-        """Return Category in which disambig pages are listed."""
-        if self.has_data_repository:
-            repo = self.data_repository()
-            repo_name = repo.family.name
-            try:
-                item = self.family.disambcatname[repo.code]
-            except KeyError:
-                raise Error(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(repo=repo_name,
-                                                       fam=self.family.name))
-            else:
-                dp = pywikibot.ItemPage(repo, item)
-                try:
-                    name = dp.getSitelink(self)
-                except pywikibot.NoPage:
-                    raise Error(
-                        'No disambiguation category name found in {repo} '
-                        'for {site}'.format(repo=repo_name, site=self))
-        else:  # fallback for non WM sites
-            try:
-                name = '%s:%s' % (Namespace.CATEGORY,
-                                  self.family.disambcatname[self.code])
-            except KeyError:
-                raise Error(
-                    'No disambiguation category name found in '
-                    '{site.family.name}_family for {site}'.format(site=self))
-        return pywikibot.Category(pywikibot.Link(name, self))
-
-    def isInterwikiLink(self, text):
-        """Return True if text is in the form of an interwiki link.
-
-        If a link object constructed using "text" as the link text parses as
-        belonging to a different site, this method returns True.
-
-        """
-        linkfam, linkcode = pywikibot.Link(text, self).parse_site()
-        return linkfam != self.family.name or linkcode != self.code
-
-    def redirectRegex(self, pattern=None):
-        """Return a compiled regular expression matching on redirect pages.
-
-        Group 1 in the regex match object will be the target title.
-
-        """
-        if pattern is None:
-            pattern = 'REDIRECT'
-        # A redirect starts with hash (#), followed by a keyword, then
-        # arbitrary stuff, then a wikilink. The wikilink may contain
-        # a label, although this is not useful.
-        return re.compile(r'\s*#{pattern}\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
-                          .format(pattern=pattern), re.IGNORECASE | re.DOTALL)
-
-    def sametitle(self, title1, title2):
-        """
-        Return True if title1 and title2 identify the same wiki page.
-
-        title1 and title2 may be unequal but still identify the same page,
-        if they use different aliases for the same namespace.
-        """
-        def ns_split(title):
-            """Separate the namespace from the name."""
-            ns, delim, name = title.partition(':')
-            if delim:
-                ns = self.namespaces.lookup_name(ns)
-            if not delim or not ns:
-                return default_ns, title
-            else:
-                return ns, name
-
-        if title1 == title2:
-            return True
-        # Replace underscores with spaces and multiple combinations of them
-        # with only one space
-        title1 = re.sub(r'[_ ]+', ' ', title1)
-        title2 = re.sub(r'[_ ]+', ' ', title2)
-        if title1 == title2:
-            return True
-        default_ns = self.namespaces[0]
-        # determine whether titles contain namespace prefixes
-        ns1_obj, name1 = ns_split(title1)
-        ns2_obj, name2 = ns_split(title2)
-        if ns1_obj != ns2_obj:
-            # pages in different namespaces
-            return False
-        name1 = name1.strip()
-        name2 = name2.strip()
-        # If the namespace has a case definition it's overriding the site's
-        # case definition
-        if ns1_obj.case == 'first-letter':
-            name1 = first_upper(name1)
-            name2 = first_upper(name2)
-        return name1 == name2
-
-    # namespace shortcuts for backwards-compatibility
-
-    @deprecated('namespaces.SPECIAL.custom_name', since='20160407')
-    def special_namespace(self):
-        """Return local name for the Special: namespace."""
-        return self.namespace(-1)
-
-    @deprecated('namespaces.FILE.custom_name', since='20160407')
-    def image_namespace(self):
-        """Return local name for the File namespace."""
-        return self.namespace(6)
-
-    @deprecated('namespaces.MEDIAWIKI.custom_name', since='20160407')
-    def mediawiki_namespace(self):
-        """Return local name for the MediaWiki namespace."""
-        return self.namespace(8)
-
-    @deprecated('namespaces.TEMPLATE.custom_name', since='20160407')
-    def template_namespace(self):
-        """Return local name for the Template namespace."""
-        return self.namespace(10)
-
-    @deprecated('namespaces.CATEGORY.custom_name', since='20160407')
-    def category_namespace(self):
-        """Return local name for the Category namespace."""
-        return self.namespace(14)
-
-    @deprecated('list(namespaces.CATEGORY)', since='20150829',
-                future_warning=True)
-    def category_namespaces(self):
-        """Return names for the Category namespace."""
-        return list(self.namespace(14, all=True))
-
-    # site-specific formatting preferences
-
-    def category_on_one_line(self):
-        # TODO: is this even needed? No family in the framework uses it.
-        """Return True if this site wants all category links on one line."""
-        return self.code in self.family.category_on_one_line
-
-    def interwiki_putfirst(self):
-        """Return list of language codes for ordering of interwiki links."""
-        return self.family.interwiki_putfirst.get(self.code, None)
-
-    def getSite(self, code):
-        """Return Site object for language 'code' in this Family."""
-        return pywikibot.Site(code=code, fam=self.family, user=self.user())
-
-    # deprecated methods for backwards-compatibility
-
-    @deprecated('pywikibot.data.api.encode_url', since='20151211',
-                future_warning=True)
-    def urlEncode(self, query):
-        """DEPRECATED."""
-        return api.encode_url(query)
-
-
-class TokenWallet:
-
-    """Container for tokens."""
-
-    def __init__(self, site):
-        """Initializer.
-
-        @type site: pywikibot.site.APISite
-        """
-        self.site = site
-        self._tokens = {}
-        self.failed_cache = set()  # cache unavailable tokens.
-
-    def load_tokens(self, types, all=False):
-        """
-        Preload one or multiple tokens.
-
-        @param types: the types of token.
-        @type types: iterable
-        @param all: load all available tokens, if None only if it can be done
-            in one request.
-        @type all: bool
-        """
-        if self.site.user() is None:
-            self.site.login()
-
-        self._tokens.setdefault(self.site.user(), {}).update(
-            self.site.get_tokens(types, all=all))
-
-        # Preload all only the first time.
-        # When all=True types is extended in site.get_tokens().
-        # Keys not recognised as tokens, are cached so they are not requested
-        # any longer.
-        if all is not False:
-            for key in types:
-                if key not in self._tokens[self.site.user()]:
-                    self.failed_cache.add((self.site.user(), key))
-
-    def __getitem__(self, key):
-        """Get token value for the given key."""
-        if self.site.user() is None:
-            self.site.login()
-
-        user_tokens = self._tokens.setdefault(self.site.user(), {})
-        # always preload all for users without tokens
-        failed_cache_key = (self.site.user(), key)
-
-        try:
-            key = self.site.validate_tokens([key])[0]
-        except IndexError:
-            raise Error(
-                "Requested token '{0}' is invalid on {1} wiki."
-                .format(key, self.site))
-
-        if (key not in user_tokens
-                and failed_cache_key not in self.failed_cache):
-            self.load_tokens([key], all=False if user_tokens else None)
-
-        if key in user_tokens:
-            return user_tokens[key]
-        else:
-            # token not allowed for self.site.user() on self.site
-            self.failed_cache.add(failed_cache_key)
-            # to be changed back to a plain KeyError?
-            raise Error(
-                "Action '{0}' is not allowed for user {1} on {2} wiki."
-                .format(key, self.site.user(), self.site))
-
-    def __contains__(self, key):
-        """Return True if the given token name is cached."""
-        return key in self._tokens.setdefault(self.site.user(), {})
-
-    def __str__(self):
-        """Return a str representation of the internal tokens dictionary."""
-        return self._tokens.__str__()
-
-    def __repr__(self):
-        """Return a representation of the internal tokens dictionary."""
-        return self._tokens.__repr__()
 
 
 class RemovedSite(BaseSite):
@@ -1986,7 +815,7 @@ class APISite(BaseSite):
             return [word]
 
     @deprecated('expand_text', since='20150831', future_warning=True)
-    def resolvemagicwords(self, wikitext):
+    def resolvemagicwords(self, wikitext):  # pragma: no cover
         """
         Replace the {{ns:xx}} marks in a wikitext with the namespace names.
 
@@ -2082,7 +911,7 @@ class APISite(BaseSite):
 
     @deprecated('siteinfo or Namespace instance', since='20150830',
                 future_warning=True)
-    def case(self):
+    def case(self):  # pragma: no cover
         """Return this site's capitalization rule."""
         # This is the global setting via $wgCapitalLinks, it is used whenever
         # the namespaces don't propagate the namespace specific value.
@@ -2093,7 +922,7 @@ class APISite(BaseSite):
         return self.siteinfo['wikiid']
 
     @deprecated('APISite.lang', since='20150629', future_warning=True)
-    def language(self):
+    def language(self):  # pragma: no cover
         """Return the code for the language of this Site."""
         return self.lang
 
@@ -2474,7 +1303,7 @@ class APISite(BaseSite):
 
     @deprecated('Check the content model instead', since='20150128',
                 future_warning=True)
-    def loadflowinfo(self, page):
+    def loadflowinfo(self, page):  # pragma: no cover
         """
         Load Flow-related information about a given page.
 
@@ -2728,8 +1557,6 @@ class APISite(BaseSite):
         if pageprops:
             props += '|pageprops'
 
-        rvprop = ['ids', 'flags', 'timestamp', 'user', 'comment', 'content']
-
         parameter = self._paraminfo.parameter('query+info', 'prop')
         if self.logged_in() and self.has_right('apihighlimits'):
             max_ids = int(parameter['highlimit'])
@@ -2759,7 +1586,7 @@ class APISite(BaseSite):
                 rvgen.request['pageids'] = set(pageids)
             else:
                 rvgen.request['titles'] = list(cache.keys())
-            rvgen.request['rvprop'] = rvprop
+            rvgen.request['rvprop'] = self._rvprops(content=True)
             pywikibot.output('Retrieving %s pages from %s.'
                              % (len(cache), self))
 
@@ -2945,7 +1772,7 @@ class APISite(BaseSite):
 
     @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
-    def getToken(self, getalways=True, getagain=False):
+    def getToken(self, getalways=True, getagain=False):  # pragma: no cover
         """DEPRECATED: Get edit token."""
         if self.username() != self.user():
             raise ValueError('The token for {0} was requested but only the '
@@ -2962,7 +1789,7 @@ class APISite(BaseSite):
 
     @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])
-    def getPatrolToken(self):
+    def getPatrolToken(self):  # pragma: no cover
         """DEPRECATED: Get patrol token."""
         if self.username() != self.user():
             raise ValueError('The token for {0} was requested but only the '
@@ -3363,12 +2190,24 @@ class APISite(BaseSite):
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
 
+    def _rvprops(self, content=False) -> list:
+        """Setup rvprop items for loadrevisions and preloadpages.
+
+        @return: rvprop items
+        """
+        props = ['comment', 'ids', 'flags', 'parsedcomment', 'sha1', 'size',
+                 'tags', 'timestamp', 'user', 'userid']
+        if content:
+            props.append('content')
+        if self.mw_version >= '1.21':
+            props.append('contentmodel')
+        if self.mw_version >= '1.32':
+            props.append('roles')
+        return props
+
     @deprecated_args(getText='content', sysop=None)
     @remove_last_args(['rollback'])
-    def loadrevisions(self, page, *, content=False, revids=None,
-                      startid=None, endid=None, starttime=None,
-                      endtime=None, rvdir=None, user=None, excludeuser=None,
-                      section=None, step=None, total=None):
+    def loadrevisions(self, page, *, content=False, section=None, **kwargs):
         """Retrieve revision information and store it in page object.
 
         By default, retrieves the last (current) revision of the page,
@@ -3392,61 +2231,60 @@ class APISite(BaseSite):
             (content must be True); section must be given by number (top of
             the article is section 0), not name
         @type section: int
-        @param revids: retrieve only the specified revision ids (raise
+        @keyword revids: retrieve only the specified revision ids (raise
             Exception if any of revids does not correspond to page)
         @type revids: an int, a str or a list of ints or strings
-        @param startid: retrieve revisions starting with this revid
-        @param endid: stop upon retrieving this revid
-        @param starttime: retrieve revisions starting at this Timestamp
-        @param endtime: stop upon reaching this Timestamp
-        @param rvdir: if false, retrieve newest revisions first (default);
+        @keyword startid: retrieve revisions starting with this revid
+        @keyword endid: stop upon retrieving this revid
+        @keyword starttime: retrieve revisions starting at this Timestamp
+        @keyword endtime: stop upon reaching this Timestamp
+        @keyword rvdir: if false, retrieve newest revisions first (default);
             if true, retrieve earliest first
-        @param user: retrieve only revisions authored by this user
-        @param excludeuser: retrieve all revisions not authored by this user
+        @keyword user: retrieve only revisions authored by this user
+        @keyword excludeuser: retrieve all revisions not authored by this user
         @raises ValueError: invalid startid/endid or starttime/endtime values
         @raises pywikibot.Error: revids belonging to a different page
         """
-        latest = (revids is None
-                  and startid is None
-                  and endid is None
-                  and starttime is None
-                  and endtime is None
-                  and rvdir is None
-                  and user is None
-                  and excludeuser is None
-                  and step is None
-                  and total is None)  # if True, retrieving current revision
+        latest = all(val is None for val in kwargs.values())
+
+        revids = kwargs.get('revids')
+        startid = kwargs.get('startid')
+        starttime = kwargs.get('starttime')
+        endid = kwargs.get('endid')
+        endtime = kwargs.get('endtime')
+        rvdir = kwargs.get('rvdir')
+        user = kwargs.get('user')
+        step = kwargs.get('step')
 
         # check for invalid argument combinations
-        if (startid is not None or endid is not None) and \
-                (starttime is not None or endtime is not None):
+        if (startid is not None or endid is not None) \
+           and (starttime is not None or endtime is not None):
             raise ValueError(
                 'loadrevisions: startid/endid combined with starttime/endtime')
+
         if starttime is not None and endtime is not None:
             if rvdir and starttime >= endtime:
                 raise ValueError(
                     'loadrevisions: starttime > endtime with rvdir=True')
-            if (not rvdir) and endtime >= starttime:
+
+            if not rvdir and endtime >= starttime:
                 raise ValueError(
                     'loadrevisions: endtime > starttime with rvdir=False')
+
         if startid is not None and endid is not None:
             if rvdir and startid >= endid:
                 raise ValueError(
                     'loadrevisions: startid > endid with rvdir=True')
-            if (not rvdir) and endid >= startid:
+            if not rvdir and endid >= startid:
                 raise ValueError(
                     'loadrevisions: endid > startid with rvdir=False')
 
         rvargs = {'type_arg': 'info|revisions'}
+        rvargs['rvprop'] = self._rvprops(content=content)
 
-        rvargs['rvprop'] = ['comment', 'flags', 'ids', 'sha1', 'timestamp',
-                            'user']
-        if self.mw_version >= '1.21':
-            rvargs['rvprop'].append('contentmodel')
-        if content:
-            rvargs['rvprop'].append('content')
-            if section is not None:
-                rvargs['rvsection'] = str(section)
+        if content and section is not None:
+            rvargs['rvsection'] = str(section)
+
         if revids is None:
             rvtitle = page.title(with_section=False).encode(self.encoding())
             rvargs['titles'] = rvtitle
@@ -3461,6 +2299,7 @@ class APISite(BaseSite):
             rvargs['rvdir'] = 'newer'
         elif rvdir is not None:
             rvargs['rvdir'] = 'older'
+
         if startid:
             rvargs['rvstartid'] = startid
         if endid:
@@ -3469,13 +2308,16 @@ class APISite(BaseSite):
             rvargs['rvstart'] = starttime
         if endtime:
             rvargs['rvend'] = endtime
+
         if user:
             rvargs['rvuser'] = user
-        elif excludeuser:
-            rvargs['rvexcludeuser'] = excludeuser
+        else:
+            rvargs['rvexcludeuser'] = kwargs.get('excludeuser')
 
         # assemble API request
-        rvgen = self._generator(api.PropertyGenerator, total=total, **rvargs)
+        rvgen = self._generator(api.PropertyGenerator,
+                                total=kwargs.get('total'), **rvargs)
+
         if step:
             rvgen.set_query_increment = step
 
@@ -3896,7 +2738,7 @@ class APISite(BaseSite):
 
         @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
 
-        @param url: The URL to search for (with ot without the protocol
+        @param url: The URL to search for (with or without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
             of the hostname
         @param namespaces: list of namespace numbers to fetch contribs from
@@ -3905,21 +2747,23 @@ class APISite(BaseSite):
         @param protocol: Protocol to search for, likely http or https, http by
                 default. Full list shown on Special:LinkSearch wikipage
         """
-        separator = '://'
-        if separator in url:
-            found_protocol = url[:url.index(separator)]
-            url = url[url.index(separator) + len(separator):]
-            if protocol and protocol != found_protocol:
-                raise ValueError('Protocol was specified, but a different one '
-                                 'was found in searched url')
-            protocol = found_protocol
+        if url is not None:
+            found_protocol, _, url = url.rpartition('://')
+
+            # If url is * we make it None in order to search for every page
+            # with any URL.
+            if url == '*':
+                url = None
+
+            if found_protocol:
+                if protocol and protocol != found_protocol:
+                    raise ValueError('Protocol was specified, but a different '
+                                     'one was found in searched url')
+                protocol = found_protocol
+
         if not protocol:
             protocol = 'http'
 
-        # If url is * we make it None in order to search for every page
-        # with any URL.
-        if url == '*':
-            url = None
         return self._generator(api.PageGenerator, type_arg='exturlusage',
                                geuquery=url, geuprotocol=protocol,
                                namespaces=namespaces,
@@ -4937,27 +3781,30 @@ class APISite(BaseSite):
         one that is not by the same user who made the last edit.
 
         @param page: the Page to be rolled back (must exist)
-
+        @keyword user: the last user to be rollbacked;
+            default is page.latest_revision.user
         """
         if len(page._revisions) < 2:
             raise Error(
-                'Rollback of %s aborted; load revision history first.'
-                % page.title(as_link=True))
-        last_rev = page.latest_revision
-        last_user = last_rev.user
+                'Rollback of {} aborted; load revision history first.'
+                .format(page))
+
+        user = kwargs.pop('user', page.latest_revision.user)
         for rev in sorted(page._revisions.values(), reverse=True,
                           key=lambda r: r.timestamp):
             # start with most recent revision first
-            if rev.user != last_user:
+            if rev.user != user:
                 break
         else:
             raise Error(
-                'Rollback of %s aborted; only one user in revision history.'
-                % page.title(as_link=True))
-        parameters = merge_unique_dicts(kwargs, action='rollback',
+                'Rollback of {} aborted; only one user in revision history.'
+                .format(page))
+
+        parameters = merge_unique_dicts(kwargs,
+                                        action='rollback',
                                         title=page,
                                         token=self.tokens['rollback'],
-                                        user=last_user)
+                                        user=user)
         self.lock_page(page)
         req = self._simple_request(**parameters)
         try:
@@ -6989,7 +5836,7 @@ class DataSite(APISite):
         return wbdata[props]
 
     @deprecated('pywikibot.ItemPage', since='20130307', future_warning=True)
-    def get_item(self, source, **params):
+    def get_item(self, source, **params):  # pragma: no cover
         """Get the data for multiple Wikibase items."""
         return self._get_item(source, **params)
 
@@ -7636,6 +6483,146 @@ class DataSite(APISite):
                               data_name='search',
                               total=total, parameters=parameters)
         return gen
+
+    def _wbset_action(self, itemdef, action, action_data, **kwargs):
+        """
+        Execute wbset{action}' on a Wikibase item.
+
+        Supported actions are:
+            wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
+
+        @param itemdef: Item to modify or create
+        @type itemdef: str, WikibasePage or Page coonected to such item
+        @param action: wbset{action] to perform:
+            'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
+        @type action: str
+        @param data: data to be used in API request, see API help
+        @type data: SiteLink or dict
+            wbsetaliases:
+                dict shall have the following structure:
+                {'language': value (str),
+                 'add': list of language codes (str),
+                 'remove': list of language codes (str),
+                 'set' list of language codes (str)
+                  }
+                'add' and 'remove' are alternative to 'set'
+            wbsetdescription and wbsetlabel:
+                dict shall have keys 'language', 'value'
+            wbsetsitelink:
+                dict shall have keys 'linksite', 'linktitle' and
+                optionally 'badges'
+        @kwargs bot: Whether to mark the edit as a bot edit, default is False
+        @type bot: bool
+        @return: query result
+        @rtype: dict
+        @raises AssertionError, TypeError
+        """
+        def format_sitelink(sitelink):
+            """Convert SiteLink to a dict accepted by wbsetsitelink API."""
+            if isinstance(sitelink, pywikibot.page.SiteLink):
+                _dict = {
+                    'linksite': sitelink._sitekey,
+                    'linktitle': sitelink._rawtitle,
+                    'badges': '|'.join([b.title() for b in sitelink.badges]),
+                }
+            else:
+                _dict = sitelink
+
+            return _dict
+
+        def prepare_data(action, data):
+            """Prepare data as expected by API."""
+            if action == 'wbsetaliases':
+                res = data
+                keys = set(res)
+                assert keys < {'language', 'add', 'remove', 'set'}
+                assert keys & {'add', 'set'} == {}
+                assert keys & {'remove', 'set'} == {}
+            elif action in ('wbsetlabel', 'wbsetdescription'):
+                res = data
+                keys = set(res)
+                assert keys == {'language', 'value'}
+            elif action == 'wbsetsitelink':
+                res = format_sitelink(data)
+                keys = set(res)
+                assert keys >= {'linksite'}
+                assert keys <= {'linksite', 'linktitle', 'badges'}
+            else:
+                raise ValueError('Something has gone wrong ...')
+
+            return res
+
+        # Supported actions
+        assert action in ('wbsetaliases', 'wbsetdescription',
+                          'wbsetlabel', 'wbsetsitelink'), \
+            'action {} not supported.'.format(action)
+
+        # prefer ID over (site, title)
+        if isinstance(itemdef, str):
+            itemdef = pywikibot.ItemPage(self, itemdef)
+        elif isinstance(itemdef, pywikibot.Page):
+            try:
+                itemdef = itemdef.data_item()
+            except pywikibot.NoPage:
+                itemdef = pywikibot.ItemPage(self)
+        if not isinstance(itemdef, pywikibot.page.WikibasePage):
+            raise TypeError('itemdef shall be str, WikibasePage or Page')
+
+        params = itemdef._defined_by(singular=True)
+        # TODO: support 'new'
+        baserevid = kwargs.pop('baserevid', 0) or itemdef.latest_revision_id
+        params.update(
+            {'id': itemdef.id,
+             'baserevid': baserevid,
+             'action': action,
+             'token': self.tokens['edit'],
+             'bot': kwargs.pop('bot', False),
+             })
+        params.update(prepare_data(action, action_data))
+
+        for arg in kwargs:
+            if arg in ['summary']:
+                params[arg] = kwargs[arg]
+            else:
+                warn('Unknown parameter {} for action  {}, ignored'
+                     .format(arg, action), UserWarning, 2)
+
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
+    def wbsetaliases(self, itemdef, aliases, **kwargs):
+        """
+        Set aliases for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetaliases', aliases, **kwargs)
+
+    def wbsetdescription(self, itemdef, description, **kwargs):
+        """
+        Set description for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetdescription', description,
+                                  **kwargs)
+
+    def wbsetlabel(self, itemdef, label, **kwargs):
+        """
+        Set label for a single Wikibase entity.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetlabel', label, **kwargs)
+
+    def wbsetsitelink(self, itemdef, sitelink, **kwargs):
+        """
+        Set, remove or modify a sitelink on a Wikibase item.
+
+        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        """
+        return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)
 
 
 wrapper = ModuleDeprecationWrapper(__name__)

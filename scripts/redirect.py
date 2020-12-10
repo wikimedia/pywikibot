@@ -82,8 +82,8 @@ from typing import Any, Generator, Optional, Union
 import pywikibot
 
 from pywikibot import i18n, xmlreader
-from pywikibot.bot import (ExistingPageBot, OptionHandler, RedirectPageBot,
-                           SingleSiteBot)
+from pywikibot.bot import (ExistingPageBot, MultipleSitesBot, OptionHandler,
+                           RedirectPageBot)
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 from pywikibot.tools import PYTHON_VERSION
 
@@ -369,7 +369,7 @@ class RedirectGenerator(OptionHandler):
             try:
                 if not moved_page.isRedirectPage():
                     continue
-            except (pywikibot.BadTitle, pywikibot.ServerError):
+            except pywikibot.ServerError:
                 continue
             # moved_page is now a redirect, so any redirects pointing
             # to it need to be changed
@@ -383,7 +383,7 @@ class RedirectGenerator(OptionHandler):
                 continue
 
 
-class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
+class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
 
     """Redirect bot."""
 
@@ -395,9 +395,6 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             'sdtemplate': None,
         })
         super().__init__(**kwargs)
-        self.repo = self.site.data_repository()
-        self.is_repo = self.repo if self.repo == self.site else None
-        self.sdtemplate = self.get_sd_template()
 
         # connect the action treat to treat_page method called by treat
         if action == 'double':
@@ -410,48 +407,59 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             raise NotImplementedError('No valid action "{}" found.'
                                       .format(action))
 
-    def get_sd_template(self) -> Optional[str]:
+    def get_sd_template(self, site=None) -> Optional[str]:
         """Look for speedy deletion template and return it.
 
+        @param site: site for which the template has to be given
+        @type site: pywikibot.BaseSite
         @return: A valid speedy deletion template.
         """
-        if self.opt.delete and not self.site.has_right('delete'):
+        title = None
+        if site:
             sd = self.opt.sdtemplate
-            if not sd and i18n.twhas_key(self.site,
+            if not sd and i18n.twhas_key(site,
                                          'redirect-broken-redirect-template'):
-                sd = i18n.twtranslate(self.site,
+                sd = i18n.twtranslate(site,
                                       'redirect-broken-redirect-template')
-            # TODO: Add bot's signature if needed (Bug: T131517)
 
             # check whether template exists for this site
-            title = None
             if sd:
                 template = extract_templates_and_params_regex_simple(sd)
                 if template:
                     title = template[0][0]
-                    page = pywikibot.Page(self.site, title, ns=10)
+                    page = pywikibot.Page(site, title, ns=10)
                     if page.exists():
                         return sd
-            pywikibot.warning(
-                'No speedy deletion template {}available.'
-                .format('"{}" '.format(title) if title else ''))
+
+        pywikibot.warning(
+            'No speedy deletion template {}available.'
+            .format('"{}" '.format(title) if title else ''))
         return None
+
+    @property
+    def sdtemplate(self):
+        """Gives the speedy deletion template for the current_page."""
+        return self.get_sd_template(self.current_page.site)
 
     def init_page(self, item) -> pywikibot.Page:
         """Ensure that we process page objects."""
+        default_site = pywikibot.Site()
         if isinstance(item, str):
-            item = pywikibot.Page(self.site, item)
+            item = pywikibot.Page(default_site, item)
         elif isinstance(item, tuple):
             redir_name, code, target, final = item
-            item = pywikibot.Page(self.site, redir_name)
+            item = pywikibot.Page(default_site, redir_name)
             item._redirect_type = code
-        return super().init_page(item)
+        page = super().init_page(item)
+        self.repo = page.site.data_repository()
+        self.is_repo = self.repo if self.repo == page.site else None
+        return page
 
     def delete_redirect(self, page, summary_key) -> None:
         """Delete the redirect page."""
-        assert page.site == self.site, (
+        assert page.site == self.current_page.site, (
             'target page is on different site {0}'.format(page.site))
-        reason = i18n.twtranslate(self.site, summary_key)
+        reason = i18n.twtranslate(page.site, summary_key)
         if page.site.has_right('delete'):
             page.delete(reason, prompt=False)
         elif self.sdtemplate:
@@ -484,10 +492,6 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         else:
             try:
                 targetPage.get()
-            except pywikibot.BadTitle as e:
-                pywikibot.warning(
-                    'Redirect target {0} is not a valid page title.'
-                    .format(str(e)[10:]))
             except pywikibot.InvalidTitle:
                 pywikibot.exception()
             except pywikibot.NoPage:
@@ -505,10 +509,10 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                     else:
                         pywikibot.output('{0} has been moved to {1}'
                                          .format(redir_page, movedTarget))
-                        reason = i18n.twtranslate(self.site,
-                                                  'redirect-fix-broken-moved',
-                                                  {'to': movedTarget.title(
-                                                      as_link=True)})
+                        reason = i18n.twtranslate(
+                            redir_page.site, 'redirect-fix-broken-moved',
+                            {'to': movedTarget.title(as_link=True,
+                                                     allow_interwiki=False)})
                         content = redir_page.get(get_redirect=True)
                         redir_page.set_redirect_target(
                             movedTarget, keep_section=True, save=False)
@@ -568,12 +572,6 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 pywikibot.exception()
                 pywikibot.output('Skipping {0}.'.format(newRedir))
                 break
-            except pywikibot.BadTitle as e:
-                # str(e) is in the format 'BadTitle: [[Foo]]'
-                pywikibot.warning(
-                    'Redirect target {0} is not a valid page title.'
-                    .format(str(e)[10:]))
-                break
             except pywikibot.NoPage:
                 if self.opt.always:
                     pywikibot.output(
@@ -626,11 +624,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                     else:
                         newRedir = targetPage
                         continue
-            try:
-                oldText = redir.get(get_redirect=True)
-            except pywikibot.BadTitle:
-                pywikibot.output('Bad Title Error')
-                break
+            oldText = redir.get(get_redirect=True)
             if self.is_repo and redir.namespace() == self.repo.item_namespace:
                 redir = pywikibot.ItemPage(self.repo, redir.title())
                 targetPage = pywikibot.ItemPage(self.repo, targetPage.title())
@@ -639,9 +633,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 break
             redir.set_redirect_target(targetPage, keep_section=True,
                                       save=False)
-            summary = i18n.twtranslate(self.site, 'redirect-fix-double',
-                                       {'to': targetPage.title(as_link=True)}
-                                       )
+            summary = i18n.twtranslate(
+                redir.site, 'redirect-fix-double',
+                {'to': targetPage.title(as_link=True, allow_interwiki=False)})
             self.userPut(redir, oldText, redir.text, summary=summary,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
@@ -739,7 +733,6 @@ def main(*args) -> None:
     if not action:
         pywikibot.bot.suggest_help(missing_action=True)
     else:
-        pywikibot.Site().login()
         options['generator'] = RedirectGenerator(action, **gen_options)
         bot = RedirectRobot(action, **options)
         bot.run()

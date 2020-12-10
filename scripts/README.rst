@@ -107,7 +107,7 @@ The contents of the package
     | image.py               | This script can be used to change one image to another  |
     |                        | or remove an image entirely.                            |
     +------------------------+---------------------------------------------------------+
-    | imagecopy.py           | Copies images from a wikimedia wiki to Commons          |
+    | imagecopy.py           | Copies images from a Wikimedia wiki to Commons          |
     +------------------------+---------------------------------------------------------+
     | imagecopy_self.py      | Copy self published files from the English Wikipedia to |
     |                        | Commons.                                                |
@@ -281,7 +281,11 @@ The contents of the package
     | compat2core.py         | Helper script to convert compat 1.0 scripts to the core |
     |                        | 3.0 framework. Also works for newer Pywikibot releases. |
     +------------------------+---------------------------------------------------------+
+    | interwikidumps.py      | Convert interwiki dumps from pickle to txt format.      |
+    +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate a i18n file from a given script.               |
+    +------------------------+---------------------------------------------------------+
+    | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
     +------------------------+---------------------------------------------------------+
     | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
     +------------------------+---------------------------------------------------------+

@@ -7,7 +7,7 @@ python:
   - '3.6'
   - '3.7'
   - '3.8'
-  - '3.9-dev'
+  - '3.9'
 
 # OSX builds do not yet support Python
 os: linux
@@ -155,7 +155,7 @@ matrix:
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
     - python: '3.7'
       env: LANGUAGE=test FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
-    - python: '3.9-dev'
+    - python: '3.9'
       env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT_TEST_NO_RC=1
     - python: '3.6'
       env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2019
+# (C) Pywikibot team, 2016-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
+from contextlib import suppress
 
-from pywikibot.page import Page, Revision, User
+from pywikibot.page import Page, User
 
 from tests.aspects import TestCase
 from tests import unittest
@@ -43,7 +43,7 @@ class TestThankRevision(TestCase):
         else:
             self.skipTest(NO_THANKABLE_REVS)
         before_time = site.getcurrenttimestamp()
-        Revision._thank(revid, site, source='pywikibot test')
+        site.thank_revision(revid, source='pywikibot test')
         log_entries = site.logevents(logtype='thanks', total=5, page=user,
                                      start=before_time, reverse=True)
         try:
@@ -72,8 +72,8 @@ class TestThankRevision(TestCase):
             test_page.text += '* ~~~~\n'
             test_page.save('Pywikibot Thanks test')
             revid = test_page.latest_revision_id
-        self.assertAPIError('invalidrecipient', None, Revision._thank,
-                            revid, site, source='pywikibot test')
+        self.assertAPIError('invalidrecipient', None, site.thank_revision,
+                            revid, source='pywikibot test')
 
 
 class TestThankRevisionErrors(TestCase):
@@ -97,8 +97,8 @@ class TestThankRevisionErrors(TestCase):
                 break
         else:
             self.skipTest(NO_THANKABLE_REVS)
-        self.assertAPIError('invalidrecipient', None, Revision._thank,
-                            revid, site, source='pywikibot test')
+        self.assertAPIError('invalidrecipient', None, site.thank_revision,
+                            revid, source='pywikibot test')
 
     def test_invalid_revision(self):
         """Test that passing an invalid revision ID causes an error."""
@@ -106,12 +106,10 @@ class TestThankRevisionErrors(TestCase):
         invalid_revids = (0, -1, 0.99, 'zero, minus one, and point nine nine',
                           (0, -1, 0.99), [0, -1, 0.99])
         for invalid_revid in invalid_revids:
-            self.assertAPIError('invalidrevision', None, Revision._thank,
-                                invalid_revid, site, source='pywikibot test')
+            self.assertAPIError('invalidrevision', None, site.thank_revision,
+                                invalid_revid, source='pywikibot test')
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

@@ -27,6 +27,7 @@ import re
 import sys
 
 from collections.abc import Iterator
+from collections import namedtuple
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
@@ -114,6 +115,11 @@ GENERATOR OPTIONS
                     or for backward compatibility:
 
                         logevent,username,total
+
+                    Note: 'start' is the most recent date and log events are
+                    iterated from present to past. If 'start'' is not provided,
+                    it means 'now'; if 'end' is not provided, it means 'since
+                    the beginning'.
 
                     To use the default value, use an empty string.
                     You have options for every type of logs given by the
@@ -418,6 +424,11 @@ _filter_unique_pages = partial(
     filter_unique, key=lambda page: '{}:{}:{}'.format(*page._cmpkey()))
 
 
+def _output_if(predicate, msg):
+    if predicate:
+        pywikibot.output(msg)
+
+
 class GeneratorFactory:
 
     """Process command line arguments and return appropriate page generator.
@@ -571,7 +582,7 @@ class GeneratorFactory:
 
         if self.catfilter_list:
             dupfiltergen = CategoryFilterPageGenerator(
-                dupfiltergen, self.catfilter_list, self.site)
+                dupfiltergen, self.catfilter_list)
 
         if (preload or self.articlefilter_list) and not self.nopreload:
             if isinstance(dupfiltergen, DequeGenerator):
@@ -643,34 +654,50 @@ class GeneratorFactory:
             compatibility, this can also be the total amount of pages
             that should be returned. It is taken as 'total' if the value does
             not have 8 digits.
-        @type start: str convertible to Timestamp in the format YYYYMMDD. If
-            the length is not 8: for backward compatibility to use this as
-            'total', it can also be a str (castable to int) or int (positive).
+        @type start: str convertible to Timestamp matching '%Y%m%d%H%M%S'.
+            If the length is not 8: for backward compatibility to use this as
+            'total', it can also be a str (castable to int).
         @param end: Timestamp to end listing at
-        @type end: str convertible to Timestamp in the format YYYYMMDD
-        @return: The generator or None if invalid 'total' value.
+        @type end: str convertible to Timestamp matching '%Y%m%d%H%M%S'
+        @return: The generator or None if invalid 'start/total' or 'end' value.
         @rtype: LogeventsPageGenerator
         """
-        total = None
-        start = start or None  # because start might be an empty string
-        if isinstance(start, str) and len(start) == 8:
-            start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
-        elif start is not None:
-            try:
-                total = int(start)
-                if total <= 0:
-                    raise ValueError
-            except ValueError:
-                pywikibot.error('Total number of log ({0}) events must be a '
-                                'positive int.'.format(total))
-                return None
-            start = None
-
-        if end is not None:
+        def parse_start(start):
+            """Parse start and return (start, total)."""
             if start is None:
-                pywikibot.error('End cannot be given if start is not given.')
-                return None
-            end = pywikibot.Timestamp.strptime(end, '%Y%m%d')
+                return None, None
+
+            if len(start) >= 8:
+                return pywikibot.Timestamp.fromtimestampformat(start), None
+
+            return None, int(start)
+
+        start = start or None  # because start might be an empty string
+        try:
+            start, total = parse_start(start)
+            assert total is None or total > 0
+        except ValueError as err:
+            pywikibot.error(
+                '{}. Start parameter has wrong format!'.format(err))
+            return None
+        except AssertionError:
+            pywikibot.error('Total number of log ({0}) events must be a '
+                            'positive int.'.format(start))
+            return None
+
+        try:
+            end = pywikibot.Timestamp.fromtimestampformat(end)
+        except ValueError as err:
+            pywikibot.error(
+                '{}. End parameter has wrong format!'.format(err))
+            return None
+        except TypeError:  # end is None
+            pass
+
+        if start or end:
+            pywikibot.output('Fetching log events in range: {} - {}.'
+                             .format(end or 'beginning of time',
+                                     start or 'now'))
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
@@ -697,19 +724,22 @@ class GeneratorFactory:
         cats = self.site.siteinfo.get('linter')  # Get linter categories.
         valid_cats = [c for _list in cats.values() for c in _list]
 
-        value = '' if value is None else value
+        value = value or ''
         cat, _, lint_from = value.partition('/')
-        if not lint_from:
-            lint_from = None
+        lint_from = lint_from or None
 
-        if cat == 'show':  # Display categories of lint errors.
+        def show_available_categories(cats):
             _i = ' ' * 4
+            _2i = 2 * _i
             txt = 'Available categories of lint errors:\n'
             for prio, _list in cats.items():
                 txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
-                for c in _list:
-                    txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
+                txt += ''.join(
+                    '{indent}{cat}\n'.format(indent=_2i, cat=c) for c in _list)
             pywikibot.output('%s' % txt)
+
+        if cat == 'show':  # Display categories of lint errors.
+            show_available_categories(cats)
             sys.exit(0)
 
         if not cat:
@@ -718,10 +748,8 @@ class GeneratorFactory:
             lint_cats = cats[cat]
         else:
             lint_cats = cat.split(',')
-            for lint_cat in lint_cats:
-                if lint_cat not in valid_cats:
-                    raise ValueError('Invalid category of lint errors: %s'
-                                     % cat)
+            assert set(lint_cats) <= set(valid_cats), \
+                'Invalid category of lint errors: %s' % cat
 
         return self.site.linter_pages(
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
@@ -1162,13 +1190,16 @@ class GeneratorFactory:
             value = None
 
         handler = getattr(self, '_handle_' + arg[1:], None)
-        if handler:
-            handler_result = handler(value)
-            if isinstance(handler_result, bool):
-                return handler_result
-            if handler_result:
-                self.gens.append(handler_result)
-                return True
+        if not handler:
+            return False
+
+        handler_result = handler(value)
+        if isinstance(handler_result, bool):
+            return handler_result
+        if handler_result:
+            self.gens.append(handler_result)
+            return True
+
         return False
 
 
@@ -1480,14 +1511,16 @@ def TextfilePageGenerator(filename: Optional[str] = None, site=None):
             # inadvertently change pages on another wiki!
             yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
                                                 site))
-        if linkmatch is None:
-            f.seek(0)
-            for title in f:
-                title = title.strip()
-                if '|' in title:
-                    title = title[:title.index('|')]
-                if title:
-                    yield pywikibot.Page(site, title)
+        if linkmatch is not None:
+            return
+
+        f.seek(0)
+        for title in f:
+            title = title.strip()
+            if '|' in title:
+                title = title[:title.index('|')]
+            if title:
+                yield pywikibot.Page(site, title)
 
 
 def PagesFromTitlesGenerator(iterable, site=None):
@@ -1599,18 +1632,19 @@ def PageTitleFilterPageGenerator(generator, ignore_list: dict):
 
     """
     def is_ignored(page):
-        if page.site.code in ignore_list.get(page.site.family.name, {}):
-            for ig in ignore_list[page.site.family.name][page.site.code]:
-                if re.search(ig, page.title()):
-                    return True
-        return False
+        try:
+            site_ig_list = ignore_list[page.site.family.name][page.site.code]
+        except KeyError:
+            return False
+        return any(re.search(ig, page.title()) for ig in site_ig_list)
 
     for page in generator:
-        if is_ignored(page):
-            if config.verbose_output:
-                pywikibot.output('Ignoring page %s' % page.title())
-        else:
+        if not is_ignored(page):
             yield page
+            continue
+
+        if config.verbose_output:
+            pywikibot.output('Ignoring page %s' % page.title())
 
 
 def RedirectFilterPageGenerator(generator, no_redirects: bool = True,
@@ -1622,27 +1656,30 @@ def RedirectFilterPageGenerator(generator, no_redirects: bool = True,
         redirects.
     @param show_filtered: Output a message for each page not yielded
     """
-    for page in generator or []:
-        if no_redirects:
-            if not page.isRedirectPage():
-                yield page
-            elif show_filtered:
-                pywikibot.output('%s is a redirect page. Skipping.' % page)
+    fmt = '{page} is {what} redirect page. Skipping.'
+    what = 'a' if no_redirects else 'not a'
 
-        else:
-            if page.isRedirectPage():
-                yield page
-            elif show_filtered:
-                pywikibot.output('%s is not a redirect page. Skipping.'
-                                 % page)
+    for page in generator or []:
+        is_redirect = page.isRedirectPage()
+        if bool(no_redirects) != bool(is_redirect):  # xor
+            yield page
+            continue
+
+        if show_filtered:
+            pywikibot.output(fmt.format(what=what, page=page))
 
 
 class ItemClaimFilter:
 
     """Item claim filter."""
 
+    page_classes = {
+        True: pywikibot.PropertyPage,
+        False: pywikibot.ItemPage,
+    }
+
     @classmethod
-    def __filter_match(cls, page, prop, claim, qualifiers=None):
+    def __filter_match(cls, page, prop, claim, qualifiers):
         """
         Return true if the page contains the claim given.
 
@@ -1650,34 +1687,27 @@ class ItemClaimFilter:
         @return: true if page contains the claim, false otherwise
         @rtype: bool
         """
-        if not isinstance(page, pywikibot.page.WikibasePage):
-            if isinstance(page.site, pywikibot.site.DataSite):  # T175151
-                on_repo = page.namespace() in (
-                    page.site.item_namespace, page.site.property_namespace)
-            else:
-                on_repo = False
-            if on_repo:
-                if page.namespace() == page.site.property_namespace:
-                    page_cls = pywikibot.PropertyPage
-                else:
-                    page_cls = pywikibot.ItemPage
+        if not isinstance(page, pywikibot.page.WikibasePage):  # T175151
+            try:
+                assert page.site.property_namespace
+                assert page.site.item_namespace
+                key = page.namespace() == page.site.property_namespace
+                page_cls = cls.page_classes[key]
                 page = page_cls(page.site, page.title(with_ns=False))
-            else:
+            except (AttributeError, AssertionError):
                 try:
                     page = pywikibot.ItemPage.fromPage(page)
                 except pywikibot.NoPage:
                     return False
 
-        for page_claim in page.get()['claims'].get(prop, []):
-            if page_claim.target_equals(claim):
-                if not qualifiers:
-                    return True
+        def match_qualifiers(page_claim, qualifiers):
+            return all(page_claim.has_qualifier(prop, val)
+                       for prop, val in qualifiers.items())
 
-                for prop, val in qualifiers.items():
-                    if not page_claim.has_qualifier(prop, val):
-                        return False
-                return True
-        return False
+        page_claims = page.get()['claims'].get(prop, [])
+        return any(
+            p_cl.target_equals(claim) and match_qualifiers(p_cl, qualifiers)
+            for p_cl in page_claims)
 
     @classmethod
     def filter(cls, generator, prop: str, claim,
@@ -1694,6 +1724,7 @@ class ItemClaimFilter:
         @param negate: true if pages that do *not* contain specified claim
             should be yielded, false otherwise
         """
+        qualifiers = qualifiers or {}
         for page in generator:
             if cls.__filter_match(page, prop, claim, qualifiers) is not negate:
                 yield page
@@ -1830,7 +1861,8 @@ def QualityFilterPageGenerator(generator, quality: List[int]):
             yield page
 
 
-def CategoryFilterPageGenerator(generator, category_list, site=None):
+@deprecated_args(site=None, since='20201107')
+def CategoryFilterPageGenerator(generator, category_list):
     """
     Wrap a generator to filter pages by categories specified.
 
@@ -1839,10 +1871,8 @@ def CategoryFilterPageGenerator(generator, category_list, site=None):
     @type category_list: list of category objects
 
     """
-    if site is None:
-        site = pywikibot.Site()
     for page in generator:
-        if all(x in site.pagecategories(page) for x in category_list):
+        if all(x in page.categories() for x in category_list):
             yield page
 
 
@@ -1874,49 +1904,46 @@ def EdittimeFilterPageGenerator(generator,
     @type show_filtered: bool
 
     """
-    do_last_edit = last_edit_start or last_edit_end
-    do_first_edit = first_edit_start or first_edit_end
+    def to_be_yielded(edit, page, show_filtered):
+        if not edit.do_edit:
+            return True
 
-    last_edit_start = last_edit_start or datetime.datetime.min
-    last_edit_end = last_edit_end or datetime.datetime.max
-    first_edit_start = first_edit_start or datetime.datetime.min
-    first_edit_end = first_edit_end or datetime.datetime.max
+        if isinstance(edit, Latest):
+            edit_time = page.latest_revision.timestamp
+        else:
+            edit_time = page.oldest_revision.timestamp
+
+        msg = '{prefix} edit on {page} was on {time}.\n' \
+              'Too {{when}}. Skipping.' \
+              .format(prefix=edit.__class__.__name__,  # prefix = Class name.
+                      page=page,
+                      time=edit_time.isoformat())
+
+        if edit_time < edit.edit_start:
+            _output_if(show_filtered, msg.format(when='old'))
+            return False
+
+        if edit_time > edit.edit_end:
+            _output_if(show_filtered, msg.format(when='recent'))
+            return False
+
+        return True
+
+    First = namedtuple('First', ['do_edit', 'edit_start', 'edit_end'])
+    Latest = namedtuple('Latest', First._fields)
+
+    latest_edit = Latest(do_edit=last_edit_start or last_edit_end,
+                         edit_start=last_edit_start or datetime.datetime.min,
+                         edit_end=last_edit_end or datetime.datetime.max)
+
+    first_edit = First(do_edit=first_edit_start or first_edit_end,
+                       edit_start=first_edit_start or datetime.datetime.min,
+                       edit_end=first_edit_end or datetime.datetime.max)
 
     for page in generator or []:
-        if do_last_edit:
-            last_edit = page.editTime()
-
-            if last_edit < last_edit_start:
-                if show_filtered:
-                    pywikibot.output(
-                        'Last edit on %s was on %s.\nToo old. Skipping.'
-                        % (page, last_edit.isoformat()))
-                continue
-
-            if last_edit > last_edit_end:
-                if show_filtered:
-                    pywikibot.output(
-                        'Last edit on %s was on %s.\nToo recent. Skipping.'
-                        % (page, last_edit.isoformat()))
-                continue
-
-        if do_first_edit:
-            first_edit = page.oldest_revision.timestamp
-
-            if first_edit < first_edit_start:
-                if show_filtered:
-                    pywikibot.output(
-                        'First edit on %s was on %s.\nToo old. Skipping.'
-                        % (page, first_edit.isoformat()))
-
-            if first_edit > first_edit_end:
-                if show_filtered:
-                    pywikibot.output(
-                        'First edit on %s was on %s.\nToo recent. Skipping.'
-                        % (page, first_edit.isoformat()))
-                continue
-
-        yield page
+        if (to_be_yielded(latest_edit, page, show_filtered)
+                and to_be_yielded(first_edit, page, show_filtered)):
+            yield page
 
 
 def UserEditFilterGenerator(generator, username: str, timestamp=None,
@@ -1941,12 +1968,11 @@ def UserEditFilterGenerator(generator, username: str, timestamp=None,
         max_revision_depth
     @param show_filtered: Output a message for each page not yielded
     """
-    ts = None
-    if timestamp:
-        if isinstance(timestamp, str):
-            ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
-        else:
-            ts = timestamp
+    if isinstance(timestamp, str):
+        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    else:
+        ts = timestamp
+
     for page in generator:
         contribs = page.contributors(total=max_revision_depth, endtime=ts)
         if bool(contribs[username]) is not bool(skip):  # xor operation
@@ -2158,24 +2184,19 @@ def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
     @return: Wrapped generator
     @rtype: generator
     """
+    why = "doesn't" if has_item else 'has'
+    msg = '{{page}} {why} a wikidata item. Skipping.'.format(why=why)
+
     for page in generator or []:
         try:
             page_item = pywikibot.ItemPage.fromPage(page, lazy_load=False)
         except pywikibot.NoPage:
             page_item = None
 
-        if page_item:
-            if not has_item:
-                if show_filtered:
-                    pywikibot.output(
-                        '%s has a wikidata item. Skipping.' % page)
-                continue
-        else:
-            if has_item:
-                if show_filtered:
-                    pywikibot.output(
-                        "%s doesn't have a wikidata item. Skipping." % page)
-                continue
+        to_be_skipped = bool(page_item) != has_item
+        if to_be_skipped:
+            _output_if(show_filtered, msg.format(page=page))
+            continue
 
         yield page
 
@@ -2601,18 +2622,12 @@ def MySQLPageGenerator(query, site=None, verbose=None):
                                 dbname=site.dbName(),
                                 encoding=site.encoding(),
                                 verbose=verbose)
+
     for row in row_gen:
-        namespaceNumber, pageName = row
-        if pageName:
-            # Namespace Dict only supports int
-            namespace = site.namespace(int(namespaceNumber))
-            pageName = pageName.decode(site.encoding())
-            if namespace:
-                pageTitle = '%s:%s' % (namespace, pageName)
-            else:
-                pageTitle = pageName
-            page = pywikibot.Page(site, pageTitle)
-            yield page
+        namespace_number, page_name = row
+        page_name = page_name.decode(site.encoding())
+        page = pywikibot.Page(site, page_name, ns=int(namespace_number))
+        yield page
 
 
 class XMLDumpOldPageGenerator(Iterator):

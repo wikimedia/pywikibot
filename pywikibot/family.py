@@ -22,7 +22,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    classproperty, deprecated, deprecated_args, FrozenDict,
+    classproperty, deprecated, deprecated_args, frozenmap,
     issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
     remove_last_args,
 )
@@ -544,12 +544,6 @@ class Family:
     # family.
     interwiki_forward = None
 
-    # Some families, e. g. wikipedia, receive forwarded interlanguage
-    # links from other families, e. g. incubator, commons, or meta.
-    # These families can set this variable to the names of their source
-    # families.
-    interwiki_forwarded_from = {}
-
     # Which language codes no longer exist and by which language code
     # should they be replaced. If for example the language with code xx:
     # now should get code yy:, add {'xx':'yy'} to obsolete.
@@ -754,7 +748,7 @@ class Family:
         return list(cls.langs.keys())
 
     @deprecated('APISite.interwiki', since='20151014', future_warning=True)
-    def get_known_families(self, site):
+    def get_known_families(self, code):
         """DEPRECATED: Return dict of inter-family interwiki links."""
         return self.known_families
 
@@ -1124,10 +1118,7 @@ class Family:
         """
         data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
-        return FrozenDict(data,
-                          'Family.obsolete not updatable; '
-                          'use Family.interwiki_removals '
-                          'and Family.interwiki_replacements')
+        return frozenmap(data)
 
     @obsolete.setter
     def obsolete(self, data):
@@ -1363,8 +1354,7 @@ class WikimediaFamily(Family):
     @classproperty
     def interwiki_replacements(cls):
         """Return an interwiki code replacement mapping."""
-        rv = cls.code_aliases.copy()
-        return FrozenDict(rv)
+        return frozenmap(cls.code_aliases)
 
     def shared_image_repository(self, code):
         """Return Wikimedia Commons as the shared image repository."""

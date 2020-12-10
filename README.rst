@@ -72,6 +72,21 @@ If you wish to write your own script it's very easy to get started:
     page.text = page.text.replace('foo', 'bar')
     page.save('Replacing "foo" with "bar"')  # Saves the page
 
+Wikibase Usage
+--------------
+
+Wikibase is a flexible knowledge base software that drives Wikidata.
+A sample pywikibot script for getting data from Wikibase:
+
+::
+
+    import pywikibot
+    site = pywikibot.Site('wikipedia:en')
+    repo = site.data_repository()  # the wikibase repository for given site
+    page = repo.page_from_repository('Q91')  # create a local page for the given item
+    item = pywikibot.ItemPage(repo, 'Q91')  # a repository item
+    data = item.get()  # get all item data from repository for this item
+
 -------------------------------------------------------------------------------------------
 
 For more documentation on pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.

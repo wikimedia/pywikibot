@@ -59,27 +59,27 @@ class HttpRequest:
 
     @property
     @deprecated('the `url` attribute', since='20201011', future_warning=True)
-    def uri(self):
+    def uri(self):  # pragma: no cover
         """DEPRECATED. Return the response URL."""
         return self.url
 
     @uri.setter
     @deprecated('the `url` attribute', since='20201011', future_warning=True)
-    def uri(self, value):
+    def uri(self, value):  # pragma: no cover
         """DEPRECATED. Set the response URL."""
         self.url = value
 
     @property
     @deprecated('the `all_headers` property', since='20201011',
                 future_warning=True)
-    def headers(self):
+    def headers(self):  # pragma: no cover
         """DEPRECATED. Return the response headers."""
         return self.all_headers
 
     @headers.setter
     @deprecated('the `all_headers` property', since='20201011',
                 future_warning=True)
-    def headers(self, value):
+    def headers(self, value):  # pragma: no cover
         """DEPRECATED. Set the response headers."""
         self.all_headers = value
 
@@ -128,7 +128,7 @@ class HttpRequest:
     @property
     @deprecated('urlparse(HttpRequest.url)',
                 since='20201011', future_warning=True)
-    def parsed_uri(self):
+    def parsed_uri(self):  # pragma: no cover
         """DEPRECATED. Return the parsed requested uri."""
         if not self._parsed_uri:
             self._parsed_uri = urlparse(self.uri)
@@ -137,14 +137,14 @@ class HttpRequest:
     @property
     @deprecated('urlparse(HttpRequest.url).netloc',
                 since='20201011', future_warning=True)
-    def hostname(self):
+    def hostname(self):  # pragma: no cover
         """DEPRECATED. Return the host of the request."""
         return self.parsed_uri.netloc
 
     @property
     @deprecated('the `status_code` property', since='20201011',
                 future_warning=True)
-    def status(self) -> Optional[int]:
+    def status(self) -> Optional[int]:  # pragma: no cover
         """DEPRECATED. Return the HTTP response status."""
         return self.status_code
 
@@ -225,13 +225,14 @@ class HttpRequest:
         return result
 
     @deprecated('the `text` property', since='20201011', future_warning=True)
-    def decode(self, encoding, errors='strict') -> str:
+    def decode(self, encoding, errors='strict') -> str:  # pragma: no cover
         """Return the decoded response."""
-        return self.raw.decode(encoding, errors)
+        return self.raw.decode(encoding,
+                               errors) if not self.exception else None
 
     @property
     @deprecated('the `text` property', since='20180321', future_warning=True)
-    def content(self) -> str:
+    def content(self) -> str:  # pragma: no cover
         """DEPRECATED. Return the response decoded by the detected encoding.
 
         @note: The behaviour will be changed.
@@ -245,11 +246,11 @@ class HttpRequest:
         return self.raw.decode(self.encoding)
 
     @deprecated('the `text` property', since='20201011', future_warning=True)
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         """Return the response decoded by the detected encoding."""
         return self.text
 
     @deprecated(since='20201011', future_warning=True)
-    def __bytes__(self) -> Optional[bytes]:
+    def __bytes__(self) -> Optional[bytes]:  # pragma: no cover
         """Return the undecoded response."""
         return self.raw

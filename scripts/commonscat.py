@@ -158,7 +158,12 @@ commonscatTemplates = {
 
 ignoreTemplates = {
     'af': ['commons'],
-    'ar': ['تحويلة تصنيف', 'كومنز', 'كومونز', 'Commons'],
+    'ar': ['تحويل تصنيف', 'نقل تصنيف', 'تحويلة تصنيف', 'Category redirect',
+           'تحويل التصنيف', 'تصانيف كومنز متعددة', 'تكم', 'روابط شقيقة',
+           'Sisterlinks', 'وصلات شقيقة', 'Sister project links'],
+    'ary': ['Category redirect'],
+    'arz': ['تحويل تصنيف', 'Category redirect', 'روابط شقيقة',
+            'Sisterlinks', 'Sister project links'],
     'be-tarask': ['Commons', 'Commons category'],
     'cs': ['Commons', 'Sestřičky', 'Sisterlinks'],
     'da': ['Commons', 'Commons left', 'Commons2', 'Commonsbilleder',
@@ -174,9 +179,8 @@ ignoreTemplates = {
            'Kategorie Jahrzehnt', 'Kategorie Jahrzehnt v. Chr.',
            'Kategorie Jahrhundert', 'Kategorie Jahrhundert v. Chr.',
            'Kategorie Jahrtausend', 'Kategorie Jahrtausend v. Chr.'],
-    'en': ['Category redirect', 'Commons', 'Commonscat1A', 'Commoncats',
-           'Commonscat4Ra',
-           'Sisterlinks', 'Sisterlinkswp', 'Sister project links',
+    'en': ['Category redirect', 'Commons', 'Commoncats',
+           'Sisterlinks', 'Sister project links',
            'Tracking category', 'Template category', 'Wikipedia category'],
     'eo': ['Commons',
            ('Projekto/box', 'commons='),
@@ -368,28 +372,21 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
             pywikibot.log('Looking for template on ' + ipage.title())
-            try:
-                if (not ipage.exists() or ipage.isRedirectPage()
-                        or ipage.isDisambig()):
-                    continue
+            if (not ipage.exists() or ipage.isRedirectPage()
+                    or ipage.isDisambig()):
+                continue
 
-                commonscatLink = self.getCommonscatLink(ipage)
-                if not commonscatLink:
-                    continue
+            commonscatLink = self.getCommonscatLink(ipage)
+            if not commonscatLink:
+                continue
 
-                checkedCommonscat = self.checkCommonscatLink(
-                    commonscatLink[1])
-
-                if checkedCommonscat:
-                    pywikibot.output(
-                        'Found link for {} at [[{}:{}]] to {}.'
-                        .format(page.title(), ipage.site.code, ipage.title(),
-                                checkedCommonscat))
-                    return checkedCommonscat
-
-            except pywikibot.BadTitle:
-                # The interwiki was incorrect
-                break
+            checkedCommonscat = self.checkCommonscatLink(commonscatLink[1])
+            if checkedCommonscat:
+                pywikibot.output(
+                    'Found link for {} at [[{}:{}]] to {}.'
+                    .format(page.title(), ipage.site.code, ipage.title(),
+                            checkedCommonscat))
+                return checkedCommonscat
         return ''
 
     def find_commons_category(self, page) -> str:
@@ -449,13 +446,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         """
         pywikibot.log('getCommonscat: ' + name)
         commonsSite = self.site.image_repository()
-
-        try:
-            # This can throw a pywikibot.BadTitle
-            commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
-        except pywikibot.BadTitle:
-            # Funky title so not correct
-            return ''
+        commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
 
         if not commonsPage.exists():
             pywikibot.output('Commons category does not exist. '
@@ -484,19 +475,19 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         .format(commonsPage, loguser, logcomment))
                     return ''
             return ''
-        elif commonsPage.isRedirectPage():
+
+        if commonsPage.isRedirectPage():
             pywikibot.log('getCommonscat: The category is a redirect')
             return self.checkCommonscatLink(
                 commonsPage.getRedirectTarget().title(with_ns=False))
-        elif (pywikibot.Page(commonsPage.site,
-              'Template:Category redirect') in commonsPage.templates()):
+
+        if (pywikibot.Page(commonsPage.site, 'Template:Category redirect')
+                in commonsPage.templates()):
             pywikibot.log(
                 'getCommonscat: The category is a category redirect')
             for template in commonsPage.templatesWithParams():
-                if (
-                    template[0].title(with_ns=False) == 'Category redirect'
-                    and len(template[1]) > 0
-                ):
+                if (template[0].title(with_ns=False) == 'Category redirect'
+                        and len(template[1]) > 0):
                     return self.checkCommonscatLink(template[1][0])
         elif commonsPage.isDisambig():
             pywikibot.log('getCommonscat: The category is disambiguation')

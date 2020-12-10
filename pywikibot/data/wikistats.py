@@ -7,6 +7,7 @@
 from collections import defaultdict
 from csv import DictReader
 from io import StringIO
+from typing import Optional
 
 import pywikibot
 
@@ -80,7 +81,7 @@ class WikiStats:
         self._data = {}
 
     @deprecated('get', since='20201017', future_warning=True)
-    def fetch(self, table: str, format='xml') -> bytes:
+    def fetch(self, table: str, format='xml') -> bytes:  # pragma: no cover
         """
         DEPRECATED. Fetch data from WikiStats.
 
@@ -104,7 +105,8 @@ class WikiStats:
         return r.raw
 
     @deprecated('get', since='20201017', future_warning=True)
-    def raw_cached(self, table: str, format='csv') -> bytes:
+    def raw_cached(self, table: str,
+                   format='csv') -> bytes:  # pragma: no cover
         """
         DEPRECATED. Cache raw data.
 
@@ -120,7 +122,7 @@ class WikiStats:
         return data
 
     @deprecated('get', since='20201017', future_warning=True)
-    def csv(self, table: str) -> list:
+    def csv(self, table: str) -> list:  # pragma: no cover
         """
         DEPRECATED. Get a list of a table of data.
 
@@ -167,14 +169,30 @@ class WikiStats:
         """
         return {data['prefix']: data for data in self.get(table)}
 
-    def sorted(self, table, key) -> list:
+    def sorted(self, table: str, key: str,
+               reverse: Optional[bool] = None) -> list:
         """
         Reverse numerical sort of data.
 
         @param table: name of table of data
-        @param key: numerical key, such as id, total, good
+        @param key: data table key
+        @param reverse: If set to True the sorting order is reversed.
+            If None the sorting order for numeric keys are reversed whereas
+            alphanumeric keys are sorted in normal way.
+        @return: The sorted table
         """
-        return sorted(self.get(table), key=lambda d: int(d[key]), reverse=True)
+        table = self.get(table)
+
+        # take the first entry to determine the sorting key
+        first_entry = table[0]
+        if first_entry[key].isdigit():
+            sort_key = lambda d: int(d[key])  # noqa: E731
+            reverse = reverse if reverse is not None else True
+        else:
+            sort_key = lambda d: d[key]  # noqa: E731
+            reverse = reverse if reverse is not None else False
+
+        return sorted(table, key=sort_key, reverse=reverse)
 
     def languages_by_size(self, table: str):
         """Return ordered list of languages by size from WikiStats."""

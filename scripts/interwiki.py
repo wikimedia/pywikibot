@@ -335,7 +335,6 @@ that you have to break it off, use "-continue" next time.
 #
 import codecs
 import os
-import pickle
 import re
 import socket
 import sys
@@ -350,7 +349,7 @@ import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
 from pywikibot import titletranslate
 
-from pywikibot.bot import ListOption, StandardOption
+from pywikibot.bot import OptionHandler, ListOption, StandardOption
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import first_upper
 from pywikibot.tools.formatter import color_format
@@ -1804,10 +1803,10 @@ class Subject(interwiki_graph.Subject):
                         'ERROR putting page: {0} blacklisted by spamfilter. '
                         'Giving up.'.format(error.url))
                     raise SaveError('Spam filter')
-                except pywikibot.PageNotSaved as error:
+                except pywikibot.PageSaveRelatedError as error:
                     pywikibot.output('ERROR putting page: {}'
                                      .format(error.args,))
-                    raise SaveError('PageNotSaved')
+                    raise SaveError('PageSaveRelatedError')
                 except (socket.error, IOError) as error:
                     if timeout > 3600:
                         raise
@@ -1935,26 +1934,8 @@ class InterwikiBot:
 
     @property
     def dump_titles(self):
-        """Return list of titles for dump file."""
-        return [s.origin.title() for s in self.subjects]
-
-    def dump(self, append=True):
-        """Write dump file."""
-        site = pywikibot.Site()
-        dumpfn = pywikibot.config.datafilepath(
-            'data',
-            'interwiki-dumps',
-            '{0}-{1}.pickle'.format(site.family.name, site.code)
-        )
-        if append:
-            mode = 'appended'
-        else:
-            mode = 'written'
-        with open(dumpfn, mode[0] + 'b') as f:
-            pickle.dump(self.dump_titles, f, protocol=config.pickle_protocol)
-        pywikibot.output('Dump {0} ({1}) {2}.'
-                         .format(site.code, site.family.name, mode))
-        return dumpfn
+        """Return generator of titles for dump file."""
+        return (s.origin.title(as_link=True) for s in self.subjects)
 
     def generateMore(self, number):
         """Generate more subjects.
@@ -2264,6 +2245,141 @@ def page_empty_check(page):
     return False
 
 
+class InterwikiDumps(OptionHandler):
+
+    """Handle interwiki dumps."""
+
+    available_options = {
+        'do_continue': False,
+        'restore_all': False
+    }
+
+    FILE_PATTERN = '{site.family.name}-{site.code}.txt'
+
+    def __init__(self, **kwargs):
+        """Initializer.
+
+        @keyword do_continue: If true, continue alphabetically starting at the
+            last of the dumped pages.
+        """
+        self.site = kwargs.pop('site', pywikibot.Site())
+        super().__init__(**kwargs)
+
+        self.restored_files = set()
+        self._next_page = '!'
+        self._next_namespace = 0
+        self.path = pywikibot.config.datafilepath('data', 'interwiki-dumps')
+
+    @property
+    def next_page(self):
+        """Return next page title string for continue option."""
+        if self._next_page == '!':
+            pywikibot.output('Dump file is empty! Starting at the beginning.')
+        return self._next_page
+
+    @property
+    def next_namespace(self):
+        """Return next page namespace for continue option."""
+        return self._next_namespace
+
+    def remove(self, filename: str):
+        """Remove filename from restored files.
+
+        @param filename: A filename to be removed from restored set.
+        """
+        with suppress(KeyError):
+            self.restored_files.remove(filename)
+
+    def get_files(self, mode='txt'):
+        """Get dump files from directory."""
+        pattern = (r'(?P<file>\A(?P<fam>[a-z]+)-(?P<code>[a-z]+)\.{}\Z)'
+                   .format(mode))
+        for filename in os.listdir(self.path):
+            found = re.match(pattern, filename)
+            if found:
+                yield (found['file'],
+                       pywikibot.Site(found['code'], found['fam']))
+
+    @property
+    def files(self):
+        """Return file generator depending on restore_all option.
+
+        rtype: generator
+        """
+        if self.opt.restore_all:
+            return self.get_files()
+        return iter([(self.FILE_PATTERN.format(site=self.site), self.site)])
+
+    def read_dump(self):
+        """Read the dump file.
+
+        @rtype: generator
+        """
+        for tail, site in self.files:
+            filename = os.path.join(self.path, tail)
+
+            if not os.path.exists(filename):
+                pywikibot.output(tail + ' does not exist.')
+            else:
+                pywikibot.output('Retrieving pages from dump file ' + tail)
+                for page in pagegenerators.TextfilePageGenerator(
+                        filename, site):
+                    if site == self.site:
+                        self._next_page = page.title(with_ns=False) + '!'
+                        self._next_namespace = page.namespace()
+                    yield page
+                else:
+                    self.restored_files.add(filename)
+
+        if self.opt.do_continue:
+            yield from self.site.allpages(start=self.next_page,
+                                          namespace=self.next_namespace,
+                                          filterredir=False)
+
+    def write_dump(self, iterable, append: bool = True):
+        """Write dump file.
+
+        @param iterable: an iterable of page titles to be dumped.
+        @type iterable: iterable
+        @param append: if a dump already exits, append the page titles to it
+            if True else overwrite it.
+        """
+        filename = os.path.join(self.path,
+                                self.FILE_PATTERN.format(site=self.site))
+        mode = 'appended' if append else 'written'
+        with codecs.open(filename, mode[0], 'utf-8') as f:
+            f.write('\r\n'.join(iterable))
+            f.write('\r\n')
+        pywikibot.output('Dump {site.code} ({site.family.name}) {mode}.'
+                         .format(site=self.site, mode=mode))
+        self.remove(filename)
+
+    def delete_dumps(self):
+        """Delete processed dumps."""
+        for filename in self.restored_files:
+            tail = os.path.split(filename)[-1]
+            try:
+                os.remove(filename)
+                pywikibot.output('Dumpfile {0} deleted'.format(tail))
+            except OSError as e:
+                pywikibot.error('Cannot delete {} due to\n{}\nDo it manually.'
+                                .format(tail, e))
+
+    def old_dumps_found(self) -> bool:
+        """Check whether dumps are in old format.
+
+        @return: True if there are dumps in pickle format, False otherwise
+        """
+        try:
+            next(self.get_files(mode='pickle'))
+        except StopIteration:
+            return False
+        pywikibot.warning(fill(
+            'The pickle format is deprecated. Use maintenance script '
+            'interwikidumps.py to convert pickle files into text files.'))
+        return True
+
+
 def main(*args):
     """
     Process command line arguments and invoke bot.
@@ -2284,8 +2400,6 @@ def main(*args):
     hintlessPageGen = None
     optContinue = False
     optRestore = False
-    restoredFiles = []
-    dumpFileName = ''
     append = True
     newPages = None
 
@@ -2356,6 +2470,9 @@ def main(*args):
     mainpagename = site.siteinfo['mainpage']
     iwconf.skip.add(pywikibot.Page(site, mainpagename))
 
+    dump = InterwikiDumps(site=site, do_continue=optContinue,
+                          restore_all=iwconf.restore_all)
+
     if newPages is not None:
         if len(namespaces) == 0:
             ns = 0
@@ -2374,34 +2491,10 @@ def main(*args):
                                                                namespaces=ns)
 
     elif optRestore or optContinue or iwconf.restore_all:
-        dumpFileName = pywikibot.config.datafilepath(
-            'data',
-            'interwiki-dumps',
-            '{0}-{1}.pickle'.format(site.family.name, site.code)
-        )
-        try:
-            with open(dumpFileName, 'rb') as f:
-                dumpedTitles = pickle.load(f)
-        except (EOFError, IOError):
-            dumpedTitles = []
-        pages = [pywikibot.Page(site, title) for title in dumpedTitles]
-
-        hintlessPageGen = iter(pages)
-        if optContinue:
-            if pages:
-                last = pages[-1]
-                nextPage = last.title(with_ns=False) + '!'
-                namespace = last.namespace()
-            else:
-                pywikibot.output(
-                    'Dump file is empty?! Starting at the beginning.')
-                nextPage = '!'
-                namespace = 0
-            gen2 = site.allpages(start=nextPage,
-                                 namespace=namespace,
-                                 filterredir=False)
-            hintlessPageGen = chain(hintlessPageGen, gen2)
-        restoredFiles.append(dumpFileName)
+        if dump.old_dumps_found():
+            # There are dumps is pickle format; they must be converted first.
+            return
+        hintlessPageGen = dump.read_dump()
 
     bot = InterwikiBot(iwconf)
 
@@ -2426,21 +2519,14 @@ def main(*args):
     try:
         bot.run()
     except KeyboardInterrupt:
-        dumpFileName = bot.dump(append)
+        dump.write_dump(bot.dump_titles, append)
     except Exception:
         pywikibot.exception()
-        dumpFileName = bot.dump(append)
+        dump.write_dump(bot.dump_titles, append)
     else:
         pywikibot.output('Script terminated sucessfully.')
     finally:
-        if dumpFileName:
-            with suppress(ValueError):
-                restoredFiles.remove(dumpFileName)
-        for dumpFileName in restoredFiles:
-            with suppress(OSError):
-                os.remove(dumpFileName)
-                pywikibot.output('Dumpfile {0} deleted'
-                                 .format(dumpFileName.split('\\')[-1]))
+        dump.delete_dumps()
 
 
 if __name__ == '__main__':

@@ -21,7 +21,8 @@ from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
     PreloadingGenerator,
-    CategorizedPageGenerator
+    CategorizedPageGenerator,
+    WikibaseItemFilterPageGenerator,
 )
 
 from pywikibot.tools import has_module, suppress_warnings
@@ -236,7 +237,7 @@ class TestCategoryFilterPageGenerator(BasetitleTestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.CategoryFilterPageGenerator(
-            gen, self.catfilter_list, site)
+            gen, self.catfilter_list)
         self.assertLength(tuple(gen), 10)
 
 
@@ -314,6 +315,27 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_start=nine_days_ago)
         self.assertIsEmpty(list(gen))
+
+
+class RedirectFilterPageGeneratorTestCase(TestCase):
+
+    """Test RedirectFilterPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_redirect_filter(self):
+        """Test RedirectFilterPageGenerator."""
+        from pywikibot.pagegenerators import RedirectFilterPageGenerator
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-randomredirect:3')
+        gf.handleArg('-page:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = RedirectFilterPageGenerator(pages, no_redirects=True)
+        self.assertLength(list(gen), 1)
+        gen = RedirectFilterPageGenerator(pages, no_redirects=False)
+        self.assertLength(list(gen), 3)
 
 
 class SubpageFilterGeneratorTestCase(TestCase):
@@ -612,6 +634,36 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
                                        pywikibot.ItemPage) for item in gen))
 
 
+class WikibaseItemFilterPageGeneratorTestCase(TestCase):
+
+    """Test WikibaseItemFilterPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_filter_pages_with_item(self):
+        """Test WikibaseItemFilterPageGenerator on pages with item."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
+        self.assertLength(list(gen), 1)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
+        self.assertLength(list(gen), 0)
+
+    def test_filter_pages_without_item(self):
+        """Test WikibaseItemFilterPageGenerator on pages without item."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Talk:Main_Page')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
+        self.assertLength(list(gen), 0)
+        gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
+        self.assertLength(list(gen), 1)
+
+
 class DryFactoryGeneratorTest(TestCase):
 
     """Dry tests for pagegenerators.GeneratorFactory."""
@@ -800,6 +852,15 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         """Test negative ItemClaimFilterPageGenerator."""
         self._simple_claim_test('P463', 'Q37470', None, False, True)
         self._simple_claim_test('P463', 'Q37471', None, True, True)
+
+    def test_item_from_page(self):
+        """Test ItemPage can be obtained form Page."""
+        site = pywikibot.Site('en', 'wikipedia')
+        page = pywikibot.Page(site, 'India')
+        gen = pagegenerators.ItemClaimFilterPageGenerator(
+            [page], 'P463', self._get_council_page())
+        pages = set(gen)
+        self.assertEqual(pages.pop(), page)
 
 
 class TestFactoryGenerator(DefaultSiteTestCase):
@@ -1186,7 +1247,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('The site {0} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
+        self.assertRaises(AssertionError, gf.handleArg, '-linter:dummy')
 
     def test_linter_generator_show(self):
         """Test generator of pages with lint errors."""

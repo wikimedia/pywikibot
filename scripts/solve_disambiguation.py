@@ -485,13 +485,15 @@ class PrimaryIgnoreManager:
         """
         return self.enabled and refPage.title(as_url=True) in self.ignorelist
 
-    def ignore(self, refPage):
-        """Write page to ignorelist.
+    def ignore(self, page_titles):
+        """Write pages to ignorelist.
 
-        @type refPage: pywikibot.Page
-        @rtype: None
-
+        @param page_titles: page titles to be ignored
+        @type page_titles: iterable
         """
+        # backward compatibility
+        if isinstance(page_titles, pywikibot.Page):
+            page_titles = [page_titles.title(as_url=True)]
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -500,7 +502,7 @@ class PrimaryIgnoreManager:
             with suppress(IOError):
                 # Open file for appending. If none exists, create a new one.
                 with codecs.open(filename, 'a', 'utf-8') as f:
-                    f.write(refPage.title(as_url=True) + '\n')
+                    f.write('\n'.join(page_titles) + '\n')
 
 
 class AddAlternativeOption(OutputProxyOption):
@@ -617,6 +619,7 @@ class DisambiguationRobot(SingleSiteBot):
         if generator:
             self.generator = generator
         self.primary = primary
+        self.ignores = set()
         self.main_only = main_only
         self.first_only = first_only
         self.minimum = minimum
@@ -783,7 +786,7 @@ class DisambiguationRobot(SingleSiteBot):
                     try:
                         refPage.put(redir_text, summary=self.comment,
                                     asynchronous=True)
-                    except pywikibot.PageNotSaved as error:
+                    except pywikibot.PageSaveRelatedError as error:
                         pywikibot.output('Page not saved: {0}'
                                          .format(error.args))
             else:
@@ -822,9 +825,10 @@ class DisambiguationRobot(SingleSiteBot):
                     if n == 0:
                         # No changes necessary for this disambiguation title.
                         return 'nochange'
-                    else:
-                        # stop loop and save page
-                        break
+
+                    # stop loop and save page
+                    break
+
                 # Ensure that next time around we will not find this same hit.
                 curpos = m.start() + 1
                 try:
@@ -833,21 +837,27 @@ class DisambiguationRobot(SingleSiteBot):
                     foundlink.parse()
                 except pywikibot.Error:
                     continue
+
                 # ignore interwiki links
                 if foundlink.site != disambPage.site:
                     continue
+
                 # Check whether the link found is to disambPage.
                 try:
                     if foundlink.canonical_title() != disambPage.title():
                         continue
+
                 except pywikibot.Error:
                     # must be a broken link
                     pywikibot.log('Invalid link [[%s]] in page [[%s]]'
                                   % (m.group('title'), refPage.title()))
                     continue
+
                 n += 1
+
                 # how many bytes should be displayed around the current link
                 context = 60
+
                 # check if there's a dn-template here already
                 if (self.dnSkip and self.dn_template_str
                         and self.dn_template_str[:-2] in text[
@@ -868,6 +878,7 @@ class DisambiguationRobot(SingleSiteBot):
                            StandardOption('next page', 'n'),
                            StandardOption('next disambig', 'g'),
                            StandardOption('unlink', 'u')]
+
                 if self.dn_template_str:
                     # '?', '/' for old choice
                     options += [AliasOption('tag template %s' %
@@ -877,6 +888,7 @@ class DisambiguationRobot(SingleSiteBot):
                 if not edited:
                     options += [ShowPageOption('show disambiguation page', 'd',
                                                m.start(), disambPage)]
+
                 options += [
                     OutputProxyOption('list', 'l',
                                       SequenceOutputter(self.alternatives)),
@@ -892,22 +904,26 @@ class DisambiguationRobot(SingleSiteBot):
                 if answer == 'x':
                     assert edited, 'invalid option before editing'
                     break
-                elif answer == 's':
+
+                if answer == 's':
                     n -= 1  # TODO what's this for?
                     continue
-                elif answer == 'e':
+
+                if answer == 'e':
                     text = edit.new_text
                     edited = True
                     curpos = 0
                     continue
-                elif answer == 'n':
+
+                if answer == 'n':
                     # skip this page
                     if self.primary:
                         # If run with the -primary argument, skip this
                         # occurrence next time.
-                        self.primaryIgnoreManager.ignore(refPage)
+                        self.ignores.add(refPage.title(as_url=True))
                     return 'nextpage'
-                elif answer == 'g':
+
+                if answer == 'g':
                     return 'nextdisambig'
 
                 # The link looks like this:
@@ -918,13 +934,16 @@ class DisambiguationRobot(SingleSiteBot):
                 if not link_text:
                     # or like this: [[page_title]]trailing_chars
                     link_text = page_title
+
                 if m.group('section') is None:
                     section = ''
                 else:
                     section = m.group('section')
+
                 trailing_chars = m.group('linktrail')
                 if trailing_chars:
                     link_text += trailing_chars
+
                 if answer == 't':
                     assert self.dn_template_str
                     # small chunk of text to search
@@ -932,71 +951,73 @@ class DisambiguationRobot(SingleSiteBot):
                     # figure out where the link (and sentence) ends, put note
                     # there
                     end_of_word_match = re.search(r'\s', search_text)
+
                     if end_of_word_match:
                         position_split = end_of_word_match.start(0)
                     else:
                         position_split = 0
+
                     # insert dab needed template
                     text = (text[:m.end() + position_split]
                             + self.dn_template_str
                             + text[m.end() + position_split:])
                     dn = True
                     continue
-                elif answer == 'u':
+
+                if answer == 'u':
                     # unlink - we remove the section if there's any
                     text = text[:m.start()] + link_text + text[m.end():]
                     unlink_counter += 1
                     continue
-                else:
-                    # Check that no option from above was missed
-                    assert isinstance(answer, tuple), 'only tuple answer left.'
-                    assert answer[0] in ['r', ''], 'only valid tuple answers.'
-                    if answer[0] == 'r':
-                        # we want to throw away the original link text
-                        replaceit = link_text == page_title
-                    elif include == 'redirect':
-                        replaceit = True
-                    else:
-                        replaceit = False
 
-                    new_page_title = answer[1]
-                    repPl = pywikibot.Page(pywikibot.Link(new_page_title,
-                                                          disambPage.site))
-                    if (new_page_title[0].isupper()
-                            or link_text[0].isupper()):
-                        new_page_title = repPl.title()
-                    else:
-                        new_page_title = repPl.title()
-                        new_page_title = first_lower(new_page_title)
-                    if new_page_title not in new_targets:
-                        new_targets.append(new_page_title)
-                    if replaceit and trailing_chars:
-                        newlink = '[[{0}{1}]]{2}'.format(new_page_title,
-                                                         section,
-                                                         trailing_chars)
-                    elif replaceit or (new_page_title == link_text
-                                       and not section):
-                        newlink = '[[{0}]]'.format(new_page_title)
-                    # check if we can create a link with trailing characters
-                    # instead of a pipelink
-                    elif (
-                        (len(new_page_title) <= len(link_text))
-                        and (firstcap(link_text[:len(new_page_title)])
-                             == firstcap(new_page_title))
-                        and (self.trailR.sub(
-                            '', link_text[len(new_page_title):]) == '')
-                        and (not section)
-                    ):
-                        newlink = '[[{0}]]{1}'.format(
-                            link_text[:len(new_page_title)],
-                            link_text[len(new_page_title):])
-                    else:
-                        newlink = '[[{0}{1}|{2}]]'.format(new_page_title,
-                                                          section, link_text)
-                    text = text[:m.start()] + newlink + text[m.end():]
-                    continue
-                # Todo: This line is unreachable (T155337)
-                pywikibot.output(text[max(0, m.start() - 30):m.end() + 30])
+                # else check that no option from above was missed
+                assert isinstance(answer, tuple), 'only tuple answer left.'
+                assert answer[0] in ['r', ''], 'only valid tuple answers.'
+
+                if answer[0] == 'r':
+                    # we want to throw away the original link text
+                    replaceit = link_text == page_title
+                else:
+                    replaceit = include == 'redirect'
+
+                new_page_title = answer[1]
+                repPl = pywikibot.Page(pywikibot.Link(new_page_title,
+                                                      disambPage.site))
+                if new_page_title[0].isupper() or link_text[0].isupper():
+                    new_page_title = repPl.title()
+                else:
+                    new_page_title = repPl.title()
+                    new_page_title = first_lower(new_page_title)
+
+                if new_page_title not in new_targets:
+                    new_targets.append(new_page_title)
+
+                if replaceit and trailing_chars:
+                    newlink = '[[{0}{1}]]{2}'.format(new_page_title,
+                                                     section,
+                                                     trailing_chars)
+                elif replaceit or (new_page_title == link_text
+                                   and not section):
+                    newlink = '[[{0}]]'.format(new_page_title)
+                # check if we can create a link with trailing characters
+                # instead of a pipelink
+                elif (
+                    (len(new_page_title) <= len(link_text))
+                    and (firstcap(link_text[:len(new_page_title)])
+                         == firstcap(new_page_title))
+                    and (self.trailR.sub(
+                        '', link_text[len(new_page_title):]) == '')
+                    and (not section)
+                ):
+                    newlink = '[[{0}]]{1}'.format(
+                        link_text[:len(new_page_title)],
+                        link_text[len(new_page_title):])
+                else:
+                    newlink = '[[{0}{1}|{2}]]'.format(new_page_title,
+                                                      section, link_text)
+                text = text[:m.start()] + newlink + text[m.end():]
+                continue
+
             if text == original_text:
                 pywikibot.output('\nNo changes have been made:\n')
             else:
@@ -1010,8 +1031,9 @@ class DisambiguationRobot(SingleSiteBot):
                     refPage.put(text, summary=self.comment, asynchronous=True)
                 except pywikibot.LockedPage:
                     pywikibot.output('Page not saved: page is locked')
-                except pywikibot.PageNotSaved as error:
+                except pywikibot.PageSaveRelatedError as error:
                     pywikibot.output('Page not saved: {0}'.format(error.args))
+
         return 'done'
 
     def findAlternatives(self, disambPage) -> bool:
@@ -1169,6 +1191,10 @@ or press enter to quit:""")
                     {'from': disambPage.title(),
                      'to': targets,
                      'count': len(new_targets)})
+
+    def teardown(self):
+        """Write ignoring pages to a file."""
+        self.primaryIgnoreManager.ignore(self.ignores)
 
     def treat(self, page) -> None:
         """Work on a single disambiguation page."""

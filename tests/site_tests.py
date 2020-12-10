@@ -29,40 +29,11 @@ from tests.aspects import (
     DefaultWikidataClientTestCase,
     DeprecationTestCase,
     TestCase,
-    TestCaseBase,
     unittest,
     WikimediaDefaultSiteTestCase,
     WikidataTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
-
-
-class TokenTestBase(TestCaseBase):
-
-    """Verify token exists before running tests."""
-
-    def setUp(self):
-        """Skip test if user does not have token and clear site wallet."""
-        super().setUp()
-        mysite = self.get_site()
-        ttype = self.token_type
-        try:
-            token = mysite.tokens[ttype]
-        except pywikibot.Error as error_msg:
-            self.assertRegex(
-                str(error_msg),
-                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-            self.assertNotIn(self.token_type, self.site.tokens)
-            self.skipTest(error_msg)
-
-        self.token = token
-        self._orig_wallet = self.site.tokens
-        self.site.tokens = pywikibot.site.TokenWallet(self.site)
-
-    def tearDown(self):
-        """Restore site tokens."""
-        self.site.tokens = self._orig_wallet
-        super().tearDown()
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
@@ -80,7 +51,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         self.assertIs(self.site.nocapitalize,
                       self.site.siteinfo['case'] == 'case-sensitive')
         self.assertOneDeprecationParts(
-            'pywikibot.site.BaseSite.nocapitalize',
+            'pywikibot.site._basesite.BaseSite.nocapitalize',
             "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
 
     def test_siteinfo_normal_call(self):
@@ -156,61 +127,6 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
                                        'it directly')
 
 
-class TestBaseSiteProperties(TestCase):
-
-    """Test properties for BaseSite."""
-
-    sites = {
-        'enwikinews': {
-            'family': 'wikinews',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwikibooks': {
-            'family': 'wikibooks',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwikiquote': {
-            'family': 'wikiquote',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enwiktionary': {
-            'family': 'wiktionary',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'enws': {
-            'family': 'wikisource',
-            'code': 'en',
-            'result': ('/doc',),
-        },
-        'dews': {
-            'family': 'wikisource',
-            'code': 'de',
-            'result': ('/Doku', '/Meta'),
-        },
-        'commons': {
-            'family': 'commons',
-            'code': 'commons',
-            'result': ('/doc', ),
-        },
-        'wikidata': {
-            'family': 'wikidata',
-            'code': 'wikidata',
-            'result': ('/doc', ),
-        },
-    }
-
-    dry = True
-
-    def test_properties(self, key):
-        """Test cases for BaseSite properties."""
-        mysite = self.get_site(key)
-        self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
-
-
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
@@ -227,56 +143,8 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = 'Site("{0}", "{1}")'.format(code, self.family)
-        self.assertStringMethod(str.endswith, repr(self.site), expect)
-
-    def test_base_methods(self):
-        """Test cases for BaseSite methods."""
-        mysite = self.get_site()
-        code = self.site.family.obsolete.get(self.code) or self.code
-        self.assertEqual(mysite.family.name, self.family)
-        self.assertEqual(mysite.code, code)
-        self.assertIsInstance(mysite.lang, str)
-        self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
-        self.assertIsInstance(mysite.user(), (str, type(None)))
-        self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
-        self.assertIsInstance(mysite.linktrail(), str)
-        self.assertIsInstance(mysite.redirect(), str)
-        try:
-            dabcat = mysite.disambcategory()
-        except pywikibot.Error as e:
-            try:
-                self.assertIn('No disambiguation category name found', str(e))
-            except AssertionError:
-                self.assertIn(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(
-                        repo=mysite.data_repository().family.name,
-                        fam=mysite.family.name),
-                    str(e))
-        else:
-            self.assertIsInstance(dabcat, pywikibot.Category)
-
-        foo = str(pywikibot.Link('foo', source=mysite))
-        if self.site.namespaces[0].case == 'case-sensitive':
-            self.assertEqual(foo, '[[foo]]')
-        else:
-            self.assertEqual(foo, '[[Foo]]')
-
-        self.assertFalse(mysite.isInterwikiLink('foo'))
-        self.assertIsInstance(mysite.redirectRegex().pattern, str)
-        self.assertIsInstance(mysite.category_on_one_line(), bool)
-        self.assertTrue(mysite.sametitle('Template:Test', 'Template:Test'))
-        self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))
-        self.assertTrue(mysite.sametitle('Test name', 'Test name'))
-        self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
-        # User, MediaWiki and Special are always
-        # first-letter (== only first non-namespace letter is case insensitive)
-        # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
-        self.assertTrue(mysite.sametitle('Special:Always', 'Special:always'))
-        self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
-        self.assertTrue(mysite.sametitle('MediaWiki:Always',
-                                         'MediaWiki:always'))
+        expect = 'Site("{}", "{}")'.format(code, self.family)
+        self.assertTrue(repr(self.site).endswith(expect))
 
     def test_constructors(self):
         """Test cases for site constructors."""
@@ -2099,59 +1967,6 @@ class TestUserList(DefaultSiteTestCase):
         self.assertEqual(cnt, len(all_users), 'Some test usernames not found')
 
 
-class PatrolTestCase(TokenTestBase, TestCase):
-
-    """Test patrol method."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    user = True
-    token_type = 'patrol'
-    write = True
-
-    def test_patrol(self):
-        """Test the site.patrol() method."""
-        mysite = self.get_site()
-
-        rc = list(mysite.recentchanges(total=1))
-        if not rc:
-            self.skipTest('no recent changes to patrol')
-
-        rc = rc[0]
-
-        # site.patrol() needs params
-        self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
-        try:
-            result = list(mysite.patrol(rcid=rc['rcid']))
-        except api.APIError as error:
-            if error.code == 'permissiondenied':
-                self.skipTest(error)
-            raise
-
-        if hasattr(mysite, '_patroldisabled') and mysite._patroldisabled:
-            self.skipTest('Patrolling is disabled on {} wiki.'.format(mysite))
-
-        result = result[0]
-        self.assertIsInstance(result, dict)
-
-        params = {'rcid': 0}
-        if mysite.mw_version >= '1.22':
-            params['revid'] = [0, 1]
-
-        raised = False
-        try:
-            # no such rcid, revid or too old revid
-            list(mysite.patrol(**params))
-        except api.APIError as error:
-            if error.code == 'badtoken':
-                self.skipTest(error)
-        except pywikibot.Error:
-            # expected result
-            raised = True
-        self.assertTrue(raised, msg='pywikibot.Error not raised')
-
-
 class SiteRandomTestCase(DefaultSiteTestCase):
 
     """Test random methods of a site."""
@@ -2201,129 +2016,6 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         for rndpage in mysite.randompages(total=5, namespaces=[6, 7]):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertIn(rndpage.namespace(), [6, 7])
-
-
-class TestSiteTokens(DefaultSiteTestCase):
-
-    """Test cases for tokens in Site methods.
-
-    Versions of sites are simulated if actual versions are higher than
-    needed by the test case.
-
-    Test is skipped if site version is not compatible.
-
-    """
-
-    user = True
-
-    def setUp(self):
-        """Store version."""
-        super().setUp()
-        self.mysite = self.get_site()
-        self._version = self.mysite.mw_version
-        self.orig_version = self.mysite.version
-
-    def tearDown(self):
-        """Restore version."""
-        super().tearDown()
-        self.mysite.version = self.orig_version
-
-    def _test_tokens(self, version, test_version, additional_token):
-        """Test tokens."""
-        if version and (self._version < version
-                        or self._version < test_version):
-            raise unittest.SkipTest(
-                'Site {} version {} is too low for this tests.'
-                .format(self.mysite, self._version))
-
-        self.mysite.version = lambda: test_version
-
-        for ttype in ('edit', 'move', additional_token):
-            tokentype = self.mysite.validate_tokens([ttype])
-            try:
-                token = self.mysite.tokens[ttype]
-            except pywikibot.Error as error_msg:
-                if tokentype:
-                    self.assertRegex(
-                        str(error_msg),
-                        "Action '[a-z]+' is not allowed "
-                        'for user .* on .* wiki.')
-                    # test __contains__
-                    self.assertNotIn(tokentype[0], self.mysite.tokens)
-                else:
-                    self.assertRegex(
-                        str(error_msg),
-                        "Requested token '[a-z]+' is invalid on .* wiki.")
-            else:
-                self.assertIsInstance(token, str)
-                self.assertEqual(token, self.mysite.tokens[ttype])
-                # test __contains__
-                self.assertIn(tokentype[0], self.mysite.tokens)
-
-    def test_tokens_in_mw_119(self):
-        """Test ability to get page tokens."""
-        self._test_tokens(None, '1.19', 'delete')
-
-    def test_patrol_tokens_in_mw_119(self):
-        """Test ability to get patrol token on MW 1.19 wiki."""
-        self._test_tokens('1.19', '1.19', 'patrol')
-
-    def test_tokens_in_mw_120_124wmf18(self):
-        """Test ability to get page tokens."""
-        self._test_tokens('1.20', '1.21', 'deleteglobalaccount')
-
-    def test_patrol_tokens_in_mw_120(self):
-        """Test ability to get patrol token."""
-        self._test_tokens('1.19', '1.20', 'patrol')
-
-    def test_tokens_in_mw_124wmf19(self):
-        """Test ability to get page tokens."""
-        self._test_tokens('1.24wmf19', '1.24wmf20', 'deleteglobalaccount')
-
-    def testInvalidToken(self):
-        """Test invalid token."""
-        self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t],
-                          'invalidtype')
-
-
-class TestDeprecatedEditTokenFunctions(TokenTestBase,
-                                       DefaultSiteTestCase,
-                                       DeprecationTestCase):
-
-    """Test cases for Site edit token deprecated methods."""
-
-    cached = True
-    user = True
-    token_type = 'edit'
-
-    def test_getToken(self):
-        """Test ability to get page tokens using site.getToken."""
-        self.mysite = self.site
-        self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
-        self.assertOneDeprecationParts('pywikibot.site.APISite.getToken',
-                                       "the 'tokens' property")
-
-
-class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test cases for Site patrol token deprecated methods."""
-
-    cached = True
-    user = True
-
-    def test_getPatrolToken(self):
-        """Test site.getPatrolToken."""
-        self.mysite = self.site
-        try:
-            self.assertEqual(self.mysite.getPatrolToken(),
-                             self.mysite.tokens['patrol'])
-            self.assertOneDeprecation()
-        except pywikibot.Error as error_msg:
-            self.assertRegex(
-                str(error_msg),
-                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-            # test __contains__
-            self.assertNotIn('patrol', self.mysite.tokens)
 
 
 class TestSiteExtensions(WikimediaDefaultSiteTestCase):
@@ -3604,8 +3296,8 @@ class TestLoginLogout(DefaultSiteTestCase):
         self.assertIsNone(site.login())
 
         if site.is_oauth_token_available():
-            self.assertRaisesRegexp(api.APIError, 'cannotlogout.*OAuth',
-                                    site.logout)
+            with self.assertRaisesRegex(api.APIError, 'cannotlogout.*OAuth'):
+                site.logout()
             self.assertTrue(site.logged_in())
             self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
                                               loginstatus.AS_USER))

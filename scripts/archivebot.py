@@ -112,7 +112,7 @@ from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
 from pywikibot.tools import (
-    deprecated, FrozenDict, issue_deprecation_warning, PYTHON_VERSION,
+    deprecated, frozenmap, issue_deprecation_warning, PYTHON_VERSION,
 )
 
 if PYTHON_VERSION >= (3, 9):
@@ -127,14 +127,14 @@ Size = Tuple[int, str]
 
 ZERO = datetime.timedelta(0)
 
-MW_KEYS = FrozenDict({
+MW_KEYS = frozenmap({
     's': 'seconds',
     'h': 'hours',
     'd': 'days',
     'w': 'weeks',
     'y': 'years',
     # 'months' and 'minutes' were removed because confusion outweighs merit
-}, 'MW_KEYS is a dict constant')
+})
 
 
 class ArchiveBotSiteConfigError(pywikibot.Error):

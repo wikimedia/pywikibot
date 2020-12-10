@@ -34,24 +34,24 @@ class TestLengthAssert(TestCase):
     seq1 = ('foo', 'bar', 'baz')
     seq2 = 'foo'
 
-    def test_assert_is_emtpy(self):
+    def test_assert_is_empty(self):
         """Test assertIsEmpty method."""
         self.assertIsEmpty([])
         self.assertIsEmpty('')
 
     @unittest.expectedFailure
-    def test_assert_is_emtpy_fail(self):
+    def test_assert_is_empty_fail(self):
         """Test assertIsEmpty method failing."""
         self.assertIsEmpty(self.seq1)
         self.assertIsEmpty(self.seq2)
 
-    def test_assert_is_not_emtpy(self):
+    def test_assert_is_not_empty(self):
         """Test assertIsNotEmpty method."""
         self.assertIsNotEmpty(self.seq1)
         self.assertIsNotEmpty(self.seq2)
 
     @unittest.expectedFailure
-    def test_assert_is_not_emtpy_fail(self):
+    def test_assert_is_not_empty_fail(self):
         """Test assertIsNotEmpty method."""
         self.assertIsNotEmpty([])
         self.assertIsNotEmpty('')

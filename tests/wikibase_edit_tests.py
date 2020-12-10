@@ -458,6 +458,65 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         self.assertNotIn('P88', claim.qualifiers.keys())
 
 
+class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
+
+    """Run general wikibase write tests."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def setUp(self):
+        """Setup tests."""
+        self.testsite = self.get_repo()
+        self.item = pywikibot.ItemPage(self.testsite, 'Q68')
+        badge = pywikibot.ItemPage(self.testsite, 'Q608')
+        self.sitelink = pywikibot.page.SiteLink('Test page',
+                                                site='enwikisource',
+                                                badges=[badge])
+        super().setUp()
+
+    def tearDown(self):
+        """Tear down tests."""
+        self.item = None
+        self.sitelink = None
+        super().tearDown()
+
+    def test_wbsetlabel_set_from_id(self):
+        """Test setting an Italian label using id."""
+        self.assertEqual(self.item.getID(), 'Q68')
+        self.testsite.wbsetlabel('Q68', {'language': 'it', 'value': 'Test123'})
+        self.item.get(force=True)
+        self.assertEqual(self.item.labels['it'], 'Test123')
+
+    def test_wbsetlabel_remove_from_item(self):
+        """Test removing an Italian label using item."""
+        self.assertEqual(self.item.getID(), 'Q68')
+        self.testsite.wbsetlabel(self.item, {'language': 'it', 'value': ''})
+        # Check 'it' label is removed
+        self.item.get(force=True)
+        self.assertNotIn('it', self.item.labels.keys())
+
+    def test_wbsetsitelink_set_remove(self):
+        """Test setting a sitelink using id."""
+        self.assertEqual(self.item.getID(), 'Q68')
+        # add sitelink
+        self.testsite.wbsetsitelink(
+            'Q68',
+            {'linksite': 'enwikisource',
+             'linktitle': 'Test page',
+             'badges': 'Q608'
+             })
+        self.item.get(force=True)
+        self.assertEqual(self.item.sitelinks['enwikisource'], self.sitelink)
+        # remove sitelink
+        self.testsite.wbsetsitelink(self.item, {'linksite': 'enwikisource'})
+        self.item.get(force=True)
+        self.assertIsNone(self.item.sitelinks.get('enwikisource'))
+
+
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
         unittest.main()

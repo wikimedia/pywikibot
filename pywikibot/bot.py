@@ -119,21 +119,21 @@ from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING
 from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
 from pywikibot.logging import (
     add_init_routine,
-    debug, error, exception, log, output, stdout, warning,
+    critical, debug, error, exception, log, output, stdout, warning,
 )
-from pywikibot.logging import critical
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    PYTHON_VERSION,
+    PYTHON_VERSION, suppress_warnings
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
-from pywikibot.tools import classproperty, suppress_warnings
 from pywikibot.tools.formatter import color_format
 
 if PYTHON_VERSION >= (3, 9):
+    from collections.abc import Iterable
     Dict = dict
+    List = list
 else:
-    from typing import Dict
+    from typing import Dict, Iterable, List
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -156,10 +156,14 @@ GLOBAL OPTIONS
 
 -lang:xx          Set the language of the wiki you want to work on, overriding
                   the configuration in user-config.py. xx should be the
-                  language code.
+                  site code.
 
 -family:xyz       Set the family of the wiki you want to work on, e.g.
-                  wikipedia, wiktionary, wikitravel, ...
+                  wikipedia, wiktionary, wikivoyage, ...
+                  This will override the configuration in user-config.py.
+
+-site:xyz:xx      Set the wiki site you want to work on, e.g.
+                  wikipedia:test, wiktionary:de, wikivoyage:en, ...
                   This will override the configuration in user-config.py.
 
 -user:xyz         Log in as user 'xyz' instead of the default username.
@@ -724,7 +728,8 @@ def calledModuleName() -> str:
     return Path(pywikibot.argvu[0]).stem
 
 
-def handle_args(args=None, do_help=True):
+def handle_args(args: Optional[Iterable[str]] = None,
+                do_help: bool = True) -> List[str]:
     """
     Handle standard command line arguments, and return the rest as a list.
 
@@ -738,11 +743,8 @@ def handle_args(args=None, do_help=True):
     args may be passed as an argument, thereby overriding sys.argv
 
     @param args: Command line arguments
-    @type args: typing.Iterable
     @param do_help: Handle parameter '-help' to show help and invoke sys.exit
-    @type do_help: bool
     @return: list of arguments not recognised globally
-    @rtype: list of str
     """
     if pywikibot._sites:
         warn('Site objects have been created before arguments were handled',
@@ -767,6 +769,8 @@ def handle_args(args=None, do_help=True):
             do_help = value or True
         elif option == '-dir':
             pass
+        elif option == '-site':
+            config.family, config.mylang = value.split(':')
         elif option == '-family':
             config.family = value
         elif option == '-lang':
@@ -861,7 +865,7 @@ def handle_args(args=None, do_help=True):
 
 
 @deprecated('handle_args', since='20150409', future_warning=True)
-def handleArgs(*args):
+def handleArgs(*args):  # pragma: no cover
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)
 
@@ -896,7 +900,7 @@ def show_help(module_name=None, show_global=False):
 
 
 @deprecated('show_help', since='20200705')
-def showHelp(module_name=None):
+def showHelp(module_name=None):  # pragma: no cover
     """DEPRECATED. Use show_help()."""
     return show_help(module_name)
 
@@ -1085,14 +1089,14 @@ class OptionHandler:
         """
         self.set_options(**kwargs)
 
-    @classproperty
+    @property
     @deprecated('available_options', since='20201006')
-    def availableOptions(cls):
+    def availableOptions(self):
         """DEPRECATED. Available_options class property."""
-        return cls.available_options
+        return self.available_options
 
     @deprecated('set_options', since='20201006')
-    def setOptions(self, **kwargs):
+    def setOptions(self, **kwargs):  # pragma: no cover
         """DEPRECATED. Set the instance options."""
         self.set_options(**kwargs)
 
@@ -1122,7 +1126,7 @@ class OptionHandler:
                               .format(opt))
 
     @deprecated(_DEPRECATION_MSG, since='20201006')
-    def getOption(self, option):
+    def getOption(self, option):  # pragma: no cover
         """DEPRECATED. Get the current value of an option.
 
         @param option: key defined in OptionHandler.available_options
@@ -1133,13 +1137,13 @@ class OptionHandler:
 
     @property
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self):
+    def options(self):  # pragma: no cover
         """DEPRECATED. Return changed options."""
         return self.opt._options
 
     @options.setter
     @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self, options):
+    def options(self, options):  # pragma: no cover
         """DEPRECATED. Return changed options."""
         self.set_options(**options)
 
@@ -1347,7 +1351,7 @@ class BaseBot(OptionHandler):
         return False
 
     @deprecated('generator.close()', since='20200804')
-    def stop(self):
+    def stop(self):  # pragma: no cover
         """Stop iterating."""
         pywikibot.output('Generator has been stopped.')
         self.generator.close()

@@ -44,9 +44,14 @@ class TestLogentriesBase(TestCase):
             'code': 'de',
             'target': 'Hauptseite',
         },
-        'old': {
+        'enwow': {
             'family': 'wowwiki',
             'code': 'en',
+            'target': None,
+        },
+        'old': {
+            'family': 'wowwiki',
+            'code': 'hu',
             'target': None,
         }
     }
@@ -58,7 +63,11 @@ class TestLogentriesBase(TestCase):
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
             self.assertLess(self.site.mw_version, '1.20')
-        return next(iter(self.site.logevents(logtype=logtype, total=1)))
+        try:
+            le = next(iter(self.site.logevents(logtype=logtype, total=1)))
+        except StopIteration:
+            self.skipTest('No entry found for {!r}'.format(logtype))
+        return le
 
     def _test_logevent(self, logtype):
         """Test a single logtype entry."""

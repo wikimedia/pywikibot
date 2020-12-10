@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 """Script that forms part of pwb_tests."""
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import os.path
 
 if __name__ == '__main__':

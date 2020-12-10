@@ -128,7 +128,8 @@ import requests
 
 import pywikibot
 
-from pywikibot import comms, i18n, config, pagegenerators, textlib, config2
+from pywikibot import comms, i18n, pagegenerators, textlib
+from pywikibot import config2 as config
 
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
@@ -192,14 +193,14 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
         mc.timegate_uri = timegate_uri
 
     retry_count = 0
-    while retry_count <= config2.max_retries:
+    while retry_count <= config.max_retries:
         try:
             memento_info = mc.get_memento_info(url, when)
             break
         except (requests.ConnectionError, MementoClientException) as e:
             error = e
             retry_count += 1
-            pywikibot.sleep(config2.retry_wait)
+            pywikibot.sleep(config.retry_wait)
     else:
         raise error
 
@@ -598,7 +599,7 @@ class LinkCheckThread(threading.Thread):
                              .format(self.url, self.page.title()))
             raise
 
-        if r.status_code_code != requests.codes.ok \
+        if r.status_code != requests.codes.ok \
            or r.status_code in self.HTTPignore:
             message = str(r.status_code)
             pywikibot.output('*{} links to {} - {}.'

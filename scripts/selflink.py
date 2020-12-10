@@ -13,12 +13,10 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2019
+# (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import pywikibot
 
 from pywikibot.bot import Choice, MultipleSitesBot
@@ -35,7 +33,7 @@ class _BoldChoice(Choice):
     """A choice to make the title bold."""
 
     def __init__(self, page, replacer):
-        super(_BoldChoice, self).__init__('make bold', 'b', replacer)
+        super().__init__('make bold', 'b', replacer)
         self._page = page
 
     def handle(self):
@@ -50,12 +48,12 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
 
     def __init__(self, generator, **kwargs):
         """Initializer."""
-        super(SelflinkBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.generator = generator
 
     def _create_callback(self):
         """Create callback and add a choice to make the link bold."""
-        callback = super(SelflinkBot, self)._create_callback()
+        callback = super()._create_callback()
         callback.additional_choices += [_BoldChoice(self.current_page,
                                                     callback)]
         return callback

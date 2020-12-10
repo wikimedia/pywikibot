@@ -5,7 +5,7 @@ Coordinate importing script.
 
 Usage:
 
-    python pwb.py coordinate_import -lang:en -family:wikipedia \
+    python pwb.py coordinate_import -site:wikipedia:en \
         -cat:Category:Coordinates_not_on_Wikidata
 
 This will work on all pages in the category "coordinates not on Wikidata" and
@@ -23,10 +23,10 @@ You can use any typical pagegenerator to provide with a list of pages:
 
 You can also run over a set of items on the repo without coordinates and
 try to import them from any connected page. To do this, you have to
-explicitly provide the repo as the site using -lang and -family arguments.
+explicitly provide the repo as the site using -site argument.
 Example:
 
-    python pwb.py coordinate_import -lang:wikidata -family:wikidata \
+    python pwb.py coordinate_import -site:wikidata:wikidata \
         -namespace:0 -querypage:Deadendpages
 
 

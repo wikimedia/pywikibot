@@ -46,6 +46,8 @@ from typing import Union
 import pywikibot
 
 from pywikibot.bot import OptionHandler
+from pywikibot.data import api
+from pywikibot.exceptions import Error
 from pywikibot import i18n
 from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
@@ -99,25 +101,24 @@ class BaseRevertBot(OptionHandler):
         """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
         history = list(page.revisions(total=2))
-        if len(history) > 1:
-            rev = history[1]
-        else:
+        if len(history) <= 1:
             return False
 
-        comment = i18n.twtranslate(
-            self.site, 'revertbot-revert',
-            {'revid': rev.revid,
-             'author': rev.user,
-             'timestamp': rev.timestamp})
-
-        if self.opt.comment:
-            comment += ': ' + self.opt.comment
+        rev = history[1]
 
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<',
             page.title(as_link=True, force_interwiki=True, textlink=True)))
 
         if not self.opt.rollback:
+            comment = i18n.twtranslate(
+                self.site, 'revertbot-revert',
+                {'revid': rev.revid,
+                 'author': rev.user,
+                 'timestamp': rev.timestamp})
+            if self.opt.comment:
+                comment += ': ' + self.opt.comment
+
             old = page.text
             page.text = page.getOldVersion(rev.revid)
             pywikibot.showDiff(old, page.text)
@@ -125,21 +126,20 @@ class BaseRevertBot(OptionHandler):
             return comment
 
         try:
-            pywikibot.data.api.Request(
-                self.site, parameters={'action': 'rollback',
-                                       'title': page,
-                                       'user': self.user,
-                                       'token': rev.rollbacktoken,
-                                       'markbot': True}).submit()
-        except pywikibot.data.api.APIError as e:
+            self.site.rollbackpage(page, user=self.user, markbot=True)
+        except api.APIError as e:
             if e.code == 'badtoken':
                 pywikibot.error(
                     'There was an API token error rollbacking the edit')
-            else:
-                pywikibot.exception()
-            return False
-        return 'The edit(s) made in {0} by {1} was rollbacked'.format(
-            page.title(), self.user)
+                return False
+        except Error:
+            pass
+        else:
+            return 'The edit(s) made in {} by {} was rollbacked'.format(
+                page.title(), self.user)
+
+        pywikibot.exception()
+        return False
 
     def log(self, msg) -> None:
         """Log the message msg."""

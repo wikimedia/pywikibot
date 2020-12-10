@@ -16,7 +16,6 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
-import hashlib
 import logging
 import os.path
 import re
@@ -43,6 +42,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.family import Family
+from pywikibot.page._revision import Revision
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
     add_full_name,
@@ -62,10 +62,13 @@ from pywikibot.tools import (
 from pywikibot.tools import is_IP
 
 if PYTHON_VERSION >= (3, 9):
+    from functools import cache
     Dict = dict
     List = list
 else:
+    from functools import lru_cache
     from typing import Dict, List
+    cache = lru_cache(None)
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'
@@ -321,8 +324,9 @@ class BasePage(ComparableMixin):
         @param as_filename: (not used with as_link) if true, replace any
             characters that are unsafe in filenames
         @param insite: (only used if as_link is true) a site object where the
-            title is to be shown. default is the current family/lang given by
-            -family and -lang option i.e. config.family and config.mylang
+            title is to be shown. Default is the current family/lang given by
+            -family and -lang or -site option i.e. config.family and
+            config.mylang
         @param without_brackets: (cannot be used with as_link) if true, remove
             the last pair of brackets(usually removes disambiguation brackets).
         """
@@ -587,12 +591,12 @@ class BasePage(ComparableMixin):
         self._revid = value
 
     @deprecated('latest_revision_id', since='20150727', future_warning=True)
-    def latestRevision(self):
+    def latestRevision(self):  # pragma: no cover
         """Return the current revision id for this page."""
         return self.latest_revision_id
 
     @deprecated('latest_revision_id', since='20150407', future_warning=True)
-    def pageAPInfo(self):
+    def pageAPInfo(self):  # pragma: no cover
         """Return the current revision id for this page."""
         if self.isRedirectPage():
             raise pywikibot.IsRedirectPage(self)
@@ -615,6 +619,7 @@ class BasePage(ComparableMixin):
         """
         if getattr(self, '_text', None) is not None:
             return self._text
+
         try:
             return self.get(get_redirect=True)
         except pywikibot.NoPage:
@@ -622,12 +627,19 @@ class BasePage(ComparableMixin):
             return ''
 
     @text.setter
-    def text(self, value: str):
-        """
-        Update the current (edited) wikitext.
+    def text(self, value: Optional[str]):
+        """Update the current (edited) wikitext.
 
         @param value: New value or None
         """
+        try:
+            self.botMayEdit()  # T262136, T267770
+        except Exception as e:
+            # dry tests aren't able to make an API call but are
+            # but are rejected by an Exception; ignore it then.
+            if not str(e).startswith('DryRequest rejecting request:'):
+                raise
+
         del self.text
         self._text = None if value is None else str(value)
 
@@ -740,7 +752,7 @@ class BasePage(ComparableMixin):
     @property
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609', future_warning=True)
-    def previous_revision_id(self) -> int:
+    def previous_revision_id(self) -> int:  # pragma: no cover
         """
         Return the revision id for the previous revision of this Page.
 
@@ -750,7 +762,7 @@ class BasePage(ComparableMixin):
 
     @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
                 since='20150609', future_warning=True)
-    def previousRevision(self) -> int:
+    def previousRevision(self) -> int:  # pragma: no cover
         """
         Return the revision id for the previous revision.
 
@@ -835,7 +847,7 @@ class BasePage(ComparableMixin):
         raise pywikibot.IsNotRedirectPage(self)
 
     @deprecated(since='20151207', future_warning=True)
-    def isEmpty(self) -> bool:
+    def isEmpty(self) -> bool:  # pragma: no cover
         """
         Return True if the page text has less than 4 characters.
 
@@ -1080,10 +1092,11 @@ class BasePage(ComparableMixin):
         return self.site.page_can_be_edited(self, action)
 
     @deprecated("Page.has_permission('edit')", since='20200208')
-    def canBeEdited(self):
+    def canBeEdited(self):  # pragma: no cover
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
+    @cache
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -1271,7 +1284,7 @@ class BasePage(ComparableMixin):
         if not done:
             if not quiet:
                 pywikibot.warning('Page %s not saved' % link)
-            raise pywikibot.PageNotSaved(self)
+            raise pywikibot.PageSaveRelatedError(self)
         if not quiet:
             pywikibot.output('Page %s saved' % link)
 
@@ -1303,9 +1316,7 @@ class BasePage(ComparableMixin):
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
             CANCEL_MATCH, CosmeticChangesToolkit)
-        cc_toolkit = CosmeticChangesToolkit(
-            self.site, namespace=self.namespace(), pageTitle=self.title(),
-            ignore=CANCEL_MATCH)
+        cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL_MATCH)
         self.text = cc_toolkit.change(old)
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
@@ -1332,11 +1343,13 @@ class BasePage(ComparableMixin):
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
-    @deprecated('put(asynchronous=True) or save(asynchronous=True)')
+    @deprecated('put(asynchronous=True) or save(asynchronous=True)',
+                since='20180501')
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
-                  botflag=None, force=False, callback=None, **kwargs):
+                  botflag=None, force=False, callback=None,
+                  **kwargs):  # pragma: no cover
         """
         Put page on queue to be saved to wiki asynchronously.
 
@@ -1646,7 +1659,7 @@ class BasePage(ComparableMixin):
         return self.site.getredirtarget(self)
 
     @deprecated('moved_target()', since='20150524', future_warning=True)
-    def getMovedTarget(self):
+    def getMovedTarget(self):  # pragma: no cover
         """
         Return a Page object for the target this Page was moved to.
 
@@ -1726,17 +1739,6 @@ class BasePage(ComparableMixin):
                        self.revisions(total=total,
                                       starttime=starttime, endtime=endtime))
 
-    @deprecated('contributors().keys()', since='20150206', future_warning=True)
-    def contributingUsers(self, total: Optional[int] = None):
-        """
-        Return a set of usernames (or IPs) of users who edited this page.
-
-        @param total: iterate no more than this number of revisions in total
-
-        @rtype: dict_keys
-        """
-        return self.contributors(total=total).keys()
-
     def revision_count(self, contributors=None) -> int:
         """Determine number of edits from contributors.
 
@@ -1761,7 +1763,7 @@ class BasePage(ComparableMixin):
 
     @deprecated('contributors() or revisions()', since='20150206',
                 future_warning=True)
-    @deprecated_args(limit='total')
+    @deprecated_args(limit='total')  # pragma: no cover
     def getLatestEditors(self, total=1) -> list:
         """
         Get a list of revision information of the last total edits.
@@ -1978,89 +1980,36 @@ class BasePage(ComparableMixin):
         self.site.undelete_page(self, reason, undelete_revs)
 
     def protect(self,
-                edit: bool = False,
-                move: bool = False,
-                create=None, upload=None,
-                unprotect: bool = False,
                 reason: Optional[str] = None,
-                prompt: Optional[bool] = None,
                 protections: Optional[dict] = None,
                 **kwargs):
         """
         Protect or unprotect a wiki page. Requires administrator status.
 
         Valid protection levels are '' (equivalent to 'none'),
-        'autoconfirmed', and 'sysop'. If None is given, however,
-        that protection will be skipped.
+        'autoconfirmed', 'sysop' and 'all'. 'all' means 'everyone is allowed',
+        i.e. that protection type will be unprotected.
+
+        In order to unprotect a type of permission, the protection level shall
+        be either set to 'all' or '' or skipped in the protections dictionary.
+
+        Expiry of protections can be set via kwargs, see Site.protect() for
+        details. By default there is no expiry for the protection types.
 
         @param protections: A dict mapping type of protection to protection
-            level of that type.
-        @param reason: Reason for the action
-        @param prompt: Whether to ask user for confirmation (deprecated).
-                       Defaults to protections is None
+            level of that type. Allowed protection types for a page can be
+            retrieved by Page.self.applicable_protections()
+            Defaults to protections is None, which means unprotect all
+            protection types.
+            Example: {'move': 'sysop', 'edit': 'autoconfirmed'}
+
+        @param reason: Reason for the action, default is None and will set an
+            empty string.
         """
-        def process_deprecated_arg(value, arg_name):
-            # if protections was set and value is None, don't interpret that
-            # argument. But otherwise warn that the parameter was set
-            # (even implicit)
-            if called_using_deprecated_arg:
-                if value is False:  # explicit test for False (don't use not)
-                    value = 'sysop'
-                if value == 'none':  # 'none' doesn't seem do be accepted
-                    value = ''
-                if value is not None:  # empty string is allowed
-                    protections[arg_name] = value
-                    issue_deprecation_warning(
-                        '"{}" argument of protect()'.format(arg_name),
-                        '"protections" dict',
-                        warning_class=FutureWarning,
-                        since='20140815')
+        protections = protections or {}  # protections is converted to {}
+        reason = reason or ''  # None is converted to ''
 
-            else:
-                if value:
-                    warn('"protections" argument of protect() replaces "{0}";'
-                         ' cannot use both.'.format(arg_name),
-                         RuntimeWarning)
-
-        # buffer that, because it might get changed
-        called_using_deprecated_arg = protections is None
-        if called_using_deprecated_arg:
-            protections = {}
-        process_deprecated_arg(edit, 'edit')
-        process_deprecated_arg(move, 'move')
-        process_deprecated_arg(create, 'create')
-        process_deprecated_arg(upload, 'upload')
-
-        if reason is None:
-            pywikibot.output('Preparing to protection change of %s.'
-                             % (self.title(as_link=True)))
-            reason = pywikibot.input('Please enter a reason for the action:')
-        if unprotect:
-            issue_deprecation_warning(
-                '"unprotect" argument of protect()',
-                warning_class=FutureWarning,
-                since='20140815')
-            protections = {p_type: ''
-                           for p_type in self.applicable_protections()}
-        answer = 'y'
-        if called_using_deprecated_arg and prompt is None:
-            prompt = True
-        if prompt:
-            issue_deprecation_warning(
-                '"prompt" argument of protect()',
-                warning_class=FutureWarning,
-                since='20140815')
-        if prompt and not hasattr(self.site, '_noProtectPrompt'):
-            answer = pywikibot.input_choice(
-                'Do you want to change the protection level of %s?'
-                % self.title(as_link=True, force_interwiki=True),
-                [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
-                'n', automatic_quit=False)
-            if answer == 'a':
-                answer = 'y'
-                self.site._noProtectPrompt = True
-        if answer == 'y':
-            self.site.protect(self, protections, reason, **kwargs)
+        self.site.protect(self, protections, reason, **kwargs)
 
     @deprecated_args(
         comment='summary', oldCat='old_cat', newCat='new_cat',
@@ -2156,7 +2105,7 @@ class BasePage(ComparableMixin):
         return False
 
     @deprecated('Page.is_flow_page()', since='20150128', future_warning=True)
-    def isFlowPage(self):
+    def isFlowPage(self):  # pragma: no cover
         """DEPRECATED: use self.is_flow_page instead."""
         return self.is_flow_page()
 
@@ -2197,7 +2146,7 @@ class BasePage(ComparableMixin):
 # ####### DEPRECATED METHODS ########
 
     @deprecated('Page.protection()', since='20150725', future_warning=True)
-    def getRestrictions(self):
+    def getRestrictions(self):  # pragma: no cover
         """DEPRECATED. Use self.protection() instead."""
         restrictions = self.protection()
         return {k: list(restrictions[k]) for k in restrictions}
@@ -2479,7 +2428,7 @@ class FilePage(Page):
         return self._imagePageHtml
 
     @deprecated('get_file_url', since='20160609')
-    def fileUrl(self):
+    def fileUrl(self):  # pragma: no cover
         """Return the URL for the file described on this page."""
         return self.latest_file_info.url
 
@@ -2515,7 +2464,7 @@ class FilePage(Page):
         return self.latest_file_info.thumburl
 
     @deprecated('file_is_shared', since='20200618')
-    def fileIsShared(self) -> bool:
+    def fileIsShared(self) -> bool:  # pragma: no cover
         """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
         return self.file_is_shared()
 
@@ -3011,7 +2960,7 @@ class User(Page):
                 'This is an autoblock ID, you can only use to unblock it.')
 
     @deprecated('User.username', since='20160504')
-    def name(self) -> str:
+    def name(self) -> str:  # pragma: no cover
         """
         The username.
 
@@ -3355,13 +3304,13 @@ class User(Page):
         return self.isRegistered() and 'bot' not in self.groups()
 
 
-class LanguageDict(MutableMapping):
+class BaseDataDict(MutableMapping):
 
     """
-    A structure holding language data for a Wikibase entity.
+    Base structure holding data for a Wikibase entity.
 
-    Language data are mappings from a language to a string. It can be
-    labels, descriptions and others.
+    Data are mappings from a language to a value. It will be
+    specialised in subclasses.
     """
 
     def __init__(self, data=None):
@@ -3369,11 +3318,6 @@ class LanguageDict(MutableMapping):
         self._data = {}
         if data:
             self.update(data)
-
-    @classmethod
-    def fromJSON(cls, data, repo=None):
-        this = cls({key: value['value'] for key, value in data.items()})
-        return this
 
     @classmethod
     def new_empty(cls, repo):
@@ -3401,12 +3345,30 @@ class LanguageDict(MutableMapping):
         key = self.normalizeKey(key)
         return key in self._data
 
+    def __repr__(self):
+        return '{}({})'.format(type(self), self._data)
+
     @staticmethod
     def normalizeKey(key) -> str:
         """Helper function to return language codes of a site object."""
         if isinstance(key, pywikibot.site.BaseSite):
             key = key.lang
         return key
+
+
+class LanguageDict(BaseDataDict):
+
+    """
+    A structure holding language data for a Wikibase entity.
+
+    Language data are mappings from a language to a string. It can be
+    labels, descriptions and others.
+    """
+
+    @classmethod
+    def fromJSON(cls, data, repo=None):
+        this = cls({key: value['value'] for key, value in data.items()})
+        return this
 
     @classmethod
     def normalizeData(cls, data):
@@ -3420,22 +3382,18 @@ class LanguageDict(MutableMapping):
 
     def toJSON(self, diffto=None):
         data = {}
-        if diffto:
-            for key in diffto:
-                if key not in self:
-                    data[key] = {'language': key, 'value': ''}
-                elif self[key] != diffto[key]['value']:
-                    data[key] = {'language': key, 'value': self[key]}
-            for key in self:
-                if key not in diffto:
-                    data[key] = {'language': key, 'value': self[key]}
-        else:
-            for key in self:
+        diffto = diffto or {}
+        for key in diffto.keys() - self.keys():
+            data[key] = {'language': key, 'value': ''}
+        for key in self.keys() - diffto.keys():
+            data[key] = {'language': key, 'value': self[key]}
+        for key in self.keys() & diffto.keys():
+            if self[key] != diffto[key]['value']:
                 data[key] = {'language': key, 'value': self[key]}
         return data
 
 
-class AliasesDict(MutableMapping):
+class AliasesDict(BaseDataDict):
 
     """
     A structure holding aliases for a Wikibase entity.
@@ -3443,44 +3401,12 @@ class AliasesDict(MutableMapping):
     It is a mapping from a language to a list of strings.
     """
 
-    def __init__(self, data=None):
-        super().__init__()
-        self._data = {}
-        if data:
-            self.update(data)
-
     @classmethod
     def fromJSON(cls, data, repo=None):
         this = cls()
         for key, value in data.items():
             this[key] = [val['value'] for val in value]
         return this
-
-    @classmethod
-    def new_empty(cls, repo):
-        return cls()
-
-    def __getitem__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        return self._data[key]
-
-    def __setitem__(self, key, value):
-        key = LanguageDict.normalizeKey(key)
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        del self._data[key]
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def __len__(self):
-        return len(self._data)
-
-    def __contains__(self, key):
-        key = LanguageDict.normalizeKey(key)
-        return key in self._data
 
     @classmethod
     def normalizeData(cls, data):
@@ -3498,20 +3424,18 @@ class AliasesDict(MutableMapping):
 
     def toJSON(self, diffto=None):
         data = {}
-        if diffto:
-            for lang, strings in diffto.items():
-                if len(self.get(lang, [])) > 0:
-                    if tuple(sorted(val['value'] for val in strings)) != tuple(
-                            sorted(self[lang])):
-                        data[lang] = [{'language': lang, 'value': i}
-                                      for i in self[lang]]
-                else:
-                    data[lang] = [
-                        {'language': lang, 'value': i['value'], 'remove': ''}
-                        for i in strings]
-        else:
-            for lang, values in self.items():
-                data[lang] = [{'language': lang, 'value': i} for i in values]
+        diffto = diffto or {}
+        for lang in diffto.keys() & self.keys():
+            if (sorted(val['value'] for val in diffto[lang])
+                    != sorted(self[lang])):
+                data[lang] = [{'language': lang, 'value': i}
+                              for i in self[lang]]
+        for lang in diffto.keys() - self.keys():
+            data[lang] = [
+                {'language': lang, 'value': i['value'], 'remove': ''}
+                for i in diffto[lang]]
+        for lang in self.keys() - diffto.keys():
+            data[lang] = [{'language': lang, 'value': i} for i in self[lang]]
         return data
 
 
@@ -3551,6 +3475,9 @@ class ClaimCollection(MutableMapping):
 
     def __contains__(self, key):
         return key in self._data
+
+    def __repr__(self):
+        return '{}({})'.format(type(self), self._data)
 
     @classmethod
     def normalizeData(cls, data):
@@ -4817,7 +4744,7 @@ class Property:
         return self._type
 
     @deprecated('Property.type', since='20140607', future_warning=True)
-    def getType(self):
+    def getType(self):  # pragma: no cover
         """
         Return the type of this property.
 
@@ -5509,139 +5436,6 @@ class Claim(Property):
         }
 
 
-class Revision(DotReadableDict):
-
-    """A structure holding information about a single revision of a Page."""
-
-    def __init__(self, revid, timestamp, user, anon=False, comment='',
-                 text=None, minor=False, rollbacktoken=None, parentid=None,
-                 contentmodel=None, sha1=None, slots=None):
-        """
-        Initializer.
-
-        All parameters correspond to object attributes (e.g., revid
-        parameter is stored as self.revid)
-
-        @param revid: Revision id number
-        @type revid: int
-        @param text: Revision wikitext.
-        @type text: str, or None if text not yet retrieved
-        @param timestamp: Revision time stamp
-        @type timestamp: pywikibot.Timestamp
-        @param user: user who edited this revision
-        @type user: str
-        @param anon: user is unregistered
-        @type anon: bool
-        @param comment: edit comment text
-        @type comment: str
-        @param minor: edit flagged as minor
-        @type minor: bool
-        @param rollbacktoken: rollback token
-        @type rollbacktoken: str
-        @param parentid: id of parent Revision
-        @type parentid: int
-        @param contentmodel: content model label (v1.21+)
-        @type contentmodel: str
-        @param sha1: sha1 of revision text
-        @type sha1: str
-        @param slots: revision slots (v1.32+)
-        @type slots: dict
-        """
-        self.revid = revid
-        self._text = text
-        self.timestamp = timestamp
-        self.user = user
-        self.anon = anon
-        self.comment = comment
-        self.minor = minor
-        self.rollbacktoken = rollbacktoken
-        self._parent_id = parentid
-        self._content_model = contentmodel
-        self._sha1 = sha1
-        self.slots = slots
-
-    @property
-    def parent_id(self) -> int:
-        """
-        Return id of parent/previous revision.
-
-        Returns 0 if there is no previous revision
-
-        @return: id of parent/previous revision
-        @raises AssertionError: parent id not supplied to the constructor
-        """
-        assert self._parent_id is not None, (
-            'Revision {0} was instantiated without a parent id'
-            .format(self.revid))
-
-        return self._parent_id
-
-    @property
-    def text(self) -> Optional[str]:
-        """
-        Return text of this revision.
-
-        This is meant for compatibility with older MW version which
-        didn't support revisions with slots. For newer MW versions,
-        this returns the contents of the main slot.
-
-        @return: text of the revision
-        """
-        if self.slots is not None:
-            return self.slots.get('main', {}).get('*')
-        return self._text
-
-    @property
-    def content_model(self) -> str:
-        """
-        Return content model of the revision.
-
-        This is meant for compatibility with older MW version which
-        didn't support revisions with slots. For newer MW versions,
-        this returns the content model of the main slot.
-
-        @return: content model
-        @raises AssertionError: content model not supplied to the constructor
-            which always occurs for MediaWiki versions lower than 1.21.
-        """
-        if self._content_model is None and self.slots is not None:
-            self._content_model = self.slots.get('main', {}).get(
-                'contentmodel')
-        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
-        assert self._content_model is not None, (
-            'Revision {0} was instantiated without a content model'
-            .format(self.revid))
-
-        return self._content_model
-
-    @property
-    def sha1(self) -> Optional[str]:
-        """
-        Return and cache SHA1 checksum of the text.
-
-        @return: if the SHA1 checksum is cached it'll be returned which is the
-            case when it was requested from the API. Otherwise it'll use the
-            revision's text to calculate the checksum (encoding it using UTF8
-            first). That calculated checksum will be cached too and returned on
-            future calls. If the text is None (not queried) it will just return
-            None and does not cache anything.
-        """
-        if self._sha1 is None and self.text is not None:
-            self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
-        return self._sha1
-
-    @staticmethod
-    def _thank(revid, site, source='pywikibot'):
-        """Thank a user for this revision.
-
-        @param site: The Site object for this revision.
-        @type site: Site
-        @param source: An optional source to pass to the API.
-        @type source: str
-        """
-        site.thank_revision(revid, source)
-
-
 class FileInfo(DotReadableDict):
 
     """
@@ -6121,9 +5915,9 @@ class Link(BaseLink):
 
         # "empty" local links can only be self-links
         # with a fragment identifier.
-        if not t.strip() and not self._is_interwiki:
-            raise pywikibot.InvalidTitle('The link does not contain a page '
-                                         'title')
+        if not t.strip(' ') and not self._is_interwiki:  # T197642
+            raise pywikibot.InvalidTitle(
+                'The link does not contain a page title')
 
         if self._site.namespaces[self._namespace].case == 'first-letter':
             t = first_upper(t)
