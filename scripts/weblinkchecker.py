@@ -599,7 +599,7 @@ class LinkCheckThread(threading.Thread):
                              .format(self.url, self.page.title()))
             raise
 
-        if r.status_code_code != requests.codes.ok \
+        if r.status_code != requests.codes.ok \
            or r.status_code in self.HTTPignore:
             message = str(r.status_code)
             pywikibot.output('*{} links to {} - {}.'
