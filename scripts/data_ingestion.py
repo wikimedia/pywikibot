@@ -114,7 +114,7 @@ import pywikibot
 from pywikibot.comms.http import fetch
 from pywikibot import pagegenerators
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
+from pywikibot.tools import deprecated_args, PYTHON_VERSION
 
 if PYTHON_VERSION >= (3, 9):
     Tuple = tuple
@@ -164,7 +164,7 @@ class Photo(pywikibot.FilePage):
             self.contents = io.BytesIO(imageFile)
         return self.contents
 
-    @deprecated_args(site=None)
+    @deprecated_args(site=True)
     def findDuplicateImages(self):
         """
         Find duplicates of the photo.
@@ -250,17 +250,6 @@ class DataIngestionBot(pywikibot.Bot):
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
-    @property
-    @deprecated('generator', since='20150508', future_warning=True)
-    def reader(self):
-        """Deprecated generator."""
-        return self.generator
-
-    @reader.setter
-    @deprecated('generator', since='20150508', future_warning=True)
-    def reader(self, value):
-        self.generator = value
-
     def treat(self, photo):
         """
         Process each page.
@@ -289,11 +278,6 @@ class DataIngestionBot(pywikibot.Bot):
         bot.run()
 
         return title
-
-    @deprecated('treat()', since='20150118', future_warning=True)
-    def doSingle(self):
-        """Process one page."""
-        return self.treat(next(self.reader))
 
     @classmethod
     def parseConfigurationPage(cls, configurationPage):
