@@ -63,7 +63,7 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtension,
 )
-from pywikibot.site._basesite import BaseSite, PageInUse
+from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
 from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.site._interwikimap import _InterwikiMap
 from pywikibot.site._namespace import Namespace, NamespacesDict
@@ -95,16 +95,6 @@ __all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
            'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
-
-
-class RemovedSite(BaseSite):
-
-    """Site removed from a family."""
-
-    @remove_last_args(['sysop'])
-    def __init__(self, code, fam, user=None):
-        """Initializer."""
-        super().__init__(code, fam, user)
 
 
 _mw_msg_cache = defaultdict(dict)

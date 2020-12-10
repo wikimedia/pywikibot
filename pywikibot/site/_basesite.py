@@ -534,3 +534,10 @@ class BaseSite(ComparableMixin):
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
+
+
+class RemovedSite(BaseSite):
+
+    """Site removed from a family."""
+
+    pass
