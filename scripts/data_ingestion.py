@@ -160,7 +160,7 @@ class Photo(pywikibot.FilePage):
         TODO: Add exception handling
         """
         if not self.contents:
-            imageFile = fetch(self.URL).raw
+            imageFile = fetch(self.URL).content
             self.contents = io.BytesIO(imageFile)
         return self.contents
 

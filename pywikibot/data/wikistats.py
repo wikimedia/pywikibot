@@ -102,7 +102,7 @@ class WikiStats:
             table = self.FAMILY_MAPPING[table]
 
         r = http.fetch(url.format(table=table, format=format))
-        return r.raw
+        return r.content
 
     @deprecated('get', since='20201017', future_warning=True)
     def raw_cached(self, table: str,

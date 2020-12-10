@@ -595,7 +595,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         new_text = new_text.replace(match.group(), repl)
                     return
 
-                linkedpagetext = f.raw
+                linkedpagetext = f.content
 
             except UnicodeError:
                 # example:

@@ -110,7 +110,7 @@ def get_image_from_image_page(imagePage):
     """Get the image object to work based on an imagePage object."""
     imageURL = imagePage.get_file_url()
     imageURLopener = http.fetch(imageURL)
-    imageBuffer = io.BytesIO(imageURLopener.raw[:])
+    imageBuffer = io.BytesIO(imageURLopener.content[:])
     image = Image.open(imageBuffer)
     return image
 

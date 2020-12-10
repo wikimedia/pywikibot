@@ -121,9 +121,14 @@ class HttpRequest:
         return self.data.headers if not self.exception else None
 
     @property
-    def raw(self) -> Optional[bytes]:
-        """Return the raw response body."""
-        return self.data.content if not self.exception else None
+    @deprecated('the `content` property', since='20201210',
+                future_warning=True)
+    def raw(self) -> Optional[bytes]:  # pragma: no cover
+        """DEPRECATED. Return the raw response body.
+
+        @note: The behaviour will be changed.
+        """
+        return self.content
 
     @property
     @deprecated('urlparse(HttpRequest.url)',
@@ -167,7 +172,7 @@ class HttpRequest:
             # application/json | application/sparql-results+json
             self._header_encoding = 'utf-8'
         elif 'xml' in content_type:
-            header = self.raw[:100].splitlines()[0]  # bytes
+            header = self.content[:100].splitlines()[0]  # bytes
             m = re.search(
                 br'encoding=(["\'])(?P<encoding>.+?)\1', header)
             if m:
@@ -217,7 +222,7 @@ class HttpRequest:
     def _try_decode(self, encoding):
         """Helper function to try decoding."""
         try:
-            self.raw.decode(encoding)
+            self.content.decode(encoding)
         except UnicodeError as e:
             result = e
         else:
@@ -227,23 +232,21 @@ class HttpRequest:
     @deprecated('the `text` property', since='20201011', future_warning=True)
     def decode(self, encoding, errors='strict') -> str:  # pragma: no cover
         """Return the decoded response."""
-        return self.raw.decode(encoding,
-                               errors) if not self.exception else None
+        return self.content.decode(
+            encoding, errors) if not self.exception else None
 
     @property
-    @deprecated('the `text` property', since='20180321', future_warning=True)
-    def content(self) -> str:  # pragma: no cover
-        """DEPRECATED. Return the response decoded by the detected encoding.
+    def content(self) -> bytes:
+        """Return the response in bytes.
 
-        @note: The behaviour will be changed.
-            This method will return the content of the response in bytes.
+        @note: The behaviour has been changed.
         """
-        return self.text
+        return self.data.content if not self.exception else None
 
     @property
     def text(self) -> str:
         """Return the response decoded by the detected encoding."""
-        return self.raw.decode(self.encoding)
+        return self.content.decode(self.encoding)
 
     @deprecated('the `text` property', since='20201011', future_warning=True)
     def __str__(self) -> str:  # pragma: no cover
@@ -253,4 +256,4 @@ class HttpRequest:
     @deprecated(since='20201011', future_warning=True)
     def __bytes__(self) -> Optional[bytes]:  # pragma: no cover
         """Return the undecoded response."""
-        return self.raw
+        return self.content

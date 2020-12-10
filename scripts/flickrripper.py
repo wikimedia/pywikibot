@@ -108,7 +108,7 @@ def downloadPhoto(photoUrl):
     TODO: Add exception handling
 
     """
-    imageFile = fetch(photoUrl).raw
+    imageFile = fetch(photoUrl).content
     return io.BytesIO(imageFile)
 
 
