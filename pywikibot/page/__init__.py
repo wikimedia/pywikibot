@@ -635,7 +635,7 @@ class BasePage(ComparableMixin):
         try:
             self.botMayEdit()  # T262136, T267770
         except Exception as e:
-            # dry tests aren't able to make an API call but are
+            # dry tests aren't able to make an API call
             # but are rejected by an Exception; ignore it then.
             if not str(e).startswith('DryRequest rejecting request:'):
                 raise
