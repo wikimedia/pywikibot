@@ -46,7 +46,7 @@ class HttpTestCase(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn('<html lang="mul"', r.text)
         self.assertIsInstance(r.text, str)
-        self.assertIsInstance(r.raw, bytes)
+        self.assertIsInstance(r.content, bytes)
 
 
 class HttpRequestURI(DeprecationTestCase):
@@ -419,7 +419,7 @@ class CharsetTestCase(TestCase):
         req._data = resp
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_no_charset(self):
@@ -431,7 +431,7 @@ class CharsetTestCase(TestCase):
         req._data = resp
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_content_type_application_json_without_charset(self):
@@ -503,7 +503,7 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request()
         self.assertIsNone(req.charset)
         self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_same_charset(self):
@@ -511,7 +511,7 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf-8')
         self.assertEqual('utf-8', req.charset)
         self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_header_charset(self):
@@ -521,7 +521,7 @@ class CharsetTestCase(TestCase):
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_code_charset(self):
@@ -532,7 +532,7 @@ class CharsetTestCase(TestCase):
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_invalid_charset(self):
@@ -545,7 +545,7 @@ class CharsetTestCase(TestCase):
             self.assertRaisesRegex(
                 UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
                 lambda: req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertRaisesRegex(
             UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.text)
 
@@ -579,7 +579,7 @@ class BinaryTestCase(TestCase):
         """Test with http, standard http interface for pywikibot."""
         r = http.fetch(uri=self.url)
 
-        self.assertEqual(r.raw, self.png)
+        self.assertEqual(r.content, self.png)
 
 
 class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
