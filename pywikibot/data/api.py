@@ -1334,15 +1334,6 @@ class Request(MutableMapping):
         """Return a list of tuples containing the parameters in any order."""
         return list(self._params.items())
 
-    @deprecated(since='20141006', future_warning=True)
-    def http_params(self):  # pragma: no cover
-        """Return the parameters formatted for inclusion in an HTTP request.
-
-        DEPRECATED. See _encoded_items for explanation of encoding used.
-        """
-        self._add_defaults()
-        return self._http_param_string()
-
     def _add_defaults(self):
         """
         Add default parameters to the API request.
