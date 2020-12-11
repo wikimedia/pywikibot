@@ -493,12 +493,6 @@ def _make_parameter(decoder, param):
     return newValue
 
 
-@deprecated(since='20151014', future_warning=True)
-def MakeParameter(decoder, param):
-    """DEPRECATED."""
-    return _make_parameter(decoder, param)
-
-
 # All years/decades/centuries/millenniums are designed in such a way
 # as to allow for easy date to string and string to date conversion.
 # For example, using any map with either an integer or a string will produce
