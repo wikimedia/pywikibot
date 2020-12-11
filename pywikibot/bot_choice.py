@@ -223,7 +223,7 @@ class ContextOption(OutputOption, StandardOption):
 
 class Choice(StandardOption):
 
-    """A simple choice consisting of a option, shortcut and handler."""
+    """A simple choice consisting of an option, shortcut and handler."""
 
     def __init__(self, option, shortcut, replacer):
         """Initializer."""

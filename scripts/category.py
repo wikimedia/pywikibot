@@ -201,30 +201,38 @@ class CategoryPreprocess(BaseBot):
                 if self.follow_redirects:
                     if redir_target.exists():
                         return redir_target
+
                     if self.create:
                         redir_target.text = ''
                         pywikibot.output('Redirect target {} does not exist '
                                          'yet; creating.'.format(
                                              redir_target.title(as_link=True)))
                         return redir_target
+
                     if self.edit_redirects:
                         return page
-                    pywikibot.warning('Redirect target {} can not '
-                                      'be modified; skipping.'.format(
-                                          redir_target.title(as_link=True)))
+
+                    pywikibot.warning(
+                        'Redirect target {} cannot be modified; skipping.'
+                        .format(redir_target))
                     return None
+
                 if self.edit_redirects:
                     return page
+
                 pywikibot.warning('Page {} is a redirect to {}; skipping.'
                                   .format(page.title(as_link=True),
                                           redir_target.title(as_link=True)))
                 return None
+
             return page
+
         if self.create:
             page.text = ''
             pywikibot.output('Page {} does not exist yet; creating.'
                              .format(page.title(as_link=True)))
             return page
+
         pywikibot.warning('Page {} does not exist; skipping.'
                           .format(page.title(as_link=True)))
         return None

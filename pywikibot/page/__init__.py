@@ -889,7 +889,7 @@ class BasePage(ComparableMixin):
         return self.namespace() == 14
 
     def is_filepage(self):
-        """Return True if this is an file description page, False otherwise."""
+        """Return True if this is a file description page, False otherwise."""
         return self.namespace() == 6
 
     @remove_last_args(['get_Index'])

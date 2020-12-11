@@ -65,7 +65,7 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
 
     def setUp(self):
         """Setup tests."""
-        super(TestEventStreamsStreamsTests, self).setUp()
+        super().setUp()
         site = self.get_site()
         fam = site.family
         if not isinstance(fam, WikimediaFamily):
@@ -110,7 +110,7 @@ class TestEventStreamsSettingTests(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(TestEventStreamsSettingTests, self).setUp()
+        super().setUp()
         with mock.patch('pywikibot.comms.eventstreams.EventSource'):
             self.es = EventStreams(url='dummy url')
 
@@ -169,7 +169,7 @@ class TestEventStreamsFilterTests(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        super(TestEventStreamsFilterTests, self).setUp()
+        super().setUp()
         with mock.patch('pywikibot.comms.eventstreams.EventSource'):
             self.es = EventStreams(url='dummy url')
 
@@ -205,7 +205,7 @@ class TestEventStreamsFilterTests(TestCase):
         self.assertTrue(self.es.streamfilter(self.data))
 
     def test_filter_value(self):
-        """Test EventStreams filter with assignment of a int value."""
+        """Test EventStreams filter with assignment of an int value."""
         self.es.register_filter(foo=10)
         self.assertFalse(self.es.streamfilter(self.data))
 

@@ -848,7 +848,7 @@ class OptionSet(MutableMapping):
             silently removed from the options (disabled by default).
         """
         if self._site_set:
-            raise TypeError('The site can not be set multiple times.')
+            raise TypeError('The site cannot be set multiple times.')
         # If the entries written to this are valid, it will never be
         # overwritten
         self._valid_enable = set()
@@ -1169,7 +1169,7 @@ class Request(MutableMapping):
         #
         # When we can't easily check whether the extension is loaded,
         # to avoid cyclic recursion in the Pywikibot codebase, assume
-        # that it is present, which will cause a API warning emitted
+        # that it is present, which will cause an API warning emitted
         # to the logging (console) if it is not present, but will not
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions

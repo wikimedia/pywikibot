@@ -283,7 +283,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | interwikidumps.py      | Convert interwiki dumps from pickle to txt format.      |
     +------------------------+---------------------------------------------------------+
-    | make_i18n_dict.py      | Generate a i18n file from a given script.               |
+    | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+
     | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
     +------------------------+---------------------------------------------------------+

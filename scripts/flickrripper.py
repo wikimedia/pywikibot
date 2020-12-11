@@ -103,7 +103,7 @@ def getPhotoUrl(photoSizes):
 
 def downloadPhoto(photoUrl):
     """
-    Download the photo and store it in a io.BytesIO object.
+    Download the photo and store it in an io.BytesIO object.
 
     TODO: Add exception handling
 

@@ -582,7 +582,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # Set the edit summary for this case
         self.comment = i18n.twtranslate(self.site, 'noreferences-fix-tag')
 
-        # Repair two opening tags or a opening and an empty tag
+        # Repair two opening tags or an opening and an empty tag
         pattern = re.compile(r'< *references *>(.*?)'
                              r'< */?\s*references */? *>', re.DOTALL)
         if pattern.search(oldText):

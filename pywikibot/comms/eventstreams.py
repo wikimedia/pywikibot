@@ -227,7 +227,7 @@ class EventStreams:
         @param args: You may pass your own filter functions here.
             Every function should be able to handle the data dict from events.
         @type args: callable
-        @param kwargs: Any key returned by event data with a event data value
+        @param kwargs: Any key returned by event data with an event data value
             for this given key.
         @type kwargs: str, list, tuple or other sequence
         @raise TypeError: A given args parameter is not a callable.
