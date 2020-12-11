@@ -403,11 +403,11 @@ class CharsetTestCase(TestCase):
     @staticmethod
     def _create_request(charset=None, data=UTF8_BYTES):
         """Helper method."""
-        req = threadedhttp.HttpRequest('', charset=charset)
+        req = threadedhttp.HttpRequest(charset=charset)
         resp = requests.Response()
         resp.headers = {'content-type': 'charset=utf-8'}
         resp._content = data[:]
-        req._data = resp
+        req.data = resp
         return req
 
     def test_no_content_type(self):
