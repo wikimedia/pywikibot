@@ -778,7 +778,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         elif option == '-user':
             username = value
         elif option in ('-putthrottle', '-pt'):
-            config.put_throttle = int(value)
+            config.put_throttle = float(value)
         elif option == '-log':
             if module_name not in config.log:
                 config.log.append(module_name)
