@@ -174,7 +174,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
                              % (page, template))
             return True
 
-        return super(NewItemRobot, self).skip_page(page)
+        return super().skip_page(page)
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""

@@ -93,13 +93,13 @@ class TestDeletionBot(ScriptMainTestCase):
         self._original_undelete = pywikibot.Page.undelete
         pywikibot.Page.delete = delete_dummy
         pywikibot.Page.undelete = undelete_dummy
-        super(TestDeletionBot, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         """Tear down unit test."""
         pywikibot.Page.delete = self._original_delete
         pywikibot.Page.undelete = self._original_undelete
-        super(TestDeletionBot, self).tearDown()
+        super().tearDown()
 
     def test_dry(self):
         """Test dry run of bot."""

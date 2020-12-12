@@ -190,14 +190,14 @@ class OAuthEditTest(OAuthSiteTestCase):
 
     def setUp(self):
         """Set up test by checking site and initialization."""
-        super(OAuthEditTest, self).setUp()
+        super().setUp()
         self._authenticate = config.authenticate
         oauth_tokens = self.consumer_token + self.access_token
         config.authenticate[self.site.hostname()] = oauth_tokens
 
     def tearDown(self):
         """Tear down test by resetting config.authenticate."""
-        super(OAuthEditTest, self).tearDown()
+        super().tearDown()
         config.authenticate = self._authenticate
 
     def test_edit(self):

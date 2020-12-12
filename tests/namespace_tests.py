@@ -260,7 +260,7 @@ class TestNamespacesDictLookupName(TestCase):
 
     def setUp(self):
         """Setup namespaces dict."""
-        super(TestNamespacesDictLookupName, self).setUp()
+        super().setUp()
         self.namespaces = builtin_NamespacesDict()
 
     def test_lookup_name(self):
