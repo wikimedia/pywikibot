@@ -404,22 +404,24 @@ class BaseSite(ComparableMixin):
                     'No {repo} qualifier found for disambiguation category '
                     'name in {fam}_family file'.format(repo=repo_name,
                                                        fam=self.family.name))
-            else:
-                dp = pywikibot.ItemPage(repo, item)
-                try:
-                    name = dp.getSitelink(self)
-                except pywikibot.NoPage:
-                    raise Error(
-                        'No disambiguation category name found in {repo} '
-                        'for {site}'.format(repo=repo_name, site=self))
+
+            dp = pywikibot.ItemPage(repo, item)
+            try:
+                name = dp.getSitelink(self)
+            except pywikibot.NoPage:
+                raise Error(
+                    'No disambiguation category name found in {repo} '
+                    'for {site}'.format(repo=repo_name, site=self))
+
         else:  # fallback for non WM sites
             try:
-                name = '%s:%s' % (Namespace.CATEGORY,
-                                  self.family.disambcatname[self.code])
+                name = '{}:{}'.format(Namespace.CATEGORY,
+                                      self.family.disambcatname[self.code])
             except KeyError:
                 raise Error(
                     'No disambiguation category name found in '
                     '{site.family.name}_family for {site}'.format(site=self))
+
         return pywikibot.Category(pywikibot.Link(name, self))
 
     def isInterwikiLink(self, text):  # noqa: N802
@@ -446,7 +448,7 @@ class BaseSite(ComparableMixin):
         return re.compile(r'\s*#{pattern}\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
                           .format(pattern=pattern), re.IGNORECASE | re.DOTALL)
 
-    def sametitle(self, title1, title2):
+    def sametitle(self, title1: str, title2: str) -> bool:
         """
         Return True if title1 and title2 identify the same wiki page.
 
@@ -463,14 +465,13 @@ class BaseSite(ComparableMixin):
             else:
                 return ns, name
 
-        if title1 == title2:
-            return True
         # Replace underscores with spaces and multiple combinations of them
         # with only one space
         title1 = re.sub(r'[_ ]+', ' ', title1)
         title2 = re.sub(r'[_ ]+', ' ', title2)
         if title1 == title2:
             return True
+
         default_ns = self.namespaces[0]
         # determine whether titles contain namespace prefixes
         ns1_obj, name1 = ns_split(title1)
@@ -478,6 +479,7 @@ class BaseSite(ComparableMixin):
         if ns1_obj != ns2_obj:
             # pages in different namespaces
             return False
+
         name1 = name1.strip()
         name2 = name2.strip()
         # If the namespace has a case definition it's overriding the site's
