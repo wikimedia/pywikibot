@@ -49,36 +49,6 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r.raw, bytes)
 
 
-class HttpRequestURI(DeprecationTestCase):
-
-    """Tests using http.request without a site."""
-
-    sites = {
-        'www-wp': {
-            'hostname': 'www.wikipedia.org',
-        },
-        'www-wq': {
-            'hostname': 'www.wikiquote.org',
-        },
-    }
-
-    def test_http(self):
-        """Test http.request using http://www.wikipedia.org/."""
-        r = http.request(site=None, uri='http://www.wikipedia.org/')
-        self.assertIsInstance(r, str)
-        self.assertIn('<html lang="mul"', r)
-        self.assertOneDeprecationParts(
-            'Invoking http.request without argument site', 'http.fetch()')
-
-    def test_https(self):
-        """Test http.request using https://www.wikiquote.org/."""
-        r = http.request(site=None, uri='https://www.wikiquote.org/')
-        self.assertIsInstance(r, str)
-        self.assertIn('<html lang="mul"', r)
-        self.assertOneDeprecationParts(
-            'Invoking http.request without argument site', 'http.fetch()')
-
-
 class TestGetAuthenticationConfig(TestCase):
 
     """Test http.get_authentication."""
