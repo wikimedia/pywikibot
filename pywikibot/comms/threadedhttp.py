@@ -57,6 +57,12 @@ class HttpRequest:
         self._parsed_uri = None
         self._data = None
 
+    def __getattr__(self, name):
+        """Delegate undefined method calls to request.Response object."""
+        if self.exception and name in ('content', 'status_code'):
+            return None
+        return getattr(self.data, name)
+
     @property
     @deprecated('the `url` attribute', since='20201011', future_warning=True)
     def uri(self):  # pragma: no cover
@@ -154,11 +160,6 @@ class HttpRequest:
         return self.status_code
 
     @property
-    def status_code(self) -> Optional[int]:
-        """Return the HTTP response status."""
-        return self.data.status_code if not self.exception else None
-
-    @property
     def header_encoding(self):
         """Return charset given by the response header."""
         if hasattr(self, '_header_encoding'):
@@ -234,14 +235,6 @@ class HttpRequest:
         """Return the decoded response."""
         return self.content.decode(
             encoding, errors) if not self.exception else None
-
-    @property
-    def content(self) -> bytes:
-        """Return the response in bytes.
-
-        @note: The behaviour has been changed.
-        """
-        return self.data.content if not self.exception else None
 
     @property
     def text(self) -> str:
