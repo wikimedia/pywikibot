@@ -37,7 +37,8 @@ from pywikibot.exceptions import (
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
-    deprecate_arg,
+    deprecated_args,
+    issue_deprecation_warning,
     file_mode_checker,
     PYTHON_VERSION,
 )
@@ -243,8 +244,14 @@ def request(site, uri: Optional[str] = None, method='GET', params=None,
     if data:
         body = data
 
-    kwargs.setdefault('disable_ssl_certificate_validation',
-                      site.ignore_certificate_error())
+    kwargs.setdefault('verify', site.verify_SSL_certificate())
+    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
+    if old_validation is not None:
+        issue_deprecation_warning('disable_ssl_certificate_validation',
+                                  instead='verify',
+                                  warning_class=FutureWarning,
+                                  since='20201220')
+        kwargs.update(verify=not old_validation)
 
     if not headers:
         headers = {}
@@ -314,7 +321,7 @@ def error_handling_callback(request):
         warning('Http response status {}'.format(request.status_code))
 
 
-@deprecate_arg('callback', True)
+@deprecated_args(callback=True)
 def fetch(uri, method='GET', params=None, body=None, headers=None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False,
@@ -333,8 +340,8 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
-    @kwarg disable_ssl_certificate_validation: diable SSL Verification
-    @type disable_ssl_certificate_validation: bool
+    @kwarg verify: verify the SSL certificate (default is True)
+    @type verify: bool or path to certificates
     @kwarg callbacks: Methods to call once data is fetched
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
@@ -397,7 +404,13 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
             auth = requests_oauthlib.OAuth1(*auth)
 
     timeout = config.socket_timeout
-    ignore_validation = kwargs.pop('disable_ssl_certificate_validation', False)
+    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
+    if old_validation is not None:
+        issue_deprecation_warning('disable_ssl_certificate_validation',
+                                  instead='verify',
+                                  warning_class=FutureWarning,
+                                  since='20201220')
+        kwargs.update(verify=not old_validation)
 
     try:
         # Note that the connections are pooled which mean that a future
@@ -405,7 +418,6 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         # verify=True, when a request with verify=False happened before
         response = session.request(method, uri, params=params, data=body,
                                    headers=headers, auth=auth, timeout=timeout,
-                                   verify=not ignore_validation,
                                    **kwargs)
     except Exception as e:
         request.data = e

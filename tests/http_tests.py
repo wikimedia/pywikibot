@@ -106,7 +106,7 @@ class HttpsCertificateTestCase(TestCase):
         with warnings.catch_warnings(record=True) as warning_log:
             response = http.fetch(
                 uri='https://testssl-expire-r2i2.disig.sk/index.en.html',
-                disable_ssl_certificate_validation=True)
+                verify=False)
         r = response.text
         self.assertIsInstance(r, str)
         self.assertTrue(re.search(r'<title>.*</title>', r))
