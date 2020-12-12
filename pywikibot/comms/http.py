@@ -19,6 +19,7 @@ This module is responsible for
 import atexit
 import sys
 
+from contextlib import suppress
 from http import cookiejar
 from string import Formatter
 from typing import Optional, Union
@@ -302,7 +303,9 @@ def error_handling_callback(request):
         raise Server414Error('Too long GET request')
 
     if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.url)
+        with suppress(Exception):
+            # request.data exception may contain response and request attribute
+            error('An error occurred for uri ' + request.data.request.url)
         raise request.data from None
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
@@ -381,8 +384,7 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         callbacks.append(error_handling_callback)
 
     charset = kwargs.pop('charset', None)
-    request = threadedhttp.HttpRequest(
-        uri, method, params, body, headers, callbacks, charset, **kwargs)
+    request = threadedhttp.HttpRequest(charset=charset)
 
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
@@ -409,7 +411,9 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         request.data = e
     else:
         request.data = response
-    #  error_handling_callback is called in HttpRequest data.setter
+
+    for callback in callbacks:
+        callback(request)
 
     # if there's no data in the answer we're in trouble
     try:
