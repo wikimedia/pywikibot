@@ -2359,7 +2359,8 @@ class FilePage(Page):
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
         if self.namespace() != 6:
-            raise ValueError("'%s' is not in the file namespace!" % title)
+            raise ValueError("'{}' is not in the file namespace!"
+                             .format(self.title()))
 
     def _load_file_revisions(self, imageinfo):
         for file_rev in imageinfo:
@@ -2634,8 +2635,8 @@ class Category(Page):
         self.sortKey = sort_key
         super().__init__(source, title, ns=14)
         if self.namespace() != 14:
-            raise ValueError("'%s' is not in the category namespace!"
-                             % title)
+            raise ValueError("'{}' is not in the category namespace!"
+                             .format(self.title()))
 
     @deprecated_args(sortKey='sort_key')
     def aslink(self, sort_key: Optional[str] = None) -> str:
@@ -2951,8 +2952,8 @@ class User(Page):
             self._isAutoblock = False
         super().__init__(source, title, ns=2)
         if self.namespace() != 2:
-            raise ValueError("'%s' is not in the user namespace!"
-                             % title)
+            raise ValueError("'{}' is not in the user namespace!"
+                             .format(self.title()))
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
