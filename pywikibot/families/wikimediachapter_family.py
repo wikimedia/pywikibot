@@ -6,7 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import deprecated, classproperty
 
 
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -26,9 +25,3 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'nl', 'no', 'nyc', 'pl', 'pt', 'punjabi', 'romd', 'rs', 'ru', 'se',
         'tr', 'ua', 'uk', 've', 'wb',
     ]
-
-    @classproperty
-    @deprecated(since='20150621', future_warning=True)
-    def countries(cls):  # pragma: no cover
-        """Deprecated."""
-        return cls.codes
