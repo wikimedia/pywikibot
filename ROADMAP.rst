@@ -23,6 +23,6 @@ Future release notes
 * 5.0.0: HttpRequest result of http.fetch() will be replaced by requests.Response (T265206)
 * 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
-* 5.0.0: Outdated recentchanges parameter will be removed
+* 5.0.0: Outdated Site.recentchanges() parameters will be removed
 * 5.0.0: site.LoginStatus will be removed in favour of login.LoginStatus
 * 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed
