@@ -4,7 +4,6 @@
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
-from collections import defaultdict
 from csv import DictReader
 from io import StringIO
 from typing import Optional
@@ -12,7 +11,7 @@ from typing import Optional
 import pywikibot
 
 from pywikibot.comms import http
-from pywikibot.tools import deprecated, remove_last_args
+from pywikibot.tools import remove_last_args
 
 
 class WikiStats:
@@ -77,67 +76,7 @@ class WikiStats:
     def __init__(self, url='https://wikistats.wmflabs.org/') -> None:
         """Initializer."""
         self.url = url
-        self._raw = defaultdict(dict)
         self._data = {}
-
-    @deprecated('get', since='20201017', future_warning=True)
-    def fetch(self, table: str, format='xml') -> bytes:  # pragma: no cover
-        """
-        DEPRECATED. Fetch data from WikiStats.
-
-        @param table: table of data to fetch
-        @param format: Format of data to use
-        @type format: 'xml' or 'csv'.
-        """
-        if format == 'xml':
-            path = '/{format}/{table}.{format}'
-        else:
-            path = '/api.php?action=dump&table={table}&format={format}'
-        url = self.url + path
-
-        if table not in self.ALL_KEYS:
-            pywikibot.warning('WikiStats unknown table ' + table)
-
-        if table in self.FAMILY_MAPPING:
-            table = self.FAMILY_MAPPING[table]
-
-        r = http.fetch(url.format(table=table, format=format))
-        return r.content
-
-    @deprecated('get', since='20201017', future_warning=True)
-    def raw_cached(self, table: str,
-                   format='csv') -> bytes:  # pragma: no cover
-        """
-        DEPRECATED. Cache raw data.
-
-        @param table: table of data to fetch
-        @param format: format of data to use
-        @type format: 'xml' or 'csv'.
-        """
-        if table in self._raw[format]:
-            return self._raw[format][table]
-
-        data = self.fetch(table, format)
-        self._raw[format][table] = data
-        return data
-
-    @deprecated('get', since='20201017', future_warning=True)
-    def csv(self, table: str) -> list:  # pragma: no cover
-        """
-        DEPRECATED. Get a list of a table of data.
-
-        @param table: table of data to fetch
-        """
-        return self.get(table)
-
-    @deprecated('get', since='20201017', future_warning=True)
-    def xml(self, table: str) -> list:
-        """
-        DEPRECATED. Get a list of a table of data.
-
-        @param table: table of data to fetch
-        """
-        return self.get(table)
 
     @remove_last_args(['format'])
     def get(self, table: str) -> list:
