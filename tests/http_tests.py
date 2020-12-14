@@ -23,7 +23,6 @@ from tests import join_images_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
-    DeprecationTestCase,
     HttpbinTestCase,
     require_modules,
 )
@@ -550,23 +549,6 @@ class BinaryTestCase(TestCase):
         r = http.fetch(uri=self.url)
 
         self.assertEqual(r.content, self.png)
-
-
-class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
-
-    """Test usage of deprecated pywikibot.cookie_jar."""
-
-    net = False
-
-    def test_cookie_jar(self):
-        """Test pywikibot.cookie_jar is deprecated."""
-        # Accessing from the main package should be deprecated.
-        main_module_cookie_jar = pywikibot.cookie_jar
-
-        self.assertOneDeprecationParts('pywikibot.cookie_jar',
-                                       'pywikibot.comms.http.cookie_jar')
-
-        self.assertIs(main_module_cookie_jar, http.cookie_jar)
 
 
 class QueryStringParamsTestCase(HttpbinTestCase):

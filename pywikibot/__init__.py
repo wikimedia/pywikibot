@@ -1317,9 +1317,6 @@ _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr(
-    'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
-    since='20150921', future_warning=True)
-wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
                     'use pywikibot.bot.QuitKeyboardInterrupt instead.',
