@@ -90,7 +90,7 @@ class MovePagesBot(MultipleSitesBot, CurrentPageBot):
                 'Page {page} on {page.site} is a redirect; skipping'
                 .format(page=page))
             return True
-        return super(MovePagesBot, self).skip_page(page)
+        return super().skip_page(page)
 
     def treat_page(self):
         """Treat a single page."""

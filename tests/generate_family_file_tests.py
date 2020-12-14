@@ -25,7 +25,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         save = self.langs
         self.langs = sample(save, min(len(save), 10))
         self.prefixes = [item['prefix'] for item in self.langs]
-        super(FamilyTestGenerator, self).getapis()
+        super().getapis()
         self.langs = save
 
     def writefile(self):
@@ -41,7 +41,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
     def setUp(self):
         """Set up tests class."""
-        super(TestGenerateFamilyFiles, self).setUp()
+        super().setUp()
         self.generator_instance = FamilyTestGenerator(
             url=self.site.base_url(''), name=self.familyname, dointerwiki='y')
 

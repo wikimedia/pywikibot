@@ -78,7 +78,7 @@ class TestAPIMWException(DefaultSiteTestCase):
 
     def setUp(self):
         """Mock warning and error."""
-        super(TestAPIMWException, self).setUp()
+        super().setUp()
         self.warning_patcher = patch.object(pywikibot, 'warning')
         self.error_patcher = patch.object(pywikibot, 'error')
         self.warning_patcher.start()
@@ -88,7 +88,7 @@ class TestAPIMWException(DefaultSiteTestCase):
         """Check warning and error calls."""
         self.warning_patcher.stop()
         self.error_patcher.stop()
-        super(TestAPIMWException, self).tearDown()
+        super().tearDown()
 
     def _test_assert_called_with(self, req):
         self.assertRaises(api.APIMWException, req.submit)
@@ -584,7 +584,7 @@ class TestDryPageGenerator(TestCase):
 
     def setUp(self):
         """Set up test case."""
-        super(TestDryPageGenerator, self).setUp()
+        super().setUp()
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
                                      generator='links',
@@ -796,7 +796,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
 
     def setUp(self):
         """Set up test case."""
-        super(TestDryQueryGeneratorNamespaceParam, self).setUp()
+        super().setUp()
         self.site = self.get_site()
         self.site._paraminfo['query+querypage'] = {
             'prefix': 'qp',
@@ -869,7 +869,7 @@ class TestDryListGenerator(TestCase):
 
     def setUp(self):
         """Set up test case."""
-        super(TestDryListGenerator, self).setUp()
+        super().setUp()
         mysite = self.get_site()
         mysite._paraminfo['query+allpages'] = {
             'prefix': 'ap',
@@ -988,14 +988,14 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
 
     def setUp(self):
         """Patch the LoginManager to avoid UI interaction."""
-        super(TestLazyLoginNotExistUsername, self).setUp()
+        super().setUp()
         self.orig_login_manager = pywikibot.data.api.LoginManager
         pywikibot.data.api.LoginManager = FakeLoginManager
 
     def tearDown(self):
         """Restore the original LoginManager."""
         pywikibot.data.api.LoginManager = self.orig_login_manager
-        super(TestLazyLoginNotExistUsername, self).tearDown()
+        super().tearDown()
 
     @patch.object(pywikibot, 'output')
     @patch.object(pywikibot, 'warning')

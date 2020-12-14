@@ -39,7 +39,7 @@ class LogEntry(UserDict):
 
     def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""
-        super(LogEntry, self).__init__(apidata)
+        super().__init__(apidata)
         self.site = site
         expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
@@ -90,7 +90,7 @@ class LogEntry(UserDict):
                     'user'):  # TODO use specific User class for 'user'?
             return lambda: self[item]
 
-        return super(LogEntry, self).__getattribute__(item)
+        return super().__getattribute__(item)
 
     @property
     def _params(self):
@@ -171,7 +171,7 @@ class BlockEntry(LogEntry):
 
     def __init__(self, apidata, site):
         """Initializer."""
-        super(BlockEntry, self).__init__(apidata, site)
+        super().__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
         # See bug T19781
         pos = self['title'].find('#')
@@ -192,7 +192,7 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             return self._blockid
         else:
-            return super(BlockEntry, self).page()
+            return super().page()
 
     def flags(self) -> List[str]:
         """

@@ -174,7 +174,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
     def init_page(self, page):
         """Add redirect targets to check list."""
         global checked
-        super(MakeCatBot, self).init_page(page)
+        super().init_page(page)
         if page.isRedirectPage():
             newpage = page.getRedirectTarget()
             if self.needcheck(newpage):
@@ -187,7 +187,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
             pywikibot.warning('Page {page} does not exist on {page.site}. '
                               'Skipping.'.format(page=page))
             return True
-        return super(MakeCatBot, self).skip_page(page)
+        return super().skip_page(page)
 
     def treat_page(self):
         """Work on current page and ask to add article to category."""
