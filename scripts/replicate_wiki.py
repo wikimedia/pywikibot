@@ -51,13 +51,6 @@ from collections import defaultdict
 import pywikibot
 
 from pywikibot import config, Page
-from pywikibot.tools import deprecated
-
-
-@deprecated('BaseSite.namespaces', since='20150515', future_warning=True)
-def namespaces(site):
-    """Return a dictionary from namespace number to prefix."""
-    return {n.id: n.custom_name for n in site.namespaces}
 
 
 def multiple_replace(text, word_dict):
