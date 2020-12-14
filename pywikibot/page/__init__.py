@@ -2143,14 +2143,6 @@ class BasePage(ComparableMixin):
             return '{}://{}'.format(wiki.protocol(), link)
         return link
 
-# ####### DEPRECATED METHODS ########
-
-    @deprecated('Page.protection()', since='20150725', future_warning=True)
-    def getRestrictions(self):  # pragma: no cover
-        """DEPRECATED. Use self.protection() instead."""
-        restrictions = self.protection()
-        return {k: list(restrictions[k]) for k in restrictions}
-
 
 class Page(BasePage):
 
