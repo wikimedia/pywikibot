@@ -142,10 +142,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
     ]
 
-    # On most Wikipedias page names must start with a capital letter,
-    # but some languages don't use this.
-    nocapitalize = ['jbo']
-
     # Languages that used to be coded in iso-8859-1
     latin1old = {
         'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'es', 'et', 'eu', 'fi',

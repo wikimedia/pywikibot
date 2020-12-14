@@ -100,18 +100,6 @@ class BaseSite(ComparableMixin):
         self._locked_pages = set()
 
     @property
-    @deprecated(
-        "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'",
-        since='20170504', future_warning=True)
-    def nocapitalize(self):
-        """
-        Return whether this site's default title case is case-sensitive.
-
-        DEPRECATED.
-        """
-        return self.siteinfo['case'] == 'case-sensitive'
-
-    @property
     def throttle(self):
         """Return this Site's throttle. Initialize a new one if needed."""
         if not hasattr(self, '_throttle'):
