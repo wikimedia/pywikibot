@@ -277,9 +277,6 @@ if config.max_retries > 2:
 # Raise CaptchaError if a test requires solving a captcha
 config.solve_captcha = False
 
-cache_misses = 0
-cache_hits = 0
-
 warnings.filterwarnings('always')
 
 
@@ -302,11 +299,7 @@ class TestRequest(CachedRequest):
 
     def _load_cache(self):
         """Return whether the cache can be used."""
-        global cache_hits
-        global cache_misses
-
         if not super()._load_cache():
-            cache_misses += 1
             return False
 
         # tokens need careful management in the cache
@@ -317,16 +310,15 @@ class TestRequest(CachedRequest):
                 self._data = None
                 return False
 
-        cache_hits += 1
         return True
 
     def _write_cache(self, data):
         """Write data except login details."""
         if 'intoken' in self._uniquedescriptionstr():
-            return
+            return None
 
         if 'lgpassword' in self._uniquedescriptionstr():
-            return
+            return None
 
         return super()._write_cache(data)
 
