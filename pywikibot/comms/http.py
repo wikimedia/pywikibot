@@ -283,7 +283,7 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
     return None
 
 
-def error_handling_callback(request):
+def error_handling_callback(response):
     """
     Raise exceptions and log alerts.
 
@@ -291,27 +291,30 @@ def error_handling_callback(request):
     @type request: L{threadedhttp.HttpRequest}
     """
     # TODO: do some error correcting stuff
-    if isinstance(request.data, requests.exceptions.SSLError):
-        if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
-            raise FatalServerError(str(request.data))
+    if isinstance(response, requests.exceptions.SSLError):
+        if SSL_CERT_VERIFY_FAILED_MSG in str(response):
+            raise FatalServerError(str(response))
 
-    if request.status_code == 504:
-        raise Server504Error('Server {} timed out'
-                             .format(urlparse(request.url).netloc))
-
-    if request.status_code == 414:
-        raise Server414Error('Too long GET request')
-
-    if isinstance(request.data, Exception):
+    if isinstance(response, Exception):
         with suppress(Exception):
             # request.data exception may contain response and request attribute
-            error('An error occurred for uri ' + request.data.request.url)
-        raise request.data from None
+            error('An error occurred for uri ' + response.request.url)
+        raise response from None
+
+    if response.status_code == 504:
+        raise Server504Error('Server {} timed out'
+                             .format(urlparse(response.url).netloc))
+
+    if response.status_code == 414:
+        raise Server414Error('Too long GET request')
+
+    # TODO: shall it raise? this might break some code, TBC
+    # response.raise_for_status()
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
-    if request.status_code not in (200, 207):
-        warning('Http response status {}'.format(request.status_code))
+    if response.status_code not in (200, 207):
+        warning('Http response status {}'.format(response.status_code))
 
 
 @deprecate_arg('callback', True)
@@ -409,11 +412,12 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
                                    **kwargs)
     except Exception as e:
         request.data = e
+        response = e
     else:
         request.data = response
 
     for callback in callbacks:
-        callback(request)
+        callback(response)
 
     # if there's no data in the answer we're in trouble
     try:
