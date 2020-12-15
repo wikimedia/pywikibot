@@ -25,7 +25,7 @@ from pywikibot.tools import (
 )
 
 if PYTHON_VERSION >= (3, 9):
-    List = tuple
+    Tuple = tuple
 else:
     from typing import Tuple
 
