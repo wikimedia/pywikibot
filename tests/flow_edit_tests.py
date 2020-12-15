@@ -217,6 +217,7 @@ class FlowTests(TestCase):
 
     def setUp(self):
         """Setup tests."""
+        super().setUp()
         self.topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         self.post = Post(self.topic, 'sq1qvoig1az8w7cd')
 
