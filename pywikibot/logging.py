@@ -129,8 +129,9 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     """
     if toStdout:  # maintained for backwards-compatibity only
         from pywikibot.tools import issue_deprecation_warning
-        issue_deprecation_warning('"toStdout" parameter',
-                                  'pywikibot.stdout()', since='20160228')
+        issue_deprecation_warning('"toStdout" parameter', 'pywikibot.stdout()',
+                                  warning_class=FutureWarning,
+                                  since='20160228')
         logoutput(text, decoder, newline, STDOUT, **kwargs)
     else:
         logoutput(text, decoder, newline, INFO, **kwargs)
