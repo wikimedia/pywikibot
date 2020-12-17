@@ -12,6 +12,7 @@ from contextlib import suppress
 import pywikibot
 
 from pywikibot.exceptions import HiddenKeyError
+from pywikibot.family import AutoFamily
 from pywikibot.logentries import (
     LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
 
@@ -50,8 +51,10 @@ class TestLogentriesBase(TestCase):
             'target': None,
         },
         'old': {
-            'family': 'wowwiki',
-            'code': 'hu',
+            'family': AutoFamily('btrfs',
+                                 # /api.php required for scriptpath()
+                                 'https://btrfs.wiki.kernel.org/api.php'),
+            'code': 'btrfs',
             'target': None,
         }
     }
