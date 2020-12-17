@@ -1398,7 +1398,8 @@ def AutoFamily(name: str, url: str):
             return self.url.path[0:-8]
 
         # AutoFamily refers to the variable set below, not the function
-        return super().scriptpath(code)
+        # but the reference must be given here
+        return super(AutoFamily, self).scriptpath(code)
 
     AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()
