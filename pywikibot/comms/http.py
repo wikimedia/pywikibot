@@ -96,7 +96,7 @@ class _UserAgentFormatter(Formatter):
 
     def get_value(self, key, args, kwargs):
         """Get field as usual except for version and revision."""
-        # This is the Pywikibot revision; also map it to {version} at present.
+        # This is the Pywikibot version; also map it to {revision} at present.
         if key == 'version' or key == 'revision':
             return pywikibot.version.getversiondict()['rev']
         return super().get_value(key, args, kwargs)
@@ -143,16 +143,10 @@ def user_agent(site=None, format_string: str = None) -> str:
     @return: The formatted user agent
     """
     values = USER_AGENT_PRODUCTS.copy()
-
-    script_name = pywikibot.bot.calledModuleName()
-
-    values['script'] = script_name
-
-    # TODO: script_product should add the script version, if known
-    values['script_product'] = script_name
+    values.update(dict.fromkeys(['script', 'script_product'],
+                                pywikibot.bot.calledModuleName()))
 
     script_comments = []
-    username = ''
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
@@ -161,6 +155,7 @@ def user_agent(site=None, format_string: str = None) -> str:
     values['lang'] = ''  # TODO: use site.lang, if known
     values['site'] = ''
 
+    username = ''
     if site:
         script_comments.append(str(site))
 
