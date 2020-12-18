@@ -111,7 +111,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1,<=2.25.0;python_version<"3.6"',
+    'requests>=2.20.1,<2.26.0;python_version<"3.6"',
     'requests>=2.20.1;python_version>="3.6"',
 ]
 

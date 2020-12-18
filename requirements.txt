@@ -19,7 +19,7 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README-conversion.txt
-requests>=2.20.1, <=2.25.0; python_version < '3.6'
+requests>=2.20.1, < 2.26.0; python_version < '3.6'
 requests>=2.20.1 ; python_version >= '3.6'
 
 # OAuth support
