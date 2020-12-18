@@ -11,8 +11,9 @@ If user-config.py cannot be found in any of those locations, this module
 will fail to load unless the environment variable PYWIKIBOT_NO_USER_CONFIG
 is set to a value other than '0'. i.e. PYWIKIBOT_NO_USER_CONFIG=1 will
 allow config to load without a user-config.py. However, warnings will be
-shown if user-config.py was not loaded.
-To prevent these warnings, set PYWIKIBOT_NO_USER_CONFIG=2.
+shown if user-config.py was not loaded. To prevent these warnings, set
+PYWIKIBOT_NO_USER_CONFIG=2. If pywikibot is installed as a site-package
+the behaviour is like PYWIKIBOT_NO_USER_CONFIG=2 is set.
 
 Provides two functions to register family classes which can be used in
 the user-config:
@@ -47,6 +48,7 @@ import types
 
 from locale import getdefaultlocale
 from os import getenv, environ
+from pathlib import Path
 from textwrap import fill
 from typing import Optional, Union
 from warnings import warn
@@ -89,7 +91,9 @@ for env_name in (
 _imports = frozenset(name for name in globals() if not name.startswith('_'))
 
 __no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG')
-if __no_user_config == '0':
+if __no_user_config is None and 'site-packages' in Path(__file__).parts:
+    __no_user_config = '2'
+elif __no_user_config == '0':
     __no_user_config = None
 
 
@@ -294,7 +298,8 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
          '.pywikibot' directory (Unix and similar) under the user's home
          directory.
 
-    Set PYWIKIBOT_NO_USER_CONFIG=1 to disable loading user-config.py
+    Set PYWIKIBOT_NO_USER_CONFIG=1 to disable loading user-config.py or
+    install pywikibot as a site-package.
 
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
@@ -358,17 +363,18 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
         raise RuntimeError("Directory '%s' does not exist." % base_dir)
     # check if user-config.py is in base_dir
     if not exists(base_dir):
-        exc_text = "No user-config.py found in directory '%s'.\n" % base_dir
-        if __no_user_config:
-            if __no_user_config != '2':
-                output(exc_text)
-        else:
+        exc_text = 'No user-config.py found in directory {!r}.\n'.format(
+            base_dir)
+
+        if __no_user_config is None:
             exc_text += (
                 '  Please check that user-config.py is stored in the correct '
                 'location.\n'
                 '  Directory where user-config.py is searched is determined '
                 'as follows:\n\n    ') + get_base_dir.__doc__
             raise RuntimeError(exc_text)
+        elif __no_user_config != '2':
+            output(exc_text)
 
     return base_dir
 
