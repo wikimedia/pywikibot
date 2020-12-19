@@ -657,7 +657,8 @@ class ParamInfo(Sized, Container):
         return param_data[0]
 
     @property
-    @deprecated('submodules() or module_paths', since='20150715')
+    @deprecated('submodules() or module_paths', since='20150715',
+                future_warning=True)
     def modules(self) -> Union[Set[str], FrozenSet[str]]:
         """
         Set of all main and query modules without path prefixes.
