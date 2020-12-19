@@ -80,7 +80,6 @@ from pywikibot.tools import (
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
-    ModuleDeprecationWrapper,
     PYTHON_VERSION,
     remove_last_args,
 )
@@ -90,9 +89,8 @@ if PYTHON_VERSION >= (3, 9):
 else:
     from typing import List
 
-__all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
-           'NamespacesDict', 'PageInUse', 'RemovedSite',
-           'Siteinfo', 'TokenWallet')
+__all__ = ('APISite', 'DataSite', 'Namespace', 'NamespacesDict', 'PageInUse',
+           'RemovedSite', 'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
 
@@ -6608,10 +6606,3 @@ class DataSite(APISite):
         See self._wbset_action(self, itemdef, action, action_data, **kwargs)
         """
         return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-# Note: use LoginStatus instead of _LoginStatus
-#       after desupport warning is removed
-wrapper._add_deprecated_attr('LoginStatus', _LoginStatus,
-                             since='20200919', future_warning=True)
