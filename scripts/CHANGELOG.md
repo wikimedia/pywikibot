@@ -1,5 +1,19 @@
 # Schripts Changelog
 
+## 5.3.0
+*19 December 2020*
+
+### data_ingestion
+* Remove deprecated Photo.reader property and Photo.doSingle() method
+
+
+### replicate_wiki
+* Remove deprecated namespace function
+
+### template
+* remove deprecated XmlDumpTemplatePageGenerator
+
+
 ## 5.2.0
 *10 December 2020*
 
