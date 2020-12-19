@@ -1,25 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Allow using pywikibot as site-package without user-config.py (T270474)
-* Python 3.10 is supported
-* Fix AutoFamily scriptpath() call (T270370)
-* Add support for skrwiki, skrwiktionary, eowikivoyage, wawikisource, madwiki (T268414, T268460, T269429, T269434, T269442)
-* wikistats methods fetch, raw_cached, csv, xml has been removed
-* PageRelatedError.getPage() has been removed in favour of PageRelatedError.page
-* DataSite.get_item() method has been removed
-* global put_throttle option may be given as float (T269741)
-* Property.getType() method has been removed
-* Family.server_time() method was removed; it is still available from Site object (T89451)
-* All HttpRequest parameters except of charset has been dropped (T265206)
-* A lot of methods and properties of HttpRequest are deprecared in favour of requests.Resonse attributes (T265206)
-* Method and properties of HttpRequest are delegated to requests.Response object (T265206)
-* comms.threadedhttp.HttpRequest.raw was replaced by HttpRequest.content property (T265206)
-* Desupported version.getfileversion() has been removed
-* site parameter of comms.http.requests() function is mandatory and cannot be omitted
-* date.MakeParameter() function has been removed
-* api.Request.http_params() method has been removed
-* L10N updates
+* (no changes yet)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
