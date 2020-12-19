@@ -264,7 +264,7 @@ class TestTerminalOutput(UITestCase):
             pywikibot.output('output', toStdout=True)
             self.assertEqual(newstdout.getvalue(), 'output\n')
             self.assertLength(w, 1)
-            self.assertEqual(w[0].category, DeprecationWarning)
+            self.assertEqual(w[0].category, FutureWarning)
             message = str(w[0].message)
             self.assertTrue(
                 message.startswith('"toStdout" parameter is deprecated'))
