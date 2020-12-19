@@ -17,7 +17,17 @@ from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import deprecated, first_lower, first_upper
+from pywikibot.tools import (
+    deprecated,
+    first_lower,
+    first_upper,
+    PYTHON_VERSION,
+)
+
+if PYTHON_VERSION >= (3, 9):
+    Tuple = tuple
+else:
+    from typing import Tuple
 
 #
 # Different collections of well known formats
@@ -364,6 +374,36 @@ def escapePattern2(pattern):
     Allows matching of any _digitDecoders inside the string.
     Returns a compiled regex object and a list of digit decoders.
     """
+    @singledispatch
+    def decode(dec: tuple, subpattern: str, newpattern: str,
+               strpattern: str) -> Tuple[str, str]:
+
+        if len(subpattern) == 3:
+            # enforce mandatory field size
+            newpattern += '([%s]{%s})' % (dec[0], subpattern[1])
+            # add the number of required digits as the last (4th)
+            # part of the tuple
+            decoders.append(dec + (int(s[1]),))
+        else:
+            newpattern += '([{}]+)'.format(dec[0])
+            decoders.append(dec)
+
+        # All encoders produce a string for strpattern.
+        # This causes problem with the zero padding.
+        # Need to rethink
+
+        return newpattern, strpattern + '%s'
+
+    @decode.register(str)
+    def _(dec: str, subpattern: str, newpattern: str,
+          strpattern: str) -> Tuple[str, str]:
+        # Special case for strings that are replaced instead of decoded
+        # Keep the original text for strPattern
+        assert len(subpattern) < 3, (
+            'Invalid pattern {}: Cannot use zero padding size '
+            'in {}!'.format(pattern, subpattern))
+        return newpattern + re.escape(dec), strpattern + subpattern
+
     if pattern not in _escPtrnCache2:
         newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
@@ -376,29 +416,7 @@ def escapePattern2(pattern):
                     and (len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
-                if isinstance(dec, str):
-                    # Special case for strings that are replaced instead of
-                    # decoded
-                    assert len(s) < 3, (
-                        'Invalid pattern {0}: Cannot use zero padding size '
-                        'in {1}!'.format(pattern, s))
-                    newPattern += re.escape(dec)
-                    strPattern += s  # Keep the original text
-                else:
-                    if len(s) == 3:
-                        # enforce mandatory field size
-                        newPattern += '([%s]{%s})' % (dec[0], s[1])
-                        # add the number of required digits as the last (4th)
-                        # part of the tuple
-                        dec += (int(s[1]),)
-                    else:
-                        newPattern += '([{}]+)'.format(dec[0])
-
-                    decoders.append(dec)
-                    # All encoders produce a string
-                    # this causes problem with the zero padding.
-                    # Need to rethink
-                    strPattern += '%s'
+                newPattern, strPattern = decode(dec, s, newPattern, strPattern)
             else:
                 newPattern += re.escape(s)
                 strPattern += s
@@ -491,12 +509,6 @@ def _make_parameter(decoder, param):
         # This converts "205" into "0205" for "%4d"
         newValue = decoder[0][0] * (decoder[3] - len(newValue)) + newValue
     return newValue
-
-
-@deprecated(since='20151014', future_warning=True)
-def MakeParameter(decoder, param):
-    """DEPRECATED."""
-    return _make_parameter(decoder, param)
 
 
 # All years/decades/centuries/millenniums are designed in such a way

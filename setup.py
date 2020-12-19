@@ -110,7 +110,10 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 
 # ------- setup install_requires ------- #
 # packages which are mandatory
-dependencies = ['requests>=2.20.1']
+dependencies = [
+    'requests>=2.20.1,<2.26.0;python_version<"3.6"',
+    'requests>=2.20.1;python_version>="3.6"',
+]
 
 try:
     import bz2
@@ -279,6 +282,7 @@ def main():
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
             'Programming Language :: Python :: Implementation :: CPython',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
             'Topic :: Software Development :: Libraries :: Python Modules',

@@ -63,7 +63,7 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtension,
 )
-from pywikibot.site._basesite import BaseSite, PageInUse
+from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
 from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.site._interwikimap import _InterwikiMap
 from pywikibot.site._namespace import Namespace, NamespacesDict
@@ -95,16 +95,6 @@ __all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
            'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
-
-
-class RemovedSite(BaseSite):
-
-    """Site removed from a family."""
-
-    @remove_last_args(['sysop'])
-    def __init__(self, code, fam, user=None):
-        """Initializer."""
-        super().__init__(code, fam, user)
 
 
 _mw_msg_cache = defaultdict(dict)
@@ -3382,11 +3372,11 @@ class APISite(BaseSite):
 
         if text_overrides:
             if 'text' in kwargs:
-                raise ValueError('text can not be used with any of %s'
-                                 % ', '.join(text_overrides))
+                raise ValueError('text cannot be used with any of {}'
+                                 .format(', '.join(text_overrides)))
             if len(text_overrides) > 1:
-                raise ValueError('Multiple text overrides used: %s'
-                                 % ', '.join(text_overrides))
+                raise ValueError('Multiple text overrides used: {}'
+                                 .format(', '.join(text_overrides)))
             text = None
             basetimestamp = False
         elif 'text' in kwargs:
@@ -5834,11 +5824,6 @@ class DataSite(APISite):
         assert props in wbdata, \
             'API wbgetentities response lacks %s key' % props
         return wbdata[props]
-
-    @deprecated('pywikibot.ItemPage', since='20130307', future_warning=True)
-    def get_item(self, source, **params):  # pragma: no cover
-        """Get the data for multiple Wikibase items."""
-        return self._get_item(source, **params)
 
     # Only separated from get_item to avoid the deprecation message via
     # _get_propertyitem

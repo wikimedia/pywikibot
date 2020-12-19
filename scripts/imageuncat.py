@@ -36,7 +36,7 @@ ignoreCategories = ['[[Category:CC-BY-SA-3.0]]',
                     '[[Category:Media lacking a description]]',
                     '[[Category:Self-published work]]']
 
-# Don't bother to put the template on a image with one of these templates
+# Don't bother to put the template on an image with one of these templates
 skipTemplates = ['Delete',
                  'Nocat',
                  'No license',

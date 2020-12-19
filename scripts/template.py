@@ -119,51 +119,8 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools import deprecated, filter_unique
+from pywikibot.tools import filter_unique
 from scripts.replace import ReplaceRobot as ReplaceBot
-
-
-@deprecated('XMLDumpPageGenerator', since='20151109', future_warning=True)
-class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
-
-    """
-    Generator which yields Pages that transclude a template.
-
-    These pages will be retrieved from a local XML dump file
-    (cur table), and may not still transclude the template.
-    """
-
-    def __init__(self, templates, xmlfilename: str) -> None:
-        """
-        Initializer.
-
-        @param templateNames: A list of Page objects representing the searched
-            templates
-        @type templateNames: list
-        @param xmlfilename: The dump's path, either absolute or relative
-
-        """
-        self.templates = templates
-        self.xmlfilename = xmlfilename
-        mysite = pywikibot.Site()
-        # regular expression to find the original template.
-        # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
-        # The old syntax, {{msg:vfd}}, will also be found.
-        template_patterns = []
-        for template in self.templates:
-            template_pattern = template.title(with_ns=False)
-            if mysite.namespaces[10].case == 'first-letter':
-                template_pattern = '[{0}{1}]{2}'.format(
-                    template_pattern[0].upper(), template_pattern[0].lower(),
-                    template_pattern[1:])
-            template_pattern = re.sub(' ', '[_ ]', template_pattern)
-            template_patterns.append(template_pattern)
-        template_regex = re.compile(
-            r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}'
-            % '|'.join(template_patterns))
-
-        super().__init__(xmlfilename, site=mysite,
-                         text_predicate=template_regex.search)
 
 
 class TemplateRobot(ReplaceBot):

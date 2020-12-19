@@ -191,7 +191,7 @@ class AssertAPIErrorContextManager(object):
     Context manager to assert certain APIError exceptions.
 
     This is build similar to the L{unittest.TestCase.assertError}
-    implementation which creates an context manager. It then calls L{handle}
+    implementation which creates a context manager. It then calls L{handle}
     which either returns this manager if no executing object given or calls
     the callable object.
     """

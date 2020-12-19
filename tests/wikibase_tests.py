@@ -19,7 +19,7 @@ from pywikibot.page import (
     ClaimCollection, SiteLinkCollection,
 )
 from pywikibot.site import Namespace, NamespacesDict
-from pywikibot.tools import MediaWikiVersion, suppress_warnings
+from pywikibot.tools import MediaWikiVersion
 
 from tests import join_pages_path, mock
 from tests.aspects import (
@@ -1167,7 +1167,7 @@ class TestItemLoad(WikidataTestCase):
         """Helper function to test a page without an associated item.
 
         It tests two of the ways to fetch an item:
-        1. the Page already has props, which should contain a item id if
+        1. the Page already has props, which should contain an item id if
            present, and that item id is used to instantiate the item, and
         2. the page doesn't have props, in which case the site&titles is
            used to lookup the item id, but that lookup occurs after
@@ -1375,17 +1375,14 @@ class TestPropertyPage(WikidataTestCase):
         with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
             PropertyPage(wikidata, title='')
 
-    @suppress_warnings('pywikibot.page.Property.getType is deprecated')
     def test_globe_coordinate(self):
         """Test a coordinate PropertyPage has the correct type."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P625')
         self.assertEqual(property_page.type, 'globe-coordinate')
-        self.assertEqual(property_page.getType(), 'globecoordinate')
 
         claim = pywikibot.Claim(wikidata, 'P625')
         self.assertEqual(claim.type, 'globe-coordinate')
-        self.assertEqual(claim.getType(), 'globecoordinate')
 
     def test_get(self):
         """Test PropertyPage.get() method."""

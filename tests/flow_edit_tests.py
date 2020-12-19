@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 
 from pywikibot.exceptions import LockedPage
 from pywikibot.flow import Board, Topic, Post
@@ -217,8 +217,23 @@ class FlowTests(TestCase):
 
     def setUp(self):
         """Setup tests."""
+        super().setUp()
         self.topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         self.post = Post(self.topic, 'sq1qvoig1az8w7cd')
+
+    @contextmanager
+    def restored(self, flow):
+        """Setup and restore test."""
+        # Setup
+        if flow.is_moderated:
+            flow.restore(MODERATION_REASON)
+        self.assertFalse(flow.is_moderated)
+        try:
+            yield flow
+        finally:
+            # Restore
+            flow.restore(MODERATION_REASON)
+            self.assertFalse(flow.is_moderated)
 
 
 class TestFlowHide(FlowTests):
@@ -228,17 +243,11 @@ class TestFlowHide(FlowTests):
     def test_hide(self):
         """Hide and restore a test topic and post."""
         for flow in (self.topic, self.post):
-            with self.subTest(flow=flow.__class__.__name__):
-                # Setup
-                if flow.is_moderated:
-                    flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
+            with self.subTest(flow=flow.__class__.__name__), \
+                 self.restored(flow):
                 # Hide
                 flow.hide(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
-                # Restore
-                flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
 
 
 class TestFlowSysop(FlowTests):
@@ -250,32 +259,20 @@ class TestFlowSysop(FlowTests):
     def test_delete(self):
         """Delete and restore a test topic and post."""
         for flow in (self.topic, self.post):
-            with self.subTest(flow=flow.__class__.__name__):
-                # Setup
-                if flow.is_moderated:
-                    flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
+            with self.subTest(flow=flow.__class__.__name__), \
+                 self.restored(flow):
                 # Delete
                 flow.delete_mod(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
-                # Restore
-                flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
 
     def test_suppress(self):
         """Suppress and restore a test topic and post."""
         for flow in (self.topic, self.post):
-            with self.subTest(flow=flow.__class__.__name__):
-                # Setup
-                if flow.is_moderated:
-                    flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
+            with self.subTest(flow=flow.__class__.__name__), \
+                 self.restored(flow):
                 # Suppress
                 flow.suppress(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
-                # Restore
-                flow.restore(MODERATION_REASON)
-                self.assertFalse(flow.is_moderated)
 
 
 if __name__ == '__main__':  # pragma: no cover

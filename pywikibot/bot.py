@@ -778,7 +778,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         elif option == '-user':
             username = value
         elif option in ('-putthrottle', '-pt'):
-            config.put_throttle = int(value)
+            config.put_throttle = float(value)
         elif option == '-log':
             if module_name not in config.log:
                 config.log.append(module_name)
@@ -923,8 +923,8 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     @param missing_action: Add an entry that no action was defined.
     @type missing_action: bool
     @param additional_text: Additional text added to the end.
-    @param missing_dependencies: A list of dependencies which can not
-        be imported.
+    @param missing_dependencies: A list of dependencies which cannot be
+        imported.
     @type missing_dependencies: list of str
     @return: True if an error message was printed, False otherwise
     """
@@ -1038,7 +1038,7 @@ class OptionHandler:
     """Class to get and set options.
 
     How to use options of OptionHandler and its BaseBot subclasses:
-    First define a available_options class attribute to define all
+    First define an available_options class attribute to define all
     available options:
 
     available_options = {'foo': 'bar', 'bar': 42, 'baz': False}

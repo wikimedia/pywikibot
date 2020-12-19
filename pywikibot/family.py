@@ -320,6 +320,7 @@ class Family:
         'sg': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'sh': '[a-zčćđžš]*',
         'sk': '[a-záäčďéíľĺňóôŕšťúýž]*',
+        'skr': '[ابپتٹثجچحخدڈذرڑزژسشصضطظعغفقکگلمنںوؤہھیئےآأءۃٻڄݙڋڰڳݨ]*',
         'sl': '[a-zčćđžš]*',
         'smn': '[a-zâčđŋšžäá]*',
         'sr': '[abvgdđežzijklljmnnjoprstćufhcčdž'
@@ -1075,15 +1076,6 @@ class Family:
             return repo.code, repo.family.name
         return (None, None)
 
-    @deprecated('Site.server_time()', since='20141225', future_warning=True)
-    def server_time(self, code):
-        """
-        DEPRECATED, use Site.server_time instead.
-
-        Return a datetime object representing server time.
-        """
-        return pywikibot.Site(code, self).server_time()
-
     def isPublic(self, code):
         """Check the wiki require logging in before viewing it."""
         return True
@@ -1406,7 +1398,8 @@ def AutoFamily(name: str, url: str):
             return self.url.path[0:-8]
 
         # AutoFamily refers to the variable set below, not the function
-        return super().scriptpath(code)
+        # but the reference must be given here
+        return super(AutoFamily, self).scriptpath(code)
 
     AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()

@@ -49,7 +49,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
 
     def setUp(self):
         """Setup interwiki_graph data."""
-        super(TestWiktionaryGraph, self).setUp()
+        super().setUp()
         data = interwiki_graph.Subject(self.pages['en'])
         data.found_in[self.pages['en']] = [self.pages['fr'], self.pages['pl']]
         data.found_in[self.pages['fr']] = [self.pages['en'], self.pages['pl']]

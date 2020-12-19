@@ -603,7 +603,7 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a pywikibot.Timestamp.
 
-        @raises ValueError: instance value can not be represented using
+        @raises ValueError: instance value cannot be represented using
             Timestamp
         """
         if self.year <= 0:
@@ -1245,7 +1245,7 @@ def _flush(stop=True):
             remainingPages -= 1
 
         remainingSeconds = datetime.timedelta(
-            seconds=(remainingPages * config.put_throttle))
+            seconds=round(remainingPages * config.put_throttle))
         return (remainingPages, remainingSeconds)
 
     if stop:

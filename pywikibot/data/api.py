@@ -657,7 +657,8 @@ class ParamInfo(Sized, Container):
         return param_data[0]
 
     @property
-    @deprecated('submodules() or module_paths', since='20150715')
+    @deprecated('submodules() or module_paths', since='20150715',
+                future_warning=True)
     def modules(self) -> Union[Set[str], FrozenSet[str]]:
         """
         Set of all main and query modules without path prefixes.
@@ -848,7 +849,7 @@ class OptionSet(MutableMapping):
             silently removed from the options (disabled by default).
         """
         if self._site_set:
-            raise TypeError('The site can not be set multiple times.')
+            raise TypeError('The site cannot be set multiple times.')
         # If the entries written to this are valid, it will never be
         # overwritten
         self._valid_enable = set()
@@ -1169,7 +1170,7 @@ class Request(MutableMapping):
         #
         # When we can't easily check whether the extension is loaded,
         # to avoid cyclic recursion in the Pywikibot codebase, assume
-        # that it is present, which will cause a API warning emitted
+        # that it is present, which will cause an API warning emitted
         # to the logging (console) if it is not present, but will not
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions
@@ -1333,15 +1334,6 @@ class Request(MutableMapping):
     def items(self):
         """Return a list of tuples containing the parameters in any order."""
         return list(self._params.items())
-
-    @deprecated(since='20141006', future_warning=True)
-    def http_params(self):  # pragma: no cover
-        """Return the parameters formatted for inclusion in an HTTP request.
-
-        DEPRECATED. See _encoded_items for explanation of encoding used.
-        """
-        self._add_defaults()
-        return self._http_param_string()
 
     def _add_defaults(self):
         """

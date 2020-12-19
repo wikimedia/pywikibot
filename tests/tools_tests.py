@@ -494,7 +494,7 @@ class TestFilterUnique(TestCase):
         self._test_dedup_int(deduped, deduper)
 
     def test_OrderedDict(self):
-        """Test filter_unique with a OrderedDict."""
+        """Test filter_unique with an OrderedDict."""
         deduped = OrderedDict()
         deduper = tools.filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)

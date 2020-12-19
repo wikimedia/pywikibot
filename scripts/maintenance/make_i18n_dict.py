@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Generate a i18n file from a given script.
+Generate an i18n file from a given script.
 
 run IDLE at topmost level:
 >>> import pwb

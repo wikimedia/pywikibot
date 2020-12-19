@@ -46,37 +46,7 @@ class HttpTestCase(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn('<html lang="mul"', r.text)
         self.assertIsInstance(r.text, str)
-        self.assertIsInstance(r.raw, bytes)
-
-
-class HttpRequestURI(DeprecationTestCase):
-
-    """Tests using http.request without a site."""
-
-    sites = {
-        'www-wp': {
-            'hostname': 'www.wikipedia.org',
-        },
-        'www-wq': {
-            'hostname': 'www.wikiquote.org',
-        },
-    }
-
-    def test_http(self):
-        """Test http.request using http://www.wikipedia.org/."""
-        r = http.request(site=None, uri='http://www.wikipedia.org/')
-        self.assertIsInstance(r, str)
-        self.assertIn('<html lang="mul"', r)
-        self.assertOneDeprecationParts(
-            'Invoking http.request without argument site', 'http.fetch()')
-
-    def test_https(self):
-        """Test http.request using https://www.wikiquote.org/."""
-        r = http.request(site=None, uri='https://www.wikiquote.org/')
-        self.assertIsInstance(r, str)
-        self.assertIn('<html lang="mul"', r)
-        self.assertOneDeprecationParts(
-            'Invoking http.request without argument site', 'http.fetch()')
+        self.assertIsInstance(r.content, bytes)
 
 
 class TestGetAuthenticationConfig(TestCase):
@@ -403,11 +373,11 @@ class CharsetTestCase(TestCase):
     @staticmethod
     def _create_request(charset=None, data=UTF8_BYTES):
         """Helper method."""
-        req = threadedhttp.HttpRequest('', charset=charset)
+        req = threadedhttp.HttpRequest(charset=charset)
         resp = requests.Response()
         resp.headers = {'content-type': 'charset=utf-8'}
         resp._content = data[:]
-        req._data = resp
+        req.data = resp
         return req
 
     def test_no_content_type(self):
@@ -419,7 +389,7 @@ class CharsetTestCase(TestCase):
         req._data = resp
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_no_charset(self):
@@ -431,7 +401,7 @@ class CharsetTestCase(TestCase):
         req._data = resp
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_content_type_application_json_without_charset(self):
@@ -503,7 +473,7 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request()
         self.assertIsNone(req.charset)
         self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_same_charset(self):
@@ -511,7 +481,7 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf-8')
         self.assertEqual('utf-8', req.charset)
         self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_header_charset(self):
@@ -521,7 +491,7 @@ class CharsetTestCase(TestCase):
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_code_charset(self):
@@ -532,7 +502,7 @@ class CharsetTestCase(TestCase):
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_invalid_charset(self):
@@ -545,7 +515,7 @@ class CharsetTestCase(TestCase):
             self.assertRaisesRegex(
                 UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
                 lambda: req.encoding)
-        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
         self.assertRaisesRegex(
             UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.text)
 
@@ -579,7 +549,7 @@ class BinaryTestCase(TestCase):
         """Test with http, standard http interface for pywikibot."""
         r = http.fetch(uri=self.url)
 
-        self.assertEqual(r.raw, self.png)
+        self.assertEqual(r.content, self.png)
 
 
 class TestDeprecatedGlobalCookieJar(DeprecationTestCase):

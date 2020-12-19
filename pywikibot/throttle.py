@@ -11,7 +11,7 @@ import time
 
 from collections import namedtuple
 from contextlib import suppress
-from typing import Optional
+from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
@@ -42,8 +42,11 @@ class Throttle:
 
     """
 
-    def __init__(self, site, mindelay=None, maxdelay=None, writedelay=None,
-                 multiplydelay=True):
+    def __init__(self, site,
+                 mindelay: Optional[int] = None,
+                 maxdelay: Optional[int] = None,
+                 writedelay: Union[int, float, None] = None,
+                 multiplydelay: bool = True):
         """Initializer."""
         self.lock = threading.RLock()
         self.lock_write = threading.RLock()

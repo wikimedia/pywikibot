@@ -673,7 +673,8 @@ class MetaTestCaseClass(type):
                 self.site = sitedata['site']
                 func(self, key)
 
-            sitename = sitedata['family'] + ':' + sitedata['code']
+            # sitedata['family'] may be an AutoFamily. Use str() for its name
+            sitename = str(sitedata['family']) + ':' + sitedata['code']
             if func.__doc__:
                 if func.__doc__.endswith('.'):
                     wrapped_method.__doc__ = func.__doc__[:-1]

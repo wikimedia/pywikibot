@@ -19,6 +19,7 @@ This module is responsible for
 import atexit
 import sys
 
+from contextlib import suppress
 from http import cookiejar
 from string import Formatter
 from typing import Optional, Union
@@ -38,7 +39,6 @@ from pywikibot.tools import (
     deprecated,
     deprecate_arg,
     file_mode_checker,
-    issue_deprecation_warning,
     PYTHON_VERSION,
 )
 
@@ -217,8 +217,7 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-@deprecate_arg('ssl', None)
-def request(site=None, uri: Optional[str] = None, method='GET', params=None,
+def request(site, uri: Optional[str] = None, method='GET', params=None,
             body=None, headers=None, data=None, **kwargs) -> str:
     """
     Request to Site with default error handling and response decoding.
@@ -243,15 +242,6 @@ def request(site=None, uri: Optional[str] = None, method='GET', params=None,
     # requests.Session.request.
     if data:
         body = data
-
-    assert(site or uri)
-    if not site:
-        # +1 because of @deprecate_arg
-        issue_deprecation_warning(
-            'Invoking http.request without argument site', 'http.fetch()', 3,
-            warning_class=FutureWarning, since='20150814')
-        r = fetch(uri, method, params, body, headers, **kwargs)
-        return r.text
 
     kwargs.setdefault('disable_ssl_certificate_validation',
                       site.ignore_certificate_error())
@@ -293,49 +283,7 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
     return None
 
 
-@deprecated(since='20201015', future_warning=True)
-def _http_process(session, http_request) -> None:  # pragma: no cover
-    """DEPRECATED.
-
-    Process an `threadedhttp.HttpRequest` instance.
-
-    @param session: Session that will be used to process the `http_request`.
-    @type session: L{requests.Session}
-    @param http_request: Request that will be processed.
-    @type http_request: L{threadedhttp.HttpRequest}
-    """
-    method = http_request.method
-    uri = http_request.uri
-    params = http_request.params
-    body = http_request.body
-    headers = http_request.all_headers
-    auth = get_authentication(uri)
-    if auth is not None and len(auth) == 4:
-        if isinstance(requests_oauthlib, ImportError):
-            warn('%s' % requests_oauthlib, ImportWarning)
-            error('OAuth authentication not supported: %s'
-                  % requests_oauthlib)
-            auth = None
-        else:
-            auth = requests_oauthlib.OAuth1(*auth)
-    timeout = config.socket_timeout
-    try:
-        ignore_validation = http_request.kwargs.pop(
-            'disable_ssl_certificate_validation', False)
-        # Note that the connections are pooled which mean that a future
-        # HTTPS request can succeed even if the certificate is invalid and
-        # verify=True, when a request with verify=False happened before
-        response = session.request(method, uri, params=params, data=body,
-                                   headers=headers, auth=auth, timeout=timeout,
-                                   verify=not ignore_validation,
-                                   **http_request.kwargs)
-    except Exception as e:
-        http_request.data = e
-    else:
-        http_request.data = response
-
-
-def error_handling_callback(request):
+def error_handling_callback(response):
     """
     Raise exceptions and log alerts.
 
@@ -343,82 +291,30 @@ def error_handling_callback(request):
     @type request: L{threadedhttp.HttpRequest}
     """
     # TODO: do some error correcting stuff
-    if isinstance(request.data, requests.exceptions.SSLError):
-        if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
-            raise FatalServerError(str(request.data))
+    if isinstance(response, requests.exceptions.SSLError):
+        if SSL_CERT_VERIFY_FAILED_MSG in str(response):
+            raise FatalServerError(str(response))
 
-    if request.status_code == 504:
+    if isinstance(response, Exception):
+        with suppress(Exception):
+            # request.data exception may contain response and request attribute
+            error('An error occurred for uri ' + response.request.url)
+        raise response from None
+
+    if response.status_code == 504:
         raise Server504Error('Server {} timed out'
-                             .format(urlparse(request.url).netloc))
+                             .format(urlparse(response.url).netloc))
 
-    if request.status_code == 414:
+    if response.status_code == 414:
         raise Server414Error('Too long GET request')
 
-    if isinstance(request.data, Exception):
-        error('An error occurred for uri ' + request.url)
-        raise request.data from None
+    # TODO: shall it raise? this might break some code, TBC
+    # response.raise_for_status()
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
-    if request.status_code not in (200, 207):
-        warning('Http response status {}'.format(request.status_code))
-
-
-@deprecated(since='20201015', future_warning=True)
-def _enqueue(uri, method='GET', params=None, body=None, headers=None,
-             data=None, **kwargs):  # pragma: no cover
-    """DEPRECATED.
-
-    Enqueue non-blocking threaded HTTP request with callback.
-
-    Callbacks, including the default error handler if enabled, are run in the
-    HTTP thread, where exceptions are logged but are not able to be caught.
-    The default error handler is called first, then 'callback' (singular),
-    followed by each callback in 'callbacks' (plural). All callbacks are
-    invoked, even if the default error handler detects a problem, so they
-    must check request.exception before using the response data.
-
-    Note: multiple async requests do not automatically run concurrently,
-    as they are limited by the number of http threads in L{numthreads},
-    which is set to 1 by default.
-
-    @see: L{requests.Session.request} for parameters.
-
-    @kwarg default_error_handling: Use default error handling
-    @type default_error_handling: bool
-    @kwarg callback: Method to call once data is fetched
-    @type callback: callable
-    @kwarg callbacks: Methods to call once data is fetched
-    @type callbacks: list of callable
-    @rtype: L{threadedhttp.HttpRequest}
-    """
-    # body and data parameters both map to the data parameter of
-    # requests.Session.request.
-    if data:
-        body = data
-
-    default_error_handling = kwargs.pop('default_error_handling', None)
-    callback = kwargs.pop('callback', None)
-
-    callbacks = []
-    if default_error_handling:
-        callbacks.append(error_handling_callback)
-    if callback:
-        callbacks.append(callback)
-
-    callbacks += kwargs.pop('callbacks', [])
-
-    all_headers = config.extra_headers.copy()
-    all_headers.update(headers or {})
-
-    user_agent_format_string = all_headers.get('user-agent')
-    if not user_agent_format_string or '{' in user_agent_format_string:
-        all_headers['user-agent'] = user_agent(None, user_agent_format_string)
-
-    request = threadedhttp.HttpRequest(
-        uri, method, params, body, all_headers, callbacks, **kwargs)
-    _http_process(session, request)
-    return request
+    if response.status_code not in (200, 207):
+        warning('Http response status {}'.format(response.status_code))
 
 
 @deprecate_arg('callback', True)
@@ -491,8 +387,7 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         callbacks.append(error_handling_callback)
 
     charset = kwargs.pop('charset', None)
-    request = threadedhttp.HttpRequest(
-        uri, method, params, body, headers, callbacks, charset, **kwargs)
+    request = threadedhttp.HttpRequest(charset=charset)
 
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
@@ -517,9 +412,12 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
                                    **kwargs)
     except Exception as e:
         request.data = e
+        response = e
     else:
         request.data = response
-    #  error_handling_callback is called in HttpRequest data.setter
+
+    for callback in callbacks:
+        callback(response)
 
     # if there's no data in the answer we're in trouble
     try:

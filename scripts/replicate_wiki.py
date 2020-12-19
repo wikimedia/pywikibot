@@ -11,7 +11,7 @@ or:
 
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
-to copy all templates from an nlwiki to liwiki and fywiki. It will show which
+to copy all templates from nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write
 pages if -r /is/ present.
 
@@ -51,13 +51,6 @@ from collections import defaultdict
 import pywikibot
 
 from pywikibot import config, Page
-from pywikibot.tools import deprecated
-
-
-@deprecated('BaseSite.namespaces', since='20150515', future_warning=True)
-def namespaces(site):
-    """Return a dictionary from namespace number to prefix."""
-    return {n.id: n.custom_name for n in site.namespaces}
 
 
 def multiple_replace(text, word_dict):

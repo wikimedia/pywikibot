@@ -5,7 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import datetime
 import json
 import os
@@ -141,7 +140,7 @@ def getversiondict():
 
 
 def svn_rev_info(path):
-    """Fetch information about the current revision of an Subversion checkout.
+    """Fetch information about the current revision of a Subversion checkout.
 
     @param path: directory of the Subversion checkout
     @return:
@@ -204,7 +203,7 @@ def github_svn_rev2hash(tag: str, rev):
                          '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
                     headers={'label': str(rev),
                              'user-agent': 'SVN/1.7.5 {pwb}'})
-    dom = xml.dom.minidom.parse(BytesIO(request.raw))
+    dom = xml.dom.minidom.parse(BytesIO(request.content))
     hsh = dom.getElementsByTagName('C:git-commit')[0].firstChild.nodeValue
     date = dom.getElementsByTagName('S:date')[0].firstChild.nodeValue
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
@@ -382,38 +381,6 @@ def getversion_onlinerepo(path='branches/master'):
         return hsh
     except Exception as e:
         raise ParseError(repr(e) + ' while parsing ' + repr(buf))
-
-
-@deprecated('get_module_version, get_module_filename and get_module_mtime',
-            since='20150221', future_warning=True)
-def getfileversion(filename: str):  # pragma: no cover
-    """Retrieve revision number of file.
-
-    Extracts __version__ variable containing Id tag, without importing it.
-    (thus can be done for any file)
-
-    The version variable containing the Id tag is read and
-    returned. Because it doesn't import it, the version can
-    be retrieved from any file.
-    @param filename: Name of the file to get version
-    """
-    _program_dir = _get_program_dir()
-    __version__ = None
-    mtime = None
-    fn = os.path.join(_program_dir, filename)
-    if os.path.exists(fn):
-        with codecs.open(fn, 'r', 'utf-8') as f:
-            for line in f.readlines():
-                if line.find('__version__') == 0:
-                    with suppress(Exception):
-                        exec(line)
-                    break
-        stat = os.stat(fn)
-        mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
-    if mtime and __version__:
-        return '%s %s %s' % (filename, __version__[5:-1][:7], mtime)
-    else:
-        return None
 
 
 @deprecated('pywikibot.__version__', since='20201003')

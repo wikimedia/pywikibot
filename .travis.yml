@@ -8,6 +8,7 @@ python:
   - '3.7'
   - '3.8'
   - '3.9'
+  - '3.10-dev'
 
 # OSX builds do not yet support Python
 os: linux
@@ -163,15 +164,11 @@ matrix:
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.8'
       env: LANGUAGE=en FAMILY=btrfswiki
-    - python: '3.10-dev'
-      env: LANGUAGE=test2 FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
   allow_failures:
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.8'
       env: LANGUAGE=en FAMILY=btrfswiki
-    - python: '3.10-dev'
-      env: LANGUAGE=test2 FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
 
 notifications:
   email:

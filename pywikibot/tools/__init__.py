@@ -839,7 +839,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
     already present in the local set.
 
     For large collections, this is not memory efficient, as a strong reference
-    to every item is kept in a local set which can not be cleared.
+    to every item is kept in a local set which cannot be cleared.
 
     Also, the local set can't be re-used when chaining unique operations on
     multiple generators.
@@ -905,7 +905,7 @@ class EmptyDefault(str, Mapping):
     empty collections, so it can be iterated through it safely if treated as a
     list, tuple, set or dictionary. It is also basically an empty string.
 
-    Accessing a value via __getitem__ will result in an combined KeyError and
+    Accessing a value via __getitem__ will result in a combined KeyError and
     IndexError.
     """
 

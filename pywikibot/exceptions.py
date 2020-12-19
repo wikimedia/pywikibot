@@ -86,9 +86,11 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
+import re
+
 from typing import Optional, Union
 
-from pywikibot.tools import deprecated, _NotImplementedWarning
+from pywikibot.tools import _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -155,16 +157,11 @@ class PageRelatedError(Error):
         self.title = page.title(as_link=True)
         self.site = page.site
 
-        if '%(' in self.message and ')s' in self.message:
-            super().__init__(self.message % self.__dict__)
+        if re.search(r'%\(\w+\)s', self.message):
+            values = self.__dict__
         else:
-            super().__init__(self.message % page)
-
-    @deprecated('PageRelatedError.page attribute', since='20201016',
-                future_warning=True)
-    def getPage(self):
-        """DEPRECATED. Return the page related to the exception."""
-        return self.page
+            values = page
+        super().__init__(self.message % values)
 
 
 class PageSaveRelatedError(PageRelatedError):

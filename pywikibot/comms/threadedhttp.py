@@ -12,7 +12,12 @@ from typing import Optional
 from urllib.parse import urlparse
 
 import pywikibot
-from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
+from pywikibot.tools import (
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+    PYTHON_VERSION,
+)
 
 if PYTHON_VERSION >= (3, 9):
     Dict = dict
@@ -31,31 +36,87 @@ class HttpRequest:
     * an exception
     """
 
-    @deprecated_args(headers='all_headers', uri='url')
-    def __init__(self, url, method='GET', params=None, body=None,
+    @deprecated_args(uri=True, method=True, params=True, body=True,
+                     headers=True, all_headers=True)
+    def __init__(self, url=None, method=None, params=None, body=None,
                  all_headers=None, callbacks=None, charset=None, **kwargs):
         """Initializer."""
-        self.url = url
-        self.method = method
-        self.params = params
-        self.body = body
-        self.all_headers = all_headers
         if isinstance(charset, codecs.CodecInfo):
             self.charset = charset.name
-        elif charset:
-            self.charset = charset
-        elif all_headers and 'accept-charset' in all_headers:
-            self.charset = all_headers['accept-charset']
         else:
-            self.charset = None
+            self.charset = charset
 
-        self.callbacks = callbacks
-
-        self.args = [url, method, body, all_headers]
-        self.kwargs = kwargs
-
+        self._kwargs = kwargs
         self._parsed_uri = None
         self._data = None
+
+        # deprecate positional parameters
+        if url:
+            issue_deprecation_warning("'url' parameter", depth=3,
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if method:
+            issue_deprecation_warning("'method' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if params:
+            issue_deprecation_warning("'params' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if body:
+            issue_deprecation_warning("'body' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if all_headers:
+            issue_deprecation_warning("'all_headers' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if callbacks:
+            issue_deprecation_warning("'callbacks' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201211')
+        if kwargs:
+            for item in kwargs.items():
+                issue_deprecation_warning('{}={!r} parameter'.format(*item),
+                                          warning_class=FutureWarning,
+                                          since='20201211')
+
+    def __getattr__(self, name):
+        """Delegate undefined method calls to request.Response object."""
+        if self.exception and name in ('content', 'status_code'):
+            return None
+        return getattr(self.data, name)
+
+    @property
+    @deprecated(since='20201211', future_warning=True)
+    def args(self):  # pragma: no cover
+        """DEPRECATED: Return predefined argument list."""
+        return [
+            self.url,
+            self.request.method,
+            self.request.body,
+            self.all_headers,
+        ]
+
+    @property
+    @deprecated('the `request.body` attribute',
+                since='20201211', future_warning=True)
+    def body(self):  # pragma: no cover
+        """DEPRECATED: Return request body attribute."""
+        return self.request.body
+
+    @property
+    @deprecated(since='20201211', future_warning=True)
+    def kwargs(self):  # pragma: no cover
+        """DEPRECATED: Return request body attribute."""
+        return self._kwargs
+
+    @property
+    @deprecated('the `request.method` attribute',
+                since='20201211', future_warning=True)
+    def method(self):  # pragma: no cover
+        """DEPRECATED: Return request body attribute."""
+        return self.request.method
 
     @property
     @deprecated('the `url` attribute', since='20201011', future_warning=True)
@@ -63,25 +124,19 @@ class HttpRequest:
         """DEPRECATED. Return the response URL."""
         return self.url
 
-    @uri.setter
-    @deprecated('the `url` attribute', since='20201011', future_warning=True)
-    def uri(self, value):  # pragma: no cover
-        """DEPRECATED. Set the response URL."""
-        self.url = value
-
     @property
-    @deprecated('the `all_headers` property', since='20201011',
+    @deprecated('the `request.headers` property', since='20201011',
                 future_warning=True)
     def headers(self):  # pragma: no cover
         """DEPRECATED. Return the response headers."""
-        return self.all_headers
+        return self.request.headers
 
-    @headers.setter
-    @deprecated('the `all_headers` property', since='20201011',
+    @property
+    @deprecated('the `request.headers` property', since='20201211',
                 future_warning=True)
-    def headers(self, value):  # pragma: no cover
-        """DEPRECATED. Set the response headers."""
-        self.all_headers = value
+    def all_headers(self):  # pragma: no cover
+        """DEPRECATED. Return the response headers."""
+        return self.request.headers
 
     @property
     def data(self):
@@ -100,10 +155,6 @@ class HttpRequest:
         """
         self._data = value
 
-        if self.callbacks:
-            for callback in self.callbacks:
-                callback(self)
-
     @property
     def exception(self) -> Optional[Exception]:
         """DEPRECATED. Get the exception, if any.
@@ -121,9 +172,14 @@ class HttpRequest:
         return self.data.headers if not self.exception else None
 
     @property
-    def raw(self) -> Optional[bytes]:
-        """Return the raw response body."""
-        return self.data.content if not self.exception else None
+    @deprecated('the `content` property', since='20201210',
+                future_warning=True)
+    def raw(self) -> Optional[bytes]:  # pragma: no cover
+        """DEPRECATED. Return the raw response body.
+
+        @note: The behaviour will be changed.
+        """
+        return self.content
 
     @property
     @deprecated('urlparse(HttpRequest.url)',
@@ -149,11 +205,6 @@ class HttpRequest:
         return self.status_code
 
     @property
-    def status_code(self) -> Optional[int]:
-        """Return the HTTP response status."""
-        return self.data.status_code if not self.exception else None
-
-    @property
     def header_encoding(self):
         """Return charset given by the response header."""
         if hasattr(self, '_header_encoding'):
@@ -167,7 +218,7 @@ class HttpRequest:
             # application/json | application/sparql-results+json
             self._header_encoding = 'utf-8'
         elif 'xml' in content_type:
-            header = self.raw[:100].splitlines()[0]  # bytes
+            header = self.content[:100].splitlines()[0]  # bytes
             m = re.search(
                 br'encoding=(["\'])(?P<encoding>.+?)\1', header)
             if m:
@@ -184,6 +235,9 @@ class HttpRequest:
         """Detect the response encoding."""
         if hasattr(self, '_encoding'):
             return self._encoding
+
+        if self.charset is None and self.request is not None:
+            self.charset = self.request.headers.get('accept-charset')
 
         if self.charset is None and self.header_encoding is None:
             pywikibot.log("Http response doesn't contain a charset.")
@@ -217,7 +271,7 @@ class HttpRequest:
     def _try_decode(self, encoding):
         """Helper function to try decoding."""
         try:
-            self.raw.decode(encoding)
+            self.content.decode(encoding)
         except UnicodeError as e:
             result = e
         else:
@@ -227,23 +281,13 @@ class HttpRequest:
     @deprecated('the `text` property', since='20201011', future_warning=True)
     def decode(self, encoding, errors='strict') -> str:  # pragma: no cover
         """Return the decoded response."""
-        return self.raw.decode(encoding,
-                               errors) if not self.exception else None
-
-    @property
-    @deprecated('the `text` property', since='20180321', future_warning=True)
-    def content(self) -> str:  # pragma: no cover
-        """DEPRECATED. Return the response decoded by the detected encoding.
-
-        @note: The behaviour will be changed.
-            This method will return the content of the response in bytes.
-        """
-        return self.text
+        return self.content.decode(
+            encoding, errors) if not self.exception else None
 
     @property
     def text(self) -> str:
         """Return the response decoded by the detected encoding."""
-        return self.raw.decode(self.encoding)
+        return self.content.decode(self.encoding)
 
     @deprecated('the `text` property', since='20201011', future_warning=True)
     def __str__(self) -> str:  # pragma: no cover
@@ -253,4 +297,4 @@ class HttpRequest:
     @deprecated(since='20201011', future_warning=True)
     def __bytes__(self) -> Optional[bytes]:  # pragma: no cover
         """Return the undecoded response."""
-        return self.raw
+        return self.content

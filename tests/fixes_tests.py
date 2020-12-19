@@ -21,13 +21,13 @@ class TestFixes(TestCase):
 
     def setUp(self):
         """Backup the current fixes."""
-        super(TestFixes, self).setUp()
+        super().setUp()
         self._old_fixes = fixes.fixes
 
     def tearDown(self):
         """Recover the current fixes."""
         fixes.fixes = self._old_fixes
-        super(TestFixes, self).tearDown()
+        super().tearDown()
 
     def test_overwrite_value(self):
         """Test loading a fix file overwriting the fixes."""

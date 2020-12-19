@@ -49,7 +49,7 @@ class _InterwikiMap:
     @property
     def _iw_sites(self):
         """Fill the interwikimap cache with the basic entries."""
-        # _iw_sites is a local cache to return a APISite instance depending
+        # _iw_sites is a local cache to return an APISite instance depending
         # on the interwiki prefix of that site
         if self._map is None:
             self._map = {iw['prefix']: _IWEntry('local' in iw, iw['url'])

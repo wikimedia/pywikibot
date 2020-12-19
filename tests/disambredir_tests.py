@@ -20,10 +20,10 @@ from tests.bot_tests import FakeSaveBotTestCase, TWNBotTestCase
 from tests.utils import fixed_generator
 
 
-class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
+class TestDisambiguationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
 
     """
-    Test cases for DisambigurationRedirectBot.
+    Test cases for DisambiguationRedirectBot.
 
     It patches the bot instances in such a way that there is no user
     interaction required and it can be run autonomously. It also does not
@@ -37,7 +37,7 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
         """
         Patch _create_callback in the Bot instance.
 
-        It still creates a InteractiveReplace instance but returns another
+        It still creates an InteractiveReplace instance but returns another
         function which only calls 'handle_answer' from that InteractiveReplace
         instance if the link matches.
         """
@@ -62,7 +62,7 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize page variable."""
-        super(TestDisambigurationRedirectBot, cls).setUpClass()
+        super().setUpClass()
         # Patch the page to be independent of the actual site
         cls.page = pywikibot.Page(cls.site, 'User:BobBot/Test disambig')
         cls.page.linkedPages = fixed_generator(
@@ -73,12 +73,12 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
     def bot_save(self, page, *args, **kwargs):
         """Check if the page matches."""
         self.assertIs(page, self.page)
-        return super(TestDisambigurationRedirectBot, self).bot_save(
+        return super().bot_save(
             page, *args, **kwargs)
 
     def setUp(self):
         """Set up the test page."""
-        super(TestDisambigurationRedirectBot, self).setUp()
+        super().setUp()
         self.page.text = ('[[User:BobBot/Redir#Foo|Bar]]\n'
                           '[[User:BobBot/Redir|Baz]]\n'
                           '[[User:BobBot/Redir2]]\n'

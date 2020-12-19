@@ -635,7 +635,7 @@ class BasePage(ComparableMixin):
         try:
             self.botMayEdit()  # T262136, T267770
         except Exception as e:
-            # dry tests aren't able to make an API call but are
+            # dry tests aren't able to make an API call
             # but are rejected by an Exception; ignore it then.
             if not str(e).startswith('DryRequest rejecting request:'):
                 raise
@@ -889,7 +889,7 @@ class BasePage(ComparableMixin):
         return self.namespace() == 14
 
     def is_filepage(self):
-        """Return True if this is an file description page, False otherwise."""
+        """Return True if this is a file description page, False otherwise."""
         return self.namespace() == 6
 
     @remove_last_args(['get_Index'])
@@ -2359,7 +2359,8 @@ class FilePage(Page):
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
         if self.namespace() != 6:
-            raise ValueError("'%s' is not in the file namespace!" % title)
+            raise ValueError("'{}' is not in the file namespace!"
+                             .format(self.title()))
 
     def _load_file_revisions(self, imageinfo):
         for file_rev in imageinfo:
@@ -2634,8 +2635,8 @@ class Category(Page):
         self.sortKey = sort_key
         super().__init__(source, title, ns=14)
         if self.namespace() != 14:
-            raise ValueError("'%s' is not in the category namespace!"
-                             % title)
+            raise ValueError("'{}' is not in the category namespace!"
+                             .format(self.title()))
 
     @deprecated_args(sortKey='sort_key')
     def aslink(self, sort_key: Optional[str] = None) -> str:
@@ -2951,8 +2952,8 @@ class User(Page):
             self._isAutoblock = False
         super().__init__(source, title, ns=2)
         if self.namespace() != 2:
-            raise ValueError("'%s' is not in the user namespace!"
-                             % title)
+            raise ValueError("'{}' is not in the user namespace!"
+                             .format(self.title()))
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
@@ -4742,20 +4743,6 @@ class Property:
         if not hasattr(self, '_type'):
             self._type = self.repo.getPropertyType(self)
         return self._type
-
-    @deprecated('Property.type', since='20140607', future_warning=True)
-    def getType(self):  # pragma: no cover
-        """
-        Return the type of this property.
-
-        It returns 'globecoordinate' for type 'globe-coordinate'
-        in order to be backwards compatible. See
-        https://gerrit.wikimedia.org/r/#/c/135405/ for background.
-        """
-        if self.type == 'globe-coordinate':
-            return 'globecoordinate'
-        else:
-            return self._type
 
     def getID(self, numeric=False):
         """
