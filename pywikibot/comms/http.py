@@ -218,8 +218,8 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-def request(site, uri: Optional[str] = None, method='GET', params=None,
-            body=None, headers=None, data=None, **kwargs) -> str:
+@deprecated_args(body='data')
+def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
     """
     Request to Site with default error handling and response decoding.
 
@@ -239,11 +239,6 @@ def request(site, uri: Optional[str] = None, method='GET', params=None,
     @type charset: CodecInfo, str, None
     @return: The received data
     """
-    # body and data parameters both map to the data parameter of
-    # requests.Session.request.
-    if data:
-        body = data
-
     kwargs.setdefault('verify', site.verify_SSL_certificate())
     old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
     if old_validation is not None:
@@ -261,7 +256,7 @@ def request(site, uri: Optional[str] = None, method='GET', params=None,
     headers['user-agent'] = user_agent(site, format_string)
 
     baseuri = site.base_url(uri)
-    r = fetch(baseuri, method, params, body, headers, **kwargs)
+    r = fetch(baseuri, headers=headers, **kwargs)
     site.throttle.retry_after = int(r.response_headers.get('retry-after', 0))
     return r.text
 
@@ -321,11 +316,9 @@ def error_handling_callback(request):
         warning('Http response status {}'.format(request.status_code))
 
 
-@deprecated_args(callback=True)
-def fetch(uri, method='GET', params=None, body=None, headers=None,
-          default_error_handling: bool = True,
-          use_fake_user_agent: Union[bool, str] = False,
-          data=None, **kwargs):
+@deprecated_args(callback=True, body='data')
+def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
+          use_fake_user_agent: Union[bool, str] = False, **kwargs):
     """
     HTTP request.
 
@@ -346,11 +339,6 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
-    # body and data parameters both map to the data parameter of
-    # requests.Session.request.
-    if data:
-        body = data
-
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
@@ -416,7 +404,7 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         # Note that the connections are pooled which mean that a future
         # HTTPS request can succeed even if the certificate is invalid and
         # verify=True, when a request with verify=False happened before
-        response = session.request(method, uri, params=params, data=body,
+        response = session.request(method, uri,
                                    headers=headers, auth=auth, timeout=timeout,
                                    **kwargs)
     except Exception as e:
