@@ -837,6 +837,18 @@ class Family:
         """
         return 'http'
 
+    def verify_SSL_certificate(self, code: str) -> bool:
+        """
+        Return whether a HTTPS certificate should be verified.
+
+        @param code: language code
+        @return: flag to verify the SSL certificate;
+                 set it to False to allow access if certificate has an error.
+        """
+        return True
+
+    @deprecated('verify_SSL_certificate', since='20201013',
+                future_warning=True)
     def ignore_certificate_error(self, code: str) -> bool:
         """
         Return whether a HTTPS certificate error should be ignored.
@@ -844,7 +856,7 @@ class Family:
         @param code: language code
         @return: flag to allow access if certificate has an error.
         """
-        return False
+        return not self.verify_SSL_certificate
 
     def hostname(self, code):
         """The hostname to use for standard http connections."""
