@@ -289,8 +289,8 @@ def error_handling_callback(response):
     """
     Raise exceptions and log alerts.
 
-    @param request: Request that has completed
-    @type request: L{threadedhttp.HttpRequest}
+    @param response: Response returned by Session.request().
+    @type response: L{requests.Response}
     """
     # TODO: do some error correcting stuff
     if isinstance(response, requests.exceptions.SSLError):
