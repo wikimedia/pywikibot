@@ -191,12 +191,6 @@ def decSinglVal(v):
     return v[0]
 
 
-@deprecated(since='20151014', future_warning=True)
-def encNoConv(i):
-    """Return i."""
-    return i
-
-
 def encDec0(i):
     """Round to the nearest decade, decade starts with a '0'-ending year."""
     return (i // 10) * 10
@@ -1922,17 +1916,6 @@ for monthId in range(12):
     else:
         # 30 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(30)
-
-
-@deprecated('calendar.monthrange', since='20150707', future_warning=True)
-def getNumberOfDaysInMonth(month):
-    """
-    Return the maximum number of days in a given month, 1 being January, etc.
-
-    For February always 29 will be given, even it is not a leap year.
-    """
-    # use year 2000 which is a leap year
-    return calendar.monthrange(2000, month)[1]
 
 
 def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
