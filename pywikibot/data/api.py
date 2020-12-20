@@ -1606,9 +1606,9 @@ class Request(MutableMapping):
         """
         try:
             data = http.request(
-                site=self.site, uri=uri,
+                self.site, uri=uri,
                 method='GET' if use_get else 'POST',
-                body=body, headers=headers)
+                data=body, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
         except Server414Error:

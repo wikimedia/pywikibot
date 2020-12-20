@@ -2982,7 +2982,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)
         self.assertEqual(site.hostname(), 'mh.wikipedia.org')
-        r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
+        r = http.fetch('http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(site.siteinfo['lang'], 'mh')

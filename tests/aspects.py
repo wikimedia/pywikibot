@@ -484,7 +484,7 @@ class CheckHostnameMixin(TestCaseBase):
             try:
                 if '://' not in hostname:
                     hostname = 'http://' + hostname
-                r = http.fetch(uri=hostname,
+                r = http.fetch(hostname,
                                method='HEAD',
                                default_error_handling=False)
                 if r.exception:
