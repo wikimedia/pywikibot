@@ -2853,14 +2853,12 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated_args(nobots=True, includeredirects='redirect',
-                     namespace='namespaces', number='total', pagelist=True,
-                     rcdir=True, rcend='end', rclimit='total',
-                     rcnamespace='namespaces', rcshow=True, rcstart='start',
-                     rctype='changetype', repeat=True, returndict=True,
-                     revision=True, showAnon='anon', showBot='bot',
+    @deprecated_args(includeredirects='redirect', namespace='namespaces',
+                     number='total', rcend='end', rclimit='total',
+                     rcnamespace='namespaces', rcstart='start',
+                     rctype='changetype', showAnon='anon', showBot='bot',
                      showMinor='minor', showPatrolled='patrolled',
-                     showRedirects='redirect', step=True, topOnly='top_only')
+                     showRedirects='redirect', topOnly='top_only')
     def recentchanges(self, *,
                       start=None,
                       end=None,
