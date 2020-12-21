@@ -44,14 +44,11 @@ The following command line parameters are supported:
 from typing import Optional
 
 import pywikibot
-from pywikibot import pagegenerators, WikidataBot
-from pywikibot.exceptions import CoordinateGlobeUnknownException
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
+from pywikibot import pagegenerators, WikidataBot
+from pywikibot.backports import Tuple
+from pywikibot.exceptions import CoordinateGlobeUnknownException
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

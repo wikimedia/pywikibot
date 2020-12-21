@@ -66,15 +66,11 @@ from typing import Optional, Union
 
 import pywikibot
 
+from pywikibot.backports import Tuple
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

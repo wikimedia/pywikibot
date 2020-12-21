@@ -36,15 +36,11 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+
+from pywikibot.backports import Tuple
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
 from pywikibot import pagegenerators
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 
 class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):

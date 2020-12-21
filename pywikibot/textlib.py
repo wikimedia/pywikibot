@@ -21,20 +21,15 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
+
+from pywikibot.backports import List, Tuple
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     issue_deprecation_warning,
-    PYTHON_VERSION,
 )
-
-if PYTHON_VERSION >= (3, 9):
-    List = list
-    Tuple = tuple
-else:
-    from typing import List, Tuple
 
 try:
     import mwparserfromhell

@@ -35,12 +35,8 @@ import re
 import pywikibot
 
 from pywikibot import textlib, pagegenerators, i18n, Bot
-from pywikibot.tools import PYTHON_VERSION
+from pywikibot.backports import Tuple
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

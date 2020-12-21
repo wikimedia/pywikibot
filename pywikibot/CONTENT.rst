@@ -11,6 +11,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _wbtypes.py                | Wikibase data type classes                           |
     +----------------------------+------------------------------------------------------+
+    | backports.py               | Backports to support older Python versions           |
+    +----------------------------+------------------------------------------------------+
     | bot.py                     | User-interface related functions for building bots   |
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |

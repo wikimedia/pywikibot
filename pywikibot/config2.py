@@ -54,15 +54,10 @@ from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
+from pywikibot.backports import Dict, List, Tuple
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import issue_deprecation_warning, PYTHON_VERSION
+from pywikibot.tools import issue_deprecation_warning
 
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Tuple = tuple
-else:
-    from typing import Dict, List, Tuple
 
 OSWIN32 = (sys.platform == 'win32')
 

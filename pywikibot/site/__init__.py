@@ -34,6 +34,7 @@ from warnings import warn
 import pywikibot
 import pywikibot.family
 
+from pywikibot.backports import List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.echo import Notification
@@ -80,14 +81,9 @@ from pywikibot.tools import (
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
-    PYTHON_VERSION,
     remove_last_args,
 )
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 __all__ = ('APISite', 'DataSite', 'Namespace', 'NamespacesDict', 'PageInUse',
            'RemovedSite', 'Siteinfo', 'TokenWallet')

@@ -32,13 +32,9 @@ from typing import Union
 import pywikibot
 
 from pywikibot import pagegenerators, output, warning
+from pywikibot.backports import Set
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Set = set
-else:
-    from typing import Set
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

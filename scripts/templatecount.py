@@ -43,14 +43,8 @@ import datetime
 from typing import Generator
 
 import pywikibot
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Tuple = tuple
-else:
-    from typing import Dict, List, Tuple
+from pywikibot.backports import Dict, List, Tuple
 
 
 class TemplateCountRobot:

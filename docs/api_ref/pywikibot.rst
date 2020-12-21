@@ -20,6 +20,11 @@ Subpackages
 Submodules
 ----------
 
+pywikibot.backports module
+--------------------------
+
+.. automodule:: pywikibot.backports
+
 pywikibot.bot module
 --------------------
 

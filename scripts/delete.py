@@ -61,23 +61,11 @@ import collections
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import DefaultDict, Set, Tuple
 from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
-from pywikibot.tools import islice_with_ellipsis, PYTHON_VERSION
-
-if PYTHON_VERSION < (3, 5, 2):
-    from typing import Dict as DefaultDict
-elif PYTHON_VERSION < (3, 9):
-    from typing import DefaultDict
-else:
-    DefaultDict = collections.defaultdict
-
-if PYTHON_VERSION >= (3, 9):
-    Set = set
-    Tuple = tuple
-else:
-    from typing import Set, Tuple
+from pywikibot.tools import islice_with_ellipsis
 
 
 # This is required for the text that is shown when you run this script

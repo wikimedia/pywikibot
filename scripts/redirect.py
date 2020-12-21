@@ -82,18 +82,10 @@ from typing import Any, Generator, Optional, Union
 import pywikibot
 
 from pywikibot import i18n, xmlreader
+from pywikibot.backports import Dict, List, Set, Tuple
 from pywikibot.bot import (ExistingPageBot, MultipleSitesBot, OptionHandler,
                            RedirectPageBot)
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Set = set
-    Tuple = tuple
-else:
-    from typing import Dict, List, Set, Tuple
 
 
 def space_to_underscore(link) -> str:
