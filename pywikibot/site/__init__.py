@@ -965,7 +965,7 @@ class APISite(BaseSite):
         return self.data_repository() is not None
 
     @property
-    @deprecated('has_data_repository', since='20160405')
+    @deprecated('has_data_repository', since='20160405', future_warning=True)
     def has_transcluded_data(self):
         """Return True if site has a shared data repository like Wikidata."""
         return self.has_data_repository
@@ -2990,6 +2990,7 @@ class APISite(BaseSite):
                 if where == 'titles':
                     issue_deprecation_warning("where='titles'",
                                               "where='title'",
+                                              warning_class=FutureWarning,
                                               since='20160224')
                 where = 'title'
         if not namespaces and namespaces != 0:
@@ -4205,7 +4206,7 @@ class APISite(BaseSite):
         return True
 
     @need_right('editmywatchlist')
-    @deprecated('Site().watch', since='20160102')
+    @deprecated('Site().watch', since='20160102', future_warning=True)
     def watchpage(self, page, unwatch=False) -> bool:
         """
         Add or remove page from watchlist.
