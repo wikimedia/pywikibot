@@ -24,7 +24,6 @@ from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     classproperty, deprecated, deprecated_args, frozenmap,
     issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
-    remove_last_args,
 )
 
 if PYTHON_VERSION >= (3, 9):
@@ -505,10 +504,6 @@ class Family:
     # 'en': "Disambiguation"
     disambcatname = {}  # type: Dict[str, str]
 
-    # DEPRECATED, stores the code of the site which have a case sensitive
-    # main namespace. Use the Namespace given from the Site instead
-    nocapitalize = []  # type: List[str]
-
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
     interwiki_attop = []  # type: List[str]
@@ -661,22 +656,11 @@ class Family:
         class variable. Only penalize getting it because it must be set so that
         the backwards compatibility is still available.
         """
-        if name == 'nocapitalize':
-            issue_deprecation_warning('nocapitalize',
-                                      "APISite.siteinfo['case'] or "
-                                      "Namespace.case == 'case-sensitive'",
-                                      warning_class=FutureWarning,
-                                      since='20150214')
-        elif name == 'known_families':
+        if name == 'known_families':
             issue_deprecation_warning('known_families',
                                       'APISite.interwiki(prefix)',
                                       warning_class=FutureWarning,
                                       since='20150503')
-        elif name == 'shared_data_repository':
-            issue_deprecation_warning('shared_data_repository',
-                                      'APISite.data_repository()',
-                                      warning_class=FutureWarning,
-                                      since='20151023')
         return super().__getattribute__(name)
 
     @staticmethod
@@ -738,15 +722,6 @@ class Family:
                               FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
-
-    @classproperty
-    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014',
-                future_warning=True)
-    def iwkeys(cls):
-        """DEPRECATED: List of (interwiki_forward's) family codes."""
-        if cls.interwiki_forward:
-            return list(pywikibot.Family(cls.interwiki_forward).langs.keys())
-        return list(cls.langs.keys())
 
     @deprecated('APISite.interwiki', since='20151014', future_warning=True)
     def get_known_families(self, code):
@@ -925,11 +900,6 @@ class Family:
         """Return path to api.php."""
         return '%s/api.php' % self.scriptpath(code)
 
-    @deprecated('APISite.article_path', since='20150905', future_warning=True)
-    def nicepath(self, code):
-        """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
-        return '/wiki/'
-
     def eventstreams_host(self, code):
         """Hostname for EventStreams."""
         raise NotImplementedError('This family does not support EventStreams')
@@ -942,12 +912,6 @@ class Family:
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
         return '%s?title=%s&redirect=no' % (self.path(code), title)
-
-    @deprecated('APISite.nice_get_address(title)', since='20150628',
-                future_warning=True)
-    def nice_get_address(self, code, title):
-        """DEPRECATED: Return the nice path to title using index.php."""
-        return '%s%s' % (self.nicepath(code), title)
 
     def interface(self, code):
         """
@@ -1077,15 +1041,6 @@ class Family:
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
-        return (None, None)
-
-    # Deprecated via __getattribute__
-    @remove_last_args(['transcluded'])
-    def shared_data_repository(self, code):
-        """Return the shared Wikibase repository, if any."""
-        repo = pywikibot.Site(code, self).data_repository()
-        if repo is not None:
-            return repo.code, repo.family.name
         return (None, None)
 
     def isPublic(self, code):

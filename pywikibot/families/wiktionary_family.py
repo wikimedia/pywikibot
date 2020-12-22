@@ -70,12 +70,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'yi', 'zh', 'zh-min-nan', 'zu',
     ]
 
-    # Other than most Wikipedias, page names must not start with a capital
-    # letter on ALL Wiktionaries.
-    @classproperty
-    def nocapitalize(cls):
-        return list(cls.langs.keys())
-
     # Which languages have a special order for putting interlanguage links,
     # and what order is it? If a language is not in interwiki_putfirst,
     # alphabetical order on language code is used. For languages that are in
