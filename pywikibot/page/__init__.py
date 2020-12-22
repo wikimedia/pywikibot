@@ -2420,7 +2420,7 @@ class FilePage(Page):
             self._imagePageHtml = http.request(self.site, path)
         return self._imagePageHtml
 
-    @deprecated('get_file_url', since='20160609')
+    @deprecated('get_file_url', since='20160609', future_warning=True)
     def fileUrl(self):  # pragma: no cover
         """Return the URL for the file described on this page."""
         return self.latest_file_info.url

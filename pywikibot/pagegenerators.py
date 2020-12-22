@@ -2679,13 +2679,13 @@ class XMLDumpOldPageGenerator(Iterator):
         self.parser = dump.parse()
 
     @property
-    @deprecated('self.start', since='20160414')
+    @deprecated('self.start', since='20160414', future_warning=True)
     def xmlStart(self):
         """Deprecated xmlStart instance variable."""
         return self.start
 
     @xmlStart.setter
-    @deprecated('self.start', since='20160414')
+    @deprecated('self.start', since='20160414', future_warning=True)
     def xmlStart(self, value):
         self.start = value
 
@@ -2931,11 +2931,14 @@ PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         since='20170314')
 # Deprecated old names available for compatibility with compat.
 ImageGenerator = redirect_func(
-    PageClassGenerator, old_name='ImageGenerator', since='20161017')
+    PageClassGenerator, old_name='ImageGenerator', since='20161017',
+    future_warning=True)
 FileGenerator = redirect_func(
-    PageClassGenerator, old_name='FileGenerator', since='20161017')
+    PageClassGenerator, old_name='FileGenerator', since='20161017',
+    future_warning=True)
 CategoryGenerator = redirect_func(
-    PageClassGenerator, old_name='CategoryGenerator', since='20161017')
+    PageClassGenerator, old_name='CategoryGenerator', since='20161017',
+    future_warning=True)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
                              since='20181128')
