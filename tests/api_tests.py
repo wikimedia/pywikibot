@@ -42,25 +42,27 @@ class TestAPIMWException(DefaultSiteTestCase):
             'servedby': 'unittest',
             }
 
-    def _dummy_request(self, **kwargs):
-        self.assertIn('body', kwargs)
+    def _dummy_request(self, *args, **kwargs):
+        self.assertLength(args, 1)  # one positional argument for http.request
+        site = args[0]
+        self.assertIsInstance(site, pywikibot.BaseSite)
+        self.assertIn('data', kwargs)
         self.assertIn('uri', kwargs)
-        self.assertIn('site', kwargs)
-        if kwargs['body'] is None:
+        if kwargs['data'] is None:
             # use uri and remove script path
             parameters = kwargs['uri']
-            prefix = kwargs['site'].scriptpath() + '/api.php?'
+            prefix = site.scriptpath() + '/api.php?'
             self.assertEqual(prefix, parameters[:len(prefix)])
             parameters = parameters[len(prefix):]
         else:
-            parameters = kwargs['body']
+            parameters = kwargs['data']
         parameters = parameters.encode('ascii')  # it should be bytes anyway
         # Extract parameter data from the body, it's ugly but allows us
         # to verify that we actually test the right request
         parameters = [p.split(b'=', 1) for p in parameters.split(b'&')]
         keys = [p[0].decode('ascii') for p in parameters]
         values = [unquote_to_bytes(p[1]) for p in parameters]
-        values = [v.decode(kwargs['site'].encoding()) for v in values]
+        values = [v.decode(site.encoding()) for v in values]
         values = [v.replace('+', ' ') for v in values]
         values = [set(v.split('|')) for v in values]
         parameters = dict(zip(keys, values))
