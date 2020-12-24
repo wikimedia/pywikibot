@@ -1,7 +1,12 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* Desupported shared_image_repository() and nocapitalize() methods were removed (T89451)
+* pywikibot.cookie_jar was removed in favour of pywikibot.comms.http.cookie_jar
+* Align http.fetch() params with requests and rename 'disable_ssl_certificate_validation' to 'verify' (T265206)
+* Deprecated compat BasePage.getRestrictions() method was removed
+* Outdated Site.recentchanges() parameters has been dropped
+* site.LoginStatus has been removed in favour of login.LoginStatus
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
@@ -13,6 +18,4 @@ Future release notes
 * 5.0.0: HttpRequest result of http.fetch() will be replaced by requests.Response (T265206)
 * 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
-* 5.0.0: Outdated Site.recentchanges() parameters will be removed
-* 5.0.0: site.LoginStatus will be removed in favour of login.LoginStatus
 * 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed
