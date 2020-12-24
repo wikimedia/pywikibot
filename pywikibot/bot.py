@@ -103,6 +103,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
+from pywikibot.backports import Dict, Iterable, List
 from pywikibot import config2 as config
 from pywikibot import daemonize
 from pywikibot import i18n
@@ -128,12 +129,6 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools.formatter import color_format
 
-if PYTHON_VERSION >= (3, 9):
-    from collections.abc import Iterable
-    Dict = dict
-    List = list
-else:
-    from typing import Dict, Iterable, List
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'

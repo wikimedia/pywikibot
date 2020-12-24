@@ -29,6 +29,8 @@ from warnings import warn
 import requests
 
 import pywikibot
+
+from pywikibot.backports import Tuple
 from pywikibot.comms import threadedhttp
 from pywikibot import config2 as config
 from pywikibot.exceptions import (
@@ -40,13 +42,7 @@ from pywikibot.tools import (
     deprecated_args,
     issue_deprecation_warning,
     file_mode_checker,
-    PYTHON_VERSION,
 )
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 try:
     import requests_oauthlib

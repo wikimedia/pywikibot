@@ -31,16 +31,13 @@ Example:
 # Automatically converted from compat branch by compat2core.py script
 #
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import Tuple
 from pywikibot.bot import (
     MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot
 )
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

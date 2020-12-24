@@ -49,13 +49,9 @@ import time
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import Tuple
 from pywikibot.bot import Bot, ConfigParserBot
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',

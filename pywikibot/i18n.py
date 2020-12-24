@@ -35,19 +35,13 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import __url__
+from pywikibot.backports import cache, List
 from pywikibot import config2 as config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rule
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning, PYTHON_VERSION)
+    deprecated, deprecated_args, issue_deprecation_warning)
 
-if PYTHON_VERSION >= (3, 9, 0):
-    from functools import cache
-    List = list
-else:
-    from functools import lru_cache
-    from typing import List
-    cache = lru_cache(None)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 

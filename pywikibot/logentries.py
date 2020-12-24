@@ -9,13 +9,11 @@ from collections import UserDict
 from typing import Optional
 
 import pywikibot
-from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import classproperty, deprecated, PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
+from pywikibot.backports import List
+from pywikibot.exceptions import Error, HiddenKeyError
+from pywikibot.tools import classproperty, deprecated
+
 
 _logger = 'wiki'
 

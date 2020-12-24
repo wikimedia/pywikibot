@@ -21,20 +21,15 @@ Options:
 -onlynew : Only run on pages that do not yet have a category.
 """
 #
-# (C) Pywikibot team, 2004-2019
+# (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import i18n, textlib
-from pywikibot.bot import QuitKeyboardInterrupt
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-    List = list
-else:
-    from typing import List, Tuple
+from pywikibot import i18n, textlib
+from pywikibot.backports import List, Tuple
+from pywikibot.bot import QuitKeyboardInterrupt
 
 
 def choosecats(pagetext: str) -> List[str]:

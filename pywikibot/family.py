@@ -19,19 +19,19 @@ from os.path import basename, dirname, splitext
 from typing import Optional
 
 import pywikibot
+
+from pywikibot.backports import Dict, List, Tuple
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    classproperty, deprecated, deprecated_args, frozenmap,
-    issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
+    classproperty,
+    deprecated,
+    deprecated_args,
+    frozenmap,
+    issue_deprecation_warning,
+    ModuleDeprecationWrapper,
 )
 
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Tuple = tuple
-else:
-    from typing import Dict, List, Tuple
 
 logger = logging.getLogger('pywiki.wiki.family')
 

@@ -111,15 +111,11 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
 from pywikibot import pagegenerators
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated_args, PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
+from pywikibot.tools import deprecated_args
 
 
 class Photo(pywikibot.FilePage):

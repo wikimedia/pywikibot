@@ -107,20 +107,15 @@ from typing import Any, Optional, Pattern
 
 import pywikibot
 
+from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
 from pywikibot.tools import (
-    deprecated, frozenmap, issue_deprecation_warning, PYTHON_VERSION,
+    deprecated, frozenmap, issue_deprecation_warning,
 )
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-    Set = set
-    Tuple = tuple
-else:
-    from typing import List, Set, Tuple
 
 ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]

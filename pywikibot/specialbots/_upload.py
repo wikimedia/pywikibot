@@ -22,18 +22,13 @@ import pywikibot
 import pywikibot.comms.http as http
 import pywikibot.data.api
 
-
+from pywikibot.backports import List
 from pywikibot import config
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.data.api import APIError
 from pywikibot.exceptions import FatalServerError
-from pywikibot.tools import deprecated_args, PYTHON_VERSION
+from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
-
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 
 class UploadRobot(BaseBot):

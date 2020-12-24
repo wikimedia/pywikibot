@@ -36,6 +36,13 @@ from typing import Optional, Union
 
 import pywikibot
 
+from pywikibot import date, config, i18n, xmlreader
+from pywikibot.backports import List
+from pywikibot.bot import ShowingListOption
+from pywikibot.comms import http
+from pywikibot.data import api
+from pywikibot.exceptions import ServerError, UnknownExtension
+from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
@@ -47,18 +54,6 @@ from pywikibot.tools import (
     redirect_func,
 )
 
-from pywikibot import date, config, i18n, xmlreader
-from pywikibot.bot import ShowingListOption
-from pywikibot.comms import http
-from pywikibot.data import api
-from pywikibot.exceptions import ServerError, UnknownExtension
-from pywikibot.proofreadpage import ProofreadPage
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 _logger = 'pagegenerators'
 

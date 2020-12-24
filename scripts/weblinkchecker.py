@@ -131,17 +131,13 @@ import pywikibot
 from pywikibot import comms, i18n, pagegenerators, textlib
 from pywikibot import config2 as config
 
+from pywikibot.backports import Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated, PYTHON_VERSION, ThreadList
+from pywikibot.tools import deprecated, ThreadList
 from pywikibot.tools.formatter import color_format
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 try:
     import memento_client

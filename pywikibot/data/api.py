@@ -30,6 +30,7 @@ import pywikibot
 
 from pywikibot import config, login
 
+from pywikibot.backports import FrozenSet, Set, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
@@ -38,17 +39,13 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.tools import (
-    deprecated, issue_deprecation_warning, itergroup, PYTHON_VERSION,
+    deprecated,
+    issue_deprecation_warning,
+    itergroup,
+    PYTHON_VERSION,
     remove_last_args,
 )
 from pywikibot.tools.formatter import color_format
-
-if PYTHON_VERSION >= (3, 9):
-    Set = set
-    Tuple = tuple
-    FrozenSet = frozenset
-else:
-    from typing import Set, Tuple, FrozenSet
 
 
 _logger = 'data.api'

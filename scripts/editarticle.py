@@ -37,13 +37,8 @@ import pywikibot
 
 from pywikibot import i18n
 
+from pywikibot.backports import Tuple
 from pywikibot.editor import TextEditor
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 
 class ArticleEditor(object):

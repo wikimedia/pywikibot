@@ -31,6 +31,8 @@ from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
 import pywikibot
+
+from pywikibot.backports import cache, Dict, List
 from pywikibot import config, i18n, textlib
 from pywikibot.comms import http
 from pywikibot.data.api import APIError
@@ -55,20 +57,10 @@ from pywikibot.tools import (
     first_upper,
     issue_deprecation_warning,
     manage_wrapping,
-    PYTHON_VERSION,
     redirect_func,
     remove_last_args,
 )
 from pywikibot.tools import is_IP
-
-if PYTHON_VERSION >= (3, 9):
-    from functools import cache
-    Dict = dict
-    List = list
-else:
-    from functools import lru_cache
-    from typing import Dict, List
-    cache = lru_cache(None)
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'

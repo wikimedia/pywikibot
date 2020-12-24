@@ -35,17 +35,12 @@ For further information see pywikibot/cosmetic_changes.py
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators
+from pywikibot.backports import Tuple
 from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
 from pywikibot.cosmetic_changes import (
     CANCEL_ALL, CANCEL_MATCH, CANCEL_METHOD, CANCEL_PAGE,
     CosmeticChangesToolkit,
 )
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 
 warning = """

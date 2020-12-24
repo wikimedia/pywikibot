@@ -15,19 +15,10 @@ from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 
+from pywikibot.backports import Tuple
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import (
-    deprecated,
-    first_lower,
-    first_upper,
-    PYTHON_VERSION,
-)
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
+from pywikibot.tools import deprecated, first_lower, first_upper
 
 #
 # Different collections of well known formats

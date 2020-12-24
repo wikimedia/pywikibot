@@ -130,8 +130,8 @@ from typing import Optional
 
 import pywikibot
 
-from pywikibot import config, pagegenerators
-from pywikibot import i18n, textlib
+from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.backports import Set, Tuple
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -142,14 +142,9 @@ from pywikibot.bot import (
     suggest_help,
 )
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import deprecated_args, open_archive, PYTHON_VERSION
+from pywikibot.tools import deprecated_args, open_archive
 from pywikibot.tools.formatter import color_format
 
-if PYTHON_VERSION >= (3, 9):
-    Set = set
-    Tuple = tuple
-else:
-    from typing import Set, Tuple
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
