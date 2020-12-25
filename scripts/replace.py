@@ -142,7 +142,6 @@ the top of the help.
 #
 import codecs
 import re
-import warnings
 
 from collections.abc import Sequence
 from contextlib import suppress
@@ -154,7 +153,7 @@ from pywikibot import editor
 from pywikibot import fixes
 from pywikibot import i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-from pywikibot.tools import chars, deprecated, deprecated_args
+from pywikibot.tools import chars, deprecated_args
 
 
 # This is required for the text that is shown when you run this script
@@ -619,18 +618,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if old_text != new_text:
                 applied.add(replacement)
 
-        return new_text
-
-    @deprecated('apply_replacements', since='20160816', future_warning=True)
-    def doReplacements(self, original_text, page=None):
-        """Apply replacements to the given text and page."""
-        if page is None:
-            pywikibot.warn(
-                'You must pass the target page as the "page" parameter to '
-                'doReplacements().', DeprecationWarning, stacklevel=2)
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', DeprecationWarning)
-            new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
 
     def _replace_async_callback(self, page, err):
