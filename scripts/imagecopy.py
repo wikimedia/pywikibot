@@ -215,15 +215,14 @@ def pageTextPost(url, parameters):
     @return: A CommonHelper description message.
     @rtype: str
     """
-    gotInfo = False
-    while not gotInfo:
+    while True:
         try:
             commonsHelperPage = fetch(
                 'https://commonshelper.toolforge.org/',
                 method='POST',
                 data=parameters)
-            data = commonsHelperPage.data.content.decode('utf-8')
-            gotInfo = True
+            data = commonsHelperPage.content.decode('utf-8')
+            break
         except RequestException:
             pywikibot.output("Got a RequestException, let's try again")
     return data

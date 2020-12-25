@@ -118,8 +118,7 @@ class DownloadDumpBot(Bot):
                         return
 
                     with open(file_current_storepath, 'wb') as result_file:
-                        total = int(response.response_headers.get(
-                            'content-length', -1))
+                        total = int(response.headers['content-length'])
                         if total == -1:
                             pywikibot.warning("'content-length' missing in "
                                               'response headers')
@@ -128,7 +127,7 @@ class DownloadDumpBot(Bot):
                         display_string = ''
 
                         pywikibot.output('')
-                        for data in response.data.iter_content(100 * 1024):
+                        for data in response.iter_content(100 * 1024):
                             result_file.write(data)
 
                             if total <= 0:

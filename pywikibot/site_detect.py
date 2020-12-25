@@ -43,9 +43,9 @@ class MWSite:
         r = fetch(fromurl)
         check_response(r)
 
-        if fromurl != r.data.url:
-            pywikibot.log('{} redirected to {}'.format(fromurl, r.data.url))
-            fromurl = r.data.url
+        if fromurl != r.url:
+            pywikibot.log('{} redirected to {}'.format(fromurl, r.url))
+            fromurl = r.url
 
         self.fromurl = fromurl
 

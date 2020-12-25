@@ -291,9 +291,7 @@ class PrivateWikiTestCase(PatchingTestCase):
                     (object,),
                     {'status_code': 200,
                      'text': self._responses[parsed_url.path],
-                     'data': type(str('ResponseData'),
-                                  (object,),
-                                  {'url': url})})
+                     'url': url})
 
     @PatchingTestCase.patched(pywikibot, 'input')
     def input(self, question, *args, **kwargs):

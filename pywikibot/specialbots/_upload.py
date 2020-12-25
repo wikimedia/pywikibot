@@ -132,8 +132,8 @@ class UploadRobot(BaseBot):
             with open(path, 'ab') as fd:
                 os.lseek(handle, file_len, 0)
                 try:
-                    r = http.fetch(file_url, stream=True, headers=headers)
-                    response = r.data
+                    response = http.fetch(file_url, stream=True,
+                                          headers=headers)
                     response.raise_for_status()
 
                     # get download info, if available
