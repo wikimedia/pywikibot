@@ -929,6 +929,14 @@ class APISite(BaseSite):
             pywikibot.error(msg)
             raise
 
+        if MediaWikiVersion(version) < '1.23':
+            warn('\n'
+                 + fill('Support of MediaWiki {version} will be dropped. '
+                        'It is recommended to use MediaWiki 1.23 or above. '
+                        'You may use every Pywikibot 5.X for older MediaWiki '
+                        'versions. See T268979 for further information.'
+                        .format(version=version)), FutureWarning)
+
         if MediaWikiVersion(version) < '1.19':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
