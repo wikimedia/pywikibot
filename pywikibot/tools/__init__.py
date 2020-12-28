@@ -35,9 +35,6 @@ from warnings import catch_warnings, showwarning, warn
 from pywikibot.logging import debug
 from pywikibot.tools._unidata import _first_upper_exception
 
-PYTHON_VERSION = sys.version_info[:3]
-PY2 = (PYTHON_VERSION[0] == 2)
-
 try:
     import bz2
 except ImportError as bz2_import_error:
@@ -53,6 +50,8 @@ try:
 except ImportError as lzma_import_error:
     lzma = lzma_import_error
 
+
+PYTHON_VERSION = sys.version_info[:3]
 
 _logger = 'tools'
 
@@ -1824,7 +1823,15 @@ def concat_options(message, line_length, options):
     return '{} ({}):'.format(message, option_msg)
 
 
+def _py2():
+    """Function for deprecated PY2 variable used by wrapper below."""
+    return (PYTHON_VERSION[0] == 2)
+
+
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
                              replacement_name='tools.frozenmap',
                              since='20201109', future_warning=True)
+wrapper._add_deprecated_attr('PY2', _py2(),
+                             replacement_name='sys.version_info[0] == 2',
+                             since='20201224', future_warning=True)
