@@ -989,26 +989,21 @@ _public_globals = {
 # we can detect modified config items easily.
 _exec_globals = copy.deepcopy(_public_globals)
 
-# Get the user files
-if __no_user_config:
-    if __no_user_config != '2':
-        warning('Skipping loading of user-config.py.')
-else:
-    _filename = os.path.join(base_dir, 'user-config.py')
-    if os.path.exists(_filename):
-        _filestatus = os.stat(_filename)
-        _filemode = _filestatus[0]
-        _fileuid = _filestatus[4]
-        if OSWIN32 or _fileuid in [os.getuid(), 0]:
-            if OSWIN32 or _filemode & 0o02 == 0:
-                with open(_filename, 'rb') as f:
-                    exec(compile(f.read(), _filename, 'exec'), _exec_globals)
-            else:
-                warning("Skipped '%(fn)s': writeable by others."
-                        % {'fn': _filename})
-        else:
-            warning("Skipped '%(fn)s': owned by someone else."
-                    % {'fn': _filename})
+# Always try to get the user files
+_filename = os.path.join(base_dir, 'user-config.py')
+if os.path.exists(_filename):
+    _filestatus = os.stat(_filename)
+    _filemode = _filestatus[0]
+    _fileuid = _filestatus[4]
+    if not OSWIN32 and _fileuid not in [os.getuid(), 0]:
+        warning('Skipped {fn!r}: owned by someone else.'.format(fn=_filename))
+    elif OSWIN32 or _filemode & 0o02 == 0:
+        with open(_filename, 'rb') as f:
+            exec(compile(f.read(), _filename, 'exec'), _exec_globals)
+    else:
+        warning('Skipped {fn!r}: writeable by others.'.format(fn=_filename))
+elif __no_user_config and __no_user_config != '2':
+    warning('user-config.py cannot be loaded.')
 
 
 class _DifferentTypeError(UserWarning, TypeError):
