@@ -83,6 +83,7 @@ from pywikibot.tools import (
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
+    normalize_username,
     remove_last_args,
 )
 
@@ -322,13 +323,16 @@ class APISite(
         return auth_token is not None and len(auth_token) == 4
 
     @deprecated_args(sysop=True)
-    def login(self, sysop=None, autocreate=False):
+    def login(self, sysop=None,
+              autocreate: bool = False,
+              user: Optional[str] = None):
         """
         Log the user in if not already logged in.
 
         @param autocreate: if true, allow auto-creation of the account
-                           using unified login
-        @type autocreate: bool
+            using unified login
+        @param user: bot user name. Overrides the username set by
+            BaseSite initializer parameter or user-config.py setting
 
         @raises pywikibot.exceptions.NoUsername: Username is not recognised
             by the site.
@@ -350,6 +354,7 @@ class APISite(
             pywikibot.log(
                 '{!r}.login() called when a previous login was in progress.'
                 .format(self))
+
         # There are several ways that the site may already be
         # logged in, and we do not need to hit the server again.
         # logged_in() is False if _userinfo exists, which means this
@@ -357,13 +362,16 @@ class APISite(
         if self.logged_in():
             self._loginstatus = _LoginStatus.AS_USER
             return
+
         # check whether a login cookie already exists for this user
         # or check user identity when OAuth enabled
         self._loginstatus = _LoginStatus.IN_PROGRESS
+        self._username = normalize_username(user)
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
                 return
+
         # May occur if you are not logged in (no API read permissions).
         except api.APIError:
             pass
@@ -372,24 +380,25 @@ class APISite(
                 raise e
 
         if self.is_oauth_token_available():
-            if self.userinfo['name'] != self.username():
-                if self.username() is None:
-                    raise NoUsername('No username has been defined in your '
-                                     'user-config.py: you have to add in this '
-                                     'file the following line:\n'
-                                     "usernames['{family}']['{lang}'] "
-                                     "= '{username}'"
-                                     .format(family=self.family,
-                                             lang=self.lang,
-                                             username=self.userinfo['name']))
-                else:
-                    raise NoUsername('Logged in on {site} via OAuth as '
-                                     '{wrong}, but expect as {right}'
-                                     .format(site=self,
-                                             wrong=self.userinfo['name'],
-                                             right=self.username()))
-            else:
+            if self.userinfo['name'] == self.username():
                 raise NoUsername('Logging in on %s via OAuth failed' % self)
+
+            if self.username() is None:
+                raise NoUsername('No username has been defined in your '
+                                 'user-config.py: you have to add in this '
+                                 'file the following line:\n'
+                                 'usernames[{family!r}][{lang!r}]'
+                                 '= {username!r}'
+                                 .format(family=self.family,
+                                         lang=self.lang,
+                                         username=self.userinfo['name']))
+
+            raise NoUsername('Logged in on {site} via OAuth as '
+                             '{wrong}, but expect as {right}'
+                             .format(site=self,
+                                     wrong=self.userinfo['name'],
+                                     right=self.username()))
+
         login_manager = api.LoginManager(site=self, user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
