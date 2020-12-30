@@ -207,7 +207,10 @@ class TestScriptMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        def test_execution(script_name, args=[]):
+        def test_execution(script_name, args=None):
+            if args is None:
+                args = []
+
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_list)
 

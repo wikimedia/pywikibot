@@ -384,7 +384,7 @@ class imageFetcher(threading.Thread):
             return
 
         text = imagepage.get()
-        for regex, replacement in licenseTemplates[page.site.lang]:
+        for regex, _ in licenseTemplates[page.site.lang]:
             match = re.search(regex, text, flags=re.IGNORECASE)
             if match:
                 break
@@ -507,7 +507,7 @@ class imageFetcher(threading.Thread):
         # Still have to filter out crap like "see below" or "yes"
         if contents['permission']:
             # Strip of the license template if it's in the permission section
-            for (regex, repl) in licenseTemplates[imagepage.site.lang]:
+            for regex, _ in licenseTemplates[imagepage.site.lang]:
                 contents['permission'] = re.sub(regex, '',
                                                 contents['permission'],
                                                 flags=re.IGNORECASE)

@@ -78,7 +78,7 @@ class TestDryPageGenerators(TestCase):
     def assertFunction(self, obj):
         """Assert function test."""
         self.assertTrue(hasattr(pagegenerators, obj))
-        self.assertTrue(hasattr(getattr(pagegenerators, obj), '__call__'))
+        self.assertTrue(callable(getattr(pagegenerators, obj)))
 
     def test_module_import(self):
         """Test module import."""
@@ -1661,9 +1661,9 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         if self.site.data_repository():
             self.skipTest('Site is using a Wikibase repository')
         with self.assertRaises(ValueError):
-            for page in pagegenerators.UnconnectedPageGenerator(self.site,
-                                                                total=5):
-                assert False  # this shouldn't be reached
+            for _ in pagegenerators.UnconnectedPageGenerator(self.site,
+                                                             total=5):
+                raise AssertionError("this shouldn't be reached")
 
 
 class TestLinksearchPageGenerator(TestCase):

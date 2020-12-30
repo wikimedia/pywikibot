@@ -892,19 +892,19 @@ def showHelp(module_name=None):  # pragma: no cover
     return show_help(module_name)
 
 
-def suggest_help(missing_parameters=[], missing_generator=False,
-                 unknown_parameters=[], exception=None,
-                 missing_action=False, additional_text: str = '',
-                 missing_dependencies=[]) -> bool:
+def suggest_help(missing_parameters: Optional[List[str]] = None,
+                 missing_generator: bool = False,
+                 unknown_parameters: Optional[List[str]] = None,
+                 exception=None,
+                 missing_action: bool = False,
+                 additional_text: str = '',
+                 missing_dependencies: Optional[List[str]] = None) -> bool:
     """
     Output error message to use -help with additional text before it.
 
     @param missing_parameters: A list of parameters which are missing.
-    @type missing_parameters: list of str
     @param missing_generator: Whether a generator is missing.
-    @type missing_generator: bool
     @param unknown_parameters: A list of parameters which are unknown.
-    @type unknown_parameters: list of str
     @param exception: An exception thrown.
     @type exception: Exception
     @param missing_action: Add an entry that no action was defined.
@@ -1717,10 +1717,10 @@ class ConfigParserBot(BaseBot):
                 if not conf.has_option(section, option):
                     continue
                 # use a convenience parser method, default to get()
-                default = getattr(conf, 'get')
+                default = conf.get
                 value_type = type(value).__name__
                 if value_type == 'bool':
-                    method = getattr(conf, 'getboolean')
+                    method = conf.getboolean
                 else:
                     method = getattr(conf, 'get' + value_type, default)
                 options[option] = method(section, option)

@@ -142,9 +142,7 @@ class TestFlowLoading(TestMediaWikiFlowSandbox):
     def test_topiclist(self):
         """Test loading of topiclist."""
         board = self._page
-        i = 0
-        for topic in board.topics(limit=7):
-            i += 1
+        for i, _ in enumerate(board.topics(limit=7), start=1):
             if i == 10:
                 break
         self.assertEqual(i, 10)

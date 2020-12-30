@@ -1915,7 +1915,7 @@ class BasePage(ComparableMixin):
         sortKey='sort_key', inPlace='in_place')
     def change_category(
         self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
-        include=[]
+        include=None
     ) -> bool:
         """
         Remove page from oldCat and add it to newCat.
@@ -1944,7 +1944,7 @@ class BasePage(ComparableMixin):
         # duplicates
         cats = []
         for cat in textlib.getCategoryLinks(self.text, site=self.site,
-                                            include=include):
+                                            include=include or []):
             if cat not in cats:
                 cats.append(cat)
 

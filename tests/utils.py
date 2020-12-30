@@ -62,7 +62,7 @@ def fixed_generator(iterable):
 
 def entered_loop(iterable):
     """Return True if iterable contains items."""
-    for iterable_item in iterable:
+    for _ in iterable:
         return True
     return False
 
