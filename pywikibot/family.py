@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
