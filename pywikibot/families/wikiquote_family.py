@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
