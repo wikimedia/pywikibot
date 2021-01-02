@@ -1,11 +1,20 @@
 # Schripts Changelog
 
+## 5.4.0
+*2 January 2021*
+
+### general
+* i18n updates
+
+### replace
+* Desupported ReplaceRobot.doReplacements method was removed
+
+
 ## 5.3.0
 *19 December 2020*
 
 ### data_ingestion
 * Remove deprecated Photo.reader property and Photo.doSingle() method
-
 
 ### replicate_wiki
 * Remove deprecated namespace function
