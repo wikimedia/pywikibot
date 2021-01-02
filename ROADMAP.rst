@@ -1,17 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Re-enable reading user-config.py from site package (T270941)
-* LoginManager.getCookie() was renamed to login_to_site()
-* Deprecation warning for MediaWiki < 1.23 (T268979)
-* Add backports to support some Python 3.9 changes
-* Desupported shared_image_repository() and nocapitalize() methods were removed (T89451)
-* pywikibot.cookie_jar was removed in favour of pywikibot.comms.http.cookie_jar
-* Align http.fetch() params with requests and rename 'disable_ssl_certificate_validation' to 'verify' (T265206)
-* Deprecated compat BasePage.getRestrictions() method was removed
-* Outdated Site.recentchanges() parameters has been dropped
-* site.LoginStatus has been removed in favour of login.LoginStatus
-* L10N Updates
+* (no changes yet)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
