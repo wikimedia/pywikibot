@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikisource."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,9 +29,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
         'te', 'sl', 'hy', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
         'tr', 'az', 'ca', 'br', 'la', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
-        'vec', 'pms', 'id', 'et', 'be', 'hi', 'da', 'lij', 'mk', 'yi', 'mr',
-        'bg', 'as', 'li', 'lt', 'eu', 'or', 'pa', 'gl', 'cy', 'bs', 'sah',
-        'sk', 'zh-min-nan', 'fo', 'wa',
+        'vec', 'pms', 'id', 'be', 'et', 'hi', 'da', 'lij', 'mk', 'yi', 'mr',
+        'as', 'bg', 'li', 'lt', 'eu', 'or', 'pa', 'wa', 'gl', 'cy', 'bs',
+        'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
     # Sites we want to edit but not count as real languages

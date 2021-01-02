@@ -48,11 +48,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         self.assertEqual(self.site.case(), self.site.siteinfo['case'])
         self.assertOneDeprecationParts('pywikibot.site.APISite.case',
                                        'siteinfo or Namespace instance')
-        self.assertIs(self.site.nocapitalize,
-                      self.site.siteinfo['case'] == 'case-sensitive')
-        self.assertOneDeprecationParts(
-            'pywikibot.site._basesite.BaseSite.nocapitalize',
-            "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
@@ -2982,7 +2977,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)
         self.assertEqual(site.hostname(), 'mh.wikipedia.org')
-        r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
+        r = http.fetch('http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(site.siteinfo['lang'], 'mh')

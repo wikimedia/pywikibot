@@ -34,6 +34,7 @@ from warnings import warn
 import pywikibot
 import pywikibot.family
 
+from pywikibot.backports import List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.echo import Notification
@@ -80,19 +81,12 @@ from pywikibot.tools import (
     itergroup,
     MediaWikiVersion,
     merge_unique_dicts,
-    ModuleDeprecationWrapper,
-    PYTHON_VERSION,
     remove_last_args,
 )
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
-__all__ = ('APISite', 'DataSite', 'LoginStatus', 'Namespace',
-           'NamespacesDict', 'PageInUse', 'RemovedSite',
-           'Siteinfo', 'TokenWallet')
+__all__ = ('APISite', 'DataSite', 'Namespace', 'NamespacesDict', 'PageInUse',
+           'RemovedSite', 'Siteinfo', 'TokenWallet')
 
 _logger = 'wiki.site'
 
@@ -266,7 +260,7 @@ class APISite(BaseSite):
         auth_token = get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
-    @deprecated_args(sysop=None)
+    @deprecated_args(sysop=True)
     def login(self, sysop=None, autocreate=False):
         """
         Log the user in if not already logged in.
@@ -279,6 +273,11 @@ class APISite(BaseSite):
             by the site.
         @see: U{https://www.mediawiki.org/wiki/API:Login}
         """
+        if sysop is not None:
+            issue_deprecation_warning("'sysop' parameter",
+                                      warning_class=FutureWarning,
+                                      since='20201230')
+
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the
         #       login status may be left 'IN_PROGRESS' because
@@ -935,6 +934,14 @@ class APISite(BaseSite):
             pywikibot.error(msg)
             raise
 
+        if MediaWikiVersion(version) < '1.23':
+            warn('\n'
+                 + fill('Support of MediaWiki {version} will be dropped. '
+                        'It is recommended to use MediaWiki 1.23 or above. '
+                        'You may use every Pywikibot 5.X for older MediaWiki '
+                        'versions. See T268979 for further information.'
+                        .format(version=version)), FutureWarning)
+
         if MediaWikiVersion(version) < '1.19':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
@@ -967,7 +974,7 @@ class APISite(BaseSite):
         return self.data_repository() is not None
 
     @property
-    @deprecated('has_data_repository', since='20160405')
+    @deprecated('has_data_repository', since='20160405', future_warning=True)
     def has_transcluded_data(self):
         """Return True if site has a shared data repository like Wikidata."""
         return self.has_data_repository
@@ -2855,14 +2862,12 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated_args(nobots=True, includeredirects='redirect',
-                     namespace='namespaces', number='total', pagelist=True,
-                     rcdir=True, rcend='end', rclimit='total',
-                     rcnamespace='namespaces', rcshow=True, rcstart='start',
-                     rctype='changetype', repeat=True, returndict=True,
-                     revision=True, showAnon='anon', showBot='bot',
+    @deprecated_args(includeredirects='redirect', namespace='namespaces',
+                     number='total', rcend='end', rclimit='total',
+                     rcnamespace='namespaces', rcstart='start',
+                     rctype='changetype', showAnon='anon', showBot='bot',
                      showMinor='minor', showPatrolled='patrolled',
-                     showRedirects='redirect', step=True, topOnly='top_only')
+                     showRedirects='redirect', topOnly='top_only')
     def recentchanges(self, *,
                       start=None,
                       end=None,
@@ -2994,6 +2999,7 @@ class APISite(BaseSite):
                 if where == 'titles':
                     issue_deprecation_warning("where='titles'",
                                               "where='title'",
+                                              warning_class=FutureWarning,
                                               since='20160224')
                 where = 'title'
         if not namespaces and namespaces != 0:
@@ -4209,7 +4215,7 @@ class APISite(BaseSite):
         return True
 
     @need_right('editmywatchlist')
-    @deprecated('Site().watch', since='20160102')
+    @deprecated('Site().watch', since='20160102', future_warning=True)
     def watchpage(self, page, unwatch=False) -> bool:
         """
         Add or remove page from watchlist.
@@ -6608,10 +6614,3 @@ class DataSite(APISite):
         See self._wbset_action(self, itemdef, action, action_data, **kwargs)
         """
         return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-# Note: use LoginStatus instead of _LoginStatus
-#       after desupport warning is removed
-wrapper._add_deprecated_attr('LoginStatus', _LoginStatus,
-                             since='20200919', future_warning=True)

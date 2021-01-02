@@ -23,6 +23,7 @@ from pywikibot.__metadata__ import (
     __maintainer__, __maintainer_email__, __name__, __url__, __version__)
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
+from pywikibot.backports import cache
 from pywikibot.bot import (
     input, input_choice, input_yn, handle_args, show_help, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
@@ -59,16 +60,9 @@ from pywikibot.tools import (
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PYTHON_VERSION,
     redirect_func,
 )
 from pywikibot.tools.formatter import color_format
-
-if PYTHON_VERSION >= (3, 9, 0):
-    from functools import cache
-else:
-    from functools import lru_cache
-    cache = lru_cache(None)
 
 
 __all__ = (
@@ -1316,9 +1310,6 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
-    since='20150921', future_warning=True)
 wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '

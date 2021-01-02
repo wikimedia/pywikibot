@@ -198,8 +198,8 @@ def github_svn_rev2hash(tag: str, rev):
     @return: the git hash
     """
     uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
-    request = fetch(uri=uri, method='PROPFIND',
-                    body="<?xml version='1.0' encoding='utf-8'?>"
+    request = fetch(uri, method='PROPFIND',
+                    data="<?xml version='1.0' encoding='utf-8'?>"
                          '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
                     headers={'label': str(rev),
                              'user-agent': 'SVN/1.7.5 {pwb}'})
@@ -374,7 +374,7 @@ def getversion_onlinerepo(path='branches/master'):
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
     buf = http.fetch(
-        uri='https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/' + path,
+        'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/' + path,
         headers={'user-agent': '{pwb}'}).text[4:]
     try:
         hsh = json.loads(buf)['revision']

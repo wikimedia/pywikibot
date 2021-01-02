@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,20 +28,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'en', 'fr', 'mg', 'ru', 'de', 'sh', 'es', 'zh', 'el', 'nl', 'sv', 'pl',
+        'en', 'fr', 'mg', 'ru', 'de', 'sh', 'es', 'zh', 'el', 'sv', 'nl', 'pl',
         'ku', 'lt', 'it', 'ca', 'fi', 'ta', 'hu', 'tr', 'io', 'hy', 'ko', 'kn',
         'pt', 'ja', 'vi', 'sr', 'th', 'chr', 'hi', 'ro', 'no', 'id', 'et',
         'ml', 'cs', 'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'gl', 'jv',
-        'oc', 'az', 'eu', 'uk', 'br', 'da', 'lo', 'ast', 'hr', 'is', 'simple',
+        'oc', 'az', 'eu', 'uk', 'br', 'da', 'lo', 'ast', 'hr', 'simple', 'is',
         'la', 'fj', 'tg', 'ky', 'sk', 'bg', 'wa', 'ur', 'ps', 'cy', 'vo', 'af',
-        'zh-min-nan', 'he', 'shn', 'scn', 'tl', 'pa', 'sl', 'sw', 'fy', 'bn',
-        'nn', 'lv', 'ka', 'sq', 'co', 'mn', 'pnb', 'min', 'lb', 'nds', 'bs',
-        'nah', 'sa', 'ms', 'kk', 'yue', 'km', 'vec', 'tk', 'mk', 'be', 'sm',
-        'hsb', 'shy', 'gd', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt', 'mt',
-        'sd', 'gn', 'mr', 'fo', 'ie', 'so', 'csb', 'ug', 'st', 'roa-rup', 'si',
-        'hif', 'zu', 'kl', 'mi', 'su', 'ay', 'jbo', 'ln', 'yi', 'gu', 'na',
-        'gv', 'kw', 'tpi', 'rw', 'ne', 'ts', 'om', 'qu', 'ha', 'ss', 'iu',
-        'am', 'dv', 'sg', 'ti', 'tn', 'ks', 'skr',
+        'zh-min-nan', 'he', 'skr', 'shn', 'scn', 'tl', 'pa', 'sl', 'sw', 'fy',
+        'bn', 'nn', 'lv', 'ka', 'sq', 'co', 'mn', 'pnb', 'min', 'lb', 'nds',
+        'bs', 'nah', 'ms', 'sa', 'yue', 'kk', 'km', 'vec', 'tk', 'mk', 'be',
+        'sm', 'hsb', 'shy', 'gd', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt',
+        'mt', 'sd', 'gn', 'mr', 'fo', 'ie', 'so', 'csb', 'ug', 'st', 'roa-rup',
+        'si', 'hif', 'zu', 'kl', 'mi', 'su', 'ay', 'jbo', 'ln', 'yi', 'gu',
+        'na', 'gv', 'kw', 'tpi', 'ne', 'rw', 'ts', 'om', 'qu', 'ha', 'ss',
+        'iu', 'am', 'dv', 'sg', 'ti', 'tn', 'ks',
     ]
 
     category_redirect_templates = {
@@ -69,12 +68,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo', 'wa', 'wo',
         'yi', 'zh', 'zh-min-nan', 'zu',
     ]
-
-    # Other than most Wikipedias, page names must not start with a capital
-    # letter on ALL Wiktionaries.
-    @classproperty
-    def nocapitalize(cls):
-        return list(cls.langs.keys())
 
     # Which languages have a special order for putting interlanguage links,
     # and what order is it? If a language is not in interwiki_putfirst,

@@ -23,7 +23,6 @@ from tests import join_images_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
-    DeprecationTestCase,
     HttpbinTestCase,
     require_modules,
 )
@@ -100,13 +99,13 @@ class HttpsCertificateTestCase(TestCase):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
         self.assertRaisesRegex(
             pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE, http.fetch,
-            uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+            'https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         with warnings.catch_warnings(record=True) as warning_log:
             response = http.fetch(
-                uri='https://testssl-expire-r2i2.disig.sk/index.en.html',
-                disable_ssl_certificate_validation=True)
+                'https://testssl-expire-r2i2.disig.sk/index.en.html',
+                verify=False)
         r = response.text
         self.assertIsInstance(r, str)
         self.assertTrue(re.search(r'<title>.*</title>', r))
@@ -115,7 +114,7 @@ class HttpsCertificateTestCase(TestCase):
         # Verify that it now fails again
         self.assertRaisesRegex(
             pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE, http.fetch,
-            uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+            'https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         # Verify that the warning occurred
@@ -144,14 +143,14 @@ class TestHttpStatus(HttpbinTestCase):
         self.assertRaisesRegex(pywikibot.Server504Error,
                                r'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
                                http.fetch,
-                               uri=self.get_httpbin_url('/status/504'))
+                               self.get_httpbin_url('/status/504'))
 
     def test_server_not_found(self):
         """Test server not found exception."""
         self.assertRaisesRegex(requests.exceptions.ConnectionError,
                                'Max retries exceeded with url: /w/api.php',
                                http.fetch,
-                               uri='http://ru-sib.wikipedia.org/w/api.php',
+                               'http://ru-sib.wikipedia.org/w/api.php',
                                default_error_handling=True)
 
     def test_invalid_scheme(self):
@@ -160,18 +159,18 @@ class TestHttpStatus(HttpbinTestCase):
         self.assertRaisesRegex(
             requests.exceptions.InvalidSchema,
             "No connection adapters were found for u?'invalid://url'",
-            http.fetch, uri='invalid://url')
+            http.fetch, 'invalid://url')
 
     def test_follow_redirects(self):
         """Test follow 301 redirects correctly."""
         # The following will redirect from ' ' -> '_', and maybe to https://
-        r = http.fetch(uri='http://en.wikipedia.org/wiki/Main%20Page')
+        r = http.fetch('http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status_code, 200)
         self.assertIsNotNone(r.data.history)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page',
                       r.data.url)
 
-        r = http.fetch(uri='http://en.wikia.com')
+        r = http.fetch('http://en.wikia.com')
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.data.url,
                          'https://www.fandom.com/explore')
@@ -547,26 +546,9 @@ class BinaryTestCase(TestCase):
 
     def test_http(self):
         """Test with http, standard http interface for pywikibot."""
-        r = http.fetch(uri=self.url)
+        r = http.fetch(self.url)
 
         self.assertEqual(r.content, self.png)
-
-
-class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
-
-    """Test usage of deprecated pywikibot.cookie_jar."""
-
-    net = False
-
-    def test_cookie_jar(self):
-        """Test pywikibot.cookie_jar is deprecated."""
-        # Accessing from the main package should be deprecated.
-        main_module_cookie_jar = pywikibot.cookie_jar
-
-        self.assertOneDeprecationParts('pywikibot.cookie_jar',
-                                       'pywikibot.comms.http.cookie_jar')
-
-        self.assertIs(main_module_cookie_jar, http.cookie_jar)
 
 
 class QueryStringParamsTestCase(HttpbinTestCase):
@@ -585,7 +567,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
     def test_no_params(self):
         """Test fetch method with no parameters."""
-        r = http.fetch(uri=self.url, params={})
+        r = http.fetch(self.url, params={})
         if r.status_code == 503:  # T203637
             self.skipTest(
                 '503: Service currently not available for ' + self.url)
@@ -601,7 +583,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(uri=self.url, params={'fish&chips': 'delicious'})
+        r = http.fetch(self.url, params={'fish&chips': 'delicious'})
         if r.status_code == 503:  # T203637
             self.skipTest(
                 '503: Service currently not available for ' + self.url)
@@ -617,7 +599,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(uri=self.url, params={'fish%26chips': 'delicious'})
+        r = http.fetch(self.url, params={'fish%26chips': 'delicious'})
         if r.status_code == 503:  # T203637
             self.skipTest(
                 '503: Service currently not available for ' + self.url)
@@ -638,12 +620,12 @@ class DataBodyParameterTestCase(HttpbinTestCase):
             'X-Amzn-Trace-Id', 'X-B3-Parentspanid', 'X-B3-Spanid',
             'X-B3-Traceid', 'X-Forwarded-Client-Cert',
         )
-        r_data_request = http.fetch(uri=self.get_httpbin_url('/post'),
+        r_data_request = http.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
-        r_body_request = http.fetch(uri=self.get_httpbin_url('/post'),
+        r_body_request = http.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
-                                    body={'fish&chips': 'delicious'})
+                                    data={'fish&chips': 'delicious'})
 
         r_data = json.loads(r_data_request.text)
         r_body = json.loads(r_body_request.text)

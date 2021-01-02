@@ -36,6 +36,13 @@ from typing import Optional, Union
 
 import pywikibot
 
+from pywikibot import date, config, i18n, xmlreader
+from pywikibot.backports import List
+from pywikibot.bot import ShowingListOption
+from pywikibot.comms import http
+from pywikibot.data import api
+from pywikibot.exceptions import ServerError, UnknownExtension
+from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
@@ -47,18 +54,6 @@ from pywikibot.tools import (
     redirect_func,
 )
 
-from pywikibot import date, config, i18n, xmlreader
-from pywikibot.bot import ShowingListOption
-from pywikibot.comms import http
-from pywikibot.data import api
-from pywikibot.exceptions import ServerError, UnknownExtension
-from pywikibot.proofreadpage import ProofreadPage
-from pywikibot.tools import PYTHON_VERSION
-
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 _logger = 'pagegenerators'
 
@@ -2679,13 +2674,13 @@ class XMLDumpOldPageGenerator(Iterator):
         self.parser = dump.parse()
 
     @property
-    @deprecated('self.start', since='20160414')
+    @deprecated('self.start', since='20160414', future_warning=True)
     def xmlStart(self):
         """Deprecated xmlStart instance variable."""
         return self.start
 
     @xmlStart.setter
-    @deprecated('self.start', since='20160414')
+    @deprecated('self.start', since='20160414', future_warning=True)
     def xmlStart(self, value):
         self.start = value
 
@@ -2931,11 +2926,14 @@ PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         since='20170314')
 # Deprecated old names available for compatibility with compat.
 ImageGenerator = redirect_func(
-    PageClassGenerator, old_name='ImageGenerator', since='20161017')
+    PageClassGenerator, old_name='ImageGenerator', since='20161017',
+    future_warning=True)
 FileGenerator = redirect_func(
-    PageClassGenerator, old_name='FileGenerator', since='20161017')
+    PageClassGenerator, old_name='FileGenerator', since='20161017',
+    future_warning=True)
 CategoryGenerator = redirect_func(
-    PageClassGenerator, old_name='CategoryGenerator', since='20161017')
+    PageClassGenerator, old_name='CategoryGenerator', since='20161017',
+    future_warning=True)
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
                              since='20181128')

@@ -29,6 +29,8 @@ from warnings import warn
 import requests
 
 import pywikibot
+
+from pywikibot.backports import Tuple
 from pywikibot.comms import threadedhttp
 from pywikibot import config2 as config
 from pywikibot.exceptions import (
@@ -37,15 +39,10 @@ from pywikibot.exceptions import (
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
-    deprecate_arg,
+    deprecated_args,
+    issue_deprecation_warning,
     file_mode_checker,
-    PYTHON_VERSION,
 )
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 try:
     import requests_oauthlib
@@ -217,8 +214,8 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-def request(site, uri: Optional[str] = None, method='GET', params=None,
-            body=None, headers=None, data=None, **kwargs) -> str:
+@deprecated_args(body='data')
+def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
     """
     Request to Site with default error handling and response decoding.
 
@@ -238,13 +235,14 @@ def request(site, uri: Optional[str] = None, method='GET', params=None,
     @type charset: CodecInfo, str, None
     @return: The received data
     """
-    # body and data parameters both map to the data parameter of
-    # requests.Session.request.
-    if data:
-        body = data
-
-    kwargs.setdefault('disable_ssl_certificate_validation',
-                      site.ignore_certificate_error())
+    kwargs.setdefault('verify', site.verify_SSL_certificate())
+    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
+    if old_validation is not None:
+        issue_deprecation_warning('disable_ssl_certificate_validation',
+                                  instead='verify',
+                                  warning_class=FutureWarning,
+                                  since='20201220')
+        kwargs.update(verify=not old_validation)
 
     if not headers:
         headers = {}
@@ -254,7 +252,7 @@ def request(site, uri: Optional[str] = None, method='GET', params=None,
     headers['user-agent'] = user_agent(site, format_string)
 
     baseuri = site.base_url(uri)
-    r = fetch(baseuri, method, params, body, headers, **kwargs)
+    r = fetch(baseuri, headers=headers, **kwargs)
     site.throttle.retry_after = int(r.response_headers.get('retry-after', 0))
     return r.text
 
@@ -287,8 +285,8 @@ def error_handling_callback(response):
     """
     Raise exceptions and log alerts.
 
-    @param request: Request that has completed
-    @type request: L{threadedhttp.HttpRequest}
+    @param response: Response returned by Session.request().
+    @type response: L{requests.Response}
     """
     # TODO: do some error correcting stuff
     if isinstance(response, requests.exceptions.SSLError):
@@ -317,11 +315,9 @@ def error_handling_callback(response):
         warning('Http response status {}'.format(response.status_code))
 
 
-@deprecate_arg('callback', True)
-def fetch(uri, method='GET', params=None, body=None, headers=None,
-          default_error_handling: bool = True,
-          use_fake_user_agent: Union[bool, str] = False,
-          data=None, **kwargs):
+@deprecated_args(callback=True, body='data')
+def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
+          use_fake_user_agent: Union[bool, str] = False, **kwargs):
     """
     HTTP request.
 
@@ -336,17 +332,12 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
-    @kwarg disable_ssl_certificate_validation: diable SSL Verification
-    @type disable_ssl_certificate_validation: bool
+    @kwarg verify: verify the SSL certificate (default is True)
+    @type verify: bool or path to certificates
     @kwarg callbacks: Methods to call once data is fetched
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
-    # body and data parameters both map to the data parameter of
-    # requests.Session.request.
-    if data:
-        body = data
-
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
@@ -400,15 +391,20 @@ def fetch(uri, method='GET', params=None, body=None, headers=None,
             auth = requests_oauthlib.OAuth1(*auth)
 
     timeout = config.socket_timeout
-    ignore_validation = kwargs.pop('disable_ssl_certificate_validation', False)
+    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
+    if old_validation is not None:
+        issue_deprecation_warning('disable_ssl_certificate_validation',
+                                  instead='verify',
+                                  warning_class=FutureWarning,
+                                  since='20201220')
+        kwargs.update(verify=not old_validation)
 
     try:
         # Note that the connections are pooled which mean that a future
         # HTTPS request can succeed even if the certificate is invalid and
         # verify=True, when a request with verify=False happened before
-        response = session.request(method, uri, params=params, data=body,
+        response = session.request(method, uri,
                                    headers=headers, auth=auth, timeout=timeout,
-                                   verify=not ignore_validation,
                                    **kwargs)
     except Exception as e:
         request.data = e

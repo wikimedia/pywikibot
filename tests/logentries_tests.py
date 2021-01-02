@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -307,14 +306,15 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         """Test title and page return the same instance."""
         # Request multiple log entries in the hope that one might have no
         # title entry
+        self._do_test_warning_filename = False  # T271044
         for logentry in self.site.logevents(total=5):
             if 'title' in logentry.data:  # title may be missing
                 self.assertIsInstance(logentry.title(), pywikibot.Page)
                 self.assertIs(logentry.title(), logentry.page())
-                self.assertOneDeprecation(count=2)
             else:
                 self.assertRaises(KeyError, logentry.title)
-                self.assertOneDeprecation()
+            self.assertDeprecation()  # T271044
+        self._reset_messages()  # T271044
 
     def test_get_moved_target(self, key):
         """Test getMovedTarget method."""

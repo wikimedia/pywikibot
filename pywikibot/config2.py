@@ -54,15 +54,10 @@ from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
+from pywikibot.backports import Dict, List, Tuple
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import issue_deprecation_warning, PYTHON_VERSION
+from pywikibot.tools import issue_deprecation_warning
 
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Tuple = tuple
-else:
-    from typing import Dict, List, Tuple
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -994,26 +989,21 @@ _public_globals = {
 # we can detect modified config items easily.
 _exec_globals = copy.deepcopy(_public_globals)
 
-# Get the user files
-if __no_user_config:
-    if __no_user_config != '2':
-        warning('Skipping loading of user-config.py.')
-else:
-    _filename = os.path.join(base_dir, 'user-config.py')
-    if os.path.exists(_filename):
-        _filestatus = os.stat(_filename)
-        _filemode = _filestatus[0]
-        _fileuid = _filestatus[4]
-        if OSWIN32 or _fileuid in [os.getuid(), 0]:
-            if OSWIN32 or _filemode & 0o02 == 0:
-                with open(_filename, 'rb') as f:
-                    exec(compile(f.read(), _filename, 'exec'), _exec_globals)
-            else:
-                warning("Skipped '%(fn)s': writeable by others."
-                        % {'fn': _filename})
-        else:
-            warning("Skipped '%(fn)s': owned by someone else."
-                    % {'fn': _filename})
+# Always try to get the user files
+_filename = os.path.join(base_dir, 'user-config.py')
+if os.path.exists(_filename):
+    _filestatus = os.stat(_filename)
+    _filemode = _filestatus[0]
+    _fileuid = _filestatus[4]
+    if not OSWIN32 and _fileuid not in [os.getuid(), 0]:
+        warning('Skipped {fn!r}: owned by someone else.'.format(fn=_filename))
+    elif OSWIN32 or _filemode & 0o02 == 0:
+        with open(_filename, 'rb') as f:
+            exec(compile(f.read(), _filename, 'exec'), _exec_globals)
+    else:
+        warning('Skipped {fn!r}: writeable by others.'.format(fn=_filename))
+elif __no_user_config and __no_user_config != '2':
+    warning('user-config.py cannot be loaded.')
 
 
 class _DifferentTypeError(UserWarning, TypeError):

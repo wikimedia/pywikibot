@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,8 +31,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'en', 'hu', 'de', 'fr', 'it', 'pt', 'ja', 'es', 'nl', 'pl', 'id', 'he',
         'fi', 'zh', 'sq', 'az', 'fa', 'ru', 'vi', 'ca', 'eu', 'da', 'ko', 'ba',
-        'th', 'sv', 'gl', 'sr', 'cs', 'hi', 'hr', 'no', 'sa', 'tr', 'ar', 'ta',
-        'uk', 'eo', 'sk', 'is', 'ro', 'bn', 'si', 'mk', 'ka', 'bg', 'ms', 'tt',
+        'th', 'sv', 'gl', 'sr', 'cs', 'hi', 'hr', 'no', 'sa', 'tr', 'ar', 'uk',
+        'ta', 'eo', 'sk', 'is', 'ro', 'bn', 'si', 'mk', 'bg', 'ka', 'ms', 'tt',
         'lt', 'el', 'li', 'sl', 'ur', 'km', 'tl', 'la', 'et', 'be', 'kk', 'ia',
         'ml', 'oc', 'ne', 'hy', 'cv', 'pa', 'tg', 'te', 'ku', 'fy', 'bs', 'cy',
         'af', 'mg', 'mr', 'ky',

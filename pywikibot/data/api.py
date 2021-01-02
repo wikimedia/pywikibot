@@ -30,6 +30,7 @@ import pywikibot
 
 from pywikibot import config, login
 
+from pywikibot.backports import FrozenSet, Set, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
@@ -38,17 +39,12 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.tools import (
-    deprecated, issue_deprecation_warning, itergroup, PYTHON_VERSION,
-    remove_last_args,
+    deprecated,
+    issue_deprecation_warning,
+    itergroup,
+    PYTHON_VERSION,
 )
 from pywikibot.tools.formatter import color_format
-
-if PYTHON_VERSION >= (3, 9):
-    Set = set
-    Tuple = tuple
-    FrozenSet = frozenset
-else:
-    from typing import Set, Tuple, FrozenSet
 
 
 _logger = 'data.api'
@@ -1606,9 +1602,9 @@ class Request(MutableMapping):
         """
         try:
             data = http.request(
-                site=self.site, uri=uri,
+                self.site, uri=uri,
                 method='GET' if use_get else 'POST',
-                body=body, headers=headers)
+                data=body, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
         except Server414Error:
@@ -2957,8 +2953,7 @@ class LoginManager(login.LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
-    def getCookie(self) -> str:
+    def login_to_site(self):
         """Login to the site.
 
         Note, this doesn't actually return or do anything with cookies.
@@ -3030,7 +3025,7 @@ class LoginManager(login.LoginManager):
             status = response[result_key]
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
-                return ''
+                return None
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
@@ -3069,10 +3064,6 @@ class LoginManager(login.LoginManager):
             raise APIError(**response)
         info = fail_reason
         raise APIError(code=status, info=info)
-
-    def storecookiedata(self, data):
-        """Ignore data; cookies are set by http module."""
-        http.cookie_jar.save(ignore_discard=True)
 
     def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.

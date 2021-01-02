@@ -15,7 +15,9 @@ from tkinter import simpledialog as tkSimpleDialog
 from typing import Optional
 
 import pywikibot
+
 from pywikibot import __url__
+from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -33,11 +35,6 @@ else:
     from idlelib.configDialog import ConfigDialog
     from idlelib.configHandler import idleConf
     from idlelib.MultiCall import MultiCallCreator
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 
 class TextEditor(ScrolledText):

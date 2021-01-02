@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Configuration file for Sphinx."""
 #
 # (C) Pywikibot team, 2014-2020

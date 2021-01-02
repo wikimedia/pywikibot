@@ -17,8 +17,10 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import config, __url__
+from pywikibot.comms import http
 from pywikibot.exceptions import NoUsername
 from pywikibot.tools import (
+    deprecated,
     deprecated_args, file_mode_checker, normalize_username, remove_last_args,
 )
 
@@ -185,6 +187,7 @@ class LoginManager:
         # No bot policies on other sites
         return True
 
+    @deprecated('login_to_site', since='20201227', future_warning=True)
     @remove_last_args(['remember', 'captcha'])
     def getCookie(self):
         """
@@ -194,20 +197,17 @@ class LoginManager:
 
         @return: cookie data if successful, None otherwise.
         """
-        # THIS IS OVERRIDDEN IN data/api.py
-        return None
+        self.login_to_site()
 
-    def storecookiedata(self, data: str) -> None:
-        """
-        Store cookie data.
-
-        @param data: The raw data as returned by getCookie()
-        """
+    def login_to_site(self):
+        """Login to the site."""
         # THIS IS OVERRIDDEN IN data/api.py
-        filename = config.datafilepath('pywikibot.lwp')
-        pywikibot.debug('Storing cookies to {}'.format(filename), _logger)
-        with open(filename, 'w') as f:
-            f.write(data)
+        raise NotImplementedError
+
+    @remove_last_args(['data'])
+    def storecookiedata(self) -> None:
+        """Store cookie data."""
+        http.cookie_jar.save(ignore_discard=True)
 
     def readPassword(self):
         """
@@ -323,7 +323,7 @@ class LoginManager:
         pywikibot.output('Logging in to {site} as {name}'
                          .format(name=self.login_name, site=self.site))
         try:
-            cookiedata = self.getCookie()
+            self.login_to_site()
         except pywikibot.data.api.APIError as e:
             error_code = e.code
             pywikibot.error('Login failed ({}).'.format(error_code))
@@ -340,7 +340,7 @@ class LoginManager:
                 return self.login(retry=True)
             else:
                 return False
-        self.storecookiedata(cookiedata)
+        self.storecookiedata()
         pywikibot.log('Should be logged in now')
         return True
 

@@ -15,19 +15,10 @@ from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 
+from pywikibot.backports import Tuple
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import (
-    deprecated,
-    first_lower,
-    first_upper,
-    PYTHON_VERSION,
-)
-
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
+from pywikibot.tools import deprecated, first_lower, first_upper
 
 #
 # Different collections of well known formats
@@ -189,12 +180,6 @@ def dh_millenniumBC(value, pattern):
 def decSinglVal(v):
     """Return first item in list v."""
     return v[0]
-
-
-@deprecated(since='20151014', future_warning=True)
-def encNoConv(i):
-    """Return i."""
-    return i
 
 
 def encDec0(i):
@@ -1922,17 +1907,6 @@ for monthId in range(12):
     else:
         # 30 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(30)
-
-
-@deprecated('calendar.monthrange', since='20150707', future_warning=True)
-def getNumberOfDaysInMonth(month):
-    """
-    Return the maximum number of days in a given month, 1 being January, etc.
-
-    For February always 29 will be given, even it is not a leap year.
-    """
-    # use year 2000 which is a leap year
-    return calendar.monthrange(2000, month)[1]
 
 
 def getAutoFormat(lang, title, ignoreFirstLetterCase=True):

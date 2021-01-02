@@ -8,18 +8,13 @@
 from collections.abc import Iterable, Mapping
 from typing import Optional, Union
 
+from pywikibot.backports import List
 from pywikibot.tools import (
     ComparableMixin,
     deprecated_args,
     issue_deprecation_warning,
-    PYTHON_VERSION,
     SelfCallMixin,
 )
-
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 
 class Namespace(Iterable, ComparableMixin):

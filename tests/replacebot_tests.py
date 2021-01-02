@@ -10,7 +10,6 @@ from contextlib import suppress
 import pywikibot
 
 from pywikibot import fixes
-from pywikibot.tools import suppress_warnings
 
 from scripts import replace
 
@@ -162,8 +161,6 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertEqual(expected,
                          bot.apply_replacements('Hello 1', applied, page))
         self.assertEqual(applied, required_applied)
-        with suppress_warnings('scripts.replace.ReplaceRobot.doReplacements'):
-            self.assertEqual(expected, bot.doReplacements('Hello 1', page))
 
     def test_only_cmd(self):
         """Test command line replacements only."""

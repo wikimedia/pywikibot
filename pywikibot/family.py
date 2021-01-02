@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,20 +18,19 @@ from os.path import basename, dirname, splitext
 from typing import Optional
 
 import pywikibot
+
+from pywikibot.backports import Dict, List, Tuple
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    classproperty, deprecated, deprecated_args, frozenmap,
-    issue_deprecation_warning, ModuleDeprecationWrapper, PYTHON_VERSION,
-    remove_last_args,
+    classproperty,
+    deprecated,
+    deprecated_args,
+    frozenmap,
+    issue_deprecation_warning,
+    ModuleDeprecationWrapper,
 )
 
-if PYTHON_VERSION >= (3, 9):
-    Dict = dict
-    List = list
-    Tuple = tuple
-else:
-    from typing import Dict, List, Tuple
 
 logger = logging.getLogger('pywiki.wiki.family')
 
@@ -113,8 +111,8 @@ class Family:
         'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km',
         'pcd', 'pms', 'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh',
         'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se',
-        'sm', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
-        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'sm', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco', 'stq', 'st', 'nso', 'tn',
+        'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
         'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'shn', 'ta', 'kab',
         'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy',
         've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk',
@@ -149,8 +147,8 @@ class Family:
         'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap',
         'ps', 'jam', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
         'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah', 'szy',
-        'se', 'sa', 'sg', 'sat', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
-        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'se', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco', 'stq', 'st', 'nso', 'tn',
+        'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
         'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'kbp',
         'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr',
         'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk',
@@ -505,10 +503,6 @@ class Family:
     # 'en': "Disambiguation"
     disambcatname = {}  # type: Dict[str, str]
 
-    # DEPRECATED, stores the code of the site which have a case sensitive
-    # main namespace. Use the Namespace given from the Site instead
-    nocapitalize = []  # type: List[str]
-
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
     interwiki_attop = []  # type: List[str]
@@ -661,22 +655,11 @@ class Family:
         class variable. Only penalize getting it because it must be set so that
         the backwards compatibility is still available.
         """
-        if name == 'nocapitalize':
-            issue_deprecation_warning('nocapitalize',
-                                      "APISite.siteinfo['case'] or "
-                                      "Namespace.case == 'case-sensitive'",
-                                      warning_class=FutureWarning,
-                                      since='20150214')
-        elif name == 'known_families':
+        if name == 'known_families':
             issue_deprecation_warning('known_families',
                                       'APISite.interwiki(prefix)',
                                       warning_class=FutureWarning,
                                       since='20150503')
-        elif name == 'shared_data_repository':
-            issue_deprecation_warning('shared_data_repository',
-                                      'APISite.data_repository()',
-                                      warning_class=FutureWarning,
-                                      since='20151023')
         return super().__getattribute__(name)
 
     @staticmethod
@@ -738,15 +721,6 @@ class Family:
                               FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
-
-    @classproperty
-    @deprecated('Family.codes or APISite.validLanguageLinks', since='20151014',
-                future_warning=True)
-    def iwkeys(cls):
-        """DEPRECATED: List of (interwiki_forward's) family codes."""
-        if cls.interwiki_forward:
-            return list(pywikibot.Family(cls.interwiki_forward).langs.keys())
-        return list(cls.langs.keys())
 
     @deprecated('APISite.interwiki', since='20151014', future_warning=True)
     def get_known_families(self, code):
@@ -837,6 +811,18 @@ class Family:
         """
         return 'http'
 
+    def verify_SSL_certificate(self, code: str) -> bool:
+        """
+        Return whether a HTTPS certificate should be verified.
+
+        @param code: language code
+        @return: flag to verify the SSL certificate;
+                 set it to False to allow access if certificate has an error.
+        """
+        return True
+
+    @deprecated('verify_SSL_certificate', since='20201013',
+                future_warning=True)
     def ignore_certificate_error(self, code: str) -> bool:
         """
         Return whether a HTTPS certificate error should be ignored.
@@ -844,7 +830,7 @@ class Family:
         @param code: language code
         @return: flag to allow access if certificate has an error.
         """
-        return False
+        return not self.verify_SSL_certificate
 
     def hostname(self, code):
         """The hostname to use for standard http connections."""
@@ -913,11 +899,6 @@ class Family:
         """Return path to api.php."""
         return '%s/api.php' % self.scriptpath(code)
 
-    @deprecated('APISite.article_path', since='20150905', future_warning=True)
-    def nicepath(self, code):
-        """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
-        return '/wiki/'
-
     def eventstreams_host(self, code):
         """Hostname for EventStreams."""
         raise NotImplementedError('This family does not support EventStreams')
@@ -930,12 +911,6 @@ class Family:
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
         return '%s?title=%s&redirect=no' % (self.path(code), title)
-
-    @deprecated('APISite.nice_get_address(title)', since='20150628',
-                future_warning=True)
-    def nice_get_address(self, code, title):
-        """DEPRECATED: Return the nice path to title using index.php."""
-        return '%s%s' % (self.nicepath(code), title)
 
     def interface(self, code):
         """
@@ -1065,15 +1040,6 @@ class Family:
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
-        return (None, None)
-
-    # Deprecated via __getattribute__
-    @remove_last_args(['transcluded'])
-    def shared_data_repository(self, code):
-        """Return the shared Wikibase repository, if any."""
-        repo = pywikibot.Site(code, self).data_repository()
-        if repo is not None:
-            return repo.code, repo.family.name
         return (None, None)
 
     def isPublic(self, code):

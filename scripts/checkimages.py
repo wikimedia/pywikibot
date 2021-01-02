@@ -90,6 +90,7 @@ from typing import Generator
 
 import pywikibot
 
+from pywikibot.backports import List, Tuple
 from pywikibot.bot import suggest_help
 from pywikibot import config2 as config
 from pywikibot.exceptions import NotEmailableError
@@ -97,13 +98,7 @@ from pywikibot.family import Family
 from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-    Tuple = tuple
-else:
-    from typing import List, Tuple
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#

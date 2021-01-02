@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,30 +33,30 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ce', 'ms', 'eo', 'he', 'hy', 'bg', 'da', 'azb', 'tt', 'sk', 'kk',
         'hr', 'min', 'et', 'lt', 'be', 'el', 'simple', 'az', 'sl', 'gl', 'ur',
         'nn', 'ka', 'hi', 'th', 'uz', 'la', 'ta', 'cy', 'vo', 'mk', 'ast',
-        'zh-yue', 'lv', 'tg', 'bn', 'af', 'mg', 'oc', 'bs', 'nds', 'sq', 'ky',
-        'new', 'be-tarask', 'ml', 'te', 'br', 'vec', 'mr', 'pms', 'tl', 'my',
-        'jv', 'su', 'ht', 'sw', 'lb', 'pnb', 'ba', 'ga', 'szl', 'is', 'lmo',
-        'fy', 'cv', 'sco', 'wuu', 'diq', 'an', 'pa', 'ku', 'yo', 'ne', 'bar',
+        'zh-yue', 'lv', 'tg', 'bn', 'my', 'af', 'mg', 'oc', 'bs', 'nds', 'sq',
+        'ky', 'be-tarask', 'new', 'ml', 'te', 'br', 'mr', 'vec', 'pms', 'tl',
+        'jv', 'ht', 'su', 'sw', 'lb', 'pnb', 'ba', 'ga', 'szl', 'is', 'lmo',
+        'cv', 'fy', 'sco', 'wuu', 'diq', 'an', 'pa', 'ku', 'yo', 'ne', 'bar',
         'io', 'gu', 'ckb', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn', 'si',
         'bat-smg', 'nv', 'or', 'cdo', 'ilo', 'gd', 'xmf', 'yi', 'am', 'nap',
         'bug', 'wa', 'sd', 'hsb', 'mai', 'fo', 'map-bms', 'mzn', 'li', 'sah',
         'os', 'eml', 'frr', 'ps', 'sa', 'avk', 'gor', 'bcl', 'zh-classical',
-        'ace', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'hyw', 'km',
-        'crh', 'nso', 'rue', 'shn', 'se', 'as', 'bh', 'vls', 'mi', 'nds-nl',
-        'nah', 'sc', 'ha', 'lrc', 'vep', 'sn', 'gan', 'myv', 'ab', 'glk',
-        'kab', 'bo', 'so', 'co', 'zu', 'tk', 'fiu-vro', 'sat', 'kv', 'ban',
-        'ie', 'csb', 'pcd', 'gv', 'udm', 'ay', 'ug', 'zea', 'nrm', 'lij', 'kw',
-        'frp', 'lez', 'gn', 'lfn', 'stq', 'mwl', 'gom', 'rm', 'mt', 'lo',
-        'lad', 'olo', 'koi', 'fur', 'bjn', 'ang', 'dty', 'dsb', 'ext', 'ln',
-        'tyv', 'ary', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'pi', 'pag', 'av',
-        'awa', 'haw', 'bxr', 'xal', 'ig', 'krc', 'pap', 'za', 'rw', 'smn',
+        'ace', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'hyw', 'crh',
+        'km', 'nso', 'rue', 'shn', 'se', 'as', 'bh', 'vls', 'mi', 'nds-nl',
+        'nah', 'sc', 'lrc', 'ha', 'vep', 'sn', 'gan', 'zu', 'myv', 'ab', 'glk',
+        'kab', 'bo', 'so', 'co', 'tk', 'fiu-vro', 'ban', 'sat', 'kv', 'ie',
+        'csb', 'pcd', 'gv', 'udm', 'ay', 'ug', 'zea', 'nrm', 'lij', 'kw',
+        'frp', 'lez', 'gn', 'lfn', 'stq', 'mwl', 'rm', 'mt', 'gom', 'lo',
+        'lad', 'olo', 'koi', 'fur', 'bjn', 'ang', 'dty', 'dsb', 'ext', 'ary',
+        'ln', 'tyv', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'pi', 'pag', 'av',
+        'awa', 'haw', 'bxr', 'xal', 'ig', 'krc', 'smn', 'pap', 'za', 'rw',
         'pdc', 'kaa', 'szy', 'arc', 'to', 'nov', 'kbp', 'jam', 'wo', 'tpi',
-        'inh', 'kbd', 'na', 'tet', 'atj', 'tcy', 'ki', 'ak', 'jbo', 'roa-rup',
-        'bi', 'lbe', 'lg', 'xh', 'kg', 'ty', 'mdf', 'lld', 'fj', 'srn', 'gcr',
-        'om', 'ltg', 'sm', 'chr', 'nqo', 'got', 'kl', 'pih', 'st', 'mnw', 'ny',
-        'cu', 'tw', 'tn', 'ts', 'bm', 'rmy', 'chy', 'rn', 'tum', 'ss', 'ch',
-        'ks', 'iu', 'pnt', 'ady', 've', 'ee', 'ik', 'ff', 'sg', 'din', 'dz',
-        'ti', 'cr', 'mad', 'skr',
+        'inh', 'kbd', 'na', 'tet', 'atj', 'tcy', 'ki', 'ak', 'jbo', 'lld',
+        'bi', 'roa-rup', 'lbe', 'lg', 'kg', 'xh', 'ty', 'mdf', 'fj', 'srn',
+        'skr', 'gcr', 'om', 'ltg', 'sm', 'chr', 'nqo', 'got', 'kl', 'pih',
+        'st', 'mnw', 'ny', 'cu', 'tw', 'tn', 'ts', 'bm', 'rmy', 'chy', 'rn',
+        'tum', 'ss', 'ch', 'ks', 'iu', 'pnt', 'ady', 've', 'ee', 'mad', 'ik',
+        'ff', 'sg', 'din', 'dz', 'ti', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
@@ -141,10 +140,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'war', 'wo', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh',
         'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
     ]
-
-    # On most Wikipedias page names must start with a capital letter,
-    # but some languages don't use this.
-    nocapitalize = ['jbo']
 
     # Languages that used to be coded in iso-8859-1
     latin1old = {

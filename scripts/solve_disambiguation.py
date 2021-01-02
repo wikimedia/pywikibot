@@ -89,19 +89,17 @@ from itertools import chain
 from typing import Generator, Optional
 
 import pywikibot
+
 from pywikibot import config
 from pywikibot import editor as editarticle
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import List
 from pywikibot.bot import (HighlightContextOption, ListOption,
                            OutputProxyOption, SingleSiteBot, StandardOption)
 from pywikibot.tools import first_lower
-from pywikibot.tools import first_upper as firstcap, PYTHON_VERSION
+from pywikibot.tools import first_upper as firstcap
 from pywikibot.tools.formatter import SequenceOutputter
 
-if PYTHON_VERSION >= (3, 9):
-    List = list
-else:
-    from typing import List
 
 # Disambiguation Needed template
 dn_template = {
