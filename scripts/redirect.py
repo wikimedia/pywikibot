@@ -138,7 +138,7 @@ class RedirectGenerator(OptionHandler):
         redict = {}
         # open xml dump and read page titles out of it
         dump = xmlreader.XmlDump(xmlFilename)
-        redirR = self.site.redirectRegex()
+        redirR = self.site.redirect_regex
         readPagesCount = 0
         pageTitles = set()
         for entry in dump.parse():

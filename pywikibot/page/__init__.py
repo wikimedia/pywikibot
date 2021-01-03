@@ -2255,7 +2255,7 @@ class Page(BasePage):
             raise pywikibot.NoPage(self)
         if self.exists() and not self.isRedirectPage() and not force:
             raise pywikibot.IsNotRedirectPage(self)
-        redirect_regex = self.site.redirectRegex()
+        redirect_regex = self.site.redirect_regex
         if self.exists():
             old_text = self.get(get_redirect=True)
         else:
