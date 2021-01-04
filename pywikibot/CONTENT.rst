@@ -35,10 +35,10 @@ The contents of the package
     | exceptions.py              | Exception classes used throughout the framework      |
     +----------------------------+------------------------------------------------------+
     | family.py                  | Abstract superclass for wiki families. Subclassed by |
-    |                            | the classes in the 'families' subdirectory.          |
+    |                            | the classes in the 'families' subdirectory           |
     +----------------------------+------------------------------------------------------+
     | fixes.py                   | File containing all standard fixes, stores           |
-    |                            | predefined replacements used by replace.py.          |
+    |                            | predefined replacements used by replace.py           |
     +----------------------------+------------------------------------------------------+
     | flow.py                    | Objects representing Flow entities                   |
     +----------------------------+------------------------------------------------------+
@@ -51,10 +51,10 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | logging.py                 | Logging and output functions                         |
     +----------------------------+------------------------------------------------------+
-    | login.py                   | Log in to an account on your "home" wiki. or check   |
+    | login.py                   | Log in to an account on your "home" wiki, or check   |
     |                            | login status                                         |
     +----------------------------+------------------------------------------------------+
-    | pagegenerators.py          | Generator pages.                                     |
+    | pagegenerators.py          | Generator pages                                      |
     +----------------------------+------------------------------------------------------+
     | plural.py                  | Module containing plural rules of various languages  |
     +----------------------------+------------------------------------------------------+
@@ -68,17 +68,17 @@ The contents of the package
     | throttle.py                | Mechanics to slow down wiki read and/or write rate   |
     +----------------------------+------------------------------------------------------+
     | titletranslate.py          | Rules and tricks to auto-translate wikipage titles   |
-    |                            | articles.                                            |
+    |                            | articles                                             |
     +----------------------------+------------------------------------------------------+
     | version.py                 | Module to determine the pywikibot version (tag,      |
     |                            | revision and date)                                   |
     +----------------------------+------------------------------------------------------+
-    | xmlreader.py               | Reading and parsing XML dump files.                  |
+    | xmlreader.py               | Reading and parsing XML dump files                   |
     +----------------------------+------------------------------------------------------+
 
 
     +----------------------------+------------------------------------------------------+
-    |  comms                     | Communication layer.                                 |
+    |  comms                     | Communication layer                                  |
     +============================+======================================================+
     | eventstreams.py            | stream client for server sent events                 |
     +----------------------------+------------------------------------------------------+
@@ -116,17 +116,17 @@ The contents of the package
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
     | _basesite.py               | Objects representingsite methods independent of the  |
-    |                            | communication interface.                             |
+    |                            | communication interface                              |
     +----------------------------+------------------------------------------------------+
-    | _decorators.py             | Decorators used by site models.                      |
+    | _decorators.py             | Decorators used by site models                       |
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+
     | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
     +----------------------------+------------------------------------------------------+
-    | _siteinfo.py               | Objects representing site info data contents.        |
+    | _siteinfo.py               | Objects representing site info data contents         |
     +----------------------------+------------------------------------------------------+
-    | _tokenwallet.py            | Objects representing api tokens.                     |
+    | _tokenwallet.py            | Objects representing api tokens                      |
     +----------------------------+------------------------------------------------------+
 
 
@@ -142,7 +142,7 @@ The contents of the package
 
 
     +----------------------------+------------------------------------------------------+
-    | tools                      | Miscellaneous helper functions (not wiki-dependent). |
+    | tools                      | Miscellaneous helper functions (not wiki-dependent)  |
     +============================+======================================================+
     | __init__.py                | several classes and methods                          |
     +----------------------------+------------------------------------------------------+
@@ -180,12 +180,12 @@ The contents of the package
     | Others                                                                            |
     +============================+======================================================+
     | families (folder)          | Contains wiki-specific information like URLs,        |
-    |                            | languages, encodings etc.                            |
+    |                            | languages, encodings etc                             |
     +----------------------------+------------------------------------------------------+
     | CONTENT.rst                | This file ( Short info on all modules )              |
     +----------------------------+------------------------------------------------------+
     | epydoc.cfg                 | The list of objects to document                      |
     +----------------------------+------------------------------------------------------+
-    | READMY.rst                 | Package description file                             |
+    | README.rst                 | Package description file                             |
     +----------------------------+------------------------------------------------------+
 
