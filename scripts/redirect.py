@@ -39,8 +39,6 @@ and arguments can be:
                If neither of -xml -fullscan -moves is given, info will be
                loaded from a special page of the live wiki.
 
--page:title    Work on a single page
-
 -offset:n      With -moves, the number of hours ago to start scanning moved
                pages. With -xml, the number of the redirect to restart with
                (see progress). Otherwise, ignored.
@@ -104,7 +102,6 @@ class RedirectGenerator(OptionHandler):
         'moves': False,
         'namespaces': {0},
         'offset': -1,
-        'page': None,
         'start': None,
         'limit': None,
         'until': None,
@@ -299,8 +296,6 @@ class RedirectGenerator(OptionHandler):
             for (key, value) in redirs.items():
                 if value not in pageTitles:
                     yield key
-        elif self.opt.page:
-            yield self.opt.page
         else:
             pywikibot.output('Retrieving broken redirect special page...')
             yield from self.site.preloadpages(self.site.broken_redirects())
@@ -330,8 +325,6 @@ class RedirectGenerator(OptionHandler):
                     pywikibot.output('\nChecking redirect {0} of {1}...'
                                      .format(num, total))
                     yield key
-        elif self.opt.page:
-            yield self.opt.page
         else:
             pywikibot.output('Retrieving double redirect special page...')
             yield from self.site.preloadpages(self.site.double_redirects())
@@ -693,7 +686,7 @@ def main(*args) -> None:
             source.add(arg)
         elif option == 'offset':
             gen_options[option] = int(value)
-        elif option in ('page', 'start', 'until'):
+        elif option in ('start', 'until'):
             gen_options[option] = value
         elif option == 'limit':
             options['limit'] = gen_options['limit'] = int(value)
@@ -713,10 +706,12 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(missing_action=True)
         return
 
-    if gen_factory.namespaces:
-        gen_options['namespaces'] = gen_factory.namespaces
-    gen = RedirectGenerator(action, **gen_options)
-    options['generator'] = gen_factory.getCombinedGenerator(gen)
+    gen = None
+    if not gen_factory.gens:
+        if gen_factory.namespaces:
+            gen_options['namespaces'] = gen_factory.namespaces
+        gen = RedirectGenerator(action, **gen_options)
+    options['generator'] = gen_factory.getCombinedGenerator(gen=gen)
     bot = RedirectRobot(action, **options)
     bot.run()
 
