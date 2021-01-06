@@ -21,8 +21,6 @@ Furthermore, the following command line parameters are supported:
 
 -summary          Define the summary to use
 
--except           Use a regex to check if the text is already in the page
-
 -excepturl        Use the html page as text where you want to see if there's
                   the text, not the wiki-page.
 
@@ -54,7 +52,7 @@ Warning! Put it in one line, otherwise it won't work correctly:
         -summary:"Bot: Aggiungo template Categorizzare"
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -69,7 +67,9 @@ import pywikibot
 from pywikibot.backports import Tuple
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot_choice import QuitKeyboardInterrupt
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -282,7 +282,6 @@ def main(*args: Tuple[str, ...]) -> None:
     # If none, the var is set only for check purpose.
     summary = None
     addText = None
-    regexSkip = None
     regexSkipUrl = None
     always = False
     textfile = None
@@ -310,7 +309,11 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option == '-excepturl':
             regexSkipUrl = value or pywikibot.input('What text should I skip?')
         elif option == '-except':
-            regexSkip = value or pywikibot.input('What text should I skip?')
+            new_arg = ''.join('-grepnot', sep, value)
+            issue_deprecation_warning(arg, new_arg,
+                                      2, ArgumentDeprecationWarning,
+                                      since='20201224')
+            genFactory.handleArg(new_arg)
         elif option == '-up':
             up = True
         elif option == '-noreorder':
@@ -335,8 +338,9 @@ def main(*args: Tuple[str, ...]) -> None:
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
     for page in generator:
-        (_, newtext, _) = add_text(page, addText, summary, regexSkip,
-                                   regexSkipUrl, always, up, True,
+        (_, newtext, _) = add_text(page, addText, summary,
+                                   regexSkipUrl=regexSkipUrl,
+                                   always=always, up=up,
                                    reorderEnabled=reorderEnabled,
                                    create=talkPage)
 
