@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module contains backports to support older Python versions."""
 #
 # (C) Pywikibot team, 2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Module to define and load pywikibot configuration default and user preferences.
 
