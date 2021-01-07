@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
 # (C) Pywikibot team, 2007-2020

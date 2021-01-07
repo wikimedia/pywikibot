@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
 # (C) Pywikibot team, 2010-2020
@@ -171,7 +170,7 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
     return fam.name, mycode, username
 
 
-EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
+EXTENDED_CONFIG = """\
 # This is an automatically generated file. You can find more configuration
 # parameters in 'config.py' file.
 
@@ -220,14 +219,14 @@ mylang = '{main_code}'
 
 {config_text}"""
 
-SMALL_CONFIG = """# -*- coding: utf-8 -*-
+SMALL_CONFIG = """\
 family = '{main_family}'
 mylang = '{main_code}'
 {usernames}
 {botpasswords}
 """
 
-PASSFILE_CONFIG = """# -*- coding: utf-8 -*-
+PASSFILE_CONFIG = """\
 # This is an automatically generated file used to store
 # BotPasswords.
 #

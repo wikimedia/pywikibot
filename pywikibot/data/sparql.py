@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """SPARQL Query interface."""
 #
 # (C) Pywikibot team, 2016-2020
