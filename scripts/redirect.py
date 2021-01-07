@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to resolve double redirects, and to delete broken redirects.
 
@@ -70,7 +69,7 @@ and arguments can be:
 
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -256,24 +255,21 @@ class RedirectGenerator(OptionHandler):
                          for x in data['query']['redirects']}
 
             for pagetitle in data['query']['pages'].values():
-                if 'missing' in pagetitle and 'pageid' not in pagetitle:
-                    pages[pagetitle['title']] = False
-                else:
-                    pages[pagetitle['title']] = True
+                pages[pagetitle['title']] = \
+                    'missing' not in pagetitle or 'pageid' in pagetitle
             for redirect in redirects:
                 target = redirects[redirect]
-                result = 0
+                result = None
                 final = None
-                try:
-                    if pages[target]:
-                        final = target
-                        with suppress(KeyError):
-                            while result <= maxlen:
-                                result += 1
-                                final = redirects[final]
-                            # result = None
-                except KeyError:
-                    result = None
+
+                if pages.get(target):
+                    result = 0
+                    final = target
+                    with suppress(KeyError):
+                        while result <= maxlen:
+                            result += 1
+                            final = redirects[final]
+
                 yield (redirect, result, target, final)
 
     def retrieve_broken_redirects(self) -> Generator[
@@ -281,14 +277,13 @@ class RedirectGenerator(OptionHandler):
         """Retrieve broken redirects."""
         if self.opt.fullscan:
             count = 0
-            for (pagetitle, type, target, final) \
-                    in self.get_redirects_via_api(maxlen=2):
+            for pagetitle, type, target, final in self.get_redirects_via_api(
+                    maxlen=2):
                 if type == 0:
                     yield pagetitle
-                    if self.opt.limit:
-                        count += 1
-                        if count >= self.opt.limit:
-                            break
+                    count += 1
+                    if self.opt.limit and count >= self.opt.limit:
+                        break
         elif self.opt.xml:
             # retrieve information from XML dump
             pywikibot.output(
@@ -311,14 +306,13 @@ class RedirectGenerator(OptionHandler):
             yield from self.get_moved_pages_redirects()
         elif self.opt.fullscan:
             count = 0
-            for (pagetitle, type, target, final) \
-                    in self.get_redirects_via_api(maxlen=2):
-                if type != 0 and type != 1:
+            for pagetitle, type_, target, final in self.get_redirects_via_api(
+                    maxlen=2):
+                if type_ != 0 and type_ != 1:
                     yield pagetitle
-                    if self.opt.limit:
-                        count += 1
-                        if count >= self.opt.limit:
-                            break
+                    count += 1
+                    if self.opt.limit and count >= self.opt.limit:
+                        break
         elif self.opt.xml:
             redict, _ = self.get_redirects_from_dump()
             total = len(redict)
