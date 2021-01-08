@@ -380,6 +380,23 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P30175'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    def test_musical_notation_edit(self):
+        """Attempt adding a musical notation claim with valid input."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P88936')
+
+        # set new claim
+        claim = pywikibot.page.Claim(
+            testsite, 'P88936', datatype='musical-notation')
+        target = "\relative c' { c d e f | g2 g | a4 a a a | g1 |})"
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P88936'][0]
+        self.assertEqual(claim.getTarget(), target)
+
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):
 

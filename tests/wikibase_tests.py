@@ -1680,6 +1680,15 @@ class TestClaimSetValue(WikidataTestCase):
         self.assertEqual(claim.target.month, 1)
         self.assertEqual(claim.target.day, 1)
 
+    def test_set_musical_notation(self):
+        """Test setting claim of musical-notation type."""
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P6604')
+        self.assertEqual(claim.type, 'musical-notation')
+        claim.setTarget("\relative c' { c d e f | g2 g | a4 a a a | g1 |})")
+        self.assertEqual(
+            claim.target, "\relative c' { c d e f | g2 g | a4 a a a | g1 |})")
+
     def test_set_incorrect_target_value(self):
         """Test setting claim of the incorrect value."""
         wikidata = self.get_repo()
