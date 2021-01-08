@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for OpenStreetMap wiki."""
 #
 # (C) Pywikibot team, 2009-2020

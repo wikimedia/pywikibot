@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Foundation wiki."""
 #
 # (C) Pywikibot team, 2019-2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikimedia species wiki."""
 #
 # (C) Pywikibot team, 2007-2020

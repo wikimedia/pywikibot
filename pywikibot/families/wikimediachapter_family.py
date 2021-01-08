@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 #
 # (C) Pywikibot team, 2012-2020

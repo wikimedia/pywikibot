@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Various i18n functions.
 
 Helper functions for both the internal localization system and for

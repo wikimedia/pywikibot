@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikihow Wiki."""
 #
 # (C) Pywikibot team, 2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Text editor class for your favourite editor."""
 #
 # (C) Pywikibot team, 2004-2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Library to log the bot in to a wiki account."""
 #
 # (C) Pywikibot team, 2003-2020
