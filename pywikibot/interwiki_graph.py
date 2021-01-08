@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2020

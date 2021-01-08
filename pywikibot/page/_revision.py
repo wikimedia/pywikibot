@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Object representing page revision."""
 #
 # (C) Pywikibot team, 2008-2020

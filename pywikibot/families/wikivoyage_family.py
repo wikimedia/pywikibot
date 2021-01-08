@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikivoyage."""
 #
 # (C) Pywikibot team, 2012-2020
