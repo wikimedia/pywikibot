@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,8 +27,6 @@ from pywikibot.backports import cache, removesuffix
 from pywikibot.bot import (
     input, input_choice, input_yn, handle_args, show_help, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
-    # the following are flagged as deprecated on usage
-    handleArgs,
 )
 from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
@@ -73,7 +71,7 @@ __all__ = (
     'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
-    'FilePage', 'handle_args', 'handleArgs', 'html2unicode', 'input',
+    'FilePage', 'handle_args', 'html2unicode', 'input',
     'input_choice', 'input_yn', 'InterwikiRedirectPage', 'InvalidTitle',
     'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage',
     'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget', 'NoPage',

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -655,7 +654,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
             'python -c \"'
             'import subprocess, pywikibot; '
             "subprocess.run('cls', shell=True); "
-            "pywikibot.output('\\n'.join(pywikibot.handleArgs()))\" "
+            "pywikibot.output('\\n'.join(pywikibot.handle_args()))\" "
             'Alpha Bετα Гамма دلتا\n')
         lines = []
 
