@@ -326,7 +326,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         self.assertEqual(claim.getTarget(), target)
 
     def test_identifier_edit(self):
-        """Attempt adding a math claim with valid input."""
+        """Attempt adding an external identifier claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P718')
 
