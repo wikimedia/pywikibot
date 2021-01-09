@@ -6,23 +6,33 @@
 #
 from pywikibot.titletranslate import translate
 
-from tests.aspects import unittest, DefaultSiteTestCase
+from tests.aspects import unittest, TestCase
 
 
-class TestTitleTranslate(DefaultSiteTestCase):
+class TestTitleTranslate(TestCase):
 
     """Tests for titletranslate module."""
 
-    def setUp(self):
-        """Skip sites with empty languages_by_size list."""
-        super().setUp()
-        if not self.site.family.languages_by_size:
-            self.skipTest('languages_by_size is empty')
+    sites = {
+        'dewikt': {
+            'family': 'wiktionary',
+            'code': 'de',
+        },
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'zhwikisource': {
+            'family': 'wikisource',
+            'code': 'zh',
+        },
+    }
 
-    def test_translate(self):
+    def test_translate(self, key):
         """Test translate method."""
-        result = translate(page=self.get_mainpage(), auto=False,
-                           hints=['5:', 'nl,en,zh'], site=self.site)
+        site = self.get_site(key)
+        result = translate(page=self.get_mainpage(site), auto=False,
+                           hints=['5:', 'nl,en,zh'], site=site)
         self.assertLength(result, 6)
 
 
