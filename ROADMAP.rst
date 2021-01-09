@@ -1,7 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* -grepnot filter option was added to pagegenerators module (T219281)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
