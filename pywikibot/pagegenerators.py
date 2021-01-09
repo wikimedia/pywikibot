@@ -37,7 +37,7 @@ from typing import Optional, Union
 import pywikibot
 
 from pywikibot import date, config, i18n, xmlreader
-from pywikibot.backports import List
+from pywikibot.backports import Iterable, List
 from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
 from pywikibot.data import api
@@ -435,14 +435,21 @@ class GeneratorFactory:
     that are used by many scripts and that determine which pages to work on.
     """
 
-    def __init__(self, site=None, positional_arg_name: Optional[str] = None):
+    def __init__(self, site=None,
+                 positional_arg_name: Optional[str] = None,
+                 enabled_options: Optional[Iterable[str]] = None,
+                 disabled_options: Optional[Iterable[str]] = None):
         """
         Initializer.
 
-        @param site: Site for generator results.
+        @param site: Site for generator results
         @type site: L{pywikibot.site.BaseSite}
         @param positional_arg_name: generator to use for positional args,
             which do not begin with a hyphen
+        @param enabled_options: only enable options given by this Iterable.
+            This is priorized over disabled_options
+        @param disabled_options: disable these given options and let them
+            be handled by scripts options handler
         """
         self.gens = []
         self._namespaces = []
@@ -460,6 +467,27 @@ class GeneratorFactory:
         self._positional_arg_name = positional_arg_name
         self._sparql = None
         self.nopreload = False
+        self._validate_options(enabled_options, disabled_options)
+
+    def _validate_options(self, enable, disable):
+        """Validate option restrictions."""
+        msg = '{!r} is not a valid pagegenerators option to be '
+        enable = enable or []
+        disable = disable or []
+        self.enabled_options = set(enable)
+        self.disabled_options = set(disable)
+        for opt in enable:
+            if not hasattr(self, '_handle_' + opt):
+                pywikibot.warning((msg + 'enabled').format(opt))
+                self.enabled_options.remove(opt)
+        for opt in disable:
+            if not hasattr(self, '_handle_' + opt):
+                pywikibot.warning((msg + 'disabled').format(opt))
+                self.disabled_options.remove(opt)
+        if self.enabled_options and self.disabled_options:
+            pywikibot.warning('Ignoring disabled option because enabled '
+                              'options are set.')
+            self.disabled_options = []
 
     @property
     def site(self):
@@ -1200,7 +1228,14 @@ class GeneratorFactory:
         if value == '':
             value = None
 
-        handler = getattr(self, '_handle_' + arg[1:], None)
+        opt = arg[1:]
+        if opt in self.disabled_options:
+            return False
+
+        if self.enabled_options and opt not in self.enabled_options:
+            return False
+
+        handler = getattr(self, '_handle_' + opt, None)
         if not handler:
             return False
 
