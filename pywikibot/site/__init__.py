@@ -415,7 +415,8 @@ class APISite(BaseSite):
     @userinfo.deleter
     def userinfo(self):
         """Delete cached userinfo."""
-        del self._userinfo
+        if hasattr(self, '_userinfo'):
+            del self._userinfo
 
     @deprecated('userinfo property and userinfo deleter', since='20210110')
     def getuserinfo(self, force: bool = False) -> dict:
