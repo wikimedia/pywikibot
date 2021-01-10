@@ -34,8 +34,6 @@ from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 
-import tests
-
 from tests import (
     safe_repr, unittest, patch_request, unpatch_request, unittest_print)
 from tests.utils import (
@@ -402,34 +400,6 @@ class DisconnectedSiteMixin(TestCaseBase):
         pywikibot.Claim.TARGET_CONVERTER['commonsMedia'] = self.old_convert
 
 
-class CacheInfoMixin(TestCaseBase):
-
-    """Report cache hits and misses."""
-
-    def setUp(self):
-        """Set up test."""
-        super().setUp()
-        self.cache_misses_start = tests.cache_misses
-        self.cache_hits_start = tests.cache_hits
-
-    def tearDown(self):
-        """Tear down test."""
-        self.cache_misses = tests.cache_misses - self.cache_misses_start
-        self.cache_hits = tests.cache_hits - self.cache_hits_start
-
-        if self.cache_misses:
-            unittest_print(' {} cache misses'
-                           .format(self.cache_misses), end=' ')
-        if self.cache_hits:
-            unittest_print(' {} cache hits'
-                           .format(self.cache_hits), end=' ')
-
-        if self.cache_misses or self.cache_hits:
-            sys.stdout.flush()
-
-        super().tearDown()
-
-
 class CheckHostnameMixin(TestCaseBase):
 
     """Check the hostname is online before running tests."""
@@ -706,9 +676,9 @@ class MetaTestCaseClass(type):
 
         # Inherit superclass attributes
         for base in bases:
-            for key in ('pwb', 'net', 'site', 'user', 'sysop', 'write',
-                        'sites', 'family', 'code', 'dry', 'hostname', 'oauth',
-                        'hostnames', 'cached', 'cacheinfo', 'wikibase'):
+            for key in ('cached', 'code', 'dry', 'family', 'hostname',
+                        'hostnames', 'net', 'oauth', 'pwb', 'site', 'sites',
+                        'sysop', 'user', 'wikibase', 'write'):
                 if hasattr(base, key) and key not in dct:
                     dct[key] = getattr(base, key)
 
@@ -792,9 +762,6 @@ class MetaTestCaseClass(type):
             del dct['net']
         else:
             dct['net'] = True
-
-        if dct.get('cacheinfo'):
-            bases = cls.add_base(bases, CacheInfoMixin)
 
         if dct.get('cached'):
             bases = cls.add_base(bases, ForceCacheMixin)
