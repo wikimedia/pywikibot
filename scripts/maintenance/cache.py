@@ -79,20 +79,11 @@ import pywikibot
 from pywikibot.data import api
 
 # The follow attributes are used by eval()
-from pywikibot.login import LoginStatus
-from pywikibot.page import User
-from pywikibot.site import APISite, ClosedSite, DataSite
+from pywikibot.login import LoginStatus  # noqa: F401
+from pywikibot.page import User  # noqa: F401
+from pywikibot.site import APISite, ClosedSite, DataSite  # noqa: F401
 
 from pywikibot.tools import PYTHON_VERSION
-
-__all__ = (
-    'User', 'APISite', 'ClosedSite', 'DataSite', 'LoginStatus',
-    'ParseError', 'CacheEntry', 'process_entries', 'main',
-    'has_password', 'is_logout', 'empty_response', 'not_accessed',
-    'incorrect_hash',
-    'older_than', 'newer_than', 'older_than_one_day', 'recent',
-    'uniquedesc', 'parameters',
-)
 
 
 class ParseError(Exception):
