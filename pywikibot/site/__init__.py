@@ -412,7 +412,8 @@ class APISite(BaseSite):
 
     userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
 
-    def getglobaluserinfo(self):
+    @property
+    def globaluserinfo(self):
         """Retrieve globaluserinfo from site and cache it.
 
         self._globaluserinfo will be a dict with the following keys and values:
@@ -441,8 +442,10 @@ class APISite(BaseSite):
             self._globaluserinfo['registration'] = iso_ts
         return self._globaluserinfo
 
-    globaluserinfo = property(fget=getglobaluserinfo,
-                              doc=getglobaluserinfo.__doc__)
+    @deprecated('globaluserinfo property', since='20210110')
+    def getglobaluserinfo(self):
+        """DEPRECATED. Retrieve globaluserinfo."""
+        return self.globaluserinfo
 
     @remove_last_args(['sysop'])
     def is_blocked(self):
