@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1685,9 +1684,9 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P6604')
         self.assertEqual(claim.type, 'musical-notation')
-        claim.setTarget("\relative c' { c d e f | g2 g | a4 a a a | g1 |})")
-        self.assertEqual(
-            claim.target, "\relative c' { c d e f | g2 g | a4 a a a | g1 |})")
+        target = "\relative c' { c d e f | g2 g | a4 a a a | g1 |})"
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
 
     def test_set_incorrect_target_value(self):
         """Test setting claim of the incorrect value."""
