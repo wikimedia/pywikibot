@@ -4691,6 +4691,7 @@ class Property:
              'external-id': str,
              'geo-shape': pywikibot.WbGeoShape,
              'tabular-data': pywikibot.WbTabularData,
+             'musical-notation': str,
              }
 
     # the value type where different from the type
@@ -4703,6 +4704,7 @@ class Property:
                    'external-id': 'string',
                    'geo-shape': 'string',
                    'tabular-data': 'string',
+                   'musical-notation': 'string',
                    }
 
     def __init__(self, site, id: str, datatype: Optional[str] = None):
@@ -5380,7 +5382,8 @@ class Claim(Property):
         if self.type in ('wikibase-item', 'wikibase-property'):
             value = {'entity-type': self.getTarget().entity_type,
                      'numeric-id': self.getTarget().getID(numeric=True)}
-        elif self.type in ('string', 'url', 'math', 'external-id'):
+        elif self.type in ('string', 'url', 'math', 'external-id',
+                           'musical-notation'):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
