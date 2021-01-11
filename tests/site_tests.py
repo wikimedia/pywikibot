@@ -1624,6 +1624,144 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
                           end='2008-10-03T00:00:01Z', reverse=True, total=5)
 
 
+class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
+
+    """Test site method site.alldeletedrevisions() with bot user."""
+
+    user = True
+
+    def test_basic(self):
+        """Test the site.alldeletedrevisions() method."""
+        mysite = self.get_site()
+        drev = list(mysite.alldeletedrevisions(user=mysite.user(), total=10))
+        self.assertTrue(all(isinstance(data, dict)
+                            for data in drev))
+        self.assertTrue(all('revisions' in data
+                            and isinstance(data['revisions'], dict)
+                            for data in drev))
+        self.assertTrue(all('user' in rev
+                            and rev['user'] == mysite.user()
+                            for data in drev
+                            for rev in data))
+
+    def test_namespaces(self):
+        """Test the site.alldeletedrevisions() method using namespaces."""
+        mysite = self.get_site()
+        for data in mysite.alldeletedrevisions(namespaces=14, total=5):
+            self.assertIsInstance(data, dict)
+            self.assertIn('title', data)
+            self.assertTrue(data['title'].startswith(mysite.namespace(14)))
+
+        for data in mysite.alldeletedrevisions(user=mysite.user(),
+                                               namespaces=[10, 11],
+                                               total=5):
+            self.assertIsInstance(data, dict)
+            self.assertIn('title', data)
+            self.assertIn(data['ns'], (10, 11))
+
+    def test_excludeuser(self):
+        """Test the site.alldeletedrevisions() method using excludeuser."""
+        mysite = self.get_site()
+        for data in mysite.alldeletedrevisions(excludeuser=mysite.user(),
+                                               total=5):
+            self.assertIsInstance(data, dict)
+            for drev in data:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('user', data)
+                self.assertNotEqual('user', mysite.user())
+
+    def test_user_range(self):
+        """Test the site.alldeletedrevisions() method with range."""
+        mysite = self.get_site()
+        start = '2008-10-06T01:02:03Z'
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                start=pywikibot.Timestamp.fromISOformat(start),
+                total=5):
+            for drev in data:
+                self.assertLessEqual(drev['timestamp'], start)
+
+        end = '2008-10-07T02:03:04Z'
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                end=pywikibot.Timestamp.fromISOformat(end),
+                total=5):
+            for drev in data:
+                self.assertGreaterEqual(drev['timestamp'], end)
+
+        start = '2008-10-10T11:59:59Z'
+        end = '2008-10-10T00:00:01Z'
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                start=pywikibot.Timestamp.fromISOformat(start),
+                end=pywikibot.Timestamp.fromISOformat(end),
+                total=5):
+            for drev in data:
+                self.assertTrue(end <= drev['timestamp'] <= start)
+
+    def test_user_range_reverse(self):
+        """Test the site.alldeletedrevisions() method with range reversed."""
+        mysite = self.get_site()
+        start = '2008-10-08T03:05:07Z'
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                start=pywikibot.Timestamp.fromISOformat(start),
+                total=5, reverse=True):
+            for drev in data:
+                self.assertGreaterEqual(drev['timestamp'], start)
+
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                end=pywikibot.Timestamp.fromISOformat('2008-10-09T04:06:08Z'),
+                total=5, reverse=True):
+            for drev in data:
+                self.assertLessEqual(drev['timestamp'], '2008-10-09T04:06:08Z')
+
+        start = '2008-10-11T06:00:01Z'
+        end = '2008-10-11T23:59:59Z'
+        for data in mysite.alldeletedrevisions(
+                user=mysite.user(),
+                start=pywikibot.Timestamp.fromISOformat(start),
+                end=pywikibot.Timestamp.fromISOformat(end),
+                reverse=True, total=5):
+            for drev in data:
+                self.assertTrue(start <= drev['timestamp'] <= end)
+
+    def test_invalid_range(self):
+        """Test site.alldeletedrevisions() method with invalid range."""
+        mysite = self.get_site()
+        # start earlier than end
+        self.assertRaises(AssertionError, mysite.alldeletedrevisions,
+                          user=mysite.user(),
+                          start='2008-10-03T00:00:01Z',
+                          end='2008-10-03T23:59:59Z', total=5)
+        # reverse: end earlier than start
+        self.assertRaises(AssertionError, mysite.alldeletedrevisions,
+                          user=mysite.user(),
+                          start='2008-10-03T23:59:59Z',
+                          end='2008-10-03T00:00:01Z', reverse=True, total=5)
+
+
+class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
+
+    """Test site method site.alldeletedrevisions() without bot user."""
+
+    def test_prefix(self):
+        """Test the site.alldeletedrevisions() method with prefix."""
+        mysite = self.get_site()
+        for data in mysite.alldeletedrevisions(prefix='John', total=5):
+            self.assertIsInstance(data, dict)
+            for key in ('title', 'ns'):
+                self.assertIn(key, data)
+            title = data['title']
+            if data['ns'] > 0:
+                *_, title = title.partition(':')
+            self.assertTrue(title.startswith('John'))
+            for drev in data['revisions']:
+                for key in ('parentid', 'revid', 'timestamp', 'user'):
+                    self.assertIn(key, drev)
+
+
 class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
     """Test site method watchlist_revs()."""
@@ -1815,6 +1953,68 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                                          start='2008-09-03T23:59:59Z',
                                          end='2008-09-03T00:00:01Z', total=5,
                                          reverse=True)
+                next(gen)
+
+    def test_alldeletedrevisions(self):
+        """Test the site.alldeletedrevisions() method."""
+        mysite = self.get_site()
+        myuser = mysite.user()
+        if not mysite.has_right('deletedhistory'):
+            self.skipTest(
+                "You don't have permission to view the deleted revisions "
+                'on {0}.'.format(mysite))
+        prop = ['ids', 'timestamp', 'flags', 'user', 'comment']
+        gen = mysite.alldeletedrevisions(total=10, prop=prop)
+
+        for item in gen:
+            break
+        else:
+            self.skipTest('{0} does not have deleted edits.'.format(myuser))
+        self.assertIn('revisions', item)
+        for drev in item['revisions']:
+            for key in ('parentid', 'revid', 'timestamp', 'user', 'comment'):
+                self.assertIn(key, drev)
+
+        with self.subTest(start='2008-10-11T01:02:03Z', reverse=False,
+                          prop=prop):
+            for item in mysite.alldeletedrevisions(
+                start='2008-10-11T01:02:03Z',
+                total=5
+            ):
+                for drev in item['revisions']:
+                    self.assertIsInstance(drev, dict)
+                    self.assertLessEqual(drev['timestamp'],
+                                         '2008-10-11T01:02:03Z')
+
+        with self.subTest(start='2008-10-11T01:02:03Z', reverse=True,
+                          prop=prop):
+            for item in mysite.alldeletedrevisions(
+                start='2008-10-11T01:02:03Z',
+                total=5
+            ):
+                for drev in item['revisions']:
+                    self.assertIsInstance(drev, dict)
+                    self.assertGreaterEqual(drev['timestamp'],
+                                            '2008-10-11T01:02:03Z')
+
+        # start earlier than end
+        with self.subTest(start='2008-09-03T00:00:01Z',
+                          end='2008-09-03T23:59:59Z',
+                          reverse=False, prop=prop):
+            with self.assertRaises(AssertionError):
+                gen = mysite.alldeletedrevisions(start='2008-09-03T00:00:01Z',
+                                                 end='2008-09-03T23:59:59Z',
+                                                 total=5)
+                next(gen)
+
+        # reverse: end earlier than start
+        with self.subTest(start='2008-09-03T23:59:59Z',
+                          end='2008-09-03T00:00:01Z',
+                          reverse=True, prop=prop):
+            with self.assertRaises(AssertionError):
+                gen = mysite.alldeletedrevisions(start='2008-09-03T23:59:59Z',
+                                                 end='2008-09-03T00:00:01Z',
+                                                 total=5, reverse=True)
                 next(gen)
 
 
