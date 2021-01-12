@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -107,6 +106,19 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
                          self.site.namespace(14))
         self.assertEqual(self.site.category_namespaces(),
                          list(self.site.namespace(14, all=True)))
+
+    def test_loadimageinfo(self):
+        """Test deprecation warning if result of loadimageinfo() is used."""
+        file = pywikibot.FilePage(self.site, 'foo.jpg')
+        if not file.file_is_shared():
+            self.skipPage('test file is not shared from image repository.')
+        self.site.loadimageinfo(file)
+        self.assertNoDeprecation()
+        result = self.site.loadimageinfo(file)  # noqa: F841
+        self.assertOneDeprecation()
+        x = []
+        x.append(self.site.loadimageinfo(file))
+        self.assertOneDeprecation()
 
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
