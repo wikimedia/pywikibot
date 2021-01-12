@@ -34,7 +34,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ml', 'cs', 'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'ar', 'gl', 'jv',
         'oc', 'az', 'eu', 'uk', 'br', 'da', 'lo', 'ast', 'hr', 'simple', 'is',
         'la', 'fj', 'tg', 'ky', 'sk', 'bg', 'wa', 'ur', 'ps', 'cy', 'vo', 'af',
-        'zh-min-nan', 'he', 'skr', 'shn', 'scn', 'tl', 'pa', 'sl', 'sw', 'fy',
+        'zh-min-nan', 'skr', 'he', 'shn', 'scn', 'sl', 'tl', 'pa', 'sw', 'fy',
         'bn', 'nn', 'lv', 'ka', 'sq', 'co', 'mn', 'pnb', 'min', 'lb', 'nds',
         'bs', 'nah', 'ms', 'sa', 'yue', 'kk', 'km', 'vec', 'tk', 'mk', 'be',
         'sm', 'hsb', 'shy', 'gd', 'ga', 'an', 'wo', 'gom', 'ang', 'ia', 'tt',
