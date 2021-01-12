@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 User-interface related functions for building bots.
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikimania wikis."""
 #
 # (C) Pywikibot team, 2017-2020

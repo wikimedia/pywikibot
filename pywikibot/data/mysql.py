@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Miscellaneous helper functions for mysql queries."""
 #
 # (C) Pywikibot team, 2016-2020

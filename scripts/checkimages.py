@@ -78,7 +78,7 @@ Todo
 
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -124,6 +124,7 @@ n_txt = {
     'it': '{{subst:unverdata}}',
     'ja': '{{subst:Nld}}',
     'ko': '{{subst:nld}}',
+    'ru': '{{subst:nld}}',
     'sd': '{{subst:اجازت نامعلوم}}',
     'sr': '{{subst:датотека без лиценце}}',
     'ta': '{{subst:nld}}',
@@ -153,6 +154,7 @@ txt_find = {
     'ja': ['{{no source', '{{unknown',
            '{{non free', '<!--削除についての議論が終了するまで'],
     'ko': ['{{출처 없음', '{{라이선스 없음', '{{Unknown'],
+    'ru': ['{{no license'],
     'sd': ['{{ناحوالا', '{{ااجازت نامعلوم', '{{Di-no'],
     'sr': ['{{датотека без лиценце', '{{датотека без извора'],
     'ta': ['{{no source', '{{nld', '{{no license'],
@@ -177,6 +179,7 @@ empty = {
           '<!-- fine template di benvenuto -->',
     'ja': '{{subst:Welcome/intro}}\n{{subst:welcome|--~~~~}}\n',
     'ko': '{{환영}}--~~~~\n',
+    'ru': '{{subst:Приветствие}}\n~~~~\n',
     'sd': '{{ڀليڪار}}\n~~~~\n',
     'sr': '{{dd}}--~~~~\n',
     'ta': '{{welcome}}\n~~~~\n',
@@ -198,6 +201,7 @@ delete_immediately = {
     'it': '{{cancella subito|motivo=Il file ha come estensione ".%s"}}',
     'ja': '{{db|知らないファイルフォーマット %s}}',
     'ko': '{{delete|잘못된 파일 형식 (.%s)}}',
+    'ru': '{{db-badimage}}',
     'sr': '{{speedy|Ова датотека садржи екстензију %s. '
                'Молим вас да проверите да ли је у складу са правилима.}}',
     'ta': '{{delete|'
@@ -229,6 +233,7 @@ nothing_notification = {
           '%s|~~~}} --~~~~',
     'ja': '\n{{subst:Image copyright|File:%s}}--~~~~',
     'ko': '\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',
+    'ru': '{{subst:Запрос о статусе файла|Файл:%s}} --~~~~',
     'sr': '\n{{subst:Обавештење о датотеци без лиценце|%s}} --~~~~',
     'sd': '{{subst:تصوير جو ذريعو|File:%s}}--~~~~',
     'ta': '\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~',
@@ -249,6 +254,7 @@ bot_list = {
     'it': ['Filbot', 'Nikbot', '.snoopybot.'],
     'ja': ['Alexbot'],
     'ko': ['Kwjbot IV'],
+    'ru': ['Rubinbot'],
     'sr': ['KizuleBot'],
     'ta': ['TrengarasuBOT'],
     'ur': ['Shuaib-bot', 'Tahir-bot', 'SAMI.Bot'],
@@ -290,6 +296,7 @@ report_page = {
     'it': 'Progetto:Coordinamento/Immagini/Bot/Report',
     'ja': 'User:Alexbot/report',
     'ko': 'User:Kwjbot IV/Report',
+    'ru': 'User:Rubinbot/Report',
     'sd': 'واپرائيندڙ:Kaleem Bhatti/درخواست تصوير',
     'sr': 'User:KizuleBot/checkimages.py/дневник',
     'ta': 'User:Trengarasu/commonsimages',
@@ -324,6 +331,8 @@ HiddenTemplate = {
            'Template:Permissionotrs'],
     'ja': ['Template:Information'],
     'ko': ['Template:그림 정보'],
+    'ru': ['Template:Изображение',
+           'Template:Обоснование добросовестного использования'],
     'sd': ['Template:معلومات'],
     'sr': ['Шаблон:Информација', 'Шаблон:Non-free use rationale 2'],
     'ta': ['Template:Information'],
@@ -374,6 +383,7 @@ duplicatesText = {
     'de': '{{NowCommons}}',
     'it': '\n{{Progetto:Coordinamento/Immagini/Bot/Template duplicati|'
           '__images__}}',
+    'ru': '{{NCT|__image__}}',
     'sr': '{{NowCommons|__image__}}',
 }
 
@@ -407,6 +417,7 @@ category_with_licenses = {
     'it': 'Categoria:Template Licenze copyright',
     'ja': 'Category:画像の著作権表示テンプレート',
     'ko': '분류:위키백과 그림 저작권 틀',
+    'ru': 'Category:Шаблоны:Лицензии файлов',
     'sd': 'زمرو:وڪيپيڊيا فائل ڪاپي رائيٽ سانچا',
     'sr': 'Категорија:Шаблони за слике',
     'ta': 'Category:காப்புரிமை வார்ப்புருக்கள்',
@@ -442,7 +453,7 @@ serviceTemplates = {
 
 # Add your project (in alphabetical order) if you want that the bot starts
 project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
-                    'ko', 'meta', 'sd', 'sr', 'ta', 'test', 'ur', 'zh']
+                    'ko', 'ru', 'meta', 'sd', 'sr', 'ta', 'test', 'ur', 'zh']
 
 # END OF CONFIGURATION.
 

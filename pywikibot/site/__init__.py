@@ -300,7 +300,7 @@ class APISite(BaseSite):
         # or check user identity when OAuth enabled
         self._loginstatus = _LoginStatus.IN_PROGRESS
         try:
-            self.getuserinfo(force=True)
+            del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
                 return
         # May occur if you are not logged in (no API read permissions).
@@ -332,7 +332,8 @@ class APISite(BaseSite):
         login_manager = api.LoginManager(site=self, user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
-            self.getuserinfo(force=True)
+            del self.userinfo  # force reloading
+            self.userinfo  # load userinfo
             self._loginstatus = _LoginStatus.AS_USER
         else:
             self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
@@ -375,8 +376,12 @@ class APISite(BaseSite):
         # Clear also cookies for site's second level domain (T224712)
         api._invalidate_superior_cookies(self.family)
 
-    def getuserinfo(self, force=False):
+    @property
+    def userinfo(self):
         """Retrieve userinfo from site and store in _userinfo attribute.
+
+        To force retrieving userinfo ignoring cache, just delete this
+        property.
 
         self._userinfo will be a dict with the following keys and values:
 
@@ -389,11 +394,8 @@ class APISite(BaseSite):
           - blockinfo: present if user is blocked (dict)
 
         U{https://www.mediawiki.org/wiki/API:Userinfo}
-
-        @param force: force to retrieve userinfo ignoring cache
-        @type force: bool
         """
-        if force or not hasattr(self, '_userinfo'):
+        if not hasattr(self, '_userinfo'):
             uirequest = self._simple_request(
                 action='query',
                 meta='userinfo',
@@ -410,9 +412,24 @@ class APISite(BaseSite):
                                   .format(self))
         return self._userinfo
 
-    userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
+    @userinfo.deleter
+    def userinfo(self):
+        """Delete cached userinfo."""
+        if hasattr(self, '_userinfo'):
+            del self._userinfo
 
-    def getglobaluserinfo(self):
+    @deprecated('userinfo property and userinfo deleter', since='20210110')
+    def getuserinfo(self, force: bool = False) -> dict:
+        """DEPRECATED. Retrieve userinfo from site.
+
+        @param force: force to retrieve userinfo ignoring cache
+        """
+        if force:
+            del self.userinfo
+        return self.userinfo
+
+    @property
+    def globaluserinfo(self):
         """Retrieve globaluserinfo from site and cache it.
 
         self._globaluserinfo will be a dict with the following keys and values:
@@ -441,8 +458,10 @@ class APISite(BaseSite):
             self._globaluserinfo['registration'] = iso_ts
         return self._globaluserinfo
 
-    globaluserinfo = property(fget=getglobaluserinfo,
-                              doc=getglobaluserinfo.__doc__)
+    @deprecated('globaluserinfo property', since='20210110')
+    def getglobaluserinfo(self):
+        """DEPRECATED. Retrieve globaluserinfo."""
+        return self.globaluserinfo
 
     @remove_last_args(['sysop'])
     def is_blocked(self):
@@ -3838,24 +3857,33 @@ class APISite(BaseSite):
         """Delete page from the wiki. Requires appropriate privilege level.
 
         @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        Page to be deleted can be given either as Page object or as pageid.
 
-        @param page: Page to be deleted.
-        @type page: pywikibot.Page
+        @param page: Page to be deleted or its pageid.
+        @type page: Page or, in case of pageid, int or str
         @param reason: Deletion reason.
+        @raises TypeError, ValueError: page has wrong type/value.
 
         """
         token = self.tokens['delete']
+        params = {'action': 'delete', 'token': token, 'reason': reason}
+
+        if isinstance(page, pywikibot.Page):
+            params['title'] = page
+            msg = page.title(withSection=False)
+        else:
+            pageid = int(page)
+            params['pageid'] = pageid
+            msg = pageid
+
+        req = self._simple_request(**params)
         self.lock_page(page)
-        req = self._simple_request(action='delete',
-                                   token=token,
-                                   title=page,
-                                   reason=reason)
         try:
             req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
-                'title': page.title(with_section=False),
+                'title': msg,
                 'user': self.user(),
             }
             if err.code in self._dl_errors:

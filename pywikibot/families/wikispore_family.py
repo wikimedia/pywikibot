@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikispore."""
 #
 # (C) Pywikibot team, 2020

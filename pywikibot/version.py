@@ -16,7 +16,6 @@ import time
 import xml.dom.minidom
 
 from contextlib import closing, suppress
-from distutils import log
 from distutils.sysconfig import get_python_lib
 from importlib import import_module
 from io import BytesIO
@@ -102,7 +101,6 @@ def getversiondict():
     exceptions = {}
 
     for vcs_func in (getversion_git,
-                     getversion_svn_setuptools,
                      getversion_svn,
                      getversion_nightly,
                      getversion_package):
@@ -208,37 +206,6 @@ def github_svn_rev2hash(tag: str, rev):
     date = dom.getElementsByTagName('S:date')[0].firstChild.nodeValue
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
     return hsh, date
-
-
-def getversion_svn_setuptools(path=None):
-    """Get version info for a Subversion checkout using setuptools.
-
-    @param path: directory of the Subversion checkout
-    @return:
-        - tag (name for the repository),
-        - rev (current Subversion revision identifier),
-        - date (date of current revision),
-        - hash (git hash for the Subversion revision)
-    @rtype: C{tuple} of three C{str} and a C{time.struct_time}
-    """
-    from setuptools_svn import svn_utils
-
-    tag = 'pywikibot-core'
-    _program_dir = path or _get_program_dir()
-    svninfo = svn_utils.SvnInfo(_program_dir)
-    # suppress warning
-    old_level = log.set_threshold(log.ERROR)
-    rev = svninfo.get_revision()
-    log.set_threshold(old_level)
-    if not isinstance(rev, int):
-        raise TypeError('SvnInfo.get_revision() returned type %s' % type(rev))
-    if rev < 0:
-        raise ValueError('SvnInfo.get_revision() returned %d' % rev)
-    if rev == 0:
-        raise ParseError('SvnInfo: invalid workarea')
-    hsh, date = github_svn_rev2hash(tag, rev)
-    rev = 's%s' % rev
-    return (tag, rev, date, hsh)
 
 
 def getversion_svn(path=None):

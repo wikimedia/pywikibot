@@ -835,6 +835,8 @@ class DisambiguationRobot(SingleSiteBot):
                     foundlink.parse()
                 except pywikibot.Error:
                     continue
+                except ValueError:  # T111513
+                    continue
 
                 # ignore interwiki links
                 if foundlink.site != disambPage.site:

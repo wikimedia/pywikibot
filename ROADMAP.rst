@@ -1,21 +1,18 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Re-enable reading user-config.py from site package (T270941)
-* LoginManager.getCookie() was renamed to login_to_site()
-* Deprecation warning for MediaWiki < 1.23 (T268979)
-* Add backports to support some Python 3.9 changes
-* Desupported shared_image_repository() and nocapitalize() methods were removed (T89451)
-* pywikibot.cookie_jar was removed in favour of pywikibot.comms.http.cookie_jar
-* Align http.fetch() params with requests and rename 'disable_ssl_certificate_validation' to 'verify' (T265206)
-* Deprecated compat BasePage.getRestrictions() method was removed
-* Outdated Site.recentchanges() parameters has been dropped
-* site.LoginStatus has been removed in favour of login.LoginStatus
-* L10N Updates
+* Add support for niawiki, bclwikt, diqwikt, niawikt (T270416, T270282, T270278, T270412)
+* Delete page using pageid instead of title (T57072)
+* version.getversion_svn_setuptools function was removed (T270393)
+* Add support for "musical notation" data type to wikibase
+* -grepnot filter option was added to pagegenerators module (T219281)
+* L10N updates
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 5.5.0: Site.getuserinfo() method will be dropped in favour of userinfo property
+* 5.5.0: Site.getglobaluserinfo() method will be dropped in favour of globaluserinfo property
 * 5.4.0: Support of MediaWiki < 1.23 will be dropped with release 6.0  (T268979)
 * 5.4.0: LoginManager.getCookie() is deprecated and will be removed
 * 5.4.0: tools.PY2 will be removed (T213287)

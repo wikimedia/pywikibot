@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Diff module."""
 #
 # (C) Pywikibot team, 2014-2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for MediaWiki wiki."""
 #
 # (C) Pywikibot team, 2006-2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Family module for Translate Wiki."""
 #
 # (C) Pywikibot team, 2007-2020

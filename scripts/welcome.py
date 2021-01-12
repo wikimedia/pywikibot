@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to welcome new users.
 
@@ -157,7 +156,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
 badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -231,6 +230,7 @@ netext = {
         'fa': '{{جا:خوشامد}} %s',
         'fr': '{{subst:Discussion Projet:Aide/Bienvenue}} %s',
         'ga': '{{subst:fáilte}} %s',
+        'gom': '{{subst:welcome}} %s',
         'gor': '{{subst:Welcome}} %s',
         'he': '{{ס:ברוך הבא}} %s',
         'hr': '{{subst:dd}} %s',

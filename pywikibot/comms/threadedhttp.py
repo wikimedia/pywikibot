@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Http backend layer providing a HTTP requests wrapper."""
 #
 # (C) Pywikibot team, 2007-2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Choices for input_choice."""
 #
 # (C) Pywikibot team, 2015-2020

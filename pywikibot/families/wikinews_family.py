@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +21,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'ru', 'sr', 'fr', 'en', 'pt', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
-        'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'fi', 'ro', 'li', 'tr', 'ja',
+        'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'fi', 'li', 'ro', 'tr', 'ja',
         'eo', 'sq', 'no', 'ko', 'bg', 'bs', 'he',
     ]
 
