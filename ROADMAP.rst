@@ -1,12 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Add support for niawiki, bclwikt, diqwikt, niawikt (T270416, T270282, T270278, T270412)
-* Delete page using pageid instead of title (T57072)
-* version.getversion_svn_setuptools function was removed (T270393)
-* Add support for "musical notation" data type to wikibase
-* -grepnot filter option was added to pagegenerators module (T219281)
-* L10N updates
+* (no changes yet)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
