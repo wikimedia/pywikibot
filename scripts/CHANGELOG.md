@@ -1,5 +1,19 @@
 # Schripts Changelog
 
+## 5.5.0
+*12 January 2021
+
+### general
+* i18n updates
+* L10N updates
+
+### add_text
+* -except option was renamed to -grepnot from pagegenerators
+
+### solve_disambiguation
+* ignore ValueError when parsing a Link object (T111513)
+
+
 ## 5.4.0
 *2 January 2021*
 
