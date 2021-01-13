@@ -4357,6 +4357,7 @@ class APISite(BaseSite):
         return req.submit()['query']['stashimageinfo'][0]
 
     @deprecate_arg('imagepage', 'filepage')
+    @need_right('upload')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
                chunk_size: int = 0, _file_key: Optional[str] = None,
@@ -4448,11 +4449,6 @@ class APISite(BaseSite):
 
         # An offset != 0 doesn't make sense without a file key
         assert(_offset == 0 or _file_key is not None)
-        # check for required user right
-        if not self.has_right('upload'):
-            raise Error(
-                "User '%s' does not have upload rights on site %s."
-                % (self.user(), self))
         # check for required parameters
         if bool(source_filename) == bool(source_url):
             raise ValueError('APISite.upload: must provide either '
