@@ -4472,8 +4472,7 @@ class APISite(BaseSite):
                                       '"report_success" is True or None',
                                       '"report_success=False" or define '
                                       '"ignore_warnings" as callable/iterable',
-                                      3, warning_class=FutureWarning,
-                                      since='20150823')
+                                      3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
