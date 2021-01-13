@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Objects representing interwiki map of MediaWiki site."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,6 +15,7 @@ class _IWEntry:
         self._site = None
         self.local = local
         self.url = url
+        self.prefix = prefix
 
     @property
     def site(self):
