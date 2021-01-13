@@ -28,7 +28,7 @@ The following generators and filters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -114,7 +114,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 raise ValueError(
                     'Unknown ignore mode "{0}"!'.format(ignore_mode))
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     site = pywikibot.Site()
 

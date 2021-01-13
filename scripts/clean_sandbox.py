@@ -38,7 +38,7 @@ For example:
     delay: 7
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -285,7 +285,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif opt == 'summary':
             opts[opt] = value or pywikibot.input('Enter the summary:')
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     generator = gen_factory.getCombinedGenerator()
 

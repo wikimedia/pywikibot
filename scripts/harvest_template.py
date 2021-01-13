@@ -88,7 +88,7 @@ will not add duplicate claims for the same member:
         -multi
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of MIT License.
 #
@@ -379,7 +379,7 @@ def main(*args) -> None:
                 template_title = arg[10:]
         elif arg.startswith('-create'):
             options['create'] = True
-        elif gen.handleArg(arg):
+        elif gen.handle_arg(arg):
             if arg.startswith('-transcludes:'):
                 template_title = arg[13:]
         else:
@@ -421,7 +421,7 @@ def main(*args) -> None:
 
     generator = gen.getCombinedGenerator(preload=True)
     if not generator:
-        gen.handleArg('-transcludes:' + template_title)
+        gen.handle_arg('-transcludes:' + template_title)
         generator = gen.getCombinedGenerator(preload=True)
 
     bot = HarvestRobot(generator, template_title, fields, **options)
