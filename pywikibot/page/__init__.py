@@ -11,7 +11,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -581,18 +581,6 @@ class BasePage(ComparableMixin):
         del self.latest_revision_id
         self._revid = value
 
-    @deprecated('latest_revision_id', since='20150727', future_warning=True)
-    def latestRevision(self):  # pragma: no cover
-        """Return the current revision id for this page."""
-        return self.latest_revision_id
-
-    @deprecated('latest_revision_id', since='20150407', future_warning=True)
-    def pageAPInfo(self):  # pragma: no cover
-        """Return the current revision id for this page."""
-        if self.isRedirectPage():
-            raise pywikibot.IsRedirectPage(self)
-        return self.latest_revision_id
-
     @property
     def latest_revision(self):
         """Return the current revision for this page."""
@@ -740,27 +728,6 @@ class BasePage(ComparableMixin):
         """
         return self.latest_revision.timestamp
 
-    @property
-    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
-                since='20150609', future_warning=True)
-    def previous_revision_id(self) -> int:  # pragma: no cover
-        """
-        Return the revision id for the previous revision of this Page.
-
-        If the page has only one revision, it shall return -1.
-        """
-        return self.latest_revision.parent_id or -1
-
-    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
-                since='20150609', future_warning=True)
-    def previousRevision(self) -> int:  # pragma: no cover
-        """
-        Return the revision id for the previous revision.
-
-        DEPRECATED: Use latest_revision.parent_id instead.
-        """
-        return self.latest_revision.parent_id or -1
-
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 
@@ -836,19 +803,6 @@ class BasePage(ComparableMixin):
         if self.isCategoryRedirect():
             return Category(Link(self._catredirect, self.site))
         raise pywikibot.IsNotRedirectPage(self)
-
-    @deprecated(since='20151207', future_warning=True)
-    def isEmpty(self) -> bool:  # pragma: no cover
-        """
-        Return True if the page text has less than 4 characters.
-
-        Character count ignores language links and category links.
-        Can raise the same exceptions as get().
-        """
-        txt = self.get()
-        txt = textlib.removeLanguageLinks(txt, site=self.site)
-        txt = textlib.removeCategoryLinks(txt, site=self.site)
-        return len(txt) < 4
 
     def isTalkPage(self):
         """Return True if this page is in any talk namespace."""
@@ -2094,11 +2048,6 @@ class BasePage(ComparableMixin):
                 pywikibot.output('Page %s not saved; sysop privileges '
                                  'required.' % self.title(as_link=True))
         return False
-
-    @deprecated('Page.is_flow_page()', since='20150128', future_warning=True)
-    def isFlowPage(self):  # pragma: no cover
-        """DEPRECATED: use self.is_flow_page instead."""
-        return self.is_flow_page()
 
     def is_flow_page(self) -> bool:
         """Whether a page is a Flow page."""

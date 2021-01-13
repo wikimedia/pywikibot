@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +13,6 @@ import pywikibot
 import pywikibot.page
 
 from pywikibot import config, InvalidTitle
-from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     DefaultDrySiteTestCase, DefaultSiteTestCase, SiteAttributeTestCase,
@@ -442,11 +440,7 @@ class TestPageObject(DefaultSiteTestCase):
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
         self.assertIsInstance(mainpage.get(), str)
-        with suppress_warnings(
-                r'pywikibot\.page\.BasePage\.latestRevision '
-                r'is deprecated[\s\w]+; '
-                r'use latest_revision_id instead\.'):
-            self.assertIsInstance(mainpage.latestRevision(), int)
+        self.assertIsInstance(mainpage.latest_revision_id, int)
         self.assertIsInstance(mainpage.userName(), str)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
