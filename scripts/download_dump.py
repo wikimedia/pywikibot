@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot downloads dump from dumps.wikimedia.org.
 
@@ -14,7 +13,7 @@ This script supports the following command line parameters:
 
 """
 #
-# (C) Pywikibot team, 2017-2020
+# (C) Pywikibot team, 2017-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -108,54 +107,50 @@ class DownloadDumpBot(Bot):
                         download_filename)
                     pywikibot.output('Downloading file from ' + url)
                     response = fetch(url, stream=True)
-                    if response.status_code == 200:
-                        with open(file_current_storepath, 'wb') as result_file:
-                            try:
-                                total = int(response.response_headers[
-                                    'content-length'])
-                            except KeyError:
-                                pywikibot.exception()
-                                total = -1
-                            downloaded = 0
-                            parts = 50
-                            display_string = ''
 
-                            pywikibot.output('')
-                            for data in response.data.iter_content(100 * 1024):
-                                result_file.write(data)
-
-                                if total <= 0:
-                                    continue
-
-                                downloaded += len(data)
-                                done = int(parts * downloaded / total)
-                                display = map(convert_from_bytes,
-                                              (downloaded, total))
-                                prior_display = display_string
-                                display_string = '\r|{}{}|{}{}/{}'.format(
-                                    '=' * done,
-                                    '-' * (parts - done),
-                                    ' ' * 5,
-                                    *display)
-                                # Add whitespace to cover up prior bar
-                                display_string += ' ' * (
-                                    len(prior_display.rstrip())
-                                    - len(display_string.rstrip()))
-
-                                pywikibot.output(display_string, newline=False)
-                            pywikibot.output('')
-                    else:
+                    if response.status_code != 200:
                         if response.status_code == 404:
                             pywikibot.output(
-                                'File with name "{filename}", '
-                                'from dumpdate "{dumpdate}", '
-                                'and wiki "{wikiname}" ({url}) isn\'t '
-                                'available in the Wikimedia Dumps'.format(
-                                    filename=self.opt.filename,
-                                    dumpdate=self.opt.dumpdate,
-                                    url=url,
-                                    wikiname=self.opt.wikiname))
+                                'File with name {filename!r}, from dumpdate '
+                                '{dumpdate!r}, and wiki {wikiname!r} ({url}) '
+                                "isn't available in the Wikimedia Dumps"
+                                .format(url=url, **self.opt))
                         return
+
+                    with open(file_current_storepath, 'wb') as result_file:
+                        total = int(response.response_headers.get(
+                            'content-length', -1))
+                        if total == -1:
+                            pywikibot.warning("'content-length' missing in "
+                                              'response headers')
+                        downloaded = 0
+                        parts = 50
+                        display_string = ''
+
+                        pywikibot.output('')
+                        for data in response.data.iter_content(100 * 1024):
+                            result_file.write(data)
+
+                            if total <= 0:
+                                continue
+
+                            downloaded += len(data)
+                            done = int(parts * downloaded / total)
+                            display = map(convert_from_bytes,
+                                          (downloaded, total))
+                            prior_display = display_string
+                            display_string = '\r|{}{}|{}{}/{}'.format(
+                                '=' * done,
+                                '-' * (parts - done),
+                                ' ' * 5,
+                                *display)
+                            # Add whitespace to cover up prior bar
+                            display_string += ' ' * (
+                                len(prior_display.rstrip())
+                                - len(display_string.rstrip()))
+
+                            pywikibot.output(display_string, newline=False)
+                        pywikibot.output('')
 
                 # Rename the temporary file to the target file
                 # if the download completes successfully
