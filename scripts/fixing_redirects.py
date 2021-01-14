@@ -10,7 +10,7 @@ Can be used with:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -200,7 +200,7 @@ def main(*args):
     for arg in local_args:
         if arg == '-featured':
             featured = True
-        elif genFactory.handleArg(arg):
+        elif genFactory.handle_arg(arg):
             pass
 
     mysite = pywikibot.Site()

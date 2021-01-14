@@ -313,7 +313,7 @@ def main(*args: Tuple[str, ...]) -> None:
             issue_deprecation_warning(arg, new_arg,
                                       2, ArgumentDeprecationWarning,
                                       since='20201224')
-            genFactory.handleArg(new_arg)
+            genFactory.handle_arg(new_arg)
         elif option == '-up':
             up = True
         elif option == '-noreorder':
@@ -323,7 +323,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option in ('-talk', '-talkpage'):
             talkPage = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:

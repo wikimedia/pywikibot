@@ -43,7 +43,7 @@ cannot be set by settings file:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -161,7 +161,7 @@ def main(*args: Tuple[str, ...]) -> None:
     for arg in local_args:
 
         # Catch the pagegenerators options
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue  # nothing to do here
 
         # Now pick up your own options

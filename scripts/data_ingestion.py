@@ -94,7 +94,7 @@ Warning! Put it in one line, otherwise it won't work correctly.
 
 """
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -326,7 +326,7 @@ def main(*args: Tuple[str, ...]):
         if arg.startswith('-csvdir:'):
             csv_dir = arg[8:]
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     config_generator = genFactory.getCombinedGenerator()
 

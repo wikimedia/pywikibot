@@ -1179,7 +1179,7 @@ class GeneratorFactory:
                 'Invalid -logevents parameter "{0}"'.format(params[0]))
         return self._parse_log_events(*params)
 
-    def handleArg(self, arg: str) -> bool:
+    def handle_arg(self, arg: str) -> bool:
         """Parse one argument at a time.
 
         If it is recognized as an argument that specifies a generator, a
@@ -1212,6 +1212,11 @@ class GeneratorFactory:
             return True
 
         return False
+
+    @deprecated('handle_arg', since='20210113', future_warning=True)
+    def handleArg(self, arg: str):
+        """DEPRECATED. Use handle_arg()."""
+        return self.handle_arg(arg)
 
 
 def _int_none(v):

@@ -31,7 +31,7 @@ category links like [[Category:Hensies]], causing this script
 to create [[Category:Cultural heritage monuments in Hensies]].
 """
 #
-# (c) Pywikibot team, 2011-2020
+# (c) Pywikibot team, 2011-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -117,7 +117,7 @@ def main(*args: Tuple[str, ...]):
             if value:
                 options[opt] = value
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     missing = ['-' + arg for arg in ('basename', 'parent')
                if arg not in options]

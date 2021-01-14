@@ -37,7 +37,7 @@ The following command line parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of MIT License.
 #
@@ -163,7 +163,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     create_new = False
     for arg in local_args:
-        if generator_factory.handleArg(arg):
+        if generator_factory.handle_arg(arg):
             continue
         if arg == '-create':
             create_new = True

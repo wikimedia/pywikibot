@@ -1416,7 +1416,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option == 'prefix':
             prefix = value
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     bot = None
 
@@ -1429,7 +1429,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 'Category to add (do not give namespace):')
         if not gen:
             # default for backwards compatibility
-            gen_factory.handleArg('-links')
+            gen_factory.handle_arg('-links')
             gen = gen_factory.getCombinedGenerator()
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.

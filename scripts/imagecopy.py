@@ -57,7 +57,7 @@ deletion):
 By default the bot works on your home wiki (set in user-config)
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -505,7 +505,7 @@ def main(*args):
         elif arg == '-delete':
             delete_after_done = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     pregenerator = genFactory.getCombinedGenerator(preload=True)
     if not pregenerator:

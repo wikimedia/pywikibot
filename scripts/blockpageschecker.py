@@ -41,7 +41,7 @@ Examples:
 
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -241,7 +241,7 @@ def main(*args):
             if value:
                 namespace = int(value)
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if config.mylang not in project_inserted:
         pywikibot.output('Your project is not supported by this script.\n'
