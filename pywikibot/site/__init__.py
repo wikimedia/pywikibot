@@ -202,7 +202,8 @@ class APISite(BaseSite):
         gen.set_maximum_items(total)
         return gen
 
-    def _request_class(self, kwargs):
+    @staticmethod
+    def _request_class(kwargs):
         """
         Get the appropriate class.
 
@@ -333,7 +334,7 @@ class APISite(BaseSite):
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             del self.userinfo  # force reloading
-            self.userinfo  # load userinfo
+            assert self.userinfo['name'] == self.username()  # load userinfo
             self._loginstatus = _LoginStatus.AS_USER
         else:
             self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
@@ -518,7 +519,8 @@ class APISite(BaseSite):
             'articlepath must end with /$1'
         return self.siteinfo['general']['articlepath'][:-2]
 
-    def assert_valid_iter_params(self, msg_prefix, start, end, reverse,
+    @staticmethod
+    def assert_valid_iter_params(msg_prefix, start, end, reverse,
                                  is_ts=True):
         """Validate iterating API parameters.
 
@@ -837,7 +839,13 @@ class APISite(BaseSite):
         # return the magic word without the preceding '#' character
         return self.getmagicwords('redirect')[0].lstrip('#')
 
+    @deprecated('redirect_regex', since='20210103', future_warning=True)
     def redirectRegex(self):
+        """Return a compiled regular expression matching on redirect pages."""
+        return self.redirect_regex
+
+    @property
+    def redirect_regex(self):
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.
@@ -892,9 +900,10 @@ class APISite(BaseSite):
             except KeyError:
                 pywikibot.warning(
                     'Broken namespace alias "{0}" (id: {1}) on {2}'.format(
-                        item['*'], item['id'], self))
-            if item['*'] not in namespace:
-                namespace.aliases.append(item['*'])
+                        item['*'], ns, self))
+            else:
+                if item['*'] not in namespace:
+                    namespace.aliases.append(item['*'])
 
         return _namespaces
 
@@ -2228,7 +2237,7 @@ class APISite(BaseSite):
 
         By default, retrieves the last (current) revision of the page,
         unless any of the optional parameters revids, startid, endid,
-        starttime, endtime, rvdir, user, excludeuser, or limit are
+        starttime, endtime, rvdir, user, excludeuser, or total are
         specified. Unless noted below, all parameters not specified
         default to False.
 
@@ -2255,9 +2264,10 @@ class APISite(BaseSite):
         @keyword starttime: retrieve revisions starting at this Timestamp
         @keyword endtime: stop upon reaching this Timestamp
         @keyword rvdir: if false, retrieve newest revisions first (default);
-            if true, retrieve earliest first
+            if true, retrieve oldest first
         @keyword user: retrieve only revisions authored by this user
         @keyword excludeuser: retrieve all revisions not authored by this user
+        @keyword total: number of revisions to retrieve
         @raises ValueError: invalid startid/endid or starttime/endtime values
         @raises pywikibot.Error: revids belonging to a different page
         """
@@ -4344,13 +4354,12 @@ class APISite(BaseSite):
         raise RuntimeError(
             'Unexpected success of upload action without parameters.')
 
-    def stash_info(self, file_key, props=False):
+    def stash_info(self, file_key, props=None):
         """Get the stash info for a given file key.
 
         @see: U{https://www.mediawiki.org/wiki/API:Stashimageinfo}
         """
-        if not props:
-            props = False
+        props = props or False
         req = self._simple_request(
             action='query', prop='stashimageinfo', siifilekey=file_key,
             siiprop=props)
@@ -5589,8 +5598,8 @@ class APISite(BaseSite):
 
         @see: U{https://www.mediawiki.org/wiki/API:Watchlistraw}
 
-        @param force_reload: Reload watchlist
-        @type force_reload: bool
+        @param force: Reload watchlist
+        @type force: bool
         @param total: if not None, limit the generator to yielding this many
             items in total
         @type total: int
@@ -6287,7 +6296,7 @@ class DataSite(APISite):
         @param claim: A Claim object to remove the sources from
         @type claim: pywikibot.Claim
         @param sources: A list of Claim objects that are sources
-        @type sources: pywikibot.Claim
+        @type sources: list
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary

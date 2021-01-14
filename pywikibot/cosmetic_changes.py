@@ -788,7 +788,7 @@ class CosmeticChangesToolkit:
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre',
                           'syntaxhighlight', 'template', 'timeline',
-                          self.site.redirectRegex()]
+                          self.site.redirect_regex]
             text = textlib.replaceExcept(
                 text,
                 r'(?m)'
