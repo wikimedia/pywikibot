@@ -67,7 +67,7 @@ from pywikibot.tools.formatter import color_format
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
-    '__maintainer__', '__maintainer_email__', '__name__', '__release__',
+    '__maintainer__', '__maintainer_email__', '__name__',
     '__url__', '__version__',
     'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
@@ -80,8 +80,8 @@ __all__ = (
     'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
     'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
     'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    'QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
-    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'showHelp',
+    '_QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
+    'Server504Error', 'ServerError', 'showDiff', 'show_help',
     'Site', 'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
     'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
     'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
@@ -1019,7 +1019,7 @@ class WbUnknown(_WbRepresentation):
 
     _items = ('json',)
 
-    def __init__(self, json) -> dict:
+    def __init__(self, json):
         """
         Create a new WbUnknown object.
 
