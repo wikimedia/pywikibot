@@ -1,8 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 import calendar
@@ -328,8 +327,8 @@ class RedirectFilterPageGeneratorTestCase(TestCase):
         """Test RedirectFilterPageGenerator."""
         from pywikibot.pagegenerators import RedirectFilterPageGenerator
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-randomredirect:3')
-        gf.handleArg('-page:Main_Page')
+        gf.handle_arg('-randomredirect:3')
+        gf.handle_arg('-page:Main_Page')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         gen = RedirectFilterPageGenerator(pages, no_redirects=True)
@@ -644,7 +643,7 @@ class WikibaseItemFilterPageGeneratorTestCase(TestCase):
     def test_filter_pages_with_item(self):
         """Test WikibaseItemFilterPageGenerator on pages with item."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Main_Page')
+        gf.handle_arg('-page:Main_Page')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
@@ -655,7 +654,7 @@ class WikibaseItemFilterPageGeneratorTestCase(TestCase):
     def test_filter_pages_without_item(self):
         """Test WikibaseItemFilterPageGenerator on pages without item."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Talk:Main_Page')
+        gf.handle_arg('-page:Talk:Main_Page')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         gen = WikibaseItemFilterPageGenerator(pages, has_item=True)
@@ -676,36 +675,36 @@ class DryFactoryGeneratorTest(TestCase):
     def test_one_namespace(self):
         """Test one namespace."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:2')
+        gf.handle_arg('-ns:2')
         self.assertEqual(gf.namespaces, {2})
 
     def test_two_namespaces(self):
         """Test two namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:2')
-        gf.handleArg('-ns:Talk')
+        gf.handle_arg('-ns:2')
+        gf.handle_arg('-ns:Talk')
         self.assertEqual(gf.namespaces, {2, 1})
 
     def test_two_named_namespaces(self):
         """Test two named namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:Talk,File')
+        gf.handle_arg('-ns:Talk,File')
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_two_numeric_namespaces(self):
         """Test two namespaces delimited by colon."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:1,6')
+        gf.handle_arg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_immutable_namespaces_on_read(self):
         """Test immutable namespaces on read."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:1,6')
+        gf.handle_arg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
         self.assertIsInstance(gf.namespaces, frozenset)
         with self.assertRaises(AssertionError):
-            gf.handleArg('-ns:0')
+            gf.handle_arg('-ns:0')
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_unsupported_quality_level_filter(self):
@@ -716,7 +715,7 @@ class DryFactoryGeneratorTest(TestCase):
     def test_one_excluded_namespaces(self):
         """Test one excluded namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:not:2')
+        gf.handle_arg('-ns:not:2')
         ns = set(range(16))
         ns.remove(2)
         self.assertTrue(ns.issubset(gf.namespaces))
@@ -724,8 +723,8 @@ class DryFactoryGeneratorTest(TestCase):
     def test_two_excluded_namespaces(self):
         """Test two excluded namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:not:2')
-        gf.handleArg('-ns:not:Talk')
+        gf.handle_arg('-ns:not:2')
+        gf.handle_arg('-ns:not:Talk')
         ns = set(range(16))
         ns.remove(2)
         ns.remove(1)
@@ -734,7 +733,7 @@ class DryFactoryGeneratorTest(TestCase):
     def test_two_excluded_named_namespaces(self):
         """Test two excluded named namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:not:Talk,File')
+        gf.handle_arg('-ns:not:Talk,File')
         ns = set(range(16))
         ns.remove(1)
         ns.remove(6)
@@ -743,7 +742,7 @@ class DryFactoryGeneratorTest(TestCase):
     def test_two_excluded_numeric_namespaces(self):
         """Test two excluded namespaces delimited by colon."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:not:1,6')
+        gf.handle_arg('-ns:not:1,6')
         ns = set(range(16))
         ns.remove(1)
         ns.remove(6)
@@ -752,9 +751,9 @@ class DryFactoryGeneratorTest(TestCase):
     def test_mixed_namespaces_with_exclusion(self):
         """Test mixed namespaces with exclusion."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:not:2,File')
-        gf.handleArg('-ns:not:3,4,5')
-        gf.handleArg('-ns:6,7')
+        gf.handle_arg('-ns:not:2,File')
+        gf.handle_arg('-ns:not:3,4,5')
+        gf.handle_arg('-ns:6,7')
         ns = set(range(16))
         for i in range(2, 6):
             ns.remove(i)
@@ -763,17 +762,17 @@ class DryFactoryGeneratorTest(TestCase):
     def test_given_namespaces_with_exclusion(self):
         """Test mixed namespaces with exclusion."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-ns:1,2,3,4,5')
-        gf.handleArg('-ns:not:User')
+        gf.handle_arg('-ns:1,2,3,4,5')
+        gf.handle_arg('-ns:not:User')
         self.assertEqual(gf.namespaces, {1, 3, 4, 5})
 
     def test_invalid_arg(self):
         """Test invalid / non-generator arguments."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        self.assertFalse(gf.handleArg('-foobar'))
-        self.assertFalse(gf.handleArg('barbaz'))
-        self.assertFalse(gf.handleArg('-ì'))
-        self.assertFalse(gf.handleArg('ì'))
+        self.assertFalse(gf.handle_arg('-foobar'))
+        self.assertFalse(gf.handle_arg('barbaz'))
+        self.assertFalse(gf.handle_arg('-ì'))
+        self.assertFalse(gf.handle_arg('ì'))
 
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
@@ -876,7 +875,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_intersect_generator(self):
         """Test getCombinedGenerator with generator parameter."""
         gf = pagegenerators.GeneratorFactory()
-        gf.handleArg('-intersect')
+        gf.handle_arg('-intersect')
         gf.gens = ['Python 3.7-dev']
         gen = gf.getCombinedGenerator(gen='Pywikibot 3.0.dev')
         self.assertEqual(''.join(gen), 'Pyot 3.dev')
@@ -884,15 +883,15 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_ns(self):
         """Test namespace option."""
         gf = pagegenerators.GeneratorFactory()
-        gf.handleArg('-ns:1')
+        gf.handle_arg('-ns:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNone(gen)
 
     def test_allpages_default(self):
         """Test allpages generator."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start:!'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start:!'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -904,9 +903,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_allpages_ns(self):
         """Test allpages generator with namespace argument."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start:!'))
-        gf.handleArg('-limit:10')
-        gf.handleArg('-ns:1')
+        self.assertTrue(gf.handle_arg('-start:!'))
+        gf.handle_arg('-limit:10')
+        gf.handle_arg('-ns:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -917,9 +916,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test allpages generator with titleregex filter."""
         gf = pagegenerators.GeneratorFactory()
         # Matches titles with the same two or more continuous characters
-        self.assertTrue(gf.handleArg('-start'))
-        self.assertTrue(gf.handleArg('-titleregex:(.)\\1+'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start'))
+        self.assertTrue(gf.handle_arg('-titleregex:(.)\\1+'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -931,10 +930,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilter_ns_after(self):
         """Test allpages generator with titleregex and namespace filter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
-        self.assertTrue(gf.handleArg('-titleregex:.*'))
-        gf.handleArg('-ns:1')
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start'))
+        self.assertTrue(gf.handle_arg('-titleregex:.*'))
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         self.assertLessEqual(len(pages), 10)
@@ -943,10 +942,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilter_ns_before(self):
         """Test allpages generator with namespace and titleregex filter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
-        gf.handleArg('-ns:1')
-        self.assertTrue(gf.handleArg('-titleregex:.*'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start'))
+        gf.handle_arg('-ns:1')
+        self.assertTrue(gf.handle_arg('-titleregex:.*'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -956,10 +955,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilternot_default(self):
         """Test allpages generator with titleregexnot filter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
+        self.assertTrue(gf.handle_arg('-start'))
         # matches titles with less than 11 characters
-        self.assertTrue(gf.handleArg('-titleregexnot:.{11,}'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-titleregexnot:.{11,}'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -971,10 +970,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilternot_ns_after(self):
         """Test allpages generator with titleregexnot and namespace filter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
-        self.assertTrue(gf.handleArg('-titleregexnot:zzzz'))
-        gf.handleArg('-ns:1')
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start'))
+        self.assertTrue(gf.handle_arg('-titleregexnot:zzzz'))
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         self.assertLessEqual(len(pages), 10)
@@ -983,10 +982,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilternot_ns_before(self):
         """Test allpages generator with namespace and titleregexnot filter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
-        gf.handleArg('-ns:1')
-        self.assertTrue(gf.handleArg('-titleregexnot:zzzz'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-start'))
+        gf.handle_arg('-ns:1')
+        self.assertTrue(gf.handle_arg('-titleregexnot:zzzz'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -996,8 +995,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_allpages_with_two_ns(self):
         """Test that allpages fails with two ns as parameter."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-start'))
-        gf.handleArg('-ns:3,1')
+        self.assertTrue(gf.handle_arg('-start'))
+        gf.handle_arg('-ns:3,1')
         # allpages only accepts a single namespace, and will raise a
         # TypeError if self.namespaces contains more than one namespace.
         self.assertRaises(
@@ -1008,8 +1007,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_prefixing_default(self):
         """Test prefixindex generator."""
         gf = pagegenerators.GeneratorFactory()
-        self.assertTrue(gf.handleArg('-prefixindex:a'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-prefixindex:a'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1021,9 +1020,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_prefixing_ns(self):
         """Test prefixindex generator with namespace filter."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-prefixindex:a')
-        gf.handleArg('-limit:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-prefixindex:a')
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
@@ -1031,7 +1030,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_timespan(self):
         """Test recentchanges generator with offset and duration params."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-recentchanges:120,70')
+        gf.handle_arg('-recentchanges:120,70')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertRaises(ValueError, gf.handleArg, '-recentchanges:3,2,1')
@@ -1044,7 +1043,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_rctag(self):
         """Test recentchanges generator with recent changes tag."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-recentchanges:visualeditor')
+        gf.handle_arg('-recentchanges:visualeditor')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, {0, 1, 2}, skip=True)
@@ -1055,7 +1054,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('Skipping {} due to too many autoblocked users'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-recentchanges:50')
+        gf.handle_arg('-recentchanges:50')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, {0, 1, 2}, skip=True)
@@ -1063,8 +1062,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_ns(self):
         """Test recentchanges generator with namespace."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-recentchanges:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
@@ -1072,9 +1071,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_ns_multi(self):
         """Test recentchanges generator with multiple namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-ns:3')
-        gf.handleArg('-recentchanges:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-ns:3')
+        gf.handle_arg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, {1, 3})
@@ -1083,8 +1082,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test pageid parameter."""
         # Get reference pages and their pageids.
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        self.assertTrue(gf.handleArg('-random'))
-        gf.handleArg('-limit:10')
+        self.assertTrue(gf.handle_arg('-random'))
+        gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         self.assertLength(pages, 10)
@@ -1093,7 +1092,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
         # Get by pageids.
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handleArg('-pageid:{}'.format(pageids))
+        gf.handle_arg('-pageid:{}'.format(pageids))
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages_from_pageid = list(gen)
@@ -1106,14 +1105,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_pagegenerator(self):
         """Test page generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Main Page')
+        gf.handle_arg('-page:Main Page')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
 
     def test_random_generator_default(self):
         """Test random generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-random:1')
+        gf.handle_arg('-random:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1122,8 +1121,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_random_generator_ns(self):
         """Test random generator with namespace."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-random:1')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-random:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
@@ -1131,9 +1130,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_random_generator_ns_multi(self):
         """Test random generator with multiple namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-ns:3')
-        gf.handleArg('-random:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-ns:3')
+        gf.handle_arg('-random:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, {1, 3})
@@ -1141,7 +1140,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_randomredirect_generator_default(self):
         """Test random generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-randomredirect:1')
+        gf.handle_arg('-randomredirect:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1150,8 +1149,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_randomredirect_generator_ns(self):
         """Test random generator with namespace."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-randomredirect:1')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-randomredirect:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
@@ -1159,9 +1158,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_randomredirect_generator_ns_multi(self):
         """Test random generator with multiple namespaces."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-ns:3')
-        gf.handleArg('-randomredirect:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-ns:3')
+        gf.handle_arg('-randomredirect:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, {1, 3})
@@ -1175,8 +1174,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
                 gf = pagegenerators.GeneratorFactory()
-                gf.handleArg('-property:{0}'.format(item))
-                gf.handleArg('-limit:10')
+                gf.handle_arg('-property:{0}'.format(item))
+                gf.handle_arg('-limit:10')
                 gen = gf.getCombinedGenerator()
                 self.assertIsNotNone(gen)
                 pages = list(gen)
@@ -1201,11 +1200,11 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test page generator with positional argument."""
         gf1 = pagegenerators.GeneratorFactory(site=self.site,
                                               positional_arg_name='page')
-        gf1.handleArg('Main Page')
+        gf1.handle_arg('Main Page')
         gen1 = gf1.getCombinedGenerator()
         self.assertIsNotNone(gen1)
         gf2 = pagegenerators.GeneratorFactory(site=self.site)
-        gf2.handleArg('-page:Main Page')
+        gf2.handle_arg('-page:Main Page')
         gen2 = gf2.getCombinedGenerator()
         self.assertIsNotNone(gen2)
         self.assertEqual(list(gen1), list(gen2))
@@ -1214,11 +1213,11 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test page generator with positional argument with colon."""
         gf1 = pagegenerators.GeneratorFactory(site=self.site,
                                               positional_arg_name='page')
-        gf1.handleArg('Project:Main Page')
+        gf1.handle_arg('Project:Main Page')
         gen1 = gf1.getCombinedGenerator()
         self.assertIsNotNone(gen1)
         gf2 = pagegenerators.GeneratorFactory(site=self.site)
-        gf2.handleArg('-page:Project:Main Page')
+        gf2.handle_arg('-page:Project:Main Page')
         gen2 = gf2.getCombinedGenerator()
         self.assertIsNotNone(gen2)
         self.assertEqual(list(gen1), list(gen2))
@@ -1229,9 +1228,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('The site {0} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-limit:3')
-        gf.handleArg('-linter:obsolete-tag')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-limit:3')
+        gf.handle_arg('-linter:obsolete-tag')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -1254,7 +1253,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         if self.site.has_extension('Linter'):
             with self.assertRaises(SystemExit) as cm:
-                gf.handleArg('-linter:show')
+                gf.handle_arg('-linter:show')
             self.assertEqual(cm.exception.code, 0)
         else:
             self.assertRaises(UnknownExtension, gf.handleArg, '-linter:show')
@@ -1262,8 +1261,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_querypage_generator_with_valid_page(self):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-querypage:Ancientpages')
-        gf.handleArg('-limit:5')
+        gf.handle_arg('-querypage:Ancientpages')
+        gf.handle_arg('-limit:5')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
@@ -1280,7 +1279,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(SystemExit) as cm:
-            gf.handleArg('-querypage')
+            gf.handle_arg('-querypage')
         self.assertEqual(cm.exception.code, 0)
 
 
@@ -1321,7 +1320,7 @@ class TestFactoryGeneratorNewpages(TestCase):
         """Test newpages generator."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
-        gf.handleArg('-newpages:60')
+        gf.handle_arg('-newpages:60')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1340,7 +1339,7 @@ class TestFactoryGeneratorNewpages(TestCase):
         """Test newpages generator with limit argument."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
-        gf.handleArg('-newpages:10')
+        gf.handle_arg('-newpages:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 0)
@@ -1349,8 +1348,8 @@ class TestFactoryGeneratorNewpages(TestCase):
         """Test newpages generator with limit argument and namespace filter."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-newpages:10')
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-newpages:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
@@ -1375,26 +1374,26 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
 
     def test_wanted_pages(self):
         """Test wantedpages generator."""
-        self.gf.handleArg('-wantedpages:5')
+        self.gf.handle_arg('-wantedpages:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
 
     def test_wanted_files(self):
         """Test wantedfiles generator."""
-        self.gf.handleArg('-wantedfiles:5')
+        self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.FilePage)
 
     def test_wanted_templates(self):
         """Test wantedtemplates generator."""
-        self.gf.handleArg('-wantedtemplates:5')
+        self.gf.handle_arg('-wantedtemplates:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 10)
 
     def test_wanted_categories(self):
         """Test wantedcategories generator."""
-        self.gf.handleArg('-wantedcategories:5')
+        self.gf.handle_arg('-wantedcategories:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Category)
 
@@ -1406,8 +1405,8 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_onlyif(self):
         """Test -onlyif without qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Q15745378')
-        self.assertTrue(gf.handleArg(
+        gf.handle_arg('-page:Q15745378')
+        self.assertTrue(gf.handle_arg(
             '-onlyif:P1476=International Journal of Minerals\\, '
             'Metallurgy\\, and Materials'))
         gen = gf.getCombinedGenerator()
@@ -1417,9 +1416,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_onlyifnot(self):
         """Test -onlyifnot without qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Q15745378')
-        gf.handleArg('-onlyifnot:P1476=International Journal of Minerals\\, '
-                     'Metallurgy\\, and Materials')
+        gf.handle_arg('-page:Q15745378')
+        gf.handle_arg('-onlyifnot:P1476=International Journal of Minerals\\, '
+                      'Metallurgy\\, and Materials')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertIsEmpty(set(gen))
@@ -1427,8 +1426,8 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_onlyif_qualifiers(self):
         """Test -onlyif with qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-page:Q668')
-        gf.handleArg('-onlyif:P47=Q837,P805=Q3088768')
+        gf.handle_arg('-page:Q668')
+        gf.handle_arg('-onlyif:P47=Q837,P805=Q3088768')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertLength(set(gen), 1)
@@ -1436,7 +1435,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_searchitem(self):
         """Test -searchitem."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-searchitem:abc')
+        gf.handle_arg('-searchitem:abc')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertIsNotNone(next(gen))
@@ -1444,8 +1443,8 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_searchitem_language(self):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-searchitem:pl:abc')
-        gf.handleArg('-limit:1')
+        gf.handle_arg('-searchitem:pl:abc')
+        gf.handle_arg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         # alphabet, also known as ABC
@@ -1453,8 +1452,8 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         self.assertEqual(page1.title(), 'Q9779')
 
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-searchitem:en:abc')
-        gf.handleArg('-limit:2')
+        gf.handle_arg('-searchitem:en:abc')
+        gf.handle_arg('-limit:2')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         # American Broadcasting Company
@@ -1497,13 +1496,13 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         """Test wrong logevents option."""
         factory = pagegenerators.GeneratorFactory
         gf = factory()
-        self.assertFalse(gf.handleArg('-log'))
-        self.assertFalse(gf.handleArg('-log:text_here'))
+        self.assertFalse(gf.handle_arg('-log'))
+        self.assertFalse(gf.handle_arg('-log:text_here'))
         self.assertRaises(NotImplementedError,
                           gf.handleArg, '-logevents:anyevent')
         # test that old format log option is not handled by any handler method.
         gf_mock = mock.create_autospec(gf)
-        self.assertFalse(factory.handleArg(gf_mock, '-anotherlog'))
+        self.assertFalse(factory.handle_arg(gf_mock, '-anotherlog'))
         self.assertFalse(gf_mock.method_calls)
 
     def test_logevents_with_start_timestamp(self):
@@ -1512,8 +1511,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         # We limit the results to 1 as running this on large websites like
         # Wikipedia will give an insane number of results as it asks for all
         # logevents since beginning till now.
-        self.assertTrue(gf.handleArg('-limit:1'))
-        self.assertTrue(gf.handleArg('-logevents:newusers,,21000101'))
+        self.assertTrue(gf.handle_arg('-limit:1'))
+        self.assertTrue(gf.handle_arg('-logevents:newusers,,21000101'))
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1524,7 +1523,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
     def test_logevents_with_start_and_end_timestamp(self):
         """Test -logevents which uses timestamps for start and end."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertTrue(gf.handleArg('-logevents:newusers,,21000101,20990101'))
+        self.assertTrue(
+            gf.handle_arg('-logevents:newusers,,21000101,20990101'))
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1533,7 +1533,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
     def test_logevents_with_total(self):
         """Test -logevents which uses total."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertTrue(gf.handleArg('-logevents:newusers,,1'))
+        self.assertTrue(gf.handle_arg('-logevents:newusers,,1'))
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -1672,9 +1672,9 @@ class TestLinksearchPageGenerator(TestCase):
 
         for search, expected in cases:
             gf = pagegenerators.GeneratorFactory(site=self.site)
-            gf.handleArg('-weblink:{}'.format(search))
-            gf.handleArg('-ns:2')
-            gf.handleArg('-limit:1')
+            gf.handle_arg('-weblink:{}'.format(search))
+            gf.handle_arg('-ns:2')
+            gf.handle_arg('-limit:1')
             gen = gf.getCombinedGenerator()
             genlist = list(gen)
             self.assertLength(genlist, 1)
