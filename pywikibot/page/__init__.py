@@ -2528,7 +2528,7 @@ class FilePage(Page):
         if req.status_code == 200:
             try:
                 with open(filename, 'wb') as f:
-                    for chunk in req.data.iter_content(chunk_size):
+                    for chunk in req.iter_content(chunk_size):
                         f.write(chunk)
             except IOError as e:
                 raise e

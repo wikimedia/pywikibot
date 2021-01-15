@@ -16,7 +16,8 @@ import requests
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.comms import http, threadedhttp
+
+from pywikibot.comms import http
 from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 
 from tests import join_images_path, patch
@@ -41,7 +42,7 @@ class HttpTestCase(TestCase):
     def test_fetch(self):
         """Test http.fetch using http://www.wikipedia.org/."""
         r = http.fetch('http://www.wikipedia.org/')
-        self.assertIsInstance(r, threadedhttp.HttpRequest)
+        self.assertIsInstance(r, requests.Response)
         self.assertEqual(r.status_code, 200)
         self.assertIn('<html lang="mul"', r.text)
         self.assertIsInstance(r.text, str)
@@ -106,9 +107,8 @@ class HttpsCertificateTestCase(TestCase):
             response = http.fetch(
                 'https://testssl-expire-r2i2.disig.sk/index.en.html',
                 verify=False)
-        r = response.text
-        self.assertIsInstance(r, str)
-        self.assertTrue(re.search(r'<title>.*</title>', r))
+        self.assertIsInstance(response.text, str)
+        self.assertTrue(re.search(r'<title>.*</title>', response.text))
         http.session.close()  # clear the connection
 
         # Verify that it now fails again
@@ -166,14 +166,12 @@ class TestHttpStatus(HttpbinTestCase):
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch('http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status_code, 200)
-        self.assertIsNotNone(r.data.history)
-        self.assertIn('//en.wikipedia.org/wiki/Main_Page',
-                      r.data.url)
+        self.assertIsNotNone(r.history)
+        self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
         r = http.fetch('http://en.wikia.com')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.data.url,
-                         'https://www.fandom.com/explore')
+        self.assertEqual(r.url, 'https://www.fandom.com/explore')
 
 
 class UserAgentTestCase(TestCase):
@@ -282,19 +280,19 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         r = http.fetch(
             self.get_httpbin_url('/status/200'),
             headers={'user-agent': 'EXISTING'})
-        self.assertEqual(r.headers['user-agent'], 'EXISTING')
+        self.assertEqual(r.request.headers['user-agent'], 'EXISTING')
 
         # Argument value changes
         r = http.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=True)
-        self.assertNotEqual(r.headers['user-agent'], http.user_agent())
+        self.assertNotEqual(r.request.headers['user-agent'], http.user_agent())
         r = http.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=False)
-        self.assertEqual(r.headers['user-agent'], http.user_agent())
+        self.assertEqual(r.request.headers['user-agent'], http.user_agent())
         r = http.fetch(
             self.get_httpbin_url('/status/200'),
             use_fake_user_agent='ARBITRARY')
-        self.assertEqual(r.headers['user-agent'], 'ARBITRARY')
+        self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
         # Empty value
         self.assertRaisesRegex(ValueError,
@@ -313,7 +311,7 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
             self.get_httpbin_hostname(): 'OVERRIDDEN'}
         r = http.fetch(
             self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
-        self.assertEqual(r.headers['user-agent'], 'OVERRIDDEN')
+        self.assertEqual(r.request.headers['user-agent'], 'OVERRIDDEN')
 
     @require_modules('fake_useragent')
     def test_fetch_with_fake_useragent(self):
@@ -370,153 +368,170 @@ class CharsetTestCase(TestCase):
     UTF8_BYTES = STR.encode('utf8')
 
     @staticmethod
-    def _create_request(charset=None, data=UTF8_BYTES):
+    def _create_response(headers=None, data=UTF8_BYTES):
         """Helper method."""
-        req = threadedhttp.HttpRequest(charset=charset)
         resp = requests.Response()
-        resp.headers = {'content-type': 'charset=utf-8'}
+        resp.request = requests.Request()
+        if headers is not None:
+            resp.headers = headers
+        else:
+            resp.headers = {'content-type': 'charset=utf-8'}
         resp._content = data[:]
-        req.data = resp
-        return req
+        return resp
 
     def test_no_content_type(self):
         """Test decoding without content-type (and then no charset)."""
-        req = threadedhttp.HttpRequest('')
-        resp = requests.Response()
-        resp.headers = {}
-        resp._content = CharsetTestCase.LATIN1_BYTES[:]
-        req._data = resp
-        self.assertIsNone(req.charset)
-        self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={},
+            data=CharsetTestCase.LATIN1_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('latin1', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_no_charset(self):
         """Test decoding without explicit charset."""
-        req = threadedhttp.HttpRequest('')
-        resp = requests.Response()
-        resp.headers = {'content-type': ''}
-        resp._content = CharsetTestCase.LATIN1_BYTES[:]
-        req._data = resp
-        self.assertIsNone(req.charset)
-        self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': ''},
+            data=CharsetTestCase.LATIN1_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('latin1', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_content_type_application_json_without_charset(self):
         """Test decoding without explicit charset but JSON content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = CharsetTestCase.UTF8_BYTES[:]
-        resp.headers = {'content-type': 'application/json'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('utf-8', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/json'},
+            data=CharsetTestCase.UTF8_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
 
     def test_content_type_sparql_json_without_charset(self):
         """Test decoding without explicit charset but JSON content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = CharsetTestCase.UTF8_BYTES[:]
-        resp.headers = {'content-type': 'application/sparql-results+json'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('utf-8', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/sparql-results+json'},
+            data=CharsetTestCase.UTF8_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
 
     def test_content_type_xml_without_charset(self):
         """Test decoding without explicit charset but xml content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = CharsetTestCase.UTF8_BYTES[:]
-        resp.headers = {'content-type': 'text/xml'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('utf-8', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/xml'},
+            data=CharsetTestCase.UTF8_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
 
     def test_content_type_xml_with_charset(self):
         """Test xml content with utf-8 encoding given in content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = '<?xml version="1.0" encoding="UTF-8"?>'.encode(
-            'utf-8')
-        resp.headers = {'content-type': 'text/xml'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('UTF-8', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/xml'},
+            data='<?xml version="1.0" encoding="UTF-8"?>'.encode('utf-8'))
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('UTF-8', resp.encoding)
 
     def test_content_type_xml_with_charset_and_more_data(self):
         """Test xml content with utf-8 encoding given in content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = (
-            '<?xml version="1.0" encoding="UTF-8" someparam="ignored"?>'
-            .encode('utf-8'))
-        resp.headers = {'content-type': 'text/xml'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('UTF-8', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/xml'},
+            data='<?xml version="1.0" encoding="UTF-8" '
+                 'someparam="ignored"?>'.encode('utf-8'))
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('UTF-8', resp.encoding)
 
     def test_content_type_xml_with_variant_charset(self):
         """Test xml content with latin1 encoding given in content."""
-        req = CharsetTestCase._create_request()
-        resp = requests.Response()
-        req._data = resp
-        resp._content = "<?xml version='1.0' encoding='latin1'?>".encode(
-            'latin1')
-        resp.headers = {'content-type': 'text/xml'}
-        self.assertIsNone(req.charset)
-        self.assertEqual('latin1', req.encoding)
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={'content-type': 'application/xml'},
+            data="<?xml version='1.0' encoding='latin1'?>".encode('latin1'))
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('latin1', resp.encoding)
 
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
-        req = CharsetTestCase._create_request()
-        self.assertIsNone(req.charset)
-        self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+        charset = None
+        resp = CharsetTestCase._create_response()
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_same_charset(self):
         """Test decoding with explicit and equal charsets."""
-        req = CharsetTestCase._create_request('utf-8')
-        self.assertEqual('utf-8', req.charset)
-        self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+        charset = 'utf-8'
+        resp = CharsetTestCase._create_response()
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_header_charset(self):
         """Test decoding with different charsets and valid header charset."""
-        req = CharsetTestCase._create_request('latin1')
-        self.assertEqual('latin1', req.charset)
+        charset = 'latin1'
+        resp = CharsetTestCase._create_response()
+        resp.encoding = http._decide_encoding(resp, charset)
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
-            self.assertEqual('utf-8', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+            self.assertEqual('utf-8', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_code_charset(self):
         """Test decoding with different charsets and invalid header charset."""
-        req = CharsetTestCase._create_request('latin1',
-                                              CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual('latin1', req.charset)
+        charset = 'latin1'
+        resp = CharsetTestCase._create_response(
+            data=CharsetTestCase.LATIN1_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
-            self.assertEqual('latin1', req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.text, CharsetTestCase.STR)
+            self.assertEqual('latin1', resp.encoding)
+        self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_invalid_charset(self):
         """Test decoding with different and invalid charsets."""
-        req = CharsetTestCase._create_request('utf16',
-                                              CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual('utf16', req.charset)
+        charset = 'utf16'
+        resp = CharsetTestCase._create_response(
+            data=CharsetTestCase.LATIN1_BYTES)
         # Ignore WARNING: Encoding "utf16" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertRaisesRegex(
                 UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
-                lambda: req.encoding)
-        self.assertEqual(req.content, CharsetTestCase.LATIN1_BYTES)
-        self.assertRaisesRegex(
-            UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.text)
+                http._decide_encoding, resp, charset)
+        self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
+
+        try:
+            resp.encoding = http._decide_encoding(resp, charset)
+        except UnicodeDecodeError as e:
+            resp.encoding = e
+
+        with patch('pywikibot.error'):
+            self.assertRaisesRegex(
+                UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
+                http.error_handling_callback, resp)
+
+        # TODO: this is a breaking change
+        # self.assertRaisesRegex(
+        #     UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: resp.text)
+
+        # Response() would do:
+        # encoding = UnicodeDecodeError -> str(self.content, errors='replace')
+        self.assertEqual(
+            resp.text, str(resp.content, errors='replace'))
+        # encoding = None -> str(resp.content, resp.encoding, errors='replace')
+        resp.encoding = None
+        self.assertEqual(
+            resp.text,
+            str(resp.content, resp.apparent_encoding, errors='replace'))
 
 
 class BinaryTestCase(TestCase):

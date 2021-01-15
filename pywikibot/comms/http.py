@@ -16,6 +16,8 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 import atexit
+import codecs
+import re
 import sys
 
 from contextlib import suppress
@@ -30,7 +32,6 @@ import requests
 import pywikibot
 
 from pywikibot.backports import Tuple
-from pywikibot.comms import threadedhttp
 from pywikibot import config2 as config
 from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
@@ -252,7 +253,7 @@ def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
 
     baseuri = site.base_url(uri)
     r = fetch(baseuri, headers=headers, **kwargs)
-    site.throttle.retry_after = int(r.response_headers.get('retry-after', 0))
+    site.throttle.retry_after = int(r.headers.get('retry-after', 0))
     return r.text
 
 
@@ -313,15 +314,24 @@ def error_handling_callback(response):
     if response.status_code not in (200, 207):
         warning('Http response status {}'.format(response.status_code))
 
+    if isinstance(response.encoding, UnicodeDecodeError):
+        error('An error occurred for uri {}: '
+              'no encoding detected!'.format(response.request.url))
+        raise response.encoding from None
+
 
 @deprecated_args(callback=True, body='data')
-def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
+def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
+          default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False, **kwargs):
     """
     HTTP request.
 
     See L{requests.Session.request} for parameters.
 
+    @param uri: URL to send
+    @param method: HTTP method of the request (default: GET)
+    @param headers: dictionary of headers of the request
     @param default_error_handling: Use default error handling
     @param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
@@ -335,7 +345,7 @@ def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
     @type verify: bool or path to certificates
     @kwarg callbacks: Methods to call once data is fetched
     @type callbacks: list of callable
-    @rtype: L{threadedhttp.HttpRequest}
+    @rtype: L{requests.Response}
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
@@ -373,11 +383,11 @@ def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
         headers['user-agent'] = assign_user_agent(headers.get('user-agent'))
 
     callbacks = kwargs.pop('callbacks', [])
+    # error_handling_callback will be executed first.
     if default_error_handling:
-        callbacks.append(error_handling_callback)
+        callbacks.insert(0, error_handling_callback)
 
     charset = kwargs.pop('charset', None)
-    request = threadedhttp.HttpRequest(charset=charset)
 
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
@@ -406,18 +416,107 @@ def fetch(uri, method='GET', headers=None, default_error_handling: bool = True,
                                    headers=headers, auth=auth, timeout=timeout,
                                    **kwargs)
     except Exception as e:
-        request.data = e
         response = e
     else:
-        request.data = response
+        response.encoding = _decide_encoding(response, charset)
 
     for callback in callbacks:
         callback(response)
 
-    # if there's no data in the answer we're in trouble
-    try:
-        request.data
-    except AssertionError as e:
-        raise e
+    return _ResponseDeprecationWrapper(response)
 
-    return request
+
+class _ResponseDeprecationWrapper(requests.Response):
+
+    """Helper class for the deprecation of HttpRequests.
+
+    This class will be removed ASAP. Its only purpose is to allow
+    a graceful deprecation of HttpRequests.
+    DO NOT USE!
+
+    """
+
+    def __init__(self, response):
+        self.__response = response
+
+    def __getattr__(self, attr):
+        return getattr(self.__response, attr)
+
+    def __setattr__(self, attr, val):
+        if attr == '_ResponseDeprecationWrapper__response':
+            object.__setattr__(self, attr, val)
+
+        return setattr(self.__response, attr, val)
+
+    @property
+    @deprecated('attribute/methods of Response(), '
+                'which is now returned from http.fetch()',
+                since='20210110', future_warning=True)
+    def data(self):
+        return self
+
+
+def _get_encoding_from_response_headers(response):
+    """Return charset given by the response header."""
+    content_type = response.headers.get('content-type')
+
+    if not content_type:
+        return None
+
+    m = re.search('charset=(?P<charset>.*?$)', content_type)
+    if m:
+        header_encoding = m.group('charset')
+    elif 'json' in content_type:
+        # application/json | application/sparql-results+json
+        header_encoding = 'utf-8'
+    elif 'xml' in content_type:
+        header = response.content[:100].splitlines()[0]  # bytes
+        m = re.search(
+            br'encoding=(["\'])(?P<encoding>.+?)\1', header)
+        if m:
+            header_encoding = m.group('encoding').decode('utf-8')
+        else:
+            header_encoding = 'utf-8'
+    else:
+        header_encoding = None
+
+    return header_encoding
+
+
+def _decide_encoding(response, charset):
+    """Detect the response encoding."""
+    def _try_decode(content, encoding):
+        """Helper function to try decoding."""
+        content.decode(encoding)
+        return encoding
+
+    header_encoding = _get_encoding_from_response_headers(response)
+    if header_encoding is None:
+        pywikibot.log('Http response does not contain a charset.')
+
+    if charset is None:
+        charset = response.request.headers.get('accept-charset')
+
+    # No charset requested, or in request headers or response headers.
+    # Defaults to latin1.
+    if charset is None and header_encoding is None:
+        return _try_decode(response.content, 'latin1')
+
+    if charset is None and header_encoding is not None:
+        return _try_decode(response.content, header_encoding)
+
+    if charset is not None and header_encoding is None:
+        return _try_decode(response.content, charset)
+
+    # Both charset and header_encoding are available.
+    if codecs.lookup(header_encoding) != codecs.lookup(charset):
+        pywikibot.warning(
+            'Encoding "{}" requested but "{}" received in the '
+            'response header.'.format(charset, header_encoding))
+
+    try:
+        _encoding = _try_decode(response.content, header_encoding)
+    except UnicodeDecodeError:
+        _encoding = _try_decode(response.content, charset)
+
+    return _encoding

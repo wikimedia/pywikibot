@@ -457,17 +457,12 @@ class CheckHostnameMixin(TestCaseBase):
                 r = http.fetch(hostname,
                                method='HEAD',
                                default_error_handling=False)
-                if r.exception:
-                    e = r.exception
-                else:
-                    if r.status_code not in {200, 301, 302, 303, 307, 308}:
-                        raise ServerError('HTTP status: {}'
-                                          .format(r.status_code))
-            except Exception as e2:
+                if r.status_code not in {200, 301, 302, 303, 307, 308}:
+                    raise ServerError('HTTP status: {}'.format(r.status_code))
+            except Exception as e:
                 pywikibot.error('{}: accessing {} caused exception:'
                                 .format(cls.__name__, hostname))
-                pywikibot.exception(e2, tb=True)
-                e = e2
+                pywikibot.exception(e, tb=True)
 
             if e:
                 cls._checked_hostnames[hostname] = e
