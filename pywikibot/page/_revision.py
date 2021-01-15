@@ -1,6 +1,6 @@
 """Object representing page revision."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,7 @@ import hashlib
 from collections.abc import Mapping
 
 from pywikibot import Timestamp, warning
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import deprecated
 
 
 class Revision(Mapping):
@@ -26,39 +26,11 @@ class Revision(Mapping):
     Sample for Revision access
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
-        self._clean_args(args, kwargs)
         self._data = kwargs
         self._upcast_dict(self._data)
         super().__init__()
-
-    def _clean_args(self, args: tuple, kwargs: dict):
-        """Cleanup positional arguments.
-
-        Replace positional arguments with keyword arguments for
-        backwards compatibility.
-        @param: args: tuple of positional arguments
-        @param: kwargs: mutable dict of keyword arguments to be updated
-        """
-        keys = (  # postional argument keys by old order
-            'revid', 'timestamp', 'user', 'anon', 'comment', 'text', 'minor',
-            'rollbacktoken', 'parentid', 'contentmodel', 'sha1', 'slots'
-        )
-
-        # replace positional arguments with keyword arguments
-        for i, (arg, key) in enumerate(zip(args, keys)):  # pragma: no cover
-            issue_deprecation_warning('Positional argument {} ({})'
-                                      .format(i + 1, arg),
-                                      'keyword argument "{}={}"'
-                                      .format(key, arg),
-                                      warning_class=FutureWarning,
-                                      since='20200802')
-            if key in kwargs:
-                warning('"{}" is given as keyword argument "{}" already; '
-                        'ignoring "{}"'.format(key, arg, kwargs[key]))
-            else:
-                kwargs[key] = arg
 
     @staticmethod
     def _upcast_dict(map_):
