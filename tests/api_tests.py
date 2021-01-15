@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -759,7 +758,10 @@ class TestPropertyGenerator(TestCase):
         count = 0
         for pagedata in gen:
             self.assertIsInstance(pagedata, dict)
-            self.assertIn('pageid', pagedata)
+            if 'missing' in pagedata:
+                self.assertNotIn('pageid', pagedata)
+            else:
+                self.assertIn('pageid', pagedata)
             count += 1
         self.assertLength(links, count)
 
@@ -777,7 +779,10 @@ class TestPropertyGenerator(TestCase):
         count = 0
         for pagedata in gen:
             self.assertIsInstance(pagedata, dict)
-            self.assertIn('pageid', pagedata)
+            if 'missing' in pagedata:
+                self.assertNotIn('pageid', pagedata)
+            else:
+                self.assertIn('pageid', pagedata)
             count += 1
         self.assertLength(links, count)
 
