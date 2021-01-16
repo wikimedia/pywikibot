@@ -31,7 +31,7 @@ mwoauth>=0.2.4,!=0.3.1
 pydot >= 1.2
 
 # cosmetic_changes and scripts/isbn
-python-stdnum >= 1.14
+python-stdnum >= 1.15
 
 # GUI
 Pillow >= 6.2.2, < 8.0.0 ; python_version < '3.6'
