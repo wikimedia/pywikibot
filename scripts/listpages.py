@@ -213,7 +213,7 @@ def main(*args) -> None:
         elif option == '-summary':
             summary = value
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     if base_dir:
         base_dir = os.path.expanduser(base_dir)

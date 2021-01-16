@@ -255,7 +255,7 @@ def main(*args):
         elif arg == '-always':
             options['always'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     generator = gen_factory.getCombinedGenerator()
 

@@ -189,7 +189,7 @@ def main(*args):
         if arg == '-onlyuncat':
             onlyUncat = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     generator = genFactory.getCombinedGenerator()
     if not generator:

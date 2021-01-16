@@ -838,7 +838,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if genFactory.handleArg(arg):
+        if genFactory.handle_arg(arg):
             continue
         if arg == '-regex':
             regex = True
@@ -980,7 +980,7 @@ def main(*args):
             if isinstance(gen_args, str):
                 gen_args = [gen_args]
             for gen_arg in gen_args:
-                genFactory.handleArg(gen_arg)
+                genFactory.handle_arg(gen_arg)
         replacement_set = ReplacementList(fix.get('regex'),
                                           fix.get('exceptions'),
                                           fix.get('nocase'),

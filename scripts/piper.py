@@ -132,7 +132,7 @@ def main(*args):
         else:
             # check if a standard argument like
             # -start:XYZ or -ref:Asdf was given.
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     options['filters'] = filters
 

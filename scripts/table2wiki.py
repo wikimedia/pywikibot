@@ -546,7 +546,7 @@ FROM page JOIN text ON (page_id = old_id)
 WHERE old_text LIKE '%<table%'
 """
                 arg = '-mysqlquery:' + query
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     if gen:
         gen = pagegenerators.NamespaceFilterPageGenerator(

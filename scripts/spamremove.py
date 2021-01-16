@@ -135,7 +135,7 @@ def main(*args):
             protocol = arg.partition(':')[2]
         elif arg.startswith('-summary:'):
             options['summary'] = arg.partition(':')[2]
-        elif gen_factory.handleArg(arg):
+        elif gen_factory.handle_arg(arg):
             continue
         else:
             spam_external_url = arg
