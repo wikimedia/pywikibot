@@ -29,13 +29,13 @@ from contextlib import suppress
 from itertools import zip_longest
 from pywikibot.login import LoginStatus as _LoginStatus
 from textwrap import fill
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
 
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.echo import Notification
@@ -63,6 +63,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
+    UserRightsError,
     UnknownExtension,
 )
 from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
@@ -3164,6 +3165,24 @@ class APISite(BaseSite):
                                                 filters)
         return wlgen
 
+    def _check_view_deleted(self, msg_prefix: str, prop: List[str]) -> None:
+        """Check if the user can view deleted comments and content.
+
+        @param msg_prefix: The calling method name
+        @param prop: Requested props to check
+        @raises UserRightsError: user cannot view a requested prop
+        """
+        err = '{}: User:{} not authorized to view '.format(msg_prefix,
+                                                           self.user())
+        if not self.has_right('deletedhistory'):
+            if self.mw_version < '1.34':
+                raise UserRightsError(err + 'deleted revisions.')
+            if 'comment' in prop or 'parsedcomment' in prop:
+                raise UserRightsError(err + 'comments of deleted revisions.')
+        if ('content' in prop and not (self.has_right('deletedtext')
+                                       or self.has_right('undelete'))):
+            raise UserRightsError(err + 'deleted content.')
+
     @deprecated_args(step=None, get_text='content', page='titles',
                      limit='total')
     def deletedrevs(self, titles=None, start=None, end=None,
@@ -3227,16 +3246,7 @@ class APISite(BaseSite):
         if start and end:
             self.assert_valid_iter_params('deletedrevs', start, end, reverse)
 
-        err = ('deletedrevs: User:{} not authorized to '
-               .format(self.user()))
-        if not self.has_right('deletedhistory'):
-            if self.mw_version < '1.34':
-                raise Error(err + 'access deleted revisions.')
-            if 'comment' in prop or 'parsedcomment' in prop:
-                raise Error(err + 'access comments of deleted revisions.')
-        if ('content' in prop and not (self.has_right('deletedtext')
-                                       or self.has_right('undelete'))):
-            raise Error(err + 'view deleted content.')
+        self._check_view_deleted('deletedrevs', prop)
 
         revids = kwargs.pop('revids', None)
         if not (bool(titles) ^ (revids is not None)):
@@ -3280,6 +3290,63 @@ class APISite(BaseSite):
                 with suppress(KeyError):
                     data['revisions'] = data.pop('deletedrevisions')
                     yield data
+
+    @need_version('1.25')
+    def alldeletedrevisions(
+        self,
+        *,
+        namespaces=None,
+        reverse: bool = False,
+        content: bool = False,
+        total: Optional[int] = None,
+        **kwargs
+    ) -> typing.Iterable[Dict[str, Any]]:
+        """
+        Iterate all deleted revisions.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Alldeletedrevisions}
+
+        @param namespaces: Only iterate pages in these namespaces
+        @type namespaces: iterable of str or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+        @param reverse: Iterate oldest revisions first (default: newest)
+        @param content: If True, retrieve the content of each revision
+        @param total: Number of revisions to retrieve
+        @keyword from: Start listing at this title
+        @keyword to: Stop listing at this title
+        @keyword prefix: Search for all page titles that begin with this value
+        @keyword excludeuser: Exclude revisions by this user
+        @keyword tag: Only list revisions tagged with this tag
+        @keyword user: List revisions by this user
+        @keyword start: Iterate revisions starting at this Timestamp
+        @keyword end: Iterate revisions ending at this Timestamp
+        @keyword prop: Which properties to get. Defaults are ids, timestamp,
+            flags, user, and comment (if you have the right to view).
+        @type prop: List[str]
+        """
+        if 'start' in kwargs and 'end' in kwargs:
+            self.assert_valid_iter_params('alldeletedrevisions',
+                                          kwargs['start'],
+                                          kwargs['end'],
+                                          reverse)
+        prop = kwargs.pop('prop') or []
+        parameters = {'adr' + k: v for k, v in kwargs.items()}
+        if not prop:
+            prop = ['ids', 'timestamp', 'flags', 'user']
+            if self.has_right('deletedhistory'):
+                prop.append('comment')
+        if content:
+            prop.append('content')
+        self._check_view_deleted('alldeletedrevisions', prop)
+        parameters['adrprop'] = prop
+        if reverse:
+            parameters['adrdir'] = 'newer'
+        yield from self._generator(api.ListGenerator,
+                                   type_arg='alldeletedrevisions',
+                                   namespaces=namespaces,
+                                   total=total,
+                                   parameters=parameters)
 
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.

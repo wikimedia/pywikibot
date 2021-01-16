@@ -31,7 +31,7 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot.backports import cache, Dict, List
+from pywikibot.backports import cache, Dict, Iterable, List, Tuple
 from pywikibot import config, i18n, textlib
 from pywikibot.comms import http
 from pywikibot.data.api import APIError
@@ -3203,6 +3203,23 @@ class User(Page):
         @rtype: tuple or None
         """
         return next(self.contributions(total=1), None)
+
+    def deleted_contributions(
+        self, *, total: int = 500, **kwargs
+    ) -> Iterable[Tuple[Page, Revision]]:
+        """Yield tuples describing this user's deleted edits.
+
+        @param: total: Limit results to this number of pages
+        @keyword start: Iterate contributions starting at this Timestamp
+        @keyword end: Iterate contributions ending at this Timestamp
+        @keyword reverse: Iterate oldest contributions first (default: newest)
+        @keyword namespaces: Only iterate pages in these namespaces
+        """
+        for data in self.site.alldeletedrevisions(user=self.username,
+                                                  total=total, **kwargs):
+            page = Page(self.site, data['title'], data['ns'])
+            for contrib in data['revisions']:
+                yield page, Revision(**contrib)
 
     @deprecate_arg('number', 'total')
     def uploadedImages(self, total=10):
