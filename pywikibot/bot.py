@@ -53,7 +53,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -70,7 +70,7 @@ __all__ = (
     'Choice', 'StaticChoice', 'LinkChoice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
-    'calledModuleName', 'handle_args', 'handleArgs',
+    'calledModuleName', 'handle_args',
     'show_help', 'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
@@ -856,12 +856,6 @@ def handle_args(args: Optional[Iterable[str]] = None,
 
     debug('handle_args() completed.', _logger)
     return non_global_args
-
-
-@deprecated('handle_args', since='20150409', future_warning=True)
-def handleArgs(*args):  # pragma: no cover
-    """DEPRECATED. Use handle_args()."""
-    return handle_args(args)
 
 
 def show_help(module_name=None, show_global=False):
