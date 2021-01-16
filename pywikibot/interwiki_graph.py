@@ -1,6 +1,6 @@
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,8 +13,6 @@ from typing import Optional
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import (
-    deprecated, deprecated_args, ModuleDeprecationWrapper)
 
 try:
     import pydot
@@ -40,26 +38,11 @@ class GraphSavingThread(threading.Thread):
     mechanism to kill a thread if it takes too long.
     """
 
-    @deprecated_args(originPage='origin')  # since 20200617
     def __init__(self, graph, origin):
         """Initializer."""
         super().__init__()
         self.graph = graph
         self.origin = origin
-
-    @property
-    @deprecated('GraphSavingThread.origin', since='20200617')
-    def originPage(self):
-        """Deprecated property for the origin page.
-
-        DEPRECATED. Use origin.
-        """
-        return self.origin
-
-    @originPage.setter
-    @deprecated('GraphSavingThread.origin', since='20200617')
-    def originPage(self, value):
-        self.origin = value
 
     def run(self):
         """Write graphs to the data directory."""
@@ -101,32 +84,6 @@ class Subject:
     @origin.setter
     def origin(self, value):
         self._origin = value
-
-    @property
-    @deprecated('Subject.origin', since='20150125', future_warning=True)
-    def originPage(self):
-        """DEPRECATED. Deprecated property for the origin page."""
-        return self.origin
-
-    @originPage.setter
-    @deprecated('Subject.origin', since='20150125', future_warning=True)
-    def originPage(self, value):
-        self.origin = value
-
-    @property
-    @deprecated('Subject.found_in', since='20150125', future_warning=True)
-    def foundIn(self):
-        """Mapping of pages to others pages interwiki linked to it.
-
-        DEPRECATED. Use found_in.
-        """
-        return self.found_in
-
-    @foundIn.setter
-    @deprecated('Subject.found_in', since='20150125', future_warning=True)
-    def foundIn(self, value):
-        """DEPRECATED. Temporary property setter to support code migration."""
-        self.found_in = value
 
 
 class GraphDrawer:
@@ -269,10 +226,3 @@ def getFilename(page, extension: Optional[str] = None) -> str:
     if extension:
         filename += '.{}'.format(extension)
     return filename
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'pydotfound',
-    replacement_name='"not isinstance(pydot, ImportError)"',
-    since='2015125', future_warning=True)
