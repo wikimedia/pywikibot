@@ -1320,7 +1320,7 @@ def main(*args: Tuple[str, ...]) -> None:
                     'Disambiguation category for your wiki is not known.')
                 raise
         else:
-            generator_factory.handleArg(argument)
+            generator_factory.handle_arg(argument)
 
     generator = generator_factory.getCombinedGenerator(generator)
     if not generator:

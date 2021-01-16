@@ -1036,7 +1036,7 @@ def main(*args):
         elif arg == '-autonomous':
             autonomous = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg()(arg)
 
     pregenerator = genFactory.getCombinedGenerator(preload=True)
     additional_text = ('' if supportedSite()

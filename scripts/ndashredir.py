@@ -134,7 +134,7 @@ def main(*args):
     for arg in local_args:
 
         # Catch the pagegenerators options
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue  # nothing to do here
 
         # Now pick up custom options

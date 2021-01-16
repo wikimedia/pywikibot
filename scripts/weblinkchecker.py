@@ -945,7 +945,7 @@ def main(*args):
             else:
                 xmlFilename = arg[5:]
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if xmlFilename:
         try:

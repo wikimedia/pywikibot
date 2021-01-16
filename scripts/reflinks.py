@@ -759,7 +759,7 @@ def main(*args):
             else:
                 xml_filename = arg[5:]
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     if xml_filename:
         generator = XmlDumpPageGenerator(xml_filename, xml_start,

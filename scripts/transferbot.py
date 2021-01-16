@@ -96,7 +96,7 @@ def main(*args) -> None:
 
     gen_factory = pagegenerators.GeneratorFactory(site=tosite if target
                                                   else fromsite)
-    unknown_args = [arg for arg in gen_args if not gen_factory.handleArg(arg)]
+    unknown_args = [arg for arg in gen_args if not gen_factory.handle_arg(arg)]
 
     gen = gen_factory.getCombinedGenerator()
 

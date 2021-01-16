@@ -195,7 +195,7 @@ def main(*args):
         elif option in protection_types and value:
             protections[option] = value
         else:
-            if not gen_factory.handleArg(arg):
+            if not gen_factory.handle_arg(arg):
                 raise ValueError('Unknown parameter "{0}"'.format(arg))
             if value:
                 message_properties.update({'cat': value, 'page': value})

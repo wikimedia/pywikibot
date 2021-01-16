@@ -685,7 +685,7 @@ def main(*args) -> None:
             gen_options[option] = value
         elif option == 'limit':
             options['limit'] = gen_options['limit'] = int(value)
-        elif gen_factory.handleArg(argument):
+        elif gen_factory.handle_arg(argument):
             pass
         else:
             pywikibot.output('Unknown argument: ' + arg)

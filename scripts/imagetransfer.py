@@ -342,7 +342,7 @@ def main(*args):
         elif opt == '-tosite':
             options['target'] = value
         else:
-            generator_factory.handleArg(arg)
+            generator_factory.handle_arg(arg)
 
     gen = generator_factory.getCombinedGenerator()
     if not gen:

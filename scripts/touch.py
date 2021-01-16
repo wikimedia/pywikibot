@@ -98,7 +98,7 @@ def main(*args) -> None:
 
     bot_class = TouchBot
     for arg in local_args:
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue
         if arg == '-purge':
             bot_class = PurgeBot
