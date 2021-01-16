@@ -309,7 +309,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option == '-excepturl':
             regexSkipUrl = value or pywikibot.input('What text should I skip?')
         elif option == '-except':
-            new_arg = ''.join('-grepnot', sep, value)
+            new_arg = ''.join(['-grepnot', sep, value])
             issue_deprecation_warning(arg, new_arg,
                                       2, ArgumentDeprecationWarning,
                                       since='20201224')
