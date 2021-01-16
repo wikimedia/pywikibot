@@ -3330,7 +3330,7 @@ class APISite(BaseSite):
                                           kwargs['start'],
                                           kwargs['end'],
                                           reverse)
-        prop = kwargs.pop('prop') or []
+        prop = kwargs.pop('prop', [])
         parameters = {'adr' + k: v for k, v in kwargs.items()}
         if not prop:
             prop = ['ids', 'timestamp', 'flags', 'user']
