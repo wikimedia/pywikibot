@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test aspects to allow fine grained control over what tests are executed.
 
@@ -7,7 +6,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -450,7 +449,6 @@ class CheckHostnameMixin(TestCaseBase):
                 else:
                     continue
 
-            e = None
             try:
                 if '://' not in hostname:
                     hostname = 'http://' + hostname
@@ -464,7 +462,6 @@ class CheckHostnameMixin(TestCaseBase):
                                 .format(cls.__name__, hostname))
                 pywikibot.exception(e, tb=True)
 
-            if e:
                 cls._checked_hostnames[hostname] = e
                 raise unittest.SkipTest(
                     '{}: hostname {} failed: {}'
