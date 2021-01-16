@@ -18,7 +18,7 @@ from pywikibot.comms import http
 from pywikibot import config
 from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
-from pywikibot.tools import suppress_warnings
+from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 
 from tests import patch, unittest_print
 from tests.aspects import (
@@ -33,6 +33,7 @@ from tests.aspects import (
     WikidataTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
+from tests.utils import expected_failure_if
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
@@ -107,6 +108,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         self.assertEqual(self.site.category_namespaces(),
                          list(self.site.namespace(14, all=True)))
 
+    @expected_failure_if(PYTHON_VERSION < (3, 6))
     def test_loadimageinfo(self):
         """Test deprecation warning if result of loadimageinfo() is used."""
         file = pywikibot.FilePage(self.site, 'foo.jpg')
