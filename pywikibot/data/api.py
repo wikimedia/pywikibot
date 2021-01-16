@@ -1,6 +1,6 @@
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,7 +29,7 @@ import pywikibot
 
 from pywikibot import config, login
 
-from pywikibot.backports import FrozenSet, Set, Tuple
+from pywikibot.backports import Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
@@ -38,7 +38,6 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.tools import (
-    deprecated,
     issue_deprecation_warning,
     itergroup,
     PYTHON_VERSION,
@@ -652,20 +651,6 @@ class ParamInfo(Sized, Container):
         return param_data[0]
 
     @property
-    @deprecated('submodules() or module_paths', since='20150715',
-                future_warning=True)
-    def modules(self) -> Union[Set[str], FrozenSet[str]]:
-        """
-        Set of all main and query modules without path prefixes.
-
-        Modules with the same names will be only added once (e.g. 'tokens' from
-        the action modules and query modules).
-
-        @return: module names
-        """
-        return self.action_modules | self.query_modules
-
-    @property
     def module_paths(self):
         """Set of all modules using their paths."""
         return self._module_set(True)
@@ -714,18 +699,6 @@ class ParamInfo(Sized, Container):
         return {'{}+{}'.format(prefix, mod) for mod in modules}
 
     @property
-    @deprecated('prefix_map', since='20150715', future_warning=True)
-    def prefixes(self):
-        """
-        Mapping of module to its prefix for all modules with a prefix.
-
-        This loads paraminfo for all modules.
-        """
-        if not self._prefixes:
-            self._prefixes = self.module_attribute_map('prefix')
-        return self._prefixes
-
-    @property
     def prefix_map(self):
         """
         Mapping of module to its prefix for all modules with a prefix.
@@ -757,39 +730,6 @@ class ParamInfo(Sized, Container):
 
         return {mod: self[mod][attribute]
                 for mod in modules if attribute in self[mod]}
-
-    @deprecated('attributes', since='20150715', future_warning=True)
-    def module_attribute_map(self, attribute: str,
-                             modules: Optional[set] = None):
-        """
-        Mapping of modules with an attribute to the attribute value.
-
-        @param attribute: attribute name
-        @param modules: modules to include. If None (default) it'll load all
-            action and query modules using the module names. It only uses the
-            path for query modules which have the same name as an action
-            module.
-        @rtype: dict using modules as keys
-        """
-        if modules is None:
-            modules = self.modules | self._prefix_submodules(
-                self.query_modules & self.action_modules, 'query')
-
-        self.fetch(modules)
-
-        return {mod: self[mod][attribute]
-                for mod in modules if self[mod][attribute]}
-
-    @property
-    @deprecated('parameter()', since='20150905', future_warning=True)
-    def query_modules_with_limits(self):
-        """Set of all query modules which have limits."""
-        if not self._with_limits:
-            self.fetch(self.submodules('query', True))
-            self._with_limits = frozenset(
-                mod for mod in self.query_modules
-                if self.parameter('query+' + mod, 'limit'))
-        return self._with_limits
 
 
 class OptionSet(MutableMapping):
