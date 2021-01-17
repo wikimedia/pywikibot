@@ -16,10 +16,12 @@ import os
 import re
 import sys
 import time
+import unittest
 import warnings
 
 from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from unittest.util import safe_repr
 
 import pywikibot
 
@@ -33,8 +35,7 @@ from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 
-from tests import (
-    safe_repr, unittest, patch_request, unpatch_request, unittest_print)
+from tests import patch_request, unpatch_request, unittest_print
 from tests.utils import (
     execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
