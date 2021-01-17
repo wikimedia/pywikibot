@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -234,11 +233,8 @@ class DryParamInfo(dict):
     def __init__(self, *args, **kwargs):
         """Initializer."""
         super().__init__(*args, **kwargs)
-        self.modules = set()
         self.action_modules = set()
         self.query_modules = set()
-        self.query_modules_with_limits = set()
-        self.prefixes = set()
 
     def fetch(self, modules, _init=False):
         """Load dry data."""
