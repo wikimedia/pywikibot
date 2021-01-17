@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +17,6 @@ from contextlib import suppress
 from itertools import chain
 from unittest import mock
 from unittest.mock import MagicMock, Mock, patch
-from unittest.util import safe_repr
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
@@ -33,8 +31,6 @@ from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
 
-
-assert safe_repr  # pyflakes workaround
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
 
