@@ -363,30 +363,6 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertRaises(KeyError, pi.submodules, 'edit')
 
-    @suppress_warnings(
-        'pywikibot.data.api.ParamInfo.query_modules_with_limits is deprecated')
-    def test_query_modules_with_limits(self):
-        """Test query_modules_with_limits property."""
-        site = self.get_site()
-        pi = api.ParamInfo(site)
-        self.assertIn('revisions', pi.query_modules_with_limits)
-        self.assertNotIn('info', pi.query_modules_with_limits)
-
-    def test_modules(self):
-        """Test v1.8 modules exist."""
-        site = self.get_site()
-        pi = api.ParamInfo(site)
-        with suppress_warnings(
-            r'pywikibot\.data\.api\.ParamInfo.modules is deprecated for '
-            r'[\w ]+; use submodules\(\) or module_paths instead\.',
-            DeprecationWarning
-        ):
-            self.assertIn('revisions', pi.modules)
-            self.assertIn('help', pi.modules)
-            self.assertIn('allpages', pi.modules)
-            for mod in pi.modules:
-                self.assertNotIn('+', mod)
-
     def test_module_paths(self):
         """Test module paths use the complete paths."""
         pi = api.ParamInfo(self.site)
@@ -395,20 +371,6 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('query+revisions', pi.module_paths)
         self.assertNotIn('allpages', pi.module_paths)
         self.assertIn('query+allpages', pi.module_paths)
-
-    def test_prefixes(self):
-        """Test v1.8 module prefixes exist."""
-        site = self.get_site()
-        pi = api.ParamInfo(site)
-        with suppress_warnings(
-            r'pywikibot.data.api.ParamInfo.'
-            r'(?:prefixes|module_attribute_map|modules) '
-            r'is deprecated for [\w ]+; ',
-            DeprecationWarning
-        ):
-            self.assertIn('revisions', pi.prefixes)
-            self.assertIn('login', pi.prefixes)
-            self.assertIn('allpages', pi.prefixes)
 
     def test_prefix_map(self):
         """Test module prefixes use the path."""
@@ -484,11 +446,6 @@ class TestOtherSubmodule(TestCase):
         other_modules -= pi.query_modules
         self.assertLessEqual(other_modules & pi.submodules('flow'),
                              pi.submodules('flow'))
-        with suppress_warnings(
-            r'pywikibot.data.api.ParamInfo.modules is deprecated; '
-            r'use submodules\(\) or module_paths instead.'
-        ):
-            self.assertFalse(other_modules & pi.modules)
 
 
 class TestParaminfoModules(DefaultSiteTestCase):
@@ -822,9 +779,6 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         self.site._paraminfo['query+links'] = {
             'prefix': 'pl',
         }
-        self.site._paraminfo.query_modules_with_limits = {'querypage',
-                                                          'allpages',
-                                                          'alllinks'}
 
     def test_namespace_for_module_with_no_limit(self):
         """Test PageGenerator set_namespace."""
@@ -883,7 +837,6 @@ class TestDryListGenerator(TestCase):
             'limit': {'max': 10},
             'namespace': {'multi': True}
         }
-        mysite._paraminfo.query_modules_with_limits = {'allpages'}
         self.gen = api.ListGenerator(listaction='allpages', site=mysite)
 
     def test_namespace_none(self):
