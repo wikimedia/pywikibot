@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test echo module."""
 #
-# (C) Pywikibot team, 2019-2020
+# (C) Pywikibot team, 2019-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -12,7 +14,7 @@ import pywikibot
 from pywikibot.echo import Notification
 from pywikibot.tools import suppress_warnings
 
-from tests.aspects import unittest, DefaultDrySiteTestCase
+from tests.aspects import DefaultDrySiteTestCase
 
 
 class TestNotification(DefaultDrySiteTestCase):

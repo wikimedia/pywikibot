@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 from urllib.parse import urlparse
 
@@ -16,7 +18,7 @@ from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
 
 from tests import unittest_print
-from tests.aspects import unittest, TestCase, PatchingTestCase
+from tests.aspects import TestCase, PatchingTestCase
 from tests.utils import DrySite
 
 

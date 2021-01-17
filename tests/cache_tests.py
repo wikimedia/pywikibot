@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 """API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from pywikibot.site import BaseSite
 
 import scripts.maintenance.cache as cache
 
+from tests.aspects import TestCase
 from tests import join_cache_path
-from tests.aspects import unittest, TestCase
 
 
 class RequestCacheTests(TestCase):

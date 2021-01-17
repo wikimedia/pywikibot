@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Test cases for the SPARQL API."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot.data.sparql as sparql
 
-from tests.aspects import unittest, TestCase, WikidataTestCase
+from tests.aspects import TestCase, WikidataTestCase
 from tests import patch
 
 

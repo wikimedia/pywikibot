@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from pywikibot.tools import deprecated
 from pywikibot.site._decorators import must_be, need_right, need_version
 from pywikibot.exceptions import UserRightsError
 
-from tests.aspects import unittest, DebugOnlyTestCase, DeprecationTestCase
+from tests.aspects import DebugOnlyTestCase, DeprecationTestCase
 
 
 class TestMustBe(DebugOnlyTestCase):

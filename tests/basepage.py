@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests for BasePage subclasses."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 from pywikibot.page import BasePage
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class BasePageTestBase(TestCase):
