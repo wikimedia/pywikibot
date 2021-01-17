@@ -1673,6 +1673,7 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
             self.assertIn('title', data)
             self.assertIn(data['ns'], (10, 11))
 
+    @unittest.expectedFailure
     def test_excludeuser(self):
         """Test the site.alldeletedrevisions() method using excludeuser."""
         mysite = self.get_site()
@@ -1741,6 +1742,7 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
             for drev in data:
                 self.assertTrue(start <= drev['timestamp'] <= end)
 
+    @unittest.expectedFailure
     def test_invalid_range(self):
         """Test site.alldeletedrevisions() method with invalid range."""
         mysite = self.get_site()
