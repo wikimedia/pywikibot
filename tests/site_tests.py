@@ -1673,17 +1673,18 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
             self.assertIn('title', data)
             self.assertIn(data['ns'], (10, 11))
 
-    @unittest.expectedFailure
     def test_excludeuser(self):
         """Test the site.alldeletedrevisions() method using excludeuser."""
         mysite = self.get_site()
         for data in mysite.alldeletedrevisions(excludeuser=mysite.user(),
                                                total=5):
             self.assertIsInstance(data, dict)
-            for drev in data:
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
                 self.assertIsInstance(drev, dict)
-                self.assertIn('user', data)
-                self.assertNotEqual('user', mysite.user())
+                self.assertIn('user', drev)
+                self.assertNotEqual(drev['user'], mysite.user())
 
     def test_user_range(self):
         """Test the site.alldeletedrevisions() method with range."""
@@ -1693,7 +1694,12 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
                 user=mysite.user(),
                 start=pywikibot.Timestamp.fromISOformat(start),
                 total=5):
-            for drev in data:
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
                 self.assertLessEqual(drev['timestamp'], start)
 
         end = '2008-10-07T02:03:04Z'
@@ -1701,7 +1707,12 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
                 user=mysite.user(),
                 end=pywikibot.Timestamp.fromISOformat(end),
                 total=5):
-            for drev in data:
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
                 self.assertGreaterEqual(drev['timestamp'], end)
 
         start = '2008-10-10T11:59:59Z'
@@ -1711,7 +1722,12 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
                 start=pywikibot.Timestamp.fromISOformat(start),
                 end=pywikibot.Timestamp.fromISOformat(end),
                 total=5):
-            for drev in data:
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
                 self.assertTrue(end <= drev['timestamp'] <= start)
 
     def test_user_range_reverse(self):
@@ -1722,15 +1738,26 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
                 user=mysite.user(),
                 start=pywikibot.Timestamp.fromISOformat(start),
                 total=5, reverse=True):
-            for drev in data:
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
                 self.assertGreaterEqual(drev['timestamp'], start)
 
         for data in mysite.alldeletedrevisions(
                 user=mysite.user(),
                 end=pywikibot.Timestamp.fromISOformat('2008-10-09T04:06:08Z'),
                 total=5, reverse=True):
-            for drev in data:
-                self.assertLessEqual(drev['timestamp'], '2008-10-09T04:06:08Z')
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
+                self.assertLessEqual(drev['timestamp'],
+                                     '2008-10-09T04:06:08Z')
 
         start = '2008-10-11T06:00:01Z'
         end = '2008-10-11T23:59:59Z'
@@ -1739,23 +1766,31 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
                 start=pywikibot.Timestamp.fromISOformat(start),
                 end=pywikibot.Timestamp.fromISOformat(end),
                 reverse=True, total=5):
-            for drev in data:
+            self.assertIsInstance(data, dict)
+            self.assertIn('revisions', data)
+            self.assertIsInstance(data['revisions'], list)
+            for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
+                self.assertIn('timestamp', drev)
                 self.assertTrue(start <= drev['timestamp'] <= end)
 
-    @unittest.expectedFailure
     def test_invalid_range(self):
         """Test site.alldeletedrevisions() method with invalid range."""
         mysite = self.get_site()
         # start earlier than end
-        self.assertRaises(AssertionError, mysite.alldeletedrevisions,
-                          user=mysite.user(),
-                          start='2008-10-03T00:00:01Z',
-                          end='2008-10-03T23:59:59Z', total=5)
+        with self.assertRaises(AssertionError):
+            adrgen = mysite.alldeletedrevisions(user=mysite.user(),
+                                                start='2008-10-03T00:00:01Z',
+                                                end='2008-10-03T23:59:59Z',
+                                                total=5)
+            next(adrgen)
         # reverse: end earlier than start
-        self.assertRaises(AssertionError, mysite.alldeletedrevisions,
-                          user=mysite.user(),
-                          start='2008-10-03T23:59:59Z',
-                          end='2008-10-03T00:00:01Z', reverse=True, total=5)
+        with self.assertRaises(AssertionError):
+            adrgen = mysite.alldeletedrevisions(user=mysite.user(),
+                                                start='2008-10-03T23:59:59Z',
+                                                end='2008-10-03T00:00:01Z',
+                                                reverse=True, total=5)
+            next(adrgen)
 
 
 class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
@@ -1767,13 +1802,15 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
         mysite = self.get_site()
         for data in mysite.alldeletedrevisions(prefix='John', total=5):
             self.assertIsInstance(data, dict)
-            for key in ('title', 'ns'):
+            for key in ('title', 'ns', 'revisions'):
                 self.assertIn(key, data)
             title = data['title']
             if data['ns'] > 0:
                 *_, title = title.partition(':')
             self.assertTrue(title.startswith('John'))
+            self.assertIsInstance(data['revisions'], list)
             for drev in data['revisions']:
+                self.assertIsInstance(drev, dict)
                 for key in ('parentid', 'revid', 'timestamp', 'user'):
                     self.assertIn(key, drev)
 
@@ -1982,12 +2019,12 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         prop = ['ids', 'timestamp', 'flags', 'user', 'comment']
         gen = mysite.alldeletedrevisions(total=10, prop=prop)
 
-        for item in gen:
+        for data in gen:
             break
         else:
             self.skipTest('{0} does not have deleted edits.'.format(myuser))
-        self.assertIn('revisions', item)
-        for drev in item['revisions']:
+        self.assertIn('revisions', data)
+        for drev in data['revisions']:
             for key in ('parentid', 'revid', 'timestamp', 'user', 'comment'):
                 self.assertIn(key, drev)
 
