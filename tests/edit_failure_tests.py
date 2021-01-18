@@ -8,10 +8,12 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -28,7 +30,7 @@ from pywikibot import (
 )
 
 from tests import patch
-from tests.aspects import unittest, TestCase, WikibaseTestCase
+from tests.aspects import TestCase, WikibaseTestCase
 
 
 class TestSaveFailure(TestCase):

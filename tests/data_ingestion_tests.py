@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from scripts import data_ingestion
 
 from tests import join_data_path, join_images_path
-from tests.aspects import unittest, TestCase, ScriptMainTestCase
+from tests.aspects import TestCase, ScriptMainTestCase
 from tests.utils import empty_sites
 
 

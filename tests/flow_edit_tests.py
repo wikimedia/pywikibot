@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """Edit tests for the flow module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import contextmanager, suppress
 
 from pywikibot.exceptions import LockedPage
 from pywikibot.flow import Board, Topic, Post
 
 from tests.aspects import TestCase
-from tests import unittest
 
 
 MODERATION_REASON = 'Pywikibot test'

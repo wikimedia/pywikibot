@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from pywikibot.flow import Topic
 
 from tests.aspects import TestCase
-from tests import unittest
 
 
 NO_THANKABLE_POSTS = 'There is no recent post which can be test thanked.'

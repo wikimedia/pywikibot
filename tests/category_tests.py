@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class TestCategoryObject(TestCase):

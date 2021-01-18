@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
 )
 
-from tests.aspects import unittest, DeprecationTestCase
+from tests.aspects import DeprecationTestCase
 
 
 @add_full_name

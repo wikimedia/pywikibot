@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """Test template bot module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 import pywikibot
 
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.textlib import _MultiTemplateMatchBuilder
 
+from tests.aspects import TestCase
 from tests import join_xml_data_path
-from tests.aspects import unittest, TestCase
 
 
 class TestXMLPageGenerator(TestCase):
