@@ -102,7 +102,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Dict, Iterable, List
+from pywikibot.backports import Dict, Iterable, List, Sequence
 from pywikibot import config2 as config
 from pywikibot import daemonize
 from pywikibot import i18n
@@ -510,15 +510,14 @@ def input_yn(question: str,
                         automatic_quit=automatic_quit, force=force) == 'y'
 
 
-def input_list_choice(question: str, answers,
-                      default: Optional[str] = None,
+def input_list_choice(question: str, answers: Sequence[Any],
+                      default: Union[int, str, None] = None,
                       force: bool = False) -> str:
     """
     Ask the user the question and return one of the valid answers.
 
     @param question: The question asked without trailing spaces.
     @param answers: The valid answers each containing a full length answer.
-    @type answers: Iterable of str
     @param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None.
     @param force: Automatically use the default
