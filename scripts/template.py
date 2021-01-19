@@ -298,8 +298,8 @@ def main(*args) -> None:
 
     if not gen:
         gens = (
-            pagegenerators.ReferringPageGenerator(t,
-                                                  onlyTemplateInclusion=True)
+            t.getReferences(only_template_inclusion=True,
+                            follow_redirects=False)
             for t in old_templates
         )
         gen = chain(*gens)
