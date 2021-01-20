@@ -92,7 +92,8 @@ class TestAPIMWException(DefaultSiteTestCase):
         super().tearDown()
 
     def _test_assert_called_with(self, req):
-        self.assertRaises(api.APIMWException, req.submit)
+        with self.assertRaises(api.APIMWException):
+            req.submit()
         pywikibot.warning.assert_called_with(
             'API error internal_api_error_fake: Fake error message')
         pywikibot.error.assert_called_with(
@@ -331,8 +332,9 @@ class TestParamInfo(DefaultSiteTestCase):
 
         with patch.object(pywikibot, 'warning') as w:
             pi.fetch('foobar')
-            self.assertRaises(KeyError, pi.__getitem__, 'foobar')
-            self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
+            with self.assertRaises(KeyError):
+                pi.__getitem__('foobar')
+                pi.__getitem__('foobar+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
@@ -357,11 +359,13 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod, pi[mod]['path'])
 
         with patch.object(pywikibot, 'warning') as w:
-            self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
+            with self.assertRaises(KeyError):
+                pi.__getitem('query+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
-        self.assertRaises(KeyError, pi.submodules, 'edit')
+        with self.assertRaises(KeyError):
+            pi.submodules('edit')
 
     def test_module_paths(self):
         """Test module paths use the complete paths."""
@@ -471,9 +475,10 @@ class TestOptionSet(TestCase):
     def test_non_lazy_load(self):
         """Test OptionSet with initialised site."""
         options = api.OptionSet(self.get_site(), 'recentchanges', 'show')
-        self.assertRaises(KeyError, options.__setitem__, 'invalid_name', True)
-        self.assertRaises(ValueError, options.__setitem__,
-                          'anon', 'invalid_value')
+        with self.assertRaises(KeyError):
+            options.__setitems__('invalid_name', True)
+        with self.assertRaises(ValueError):
+            options.__setitem__('anon', 'invalid_value')
         options['anon'] = True
         self.assertCountEqual(['anon'], options._enabled)
         self.assertEqual(set(), options._disabled)
@@ -500,13 +505,13 @@ class TestOptionSet(TestCase):
         options['anon'] = True
         self.assertIn('invalid_name', options._enabled)
         self.assertLength(options, 2)
-        self.assertRaises(KeyError, options._set_site, self.get_site(),
-                          'recentchanges', 'show')
+        with self.assertRaises(KeyError):
+            options._set_site(self.get_site(), 'recentchanges', 'show')
         self.assertLength(options, 2)
         options._set_site(self.get_site(), 'recentchanges', 'show', True)
         self.assertLength(options, 1)
-        self.assertRaises(TypeError, options._set_site, self.get_site(),
-                          'recentchanges', 'show')
+        with self.assertRaises(TypeError):
+            options._set_site(self.get_site(), 'recentchanges', 'show')
 
 
 class TestDryOptionSet(DefaultDrySiteTestCase):
@@ -625,9 +630,10 @@ class TestDryPageGenerator(TestCase):
 
     def test_namespace(self):
         """Test PageGenerator set_namespace."""
-        self.assertRaises(AssertionError, self.gen.set_namespace, 0)
-        self.assertRaises(AssertionError, self.gen.set_namespace, 1)
-        self.assertRaises(AssertionError, self.gen.set_namespace, None)
+        with self.assertRaises(AssertionError):
+            self.gen.set_namespace(0)
+            self.gen.set_namespace(1)
+            self.gen.set_namespace(None)
 
 
 class TestPropertyGenerator(TestCase):
@@ -785,9 +791,10 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         self.gen = api.PageGenerator(site=self.site,
                                      generator='links',
                                      parameters={'titles': 'test'})
-        self.assertRaises(AssertionError, self.gen.set_namespace, 0)
-        self.assertRaises(AssertionError, self.gen.set_namespace, 1)
-        self.assertRaises(AssertionError, self.gen.set_namespace, None)
+        with self.assertRaises(AssertionError):
+            self.gen.set_namespace(0)
+            self.gen.set_namespace(1)
+            self.gen.set_namespace(None)
 
     def test_namespace_param_is_not_settable(self):
         """Test ListGenerator support_namespace."""
@@ -798,12 +805,14 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
     def test_namespace_none(self):
         """Test ListGenerator set_namespace with None."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        self.assertRaises(TypeError, self.gen.set_namespace, None)
+        with self.assertRaises(TypeError):
+            self.gen.set_namespace(None)
 
     def test_namespace_non_multi(self):
         """Test ListGenerator set_namespace when non multi."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        self.assertRaises(TypeError, self.gen.set_namespace, [0, 1])
+        with self.assertRaises(TypeError):
+            self.gen.set_namespace([0, 1])
         self.assertIsNone(self.gen.set_namespace(0))
 
     def test_namespace_multi(self):
@@ -816,7 +825,8 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         """Test ListGenerator set_namespace when resolve fails."""
         self.gen = api.ListGenerator(listaction='allpages', site=self.site)
         self.assertTrue(self.gen.support_namespace())
-        self.assertRaises(KeyError, self.gen.set_namespace, 10000)
+        with self.assertRaises(KeyError):
+            self.gen.set_namespace(10000)
 
 
 class TestDryListGenerator(TestCase):
@@ -841,7 +851,8 @@ class TestDryListGenerator(TestCase):
 
     def test_namespace_none(self):
         """Test ListGenerator set_namespace with None."""
-        self.assertRaises(TypeError, self.gen.set_namespace, None)
+        with self.assertRaises(TypeError):
+            self.gen.set_namespace(None)
 
     def test_namespace_zero(self):
         """Test ListGenerator set_namespace with 0."""
@@ -964,9 +975,11 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         """Test the query with a username which does not exist."""
         self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
-        self.assertRaises(pywikibot.NoUsername, req.submit)
+        with self.assertRaises(pywikibot.NoUsername):
+            req.submit()
         # FIXME: T100965
-        self.assertRaises(api.APIError, req.submit)
+        with self.assertRaises(api.APIError):
+            req.submit()
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
@@ -987,9 +1000,11 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         """Test the query without a username."""
         self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
-        self.assertRaises(pywikibot.NoUsername, req.submit)
+        with self.assertRaises(pywikibot.NoUsername):
+            req.submit()
         # FIXME: T100965
-        self.assertRaises(api.APIError, req.submit)
+        with self.assertRaises(api.APIError):
+            req.submit()
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')

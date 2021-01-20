@@ -94,10 +94,10 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(archivebot.str2time('7d'), archivebot.str2time('1w'))
         self.assertEqual(archivebot.str2time('3y'), timedelta(1096))
         self.assertEqual(archivebot.str2time('3y', date), timedelta(1095))
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time,
-                          '4000@')
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time,
-                          '$1')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2time('4000@')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2time('$1')
 
     def test_checkstr(self):
         """Test for extracting key and duration from shorthand notation."""
@@ -122,16 +122,16 @@ class TestArchiveBotFunctions(TestCase):
 
     def test_str2size_failures(self):
         """Test for rejecting of invalid shorthand notation of sizes."""
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
-                          '4 KK')
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
-                          'K4')
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
-                          '4X')
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
-                          '1 234 56')
-        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2size,
-                          '1234 567')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2size('4 KK')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2size('K4')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2size('4X')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2size('1 234 56')
+        with self.assertRaises(archivebot.MalformedConfigError):
+            archivebot.str2size('1234 567')
 
 
 class TestArchiveBot(TestCase):

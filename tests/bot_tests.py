@@ -170,8 +170,8 @@ class TestBotTreatExit:
                 self.assertIs(exc, exception)
             else:
                 self.assertIsNone(exc)
-                self.assertRaisesRegex(StopIteration, '^$', next,
-                                       self._page_iter)
+                with self.assertRaisesRegex(StopIteration, '^$'):
+                    next(self._page_iter)
         return exit
 
 
@@ -274,7 +274,8 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                       pywikibot.Page(self.de, 'Page 3')],
                                      post_treat)
         self.bot.exit = self._exit(2, exception=ValueError)
-        self.assertRaisesRegex(ValueError, 'Whatever', self.bot.run)
+        with self.assertRaisesRegex(ValueError, 'Whatever'):
+            self.bot.run()
 
     def test_Bot_KeyboardInterrupt(self):
         """Test normal Bot class with a KeyboardInterrupt in treat."""
