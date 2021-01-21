@@ -158,27 +158,27 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_constructors(self):
         """Test cases for site constructors."""
         test_list = [
-            ['enwiki', ('en', 'wikipedia')],
-            ['eswikisource', ('es', 'wikisource')],
-            ['dewikinews', ('de', 'wikinews')],
-            ['ukwikivoyage', ('uk', 'wikivoyage')],
-            ['metawiki', ('meta', 'meta')],
-            ['commonswiki', ('commons', 'commons')],
-            ['wikidatawiki', ('wikidata', 'wikidata')],
-            ['testwikidatawiki', ('test', 'wikidata')],
-            ['testwiki', ('test', 'wikipedia')],  # see T225729, T228300
-            ['test2wiki', ('test2', 'wikipedia')],  # see T225729
-            ['sourceswiki', ('mul', 'wikisource')],  # see T226960
+            ['enwiki', 'wikipedia:en'],
+            ['eswikisource', 'wikisource:es'],
+            ['dewikinews', 'wikinews:de'],
+            ['ukwikivoyage', 'wikivoyage:uk'],
+            ['metawiki', 'meta:meta'],
+            ['commonswiki', 'commons:commons'],
+            ['wikidatawiki', 'wikidata:wikidata'],
+            ['testwikidatawiki', 'wikidata:test'],
+            ['testwiki', 'wikipedia:test'],  # see T225729, T228300
+            ['test2wiki', 'wikipedia:test2'],  # see T225729
+            ['sourceswiki', 'wikisource:mul'],  # see T226960
         ]
         if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
             site = self.site
         else:
             site = None
-        for dbname, site_tuple in test_list:
+        for dbname, sitename in test_list:
             with self.subTest(dbname=dbname):
-                self.assertEqual(
+                self.assertIs(
                     pywikibot.site.APISite.fromDBName(dbname, site),
-                    pywikibot.Site(*site_tuple))
+                    pywikibot.Site(sitename))
 
     def test_language_methods(self):
         """Test cases for languages() and related methods."""
