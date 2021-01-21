@@ -1,6 +1,12 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Add support for trwikivoyage (T271263)
+* UI.input_list_choice() has been improved (T272237)
+* Global handleArgs() function was removed in favour of handle_args
+* Deprecated originPage and foundIn property has been removed in interwiki_graph.py
+* ParamInfo modules, prefixes, query_modules_with_limits properties and module_attribute_map() method was removed
+* Allow querying alldeletedrevisions with APISite.alldeletedrevisions() and User.deleted_contributions()
 * data attribute of http.fetch() response is deprecated (T265206)
 * Positional arguments of page.Revision aren't supported any longer (T259428)
 * pagenenerators.handleArg() method was renamed to handle_arg() (T271437)
@@ -17,7 +23,6 @@ Future release notes
 * 5.4.0: Support of MediaWiki < 1.23 will be dropped with release 6.0  (T268979)
 * 5.4.0: LoginManager.getCookie() is deprecated and will be removed
 * 5.4.0: tools.PY2 will be removed (T213287)
-* 5.3.0: api.ParamInfo.modules property will be removed
 * 5.3.0: LogEntryFactory.logtypes property will be removed
 * 5.3.0: stdout parameter of logging.output()/pywikibot.output() function will be desupported
 * 5.0.0: HttpRequest result of http.fetch() will be replaced by requests.Response (T265206)
