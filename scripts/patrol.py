@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 The bot is meant to mark the edits based on info obtained by whitelist.
 

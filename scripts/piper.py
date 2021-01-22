@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 This bot uses external filtering programs for munging text.
 

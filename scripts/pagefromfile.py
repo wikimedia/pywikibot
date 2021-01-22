@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 Bot to upload pages from a text file.
 

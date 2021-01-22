@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Used to find expensive templates that are subject to be converted to Lua.
 

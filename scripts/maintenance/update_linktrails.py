@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script that updates the linktrails in family.py file.
 
 linktrails contains a regex for each site code which holds letters that

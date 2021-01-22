@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for reflinks script."""
 #
 # (C) Pywikibot team, 2014-2021

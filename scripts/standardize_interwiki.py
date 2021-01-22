@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Loop over all pages in the home wiki, standardizing the interwiki links.
 

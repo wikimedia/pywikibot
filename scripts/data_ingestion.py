@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 A generic bot to do data ingestion (batch uploading) of photos or other files.
 

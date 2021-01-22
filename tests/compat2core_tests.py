@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """compat2core.py tests."""
 #
 # (C) Pywikibot team, 2019-2021

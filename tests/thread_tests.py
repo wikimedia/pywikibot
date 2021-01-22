@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for threading tools."""
 #
 # (C) Pywikibot team, 2014-2021

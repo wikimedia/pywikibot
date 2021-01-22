@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Script to copy self published files from English Wikipedia to Commons.
 

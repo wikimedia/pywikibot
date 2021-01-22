@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the tools.MediaWikiVersion class."""
 #
 # (C) Pywikibot team, 2008-2020

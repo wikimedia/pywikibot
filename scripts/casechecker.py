@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
 # (C) Pywikibot team, 2006-2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A bot to remove stale protection templates from pages that are not protected.
 

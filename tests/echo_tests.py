@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test echo module."""
 #
 # (C) Pywikibot team, 2019-2021

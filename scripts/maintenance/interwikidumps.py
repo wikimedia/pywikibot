@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script to convert interwiki dumps from pickle format to txt format."""
 #
 # (C) Pywikibot team, 2019-2020

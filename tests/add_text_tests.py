@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test add_text bot module."""
 #
 # (C) Pywikibot team, 2016-2021

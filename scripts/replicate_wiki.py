@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot replicates pages in a wiki to a second wiki within one family.
 

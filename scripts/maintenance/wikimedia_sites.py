@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script that updates the language lists in Wikimedia family files.
 
 Usage:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
 # (C) Pywikibot team, 2016-2021

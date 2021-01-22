@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test for site detection."""
 #
 # (C) Pywikibot team, 2014-2021

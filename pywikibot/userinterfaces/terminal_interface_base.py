@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Base for terminal user interfaces."""
 #
 # (C) Pywikibot team, 2003-2021

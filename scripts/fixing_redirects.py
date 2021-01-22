@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Correct all redirect links in featured pages or only one page of each wiki.
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Objects representing api tokens."""
 #
 # (C) Pywikibot team, 2008-2020

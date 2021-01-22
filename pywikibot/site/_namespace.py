@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Objects representing Namespaces of MediaWiki site."""
 #
 # (C) Pywikibot team, 2008-2020

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test cases for the SPARQL API."""
 #
 # (C) Pywikibot team, 2016-2021

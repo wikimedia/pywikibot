@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 A window with a textfield where the user can edit.
 

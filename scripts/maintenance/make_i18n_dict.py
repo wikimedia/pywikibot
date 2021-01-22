@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Generate an i18n file from a given script.
 
@@ -73,7 +72,6 @@ class i18nBot:  # noqa: N801
             keys.remove('en')
             keys.insert(0, 'en')
 
-        print('# -*- coding: utf-8 -*-')
         print('msg = {')
         for code in keys:
             print("    '%s': {" % code)

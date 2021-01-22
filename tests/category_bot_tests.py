@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the category bot script."""
 #
 # (C) Pywikibot team, 2015-2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A helper script to convert compat 1.0 scripts to the new core 3.0 framework.
 

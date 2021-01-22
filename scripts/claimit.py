@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A script that adds claims to Wikidata items based on a list of pages.
 
