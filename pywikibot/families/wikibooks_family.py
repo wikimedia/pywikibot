@@ -16,16 +16,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch',
-        'co', 'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv',
-        'mi', 'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple',
-        'su', 'sw', 'tk', 'ug', 'uz', 'vo', 'wa', 'xh', 'yo', 'za',
-        'zh-min-nan', 'zu',
+        'aa', 'ak', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch', 'co',
+        'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
+        'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple', 'su',
+        'sw', 'tk', 'ug', 'uz', 'vo', 'wa', 'xh', 'yo', 'za', 'zh-min-nan',
+        'zu',
     ]
 
     removed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
-        'dk', 'tokipona',
+        'als', 'dk', 'tokipona',
     ]
 
     languages_by_size = [
