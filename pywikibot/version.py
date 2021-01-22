@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Pywikibot team, 2007-2020

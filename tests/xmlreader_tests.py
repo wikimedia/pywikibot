@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for xmlreader module."""
 #
 # (C) Pywikibot team, 2009-2020

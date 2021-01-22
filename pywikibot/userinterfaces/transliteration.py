@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module to transliterate text."""
 #
 # (C) Pywikibot team, 2006-2020

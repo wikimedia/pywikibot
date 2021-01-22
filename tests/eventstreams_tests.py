@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the eventstreams module."""
 #
 # (C) Pywikibot team, 2017-2021

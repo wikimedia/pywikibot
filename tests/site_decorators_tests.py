@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
 # (C) Pywikibot team, 2012-2021

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the Namespace class."""
 #
 # (C) Pywikibot team, 2014-2020

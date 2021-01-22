@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
 # (C) Pywikibot team, 2008-2020

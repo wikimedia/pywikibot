@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for archivebot.py/Timestripper."""
 #
 # (C) Pywikibot team, 2014-2020

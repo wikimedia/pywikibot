@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for deprecation tools."""
 #
 # (C) Pywikibot team, 2014-2021

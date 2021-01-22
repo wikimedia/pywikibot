@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Edit tests for the flow module."""
 #
 # (C) Pywikibot team, 2015-2021

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing plural rules of various languages."""
 #
 # (C) Pywikibot team, 2011-2020

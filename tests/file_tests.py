@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """FilePage tests."""
 #
 # (C) Pywikibot team, 2014-2020

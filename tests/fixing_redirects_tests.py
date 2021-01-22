@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test fixing redirects bot module."""
 #
 # (C) Pywikibot team, 2018-2020

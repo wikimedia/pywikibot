@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Bot tests for input_choice options."""
 #
 # (C) Pywikibot team, 2015-2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot uploads text from djvu files onto pages in the "Page" namespace.
 

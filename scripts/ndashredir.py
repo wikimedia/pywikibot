@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A script to create hyphenated redirects for n or m dash pages.
 

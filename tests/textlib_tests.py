@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test textlib module."""
 #
 # (C) Pywikibot team, 2011-2021

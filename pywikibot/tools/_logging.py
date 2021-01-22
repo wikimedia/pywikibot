@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Logging tools."""
 #
 # (C) Pywikibot team, 2009-2020

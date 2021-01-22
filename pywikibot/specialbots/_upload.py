@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Special bot library containing UploadRobot.
 
 Do not import classes directly from here but from specialbots.

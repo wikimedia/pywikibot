@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test generate_user_files script."""
 #
 # (C) Pywikibot team, 2018-2020

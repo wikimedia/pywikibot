@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Helper function which holds data from unicodedata library."""
 #
 # (C) Pywikibot team, 2018-2020

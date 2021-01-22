@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Script to copy files from a local Wikimedia wiki to Wikimedia Commons.
 

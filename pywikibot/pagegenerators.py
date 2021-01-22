@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module offers a wide variety of page generators.
 

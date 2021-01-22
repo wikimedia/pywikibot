@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """API Request cache tests."""
 #
 # (C) Pywikibot team, 2012-2021

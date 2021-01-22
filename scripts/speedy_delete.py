@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Help sysops to quickly check and/or delete pages listed for speedy deletion.
 

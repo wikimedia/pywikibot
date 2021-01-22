@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Bot for getting multiple images from an external site.
 

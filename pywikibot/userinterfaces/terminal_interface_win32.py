@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
 # (C) Pywikibot team, 2003-2020

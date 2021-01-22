@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 This script transfers pages from a source wiki to a target wiki.
 

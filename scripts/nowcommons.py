@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 Script to delete files that are also present on Wikimedia Commons.
 

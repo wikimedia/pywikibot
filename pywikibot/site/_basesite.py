@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Objects with site methods independent of the communication interface."""
 #
 # (C) Pywikibot team, 2008-2020
