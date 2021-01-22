@@ -1811,7 +1811,7 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
             self.assertIsInstance(data['revisions'], list)
             for drev in data['revisions']:
                 self.assertIsInstance(drev, dict)
-                for key in ('parentid', 'revid', 'timestamp', 'user'):
+                for key in ('revid', 'timestamp', 'user'):
                     self.assertIn(key, drev)
 
 
@@ -2025,7 +2025,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             self.skipTest('{0} does not have deleted edits.'.format(myuser))
         self.assertIn('revisions', data)
         for drev in data['revisions']:
-            for key in ('parentid', 'revid', 'timestamp', 'user', 'comment'):
+            for key in ('revid', 'timestamp', 'user', 'comment'):
                 self.assertIn(key, drev)
 
         with self.subTest(start='2008-10-11T01:02:03Z', reverse=False,
