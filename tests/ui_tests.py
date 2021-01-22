@@ -15,9 +15,8 @@
 # adapt the helper functions in TestWindowsTerminalUnicode for other versions.
 #
 # For the Windows-based tests, you need the following packages installed:
-#   - pywin32, for clipboard access, which can be downloaded here:
-#     http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/
-#     make sure to download the package for the correct python version!
+#   - pywin32, for clipboard access, which can be installed using:
+#     pip install -U pywin32
 #
 #   - pywinauto, to send keys to the terminal, which can be installed using:
 #     pip install -U pywinauto
