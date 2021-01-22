@@ -334,6 +334,7 @@ class TestParamInfo(DefaultSiteTestCase):
             pi.fetch('foobar')
             with self.assertRaises(KeyError):
                 pi.__getitem__('foobar')
+            with self.assertRaises(KeyError):
                 pi.__getitem__('foobar+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
@@ -360,7 +361,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         with patch.object(pywikibot, 'warning') as w:
             with self.assertRaises(KeyError):
-                pi.__getitem('query+foobar')
+                pi.__getitem__('query+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
@@ -476,7 +477,7 @@ class TestOptionSet(TestCase):
         """Test OptionSet with initialised site."""
         options = api.OptionSet(self.get_site(), 'recentchanges', 'show')
         with self.assertRaises(KeyError):
-            options.__setitems__('invalid_name', True)
+            options.__setitem__('invalid_name', True)
         with self.assertRaises(ValueError):
             options.__setitem__('anon', 'invalid_value')
         options['anon'] = True
