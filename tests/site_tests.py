@@ -113,7 +113,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         """Test deprecation warning if result of loadimageinfo() is used."""
         file = pywikibot.FilePage(self.site, 'foo.jpg')
         if not file.file_is_shared():
-            self.skipPage('test file is not shared from image repository.')
+            self.skipTest('test file is not shared from image repository.')
         self.site.loadimageinfo(file)
         self.assertNoDeprecation()
         result = self.site.loadimageinfo(file)  # noqa: F841
