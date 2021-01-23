@@ -17,7 +17,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'aa', 'ab', 'ak', 'as', 'av', 'ba', 'bh', 'bi', 'bm', 'bo',
+        'aa', 'ab', 'ak', 'as', 'av', 'bh', 'bi', 'bm', 'bo',
         'ch', 'cr', 'dz', 'ik', 'mh', 'pi', 'rm', 'rn', 'sc', 'sn', 'to', 'tw',
         'xh', 'yo', 'za',
     ]
