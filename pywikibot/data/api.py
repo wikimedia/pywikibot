@@ -37,11 +37,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
-from pywikibot.tools import (
-    issue_deprecation_warning,
-    itergroup,
-    PYTHON_VERSION,
-)
+from pywikibot.tools import itergroup, PYTHON_VERSION
 from pywikibot.tools.formatter import color_format
 
 
@@ -973,8 +969,12 @@ class Request(MutableMapping):
     # To make sure the default value of 'parameters' can be identified.
     _PARAM_DEFAULT = object()
 
-    def __init__(self, site=None, mime=None, throttle=True,
-                 max_retries=None, retry_wait=None, use_get=None,
+    def __init__(self, site=None,
+                 mime: Optional[dict] = None,
+                 throttle: bool = True,
+                 max_retries: Optional[int] = None,
+                 retry_wait: Optional[int] = None,
+                 use_get: Optional[bool] = None,
                  parameters=_PARAM_DEFAULT, **kwargs):
         """
         Create a new Request instance with the given parameters.
@@ -1006,14 +1006,13 @@ class Request(MutableMapping):
                None). Parameters which should only be transferred via mime
                mode are defined via this parameter (even an empty dict means
                mime shall be used).
-        @type mime: None or dict
-        @param max_retries: (optional) Maximum number of times to retry after
+        @param max_retries: Maximum number of times to retry after
                errors, defaults to config.max_retries.
-        @param retry_wait: (optional) Minimum time in seconds to wait after an
+        @param retry_wait: Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
                until config.retry_max seconds is reached).
-        @param use_get: (optional) Use HTTP GET request if possible. If False
-               it uses a POST request. If None, it'll try to determine via
+        @param use_get: Use HTTP GET request if possible. If False it
+               uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
         @param parameters: The parameters used for the request to the API.
         @type parameters: dict
@@ -1025,12 +1024,11 @@ class Request(MutableMapping):
                  .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
+
         self.mime = mime
-        if isinstance(mime, bool):  # type(mime) == bool is deprecated.
-            issue_deprecation_warning(
-                'Bool values of mime param in api.Request()',
-                depth=3, warning_class=FutureWarning, since='20201028')
-            self.mime = {} if mime is True else None
+        if isinstance(mime, bool):
+            raise TypeError('mime param in api.Request() must not be boolean')
+
         self.throttle = throttle
         self.use_get = use_get
         if max_retries is None:
@@ -1100,21 +1098,10 @@ class Request(MutableMapping):
                     'userinfo: {!r}'.format(username, self.site.userinfo))
 
         # MediaWiki 1.23 allows assertion for any action,
-        # whereas earlier WMF wikis and others used an extension which
-        # could only allow assert for action=edit.
-        #
-        # When we can't easily check whether the extension is loaded,
-        # to avoid cyclic recursion in the Pywikibot codebase, assume
-        # that it is present, which will cause an API warning emitted
-        # to the logging (console) if it is not present, but will not
-        # otherwise be a problem.
-        # This situation is only tripped when one of the first actions
-        # on the site is a write action and the extension isn't installed.
-        if (self.write and self.site.mw_version >= '1.23'
-            or self.action == 'edit'
-                and self.site.has_extension('AssertEdit')):
+        # make sure user is logged in
+        if self.write:
             pywikibot.debug('Adding user assertion', _logger)
-            self['assert'] = 'user'  # make sure user is logged in
+            self['assert'] = 'user'
 
     @classmethod
     def create_simple(cls, req_site, **kwargs):
@@ -2247,14 +2234,10 @@ class QueryGenerator(_RequestWrapper):
                         % self.__class__.__name__)
 
         parameters['indexpageids'] = True  # always ask for list of pageids
-        if self.site.mw_version < '1.21':
-            self.continue_name = 'query-continue'
-            self.continue_update = self._query_continue
-        else:
-            self.continue_name = 'continue'
-            self.continue_update = self._continue
-            # Explicitly enable the simplified continuation
-            parameters['continue'] = True
+        self.continue_name = 'continue'
+        self.continue_update = self._continue
+        # Explicitly enable the simplified continuation
+        parameters['continue'] = True
         self.request = self.request_class(**kwargs)
 
         self.site._paraminfo.fetch('query+' + mod for mod in self.modules)
@@ -3087,18 +3070,7 @@ def _update_protection(page, pagedict: dict):
 
 def _update_revisions(page, revisions):
     """Update page revisions."""
-    content_model = {'.js': 'javascript', '.css': 'css'}
     for rev in revisions:
-        if page.site.mw_version < '1.21':
-            # T102735: use content model depending on the page suffix
-            title = page.title(with_ns=False)
-            for suffix, cm in content_model.items():
-                if title.endswith(suffix):
-                    rev['contentmodel'] = cm
-                    break
-            else:
-                rev['contentmodel'] = 'wikitext'
-
         page._revisions[rev['revid']] = pywikibot.page.Revision(**rev)
 
 
