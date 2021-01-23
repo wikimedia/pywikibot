@@ -44,7 +44,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import Family
 from pywikibot.page._revision import Revision
-from pywikibot.site import DataSite, Namespace, need_version
+from pywikibot.site import DataSite, Namespace
 from pywikibot.tools import (
     add_full_name,
     compute_file_hash,
@@ -257,7 +257,6 @@ class BasePage(ComparableMixin):
         If it cannot be reliably determined via the API,
         None is returned.
         """
-        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
         if not hasattr(self, '_contentmodel'):
             self.site.loadpageinfo(self)
         return self._contentmodel
@@ -1576,7 +1575,6 @@ class BasePage(ComparableMixin):
             return None
         return list(self._coords)
 
-    @need_version('1.20')
     def page_image(self):
         """
         Return the most appropriate image on the page.
