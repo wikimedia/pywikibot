@@ -336,7 +336,11 @@ class APISite(BaseSite):
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             del self.userinfo  # force reloading
-            assert self.userinfo['name'] == self.username()  # load userinfo
+
+            # load userinfo
+            assert self.userinfo['name'] == self.username(), \
+                '{} != {}'.format(self.userinfo['name'], self.username())
+
             self._loginstatus = _LoginStatus.AS_USER
         else:
             self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
