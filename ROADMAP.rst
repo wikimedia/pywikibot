@@ -1,6 +1,18 @@
+**Note: 5.6.0 is the last release supporting MediaWiki 1.19-1.22.**
+
+Breaking changes with Pywikibot 6.0.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* MediaWiki 1.23+ is supported only
+* comms.http.request() will return a requests.Response object rather than plain text
+* comms.threadedhttp module will be removed
+* config.db_hostname will be renamed to db_hostname_format
+* APISite.loadimageinfo() will not return any content
+
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Use string instead of Path-like object with "open" function in UploadRobot for Python 3.5 compatibility (T272345)
 * Add support for trwikivoyage (T271263)
 * UI.input_list_choice() has been improved (T272237)
 * Global handleArgs() function was removed in favour of handle_args
@@ -12,6 +24,7 @@ Current release changes
 * pagenenerators.handleArg() method was renamed to handle_arg() (T271437)
 * Page methods deprecated for 6 years were removed
 * Create a Site with AutoFamily if a family isn't predefined (T249087)
+* L10N updates
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
