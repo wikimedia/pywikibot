@@ -80,10 +80,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ar', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy', 'da', 'el', 'et',
-        'eu', 'fa', 'fi', 'fo', 'gl', 'hr', 'hy', 'id', 'it', 'ja', 'kn',
-        'ko', 'ml', 'nap', 'no', 'or', 'pa', 'pl', 'pt', 'ro', 'sa', 'sk',
-        'sr', 'ta', 'te', 'th', 'uk', 'vi', 'zh',
+        'ar', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy', 'da', 'el', 'et', 'eu',
+        'fa', 'fi', 'fo', 'gl', 'hr', 'hy', 'id', 'it', 'ja', 'kn', 'ko', 'ml',
+        'nap', 'no', 'or', 'pa', 'pl', 'pt', 'ro', 'sa', 'sk', 'sr', 'ta',
+        'te', 'th', 'uk', 'vi', 'zh',
     ]
 
     authornamespaces = {
@@ -127,10 +127,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['as', 'az', 'bn', 'en', 'es',
-                      'et', 'gu', 'hu', 'it', 'ja', 'kn', 'ml',
-                      'mk', 'mr', 'pt', 'ro', 'sa', 'sah', 'ta',
-                      'te', 'th', 'vi']
+                     ['as', 'az', 'bn', 'en', 'es', 'et', 'gu', 'hu', 'it',
+                      'ja', 'kn', 'ml', 'mk', 'mr', 'pt', 'ro', 'sa', 'sah',
+                      'ta', 'te', 'th', 'vi']
                      ),
         'ar': ('/شرح', '/doc'),
         'be': ('/Дакументацыя', ),
