@@ -1,8 +1,6 @@
 """
 Objects used with ProofreadPage Extension.
 
-The extension is supported by MW 1.21+.
-
 This module includes objects:
 
 * ProofreadPage(Page)
@@ -21,7 +19,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
