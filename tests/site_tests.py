@@ -1644,6 +1644,13 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
 
     user = True
 
+    @classmethod
+    def setUpClass(cls):
+        """Skip test if necessary."""
+        super().setUpClass()
+        if cls.site.mw_version < '1.34':
+            cls.skipTest(cls, 'site.alldeletedrevisions() needs mw 1.34')
+
     def test_basic(self):
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
@@ -1800,6 +1807,9 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
     def test_prefix(self):
         """Test the site.alldeletedrevisions() method with prefix."""
         mysite = self.get_site()
+        if mysite.mw_version < '1.34':
+            self.skipTest('site.alldeletedrevisions() needs mw 1.34')
+
         for data in mysite.alldeletedrevisions(prefix='John', total=5):
             self.assertIsInstance(data, dict)
             for key in ('title', 'ns', 'revisions'):
