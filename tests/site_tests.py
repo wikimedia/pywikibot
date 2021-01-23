@@ -1445,8 +1445,7 @@ class SearchTestCase(DefaultSiteTestCase):
             for hit in mysite.search('another', namespaces='8|9|10', total=5):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertIn(hit.namespace(), [8, 9, 10])
-            for hit in mysite.search('wiki', namespaces=0, total=10,
-                                     get_redirects=True):
+            for hit in mysite.search('wiki', namespaces=0, total=10):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
         except pywikibot.data.api.APIError as e:
@@ -1461,7 +1460,7 @@ class SearchTestCase(DefaultSiteTestCase):
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
-            'wiki', namespaces=0, total=10, get_redirects=True, where='title')
+            'wiki', namespaces=0, total=10, where='title')
         expected_params = {
             'prop': ['info', 'imageinfo', 'categoryinfo'],
             'inprop': ['protection'],
