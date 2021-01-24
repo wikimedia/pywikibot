@@ -1177,12 +1177,29 @@ class APISite(BaseSite):
             return self.namespaces[num]
         return self.namespaces[num][0]
 
-    def _update_page(self, page, query):
+    def _update_page(self, page, query, verify_imageinfo: bool = False):
+        """Update page attributes.
+
+        @param page: page object to be updated
+        @param query: a api.QueryGenerator
+        @param verify_imageinfo: if given, every pageitem is checked
+            whether 'imageinfo' is missing. In that case an exception
+            is raised.
+
+        @raises NoPage: 'missing' key is found in pageitem
+        @raises PageRelatedError: 'imageinfo' is missing in pageitem
+        """
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(with_section=False)):
                 raise InconsistentTitleReceived(page, pageitem['title'])
             api.update_page(page, pageitem, query.props)
+
+            if verify_imageinfo and 'imageinfo' not in pageitem:
+                if 'missing' in pageitem:
+                    raise NoPage(page)
+                raise PageRelatedError(
+                    page, 'loadimageinfo: Query on %s returned no imageinfo')
 
     def loadpageinfo(self, page, preload=False):
         """Load page info from api and store in page attributes.
@@ -1312,23 +1329,7 @@ class APISite(BaseSite):
                                         'url', 'size', 'sha1', 'mime',
                                         'metadata', 'archivename'],
                                 **args)
-        # kept for backward compatibility
-        # TODO: when backward compatibility can be broken, adopt
-        # self._update_page() pattern and remove return
-        for pageitem in query:
-            if not self.sametitle(pageitem['title'], title):
-                raise InconsistentTitleReceived(page, pageitem['title'])
-            api.update_page(page, pageitem, query.props)
-
-            if 'imageinfo' not in pageitem:
-                if 'missing' in pageitem:
-                    raise NoPage(page)
-                raise PageRelatedError(
-                    page,
-                    'loadimageinfo: Query on %s returned no imageinfo')
-
-        return (pageitem['imageinfo']
-                if history else pageitem['imageinfo'][0])
+        self._update_page(page, query, verify_imageinfo=True)
 
     @deprecated('Check the content model instead', since='20150128',
                 future_warning=True)
