@@ -12,11 +12,9 @@ groups of wikis on the same topic in different languages.
 import datetime
 import functools
 import heapq
-import inspect
 import itertools
 import json
 import mimetypes
-import opcode
 import os
 import re
 import time
@@ -1328,23 +1326,6 @@ class APISite(BaseSite):
                 raise PageRelatedError(
                     page,
                     'loadimageinfo: Query on %s returned no imageinfo')
-
-        # inspect whether the result is assigned and print an deprecation
-        # warning in that case; implementation inspired by
-        # https://stackoverflow.com/questions/813882/is-there-a-way-to-check-whether-function-output-is-assigned-to-a-variable-in-pyt
-        try:
-            frame = inspect.currentframe().f_back
-            next_opcode = opcode.opname[
-                frame.f_code.co_code[frame.f_lasti + 3]]
-            if next_opcode in ('POP_TOP', 'ROT_TWO', 'ROT_THREE'):
-                issue_deprecation_warning(
-                    'APISite.loadimageinfo() result dict and any assignment',
-                    "pageitem['imageinfo'] if history is True "
-                    "else pageitem['imageinfo'][0]",
-                    warning_class=FutureWarning,
-                    since='20210110')
-        finally:
-            del frame
 
         return (pageitem['imageinfo']
                 if history else pageitem['imageinfo'][0])
