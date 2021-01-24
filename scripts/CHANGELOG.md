@@ -1,5 +1,23 @@
 # Schripts Changelog
 
+## 5.6.0
+*24 January 2021*
+
+### general
+* pagegenerators handleArg was renamed to handle_arg (T271437)
+* i18n updates
+
+### add_text
+* bugfix: str.join() expects an iterable not multiple args (T272223)
+
+### redirect
+* pagegenerators -page option was implemented (T100643)
+* pagegenerators namespace filter was implemented (T234133, T271116)
+
+## weblinkchecker
+* Deprecated LinkChecker class was removed
+
+
 ## 5.5.0
 *12 January 2021
 
