@@ -1,6 +1,6 @@
 clone_depth: 50
 skip_tags: true
-version: 5.6.{build}
+version: 6.0.{build}
 environment:
 
   APPVEYOR_PYTHON_URL: "https://raw.githubusercontent.com/dvorapa/python-appveyor-demo/master/appveyor/"

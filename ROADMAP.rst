@@ -1,34 +1,15 @@
-**Note: 5.6.0 is the last release supporting MediaWiki 1.19-1.22.**
-
-Breaking changes with Pywikibot 6.0.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* MediaWiki 1.23+ is supported only
-* comms.http.request() will return a requests.Response object rather than plain text
-* comms.threadedhttp module will be removed
-* config.db_hostname will be renamed to db_hostname_format
-* APISite.loadimageinfo() will not return any content
-
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* Use string instead of Path-like object with "open" function in UploadRobot for Python 3.5 compatibility (T272345)
-* Add support for trwikivoyage (T271263)
-* UI.input_list_choice() has been improved (T272237)
-* Global handleArgs() function was removed in favour of handle_args
-* Deprecated originPage and foundIn property has been removed in interwiki_graph.py
-* ParamInfo modules, prefixes, query_modules_with_limits properties and module_attribute_map() method was removed
-* Allow querying alldeletedrevisions with APISite.alldeletedrevisions() and User.deleted_contributions()
-* data attribute of http.fetch() response is deprecated (T265206)
-* Positional arguments of page.Revision aren't supported any longer (T259428)
-* pagenenerators.handleArg() method was renamed to handle_arg() (T271437)
-* Page methods deprecated for 6 years were removed
-* Create a Site with AutoFamily if a family isn't predefined (T249087)
-* L10N updates
+* (no changes yet)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 5.6.0: MediaWiki 1.23+ is supported only
+* 5.6.0: comms.http.request() will return a requests.Response object rather than plain text
+* 5.6.0: comms.threadedhttp module will be removed
+* 5.6.0: config.db_hostname will be renamed to db_hostname_format
 * 5.6.0: APISite.loadimageinfo will no longer return any content
 * 5.6.0: pagenenerators.handleArg() method will be removed in favour of handle_arg() (T271437)
 * 5.5.0: Site.getuserinfo() method will be dropped in favour of userinfo property
