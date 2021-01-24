@@ -113,6 +113,7 @@ _deprecated_variables = {
     'available_ssl_project', 'fake_user_agent', 'interwiki_contents_on_disk',
     'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
     'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
+    'db_hostname',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -689,10 +690,10 @@ weblink_dead_days = 7
 # db_name_format can be used to manipulate the dbName of site.
 #
 # Example for a pywikibot running on wmflabs:
-# db_hostname = 'enwiki.analytics.db.svc.eqiad.wmflabs'
+# db_hostname_format = '{0}.analytics.db.svc.eqiad.wmflabs'
 # db_name_format = '{0}_p'
 # db_connect_file = user_home_path('replica.my.cnf')
-db_hostname = 'localhost'
+db_hostname_format = 'localhost'
 db_username = ''
 db_password = ''
 db_name_format = '{0}'
