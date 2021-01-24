@@ -53,7 +53,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -70,7 +70,7 @@ __all__ = (
     'Choice', 'StaticChoice', 'LinkChoice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
-    'calledModuleName', 'handle_args', 'handleArgs',
+    'calledModuleName', 'handle_args',
     'show_help', 'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
@@ -102,7 +102,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Dict, Iterable, List
+from pywikibot.backports import Dict, Iterable, List, Sequence
 from pywikibot import config2 as config
 from pywikibot import daemonize
 from pywikibot import i18n
@@ -510,15 +510,14 @@ def input_yn(question: str,
                         automatic_quit=automatic_quit, force=force) == 'y'
 
 
-def input_list_choice(question: str, answers,
-                      default: Optional[str] = None,
+def input_list_choice(question: str, answers: Sequence[Any],
+                      default: Union[int, str, None] = None,
                       force: bool = False) -> str:
     """
     Ask the user the question and return one of the valid answers.
 
     @param question: The question asked without trailing spaces.
     @param answers: The valid answers each containing a full length answer.
-    @type answers: Iterable of str
     @param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None.
     @param force: Automatically use the default
@@ -856,12 +855,6 @@ def handle_args(args: Optional[Iterable[str]] = None,
 
     debug('handle_args() completed.', _logger)
     return non_global_args
-
-
-@deprecated('handle_args', since='20150409', future_warning=True)
-def handleArgs(*args):  # pragma: no cover
-    """DEPRECATED. Use handle_args()."""
-    return handle_args(args)
 
 
 def show_help(module_name=None, show_global=False):

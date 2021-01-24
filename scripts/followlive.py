@@ -1,6 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 """
 Periodically grab list of new articles and analyze to blank or flag them.
 

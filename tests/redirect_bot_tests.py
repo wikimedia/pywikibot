@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 """Tests for the redirect.py script."""
 #
-# (C) Pywikibot team, 2017-2020
+# (C) Pywikibot team, 2017-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -12,7 +13,7 @@ from pywikibot import Page, i18n
 
 from scripts.redirect import RedirectRobot
 
-from tests import Mock, patch, unittest
+from tests import Mock, patch
 from tests.aspects import DefaultSiteTestCase
 
 

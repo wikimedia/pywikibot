@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
 # (C) Pywikibot team, 2015-2020

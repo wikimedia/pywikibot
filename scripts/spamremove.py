@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to remove links that are being or have been spammed.
 
@@ -135,7 +134,7 @@ def main(*args):
             protocol = arg.partition(':')[2]
         elif arg.startswith('-summary:'):
             options['summary'] = arg.partition(':')[2]
-        elif gen_factory.handleArg(arg):
+        elif gen_factory.handle_arg(arg):
             continue
         else:
             spam_external_url = arg

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Create country sub-division redirect pages.
 
 Check if they are in the form Something, State, and if so, create a redirect

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to resolve double redirects, and to delete broken redirects.
 
@@ -40,12 +39,6 @@ and arguments can be:
                If neither of -xml -fullscan -moves is given, info will be
                loaded from a special page of the live wiki.
 
--page:title    Work on a single page
-
--namespace:n   Namespace to process. Can be given multiple times, for several
-               namespaces. If omitted, only the main (article) namespace is
-               treated.
-
 -offset:n      With -moves, the number of hours ago to start scanning moved
                pages. With -xml, the number of the redirect to restart with
                (see progress). Otherwise, ignored.
@@ -68,9 +61,12 @@ and arguments can be:
 
 -always        Don't prompt you for each replacement.
 
+Furthermore the following options are provided:
+
+&params;
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,7 +81,10 @@ from pywikibot import i18n, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
 from pywikibot.bot import (ExistingPageBot, MultipleSitesBot, OptionHandler,
                            RedirectPageBot)
+from pywikibot import pagegenerators
 from pywikibot.textlib import extract_templates_and_params_regex_simple
+
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 def space_to_underscore(link) -> str:
@@ -103,7 +102,6 @@ class RedirectGenerator(OptionHandler):
         'moves': False,
         'namespaces': {0},
         'offset': -1,
-        'page': None,
         'start': None,
         'limit': None,
         'until': None,
@@ -138,7 +136,7 @@ class RedirectGenerator(OptionHandler):
         redict = {}
         # open xml dump and read page titles out of it
         dump = xmlreader.XmlDump(xmlFilename)
-        redirR = self.site.redirectRegex()
+        redirR = self.site.redirect_regex
         readPagesCount = 0
         pageTitles = set()
         for entry in dump.parse():
@@ -256,24 +254,21 @@ class RedirectGenerator(OptionHandler):
                          for x in data['query']['redirects']}
 
             for pagetitle in data['query']['pages'].values():
-                if 'missing' in pagetitle and 'pageid' not in pagetitle:
-                    pages[pagetitle['title']] = False
-                else:
-                    pages[pagetitle['title']] = True
+                pages[pagetitle['title']] = \
+                    'missing' not in pagetitle or 'pageid' in pagetitle
             for redirect in redirects:
                 target = redirects[redirect]
-                result = 0
+                result = None
                 final = None
-                try:
-                    if pages[target]:
-                        final = target
-                        with suppress(KeyError):
-                            while result <= maxlen:
-                                result += 1
-                                final = redirects[final]
-                            # result = None
-                except KeyError:
-                    result = None
+
+                if pages.get(target):
+                    result = 0
+                    final = target
+                    with suppress(KeyError):
+                        while result <= maxlen:
+                            result += 1
+                            final = redirects[final]
+
                 yield (redirect, result, target, final)
 
     def retrieve_broken_redirects(self) -> Generator[
@@ -281,14 +276,13 @@ class RedirectGenerator(OptionHandler):
         """Retrieve broken redirects."""
         if self.opt.fullscan:
             count = 0
-            for (pagetitle, type, target, final) \
-                    in self.get_redirects_via_api(maxlen=2):
+            for pagetitle, type, target, final in self.get_redirects_via_api(
+                    maxlen=2):
                 if type == 0:
                     yield pagetitle
-                    if self.opt.limit:
-                        count += 1
-                        if count >= self.opt.limit:
-                            break
+                    count += 1
+                    if self.opt.limit and count >= self.opt.limit:
+                        break
         elif self.opt.xml:
             # retrieve information from XML dump
             pywikibot.output(
@@ -298,8 +292,6 @@ class RedirectGenerator(OptionHandler):
             for (key, value) in redirs.items():
                 if value not in pageTitles:
                     yield key
-        elif self.opt.page:
-            yield self.opt.page
         else:
             pywikibot.output('Retrieving broken redirect special page...')
             yield from self.site.preloadpages(self.site.broken_redirects())
@@ -311,14 +303,13 @@ class RedirectGenerator(OptionHandler):
             yield from self.get_moved_pages_redirects()
         elif self.opt.fullscan:
             count = 0
-            for (pagetitle, type, target, final) \
-                    in self.get_redirects_via_api(maxlen=2):
-                if type != 0 and type != 1:
+            for pagetitle, type_, target, final in self.get_redirects_via_api(
+                    maxlen=2):
+                if type_ != 0 and type_ != 1:
                     yield pagetitle
-                    if self.opt.limit:
-                        count += 1
-                        if count >= self.opt.limit:
-                            break
+                    count += 1
+                    if self.opt.limit and count >= self.opt.limit:
+                        break
         elif self.opt.xml:
             redict, _ = self.get_redirects_from_dump()
             total = len(redict)
@@ -329,8 +320,6 @@ class RedirectGenerator(OptionHandler):
                     pywikibot.output('\nChecking redirect {0} of {1}...'
                                      .format(num, total))
                     yield key
-        elif self.opt.page:
-            yield self.opt.page
         else:
             pywikibot.output('Retrieving double redirect special page...')
             yield from self.site.preloadpages(self.site.double_redirects())
@@ -663,11 +652,12 @@ def main(*args) -> None:
     # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None
-    namespaces = set()
     source = set()
+    gen_factory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handle_args(args):
-        arg, sep, value = arg.partition(':')
+    local_args = pywikibot.handle_args(args)
+    for argument in local_args:
+        arg, sep, value = argument.partition(':')
         option = arg.partition('-')[2]
         # bot options
         if arg == 'do':
@@ -689,32 +679,16 @@ def main(*args) -> None:
             gen_options[option] = value or i18n.input(
                 'pywikibot-enter-xml-filename')
             source.add(arg)
-        elif option == 'namespace':
-            # "-namespace:" does NOT yield -namespace:0 further down the road!
-            ns = value or i18n.input('pywikibot-enter-namespace-number')
-            # TODO: at least for some generators enter a namespace by its name
-            # or number
-            if ns == '':
-                ns = '0'
-            try:
-                ns = int(ns)
-            except ValueError:
-                # -namespace:all Process all namespaces.
-                # Only works with the API read interface.
-                pass
-            else:
-                namespaces.add(ns)
         elif option == 'offset':
             gen_options[option] = int(value)
-        elif option in ('page', 'start', 'until'):
+        elif option in ('start', 'until'):
             gen_options[option] = value
         elif option == 'limit':
             options['limit'] = gen_options['limit'] = int(value)
+        elif gen_factory.handle_arg(argument):
+            pass
         else:
             pywikibot.output('Unknown argument: ' + arg)
-
-    if namespaces:
-        gen_options['namespaces'] = namespaces
 
     if len(source) > 1:
         problem = 'You can only use one of {0} options.'.format(
@@ -722,12 +696,19 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(additional_text=problem,
                                    missing_action=not action)
         return
+
     if not action:
         pywikibot.bot.suggest_help(missing_action=True)
-    else:
-        options['generator'] = RedirectGenerator(action, **gen_options)
-        bot = RedirectRobot(action, **options)
-        bot.run()
+        return
+
+    gen = None
+    if not gen_factory.gens:
+        if gen_factory.namespaces:
+            gen_options['namespaces'] = gen_factory.namespaces
+        gen = RedirectGenerator(action, **gen_options)
+    options['generator'] = gen_factory.getCombinedGenerator(gen=gen)
+    bot = RedirectRobot(action, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

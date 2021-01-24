@@ -17,6 +17,7 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
+    ModuleDeprecationWrapper,
 )
 
 
@@ -294,3 +295,8 @@ class HttpRequest:
     def __bytes__(self) -> Optional[bytes]:  # pragma: no cover
         """Return the undecoded response."""
         return self.content
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('HttpRequest', replacement_name='',
+                             since='20201226', future_warning=True)

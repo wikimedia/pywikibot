@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script reports and fixes invalid ISBN numbers.
 
@@ -332,7 +331,7 @@ def main(*args):
         elif arg.startswith('-') and arg[1:] in ('always', 'to13', 'format'):
             options[arg[1:]] = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     gen = genFactory.getCombinedGenerator(preload=True)
 

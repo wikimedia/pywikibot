@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import time
+import unittest
 
 from contextlib import suppress
 
@@ -14,7 +14,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot import page_put_queue
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 from tests.oauth_tests import OAuthSiteTestCase
 
 called_back = False

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Stdout, stderr and argv support for unicode."""
 #
 # (C) Pywikibot team, 2012-2018

@@ -1,21 +1,21 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Unit tests for djvu.py."""
 
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
 import subprocess
+import unittest
 
 from contextlib import suppress
 
 from pywikibot.tools.djvu import DjVuFile
 
 from tests import join_data_path, create_path_func
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 

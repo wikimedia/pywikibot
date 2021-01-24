@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """This bot will move pages out of redirected categories.
 
 The bot will look for categories that are marked with a category redirect

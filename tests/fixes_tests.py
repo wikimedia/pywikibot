@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
 """Tests for fixes module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 from pywikibot import fixes
 
-from tests import unittest, join_data_path
 from tests.aspects import TestCase
+from tests import join_data_path
 
 
 class TestFixes(TestCase):

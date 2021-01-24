@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Fetch and add titles for bare links in references.
 
@@ -537,7 +536,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     ref.url, use_fake_user_agent=self._use_fake_user_agent)
 
                 # Try to get Content-Type from server
-                content_type = f.response_headers.get('content-type')
+                content_type = f.headers.get('content-type')
                 if content_type and not self.MIME.search(content_type):
                     if ref.link.lower().endswith('.pdf') \
                        and not self.opt.ignorepdf:
@@ -564,7 +563,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     return
 
                 # Get the real url where we end (http redirects !)
-                redir = f.data.url
+                redir = f.url
                 if redir != ref.link \
                    and domain.findall(redir) == domain.findall(link):
                     if soft404.search(redir) \
@@ -656,7 +655,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 new_text = new_text.replace(match.group(), repl)
                 return
 
-            u = f.data.text
+            u = f.text
 
             # Retrieves the first non empty string inside <title> tags
             for m in self.TITLE.finditer(u):
@@ -759,7 +758,7 @@ def main(*args):
             else:
                 xml_filename = arg[5:]
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     if xml_filename:
         generator = XmlDumpPageGenerator(xml_filename, xml_start,

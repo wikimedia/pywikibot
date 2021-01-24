@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Mechanics to slow down wiki read and/or write rate."""
 #
 # (C) Pywikibot team, 2008-2020

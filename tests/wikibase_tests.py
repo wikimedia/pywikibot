@@ -1630,8 +1630,9 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertEqual(claim.type, 'url')
-        claim.setTarget('https://en.wikipedia.org/')
-        self.assertEqual(claim.target, 'https://en.wikipedia.org/')
+        target = 'https://en.wikipedia.org/'
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
 
     def test_set_WbMonolingualText(self):
         """Test setting claim of monolingualtext type."""
@@ -1657,16 +1658,18 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P2535')
         self.assertEqual(claim.type, 'math')
-        claim.setTarget('a^2 + b^2 = c^2')
-        self.assertEqual(claim.target, 'a^2 + b^2 = c^2')
+        target = 'a^2 + b^2 = c^2'
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
 
     def test_set_identifier(self):
         """Test setting claim of external-id type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P214')
         self.assertEqual(claim.type, 'external-id')
-        claim.setTarget('Any string is a valid identifier')
-        self.assertEqual(claim.target, 'Any string is a valid identifier')
+        target = 'Any string is a valid identifier'
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
 
     def test_set_date(self):
         """Test setting claim of time type."""

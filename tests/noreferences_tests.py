@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test noreferences bot module."""
 #
 # (C) Pywikibot team, 2018-2020

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to manage categories.
 
@@ -113,7 +112,7 @@ Or to do it all from the command-line, use the following syntax:
 This will move all pages in the category US to the category United States.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -247,32 +246,38 @@ class CategoryPreprocess(BaseBot):
         @type page: pywikibot.Page
         @return: Page to be categorized.
         """
+        if page.namespace() != page.site.namespaces.TEMPLATE:
+            self.includeonly = []
+            return page
+
+        try:
+            tmpl, loc = moved_links[page.site.code]
+        except KeyError:
+            tmpl = []
+
+        if not isinstance(tmpl, list):
+            tmpl = [tmpl]
+
         includeonly = []
-        if page.namespace() == page.site.namespaces.TEMPLATE:
-            try:
-                tmpl, loc = moved_links[page.site.code]
-            except KeyError:
-                tmpl = []
-            if not isinstance(tmpl, list):
-                tmpl = [tmpl]
-            if tmpl != []:
-                templates = page.templatesWithParams()
-                for template, params in templates:
-                    if (template.title(with_ns=False).lower() in tmpl
-                            and params):
-                        doc_page = pywikibot.Page(page.site, params[0])
-                        if doc_page.exists():
-                            page = doc_page
-                            includeonly = ['includeonly']
-                            break
-            if includeonly == []:
-                docs = page.site.doc_subpage  # return tuple
-                for doc in docs:
-                    doc_page = pywikibot.Page(page.site, page.title() + doc)
+        if tmpl:
+            templates = page.templatesWithParams()
+            for template, params in templates:
+                if template.title(with_ns=False).lower() in tmpl and params:
+                    doc_page = pywikibot.Page(page.site, params[0])
                     if doc_page.exists():
                         page = doc_page
                         includeonly = ['includeonly']
                         break
+
+        if not includeonly:
+            docs = page.site.doc_subpage  # return tuple
+            for doc in docs:
+                doc_page = pywikibot.Page(page.site, page.title() + doc)
+                if doc_page.exists():
+                    page = doc_page
+                    includeonly = ['includeonly']
+                    break
+
         self.includeonly = includeonly
         return page
 
@@ -1411,7 +1416,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option == 'prefix':
             prefix = value
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     bot = None
 
@@ -1424,7 +1429,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 'Category to add (do not give namespace):')
         if not gen:
             # default for backwards compatibility
-            gen_factory.handleArg('-links')
+            gen_factory.handle_arg('-links')
             gen = gen_factory.getCombinedGenerator()
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.

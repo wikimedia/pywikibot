@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot appends some text to all unused images and notifies uploaders.
 

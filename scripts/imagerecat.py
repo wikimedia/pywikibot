@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Program to re-categorize images at commons.
 
@@ -189,7 +188,7 @@ def main(*args):
         if arg == '-onlyuncat':
             onlyUncat = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     generator = genFactory.getCombinedGenerator()
     if not generator:

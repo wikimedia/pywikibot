@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script changes the content language of pages.
 
@@ -18,7 +17,7 @@ Furthermore, the following command line parameters are supported:
                   the one set in -setlang (keep the current language).
 """
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -141,7 +140,7 @@ def main(*args):
         elif arg in ('-always', '-never'):
             options[opt[1:]] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     if not options.get('setlang'):
         pywikibot.error('No -setlang parameter given.')

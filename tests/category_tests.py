@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class TestCategoryObject(TestCase):
@@ -28,8 +29,8 @@ class TestCategoryObject(TestCase):
     def test_init(self):
         """Test the category's __init__ for one condition that can't be dry."""
         site = self.get_site()
-        self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE,
-                               pywikibot.Category, site, 'Wikipedia:Test')
+        with self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE):
+            pywikibot.Category(site, 'Wikipedia:Test')
 
     def test_is_empty(self):
         """Test if category is empty or not."""
@@ -153,9 +154,9 @@ class TestCategoryObject(TestCase):
         self.assertEqual(tgt, cat2)
 
         # Raise exception if target is fetched for non Category redirects.
-        self.assertRaisesRegex(pywikibot.IsNotRedirectPage,
-                               self.NOREDIRECTPAGE_RE,
-                               cat2.getCategoryRedirectTarget)
+        with self.assertRaisesRegex(pywikibot.IsNotRedirectPage,
+                                    self.NOREDIRECTPAGE_RE):
+            cat2.getCategoryRedirectTarget()
 
 
 class TestCategoryDryObject(TestCase):
@@ -188,8 +189,8 @@ class TestCategoryDryObject(TestCase):
         self.assertTrue(cat_dup_ns.title(with_ns=False), 'Page:Foo')
         self.assertTrue(cat_dup_ns.namespace(), 14)
 
-        self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE,
-                               pywikibot.Category, site, 'Talk:Foo')
+        with self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE):
+            pywikibot.Category(site, 'Talk:Foo')
 
     def test_section(self):
         """Test the section method."""

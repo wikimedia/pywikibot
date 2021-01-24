@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Objects used with ProofreadPage Extension.
 

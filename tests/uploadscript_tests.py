@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """upload.py script test."""
 #
 # (C) Pywikibot team, 2019-2020

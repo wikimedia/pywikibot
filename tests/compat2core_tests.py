@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 """compat2core.py tests."""
 #
-# (C) Pywikibot team, 2019-2020
+# (C) Pywikibot team, 2019-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 import scripts.maintenance.compat2core as c2c
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class Compat2CoreTests(TestCase):

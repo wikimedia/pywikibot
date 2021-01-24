@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
 import sys
+import unittest
 
 from contextlib import suppress
 
 from pywikibot.tools import has_module
 
 from tests import join_root_path, unittest_print
-from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
+from tests.aspects import (DefaultSiteTestCase, MetaTestCaseClass,
                            PwbTestCase)
 from tests.utils import execute_pwb
 

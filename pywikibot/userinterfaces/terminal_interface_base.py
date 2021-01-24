@@ -1,21 +1,21 @@
-# -*- coding: utf-8 -*-
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import getpass
 import logging
-import math
 import re
 import sys
 import threading
 
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config2 as config
+
+from pywikibot.backports import Sequence
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.bot_choice import (ChoiceException, Option, OutputOption,
                                   QuitKeyboardInterrupt, StandardOption)
@@ -380,31 +380,42 @@ class UI:
             return index
         return answer
 
-    def input_list_choice(self, question, answers, default=None, force=False):
-        """Ask the user to select one entry from a list of entries."""
-        message = question
-        clist = answers
+    def input_list_choice(self, question: str, answers: Sequence[Any],
+                          default: Union[int, str, None] = None,
+                          force: bool = False) -> Any:
+        """Ask the user to select one entry from a list of entries.
 
-        line_template = '{{0: >{0}}}: {{1}}'.format(
-            int(math.log10(len(clist)) + 1))
-        for n, i in enumerate(clist):
-            pywikibot.output(line_template.format(n + 1, i))
+        @param question: The question, without trailing whitespace.
+        @param answers: A sequence of options to be choosen.
+        @param default: The default answer if no was entered. None to require
+            an answer.
+        @param force: Automatically use the default.
+        @return: Return a single Sequence entry.
+        """
+        if not force:
+            line_template = '{{0: >{0}}}: {{1}}'.format(len(str(len(answers))))
+            for i, entry in enumerate(answers, start=1):
+                pywikibot.output(line_template.format(i, entry))
 
         while True:
-            choice = self.input(message, default=default, force=force)
+            choice = self.input(question, default=default, force=force)
+
             try:
                 choice = int(choice) - 1
-            except ValueError:
-                try:
-                    choice = clist.index(choice)
-                except IndexError:
-                    choice = -1
+            except (TypeError, ValueError):
+                if choice in answers:
+                    return choice
+                choice = -1
 
             # User typed choice number
-            if 0 <= choice < len(clist):
-                return clist[choice]
-            else:
-                pywikibot.error('Invalid response')
+            if 0 <= choice < len(answers):
+                return answers[choice]
+
+            if force:
+                raise ValueError('Invalid value "{}" for default during force.'
+                                 .format(default))
+
+            pywikibot.error('Invalid response')
 
     def editText(self, text: str, jumpIndex: Optional[int] = None,
                  highlight: Optional[str] = None):

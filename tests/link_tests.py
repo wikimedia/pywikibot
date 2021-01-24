@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +14,7 @@ from pywikibot import config2 as config
 from pywikibot import Site
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import Error, InvalidTitle
+from pywikibot.exceptions import InvalidTitle, TimeoutError
 
 from tests.aspects import (
     unittest,
@@ -968,7 +967,7 @@ class TestEmptyTitle(TestCase):
         self.assertEqual(link.namespace, 0)
 
 
-class TestInvalidInterwikiLinks(WikimediaDefaultSiteTestCase):
+class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
 
     """Test links to non-wikis."""
 
@@ -978,20 +977,31 @@ class TestInvalidInterwikiLinks(WikimediaDefaultSiteTestCase):
     def test_non_wiki_prefix(self):
         """Test that Link fails if the interwiki prefix is not a wiki."""
         link = Link('bugzilla:1337', source=self.site)
-        self.assertRaisesRegex(
-            Error,
-            'bugzilla:1337 is not a local page on wikipedia:en, and the '
-            'interwiki prefix bugzilla is not supported by Pywikibot!',
-            link.parse)
+        # bugzilla does not return a json content but redirects to phab.
+        # api.Request._json_loads cannot detect this problem and retries
+        # reloading due to 'the server may be down'
+
+        # ignore Timeout when trying to load siteninfo;
+        # the site is created anyway but the title cannot be parsed
+        with suppress(TimeoutError):
+            link.site
+        self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
+        self.assertTrue(link._is_interwiki)
 
     def test_other_wiki_prefix(self):
         """Test that Link fails if the interwiki prefix is a unknown family."""
-        link = Link('bulba:this-will-never-work', source=self.site)
-        self.assertRaisesRegex(
-            Error,
-            'bulba:this-will-never-work is not a local page on wikipedia:en, '
-            'and the interwiki prefix bulba is not supported by Pywikibot!',
-            link.parse)
+        link = Link('bulba:title on auto-generated Site', source=self.site)
+        self.assertEqual(link.title, 'Title on auto-generated Site')
+        self.assertEqual(link.site.sitename, 'bulba:bulba')
+        self.assertTrue(link._is_interwiki)
+
+    def test_invalid_wiki_prefix(self):
+        """Test that Link with prefix not listed in InterwikiMap."""
+        title = 'Unknownprefix:This title'
+        link = Link(title, source=self.site)
+        self.assertEqual(link.title, title)
+        self.assertEqual(link.site, self.site)
+        self.assertFalse(link._is_interwiki)
 
 
 class TestSiteLink(WikimediaDefaultSiteTestCase):

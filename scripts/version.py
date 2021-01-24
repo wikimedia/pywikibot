@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script to determine the Pywikibot version (tag, revision and date)."""
 #
 # (C) Pywikibot team, 2007-2020

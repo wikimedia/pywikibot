@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
 # (C) Pywikibot team, 2008-2020
@@ -107,7 +106,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertEqual(foo, '[[Foo]]')
 
         self.assertFalse(mysite.isInterwikiLink('foo'))
-        self.assertIsInstance(mysite.redirectRegex().pattern, str)
+        self.assertIsInstance(mysite.redirect_regex.pattern, str)
         self.assertIsInstance(mysite.category_on_one_line(), bool)
         self.assertTrue(mysite.sametitle('Template:Test', 'Template:Test'))
         self.assertTrue(mysite.sametitle('Template: Test', 'Template:   Test'))

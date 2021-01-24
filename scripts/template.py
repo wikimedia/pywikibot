@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 Very simple script to replace a template with another one.
 
@@ -262,7 +261,7 @@ def main(*args) -> None:
         elif arg.startswith('-timestamp:'):
             timestamp = arg[len('-timestamp:'):]
         else:
-            if not gen_factory.handleArg(arg):
+            if not gen_factory.handle_arg(arg):
                 template_name = pywikibot.Page(site, arg, ns=10)
                 template_names.append(template_name.title(with_ns=False))
 
@@ -298,8 +297,8 @@ def main(*args) -> None:
 
     if not gen:
         gens = (
-            pagegenerators.ReferringPageGenerator(t,
-                                                  onlyTemplateInclusion=True)
+            t.getReferences(only_template_inclusion=True,
+                            follow_redirects=False)
             for t in old_templates
         )
         gen = chain(*gens)

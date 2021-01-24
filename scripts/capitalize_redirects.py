@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Bot to create capitalized redirects.
 
@@ -103,7 +102,7 @@ def main(*args: Tuple[str, ...]):
         elif arg == '-titlecase':
             options['titlecase'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:

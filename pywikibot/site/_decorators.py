@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Decorators used by site models."""
 #
 # (C) Pywikibot team, 2008-2020

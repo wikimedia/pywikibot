@@ -26,11 +26,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
-        'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
-        'te', 'sl', 'hy', 'ta', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
+        'gu', 'pt', 'mul', 'sr', 'fa', 'hu', 'sv', 'ml', 'ko', 'bn', 'sa',
+        'te', 'sl', 'ta', 'hy', 'el', 'ro', 'fi', 'ja', 'th', 'nap', 'vi',
         'tr', 'az', 'ca', 'br', 'la', 'nl', 'kn', 'hr', 'eo', 'no', 'is',
         'vec', 'pms', 'id', 'be', 'et', 'hi', 'da', 'lij', 'mk', 'yi', 'mr',
-        'as', 'bg', 'li', 'lt', 'eu', 'or', 'pa', 'wa', 'gl', 'cy', 'bs',
+        'as', 'bg', 'li', 'lt', 'eu', 'or', 'wa', 'pa', 'gl', 'cy', 'bs',
         'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
@@ -80,10 +80,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ar', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy', 'da', 'el', 'et',
-        'eu', 'fa', 'fi', 'fo', 'gl', 'hr', 'hy', 'id', 'it', 'ja', 'kn',
-        'ko', 'ml', 'nap', 'no', 'or', 'pa', 'pl', 'pt', 'ro', 'sa', 'sk',
-        'sr', 'ta', 'te', 'th', 'uk', 'vi', 'zh',
+        'ar', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy', 'da', 'el', 'et', 'eu',
+        'fa', 'fi', 'fo', 'gl', 'hr', 'hy', 'id', 'it', 'ja', 'kn', 'ko', 'ml',
+        'nap', 'no', 'or', 'pa', 'pl', 'pt', 'ro', 'sa', 'sk', 'sr', 'ta',
+        'te', 'th', 'uk', 'vi', 'zh',
     ]
 
     authornamespaces = {
@@ -127,10 +127,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: Remove comments for appropriate pages
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['as', 'az', 'bn', 'en', 'es',
-                      'et', 'gu', 'hu', 'it', 'ja', 'kn', 'ml',
-                      'mk', 'mr', 'pt', 'ro', 'sa', 'sah', 'ta',
-                      'te', 'th', 'vi']
+                     ['as', 'az', 'bn', 'en', 'es', 'et', 'gu', 'hu', 'it',
+                      'ja', 'kn', 'ml', 'mk', 'mr', 'pt', 'ro', 'sa', 'sah',
+                      'ta', 'te', 'th', 'vi']
                      ),
         'ar': ('/شرح', '/doc'),
         'be': ('/Дакументацыя', ),

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to check language links for general pages.
 
@@ -2455,7 +2454,7 @@ def main(*args):
         elif arg.startswith('-until:'):
             until = arg[7:]
         else:
-            if not genFactory.handleArg(arg):
+            if not genFactory.handle_arg(arg):
                 if not singlePageTitle:
                     singlePageTitle = arg
 

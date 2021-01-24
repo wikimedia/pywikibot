@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script can be used to delete and undelete pages en masse.
 
@@ -52,7 +51,7 @@ Delete everything in the category "To delete" without prompting:
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -259,7 +258,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 namespaces = mysite.namespaces
             options['orphansonly'] = namespaces
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
             found = arg.find(':') + 1
             if found:
                 page_name = arg[found:]

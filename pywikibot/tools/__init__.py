@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
 # (C) Pywikibot team, 2008-2020

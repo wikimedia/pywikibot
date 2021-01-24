@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: UTF-8 -*-
 """
 Bot to add new or existing categories to pages.
 

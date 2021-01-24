@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Objects representing site info data contents."""
 #
 # (C) Pywikibot team, 2008-2020

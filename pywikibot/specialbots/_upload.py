@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Special bot library containing UploadRobot.
 
 Do not import classes directly from here but from specialbots.
@@ -129,11 +128,11 @@ class UploadRobot(BaseBot):
             else:
                 headers = {}
 
-            with open(path, 'ab') as fd:
+            with open(str(path), 'ab') as fd:  # T272345: Python 3.5 needs str
                 os.lseek(handle, file_len, 0)
                 try:
-                    r = http.fetch(file_url, stream=True, headers=headers)
-                    response = r.data
+                    response = http.fetch(file_url, stream=True,
+                                          headers=headers)
                     response.raise_for_status()
 
                     # get download info, if available

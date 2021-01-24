@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test aspects to allow fine grained control over what tests are executed.
 
@@ -7,7 +6,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,10 +16,12 @@ import os
 import re
 import sys
 import time
+import unittest
 import warnings
 
 from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from unittest.util import safe_repr
 
 import pywikibot
 
@@ -34,8 +35,7 @@ from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 
-from tests import (
-    safe_repr, unittest, patch_request, unpatch_request, unittest_print)
+from tests import patch_request, unpatch_request, unittest_print
 from tests.utils import (
     execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
@@ -450,26 +450,19 @@ class CheckHostnameMixin(TestCaseBase):
                 else:
                     continue
 
-            e = None
             try:
                 if '://' not in hostname:
                     hostname = 'http://' + hostname
                 r = http.fetch(hostname,
                                method='HEAD',
                                default_error_handling=False)
-                if r.exception:
-                    e = r.exception
-                else:
-                    if r.status_code not in {200, 301, 302, 303, 307, 308}:
-                        raise ServerError('HTTP status: {}'
-                                          .format(r.status_code))
-            except Exception as e2:
+                if r.status_code not in {200, 301, 302, 303, 307, 308}:
+                    raise ServerError('HTTP status: {}'.format(r.status_code))
+            except Exception as e:
                 pywikibot.error('{}: accessing {} caused exception:'
                                 .format(cls.__name__, hostname))
-                pywikibot.exception(e2, tb=True)
-                e = e2
+                pywikibot.exception(e, tb=True)
 
-            if e:
                 cls._checked_hostnames[hostname] = e
                 raise unittest.SkipTest(
                     '{}: hostname {} failed: {}'

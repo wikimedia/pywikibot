@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 
@@ -98,7 +97,7 @@ def main(*args) -> None:
 
     bot_class = TouchBot
     for arg in local_args:
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue
         if arg == '-purge':
             bot_class = PurgeBot

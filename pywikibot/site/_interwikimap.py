@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Objects representing interwiki map of MediaWiki site."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,16 +11,18 @@ class _IWEntry:
 
     """An entry of the _InterwikiMap with a lazy loading site."""
 
-    def __init__(self, local, url):
+    def __init__(self, local, url, prefix=None):
         self._site = None
         self.local = local
         self.url = url
+        self.prefix = prefix
 
     @property
     def site(self):
         if self._site is None:
             try:
-                self._site = pywikibot.Site(url=self.url)
+                self._site = pywikibot.Site(
+                    url=self.url, fam=None if self.local else self.prefix)
             except Exception as e:
                 self._site = e
         return self._site
@@ -52,7 +53,9 @@ class _InterwikiMap:
         # _iw_sites is a local cache to return an APISite instance depending
         # on the interwiki prefix of that site
         if self._map is None:
-            self._map = {iw['prefix']: _IWEntry('local' in iw, iw['url'])
+            self._map = {iw['prefix']: _IWEntry('local' in iw,
+                                                iw['url'],
+                                                iw['prefix'])
                          for iw in self._site.siteinfo['interwikimap']}
         return self._map
 

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A script to create hyphenated redirects for n or m dash pages.
 
@@ -134,7 +133,7 @@ def main(*args):
     for arg in local_args:
 
         # Catch the pagegenerators options
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue  # nothing to do here
 
         # Now pick up custom options

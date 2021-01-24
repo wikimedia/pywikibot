@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to handle interwiki links based on Wikibase.
 
@@ -224,7 +223,7 @@ def main(*args) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
     options = {}
     for arg in local_args:
-        if gen_factory.handleArg(arg):
+        if gen_factory.handle_arg(arg):
             continue
         option, sep, value = arg.partition(':')
         option = option[1:] if option.startswith('-') else None

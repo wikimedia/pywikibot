@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for imagecopy script."""
 #
 # (C) Pywikibot team, 2018-2020

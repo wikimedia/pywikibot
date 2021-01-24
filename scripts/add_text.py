@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 r"""
 This is a Bot to add a text at the end of the content of the page.
 
@@ -309,11 +308,11 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option == '-excepturl':
             regexSkipUrl = value or pywikibot.input('What text should I skip?')
         elif option == '-except':
-            new_arg = ''.join('-grepnot', sep, value)
+            new_arg = ''.join(['-grepnot', sep, value])
             issue_deprecation_warning(arg, new_arg,
                                       2, ArgumentDeprecationWarning,
                                       since='20201224')
-            genFactory.handleArg(new_arg)
+            genFactory.handle_arg(new_arg)
         elif option == '-up':
             up = True
         elif option == '-noreorder':
@@ -323,7 +322,7 @@ def main(*args: Tuple[str, ...]) -> None:
         elif option in ('-talk', '-talkpage'):
             talkPage = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:

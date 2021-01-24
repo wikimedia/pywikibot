@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Include Commons template in home wiki.
 
@@ -23,7 +22,7 @@ and pagegenerator can be one of these:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -133,7 +132,7 @@ def main(*args: Tuple[str, ...]):
         elif arg == '-always':
             options['always'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     gen = gen_factory.getCombinedGenerator(preload=True)
     if pywikibot.bot.suggest_help(missing_action='action' not in options,

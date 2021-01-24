@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test confirming paraminfo contains expected values."""
 #
 # (C) Pywikibot team, 2015-2020

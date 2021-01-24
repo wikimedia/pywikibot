@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Script to copy files from a local Wikimedia wiki to Wikimedia Commons.
 
@@ -57,7 +56,7 @@ deletion):
 By default the bot works on your home wiki (set in user-config)
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -215,15 +214,14 @@ def pageTextPost(url, parameters):
     @return: A CommonHelper description message.
     @rtype: str
     """
-    gotInfo = False
-    while not gotInfo:
+    while True:
         try:
             commonsHelperPage = fetch(
                 'https://commonshelper.toolforge.org/',
                 method='POST',
                 data=parameters)
-            data = commonsHelperPage.data.content.decode('utf-8')
-            gotInfo = True
+            data = commonsHelperPage.content.decode('utf-8')
+            break
         except RequestException:
             pywikibot.output("Got a RequestException, let's try again")
     return data
@@ -505,7 +503,7 @@ def main(*args):
         elif arg == '-delete':
             delete_after_done = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     pregenerator = genFactory.getCombinedGenerator(preload=True)
     if not pregenerator:

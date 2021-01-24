@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A tool to transfer flickr photos to Wikimedia Commons.
 

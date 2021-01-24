@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Script to copy self published files from English Wikipedia to Commons.
 
@@ -1036,7 +1035,7 @@ def main(*args):
         elif arg == '-autonomous':
             autonomous = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg()(arg)
 
     pregenerator = genFactory.getCombinedGenerator(preload=True)
     additional_text = ('' if supportedSite()

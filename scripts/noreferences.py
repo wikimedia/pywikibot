@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script adds a missing references section to pages.
 
@@ -762,7 +761,7 @@ def main(*args) -> None:
         elif opt == '-quiet':
             options['verbose'] = False
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     gen = genFactory.getCombinedGenerator(gen, preload=True)
     if not gen:

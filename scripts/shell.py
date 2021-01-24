@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Spawns an interactive Python shell and imports the pywikibot library.
 

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Test diff module."""
 #
 # (C) Pywikibot team, 2016-2020

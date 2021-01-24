@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script can move pages.
 
@@ -190,7 +189,7 @@ def main(*args) -> None:
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if genFactory.handleArg(arg):
+        if genFactory.handle_arg(arg):
             continue
         if arg.startswith('-pairsfile'):
             if len(arg) == len('-pairsfile'):

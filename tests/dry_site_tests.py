@@ -1,15 +1,16 @@
-# -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 import pywikibot
 
 from pywikibot.comms.http import user_agent
 
-from tests.aspects import unittest, DefaultDrySiteTestCase
+from tests.aspects import DefaultDrySiteTestCase
 
 
 class TestDrySite(DefaultDrySiteTestCase):

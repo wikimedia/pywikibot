@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2020
+# (C) Pywikibot team, 2011-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +8,7 @@ import codecs
 import functools
 import os
 import re
+import unittest
 
 from collections import OrderedDict
 from contextlib import suppress
@@ -21,7 +21,7 @@ from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 from pywikibot import UnknownSite
 
 from tests.aspects import (
-    unittest, require_modules, TestCase, DefaultDrySiteTestCase,
+    require_modules, TestCase, DefaultDrySiteTestCase,
     PatchingTestCase, SiteAttributeTestCase,
 )
 from tests import mock

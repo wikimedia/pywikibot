@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Objects representing MediaWiki sites (wikis).
 
@@ -6,16 +5,18 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
 import functools
 import heapq
+import inspect
 import itertools
 import json
 import mimetypes
+import opcode
 import os
 import re
 import time
@@ -28,13 +29,13 @@ from contextlib import suppress
 from itertools import zip_longest
 from pywikibot.login import LoginStatus as _LoginStatus
 from textwrap import fill
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
 
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.echo import Notification
@@ -62,6 +63,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
+    UserRightsError,
     UnknownExtension,
 )
 from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
@@ -202,7 +204,8 @@ class APISite(BaseSite):
         gen.set_maximum_items(total)
         return gen
 
-    def _request_class(self, kwargs):
+    @staticmethod
+    def _request_class(kwargs):
         """
         Get the appropriate class.
 
@@ -333,7 +336,11 @@ class APISite(BaseSite):
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             del self.userinfo  # force reloading
-            self.userinfo  # load userinfo
+
+            # load userinfo
+            assert self.userinfo['name'] == self.username(), \
+                '{} != {}'.format(self.userinfo['name'], self.username())
+
             self._loginstatus = _LoginStatus.AS_USER
         else:
             self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
@@ -518,7 +525,8 @@ class APISite(BaseSite):
             'articlepath must end with /$1'
         return self.siteinfo['general']['articlepath'][:-2]
 
-    def assert_valid_iter_params(self, msg_prefix, start, end, reverse,
+    @staticmethod
+    def assert_valid_iter_params(msg_prefix, start, end, reverse,
                                  is_ts=True):
         """Validate iterating API parameters.
 
@@ -837,7 +845,13 @@ class APISite(BaseSite):
         # return the magic word without the preceding '#' character
         return self.getmagicwords('redirect')[0].lstrip('#')
 
+    @deprecated('redirect_regex', since='20210103', future_warning=True)
     def redirectRegex(self):
+        """Return a compiled regular expression matching on redirect pages."""
+        return self.redirect_regex
+
+    @property
+    def redirect_regex(self):
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.
@@ -892,9 +906,10 @@ class APISite(BaseSite):
             except KeyError:
                 pywikibot.warning(
                     'Broken namespace alias "{0}" (id: {1}) on {2}'.format(
-                        item['*'], item['id'], self))
-            if item['*'] not in namespace:
-                namespace.aliases.append(item['*'])
+                        item['*'], ns, self))
+            else:
+                if item['*'] not in namespace:
+                    namespace.aliases.append(item['*'])
 
         return _namespaces
 
@@ -1313,6 +1328,23 @@ class APISite(BaseSite):
                 raise PageRelatedError(
                     page,
                     'loadimageinfo: Query on %s returned no imageinfo')
+
+        # inspect whether the result is assigned and print an deprecation
+        # warning in that case; implementation inspired by
+        # https://stackoverflow.com/questions/813882/is-there-a-way-to-check-whether-function-output-is-assigned-to-a-variable-in-pyt
+        try:
+            frame = inspect.currentframe().f_back
+            next_opcode = opcode.opname[
+                frame.f_code.co_code[frame.f_lasti + 3]]
+            if next_opcode in ('POP_TOP', 'ROT_TWO', 'ROT_THREE'):
+                issue_deprecation_warning(
+                    'APISite.loadimageinfo() result dict and any assignment',
+                    "pageitem['imageinfo'] if history is True "
+                    "else pageitem['imageinfo'][0]",
+                    warning_class=FutureWarning,
+                    since='20210110')
+        finally:
+            del frame
 
         return (pageitem['imageinfo']
                 if history else pageitem['imageinfo'][0])
@@ -2228,7 +2260,7 @@ class APISite(BaseSite):
 
         By default, retrieves the last (current) revision of the page,
         unless any of the optional parameters revids, startid, endid,
-        starttime, endtime, rvdir, user, excludeuser, or limit are
+        starttime, endtime, rvdir, user, excludeuser, or total are
         specified. Unless noted below, all parameters not specified
         default to False.
 
@@ -2255,9 +2287,10 @@ class APISite(BaseSite):
         @keyword starttime: retrieve revisions starting at this Timestamp
         @keyword endtime: stop upon reaching this Timestamp
         @keyword rvdir: if false, retrieve newest revisions first (default);
-            if true, retrieve earliest first
+            if true, retrieve oldest first
         @keyword user: retrieve only revisions authored by this user
         @keyword excludeuser: retrieve all revisions not authored by this user
+        @keyword total: number of revisions to retrieve
         @raises ValueError: invalid startid/endid or starttime/endtime values
         @raises pywikibot.Error: revids belonging to a different page
         """
@@ -3136,6 +3169,24 @@ class APISite(BaseSite):
                                                 filters)
         return wlgen
 
+    def _check_view_deleted(self, msg_prefix: str, prop: List[str]) -> None:
+        """Check if the user can view deleted comments and content.
+
+        @param msg_prefix: The calling method name
+        @param prop: Requested props to check
+        @raises UserRightsError: user cannot view a requested prop
+        """
+        err = '{}: User:{} not authorized to view '.format(msg_prefix,
+                                                           self.user())
+        if not self.has_right('deletedhistory'):
+            if self.mw_version < '1.34':
+                raise UserRightsError(err + 'deleted revisions.')
+            if 'comment' in prop or 'parsedcomment' in prop:
+                raise UserRightsError(err + 'comments of deleted revisions.')
+        if ('content' in prop and not (self.has_right('deletedtext')
+                                       or self.has_right('undelete'))):
+            raise UserRightsError(err + 'deleted content.')
+
     @deprecated_args(step=None, get_text='content', page='titles',
                      limit='total')
     def deletedrevs(self, titles=None, start=None, end=None,
@@ -3199,16 +3250,7 @@ class APISite(BaseSite):
         if start and end:
             self.assert_valid_iter_params('deletedrevs', start, end, reverse)
 
-        err = ('deletedrevs: User:{} not authorized to '
-               .format(self.user()))
-        if not self.has_right('deletedhistory'):
-            if self.mw_version < '1.34':
-                raise Error(err + 'access deleted revisions.')
-            if 'comment' in prop or 'parsedcomment' in prop:
-                raise Error(err + 'access comments of deleted revisions.')
-        if ('content' in prop and not (self.has_right('deletedtext')
-                                       or self.has_right('undelete'))):
-            raise Error(err + 'view deleted content.')
+        self._check_view_deleted('deletedrevs', prop)
 
         revids = kwargs.pop('revids', None)
         if not (bool(titles) ^ (revids is not None)):
@@ -3252,6 +3294,63 @@ class APISite(BaseSite):
                 with suppress(KeyError):
                     data['revisions'] = data.pop('deletedrevisions')
                     yield data
+
+    @need_version('1.25')
+    def alldeletedrevisions(
+        self,
+        *,
+        namespaces=None,
+        reverse: bool = False,
+        content: bool = False,
+        total: Optional[int] = None,
+        **kwargs
+    ) -> typing.Iterable[Dict[str, Any]]:
+        """
+        Iterate all deleted revisions.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Alldeletedrevisions}
+
+        @param namespaces: Only iterate pages in these namespaces
+        @type namespaces: iterable of str or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+        @param reverse: Iterate oldest revisions first (default: newest)
+        @param content: If True, retrieve the content of each revision
+        @param total: Number of revisions to retrieve
+        @keyword from: Start listing at this title
+        @keyword to: Stop listing at this title
+        @keyword prefix: Search for all page titles that begin with this value
+        @keyword excludeuser: Exclude revisions by this user
+        @keyword tag: Only list revisions tagged with this tag
+        @keyword user: List revisions by this user
+        @keyword start: Iterate revisions starting at this Timestamp
+        @keyword end: Iterate revisions ending at this Timestamp
+        @keyword prop: Which properties to get. Defaults are ids, timestamp,
+            flags, user, and comment (if you have the right to view).
+        @type prop: List[str]
+        """
+        if 'start' in kwargs and 'end' in kwargs:
+            self.assert_valid_iter_params('alldeletedrevisions',
+                                          kwargs['start'],
+                                          kwargs['end'],
+                                          reverse)
+        prop = kwargs.pop('prop', [])
+        parameters = {'adr' + k: v for k, v in kwargs.items()}
+        if not prop:
+            prop = ['ids', 'timestamp', 'flags', 'user']
+            if self.has_right('deletedhistory'):
+                prop.append('comment')
+        if content:
+            prop.append('content')
+        self._check_view_deleted('alldeletedrevisions', prop)
+        parameters['adrprop'] = prop
+        if reverse:
+            parameters['adrdir'] = 'newer'
+        yield from self._generator(api.ListGenerator,
+                                   type_arg='alldeletedrevisions',
+                                   namespaces=namespaces,
+                                   total=total,
+                                   parameters=parameters)
 
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
@@ -4344,19 +4443,19 @@ class APISite(BaseSite):
         raise RuntimeError(
             'Unexpected success of upload action without parameters.')
 
-    def stash_info(self, file_key, props=False):
+    def stash_info(self, file_key, props=None):
         """Get the stash info for a given file key.
 
         @see: U{https://www.mediawiki.org/wiki/API:Stashimageinfo}
         """
-        if not props:
-            props = False
+        props = props or False
         req = self._simple_request(
             action='query', prop='stashimageinfo', siifilekey=file_key,
             siiprop=props)
         return req.submit()['query']['stashimageinfo'][0]
 
     @deprecate_arg('imagepage', 'filepage')
+    @need_right('upload')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
                chunk_size: int = 0, _file_key: Optional[str] = None,
@@ -4448,11 +4547,6 @@ class APISite(BaseSite):
 
         # An offset != 0 doesn't make sense without a file key
         assert(_offset == 0 or _file_key is not None)
-        # check for required user right
-        if not self.has_right('upload'):
-            raise Error(
-                "User '%s' does not have upload rights on site %s."
-                % (self.user(), self))
         # check for required parameters
         if bool(source_filename) == bool(source_url):
             raise ValueError('APISite.upload: must provide either '
@@ -4472,8 +4566,7 @@ class APISite(BaseSite):
                                       '"report_success" is True or None',
                                       '"report_success=False" or define '
                                       '"ignore_warnings" as callable/iterable',
-                                      3, warning_class=FutureWarning,
-                                      since='20150823')
+                                      3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
@@ -5594,8 +5687,8 @@ class APISite(BaseSite):
 
         @see: U{https://www.mediawiki.org/wiki/API:Watchlistraw}
 
-        @param force_reload: Reload watchlist
-        @type force_reload: bool
+        @param force: Reload watchlist
+        @type force: bool
         @param total: if not None, limit the generator to yielding this many
             items in total
         @type total: int
@@ -6292,7 +6385,7 @@ class DataSite(APISite):
         @param claim: A Claim object to remove the sources from
         @type claim: pywikibot.Claim
         @param sources: A list of Claim objects that are sources
-        @type sources: pywikibot.Claim
+        @type sources: list
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary

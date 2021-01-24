@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This script creates new items on Wikidata based on certain criteria.
 
@@ -204,7 +203,7 @@ def main(*args) -> None:
         if arg.startswith(('-pageage:', '-lastedit:')):
             key, val = arg.split(':', 1)
             options[key[1:]] = int(val)
-        elif gen.handleArg(arg):
+        elif gen.handle_arg(arg):
             pass
         else:
             options[arg[1:].lower()] = True

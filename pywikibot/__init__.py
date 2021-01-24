@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,6 +15,7 @@ from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
 from typing import Optional, Union
+from urllib.parse import urlparse
 from warnings import warn
 
 from pywikibot.__metadata__ import (
@@ -22,12 +23,10 @@ from pywikibot.__metadata__ import (
     __maintainer__, __maintainer_email__, __name__, __url__, __version__)
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
-from pywikibot.backports import cache
+from pywikibot.backports import cache, removesuffix
 from pywikibot.bot import (
     input, input_choice, input_yn, handle_args, show_help, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
-    # the following are flagged as deprecated on usage
-    handleArgs,
 )
 from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
@@ -47,7 +46,7 @@ from pywikibot.exceptions import (
     UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
     WikiBaseError,
 )
-from pywikibot.family import Family
+from pywikibot.family import AutoFamily, Family
 from pywikibot.i18n import translate
 from pywikibot.logging import (
     critical, debug, error, exception, log, output, stdout, warning
@@ -66,21 +65,21 @@ from pywikibot.tools.formatter import color_format
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
-    '__maintainer__', '__maintainer_email__', '__name__', '__release__',
+    '__maintainer__', '__maintainer_email__', '__name__',
     '__url__', '__version__',
     'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
-    'FilePage', 'handle_args', 'handleArgs', 'html2unicode', 'input',
+    'FilePage', 'handle_args', 'html2unicode', 'input',
     'input_choice', 'input_yn', 'InterwikiRedirectPage', 'InvalidTitle',
     'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage',
     'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget', 'NoPage',
     'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
     'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
     'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    'QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
-    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'showHelp',
+    '_QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
+    'Server504Error', 'ServerError', 'showDiff', 'show_help',
     'Site', 'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
     'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
     'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
@@ -1018,7 +1017,7 @@ class WbUnknown(_WbRepresentation):
 
     _items = ('json',)
 
-    def __init__(self, json) -> dict:
+    def __init__(self, json):
         """
         Create a new WbUnknown object.
 
@@ -1049,12 +1048,12 @@ _sites = {}
 
 
 @cache
-def _code_fam_from_url(url: str):
+def _code_fam_from_url(url: str, name: Optional[str] = None):
     """Set url to cache and get code and family from cache.
 
     Site helper method.
     @param url: The site URL to get code and family
-    @raises pywikibot.exceptions.SiteDefinitionError: Unknown URL
+    @param name: A family name used by AutoFamily
     """
     matched_sites = []
     # Iterate through all families and look, which does apply to
@@ -1066,9 +1065,12 @@ def _code_fam_from_url(url: str):
             matched_sites.append((code, family))
 
     if not matched_sites:
-        # TODO: As soon as AutoFamily is ready, try and use an
-        #       AutoFamily
-        raise SiteDefinitionError("Unknown URL '{}'.".format(url))
+        if not name:  # create a name from url
+            name = urlparse(url).netloc.split('.')[-2]
+            name = removesuffix(name, 'wiki')
+        family = AutoFamily(name, url)
+        matched_sites.append((family.code, family))
+
     if len(matched_sites) > 1:
         warning('Found multiple matches for URL "{}": {} (use first)'
                 .format(url, ', '.join(str(s) for s in matched_sites)))
@@ -1098,17 +1100,16 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         URL. Still requires that the family supporting that URL exists.
     @raises ValueError: URL and pair of code and family given
     @raises ValueError: Invalid interface name
-    @raises pywikibot.exceptions.SiteDefinitionError: Unknown URL
     """
     _logger = 'wiki'
 
     if url:
-        # Either code and fam or only url
-        if code or fam:
+        # Either code and fam or url with optional fam for AutoFamily name
+        if code:
             raise ValueError(
                 'URL to the wiki OR a pair of code and family name '
                 'should be provided')
-        code, fam = _code_fam_from_url(url)
+        code, fam = _code_fam_from_url(url, fam)
     elif code and ':' in code:
         if fam:
             raise ValueError(

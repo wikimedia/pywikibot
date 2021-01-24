@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot searches for selflinks and allows removing them.
 
@@ -89,7 +88,7 @@ def main(*args):
         if arg == '-always':
             bot_args['always'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     gen = gen_factory.getCombinedGenerator(preload=True)
     if not gen:

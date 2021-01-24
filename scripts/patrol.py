@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 The bot is meant to mark the edits based on info obtained by whitelist.
 
@@ -451,7 +450,7 @@ def main(*args):
         elif arg.startswith('-whitelist:'):
             options['whitelist'] = arg[len('-whitelist:'):]
         else:
-            generator = gen_factory.handleArg(arg)
+            generator = gen_factory.handle_arg(arg)
             if not generator:
                 if ':' in arg:
                     m = arg.split(':')

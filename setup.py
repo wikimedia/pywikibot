@@ -24,7 +24,7 @@ To create a new distribution:
 - upload this patchset to gerrit and merge it.
 """
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,7 +58,7 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.14'],
+    'isbn': ['python-stdnum>=1.15'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
@@ -135,7 +135,7 @@ test_deps = ['bz2file', 'mock']
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
     test_deps += [
         'pywinauto>0.6.4',
-        'pywin32>220',
+        'pywin32>=225',
     ]
 
 # Add all dependencies as test dependencies,

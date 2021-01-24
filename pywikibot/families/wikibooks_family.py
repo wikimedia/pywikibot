@@ -16,26 +16,26 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch',
-        'co', 'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv',
-        'mi', 'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple',
-        'su', 'sw', 'tk', 'ug', 'uz', 'vo', 'wa', 'xh', 'yo', 'za',
-        'zh-min-nan', 'zu',
+        'aa', 'ak', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch', 'co',
+        'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
+        'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple', 'su',
+        'sw', 'tk', 'ug', 'uz', 'vo', 'wa', 'xh', 'yo', 'za', 'zh-min-nan',
+        'zu',
     ]
 
     removed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
-        'dk', 'tokipona',
+        'als', 'dk', 'tokipona',
     ]
 
     languages_by_size = [
         'en', 'hu', 'de', 'fr', 'it', 'pt', 'ja', 'es', 'nl', 'pl', 'id', 'he',
-        'fi', 'zh', 'sq', 'az', 'fa', 'ru', 'vi', 'ca', 'eu', 'da', 'ko', 'ba',
-        'th', 'sv', 'gl', 'sr', 'cs', 'hi', 'hr', 'no', 'uk', 'sa', 'tr', 'ar',
+        'fi', 'zh', 'sq', 'az', 'fa', 'vi', 'ru', 'ca', 'eu', 'da', 'ko', 'ba',
+        'th', 'sv', 'gl', 'sr', 'cs', 'hi', 'hr', 'uk', 'no', 'sa', 'tr', 'ar',
         'ta', 'eo', 'sk', 'is', 'ro', 'bn', 'si', 'mk', 'bg', 'ka', 'ms', 'tt',
-        'lt', 'el', 'li', 'sl', 'ur', 'tl', 'km', 'la', 'et', 'be', 'kk', 'ia',
-        'ml', 'oc', 'ne', 'hy', 'cv', 'pa', 'tg', 'te', 'ku', 'fy', 'bs', 'cy',
-        'af', 'mg', 'mr', 'ky',
+        'lt', 'el', 'li', 'sl', 'tl', 'ur', 'km', 'la', 'et', 'be', 'kk', 'ia',
+        'ml', 'mr', 'oc', 'ne', 'hy', 'cv', 'pa', 'tg', 'te', 'ku', 'fy', 'bs',
+        'cy', 'af', 'mg', 'ky',
     ]
 
     category_redirect_templates = {

@@ -16,23 +16,23 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'als', 'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk',
-        'kr', 'ks', 'kw', 'lb', 'na', 'nds', 'qu', 'simple',
-        'tk', 'tt', 'ug', 'vo', 'za', 'zh-min-nan',
+        'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk', 'kr', 'ks', 'kw',
+        'lb', 'na', 'nds', 'qu', 'simple', 'tk', 'tt', 'ug', 'vo', 'za',
+        'zh-min-nan',
     ]
 
     removed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
-        'tokipona',
+        'als', 'tokipona',
     ]
 
     languages_by_size = [
         'en', 'it', 'pl', 'ru', 'cs', 'fa', 'de', 'pt', 'fr', 'es', 'uk', 'he',
-        'sk', 'tr', 'bs', 'ca', 'fi', 'et', 'az', 'sl', 'lt', 'eo', 'zh', 'bg',
+        'sk', 'tr', 'bs', 'ca', 'et', 'fi', 'az', 'sl', 'lt', 'eo', 'zh', 'bg',
         'ar', 'hr', 'hy', 'el', 'su', 'nn', 'id', 'sv', 'li', 'hu', 'ko', 'nl',
-        'ja', 'ta', 'la', 'sah', 'th', 'sr', 'gu', 'gl', 'ur', 'te', 'be',
-        'cy', 'no', 'ml', 'sq', 'kn', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'da',
-        'vi', 'sa', 'is', 'br', 'mr', 'af', 'wo', 'ky',
+        'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'th', 'ur', 'te', 'be',
+        'cy', 'no', 'ml', 'sq', 'kn', 'ro', 'ku', 'eu', 'uz', 'hi', 'ka', 'vi',
+        'da', 'sa', 'is', 'br', 'mr', 'af', 'wo', 'ky',
     ]
 
     category_redirect_templates = {
@@ -48,13 +48,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'af', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs',
-        'cy', 'da', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi',
-        'fr', 'gl', 'gu', 'he', 'hi', 'hu', 'hy', 'id', 'is',
-        'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
-        'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru',
-        'sa', 'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta',
-        'te', 'th', 'tr', 'uk', 'ur', 'uz', 'vi', 'wo', 'zh',
+        'af', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'cy', 'da', 'el',
+        'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'gu', 'he', 'hi', 'hu',
+        'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
+        'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sa', 'sah',
+        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tr', 'uk', 'ur',
+        'uz', 'vi', 'wo', 'zh',
     ]
 
     # Subpages for documentation.

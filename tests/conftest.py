@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Used by pytest to do some preparation work before running tests."""
 #
 # (C) Pywikibot team, 2016-2020

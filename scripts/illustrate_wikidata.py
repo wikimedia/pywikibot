@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Bot to add images to Wikidata items.
 
@@ -14,7 +13,7 @@ Usage:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of MIT License.
 #
@@ -103,7 +102,7 @@ def main(*args) -> None:
             else:
                 wdproperty = arg[10:]
         else:
-            generator_factory.handleArg(arg)
+            generator_factory.handle_arg(arg)
 
     generator = generator_factory.getCombinedGenerator(preload=True)
     if not generator:

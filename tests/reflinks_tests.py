@@ -1,14 +1,15 @@
-# -*- coding: utf-8 -*-
 """Tests for reflinks script."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
 from tests import join_xml_data_path
-from tests.aspects import unittest, TestCase, ScriptMainTestCase
+from tests.aspects import TestCase, ScriptMainTestCase
 from tests.utils import empty_sites
 
 

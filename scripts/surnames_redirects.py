@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Bot to create redirects based on name order.
 
@@ -117,7 +116,7 @@ def main(*args):
         if arg == '-surnames_last':
             options['surnames_last'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     gen = gen_factory.getCombinedGenerator()
     if gen:

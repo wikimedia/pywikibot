@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Title translate module."""
 #
 # (C) Pywikibot team, 2003-2020

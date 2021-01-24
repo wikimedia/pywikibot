@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 With this tool you can add the template {{commonscat}} to categories.
 
@@ -35,7 +34,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -523,7 +522,7 @@ def main(*args):
         elif option == 'always':
             options[option] = True
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if checkcurrent:
         site = pywikibot.Site()

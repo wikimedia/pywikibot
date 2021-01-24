@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This is a script written to add the template "orphan" to pages.
 
@@ -255,7 +254,7 @@ def main(*args):
         elif arg == '-always':
             options['always'] = True
         else:
-            gen_factory.handleArg(arg)
+            gen_factory.handle_arg(arg)
 
     generator = gen_factory.getCombinedGenerator()
 

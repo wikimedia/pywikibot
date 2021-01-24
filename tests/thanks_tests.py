@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 from pywikibot.page import Page, User
 
 from tests.aspects import TestCase
-from tests import unittest
 
 
 NO_THANKABLE_REVS = 'There is no recent change which can be test thanked.'

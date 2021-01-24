@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 This bot is used for checking external links found at the wiki.
 
@@ -111,18 +110,13 @@ Loads all wiki pages where dead links were found during a prior run:
 #
 import codecs
 import datetime
-import http.client as httpclient
 import pickle
 import re
-import socket
 import threading
 import time
 
 from contextlib import suppress
 from functools import partial
-from typing import Optional
-from urllib.parse import urlsplit
-from urllib.request import quote
 
 import requests
 
@@ -131,13 +125,12 @@ import pywikibot
 from pywikibot import comms, i18n, pagegenerators, textlib
 from pywikibot import config2 as config
 
-from pywikibot.backports import Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated, ThreadList
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import ThreadList
 
 try:
     import memento_client
@@ -281,273 +274,6 @@ XmlDumpPageGenerator = partial(
 class NotAnURLError(BaseException):
 
     """The link is not an URL."""
-
-
-@deprecated('requests', since='20160120', future_warning=True)
-class LinkChecker:
-
-    """
-    Check links.
-
-    Given a HTTP URL, tries to load the page from the Internet and checks if it
-    is still online.
-
-    Returns a (boolean, string) tuple saying if the page is online and
-    including a status reason.
-
-    Per-domain user-agent faking is not supported in this deprecated class.
-
-    Warning: Also returns false if your Internet connection isn't working
-    correctly! (This will give a Socket Error)
-
-    """
-
-    def __init__(self, url, redirectChain=[], serverEncoding=None,
-                 HTTPignore=[]):
-        """
-        Initializer.
-
-        redirectChain is a list of redirects which were resolved by
-        resolveRedirect(). This is needed to detect redirect loops.
-        """
-        self.url = url
-        self.serverEncoding = serverEncoding
-
-        fake_ua_config = config.fake_user_agent_default.get(
-            'weblinkchecker', False)
-        if fake_ua_config and isinstance(fake_ua_config, str):
-            user_agent = fake_ua_config
-        elif fake_ua_config:
-            user_agent = comms.http.fake_user_agent()
-        else:
-            user_agent = comms.http.user_agent()
-        self.header = {
-            'user-agent': user_agent,
-            'Accept': 'text/xml,application/xml,application/xhtml+xml,'
-                      'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
-            'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
-            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-            'Keep-Alive': '30',
-            'Connection': 'keep-alive',
-        }
-        self.redirectChain = redirectChain + [url]
-        self.changeUrl(url)
-        self.HTTPignore = HTTPignore
-
-    def getConnection(self):
-        """Get a connection."""
-        if self.scheme == 'http':
-            return httpclient.HTTPConnection(self.host)
-        elif self.scheme == 'https':
-            return httpclient.HTTPSConnection(self.host)
-        else:
-            raise NotAnURLError(self.url)
-
-    def getEncodingUsedByServer(self):
-        """Get encodung used by server."""
-        if not self.serverEncoding:
-            with suppress(Exception):
-                pywikibot.output(
-                    'Contacting server %s to find out its default encoding...'
-                    % self.host)
-                conn = self.getConnection()
-                conn.request('HEAD', '/', None, self.header)
-                self.response = conn.getresponse()
-                self.readEncodingFromResponse(self.response)
-
-            if not self.serverEncoding:
-                # TODO: We might also load a page, then check for an encoding
-                # definition in a HTML meta tag.
-                pywikibot.output("Error retrieving server's default charset. "
-                                 'Using ISO 8859-1.')
-                # most browsers use ISO 8859-1 (Latin-1) as the default.
-                self.serverEncoding = 'iso8859-1'
-        return self.serverEncoding
-
-    def readEncodingFromResponse(self, response):
-        """Read encoding from response."""
-        if not self.serverEncoding:
-            with suppress(Exception):
-                ct = response.getheader('Content-Type')
-                charsetR = re.compile('charset=(.+)')
-                charset = charsetR.search(ct).group(1)
-                self.serverEncoding = charset
-
-    def changeUrl(self, url):
-        """Change url."""
-        self.url = url
-        # we ignore the fragment
-        (self.scheme, self.host, self.path, self.query,
-         self.fragment) = urlsplit(self.url)
-        if not self.path:
-            self.path = '/'
-        if self.query:
-            self.query = '?' + self.query
-        self.protocol = url.split(':', 1)[0]
-        # check if there are non-ASCII characters inside path or query, and if
-        # so, encode them in an encoding that hopefully is the right one.
-        try:
-            self.path.encode('ascii')
-            self.query.encode('ascii')
-        except UnicodeEncodeError:
-            encoding = self.getEncodingUsedByServer()
-            self.path = quote(self.path.encode(encoding))
-            self.query = quote(self.query.encode(encoding), '=&')
-
-    def resolveRedirect(self, useHEAD=False) -> Optional[str]:
-        """
-        Return the redirect target URL as a string, if it is a HTTP redirect.
-
-        If useHEAD is true, uses the HTTP HEAD method, which saves bandwidth
-        by not downloading the body. Otherwise, the HTTP GET method is used.
-        """
-        conn = self.getConnection()
-        try:
-            if useHEAD:
-                conn.request('HEAD', '%s%s' % (self.path, self.query), None,
-                             self.header)
-            else:
-                conn.request('GET', '%s%s' % (self.path, self.query), None,
-                             self.header)
-            self.response = conn.getresponse()
-            # read the server's encoding, in case we need it later
-            self.readEncodingFromResponse(self.response)
-        except httpclient.BadStatusLine:
-            # Some servers don't seem to handle HEAD requests properly,
-            # e.g. http://www.radiorus.ru/ which is running on a very old
-            # Apache server. Using GET instead works on these (but it uses
-            # more bandwidth).
-            if useHEAD:
-                return self.resolveRedirect(useHEAD=False)
-            else:
-                raise
-        if self.response.status >= 300 and self.response.status <= 399:
-            # to debug, print response.getheaders()
-            redirTarget = self.response.getheader('Location')
-            if redirTarget:
-                try:
-                    redirTarget.encode('ascii')
-                except UnicodeError:
-                    redirTarget = redirTarget.decode(
-                        self.getEncodingUsedByServer())
-                if redirTarget.startswith(('http://', 'https://')):
-                    self.changeUrl(redirTarget)
-                    return True
-                elif redirTarget.startswith('/'):
-                    self.changeUrl('{0}://{1}{2}'
-                                   .format(self.protocol, self.host,
-                                           redirTarget))
-                    return True
-                else:  # redirect to relative position
-                    # cut off filename
-                    directory = self.path[:self.path.rindex('/') + 1]
-                    # handle redirect to parent directory
-                    while redirTarget.startswith('../'):
-                        redirTarget = redirTarget[3:]
-                        # some servers redirect to .. although we are already
-                        # in the root directory; ignore this.
-                        if directory != '/':
-                            # change /foo/bar/ to /foo/
-                            directory = directory[:-1]
-                            directory = directory[:directory.rindex('/') + 1]
-                    self.changeUrl('{0}://{1}{2}{3}'
-                                   .format(self.protocol, self.host, directory,
-                                           redirTarget))
-                    return True
-        else:
-            return False  # not a redirect
-
-    def check(self, useHEAD=False) -> Tuple[bool, str]:
-        """Return True and the server status message if the page is alive."""
-        try:
-            wasRedirected = self.resolveRedirect(useHEAD=useHEAD)
-        except UnicodeError as error:
-            return False, 'Encoding Error: {0} ({1})'.format(
-                error.__class__.__name__, error)
-        except httpclient.error as error:
-            return False, 'HTTP Error: {}'.format(error.__class__.__name__)
-        except socket.error as error:
-            # https://docs.python.org/3/library/socket.html :
-            # socket.error :
-            # The accompanying value is either a string telling what went
-            # wrong or a pair (errno, string) representing an error
-            # returned by a system call, similar to the value
-            # accompanying os.error
-            if isinstance(error, str):
-                msg = error
-            else:
-                try:
-                    msg = error[1]
-                except IndexError:
-                    pywikibot.output('### DEBUG information for T57282')
-                    raise IndexError(type(error))
-            # TODO: decode msg. On Linux, it's encoded in UTF-8.
-            # How is it encoded in Windows? Or can we somehow just
-            # get the English message?
-            return False, 'Socket Error: {}'.format(repr(msg))
-        if wasRedirected:
-            if self.url in self.redirectChain:
-                if useHEAD:
-                    # Some servers don't seem to handle HEAD requests properly,
-                    # which leads to a cyclic list of redirects.
-                    # We simply start from the beginning, but this time,
-                    # we don't use HEAD, but GET requests.
-                    redirChecker = LinkChecker(
-                        self.redirectChain[0],
-                        serverEncoding=self.serverEncoding,
-                        HTTPignore=self.HTTPignore)
-                    return redirChecker.check(useHEAD=False)
-                else:
-                    urlList = ['[{0}]'.format(url)
-                               for url in self.redirectChain + [self.url]]
-                    return (False,
-                            'HTTP Redirect Loop: {0}'.format(
-                                ' -> '.join(urlList)))
-            elif len(self.redirectChain) >= 19:
-                if useHEAD:
-                    # Some servers don't seem to handle HEAD requests properly,
-                    # which leads to a long (or infinite) list of redirects.
-                    # We simply start from the beginning, but this time,
-                    # we don't use HEAD, but GET requests.
-                    redirChecker = LinkChecker(
-                        self.redirectChain[0],
-                        serverEncoding=self.serverEncoding,
-                        HTTPignore=self.HTTPignore)
-                    return redirChecker.check(useHEAD=False)
-                else:
-                    urlList = ['[{0}]'.format(url)
-                               for url in self.redirectChain + [self.url]]
-                    return (False,
-                            'Long Chain of Redirects: {0}'
-                            .format(' -> '.join(urlList)))
-            else:
-                redirChecker = LinkChecker(self.url, self.redirectChain,
-                                           self.serverEncoding,
-                                           HTTPignore=self.HTTPignore)
-                return redirChecker.check(useHEAD=useHEAD)
-        else:
-            try:
-                conn = self.getConnection()
-            except httpclient.error as error:
-                return False, 'HTTP Error: {0}'.format(
-                    error.__class__.__name__)
-            try:
-                conn.request('GET', '{0}{1}'.format(self.path, self.query),
-                             None, self.header)
-            except socket.error as error:
-                return False, 'Socket Error: {0}'.format(repr(error[1]))
-            try:
-                self.response = conn.getresponse()
-            except Exception as error:
-                return False, 'Error: {0}'.format(error)
-            # read the server's encoding, in case we need it later
-            self.readEncodingFromResponse(self.response)
-            # site down if the server status is between 400 and 499
-            alive = not (400 <= self.response.status_code < 500)
-            if self.response.status_code in self.HTTPignore:
-                alive = False
-            return alive, '{} {}'.format(self.response.status_code,
-                                         self.response.reason)
 
 
 class LinkCheckThread(threading.Thread):
@@ -899,12 +625,6 @@ def countLinkCheckThreads() -> int:
     return i
 
 
-@deprecated('requests', since='20160120', future_warning=True)
-def check(url):
-    """DEPRECATED: Use requests instead. Perform a check on URL."""
-    return LinkChecker(url).check()
-
-
 def main(*args):
     """
     Process command line arguments and invoke bot.
@@ -945,7 +665,7 @@ def main(*args):
             else:
                 xmlFilename = arg[5:]
         else:
-            genFactory.handleArg(arg)
+            genFactory.handle_arg(arg)
 
     if xmlFilename:
         try:

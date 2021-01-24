@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Script that forms part of pwb_tests."""
 #
 # (C) Pywikibot team, 2013-2020

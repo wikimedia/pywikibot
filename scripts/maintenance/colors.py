@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Utility to show pywikibot colors."""
 #
 # (C) Pywikibot team, 2016-2020

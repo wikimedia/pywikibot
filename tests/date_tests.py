@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 from datetime import datetime
 
 from pywikibot import date
 
-from tests.aspects import unittest, MetaTestCaseClass, TestCase
+from tests.aspects import MetaTestCaseClass, TestCase
 
 
 class TestDateMeta(MetaTestCaseClass):

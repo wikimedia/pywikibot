@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """Module containing special bots reusable by scripts."""
 #
 # (C) Pywikibot team, 2020

@@ -1,6 +1,6 @@
 """This module contains backports to support older Python versions."""
 #
-# (C) Pywikibot team, 2020
+# (C) Pywikibot team, 2020-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,14 +23,14 @@ else:
     from collections import defaultdict as DefaultDict  # noqa: N812
 
 if PYTHON_VERSION >= (3, 9):
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
     Dict = dict
     FrozenSet = frozenset
     List = list
     Set = set
     Tuple = tuple
 else:
-    from typing import Dict, FrozenSet, Iterable, List, Set, Tuple
+    from typing import Dict, FrozenSet, Iterable, List, Set, Sequence, Tuple
 
 
 # PEP 616 string methods

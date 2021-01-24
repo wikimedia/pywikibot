@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Script to copy images to Wikimedia Commons, or to another wiki.
 
@@ -342,7 +341,7 @@ def main(*args):
         elif opt == '-tosite':
             options['target'] = value
         else:
-            generator_factory.handleArg(arg)
+            generator_factory.handle_arg(arg)
 
     gen = generator_factory.getCombinedGenerator()
     if not gen:

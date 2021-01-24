@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Fixes implementation which overwrites the variable."""
 #
 # (C) Pywikibot team, 2015-2020

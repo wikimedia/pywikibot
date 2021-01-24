@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 A script that adds claims to Wikidata items based on a list of pages.
 
@@ -47,7 +46,7 @@ but 'p' must be included.
 
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -123,7 +122,7 @@ def main(*args) -> None:
             exists_arg = arg.split(':')[1]
             continue
         # Handle page generator args
-        if gen.handleArg(arg):
+        if gen.handle_arg(arg):
             continue
         commandline_claims.append(arg)
     if len(commandline_claims) % 2:
