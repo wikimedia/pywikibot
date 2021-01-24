@@ -7,7 +7,6 @@
 import datetime
 import hashlib
 import inspect
-import json
 import os
 import pickle
 import pprint
@@ -1534,16 +1533,17 @@ class Request(MutableMapping):
                         _logger)
         return use_get, uri, body, headers
 
-    def _http_request(self, use_get, uri, body, headers, paramstring) -> tuple:
+    def _http_request(self, use_get: bool, uri: str, data, headers,
+                      paramstring) -> tuple:
         """Get or post a http request with exception handling.
 
-        @return: a tuple containing data from request and use_get value
+        @return: a tuple containing requests.Response object from
+            http.request and use_get value
         """
         try:
-            data = http.request(
-                self.site, uri=uri,
-                method='GET' if use_get else 'POST',
-                data=body, headers=headers)
+            response = http.request(self.site, uri=uri,
+                                    method='GET' if use_get else 'POST',
+                                    data=data, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
         except Server414Error:
@@ -1564,32 +1564,28 @@ class Request(MutableMapping):
             pywikibot.error(traceback.format_exc())
             pywikibot.log('{}, {}'.format(uri, paramstring))
         else:
-            return data, use_get
+            return response, use_get
         self.wait()
         return None, use_get
 
-    def _json_loads(self, data: Union[str, bytes]) -> Optional[dict]:
-        """Read source text and return a dict.
+    def _json_loads(self, response) -> Optional[dict]:
+        """Return a dict from requests.Response.
 
-        @param data: raw data string
+        @param response: a requests.Response object
+        @type response: requests.Response
         @return: a data dict
         @raises APIError: unknown action found
         @raises APIError: unknown query result type
         """
-        if not isinstance(data, str):
-            data = data.decode(self.site.encoding())
-        pywikibot.debug(('API response received from {}:\n'
-                         .format(self.site)) + data, _logger)
-        if data.startswith('unknown_action'):
-            raise APIError(data[:14], data[16:])
         try:
-            result = json.loads(data)
+            result = response.json()
         except ValueError:
             # if the result isn't valid JSON, there must be a server
             # problem. Wait a few seconds and try again
             pywikibot.warning(
                 'Non-JSON response received from server {}; '
-                'the server may be down.'.format(self.site))
+                'the server may be down.\nStatus code:{}'
+                .format(self.site, response.status_code))
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
                 if param.endswith('limit'):
@@ -1600,11 +1596,6 @@ class Request(MutableMapping):
                         pywikibot.output('Set {} = {}'
                                          .format(param, self[param]))
         else:
-            if result and not isinstance(result, dict):
-                raise APIError('Unknown',
-                               'Unable to process query response of type {}.'
-                               .format(type(result)),
-                               data=result)
             return result or {}
         self.wait()
         return None
@@ -1804,12 +1795,12 @@ class Request(MutableMapping):
 
             use_get, uri, body, headers = self._get_request_params(use_get,
                                                                    paramstring)
-            rawdata, use_get = self._http_request(use_get, uri, body, headers,
-                                                  paramstring)
-            if rawdata is None:
+            response, use_get = self._http_request(use_get, uri, body, headers,
+                                                   paramstring)
+            if response is None:
                 continue
 
-            result = self._json_loads(rawdata)
+            result = self._json_loads(response)
             if result is None:
                 continue
 

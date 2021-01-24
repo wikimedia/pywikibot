@@ -11,7 +11,7 @@ This module is responsible for
     - Basic HTTP error handling
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -215,25 +215,26 @@ def fake_user_agent() -> str:
 
 
 @deprecated_args(body='data')
-def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
+def request(site,
+            uri: Optional[str] = None,
+            headers: Optional[dict] = None,
+            **kwargs) -> requests.Response:
     """
     Request to Site with default error handling and response decoding.
 
     See L{requests.Session.request} for additional parameters.
 
-    If the site argument is provided, the uri is a relative uri from
-    and including the document root '/'.
-
-    If the site argument is None, the uri must be absolute.
+    The optional uri is a relative uri from site base uri including the
+    document root '/'.
 
     @param site: The Site to connect to
-    @type site: L{pywikibot.site.BaseSite}
+    @type: site: pywikibot.site.BaseSite
     @param uri: the URI to retrieve
     @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
-    @return: The received data
+    @return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
     old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
@@ -254,7 +255,7 @@ def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
     baseuri = site.base_url(uri)
     r = fetch(baseuri, headers=headers, **kwargs)
     site.throttle.retry_after = int(r.headers.get('retry-after', 0))
-    return r.text
+    return r
 
 
 def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
