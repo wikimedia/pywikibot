@@ -1,6 +1,6 @@
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import pywikibot
 
 from pywikibot.backports import List
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import classproperty, deprecated
+from pywikibot.tools import deprecated
 
 
 _logger = 'wiki'
@@ -396,13 +396,6 @@ class LogEntryFactory(object):
             # When called, it will initialize a new object of that class
             logclass = self.get_valid_entry_class(logtype)
             self._creator = lambda data: logclass(data, self._site)
-
-    @classproperty
-    @deprecated('Site.logtypes or LogEntryFactory.get_entry_class(logtype)',
-                since='20160918', future_warning=True)
-    def logtypes(cls):
-        """DEPRECATED LogEntryFactory class attribute of log types."""
-        return cls._logtypes
 
     def create(self, logdata):
         """
