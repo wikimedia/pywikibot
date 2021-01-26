@@ -128,6 +128,53 @@ class APISite(BaseSite):
         self._interwikimap = _InterwikiMap(self)
         self.tokens = TokenWallet(self)
 
+    def interwiki(self, prefix):
+        """
+        Return the site for a corresponding interwiki prefix.
+
+        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
+            the interwiki table doesn't match any of the existing families.
+        @raises KeyError: if the prefix is not an interwiki prefix.
+        """
+        return self._interwikimap[prefix].site
+
+    def interwiki_prefix(self, site):
+        """
+        Return the interwiki prefixes going to that site.
+
+        The interwiki prefixes are ordered first by length (shortest first)
+        and then alphabetically. L{interwiki(prefix)} is not guaranteed to
+        equal C{site} (i.e. the parameter passed to this function).
+
+        @param site: The targeted site, which might be it's own.
+        @type site: L{BaseSite}
+        @return: The interwiki prefixes
+        @rtype: list (guaranteed to be not empty)
+        @raises KeyError: if there is no interwiki prefix for that site.
+        """
+        assert site is not None, 'Site must not be None'
+        prefixes = set()
+        for url in site._interwiki_urls():
+            prefixes.update(self._interwikimap.get_by_url(url))
+        if not prefixes:
+            raise KeyError(
+                "There is no interwiki prefix to '{0}'".format(site))
+        return sorted(prefixes, key=lambda p: (len(p), p))
+
+    def local_interwiki(self, prefix):
+        """
+        Return whether the interwiki prefix is local.
+
+        A local interwiki prefix is handled by the target site like a normal
+        link. So if that link also contains an interwiki link it does follow
+        it as long as it's a local link.
+
+        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
+            the interwiki table doesn't match any of the existing families.
+        @raises KeyError: if the prefix is not an interwiki prefix.
+        """
+        return self._interwikimap[prefix].local
+
     @classmethod
     def fromDBName(cls, dbname, site=None):
         """
