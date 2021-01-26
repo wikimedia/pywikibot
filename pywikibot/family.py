@@ -27,7 +27,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     frozenmap,
-    issue_deprecation_warning,
     ModuleDeprecationWrapper,
 )
 
@@ -356,112 +355,6 @@ class Family:
         'zh': '',
     }
 
-    # A dictionary where keys are family codes that can be used in
-    # inter-family interwiki links. Do not use it directly but
-    # get_known_families() instead.
-
-    # TODO: replace this with API interwikimap call
-    known_families = {family: family for family in (
-        'acronym', 'advisory', 'advogato', 'aew', 'appropedia', 'aquariumwiki',
-        'arborwiki', 'arxiv', 'atmwiki', 'baden', 'battlestarwiki', 'bcnbio',
-        'beacha', 'betawikiversity', 'bibcode', 'bibliowiki', 'bluwiki', 'blw',
-        'botwiki', 'boxrec', 'brickwiki', 'bugzilla', 'bulba', 'c2', 'c2find',
-        'Ĉej', 'cellwiki', 'centralwikia', 'chej', 'choralwiki', 'citizendium',
-        'ckwiss', 'comixpedia', 'commons', 'communityscheme', 'comune',
-        'creativecommonswiki', 'cxej', 'dcc', 'dcdatabase', 'dcma', 'debian',
-        'devmo', 'dictionary', 'disinfopedia', 'distributedproofreaders',
-        'distributedproofreadersca', 'dk', 'dmoz', 'dmozs', 'doom_wiki',
-        'download', 'dbdump', 'dpd', 'drae', 'dreamhost', 'drumcorpswiki',
-        'dwjwiki', 'eĉei', 'ecoreality', 'ecxei', 'elibre', 'emacswiki',
-        'encyc', 'energiewiki', 'englyphwiki', 'enkol', 'eokulturcentro',
-        'esolang', 'etherpad', 'evowiki', 'exotica', 'fanimutationwiki',
-        'finalfantasy', 'finnix', 'floralwiki', 'foldoc', 'foundationsite',
-        'foxwiki', 'freebio', 'freebsdman', 'freeculturewiki',
-        'freedomdefined', 'freefeel', 'freekiwiki', 'ganfyd', 'gardenology',
-        'gausswiki', 'gentoo', 'genwiki', 'gerrit', 'git', 'google',
-        'googledefine', 'googlegroups', 'guildwiki', 'guc', 'gutenberg',
-        'gutenbergwiki', 'hackerspaces', 'h2wiki', 'hammondwiki', 'hdl',
-        'heraldik', 'heroeswiki', 'horizonlabs', 'hrwiki', 'hrfwiki',
-        'hupwiki', 'iarchive', 'imdbname', 'imdbtitle', 'imdbcompany',
-        'imdbcharacter', 'incubator', 'infosecpedia', 'infosphere', 'irc',
-        'ircs', 'rcirc', 'iso639-3', 'issn', 'iuridictum', 'jaglyphwiki',
-        'javanet', 'javapedia', 'jefo', 'jerseydatabase', 'jira', 'jspwiki',
-        'jstor', 'kamelo', 'karlsruhe', 'kinowiki', 'komicawiki', 'kontuwiki',
-        'wikitech', 'libreplanet', 'linguistlist', 'linuxwiki', 'linuxwikide',
-        'liswiki', 'literateprograms', 'livepedia', 'localwiki', 'lojban',
-        'lostpedia', 'lqwiki', 'lugkr', 'luxo', 'm-w', 'mail', 'mailarchive',
-        'mariowiki', 'marveldatabase', 'meatball', 'mediazilla', 'memoryalpha',
-        'metawiki', 'metawikisearch', 'mineralienatlas', 'moinmoin',
-        'monstropedia', 'mosapedia', 'mozcom', 'mozillawiki', 'mozillazinekb',
-        'musicbrainz', 'mwod', 'mwot', 'nkcells', 'nara', 'nosmoke', 'nost',
-        'nostalgia', 'oeis', 'oldwikisource', 'olpc', 'omegawiki', 'onelook',
-        'openlibrary', 'openstreetmap', 'openwetware', 'opera7wiki',
-        'organicdesign', 'orthodoxwiki', 'otrs', 'otrswiki', 'ourmedia',
-        'outreach', 'owasp', 'panawiki', 'patwiki', 'personaltelco', 'petscan',
-        'phabricator', 'phwiki', 'phpwiki', 'planetmath', 'pmeg', 'pmid',
-        'pokewiki', 'policy', 'purlnet', 'pyrev', 'pythonwiki', 'pywiki',
-        'psycle', 'quality', 'quarry', 'rev', 'revo', 'rheinneckar',
-        'robowiki', 'rodovid', 'reuterswiki', 'rowiki', 'rt', 'rtfm',
-        's23wiki', 'schoolswp', 'scores', 'scoutwiki', 'scramble', 'seapig',
-        'seattlewiki', 'slwiki', 'senseislibrary', 'silcode', 'slashdot',
-        'sourceforge', 'spcom', 'species', 'squeak', 'stats', 'stewardry',
-        'strategy', 'strategywiki', 'sulutil', 'swtrain', 'svn', 'tabwiki',
-        'tclerswiki', 'technorati', 'tenwiki', 'testwiki', 'testwikidata',
-        'test2wiki', 'tfwiki', 'thelemapedia', 'theopedia', 'thinkwiki',
-        'ticket', 'tmbw', 'tmnet', 'tmwiki', 'toollabs', 'translatewiki',
-        'tviv', 'tvtropes', 'twiki', 'tyvawiki', 'umap', 'uncyclopedia',
-        'unihan', 'unreal', 'urbandict', 'usej', 'usemod', 'usability',
-        'utrs', 'vikidia', 'vlos', 'vkol', 'voipinfo', 'votewiki', 'werelate',
-        'wg', 'wikia', 'wikibooks', 'wikichristian', 'wikicities', 'wikicity',
-        'wikiconference', 'wikidata', 'wikif1', 'wikifur', 'wikihow',
-        'wikiindex', 'wikilemon', 'wikilivres', 'wikimac-de', 'wikimedia',
-        'wikinews', 'wikinfo', 'wikinvest', 'wikipapers', 'wikipedia',
-        'wikiquote', 'wikisource', 'wikispecies', 'wikispore', 'wikispot',
-        'labsconsole', 'wikiti', 'wikiversity', 'wikivoyage', 'wikiwikiweb',
-        'wiktionary', 'wipipedia', 'wlug', 'wmam', 'wmar', 'wmat', 'wmau',
-        'wmbd', 'wmbe', 'wmbr', 'wmca', 'wmch', 'wmcl', 'wmcn', 'wmco', 'wmcz',
-        'wmdc', 'securewikidc', 'wmdk', 'wmee', 'wmec', 'wmes', 'wmet',
-        'wmfdashboard', 'wmfi', 'wmfr', 'wmhi', 'wmhk', 'wmid', 'wmil', 'wmin',
-        'wmit', 'wmke', 'wmmk', 'wmmx', 'wmnl', 'wmnyc', 'wmno', 'wmpa-us',
-        'wmph', 'wmpl', 'wmpt', 'wmpunjabi', 'wmromd', 'wmrs', 'wmru', 'wmse',
-        'wmsk', 'wmtr', 'wmtw', 'wmua', 'wmuk', 'wmve', 'wmza', 'wm2005',
-        'wm2006', 'wm2007', 'wm2008', 'wm2009', 'wm2010', 'wm2011', 'wm2012',
-        'wm2013', 'wm2014', 'wm2015', 'wm2016', 'wm2017', 'wm2018',
-        'wikimania', 'wmteam', 'wmf', 'wookieepedia', 'wowwiki', 'wqy',
-        'wurmpedia', 'viaf', 'zrhwiki', 'zum', 'zwiki',
-    )}
-
-    known_families.update({
-        'b': 'wikibooks',
-        'betawiki': 'translatewiki',
-        'c': 'commons',
-        'chapter': 'wikimedia',
-        'dict': 'dictionary',
-        'foundation': 'wikimedia',
-        'gucprefix': 'guc',
-        'm': 'meta',
-        'mw': 'mediawiki',
-        'meta': 'metawiki',
-        'metawikimedia': 'metawiki',
-        'metawikipedia': 'metawiki',
-        'n': 'wikinews',
-        'outreachwiki': 'outreach',
-        'phab': 'phabricator',
-        'pokéwiki': 'pokewiki',
-        'q': 'wikiquote',
-        's': 'wikisource',
-        'toolforge': 'toollabs',
-        'v': 'wikiversity',
-        'voy': 'wikivoyage',
-        'w': 'wikipedia',
-        'wikiasite': 'wikia',
-        'wikipediawikipedia': 'wikipedia',
-        'wikisophia': 'wikisophoa',
-        'wikiskripta': 'wikiscripta',
-        'wikt': 'wiktionary',
-        'wmania': 'wikimania',
-    })
-
     # A list of category redirect template names in different languages
     category_redirect_templates = {
         '_default': []
@@ -647,21 +540,6 @@ class Family:
 
     _families = {}
 
-    def __getattribute__(self, name):
-        """
-        Check if attribute is deprecated and warn accordingly.
-
-        This is necessary as subclasses could prevent that message by using a
-        class variable. Only penalize getting it because it must be set so that
-        the backwards compatibility is still available.
-        """
-        if name == 'known_families':
-            issue_deprecation_warning('known_families',
-                                      'APISite.interwiki(prefix)',
-                                      warning_class=FutureWarning,
-                                      since='20150503')
-        return super().__getattribute__(name)
-
     @staticmethod
     @deprecated_args(fatal=None)
     def load(fam: Optional[str] = None):
@@ -721,11 +599,6 @@ class Family:
                               FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
-
-    @deprecated('APISite.interwiki', since='20151014', future_warning=True)
-    def get_known_families(self, code):
-        """DEPRECATED: Return dict of inter-family interwiki links."""
-        return self.known_families
 
     def linktrail(self, code, fallback='_default'):
         """Return regex for trailing chars displayed as part of a link.

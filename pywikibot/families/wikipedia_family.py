@@ -214,18 +214,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'de': ('Archiv',),
     }
 
-    def get_known_families(self, code):
-        """Override the family interwiki prefixes for each site."""
-        # In Swedish Wikipedia 's:' is part of page title not a family
-        # prefix for 'wikisource'.
-        if code == 'sv':
-            d = self.known_families.copy()
-            d.pop('s')
-            d['src'] = 'wikisource'
-            return d
-
-        return self.known_families
-
     def encodings(self, code):
         """Return a list of historical encodings for a specific site."""
         # Historic compatibility
