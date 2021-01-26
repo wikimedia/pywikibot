@@ -1853,6 +1853,7 @@ class Request(MutableMapping):
                                  'help': result['error']['help']}}
 
             pywikibot.warning('API error %s: %s' % (code, info))
+            pywikibot.log('           headers=\n{}'.format(response.headers))
 
             if self._internal_api_error(code, error, result):
                 continue
