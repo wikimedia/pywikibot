@@ -17,7 +17,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
-        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mus', 'ng', 'ten',
+        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'ng',
+        'ten',
     ]
 
     removed_wikis = [
@@ -56,7 +57,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'srn', 'om', 'gcr', 'ltg', 'sm', 'chr', 'nqo', 'got', 'mnw', 'pih',
         'kl', 'st', 'ny', 'cu', 'tw', 'tn', 'ts', 'bm', 'rmy', 'chy', 'rn',
         'tum', 'mad', 'ss', 'ch', 'iu', 'ks', 'pnt', 'nia', 'ady', 've', 'ee',
-        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr', 'lrc',
+        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
