@@ -2347,17 +2347,16 @@ class FilePage(Page):
             self.site.loadimageinfo(self, history=True)
         return self._file_revisions
 
-    def getImagePageHtml(self):
-        """
-        Download the file page, and return the HTML, as a string.
+    def getImagePageHtml(self) -> str:
+        """Download the file page, and return the HTML, as a string.
 
         Caches the HTML code, so that if you run this method twice on the
         same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
-            path = '%s/index.php?title=%s' \
-                   % (self.site.scriptpath(), self.title(as_url=True))
-            self._imagePageHtml = http.request(self.site, path)
+            path = '{}/index.php?title={}'.format(self.site.scriptpath(),
+                                                  self.title(as_url=True))
+            self._imagePageHtml = http.request(self.site, path).text
         return self._imagePageHtml
 
     @deprecated('get_file_url', since='20160609', future_warning=True)
