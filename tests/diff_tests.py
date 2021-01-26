@@ -91,7 +91,8 @@ class TestNoBeautifulSoup(TestCase):
 
     def test_html_comparator(self, mocked_import):
         """Test html_comparator when bs4 not installed."""
-        self.assertRaises(ImportError, html_comparator, '')
+        with self.assertRaises(ImportError):
+            html_comparator('')
         self.assertEqual(mocked_import.call_count, 1)
         self.assertIn('bs4', mocked_import.call_args[0])
 
