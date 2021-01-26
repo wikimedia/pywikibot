@@ -285,6 +285,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+
+    | preload_sites.py       | Preload and cache site information for each WM family.  |
+    +------------------------+---------------------------------------------------------+
     | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
     +------------------------+---------------------------------------------------------+
     | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
