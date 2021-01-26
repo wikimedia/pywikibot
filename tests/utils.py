@@ -15,20 +15,22 @@ from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
 from types import ModuleType
 
-try:
-    from cryptography import __version__ as cryptography_version
-    cryptography_version = list(map(int, cryptography_version.split('.')))
-except ImportError:
-    cryptography_version = None
+from requests import Response
 
 import pywikibot
-from pywikibot.comms import threadedhttp
+
 from pywikibot import config
 from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
 from tests import _pwb_py, unittest
+
+try:
+    from cryptography import __version__ as cryptography_version
+    cryptography_version = list(map(int, cryptography_version.split('.')))
+except ImportError:
+    cryptography_version = None
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -475,9 +477,9 @@ class DummyHttp(object):
         result = self.__wrapper.before_fetch(*args, **kwargs)
         if result is False:
             result = self.__wrapper._old_http.fetch(*args, **kwargs)
-        elif not isinstance(result, threadedhttp.HttpRequest):
-            raise ValueError('The result is not a valid type '
-                             '"{0}"'.format(type(result)))
+        elif not isinstance(result, Response):
+            raise ValueError('The result is not a valid type "{}"'
+                             .format(type(result)))
         response = self.__wrapper.after_fetch(result, *args, **kwargs)
         if response is None:
             response = result
@@ -503,7 +505,7 @@ class PatchedHttp(object):
 
     The data returned for C{request} may either be C{False}, a C{str} or a
     C{Mapping} which is converted into a json string. The data returned for
-    C{fetch} can only be C{False} or a L{threadedhttp.HttpRequest}. For both
+    C{fetch} can only be C{False} or a L{requests.Response}. For both
     variants any other types are not allowed and if it is False it'll use the
     original method and do an actual request.
 
