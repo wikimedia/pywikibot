@@ -1,6 +1,6 @@
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -295,8 +295,8 @@ class TestTWTranslate(TWNTestCaseBase):
 
     def testNoEnglish(self):
         """Test translating into English with missing entry."""
-        self.assertRaises(i18n.TranslationError, i18n.twtranslate,
-                          'en', 'test-no-english')
+        with self.assertRaises(i18n.TranslationError):
+            i18n.twtranslate('en', 'test-no-english')
 
 
 class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
@@ -466,8 +466,8 @@ class ScriptMessagesTestCase(TWNTestCaseBase, AutoDeprecationTestCase):
 
     def test_missing(self):
         """Test a missing message from a real message bundle."""
-        self.assertRaises(i18n.TranslationError,
-                          i18n.twntranslate, 'en', 'pywikibot-missing-key')
+        with self.assertRaises(i18n.TranslationError):
+            i18n.twntranslate('en', 'pywikibot-missing-key')
 
 
 class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):

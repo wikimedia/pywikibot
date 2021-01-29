@@ -122,7 +122,8 @@ class TestLogentriesBase(TestCase):
             else:
                 self.assertIsInstance(logentry.page(), pywikibot.Page)
         else:
-            self.assertRaises(KeyError, logentry.page)
+            with self.assertRaises(KeyError):
+                logentry.page()
 
         self.assertEqual(logentry.type(), logtype)
         self.assertIsInstance(logentry.user(), str)
@@ -312,7 +313,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
                 self.assertIsInstance(logentry.title(), pywikibot.Page)
                 self.assertIs(logentry.title(), logentry.page())
             else:
-                self.assertRaises(KeyError, logentry.title)
+                with self.assertRaises(KeyError):
+                    logentry.title()
             self.assertDeprecation()  # T271044
         self._reset_messages()  # T271044
 

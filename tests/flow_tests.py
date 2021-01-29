@@ -165,19 +165,26 @@ class TestFlowFactoryErrors(TestCase):
         real_topic = Topic(self.site, 'Topic:Slbktgav46omarsd')
         fake_topic = Topic(self.site, 'Topic:Abcdefgh12345678')
         # Topic.from_topiclist_data
-        self.assertRaises(TypeError, Topic.from_topiclist_data, self.site,
-                          '', {})
-        self.assertRaises(TypeError, Topic.from_topiclist_data, board, 521, {})
-        self.assertRaises(TypeError, Topic.from_topiclist_data, board,
-                          'slbktgav46omarsd', [0, 1, 2])
-        self.assertRaises(NoPage, Topic.from_topiclist_data, board,
-                          'abc', {'stuff': 'blah'})
+        with self.assertRaises(TypeError):
+            Topic.from_topiclist_data(self.site, '', {})
+        with self.assertRaises(TypeError):
+            Topic.from_topiclist_data(board, 521, {})
+        with self.assertRaises(TypeError):
+            Topic.from_topiclist_data(board,
+                                      'slbktgav46omarsd', [0, 1, 2])
+        with self.assertRaises(NoPage):
+            Topic.from_topiclist_data(board,
+                                      'abc', {'stuff': 'blah'})
 
         # Post.fromJSON
-        self.assertRaises(TypeError, Post.fromJSON, board, 'abc', {})
-        self.assertRaises(TypeError, Post.fromJSON, real_topic, 1234, {})
-        self.assertRaises(TypeError, Post.fromJSON, real_topic, 'abc', [])
-        self.assertRaises(NoPage, Post.fromJSON, fake_topic, 'abc',
+        with self.assertRaises(TypeError):
+            Post.fromJSON(board, 'abc', {})
+        with self.assertRaises(TypeError):
+            Post.fromJSON(real_topic, 1234, {})
+        with self.assertRaises(TypeError):
+            Post.fromJSON(real_topic, 'abc', [])
+        with self.assertRaises(NoPage):
+            Post.fromJSON(fake_topic, 'abc',
                           {'posts': [], 'revisions': []})
 
     def test_invalid_data(self):
@@ -185,28 +192,36 @@ class TestFlowFactoryErrors(TestCase):
         board = Board(self.site, 'Talk:Pywikibot test')
         real_topic = Topic(self.site, 'Topic:Slbktgav46omarsd')
         # Topic.from_topiclist_data
-        self.assertRaises(ValueError, Topic.from_topiclist_data,
-                          board, 'slbktgav46omarsd', {'stuff': 'blah'})
-        self.assertRaises(ValueError, Topic.from_topiclist_data,
-                          board, 'slbktgav46omarsd',
-                          {'posts': [], 'revisions': []})
-        self.assertRaises(ValueError, Topic.from_topiclist_data, board,
-                          'slbktgav46omarsd',
-                          {'posts': {'slbktgav46omarsd': ['123']},
-                           'revisions': {'456': []}})
-        self.assertRaises(AssertionError, Topic.from_topiclist_data, board,
-                          'slbktgav46omarsd',
-                          {'posts': {'slbktgav46omarsd': ['123']},
-                           'revisions': {'123': {'content': 789}}})
+        with self.assertRaises(ValueError):
+            Topic.from_topiclist_data(board,
+                                      'slbktgav46omarsd', {'stuff': 'blah'})
+        with self.assertRaises(ValueError):
+            Topic.from_topiclist_data(board,
+                                      'slbktgav46omarsd',
+                                      {'posts': [], 'revisions': []})
+        with self.assertRaises(ValueError):
+            Topic.from_topiclist_data(board,
+                                      'slbktgav46omarsd',
+                                      {'posts': {'slbktgav46omarsd': ['123']},
+                                       'revisions': {'456': []}})
+        with self.assertRaises(AssertionError):
+            Topic.from_topiclist_data(board,
+                                      'slbktgav46omarsd',
+                                      {'posts': {'slbktgav46omarsd': ['123']},
+                                       'revisions': {'123': {'content': 789}}})
 
         # Post.fromJSON
-        self.assertRaises(ValueError, Post.fromJSON, real_topic, 'abc', {})
-        self.assertRaises(ValueError, Post.fromJSON, real_topic, 'abc',
+        with self.assertRaises(ValueError):
+            Post.fromJSON(real_topic, 'abc', {})
+        with self.assertRaises(ValueError):
+            Post.fromJSON(real_topic, 'abc',
                           {'stuff': 'blah'})
-        self.assertRaises(ValueError, Post.fromJSON, real_topic, 'abc',
+        with self.assertRaises(ValueError):
+            Post.fromJSON(real_topic, 'abc',
                           {'posts': {'abc': ['123']},
                            'revisions': {'456': []}})
-        self.assertRaises(AssertionError, Post.fromJSON, real_topic, 'abc',
+        with self.assertRaises(AssertionError):
+            Post.fromJSON(real_topic, 'abc',
                           {'posts': {'abc': ['123']},
                            'revisions': {'123': {'content': 789}}})
 

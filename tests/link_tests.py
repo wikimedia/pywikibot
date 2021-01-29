@@ -942,15 +942,18 @@ class TestEmptyTitle(TestCase):
     def test_interwiki_namespace_without_title(self):
         """Test that Link doesn't allow links without a title."""
         link = Link('en:Help:', self.get_site())
-        self.assertRaisesRegex(
-            InvalidTitle, "'en:Help:' has no title.", link.parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                "'en:Help:' has no title."):
+            link.parse()
 
     def test_no_text(self):
         """Test that Link doesn't allow empty."""
         link = Link('', self.get_site())
-        self.assertRaisesRegex(
-            InvalidTitle, 'The link does not contain a page title',
-            link.parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                'The link does not contain a page title'):
+            link.parse()
 
     def test_namespace_lookalike(self):
         """Test that Link does only detect valid namespaces."""

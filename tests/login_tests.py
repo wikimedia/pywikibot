@@ -4,7 +4,7 @@ Tests for LoginManager classes.
 e.g. used to test password-file based login.
 """
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,8 +72,10 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
         del FakeConfig.usernames['*']
         FakeConfig.usernames['*']['en'] = FakeUsername
         error_undefined_username = 'ERROR: username for.*is undefined.\nIf'
-        self.assertRaisesRegex(NoUsername, error_undefined_username,
-                               LoginManager)
+        with self.assertRaisesRegex(
+                NoUsername,
+                error_undefined_username):
+            LoginManager()
         FakeConfig.usernames['*']['*'] = FakeUsername
         lm = LoginManager()
         self.assertEqual(lm.username, FakeUsername)

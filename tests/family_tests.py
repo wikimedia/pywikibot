@@ -1,6 +1,6 @@
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -60,11 +60,10 @@ class TestFamily(TestCase):
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""
-        self.assertRaisesRegex(
-            UnknownFamily,
-            self.UNKNOWNFAMILY_RE,
-            Family.load,
-            'unknown')
+        with self.assertRaisesRegex(
+                UnknownFamily,
+                self.UNKNOWNFAMILY_RE):
+            Family.load('unknown')
 
     def test_new_same_family_singleton(self):
         """Test that two same Family are the same object and equal."""
@@ -98,11 +97,10 @@ class TestFamily(TestCase):
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'unknown'
-        self.assertRaisesRegex(
-            UnknownFamily,
-            self.UNKNOWNFAMILY_RE,
-            family.__eq__,
-            other)
+        with self.assertRaisesRegex(
+                UnknownFamily,
+                self.UNKNOWNFAMILY_RE):
+            family.__eq__(other)
 
     def test_get_obsolete_wp(self):
         """Test three types of obsolete codes."""
@@ -197,11 +195,11 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(f.from_url(prefix + '/w/index.php?title=Foo'), 'vo')
 
         # Text after $1 is not allowed
-        self.assertRaisesRegex(
-            ValueError,
-            r'Text after the \$1 placeholder is not supported \(T111513\)',
-            f.from_url,
-            '//vo.wikipedia.org/wiki/$1/foo')
+        with self.assertRaisesRegex(
+                ValueError,
+                r'Text after the \$1 placeholder is not supported'
+                r' \(T111513\)'):
+            f.from_url('//vo.wikipedia.org/wiki/$1/foo')
 
         # the IWM may contain the wrong protocol, but it's only used to
         # determine a site so using HTTP or HTTPS is not an issue

@@ -1,6 +1,6 @@
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -97,9 +97,10 @@ class HttpsCertificateTestCase(TestCase):
 
     def test_https_cert_error(self):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
-        self.assertRaisesRegex(
-            pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE, http.fetch,
-            'https://testssl-expire-r2i2.disig.sk/index.en.html')
+        with self.assertRaisesRegex(
+                pywikibot.FatalServerError,
+                self.CERT_VERIFY_FAILED_RE):
+            http.fetch('https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         with warnings.catch_warnings(record=True) as warning_log:
@@ -111,9 +112,10 @@ class HttpsCertificateTestCase(TestCase):
         http.session.close()  # clear the connection
 
         # Verify that it now fails again
-        self.assertRaisesRegex(
-            pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE, http.fetch,
-            'https://testssl-expire-r2i2.disig.sk/index.en.html')
+        with self.assertRaisesRegex(
+                pywikibot.FatalServerError,
+                self.CERT_VERIFY_FAILED_RE):
+            http.fetch('https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         # Verify that the warning occurred
@@ -139,26 +141,27 @@ class TestHttpStatus(HttpbinTestCase):
 
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
-        self.assertRaisesRegex(pywikibot.Server504Error,
-                               r'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
-                               http.fetch,
-                               self.get_httpbin_url('/status/504'))
+        with self.assertRaisesRegex(
+                pywikibot.Server504Error,
+                r'Server ([^\:]+|[^\:]+:[0-9]+)'
+                r' timed out'):
+            http.fetch(self.get_httpbin_url('/status/504'))
 
     def test_server_not_found(self):
         """Test server not found exception."""
-        self.assertRaisesRegex(requests.exceptions.ConnectionError,
-                               'Max retries exceeded with url: /w/api.php',
-                               http.fetch,
-                               'http://ru-sib.wikipedia.org/w/api.php',
-                               default_error_handling=True)
+        with self.assertRaisesRegex(
+                requests.exceptions.ConnectionError,
+                'Max retries exceeded with url: /w/api.php'):
+            http.fetch('http://ru-sib.wikipedia.org/w/api.php',
+                       default_error_handling=True)
 
     def test_invalid_scheme(self):
         """Test invalid scheme."""
         # A InvalidSchema is raised within requests
-        self.assertRaisesRegex(
-            requests.exceptions.InvalidSchema,
-            "No connection adapters were found for u?'invalid://url'",
-            http.fetch, 'invalid://url')
+        with self.assertRaisesRegex(
+                requests.exceptions.InvalidSchema,
+                "No connection adapters were found for u?'invalid://url'"):
+            http.fetch('invalid://url')
 
     def test_follow_redirects(self):
         """Test follow 301 redirects correctly."""
@@ -294,16 +297,18 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
         # Empty value
-        self.assertRaisesRegex(ValueError,
-                               'Invalid parameter: use_fake_user_agent',
-                               http.fetch, self.get_httpbin_url('/status/200'),
-                               use_fake_user_agent='')
+        with self.assertRaisesRegex(
+                ValueError,
+                'Invalid parameter: use_fake_user_agent'):
+            http.fetch(self.get_httpbin_url('/status/200'),
+                       use_fake_user_agent='')
 
         # Parameter wrongly set to None
-        self.assertRaisesRegex(ValueError,
-                               'Invalid parameter: use_fake_user_agent',
-                               http.fetch, self.get_httpbin_url('/status/200'),
-                               use_fake_user_agent=None)
+        with self.assertRaisesRegex(
+                ValueError,
+                'Invalid parameter: use_fake_user_agent'):
+            http.fetch(self.get_httpbin_url('/status/200'),
+                       use_fake_user_agent=None)
 
         # Manually overridden domains
         config.fake_user_agent_exceptions = {
@@ -503,9 +508,10 @@ class CharsetTestCase(TestCase):
             data=CharsetTestCase.LATIN1_BYTES)
         # Ignore WARNING: Encoding "utf16" requested but "utf-8" received
         with patch('pywikibot.warning'):
-            self.assertRaisesRegex(
-                UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
-                http._decide_encoding, resp, charset)
+            with self.assertRaisesRegex(
+                    UnicodeDecodeError,
+                    self.CODEC_CANT_DECODE_RE):
+                http._decide_encoding(resp, charset)
         self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
 
         try:
@@ -514,9 +520,10 @@ class CharsetTestCase(TestCase):
             resp.encoding = e
 
         with patch('pywikibot.error'):
-            self.assertRaisesRegex(
-                UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
-                http.error_handling_callback, resp)
+            with self.assertRaisesRegex(
+                    UnicodeDecodeError,
+                    self.CODEC_CANT_DECODE_RE):
+                http.error_handling_callback(resp)
 
         # TODO: this is a breaking change
         # self.assertRaisesRegex(
