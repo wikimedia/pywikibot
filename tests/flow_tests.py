@@ -65,7 +65,7 @@ class TestTopicBasePageMethods(BasePageMethodsTestBase):
         self._test_invoke()
         self._test_return_datatypes()
         self.assertFalse(self._page.isRedirectPage())
-        self.assertEqual(self._page.latest_revision.parent_id, 0)
+        self.assertEqual(self._page.latest_revision.parentid, 0)
 
     def test_content_model(self):
         """Test Flow topic page content model."""
