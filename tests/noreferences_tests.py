@@ -1,6 +1,6 @@
 """Test noreferences bot module."""
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,7 +20,7 @@ class TestAddingReferences(TestCase):
     def test_add(self):
         """Test adding references section."""
         page = pywikibot.Page(self.site, 'foo')
-        bot = NoReferencesBot(None)
+        bot = NoReferencesBot()
         bot.site = self.site
         page.text = '\n== Reference ==\n* [http://www.baz.org Baz]'
         new_text = bot.addReferences(page.text)
@@ -31,7 +31,7 @@ class TestAddingReferences(TestCase):
     def test_add_under_templates(self):
         """Test adding references section under templates in section."""
         page = pywikibot.Page(self.site, 'foo')
-        bot = NoReferencesBot(None)
+        bot = NoReferencesBot()
         bot.site = self.site
         page.text = '\n== Reference ==\n{{Překlad|en|Baz|123456}}'
         new_text = bot.addReferences(page.text)
