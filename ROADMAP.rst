@@ -4,18 +4,20 @@ Current release changes
 Breaking changes
 ^^^^^^^^^^^^^^^^
 
+* Return requests.Response with http.request() instead of plain text (T265206)
 * config.db_hostname has been renamed to db_hostname_format
 
 Other changes
 ^^^^^^^^^^^^^
 
-* (no changes yet)
+* Add enabled_options, disabled_options to GeneratorFactory (T271320)
+* Move interwiki() interwiki_prefix() and local_interwiki() methods from BaseSite to APISite
+* Add requests.Response.headers to log when an API error occurs (T272325)
+* Unused comms.threadedhttp module was removed; threadedhttp.HttpRequest was already replaced with requests.Response (T265206)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
-* 5.6.0: comms.http.request() will return a requests.Response object rather than plain text (T265206)
-* 5.6.0: comms.threadedhttp module will be removed (T265206)
 * 5.6.0: APISite.loadimageinfo will no longer return any content
 * 5.6.0: pagenenerators.handleArg() method will be removed in favour of handle_arg() (T271437)
 * 5.5.0: Deprecated data attribute of http.fetch() result will be given up (T265206)
