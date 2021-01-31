@@ -104,6 +104,7 @@ class TestPwb(PwbTestCase):
         with self.subTest(line=2):
             self.assertEqual(stderr.readline().strip(), result[2])
 
+    @unittest.skip('No multiple results currently')
     def test_similar_scripts_found(self):
         """Test script call which gives multiple similar results."""
         result = [
