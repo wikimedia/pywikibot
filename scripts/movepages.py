@@ -31,7 +31,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -187,10 +187,9 @@ def main(*args) -> None:
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
+    local_args = genFactory.handle_args(local_args)
 
     for arg in local_args:
-        if genFactory.handle_arg(arg):
-            continue
         if arg.startswith('-pairsfile'):
             if len(arg) == len('-pairsfile'):
                 filename = pywikibot.input(

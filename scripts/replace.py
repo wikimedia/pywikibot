@@ -135,7 +135,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -832,13 +832,11 @@ def main(*args):
     replacement_file_arg_misplaced = False
 
     # Read commandline parameters.
-
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
+    local_args = genFactory.handle_args(local_args)
 
     for arg in local_args:
-        if genFactory.handle_arg(arg):
-            continue
         if arg == '-regex':
             regex = True
         elif arg.startswith('-xmlstart'):

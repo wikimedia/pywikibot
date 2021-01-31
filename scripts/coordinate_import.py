@@ -160,10 +160,11 @@ def main(*args: Tuple[str, ...]) -> None:
     local_args = pywikibot.handle_args(args)
     generator_factory = pagegenerators.GeneratorFactory()
 
+    # Process pagegenerators args
+    local_args = generator_factory.handle_args(local_args)
+
     create_new = False
     for arg in local_args:
-        if generator_factory.handle_arg(arg):
-            continue
         if arg == '-create':
             create_new = True
 
