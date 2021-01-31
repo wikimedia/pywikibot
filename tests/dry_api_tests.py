@@ -1,6 +1,6 @@
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -302,24 +302,6 @@ class DryMimeTests(TestCase):
                      {'filename': local_filename})
         })
         self.assertNotEqual(body.find(file_content), -1)
-
-
-class MimeTests(DefaultDrySiteTestCase):
-
-    """Test MIME request handling with a real site."""
-
-    def test_upload_object(self):
-        """Test Request object prepared to upload."""
-        # fake write test needs the config username
-        site = self.get_site()
-        site._username = 'myusername'
-        site._userinfo = {'name': 'myusername', 'groups': [], 'id': '1'}
-        parameters = {'action': 'upload', 'file': 'MP_sounds.png',
-                      'filename': join_images_path('MP_sounds.png')}
-        req = Request(site=site, mime=True, parameters=parameters)
-        with self.assertRaises(AssertionError):
-            assert req.mime is True
-        self.assertEqual(req.mime, {})
 
 
 class ParamInfoDictTests(DefaultDrySiteTestCase):
