@@ -398,7 +398,7 @@ class APISite(BaseSite):
         the internal login state does not match the state we receive
         from the site.
         """
-        del self._userinfo
+        del self.userinfo
         self._loginstatus = _LoginStatus.NOT_LOGGED_IN
         self.login()
 
@@ -422,7 +422,7 @@ class APISite(BaseSite):
         self._loginstatus = _LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
-        del self._userinfo
+        del self.userinfo
         self.tokens = TokenWallet(self)
         self._paraminfo = api.ParamInfo(self)
 
