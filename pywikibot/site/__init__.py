@@ -10,7 +10,6 @@ groups of wikis on the same topic in different languages.
 # Distributed under the terms of the MIT license.
 #
 import datetime
-import functools
 import heapq
 import inspect
 import itertools
@@ -5941,92 +5940,6 @@ class DataSite(APISite):
                  UserWarning, 3)
 
         return baserevid
-
-    def __getattr__(self, attr):
-        """
-        Provide data access methods.
-
-        Methods provided are get_info, get_sitelinks, get_aliases,
-        get_labels, get_descriptions, and get_urls.
-        """
-        if hasattr(self.__class__, attr):
-            return getattr(self.__class__, attr)
-        if attr.startswith('get_'):
-            props = attr.replace('get_', '')
-            if props in ['info', 'sitelinks', 'aliases', 'labels',
-                         'descriptions', 'urls']:
-                if props == 'info':
-                    instead = (
-                        '\n'
-                        "{'lastrevid': ItemPage.latest_revision_id,\n"
-                        " 'pageid': ItemPage.pageid,\n"
-                        " 'title': ItemPage.title(),\n"
-                        " 'modified': ItemPage._timestamp,\n"
-                        " 'ns': ItemPage.namespace(),\n"
-                        " 'type': ItemPage.entity_type, # for subclasses\n"
-                        " 'id': ItemPage.id"
-                        '}\n')
-                elif props == 'sitelinks':
-                    instead = 'ItemPage.sitelinks'
-                elif props in ('aliases', 'labels', 'descriptions'):
-                    instead = ('ItemPage.{0} after ItemPage.get()'
-                               .format(attr))
-                else:  # urls
-                    instead = None
-                issue_deprecation_warning('DataSite.{0}()'.format(attr),
-                                          instead, warning_class=FutureWarning,
-                                          since='20151022')
-                if props == 'urls':
-                    props = 'sitelinks/urls'
-                method = self._get_propertyitem
-                f = functools.partial(method, props)
-                if hasattr(method, '__doc__'):
-                    f.__doc__ = method.__doc__
-                return f
-
-        return super().__getattr__(attr)
-
-    def _get_propertyitem(self, props, source, **params):
-        """Generic method to get the data for multiple Wikibase items."""
-        wbdata = self._get_item(source, props=props, **params)
-        if props == 'info':
-            return wbdata
-
-        if props == 'sitelinks/urls':
-            props = 'sitelinks'
-
-        assert props in wbdata, \
-            'API wbgetentities response lacks %s key' % props
-        return wbdata[props]
-
-    # Only separated from get_item to avoid the deprecation message via
-    # _get_propertyitem
-    def _get_item(self, source, **params):
-        assert set(params) <= {'props'}, \
-            'Only "props" is a valid kwarg, not {0}'.format(set(params)
-                                                            - {'props'})
-        try:
-            source = int(source)
-        except ValueError:
-            raise NotImplementedError
-        ids = 'q' + str(source)
-        params = merge_unique_dicts(params, action='wbgetentities',
-                                    ids=ids)
-        wbrequest = self._simple_request(**params)
-        wbdata = wbrequest.submit()
-        assert 'success' in wbdata, \
-            "API wbgetentities response lacks 'success' key"
-        assert wbdata['success'] == 1, "API 'success' key is not 1"
-        assert 'entities' in wbdata, \
-            "API wbgetentities response lacks 'entities' key"
-
-        if ids.upper() in wbdata['entities']:
-            ids = ids.upper()
-
-        assert ids in wbdata['entities'], \
-            'API wbgetentities response lacks %s key' % ids
-
-        return wbdata['entities'][ids]
 
     def data_repository(self):
         """

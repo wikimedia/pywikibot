@@ -2428,56 +2428,6 @@ class TestJSON(WikidataTestCase):
         self.assertEqual(diff, expected)
 
 
-class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
-
-    """Test deprecated DataSite get_* methods."""
-
-    cached = True
-
-    def test_get_info(self):
-        """Test get_info."""
-        data = self.repo.get_info(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('title', data)
-        self.assertEqual(data['title'], 'Q60')
-
-    def test_get_labels(self):
-        """Test get_labels."""
-        data = self.repo.get_labels(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('en', data)
-
-    def test_get_aliases(self):
-        """Test get_aliases."""
-        data = self.repo.get_aliases(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('fr', data)  # T170073
-
-    def test_get_descriptions(self):
-        """Test get_descriptions."""
-        data = self.repo.get_descriptions(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('en', data)
-
-    def test_get_sitelinks(self):
-        """Test get_sitelinks."""
-        data = self.repo.get_sitelinks(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('enwiki', data)
-
-    def test_get_urls(self):
-        """Test get_urls."""
-        data = self.repo.get_urls(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('enwiki', data)
-
-
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
         unittest.main()
