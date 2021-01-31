@@ -122,7 +122,5 @@ class Revision(Mapping):
         this returns the content model of the main slot.
 
         @return: content model
-        @raises AssertionError: content model not supplied to the constructor
-            which always occurs for MediaWiki versions lower than 1.21.
         """
         return self.contentmodel
