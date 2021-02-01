@@ -324,11 +324,11 @@ class RedirectFilterPageGeneratorTestCase(TestCase):
     code = 'en'
 
     def test_redirect_filter(self):
-        """Test RedirectFilterPageGenerator."""
+        """Test RedirectFilterPageGenerator with handle_args()."""
         from pywikibot.pagegenerators import RedirectFilterPageGenerator
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handle_arg('-randomredirect:3')
-        gf.handle_arg('-page:Main_Page')
+        args = gf.handle_args(['-randomredirect:3', '-page:Main_Page'])
+        self.assertIsEmpty(args)
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         gen = RedirectFilterPageGenerator(pages, no_redirects=True)

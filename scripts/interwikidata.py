@@ -22,7 +22,7 @@ Furthermore, the following command line parameters are supported:
 -summary:         Use your own edit summary for cleaning the page.
 """
 
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -221,10 +221,10 @@ def main(*args) -> None:
     """
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
+    local_args = gen_factory.handle_args(local_args)
+
     options = {}
     for arg in local_args:
-        if gen_factory.handle_arg(arg):
-            continue
         option, sep, value = arg.partition(':')
         option = option[1:] if option.startswith('-') else None
         if option == 'summary':

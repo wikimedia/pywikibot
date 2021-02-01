@@ -156,14 +156,11 @@ def main(*args: Tuple[str, ...]) -> None:
     # to work on.
     gen_factory = pagegenerators.GeneratorFactory()
 
-    # Parse command line arguments
+    # Process pagegenerators arguments
+    local_args = gen_factory.handle_args(local_args)
+
+    # Parse your own command line arguments
     for arg in local_args:
-
-        # Catch the pagegenerators options
-        if gen_factory.handle_arg(arg):
-            continue  # nothing to do here
-
-        # Now pick up your own options
         arg, sep, value = arg.partition(':')
         option = arg[1:]
         if option in ('summary', 'text'):

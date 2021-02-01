@@ -23,7 +23,7 @@ Purge mode:
 &params;
 """
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -91,14 +91,13 @@ def main(*args) -> None:
     """
     options = {}
 
-    # Process global args and prepare generator args parser
+    # Process global and pagegenerators args
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
+    local_args = gen_factory.handle_args(local_args)
 
     bot_class = TouchBot
     for arg in local_args:
-        if gen_factory.handle_arg(arg):
-            continue
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg.startswith('-'):

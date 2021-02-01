@@ -432,6 +432,9 @@ class GeneratorFactory:
 
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
+
+    :Note: GeneratorFactory must be instantiated after global arguments are
+        parsed except if site parameter is given.
     """
 
     def __init__(self, site=None,
@@ -1205,6 +1208,10 @@ class GeneratorFactory:
             raise NotImplementedError(
                 'Invalid -logevents parameter "{0}"'.format(params[0]))
         return self._parse_log_events(*params)
+
+    def handle_args(self, args: Iterable[str]) -> List[str]:
+        """Handle command line arguments and return the rest as a list."""
+        return [arg for arg in args if not self.handle_arg(arg)]
 
     def handle_arg(self, arg: str) -> bool:
         """Parse one argument at a time.
