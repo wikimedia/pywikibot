@@ -43,7 +43,7 @@ exceptions = {
 }
 
 
-def preload_family(family):
+def preload_family(family, executor):
     """Preload all sites of a single family file."""
     msg = 'Preloading sites of {} family{}'
     pywikibot.output(msg.format(family, '...'))
@@ -54,11 +54,13 @@ def preload_family(family):
             codes.remove(code)
     obsolete = Family.load(family).obsolete
 
+    futures = set()
     for code in codes:
         if code not in obsolete:
             site = pywikibot.Site(code, family)
-            pywikibot.Page(site, 'Main page')  # title does not care
-
+            # page title does not care
+            futures.add(executor.submit(pywikibot.Page, site, 'Main page'))
+    wait(futures)
     pywikibot.output(msg.format(family, ' completed.'))
 
 
@@ -66,8 +68,8 @@ def preload_families(families, worker):
     """Preload all sites of all given family files."""
     start = datetime.now()
     with ThreadPoolExecutor(worker) as executor:
-        futures = {executor.submit(preload_family, family):
-                   family for family in families}
+        futures = {executor.submit(preload_family, family, executor)
+                   for family in families}
         wait(futures)
     pywikibot.output('Loading time used: {}'.format(datetime.now() - start))
 
