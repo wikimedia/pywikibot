@@ -1,6 +1,6 @@
 """Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,23 +71,31 @@ class TestMediaWikiVersion(TestCase):
 
     def test_invalid_versions(self):
         """Verify that insufficient version fail creating."""
-        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE,
-                               MediaWikiVersion, 'invalid')
-        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE,
-                               MediaWikiVersion, '1number')
-        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE,
-                               MediaWikiVersion, '1.missing')
-
-        self.assertRaisesRegex(AssertionError, 'Found \"wmf\" in \"wmf-1\"',
-                               MediaWikiVersion, '1.23wmf-1')
+        with self.assertRaisesRegex(
+                ValueError,
+                self.INVALID_VERSION_RE):
+            MediaWikiVersion('invalid')
+        with self.assertRaisesRegex(
+                ValueError,
+                self.INVALID_VERSION_RE):
+            MediaWikiVersion('1number')
+        with self.assertRaisesRegex(
+                ValueError,
+                self.INVALID_VERSION_RE):
+            MediaWikiVersion('1.missing')
+        with self.assertRaisesRegex(
+                AssertionError,
+                'Found \"wmf\" in \"wmf-1\"'):
+            MediaWikiVersion('1.23wmf-1')
 
     def test_generator(self):
         """Test from_generator classmethod."""
         self.assertEqual(MediaWikiVersion.from_generator('MediaWiki 1.2.3'),
                          self._make('1.2.3'))
-        self.assertRaisesRegex(ValueError, self.GENERATOR_STRING_RE,
-                               MediaWikiVersion.from_generator,
-                               'Invalid 1.2.3')
+        with self.assertRaisesRegex(
+                ValueError,
+                self.GENERATOR_STRING_RE):
+            MediaWikiVersion.from_generator('Invalid 1.2.3')
 
 
 if __name__ == '__main__':  # pragma: no cover

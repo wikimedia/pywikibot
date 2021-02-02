@@ -1,6 +1,6 @@
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,8 +34,8 @@ class TestProofreadPageInvalidSite(TestCase):
 
     def test_invalid_site_source(self):
         """Test ProofreadPage from invalid Site as source."""
-        self.assertRaises(pywikibot.UnknownExtension,
-                          ProofreadPage, self.site, 'title')
+        with self.assertRaises(pywikibot.UnknownExtension):
+            ProofreadPage(self.site, 'title')
 
 
 class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
@@ -197,7 +197,8 @@ class TestProofreadPageValidSite(TestCase):
     def test_invalid_existing_page_source(self):
         """Test ProofreadPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid['title'])
-        self.assertRaises(ValueError, ProofreadPage, source)
+        with self.assertRaises(ValueError):
+            ProofreadPage(source)
 
     def test_invalid_not_existing_page_source(self):
         """Test ProofreadPage from invalid not existing Page as source."""
@@ -214,13 +215,15 @@ class TestProofreadPageValidSite(TestCase):
         """Test ProofreadPage from Page not existing in non-Page ns."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid['title1'])
-        self.assertRaises(ValueError, ProofreadPage, source)
+        with self.assertRaises(ValueError):
+            ProofreadPage(source)
 
     def test_invalid_link_source(self):
         """Test ProofreadPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid['title'],
                                 source=self.site)
-        self.assertRaises(ValueError, ProofreadPage, source)
+        with self.assertRaises(ValueError):
+            ProofreadPage(source)
 
     def test_valid_link_source(self):
         """Test ProofreadPage from valid Link as source."""
@@ -313,7 +316,8 @@ class TestProofreadPageValidSite(TestCase):
 
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
-        self.assertRaises(ValueError, getattr, page, 'url_image')
+        with self.assertRaises(ValueError):
+            getattr(page, 'url_image')
 
 
 class TestPageQuality(TestCase):
@@ -383,7 +387,8 @@ class TestPageOCR(BS4TestCase):
 
     def test_ocr_exceptions(self):
         """Test page.ocr() exceptions."""
-        self.assertRaises(TypeError, self.page.ocr, ocr_tool='dummy')
+        with self.assertRaises(TypeError):
+            self.page.ocr(ocr_tool='dummy')
 
     def test_do_hocr(self):
         """Test page._do_hocr()."""
@@ -464,7 +469,8 @@ class TestProofreadPageIndexProperty(BS4TestCase):
         del page.index
         self.assertFalse(hasattr(page, '_index'))
         # Test setter with wrong type.
-        self.assertRaises(TypeError, setattr, page, 'index', 'invalid index')
+        with self.assertRaises(TypeError):
+            setattr(page, 'index', 'invalid index')
         # Test setter with correct type.
         page.index = index_page
         self.assertEqual(page.index, index_page)
@@ -496,8 +502,8 @@ class TestIndexPageInvalidSite(BS4TestCase):
 
     def test_invalid_site_source(self):
         """Test IndexPage from invalid Site as source."""
-        self.assertRaises(pywikibot.UnknownExtension,
-                          IndexPage, self.site, 'title')
+        with self.assertRaises(pywikibot.UnknownExtension):
+            IndexPage(self.site, 'title')
 
 
 class TestIndexPageValidSite(BS4TestCase):
@@ -521,19 +527,22 @@ class TestIndexPageValidSite(BS4TestCase):
     def test_invalid_existing_page_as_source(self):
         """Test IndexPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid_title)
-        self.assertRaises(ValueError, IndexPage, source)
+        with self.assertRaises(ValueError):
+            IndexPage(source)
 
     def test_invalid_not_existing_page_as_source(self):
         """Test IndexPage from Page not existing in non-Page ns as source."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid_title)
-        self.assertRaises(ValueError, IndexPage, source)
+        with self.assertRaises(ValueError):
+            IndexPage(source)
 
     def test_invalid_link_as_source(self):
         """Test IndexPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid_title,
                                 source=self.site)
-        self.assertRaises(ValueError, IndexPage, source)
+        with self.assertRaises(ValueError):
+            IndexPage(source)
 
     def test_valid_link_as_source(self):
         """Test IndexPage from valid Link as source."""
@@ -687,12 +696,14 @@ class TestIndexPageMappings(BS4TestCase):
         # Get label from number.
         self.assertEqual(index_page.get_label_from_page_number(num), label)
         # Error if number does not exists.
-        self.assertRaises(KeyError, index_page.get_label_from_page_number, -1)
+        with self.assertRaises(KeyError):
+            index_page.get_label_from_page_number(-1)
 
         # Get label from page.
         self.assertEqual(index_page.get_label_from_page(proofread_page), label)
         # Error if page does not exists.
-        self.assertRaises(KeyError, index_page.get_label_from_page, None)
+        with self.assertRaises(KeyError):
+            index_page.get_label_from_page(None)
 
     def test_get_page_and_number(self, key):
         """Test IndexPage page get_page_number functions."""
@@ -709,8 +720,8 @@ class TestIndexPageMappings(BS4TestCase):
 
         # Error if label does not exists.
         label, num_set = 'dummy label', []
-        self.assertRaises(KeyError, index_page.get_page_number_from_label,
-                          'dummy label')
+        with self.assertRaises(KeyError):
+            index_page.get_page_number_from_label('dummy label')
 
         # Test get_page_from_label.
         for label, page_set in data['get_page']:
@@ -721,8 +732,8 @@ class TestIndexPageMappings(BS4TestCase):
                              page_set)
 
         # Error if label does not exists.
-        self.assertRaises(KeyError, index_page.get_page_from_label,
-                          'dummy label')
+        with self.assertRaises(KeyError):
+            index_page.get_page_from_label('dummy label')
 
         # Test get_page.
         for n in num_set:
@@ -744,9 +755,12 @@ class TestIndexPageMappings(BS4TestCase):
         proofread_page = ProofreadPage(self.site, page_title)
 
         # Check start/end limits.
-        self.assertRaises(ValueError, index_page.page_gen, -1, 2)
-        self.assertRaises(ValueError, index_page.page_gen, 1, -1)
-        self.assertRaises(ValueError, index_page.page_gen, 2, 1)
+        with self.assertRaises(ValueError):
+            index_page.page_gen(-1, 2)
+        with self.assertRaises(ValueError):
+            index_page.page_gen(1, -1)
+        with self.assertRaises(ValueError):
+            index_page.page_gen(2, 1)
 
         # Check quality filters.
         gen = index_page.page_gen(num, num, filter_ql=range(5))
@@ -792,9 +806,12 @@ class TestIndexPageMappingsRedlinks(BS4TestCase):
     def test_page_gen_redlink(self):
         """Test Index page generator with redlinks."""
         # Check start/end limits.
-        self.assertRaises(ValueError, self.index.page_gen, -1, 2)
-        self.assertRaises(ValueError, self.index.page_gen, 1, -1)
-        self.assertRaises(ValueError, self.index.page_gen, 2, 1)
+        with self.assertRaises(ValueError):
+            self.index.page_gen(-1, 2)
+        with self.assertRaises(ValueError):
+            self.index.page_gen(1, -1)
+        with self.assertRaises(ValueError):
+            self.index.page_gen(2, 1)
 
         gen = self.index.page_gen(1, None, filter_ql=range(5))
         self.assertEqual(list(gen), self.pages)

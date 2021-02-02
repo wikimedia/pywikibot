@@ -87,8 +87,8 @@ class TestMustBe(DebugOnlyTestCase):
         retval = self.call_this_sysop_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertRaises(UserRightsError, self.call_this_steward_req_function,
-                          args, kwargs)
+        with self.assertRaises(UserRightsError):
+            self.call_this_steward_req_function(args, kwargs)
 
     def test_must_be_user(self):
         """Test a function which requires a user."""
@@ -98,8 +98,8 @@ class TestMustBe(DebugOnlyTestCase):
         retval = self.call_this_user_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertRaises(UserRightsError, self.call_this_sysop_req_function,
-                          args, kwargs)
+        with self.assertRaises(UserRightsError):
+            self.call_this_sysop_req_function(args, kwargs)
 
     def test_override_usertype(self):
         """Test overriding the required group."""
@@ -121,8 +121,8 @@ class TestMustBe(DebugOnlyTestCase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
         self.login('user')
-        self.assertRaises(UserRightsError, self.call_this_user_req_function,
-                          args, kwargs)
+        with self.assertRaises(UserRightsError):
+            self.call_this_user_req_function(args, kwargs)
 
 
 class TestNeedRight(DebugOnlyTestCase):
@@ -185,8 +185,8 @@ class TestNeedRight(DebugOnlyTestCase):
         retval = self.call_this_move_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        self.assertRaises(UserRightsError, self.call_this_edit_req_function,
-                          args, kwargs)
+        with self.assertRaises(UserRightsError):
+            self.call_this_edit_req_function(args, kwargs)
 
 
 class TestNeedVersion(DeprecationTestCase):
@@ -243,7 +243,8 @@ class TestNeedVersion(DeprecationTestCase):
 
     def test_need_version(self):
         """Test need_version when the version is new, exact or old enough."""
-        self.assertRaises(NotImplementedError, self.too_new)
+        with self.assertRaises(NotImplementedError):
+            self.too_new()
         self.assertTrue(self.old_enough())
         self.assertTrue(self.older())
 
@@ -254,18 +255,18 @@ class TestNeedVersion(DeprecationTestCase):
 
         # The outermost decorator is the version check, so no
         # deprecation message.
-        self.assertRaisesRegex(
-            NotImplementedError,
-            'deprecated_unavailable_method',
-            self.deprecated_unavailable_method)
+        with self.assertRaisesRegex(
+                NotImplementedError,
+                'deprecated_unavailable_method'):
+            self.deprecated_unavailable_method()
         self.assertNoDeprecation()
 
         # The deprecator is first, but the version check still
         # raises exception.
-        self.assertRaisesRegex(
-            NotImplementedError,
-            'deprecated_unavailable_method2',
-            self.deprecated_unavailable_method2)
+        with self.assertRaisesRegex(
+                NotImplementedError,
+                'deprecated_unavailable_method2'):
+            self.deprecated_unavailable_method2()
         self.assertOneDeprecationParts(
             __name__ + '.TestNeedVersion.deprecated_unavailable_method2')
 
