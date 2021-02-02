@@ -257,6 +257,14 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertNotEqual(mysite.mediawiki_messages(months, 'af'),
                                 mysite.mediawiki_messages(months, 'an'))
 
+        with self.subTest(messages='Test messages order'):
+            msg = mysite.mediawiki_messages(months, 'en')
+            self.assertIsInstance(msg, dict)
+            self.assertLength(msg, 12)
+            self.assertEqual([key.title() for key in msg][5:],
+                             list(msg.values())[5:])
+            self.assertEqual(list(msg), months)
+
         # mediawiki_messages must be given a list; using a string will split it
         with self.subTest(messages='about'):
             self.assertRaises(KeyError, self.site.mediawiki_messages, 'about')

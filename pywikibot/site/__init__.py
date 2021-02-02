@@ -20,7 +20,7 @@ import time
 import typing
 import uuid
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, OrderedDict
 from collections.abc import Iterable
 from contextlib import suppress
 from itertools import zip_longest
@@ -685,7 +685,7 @@ class APISite(BaseSite):
         @param lang: a language code, default is self.lang
         @type lang: str or None
 
-        @rtype dict
+        @rtype OrderedDict
         """
         amlang = lang or self.lang
         if not all(amlang in _mw_msg_cache
@@ -701,7 +701,7 @@ class APISite(BaseSite):
                     _mw_msg_cache[amlang][msg['name']] = msg['*']
 
             # Check requested keys
-            result = {}
+            result = OrderedDict()
             for key in keys:
                 try:
                     result[key] = _mw_msg_cache[amlang][key]
@@ -711,7 +711,7 @@ class APISite(BaseSite):
             else:
                 return result
 
-        return {_key: _mw_msg_cache[amlang][_key] for _key in keys}
+        return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
     @deprecated_args(forceReload=None)
     def mediawiki_message(self, key, lang=None) -> str:

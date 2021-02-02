@@ -87,6 +87,12 @@ class TestMonthName(TestCase):
                         'value {} does not match {}'
                         .format(formatname, code, new_value, value))
 
+    def test_month_name(self):
+        """Test some MonthName results."""
+        # T273573
+        self.assertEqual(date.formats['MonthName']['hu']('január'), 1)
+        self.assertEqual(date.formats['MonthName']['hu'](5), 'május')
+
 
 class TestMonthDelta(TestCase):
 
