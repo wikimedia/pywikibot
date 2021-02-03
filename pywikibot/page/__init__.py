@@ -3528,23 +3528,33 @@ class SiteLinkCollection(MutableMapping):
         @rtype: pywikibot.page.SiteLink
         """
         key = self.getdbName(key)
-        return self._data[key]
+        val = self._data[key]
+        if isinstance(val, str):
+            val = SiteLink(val, key)
+        elif isinstance(val, dict):
+            val = SiteLink.fromJSON(val, self.repo)
+        else:
+            return val
+        self._data[key] = val
+        return val
 
     def __setitem__(self, key, val):
         """
         Set the SiteLink for a given key.
 
+        This only sets the value given as str, dict or SiteLink. If a
+        str or dict is given the SiteLink object is created later in
+        __getitem__ method.
+
         @param key: site key as Site instance or db key
         @type key: pywikibot.Site or str
-        @param val: page name as a string or JSON containing SiteLink data
-        @type val: dict or str
-        @rtype: pywikibot.page.SiteLink
+        @param val: page name as a string or JSON containing SiteLink
+            data or a SiteLink object
+        @type val: Union[str, dict, SiteLink]
         """
-        if isinstance(val, str):
-            val = SiteLink(val, key)
-        else:
-            val = SiteLink.fromJSON(val, self.repo)
         key = self.getdbName(key)
+        if isinstance(val, SiteLink):
+            assert val.site.dbName() == key
         self._data[key] = val
 
     def __delitem__(self, key):
@@ -3851,8 +3861,8 @@ class WikibaseEntity:
         self.latest_revision_id = self._content.get('lastrevid')
 
         data = {}
-        # todo: this initializes all data,
-        # make use of lazy initialization (T245809)
+
+        # This initializes all data,
         for key, cls in self.DATA_ATTRIBUTES.items():
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)

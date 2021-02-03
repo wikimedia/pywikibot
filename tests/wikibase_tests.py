@@ -2352,8 +2352,6 @@ class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
 
-    dry = True
-
     def setUp(self):
         """Setup test."""
         super().setUp()
