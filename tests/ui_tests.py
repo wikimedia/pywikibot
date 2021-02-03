@@ -29,7 +29,6 @@ import os
 import subprocess
 import sys
 import time
-import warnings
 
 from contextlib import suppress
 
@@ -253,21 +252,9 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstderr.getvalue(), 'CRITICAL: CRITICAL\n')
 
     def test_output(self):
-        pywikibot.output('output', toStdout=False)
+        pywikibot.output('output')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'output\n')
-
-    def test_output_stdout(self):
-        with warnings.catch_warnings(record=True) as w:
-            pywikibot.output('output', toStdout=True)
-            self.assertEqual(newstdout.getvalue(), 'output\n')
-            self.assertLength(w, 1)
-            self.assertEqual(w[0].category, FutureWarning)
-            message = str(w[0].message)
-            self.assertTrue(
-                message.startswith('"toStdout" parameter is deprecated'))
-            self.assertTrue(
-                message.endswith('use pywikibot.stdout() instead.'))
 
     def test_stdout(self):
         pywikibot.stdout('output')
