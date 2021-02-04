@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -476,10 +476,3 @@ class BaseSite(ComparableMixin):
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
-
-
-class RemovedSite(BaseSite):
-
-    """Site removed from a family."""
-
-    pass
