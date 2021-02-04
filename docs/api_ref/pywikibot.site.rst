@@ -6,6 +6,11 @@ pywikibot.site package
 Submodules
 ----------
 
+pywikibot.site.\_apisite module
+-------------------------------
+
+.. automodule:: pywikibot.site._apisite
+
 pywikibot.site.\_basesite module
 --------------------------------
 

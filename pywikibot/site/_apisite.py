@@ -1,9 +1,4 @@
-"""
-Objects representing MediaWiki sites (wikis).
-
-This module also includes functions to load families, which are
-groups of wikis on the same topic in different languages.
-"""
+"""Objects representing API interface to MediaWiki site."""
 #
 # (C) Pywikibot team, 2008-2021
 #
@@ -63,10 +58,10 @@ from pywikibot.exceptions import (
     UserRightsError,
     UnknownExtension,
 )
-from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
+from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.site._interwikimap import _InterwikiMap
-from pywikibot.site._namespace import Namespace, NamespacesDict
+from pywikibot.site._namespace import Namespace
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
@@ -84,10 +79,9 @@ from pywikibot.tools import (
 )
 
 
-__all__ = ('APISite', 'DataSite', 'Namespace', 'NamespacesDict', 'PageInUse',
-           'RemovedSite', 'Siteinfo', 'TokenWallet')
+__all__ = ('APISite', 'ClosedSite', 'DataSite')
 
-_logger = 'wiki.site'
+_logger = 'wiki.apisite'
 
 
 _mw_msg_cache = defaultdict(dict)
