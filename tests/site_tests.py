@@ -42,12 +42,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
 
     cached = True
 
-    def test_capitalization(self):
-        """Test that the case method is mirroring the siteinfo."""
-        self.assertEqual(self.site.case(), self.site.siteinfo['case'])
-        self.assertOneDeprecationParts('pywikibot.site.APISite.case',
-                                       'siteinfo or Namespace instance')
-
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
         old = self.site.siteinfo('general')

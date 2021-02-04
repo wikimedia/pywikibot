@@ -970,14 +970,6 @@ class APISite(BaseSite):
         """Site information dict."""
         return self._siteinfo
 
-    @deprecated('siteinfo or Namespace instance', since='20150830',
-                future_warning=True)
-    def case(self):  # pragma: no cover
-        """Return this site's capitalization rule."""
-        # This is the global setting via $wgCapitalLinks, it is used whenever
-        # the namespaces don't propagate the namespace specific value.
-        return self.siteinfo['case']
-
     def dbName(self):
         """Return this site's internal id."""
         return self.siteinfo['wikiid']
@@ -1839,23 +1831,6 @@ class APISite(BaseSite):
                                if val != '+\\'}
 
         return user_tokens
-
-    @deprecated("the 'tokens' property", since='20150218', future_warning=True)
-    @remove_last_args(['sysop'])
-    def getToken(self, getalways=True, getagain=False):  # pragma: no cover
-        """DEPRECATED: Get edit token."""
-        if self.username() != self.user():
-            raise ValueError('The token for {0} was requested but only the '
-                             'token for {1} can be retrieved.'.format(
-                                 self.username(), self.user()))
-        if not getalways:
-            raise ValueError('In pywikibot/core getToken does not support the '
-                             'getalways parameter.')
-        token = self.validate_tokens(['edit'])[0]
-        if getagain and token in self.tokens:
-            # invalidate token
-            del self.tokens._tokens[self.user()][token]
-        return self.tokens[token]
 
     @deprecated("the 'tokens' property", since='20150218', future_warning=True)
     @remove_last_args(['sysop'])

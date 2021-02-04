@@ -1,6 +1,6 @@
 """Tests for tokens."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,24 +182,6 @@ class PatrolTestCase(TokenTestBase, TestCase):
             # expected result
             raised = True
         self.assertTrue(raised, msg='pywikibot.Error not raised')
-
-
-class TestDeprecatedEditTokenFunctions(TokenTestBase,
-                                       DefaultSiteTestCase,
-                                       DeprecationTestCase):
-
-    """Test cases for Site edit token deprecated methods."""
-
-    cached = True
-    user = True
-    token_type = 'edit'
-
-    def test_get_token(self):
-        """Test ability to get page tokens using site.getToken."""
-        self.mysite = self.site
-        self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
-        self.assertOneDeprecationParts('pywikibot.site.APISite.getToken',
-                                       "the 'tokens' property")
 
 
 class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
