@@ -16,6 +16,11 @@ pywikibot.site.\_basesite module
 
 .. automodule:: pywikibot.site._basesite
 
+pywikibot.site.\_datasite module
+--------------------------------
+
+.. automodule:: pywikibot.site._datasite
+
 pywikibot.site.\_decorators module
 ----------------------------------
 
