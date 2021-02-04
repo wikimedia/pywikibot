@@ -124,6 +124,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
     +----------------------------+------------------------------------------------------+
+    | _obsoletesites.py          | Objects representing obsolete MediaWiki sites        |
+    +----------------------------+------------------------------------------------------+
     | _siteinfo.py               | Objects representing site info data contents         |
     +----------------------------+------------------------------------------------------+
     | _tokenwallet.py            | Objects representing api tokens                      |

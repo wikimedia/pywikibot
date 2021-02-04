@@ -5,9 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot.site._apisite import APISite, ClosedSite, DataSite
-from pywikibot.site._basesite import BaseSite, PageInUse, RemovedSite
+from pywikibot.site._apisite import APISite, DataSite
+from pywikibot.site._basesite import BaseSite, PageInUse
 from pywikibot.site._namespace import Namespace, NamespacesDict
+from pywikibot.site._obsoletesites import ClosedSite, RemovedSite
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 

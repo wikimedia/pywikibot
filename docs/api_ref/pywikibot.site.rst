@@ -31,6 +31,11 @@ pywikibot.site.\_namespace module
 
 .. automodule:: pywikibot._namespace
 
+pywikibot.site.\_obsoletesites module
+-------------------------------------
+
+.. automodule:: pywikibot.site._obsoletesites
+
 pywikibot.site.\_siteinfo module
 --------------------------------
 
