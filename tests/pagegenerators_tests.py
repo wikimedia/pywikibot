@@ -1004,8 +1004,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-ns:3,1')
         # allpages only accepts a single namespace, and will raise a
         # TypeError if self.namespaces contains more than one namespace.
-        with self.assertRaises(
-                TypeError,
+        with self.assertRaisesRegex(
+            TypeError,
                 'allpages module does not support multiple namespaces'):
             gf.getCombinedGenerator()
 

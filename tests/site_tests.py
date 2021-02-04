@@ -982,9 +982,8 @@ class TestLockingPage(DefaultSiteTestCase):
         p1 = pywikibot.Page(site, 'Foo')
 
         site.lock_page(page=p1, block=True)
-        with self.assertRaises(pywikibot.site.PageInUs):
-            site.lock_page(page=p1,
-                           block=False)
+        with self.assertRaises(pywikibot.site.PageInUse):
+            site.lock_page(page=p1, block=False)
         site.unlock_page(page=p1)
         # verify it's unlocked
         site.lock_page(page=p1, block=False)
@@ -3437,11 +3436,11 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
         with self.assertRaises(pywikibot.UnknownExtension):
             site._cache_proofreadinfo()
         with self.assertRaises(pywikibot.UnknownExtension):
-            lambda x: x.proofread_index_ns(site)
+            site.proofread_index_ns
         with self.assertRaises(pywikibot.UnknownExtension):
-            lambda x: x.proofread_page_ns(site)
+            site.proofread_page_ns
         with self.assertRaises(pywikibot.UnknownExtension):
-            lambda x: x.proofread_levels(site)
+            site.proofread_levels
 
 
 class TestPropertyNames(DefaultSiteTestCase):
