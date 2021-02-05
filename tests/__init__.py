@@ -69,6 +69,7 @@ library_test_modules = {
     'category',
     'cosmetic_changes',
     'date',
+    'datasite',
     'deprecation',
     'diff',
     'djvu',
