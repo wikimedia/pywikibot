@@ -2,8 +2,7 @@
 Test aspects to allow fine grained control over what tests are executed.
 
 Several parts of the test infrastructure are implemented as mixins,
-such as API result caching and excessive test durations. An unused
-mixin to show cache usage is included.
+such as API result caching and excessive test durations.
 """
 #
 # (C) Pywikibot team, 2014-2021
