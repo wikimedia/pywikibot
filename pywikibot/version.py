@@ -1,6 +1,6 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,11 +23,12 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated
 
-cache = None
+
 _logger = 'version'
 
 
@@ -63,7 +64,7 @@ def getversion(online: bool = True) -> str:
         'master': 'branches/master',
         'stable': 'branches/stable',
     }
-    data = dict(getversiondict())  # copy dict to prevent changes in 'cache'
+    data = getversiondict()
     data['cmp_ver'] = 'n/a'
     local_hsh = data.get('hsh', '')
     hsh = {}
@@ -82,6 +83,7 @@ def getversion(online: bool = True) -> str:
     return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format_map(data)
 
 
+@cache
 def getversiondict():
     """Get version info for the package.
 
@@ -92,10 +94,6 @@ def getversiondict():
         - hash (git hash for the current revision)
     @rtype: C{dict} of four C{str}
     """
-    global cache
-    if cache:
-        return cache
-
     _program_dir = _get_program_dir()
     exceptions = {}
 
@@ -132,8 +130,7 @@ def getversiondict():
         warn('Unable to detect package date', UserWarning)
         datestring = '-2 (unknown)'
 
-    cache = {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
-    return cache
+    return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
 
 
 def svn_rev_info(path):

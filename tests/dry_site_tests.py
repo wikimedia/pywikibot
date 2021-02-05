@@ -84,13 +84,12 @@ class TestDrySite(DefaultDrySiteTestCase):
 
         self.assertEqual('foo_bar', user_agent(x, format_string='{username}'))
 
-        old_config = '{script}/{version} Pywikibot/2.0 (User:{username})'
+        old_config = '{script}/{version} Pywikibot/6.0 (User:{username})'
 
-        pywikibot.version.getversiondict()
         script_value = (pywikibot.calledModuleName() + '/'
-                        + pywikibot.version.cache['rev'])
+                        + pywikibot.version.getversiondict()['rev'])
 
-        self.assertEqual(script_value + ' Pywikibot/2.0 (User:foo_bar)',
+        self.assertEqual(script_value + ' Pywikibot/6.0 (User:foo_bar)',
                          user_agent(x, format_string=old_config))
 
         x._userinfo = {'name': '⁂'}
