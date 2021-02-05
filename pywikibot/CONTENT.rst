@@ -118,6 +118,8 @@ The contents of the package
     | _basesite.py               | Objects representing site methods independent of the |
     |                            | communication interface                              |
     +----------------------------+------------------------------------------------------+
+    | _datasite.py               | Objects representing API interface to Wikibase       |
+    +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models                       |
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
