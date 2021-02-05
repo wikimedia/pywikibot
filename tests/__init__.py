@@ -89,6 +89,7 @@ library_test_modules = {
     'interwiki_graph',
     'interwiki_link',
     'link',
+    'linter',
     'logentries',
     'login',
     'mediawikiversion',

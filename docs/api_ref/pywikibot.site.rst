@@ -26,6 +26,11 @@ pywikibot.site.\_decorators module
 
 .. automodule:: pywikibot.site._decorators
 
+pywikibot.site.\_extensions module
+----------------------------------
+
+.. automodule:: pywikibot.site._extensions
+
 pywikibot.site.\_interwikimap module
 ------------------------------------
 
