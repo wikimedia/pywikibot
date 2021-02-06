@@ -2417,8 +2417,8 @@ class FilePage(Page):
         @type ignore_warnings: bool or callable or iterable of str
         @keyword chunk_size: The chunk size in bytesfor chunked uploading (see
             U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
-            will only upload in chunks, if the version number is 1.20 or higher
-            and the chunk size is positive but lower than the file size.
+            will only upload in chunks, if the chunk size is positive but lower
+            than the file size.
         @type chunk_size: int
         @keyword _file_key: Reuses an already uploaded file using the filekey.
             If None (default) it will upload the file.
