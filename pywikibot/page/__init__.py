@@ -2594,7 +2594,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix')
+    @deprecated_args(startFrom='startprefix', startsort=None, endsort=None)
     def articles(self,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,
@@ -2603,11 +2603,8 @@ class Category(Page):
                  sortby: Optional[str] = None,
                  reverse: bool = False,
                  starttime=None, endtime=None,
-                 startsort: Optional[str] = None,
-                 endsort: Optional[str] = None,
                  startprefix: Optional[str] = None,
-                 endprefix: Optional[str] = None,
-                 ):
+                 endprefix: Optional[str] = None):
         """
         Yield all articles in the current category.
 
@@ -2635,32 +2632,24 @@ class Category(Page):
         @param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         @type endtime: pywikibot.Timestamp
-        @param startsort: if provided, only generate pages that have a
-            sortkey >= startsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
-        @param endsort: if provided, only generate pages that have a
-            sortkey <= endsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
         @param startprefix: if provided, only generate pages >= this title
-            lexically; not valid if sortby="timestamp"; overrides "startsort"
+            lexically; not valid if sortby="timestamp"
         @param endprefix: if provided, only generate pages < this title
-            lexically; not valid if sortby="timestamp"; overrides "endsort"
+            lexically; not valid if sortby="timestamp"
         @rtype: typing.Iterable[pywikibot.Page]
         """
         seen = set()
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 total=total,
-                                                content=content, sortby=sortby,
+                                                content=content,
+                                                sortby=sortby,
                                                 reverse=reverse,
                                                 starttime=starttime,
                                                 endtime=endtime,
-                                                startsort=startsort,
-                                                endsort=endsort,
                                                 startprefix=startprefix,
                                                 endprefix=endprefix,
-                                                member_type=['page', 'file']
-                                                ):
+                                                member_type=['page', 'file']):
             if recurse:
                 seen.add(hash(member))
             yield member
@@ -2668,22 +2657,21 @@ class Category(Page):
                 total -= 1
                 if total == 0:
                     return
+
         if recurse:
             if not isinstance(recurse, bool) and recurse:
-                recurse = recurse - 1
+                recurse -= 1
             for subcat in self.subcategories():
-                for article in subcat.articles(recurse, total=total,
+                for article in subcat.articles(recurse=recurse,
+                                               total=total,
                                                content=content,
                                                namespaces=namespaces,
                                                sortby=sortby,
                                                reverse=reverse,
                                                starttime=starttime,
                                                endtime=endtime,
-                                               startsort=startsort,
-                                               endsort=endsort,
                                                startprefix=startprefix,
-                                               endprefix=endprefix,
-                                               ):
+                                               endprefix=endprefix):
                     hash_value = hash(article)
                     if hash_value in seen:
                         continue
