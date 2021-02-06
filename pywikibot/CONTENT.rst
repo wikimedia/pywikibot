@@ -124,6 +124,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models                       |
     +----------------------------+------------------------------------------------------+
+    | _extensions.py             | API interfaces to MediaWiki extensions               |
+    +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+
     | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
