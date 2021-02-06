@@ -330,7 +330,11 @@ class NamespacesDict(Mapping, SelfCallMixin):
         @param key: namespace key
         """
         if isinstance(key, (Namespace, int)):
-            return self._namespaces[key]
+            try:
+                return self._namespaces[key]
+            except KeyError:
+                raise KeyError('{} is not a known namespace. Maybe you should '
+                               'clear the api cache.'.format(key))
 
         namespace = self.lookup_name(key)
         if namespace:
