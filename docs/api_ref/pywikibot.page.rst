@@ -6,6 +6,11 @@ pywikibot.page package
 Submodules
 ----------
 
+pywikibot.page.\_decorators module
+----------------------------------
+
+.. automodule:: pywikibot.page._decorators
+
 pywikibot.page.\_revision module
 --------------------------------
 
