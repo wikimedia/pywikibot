@@ -99,8 +99,8 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_invalid_token(self):
         """Test invalid token."""
-        self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t],
-                          'invalidtype')
+        with self.assertRaises(pywikibot.Error):
+            self.mysite.tokens['invalidtype']
 
 
 class TokenTestBase(TestCaseBase):
@@ -153,7 +153,8 @@ class PatrolTestCase(TokenTestBase, TestCase):
         rc = rc[0]
 
         # site.patrol() needs params
-        self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
+        with self.assertRaises(pywikibot.Error):
+            list(mysite.patrol())
         try:
             result = list(mysite.patrol(rcid=rc['rcid']))
         except api.APIError as error:

@@ -1,6 +1,6 @@
 """Bot tests for input_choice options."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -86,7 +86,8 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(message('?', [option], None), '? (r<number> [1-5])')
         self.assertEqual(message('?', [option], 'r3'),
                          '? (r<number> [1-[3]-5])')
-        self.assertRaisesRegex(AttributeError, self.TEST_RE, option.test, 1)
+        with self.assertRaisesRegex(AttributeError, self.TEST_RE):
+            option.test(1)
         self.assertFalse(option.test('0'))
         self.assertFalse(option.test('r0'))
         self.assertFalse(option.test('r6'))
@@ -98,8 +99,10 @@ class TestChoiceOptions(TestCase):
 
     def test_List(self):
         """Test ListOption."""
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
-                               bot.ListOption, [])
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            bot.ListOption([])
         options = ['foo', 'bar']
         option = bot.ListOption(options)
         self.assertTrue(option.stop)
@@ -112,9 +115,14 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(message('?', [option], None), '? (<number> [1])')
         self.assertEqual(message('?', [option], '1'), '? (<number> [[1]])')
         options.pop()
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format,
-                               None)
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format)
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            option.format(None)
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            option.format()
         self.assertFalse(option.test('0'))
         options += ['baz', 'quux', 'norf']
         self.assertEqual(message('?', [option], None), '? (<number> [1-3])')
@@ -135,16 +143,20 @@ class TestChoiceOptions(TestCase):
 
     def test_showing_list(self):
         """Test ShowingListOption."""
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
-                               bot.ShowingListOption, [])
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            bot.ShowingListOption([])
         options = ['foo', 'bar']
         option = bot.ShowingListOption(options)
         self.assertEqual(message('?', [option]), '? (<number> [1-2])')
 
     def test_multiple_choice_list(self):
         """Test MultipleChoiceList."""
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
-                               bot.MultipleChoiceList, [])
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            bot.MultipleChoiceList([])
         options = ['foo', 'bar']
         option = bot.MultipleChoiceList(options)
         self.assertTrue(option.stop)
@@ -164,8 +176,10 @@ class TestChoiceOptions(TestCase):
 
     def test_showing_multiple_choice_list(self):
         """Test ShowingMultipleChoiceList."""
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
-                               bot.ShowingMultipleChoiceList, [])
+        with self.assertRaisesRegex(
+                ValueError,
+                self.SEQ_EMPTY_RE):
+            bot.ShowingMultipleChoiceList([])
         options = ['foo', 'bar']
         option = bot.ShowingMultipleChoiceList(options)
         self.assertEqual(message('?', [option]), '? (<number> [1-2])')
