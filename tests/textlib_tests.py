@@ -727,6 +727,25 @@ class TestGenericTemplateParams(PatchingTestCase):
         self.assertTrue(self._mwpfh)
 
 
+class TestDisabledParts(DefaultDrySiteTestCase):
+
+    """Test the removeDisabledParts function in textlib."""
+
+    def test_remove_disabled_parts(self):
+        """Test removeDisabledParts function."""
+        tests = {
+            'comment': '<!-- No comment yet -->',
+            'link': '[[Target link]]',
+            'source': '<source>foo := bar</source>',
+            'template': '{{Infobox\n|foo = bar}}',
+            'unknown': '<Unknown>This is an unknown pattern</unKnown>',
+        }
+        for test, pattern in tests.items():
+            with self.subTest(test=test):
+                self.assertEqual(
+                    textlib.removeDisabledParts(pattern, tags=[test]), '')
+
+
 class TestReplaceLinks(TestCase):
 
     """Test the replace_links function in textlib."""

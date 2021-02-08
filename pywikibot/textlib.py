@@ -465,9 +465,9 @@ def removeDisabledParts(text: str, tags=None, include=[], site=None) -> str:
         tags = ('comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight')
     tags = set(tags) - set(include)
     regexes = _get_regexes(tags, site)
-    toRemoveR = re.compile('|'.join(x.pattern for x in regexes),
-                           re.IGNORECASE | re.DOTALL)
-    return toRemoveR.sub('', text)
+    for regex in regexes:
+        text = regex.sub('', text)
+    return text
 
 
 def removeHTMLParts(text: str,
