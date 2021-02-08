@@ -252,7 +252,7 @@ class TestQualityFilterPageGenerator(BasetitleTestCase):
         """Test QualityFilterPageGenerator."""
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
-        gen = pagegenerators.QualityFilterPageGenerator(gen, [0])
+        gen = pagegenerators.QualityFilterPageGenerator(gen, [0, 3])
         self.assertLength(tuple(gen), 7)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.QualityFilterPageGenerator(gen, [4])
