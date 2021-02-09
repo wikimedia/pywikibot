@@ -76,9 +76,11 @@ install:
   # Download Python version which isn't pre-installed
   - ps: ./appveyor_install.ps1
   - python -m venv env
+  - python --version
   - env\Scripts\activate.bat
-  - pip install -r dev-requirements.txt
+  - pip install --upgrade pip
   - pip install -r requirements.txt
+  - pip install -r dev-requirements.txt
 
 build: off
 
