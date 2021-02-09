@@ -2,10 +2,7 @@
 # Authors: Olivier Grisel, Jonathan Helmus, Kyle Kastner, and Alex Willmer
 # License: CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
 
-$MINICONDA_URL = "https://repo.continuum.io/miniconda/"
 $BASE_URL = "https://www.python.org/ftp/python/"
-$GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
-$GET_PIP_PATH = "C:\get-pip.py"
 
 $PYTHON_PRERELEASE_REGEX = @"
 (?x)
@@ -63,35 +60,11 @@ function ParsePythonVersion ($python_version) {
 function DownloadPython ($python_version, $platform_suffix) {
     $major, $minor, $micro, $prerelease = ParsePythonVersion $python_version
 
-    if (($major -le 2 -and $micro -eq 0) `
-        -or ($major -eq 3 -and $minor -le 2 -and $micro -eq 0) `
-        ) {
-        $dir = "$major.$minor"
-        $python_version = "$major.$minor$prerelease"
-    } else {
-        $dir = "$major.$minor.$micro"
-    }
-
-    if ($prerelease) {
-        if (($major -le 2) `
-            -or ($major -eq 3 -and $minor -eq 1) `
-            -or ($major -eq 3 -and $minor -eq 2) `
-            -or ($major -eq 3 -and $minor -eq 3) `
-            ) {
-            $dir = "$dir/prev"
-        }
-    }
-
-    if (($major -le 2) -or ($major -le 3 -and $minor -le 4)) {
-        $ext = "msi"
-        if ($platform_suffix) {
-            $platform_suffix = ".$platform_suffix"
-        }
-    } else {
-        $ext = "exe"
-        if ($platform_suffix) {
-            $platform_suffix = "-$platform_suffix"
-        }
+    # Only Python 3.5+ is supported
+    $dir = "$major.$minor.$micro"
+    $ext = "exe"
+    if ($platform_suffix) {
+        $platform_suffix = "-$platform_suffix"
     }
 
     $filename = "python-$python_version$platform_suffix.$ext"
@@ -107,21 +80,25 @@ function InstallPython ($python_version, $architecture, $python_home) {
         Write-Host $python_home "already exists, skipping."
         return $false
     }
+
     if ($architecture -eq "32") {
         $platform_suffix = ""
     } else {
         $platform_suffix = "amd64"
     }
+
     $installer_path = DownloadPython $python_version $platform_suffix
-    $installer_ext = [System.IO.Path]::GetExtension($installer_path)
     Write-Host "Installing $installer_path to $python_home"
+
+    $installer_ext = [System.IO.Path]::GetExtension($installer_path)
     $install_log = $python_home + ".log"
+
     if ($installer_ext -eq '.msi') {
-        InstallPythonMSI $installer_path $python_home $install_log
+        Write-Host "MSI installer is not supported"
     } else {
-        $uninstaller_path = DownloadPython 3.5.4 $platform_suffix
-        InstallPythonEXE $installer_path $python_home $install_log $uninstaller_path
+        InstallPythonEXE $installer_path $python_home $install_log
     }
+
     if (Test-Path $python_home) {
         Write-Host "Python $python_version ($architecture) installation complete"
     } else {
@@ -132,24 +109,11 @@ function InstallPython ($python_version, $architecture, $python_home) {
 }
 
 
-function InstallPythonEXE ($exepath, $python_home, $install_log, $unexepath) {
-    $uninstall_args = "/log C:\Python35-x64.log /quiet /uninstall InstallAllUsers=1 TargetDir=C:\Python35-x64\"
-    RunCommand $unexepath $uninstall_args
+function InstallPythonEXE ($exepath, $python_home, $install_log) {
     $install_args = "/log $install_log /quiet InstallAllUsers=1 TargetDir=$python_home\"
     RunCommand $exepath $install_args
 }
 
-
-function InstallPythonMSI ($msipath, $python_home, $install_log) {
-    $install_args = "/qn /log $install_log /i $msipath TARGETDIR=$python_home"
-    $uninstall_args = "/qn /x $msipath"
-    RunCommand "msiexec.exe" $install_args
-    if (-not(Test-Path $python_home)) {
-        Write-Host "Python seems to be installed else-where, reinstalling."
-        RunCommand "msiexec.exe" $uninstall_args
-        RunCommand "msiexec.exe" $install_args
-    }
-}
 
 function RunCommand ($command, $command_args) {
     Write-Host $command $command_args
@@ -158,8 +122,8 @@ function RunCommand ($command, $command_args) {
 
 
 function main () {
-	if ($env:PYTHON_VERSION -eq "3.5.0") {
-		InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
+    if ($env:PYTHON_VERSION -eq "3.5.0") {
+        InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     }
 }
 
