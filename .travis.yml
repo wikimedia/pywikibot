@@ -45,17 +45,18 @@ before_install:
       export PYWIKIBOT_TEST_WRITE_FAIL=1 ;
     fi
 
-before_script:
+install:
   - pip install -U setuptools
   # Make Travis reinstall default pytest (T255349)
   - pip uninstall -y pytest
   - pip install -r dev-requirements.txt
 
-script:
+before_script:
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
       pip install -e .[mwoauth];
     fi
 
+script:
   - mkdir ~/.pywikibot
 
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz 'n'
@@ -118,10 +119,7 @@ script:
       coverage run -m unittest discover -vv -p "*_tests.py" ;
     fi
 
-after_success:
-    codecov
-
-after_failure:
+after_script:
     codecov
 
 env:
