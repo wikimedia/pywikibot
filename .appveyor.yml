@@ -73,8 +73,8 @@ install:
   - git submodule update --init
   # Download the Appveyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
-  - ps: $wc = new-object net.webclient
-
+  # Download Python version which isn't pre-installed
+  - ps: appveyor_install.ps1
   - python -m venv env
   - env\Scripts\activate.bat
   - pip install -r dev-requirements.txt
