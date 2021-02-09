@@ -18,7 +18,6 @@ dist: xenial  # required for Python >= 3.7
 addons:
   apt:
     packages:
-      - libssl1.0.0
       - djvulibre-bin
 
 before_install:
