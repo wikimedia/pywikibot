@@ -84,11 +84,6 @@ install:
   - ps: $run = $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'run_with_env.cmd')
   - ps: $run | Out-File -Encoding ascii -FilePath appveyor\run_with_env.cmd
 
-  # This is needed for Python versions not installed on Appveyor build machines
-  - ps: |
-      if (-not(Test-Path($env:PYTHON))) {
-        iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1')
-      }
   - python -m venv env
   - env\Scripts\activate.bat
   - pip install -r dev-requirements.txt
