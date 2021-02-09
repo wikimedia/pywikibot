@@ -3,13 +3,6 @@ skip_tags: true
 version: 6.0.{build}
 environment:
 
-  APPVEYOR_PYTHON_URL: "https://raw.githubusercontent.com/dvorapa/python-appveyor-demo/master/appveyor/"
-
-  # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
-  # /E:ON and /V:ON options are not enabled in the batch script interpreter
-  # See: http://stackoverflow.com/a/13751649/163740
-  CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
-
   PYWIKIBOT_DIR: "%appdata%\\Pywikibot"
   PYWIKIBOT_USER_CONFIG: "%appdata%\\Pywikibot\\user-config.py"
   PYWIKIBOT_PASSWD_FILE: "%appdata%\\Pywikibot\\passwordfile"
@@ -81,8 +74,6 @@ install:
   # Download the Appveyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
   - ps: $wc = new-object net.webclient
-  - ps: $run = $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'run_with_env.cmd')
-  - ps: $run | Out-File -Encoding ascii -FilePath appveyor\run_with_env.cmd
 
   - python -m venv env
   - env\Scripts\activate.bat
