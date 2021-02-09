@@ -96,7 +96,8 @@ function InstallPython ($python_version, $architecture, $python_home) {
     if ($installer_ext -eq '.msi') {
         Write-Host "MSI installer is not supported"
     } else {
-        InstallPythonEXE $installer_path $python_home $install_log
+        $uninstaller_path = DownloadPython 3.5.4 $platform_suffix
+        InstallPythonEXE $installer_path $python_home $install_log $uninstaller_path
     }
 
     if (Test-Path $python_home) {
@@ -109,7 +110,9 @@ function InstallPython ($python_version, $architecture, $python_home) {
 }
 
 
-function InstallPythonEXE ($exepath, $python_home, $install_log) {
+function InstallPythonEXE ($exepath, $python_home, $install_log, $unexepath) {
+    $uninstall_args = "/log C:\Python35-x64.log /quiet /uninstall InstallAllUsers=1 TargetDir=C:\Python35-x64\"
+    RunCommand $unexepath $uninstall_args
     $install_args = "/log $install_log /quiet InstallAllUsers=1 TargetDir=$python_home\"
     RunCommand $exepath $install_args
 }
