@@ -349,7 +349,8 @@ class TestWbTime(WbRepresentationTestCase):
 
         t = pywikibot.WbTime(site=repo, year=-2010, hour=12, minute=43)
         regex = r'^You cannot turn BC dates into a Timestamp$'
-        self.assertRaisesRegex(ValueError, regex, t.toTimestamp)
+        with self.assertRaisesRegex(ValueError, regex):
+            t.toTimestamp()
 
         t = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                              minute=43, second=0)
@@ -1065,13 +1066,17 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(numeric_id, 7)
         self.assertFalse(hasattr(item, '_content'))
         regex = r"^Page .+ doesn't exist\.$"
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(
+                pywikibot.NoPage,
+                regex):
+            item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item.id, 'Q7')
         self.assertEqual(item.getID(), 'Q7')
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.title(), 'Q7')
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+            item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.getID(), 'Q7')
@@ -1085,7 +1090,8 @@ class TestItemLoad(WikidataTestCase):
         self.assertFalse(item.exists())
         self.assertEqual(item.getID(), 'Q9999999999999999999')
         regex = r"^Page .+ doesn't exist\.$"
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+            item.get()
 
     def test_fromPage_noprops(self):
         """Test item from page without properties."""
@@ -1264,7 +1270,8 @@ class TestItemLoad(WikidataTestCase):
         # without a full debug log.
         # It should raise NoPage on the source page, with title 'Test page'
         # as that is what the bot operator needs to see in the log output.
-        self.assertRaisesRegex(pywikibot.NoPage, 'Test page', item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, 'Test page'):
+            item.get()
 
     def test_from_entity_uri(self):
         """Test ItemPage.from_entity_uri."""
@@ -1329,8 +1336,8 @@ class TestRedirects(WikidataTestCase):
         self.assertFalse(item.isRedirectPage())
         self.assertTrue(item.exists())
         regex = r'^Page .+ is not a redirect page\.$'
-        self.assertRaisesRegex(pywikibot.IsNotRedirectPage, regex,
-                               item.getRedirectTarget)
+        with self.assertRaisesRegex(pywikibot.IsNotRedirectPage, regex):
+            item.getRedirectTarget()
 
     def test_redirect_item(self):
         """Test redirect item."""
@@ -1344,7 +1351,8 @@ class TestRedirects(WikidataTestCase):
         self.assertEqual(item.getRedirectTarget(), target)
         self.assertIsInstance(item.getRedirectTarget(), ItemPage)
         regex = r'^Page .+ is a redirect page\.$'
-        self.assertRaisesRegex(pywikibot.IsRedirectPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.IsRedirectPage, regex):
+            item.get()
 
     def test_redirect_item_without_get(self):
         """Test redirect item without explicit get operation."""
@@ -2114,9 +2122,11 @@ class TestNamespaces(WikidataTestCase):
         wikidata = self.get_repo()
         page = WikibasePage(wikidata)
         regex = r' object has no attribute '
-        self.assertRaisesRegex(AttributeError, regex, page.namespace)
+        with self.assertRaisesRegex(AttributeError, regex):
+            page.namespace()
         page = WikibasePage(wikidata, title='')
-        self.assertRaisesRegex(AttributeError, regex, page.namespace)
+        with self.assertRaisesRegex(AttributeError, regex):
+            page.namespace()
 
         page = WikibasePage(wikidata, ns=0)
         self.assertEqual(page.namespace(), 0)
@@ -2331,8 +2341,8 @@ class TestUnconnectedClient(TestCase):
         regex = r' has no data repository$'
         with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
             ItemPage.fromPage(self.wdp)
-        self.assertRaisesRegex(pywikibot.WikiBaseError, regex,
-                               self.wdp.data_item)
+        with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
+            self.wdp.data_item()
 
     def test_has_data_repository(self, key):
         """Test that site has no data repository."""
