@@ -133,7 +133,7 @@ def getversiondict():
     return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
 
 
-def svn_rev_info(path):
+def svn_rev_info(path):  # pragma: no cover
     """Fetch information about the current revision of a Subversion checkout.
 
     @param path: directory of the Subversion checkout
@@ -184,7 +184,7 @@ order by revision desc, changed_date desc""")
     return tag, rev, date
 
 
-def github_svn_rev2hash(tag: str, rev):
+def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
     """Convert a Subversion revision to a Git hash using Github.
 
     @param tag: name of the Subversion repo on Github
@@ -204,7 +204,7 @@ def github_svn_rev2hash(tag: str, rev):
     return hsh, date
 
 
-def getversion_svn(path=None):
+def getversion_svn(path=None):  # pragma: no cover
     """Get version info for a Subversion checkout.
 
     @param path: directory of the Subversion checkout
@@ -287,7 +287,7 @@ def getversion_git(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_nightly(path=None):
+def getversion_nightly(path=None):  # pragma: no cover
     """Get version info for a nightly release.
 
     @param path: directory of the uncompressed nightly.
@@ -347,7 +347,7 @@ def getversion_onlinerepo(path='branches/master'):
 
 
 @deprecated('pywikibot.__version__', since='20201003')
-def get_module_version(module) -> Optional[str]:
+def get_module_version(module) -> Optional[str]:  # pragma: no cover
     """
     Retrieve __version__ variable from an imported module.
 
