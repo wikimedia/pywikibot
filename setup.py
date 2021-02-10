@@ -245,7 +245,11 @@ def read_desc(filename):  # pragma: no cover
 
 def get_packages(name):  # pragma: no cover
     """Find framework packages."""
-    from setuptools import find_namespace_packages
+    try:
+        from setuptools import find_namespace_packages
+    except ImportError:
+        sys.exit(
+            'setuptools >= 40.1.0 is required to create a new distribution.')
     packages = find_namespace_packages(include=[name + '.*'])
     return [str(name)] + packages
 
