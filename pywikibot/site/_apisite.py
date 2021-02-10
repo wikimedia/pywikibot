@@ -366,7 +366,8 @@ class APISite(
         # check whether a login cookie already exists for this user
         # or check user identity when OAuth enabled
         self._loginstatus = _LoginStatus.IN_PROGRESS
-        self._username = normalize_username(user)
+        if user:
+            self._username = normalize_username(user)
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
