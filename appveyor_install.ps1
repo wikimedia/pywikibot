@@ -115,6 +115,7 @@ function InstallPythonEXE ($exepath, $python_home, $install_log, $unexepath) {
     RunCommand $unexepath $uninstall_args
     $install_args = "/log $install_log /quiet InstallAllUsers=1 TargetDir=$python_home\"
     RunCommand $exepath $install_args
+    RunCommand "python" '-m pip install -U "pip<21"'
 }
 
 

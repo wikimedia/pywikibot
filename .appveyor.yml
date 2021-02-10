@@ -68,17 +68,16 @@ matrix:
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
-  - "ECHO %APPVEYOR_SCHEDULED_BUILD%"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
   - git submodule update --init
   # Download the Appveyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
-  # Download Python version which isn't pre-installed
+  # Download Python 3.5.0 which isn't pre-installed
   - ps: ./appveyor_install.ps1
   - python --version
-  - python -m pip install --upgrade pip
+  - python -c "import struct; print('PYTHON_ARCH' + chr(58), struct.calcsize('P') << 3)"
   - pip --version
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
