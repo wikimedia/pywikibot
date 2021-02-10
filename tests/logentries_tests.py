@@ -50,10 +50,9 @@ class TestLogentriesBase(TestCase):
             'target': None,
         },
         'old': {
-            'family': AutoFamily('btrfs',
-                                 # /api.php required for scriptpath()
-                                 'https://btrfs.wiki.kernel.org/api.php'),
-            'code': 'btrfs',
+            'family': AutoFamily('portalwiki',
+                                 'https://theportalwiki.com/wiki/Main_Page'),
+            'code': 'en',
             'target': None,
         }
     }
@@ -64,7 +63,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertLess(self.site.mw_version, '1.20')
+            self.assertLess(self.site.mw_version, '1.24')
         try:
             le = next(iter(self.site.logevents(logtype=logtype, total=1)))
         except StopIteration:
