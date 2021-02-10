@@ -692,7 +692,7 @@ class FakeUITest(TestCase):
 
     def _encounter_color(self, color, target_stream):
         """Patched encounter_color method."""
-        assert False, 'This method should not be invoked'
+        raise AssertionError('This method should not be invoked')
 
     def test_no_color(self):
         """Test a string without any colors."""

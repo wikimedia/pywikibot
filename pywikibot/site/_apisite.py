@@ -1004,7 +1004,7 @@ class APISite(
         mw_ver, cache_time = getattr(self, '_mw_version_time', (None, None))
         if mw_ver is None or time.time() - cache_time > 60 * 60 * 24:
             mw_ver = MediaWikiVersion(self.version())
-            setattr(self, '_mw_version_time', (mw_ver, time.time()))
+            self._mw_version_time = mw_ver, time.time()
         return mw_ver
 
     @property

@@ -525,7 +525,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     """
 
     @deprecated_args(acceptall='always', addedCat='addcat')
-    def __init__(self, generator, replacements, exceptions={}, **kwargs):
+    def __init__(self, generator, replacements, exceptions=None, **kwargs):
         """Initializer."""
         self.available_options.update({
             'addcat': None,
@@ -546,7 +546,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 replacements[i] = Replacement.from_compiled(replacement[0],
                                                             replacement[1])
         self.replacements = replacements
-        self.exceptions = exceptions
+        self.exceptions = exceptions or {}
 
         if self.opt.addcat and isinstance(self.opt.addcat, str):
             self.opt.addcat = pywikibot.Category(self.site, self.opt.addcat)

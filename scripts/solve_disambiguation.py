@@ -1146,9 +1146,10 @@ or press enter to quit:""")
             self.alternatives += links
         return True
 
-    def setSummaryMessage(self, page, new_targets=[], unlink_counter=0,
+    def setSummaryMessage(self, page, new_targets=None, unlink_counter=0,
                           dn=False) -> None:
         """Setup i18n summary message."""
+        new_targets = new_targets or []
         # make list of new targets
         comma = self.site.mediawiki_message('comma-separator')
         targets = comma.join('[[{0}]]'.format(page_title)

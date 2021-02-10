@@ -276,9 +276,8 @@ class RedirectGenerator(OptionHandler):
         """Retrieve broken redirects."""
         if self.opt.fullscan:
             count = 0
-            for pagetitle, type, target, final in self.get_redirects_via_api(
-                    maxlen=2):
-                if type == 0:
+            for pagetitle, type_, *_ in self.get_redirects_via_api(maxlen=2):
+                if type_ == 0:
                     yield pagetitle
                     count += 1
                     if self.opt.limit and count >= self.opt.limit:
@@ -303,9 +302,8 @@ class RedirectGenerator(OptionHandler):
             yield from self.get_moved_pages_redirects()
         elif self.opt.fullscan:
             count = 0
-            for pagetitle, type_, target, final in self.get_redirects_via_api(
-                    maxlen=2):
-                if type_ != 0 and type_ != 1:
+            for pagetitle, type_, *_ in self.get_redirects_via_api(maxlen=2):
+                if type_ not in (0, 1):
                     yield pagetitle
                     count += 1
                     if self.opt.limit and count >= self.opt.limit:

@@ -46,7 +46,7 @@ class UploadRobot(BaseBot):
                  verify_description: bool = True,
                  ignore_warning: Union[bool, list] = False,
                  target_site=None,
-                 aborts: Union[bool, list] = [],
+                 aborts: Union[bool, list, None] = None,
                  chunk_size: int = 0,
                  summary: Optional[str] = None,
                  filename_prefix: Optional[str] = None, **kwargs):
@@ -100,7 +100,7 @@ class UploadRobot(BaseBot):
         self.keep_filename = keep_filename or self.opt.always
         self.verify_description = verify_description and not self.opt.always
         self.ignore_warning = ignore_warning
-        self.aborts = aborts
+        self.aborts = aborts or []
         self.chunk_size = chunk_size
         self.summary = summary
         self.filename_prefix = filename_prefix

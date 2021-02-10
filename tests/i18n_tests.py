@@ -33,7 +33,7 @@ class Site:
         """Initializer."""
         self.code = code
         self.family = self.Family()
-        setattr(self.family, 'name', family)
+        self.family.name = family
 
     def __repr__(self):
         return "'{site.family.name}:{site.code}'".format(site=self)

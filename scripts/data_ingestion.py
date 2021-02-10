@@ -188,11 +188,11 @@ class Photo(pywikibot.FilePage):
         # FIXME: normalise the title so it is usable as a MediaWiki title.
         return fmt % self.metadata
 
-    def getDescription(self, template, extraparams={}):
+    def getDescription(self, template, extraparams=None):
         """Generate a description for a file."""
         params = {}
         params.update(self.metadata)
-        params.update(extraparams)
+        params.update(extraparams or {})
         description = '{{%s\n' % template
         for key in sorted(params.keys()):
             value = params[key]
