@@ -79,6 +79,7 @@ install:
   - python --version
   - python -c "import struct; print('PYTHON_ARCH' + chr(58), struct.calcsize('P') << 3)"
   - pip --version
+  - easy_install --version
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
 
