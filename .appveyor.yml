@@ -67,6 +67,7 @@ matrix:
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - "ECHO %APPVEYOR_SCHEDULED_BUILD%"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
@@ -77,8 +78,6 @@ install:
   - ps: ./appveyor_install.ps1
   - python --version
   - python -m pip install --upgrade pip
-  - python -m venv env
-  - env\Scripts\activate.bat
   - pip --version
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
