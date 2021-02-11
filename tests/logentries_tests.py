@@ -28,9 +28,9 @@ class TestLogentriesBase(TestCase):
 
     It uses the German Wikipedia for a current representation of the
     log entries and the test Wikipedia for the future representation.
-    It also tests on a wiki with MW 1.19 to check that it can still read
-    the older format. It currently uses wowwiki which as of this commit
-    uses 1.19.24.
+    It also tests on a wiki with MW < 1.25 to check that it can still
+    read the older format. It currently uses portalwiki which as of this
+    commit uses 1.23.16.
     """
 
     sites = {
@@ -63,7 +63,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertLess(self.site.mw_version, '1.24')
+            self.assertLess(self.site.mw_version, '1.25')
         try:
             le = next(iter(self.site.logevents(logtype=logtype, total=1)))
         except StopIteration:
