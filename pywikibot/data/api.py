@@ -2849,7 +2849,7 @@ class LogEntryListGenerator(ListGenerator):
 
 class LoginManager(login.LoginManager):
 
-    """Supply getCookie() method to use API interface."""
+    """Supply login_to_site method to use API interface."""
 
     # API login parameters mapping
     mapping = {
@@ -2867,14 +2867,11 @@ class LoginManager(login.LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    def login_to_site(self):
+    def login_to_site(self) -> None:
         """Login to the site.
 
-        Note, this doesn't actually return or do anything with cookies.
-        The http module takes care of all the cookie stuff, this just
-        has a legacy name for now and should be renamed in the future.
-
-        @return: empty string if successful, throws exception on failure
+        Note, this doesn't do anything with cookies. The http module
+        takes care of all the cookie stuff. Throws exception on failure.
         """
         if hasattr(self, '_waituntil'):
             if datetime.datetime.now() < self._waituntil:
@@ -2939,7 +2936,7 @@ class LoginManager(login.LoginManager):
             status = response[result_key]
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
-                return None
+                return
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
@@ -2976,8 +2973,8 @@ class LoginManager(login.LoginManager):
 
         if 'error' in login_result:
             raise APIError(**response)
-        info = fail_reason
-        raise APIError(code=status, info=info)
+
+        raise APIError(code=status, info=fail_reason)
 
     def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.

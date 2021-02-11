@@ -186,18 +186,6 @@ class LoginManager:
         # No bot policies on other sites
         return True
 
-    @deprecated('login_to_site', since='20201227', future_warning=True)
-    @remove_last_args(['remember', 'captcha'])
-    def getCookie(self):
-        """
-        Login to the site.
-
-        @see: U{https://www.mediawiki.org/wiki/API:Login}
-
-        @return: cookie data if successful, None otherwise.
-        """
-        self.login_to_site()
-
     def login_to_site(self):
         """Login to the site."""
         # THIS IS OVERRIDDEN IN data/api.py
@@ -336,12 +324,14 @@ class LoginManager:
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
-                return self.login(retry=True)
-            else:
-                return False
-        self.storecookiedata()
-        pywikibot.log('Should be logged in now')
-        return True
+                return self.login(retry=False)
+
+        else:
+            self.storecookiedata()
+            pywikibot.log('Should be logged in now')
+            return True
+
+        return False
 
 
 class BotPassword:
