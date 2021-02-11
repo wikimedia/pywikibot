@@ -71,7 +71,6 @@ script:
     fi
   - if [[ $FAMILY == 'portalwiki' ]]; then
       python -m generate_family_file 'https://theportalwiki.com/wiki/Main_Page' 'portalwiki' 'y' ;
-      # export PYWIKIBOT_USERNAME="$BTRFS_PYWIKIBOT_USERNAME" ;
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"
