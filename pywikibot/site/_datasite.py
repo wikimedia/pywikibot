@@ -781,7 +781,7 @@ class DataSite(APISite):
 
     def _wbset_action(self, itemdef, action, action_data, **kwargs):
         """
-        Execute wbset{action}' on a Wikibase item.
+        Execute wbset{action}' on a Wikibase entity.
 
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
@@ -854,7 +854,7 @@ class DataSite(APISite):
 
         # prefer ID over (site, title)
         if isinstance(itemdef, str):
-            itemdef = pywikibot.ItemPage(self, itemdef)
+            itemdef = self.get_entity_for_entity_id(itemdef)
         elif isinstance(itemdef, pywikibot.Page):
             try:
                 itemdef = itemdef.data_item()
