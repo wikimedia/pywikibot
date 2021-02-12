@@ -14,7 +14,7 @@ from pywikibot import config2 as config
 from pywikibot import Site
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import InvalidTitle, TimeoutError
+from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 
 from tests.aspects import (
     unittest,
@@ -932,12 +932,10 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         """Test that Link fails if the interwiki prefix is not a wiki."""
         link = Link('bugzilla:1337', source=self.site)
         # bugzilla does not return a json content but redirects to phab.
-        # api.Request._json_loads cannot detect this problem and retries
-        # reloading due to 'the server may be down'
-
-        # ignore Timeout when trying to load siteninfo;
-        # the site is created anyway but the title cannot be parsed
-        with suppress(TimeoutError):
+        # api.Request._json_loads cannot detect this problem and raises
+        # a SiteDefinitionError. The site is created anyway but the title
+        # cannot be parsed
+        with self.assertRaises(SiteDefinitionError):
             link.site
         self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
         self.assertTrue(link._is_interwiki)

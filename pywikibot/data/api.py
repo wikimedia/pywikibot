@@ -31,11 +31,21 @@ from pywikibot import config, login
 from pywikibot.backports import removeprefix, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
-    CaptchaError, Server504Error, Server414Error, FatalServerError, NoUsername,
-    Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
+    CaptchaError,
+    Error,
+    FatalServerError,
+    InvalidTitle,
+    MaxlagTimeoutError,
+    NoUsername,
+    Server414Error,
+    Server504Error,
+    SiteDefinitionError,
+    TimeoutError,
+    UnsupportedPage,
 )
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
+from pywikibot.textlib import removeHTMLParts
 from pywikibot.tools import itergroup, PYTHON_VERSION
 from pywikibot.tools.formatter import color_format
 
@@ -1567,12 +1577,29 @@ class Request(MutableMapping):
         try:
             result = response.json()
         except ValueError:
-            # if the result isn't valid JSON, there must be a server
+            # if the result isn't valid JSON, there may be a server
             # problem. Wait a few seconds and try again
-            pywikibot.warning(
-                'Non-JSON response received from server {}; '
-                'the server may be down.\nStatus code:{}'
-                .format(self.site, response.status_code))
+            # Show 20 lines of bare text
+            text = '\n'.join(removeHTMLParts(response.text).splitlines()[:20])
+            msg = """\
+Non-JSON response received from server {site} for url
+{resp.url}
+The server may be down.
+Status code: {resp.status_code}
+
+The text message is:
+{text}
+""".format(site=self.site, resp=response, text=text)
+
+            # Do not retry for AutoFamily but raise a SiteDefinitionError
+            # Note: family.AutoFamily is a function to create that class
+            if self.site.family.__class__.__name__ == 'AutoFamily':
+                pywikibot.debug(msg, _logger)
+                raise SiteDefinitionError('Invalid AutoFamily({!r})'
+                                          .format(self.site.family.domain))
+
+            pywikibot.warning(msg)
+
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
                 if param.endswith('limit'):
