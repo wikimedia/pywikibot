@@ -8,6 +8,7 @@ import unittest
 
 from contextlib import suppress
 
+from pywikibot import Page
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit
 
 from tests.aspects import TestCase
@@ -24,8 +25,7 @@ class TestCosmeticChanges(TestCase):
     def setUpClass(cls):
         """Setup class for all tests."""
         super(TestCosmeticChanges, cls).setUpClass()
-        cls.cct = CosmeticChangesToolkit(cls.site, namespace=0,
-                                         pageTitle='Test')
+        cls.cct = CosmeticChangesToolkit(Page(cls.site, 'Test'))
 
 
 class TestDryCosmeticChanges(TestCosmeticChanges):
