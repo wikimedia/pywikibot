@@ -243,14 +243,14 @@ class TestSiteObject(DefaultSiteTestCase):
         months = ['january', 'february', 'march', 'april', 'may_long',
                   'june', 'july', 'august', 'september', 'october',
                   'november', 'december']
-        lang1, lang2 = mysite.family.codes[1:3]
+        codes = list(mysite.family.codes)
+        lang1, lang2 = codes[0], codes[-1]
         with self.subTest(messages='months', lang1=lang1, lang2=lang2):
-            if lang1 == lang2:
-                self.skipTest('lang1 and lang2 are equal ({})'.format(lang1))
             self.assertLength(mysite.mediawiki_messages(months, lang1), 12)
             self.assertLength(mysite.mediawiki_messages(months, lang2), 12)
-            self.assertNotEqual(mysite.mediawiki_messages(months, lang1),
-                                mysite.mediawiki_messages(months, lang2))
+            if lang1 != lang2:
+                self.assertNotEqual(mysite.mediawiki_messages(months, lang1),
+                                    mysite.mediawiki_messages(months, lang2))
 
         with self.subTest(messages='Test messages order'):
             msg = mysite.mediawiki_messages(months, 'en')
