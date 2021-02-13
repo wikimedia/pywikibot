@@ -419,37 +419,7 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     for callback in callbacks:
         callback(response)
 
-    return _ResponseDeprecationWrapper(response)
-
-
-class _ResponseDeprecationWrapper(requests.Response):
-
-    """Helper class for the deprecation of HttpRequests.
-
-    This class will be removed ASAP. Its only purpose is to allow
-    a graceful deprecation of HttpRequests.
-    DO NOT USE!
-
-    """
-
-    def __init__(self, response):
-        self.__response = response
-
-    def __getattr__(self, attr):
-        return getattr(self.__response, attr)
-
-    def __setattr__(self, attr, val):
-        if attr == '_ResponseDeprecationWrapper__response':
-            object.__setattr__(self, attr, val)
-
-        return setattr(self.__response, attr, val)
-
-    @property
-    @deprecated('attribute/methods of Response(), '
-                'which is now returned from http.fetch()',
-                since='20210110', future_warning=True)
-    def data(self):
-        return self
+    return response
 
 
 def _get_encoding_from_response_headers(response):
