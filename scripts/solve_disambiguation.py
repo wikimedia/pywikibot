@@ -620,36 +620,6 @@ class DisambiguationRobot(SingleSiteBot):
 
         self.dn_template_str = i18n.translate(self.site, dn_template)
 
-    @property
-    @deprecated('site attribute', since='20201102', future_warning=True)
-    def mysite(self):
-        """DEPRECATED mysite attribute."""
-        return self.site
-
-    @mysite.setter
-    @deprecated('site attribute', since='20201102', future_warning=True)
-    def mysite(self, value):
-        """DEPRECATED mysite attribute."""
-        self.site = value
-
-    @property
-    @deprecated('site.lang attribute', since='20201102', future_warning=True)
-    def mylang(self):
-        """DEPRECATED mylang attribute."""
-        return self.site.lang
-
-    @property
-    @deprecated('summary attribute', since='20201102', future_warning=True)
-    def comment(self):
-        """DEPRECATED edit summary property."""
-        return self.summary
-
-    @comment.setter
-    @deprecated('summary attribute', since='20201102', future_warning=True)
-    def comment(self, value):
-        """DEPRECATED edit summary property setter."""
-        self.summary = value
-
     def checkContents(self, text) -> Optional[str]:
         """
         Check if the text matches any of the ignore regexes.
