@@ -3846,8 +3846,14 @@ class WikibaseEntity:
         if getattr(self, 'id', '-1') == '-1':
             self.__init__(self.repo, updates['entity']['id'])
 
-        self._content = updates['entity']
-        self.get()
+        # the response also contains some data under the 'entity' key
+        # but it is NOT the actual content
+        # see also [[d:Special:Diff/1356933963]]
+        # TODO: there might be some circumstances under which
+        # the content can be safely reused
+        if hasattr(self, '_content'):
+            del self._content
+        self.latest_revision_id = updates['entity'].get('lastrevid')
 
     def concept_uri(self):
         """
