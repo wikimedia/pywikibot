@@ -4498,8 +4498,15 @@ class APISite(
                                 or (offset + len(chunk)) == filesize
                                 and chunk[-1] == b'\r'[0]):
                             chunk += b'\r'
+
+                        mime_params = {
+                            'chunk': (chunk,
+                                      ('application', 'octet-stream'),
+                                      {'filename': mime_filename})
+                        }
                         req = self._request(
-                            throttle=throttle, mime=True,
+                            throttle=throttle,
+                            mime=mime_params,
                             parameters={
                                 'action': 'upload',
                                 'token': token,
@@ -4508,13 +4515,10 @@ class APISite(
                                 'offset': offset,
                                 'filename': file_page_title,
                                 'ignorewarnings': ignore_all_warnings})
-                        req.mime = {
-                            'chunk': (chunk,
-                                      ('application', 'octet-stream'),
-                                      {'filename': mime_filename})
-                        }
+
                         if _file_key:
                             req['filekey'] = _file_key
+
                         try:
                             data = req.submit()['upload']
                             self._uploaddisabled = False
