@@ -248,7 +248,8 @@ class TestSiteObject(DefaultSiteTestCase):
         with self.subTest(messages='months', lang1=lang1, lang2=lang2):
             self.assertLength(mysite.mediawiki_messages(months, lang1), 12)
             self.assertLength(mysite.mediawiki_messages(months, lang2), 12)
-            if lang1 != lang2:
+            familyname = mysite.family.name
+            if lang1 != lang2 and lang1 != familyname and lang2 != familyname:
                 self.assertNotEqual(mysite.mediawiki_messages(months, lang1),
                                     mysite.mediawiki_messages(months, lang2))
 
