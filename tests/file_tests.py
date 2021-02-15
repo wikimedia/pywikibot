@@ -1,11 +1,12 @@
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
 import re
+import unittest
 
 from contextlib import suppress
 
@@ -13,7 +14,7 @@ import pywikibot
 
 from tests import join_images_path
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class TestShareFiles(TestCase):

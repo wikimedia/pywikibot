@@ -6,12 +6,13 @@ should be added locally.
 https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import io
 import sys
+import unittest
 
 from tests import join_tests_path, create_path_func
 from tests.utils import execute, execute_pwb

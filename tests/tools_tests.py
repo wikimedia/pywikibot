@@ -8,6 +8,7 @@ import decimal
 import os.path
 import subprocess
 import tempfile
+import unittest
 
 from collections.abc import Mapping
 from collections import OrderedDict
@@ -18,7 +19,7 @@ from pywikibot import tools
 from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path, mock
-from tests.aspects import unittest, require_modules, TestCase
+from tests.aspects import require_modules, TestCase
 
 
 class OpenArchiveTestCase(TestCase):

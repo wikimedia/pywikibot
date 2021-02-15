@@ -5,6 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import unittest
 
 from contextlib import suppress
 
@@ -17,7 +18,7 @@ from pywikibot.logentries import (
 
 from tests import unittest_print
 from tests.aspects import (
-    unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
+    MetaTestCaseClass, TestCase, DeprecationTestCase
 )
 
 

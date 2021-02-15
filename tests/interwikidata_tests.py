@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -12,7 +14,7 @@ from pywikibot import Link
 
 from scripts import interwikidata
 
-from tests.aspects import unittest, SiteAttributeTestCase
+from tests.aspects import SiteAttributeTestCase
 from tests.utils import empty_sites
 
 

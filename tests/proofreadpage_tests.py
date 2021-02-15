@@ -6,6 +6,7 @@
 #
 import difflib
 import json
+import unittest
 
 from contextlib import suppress
 
@@ -16,7 +17,7 @@ from pywikibot.proofreadpage import IndexPage, ProofreadPage
 from pywikibot.tools import has_module
 
 from tests import unittest_print
-from tests.aspects import unittest, require_modules, TestCase
+from tests.aspects import require_modules, TestCase
 from tests.basepage import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,

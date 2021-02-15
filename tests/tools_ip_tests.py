@@ -1,15 +1,17 @@
 #!/usr/bin/python
 """Test IP module/regex."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
+import unittest
+
 from contextlib import suppress
 
 from pywikibot.tools import is_IP, PYTHON_VERSION
 
 from tests import unittest_print
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 from tests.utils import expected_failure_if
 
 

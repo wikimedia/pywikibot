@@ -1,10 +1,11 @@
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
+import unittest
 
 from contextlib import suppress
 
@@ -12,7 +13,7 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 
-from tests.aspects import unittest, MetaTestCaseClass, TestCase
+from tests.aspects import MetaTestCaseClass, TestCase
 
 PACKAGES = (
     'redirect-broken-redirect-template',  # speedy deletion template

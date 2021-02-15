@@ -4,18 +4,19 @@ UploadRobot test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
+import unittest
 
 from contextlib import suppress
 
 from pywikibot.specialbots import UploadRobot
 
 from tests import join_images_path
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+from tests.aspects import TestCase, DefaultSiteTestCase
 
 
 class TestUploadbot(TestCase):

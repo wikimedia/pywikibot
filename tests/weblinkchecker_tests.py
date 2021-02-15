@@ -5,13 +5,14 @@
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import unittest
 
 from contextlib import suppress
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from urllib.parse import urlparse
 
 from scripts import weblinkchecker
-from tests.aspects import unittest, require_modules, TestCase
+from tests.aspects import require_modules, TestCase
 
 
 @require_modules('memento_client')
