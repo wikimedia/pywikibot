@@ -1898,12 +1898,18 @@ class APISite(
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
 
-    @deprecated_args(step=None)
-    def categorymembers(self, category, *, namespaces=None, sortby=None,
-                        reverse=False, starttime=None, endtime=None,
-                        startsort=None, endsort=None, total=None,
-                        content=False, member_type=None,
-                        startprefix=None, endprefix=None):
+    @deprecated_args(step=None, startsort=None, endsort=None)
+    def categorymembers(self, category, *,
+                        namespaces=None,
+                        sortby: Optional[str] = None,
+                        reverse: bool = False,
+                        starttime=None,
+                        endtime=None,
+                        total: Optional[int] = None,
+                        content: bool = False,
+                        member_type=None,
+                        startprefix: Optional[str] = None,
+                        endprefix: Optional[str] = None):
         """Iterate members of specified category.
 
         @see: U{https://www.mediawiki.org/wiki/API:Categorymembers}
@@ -1919,7 +1925,6 @@ class APISite(
             valid values are "sortkey" (default, results ordered by category
             sort key) or "timestamp" (results ordered by time page was
             added to the category)
-        @type sortby: str
         @param reverse: if True, generate results in reverse order
             (default False)
         @param starttime: if provided, only generate pages added after this
@@ -1927,23 +1932,12 @@ class APISite(
         @type starttime: pywikibot.Timestamp
         @param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
-        @param startsort: if provided, only generate pages that have a
-            sortkey >= startsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
-        @type startsort: str
-        @param endsort: if provided, only generate pages that have a
-            sortkey <= endsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
-        @type endsort: str
         @param startprefix: if provided, only generate pages >= this title
-            lexically; not valid if sortby="timestamp"; overrides "startsort"
-        @type startprefix: str
+            lexically; not valid if sortby="timestamp"
         @param endprefix: if provided, only generate pages < this title
-            lexically; not valid if sortby="timestamp"; overrides "endsort"
-        @type endprefix: str
+            lexically; not valid if sortby="timestamp"
         @param content: if True, load the current content of each iterated page
             (default False)
-        @type content: bool
         @param member_type: member type; if member_type includes 'page' and is
             used in conjunction with sortby="timestamp", the API may limit
             results to only pages in the first 50 namespaces.
@@ -1955,27 +1949,28 @@ class APISite(
             type such as NoneType or bool
         """
         if category.namespace() != 14:
-            raise Error(
-                "categorymembers: non-Category page '%s' specified"
-                % category.title())
+            raise Error('categorymembers: non-Category page {!r} specified'
+                        .format(category))
+
         cmtitle = category.title(with_section=False).encode(self.encoding())
-        cmargs = {'type_arg': 'categorymembers', 'gcmtitle': cmtitle,
-                  'gcmprop': 'ids|title|sortkey'}
+        cmargs = {
+            'type_arg': 'categorymembers',
+            'gcmtitle': cmtitle,
+            'gcmprop': 'ids|title|sortkey'
+        }
+
         if sortby in ['sortkey', 'timestamp']:
             cmargs['gcmsort'] = sortby
         elif sortby:
-            raise ValueError(
-                "categorymembers: invalid sortby value '%s'"
-                % sortby)
+            raise ValueError('categorymembers: invalid sortby value {!r}'
+                             .format(sortby))
+
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 'categorymembers: starttime must be before endtime')
         if startprefix and endprefix and startprefix > endprefix:
             raise ValueError(
                 'categorymembers: startprefix must be less than endprefix')
-        elif startsort and endsort and startsort > endsort:
-            raise ValueError(
-                'categorymembers: startsort must be less than endsort')
 
         if isinstance(member_type, str):
             member_type = {member_type}
@@ -1994,8 +1989,8 @@ class APISite(
                 if namespaces:
                     if excluded_namespaces.intersection(namespaces):
                         raise ValueError(
-                            'incompatible namespaces %r and member_type %r'
-                            % (namespaces, member_type))
+                            'incompatible namespaces {!r} and member_type {!r}'
+                            .format(namespaces, member_type))
                     # All excluded namespaces are not present in `namespaces`.
                 else:
                     # If the number of namespaces is greater than permitted by
@@ -2021,39 +2016,32 @@ class APISite(
             cmargs['gcmdir'] = 'desc'
             # API wants start/end params in opposite order if using descending
             # sort; we take care of this reversal for the user
-            (starttime, endtime) = (endtime, starttime)
-            (startsort, endsort) = (endsort, startsort)
-            (startprefix, endprefix) = (endprefix, startprefix)
+            starttime, endtime = endtime, starttime
+            startprefix, endprefix = endprefix, startprefix
+
         if starttime and sortby == 'timestamp':
             cmargs['gcmstart'] = starttime
         elif starttime:
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'starttime'")
+
         if endtime and sortby == 'timestamp':
             cmargs['gcmend'] = endtime
         elif endtime:
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'endtime'")
+
         if startprefix and sortby != 'timestamp':
             cmargs['gcmstartsortkeyprefix'] = startprefix
         elif startprefix:
             raise ValueError('categorymembers: invalid combination of '
                              "'sortby' and 'startprefix'")
-        elif startsort and sortby != 'timestamp':
-            cmargs['gcmstartsortkey'] = startsort
-        elif startsort:
-            raise ValueError('categorymembers: '
-                             "invalid combination of 'sortby' and 'startsort'")
+
         if endprefix and sortby != 'timestamp':
             cmargs['gcmendsortkeyprefix'] = endprefix
         elif endprefix:
             raise ValueError('categorymembers: '
                              "invalid combination of 'sortby' and 'endprefix'")
-        elif endsort and sortby != 'timestamp':
-            cmargs['gcmendsortkey'] = endsort
-        elif endsort:
-            raise ValueError('categorymembers: '
-                             "invalid combination of 'sortby' and 'endsort'")
 
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
