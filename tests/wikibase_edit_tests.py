@@ -10,12 +10,13 @@ class in edit_failiure_tests.py
 # Distributed under the terms of the MIT license.
 #
 import time
+import unittest
 
 from contextlib import suppress
 
 import pywikibot
 
-from tests.aspects import unittest, WikibaseTestCase
+from tests.aspects import WikibaseTestCase
 
 
 class TestWikibaseWriteGeneral(WikibaseTestCase):

@@ -16,7 +16,7 @@ import unittest
 
 from tests import join_tests_path, create_path_func
 from tests.utils import execute, execute_pwb
-from tests.aspects import unittest, PwbTestCase
+from tests.aspects import PwbTestCase
 
 join_pwb_tests_path = create_path_func(join_tests_path, 'pwb')
 
