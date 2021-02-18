@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Library module representing MediaWiki sites (wikis)."""
 #
 # (C) Pywikibot team, 2021
