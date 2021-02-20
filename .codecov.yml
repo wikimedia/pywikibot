@@ -27,6 +27,8 @@ coverage:
     - scripts/maintenance/sorting_order.py
     - scripts/maintenance/update_linktrails.py
     - scripts/maintenance/wikimedia_sites.py
+    - tests/archive
+    - tests/pwb
 
   notify:
     irc:
