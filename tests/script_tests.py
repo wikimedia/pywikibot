@@ -86,29 +86,16 @@ script_input = {
 }
 
 auto_run_script_list = [
-    'blockpageschecker',
-    'casechecker',
-    'catall',
     'category_redirect',
     'checkimages',
     'clean_sandbox',
-    'disambredir',
-    'followlive',
-    'imagerecat',
     'login',
-    'lonelypages',
     'misspelling',
     'revertbot',
     'noreferences',
-    'nowcommons',
     'parser_function_count',
-    'patrol',
     'shell',
-    'standardize_interwiki',
-    'states_redirect',
-    'unusedfiles',
     'upload',
-    'watchlist',
     'welcome',
 ]
 
