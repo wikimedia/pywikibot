@@ -105,21 +105,20 @@ class TestPwb(PwbTestCase):
         with self.subTest(line=2):
             self.assertEqual(stderr.readline().strip(), result[2])
 
-    @unittest.skip('No multiple results currently')
     def test_similar_scripts_found(self):
         """Test script call which gives multiple similar results."""
         result = [
-            'ERROR: commons.py not found! Misspelling?',
+            'ERROR: inter_wikidata.py not found! Misspelling?',
             '',
             'The most similar scripts are:',
-            '1 - nowcommons',
-            '2 - commonscat',
-            '3 - commons_link',
+            '1 - interwikidata',
+            '2 - illustrate_wikidata',
         ]
-        stderr = io.StringIO(execute_pwb(['commons'], data_in='q')['stderr'])
-        for line in range(6):
+        stderr = io.StringIO(
+            execute_pwb(['inter_wikidata'], data_in='q')['stderr'])
+        for line in result:
             with self.subTest(line=line):
-                self.assertEqual(stderr.readline().strip(), result[line])
+                self.assertEqual(stderr.readline().strip(), line)
 
 
 if __name__ == '__main__':  # pragma: no cover
