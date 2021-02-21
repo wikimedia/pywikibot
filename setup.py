@@ -58,7 +58,7 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.15'],
+    'isbn': ['python-stdnum>=1.16'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': [  # vulnerability found in Pillow<6.2.2
@@ -94,14 +94,6 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
-    'flickrripper.py': [
-        'flickrapi>=2.2',
-    ] + extra_deps['Tkinter'],
-    'imageharvest.py': extra_deps['html'],
-    'isbn.py': extra_deps['isbn'],
-    'match_images.py': extra_deps['Tkinter'],
-    'patrol.py': extra_deps['mwparserfromhell'],
-    'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
 }
 
@@ -118,17 +110,9 @@ dependencies = [
     'setuptools>=20.2 ; python_version >= "3.6"',
 ]
 
-try:
-    import bz2
-except ImportError:  # pragma: no cover
-    # Use bz2file if the python is not compiled with bz2 support.
-    dependencies.append('bz2file')
-else:
-    assert bz2
-
 
 # ------- setup tests_require ------- #
-test_deps = ['bz2file', 'mock']
+test_deps = ['mock']
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.

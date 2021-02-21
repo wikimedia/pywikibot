@@ -18,7 +18,7 @@
 #     or
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
-# mandatory; see README-conversion.txt
+# mandatory
 requests>=2.20.1, < 2.26.0; python_version < '3.6'
 requests>=2.20.1 ; python_version >= '3.6'
 setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < '3.6'
@@ -29,8 +29,8 @@ setuptools>=20.2 ; python_version >= '3.6'
 # about the user
 mwoauth>=0.2.4,!=0.3.1
 
-# cosmetic_changes and scripts/isbn
-python-stdnum >= 1.15
+# cosmetic_changes
+python-stdnum >= 1.16
 
 # GUI
 Pillow >= 6.2.2, < 8.0.0 ; python_version < '3.6'
@@ -41,9 +41,6 @@ Pillow >= 8.0.0 ; python_version >= '3.9'
 google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
-# scripts/flickrripper.py
-flickrapi >= 2.2
-
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3
 
@@ -53,13 +50,5 @@ PyMySQL
 # core HTML comparison parser in diff module
 beautifulsoup4
 
-# scripts/states_redirect.py
-pycountry
-
 # scripts/weblinkchecker.py
 memento_client>=0.5.1,!=0.6.0
-
-# tools/__init__.py
-# pywikibot prefers using the inbuilt bz2 module if python was compiled with
-# bz2 support. But if it wasn't, bz2file is used instead.
-# bz2file
