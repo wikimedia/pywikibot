@@ -91,14 +91,13 @@ class TestGenerateUserFiles(TestCase):
         self.assertIsNotNone(config_text)
         for section in ('LOGFILE SETTINGS',
                         'EXTERNAL SCRIPT PATH SETTINGS',
-                        'INTERWIKI SETTINGS',
                         'FURTHER SETTINGS',
                         'HTTP SETTINGS',
                         'REPLICATION BOT SETTINGS',
                         ):
             self.assertIn(section, config_text)
         lines = config_text.splitlines()
-        self.assertGreater(len(lines), 350)
+        self.assertGreater(len(lines), 300)
 
 
 if __name__ == '__main__':  # pragma: no cover

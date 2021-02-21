@@ -110,10 +110,12 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {
-    'available_ssl_project', 'fake_user_agent', 'interwiki_contents_on_disk',
-    'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
-    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
-    'db_hostname',
+    'available_ssl_project', 'db_hostname', 'fake_user_agent',
+    'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
+    'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
+    'interwiki_shownew', 'line_separator', 'LS', 'panoramio', 'proxy',
+    'special_page_limit', 'sysopnames', 'use_mwparserfromhell',
+    'use_SSL_onlogin', 'use_SSL_always', 'without_interwiki', 
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -514,15 +516,14 @@ editor_filename_extension = 'wiki'
 # saved in the 'logs' subdirectory.
 #
 # Example:
-#     log = ['interwiki', 'weblinkchecker', 'table2wiki']
+#     log = ['redirect', 'replace', 'weblinkchecker']
 # It is also possible to enable logging for all scripts, using this line:
 #     log = ['*']
 # To disable all logging, use this:
 #     log = []
-# Per default, logging of interwiki.py is enabled because its logfiles can
-# be used to generate so-called warnfiles.
+# Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = ['interwiki']
+log = []
 # filename defaults to modulename-bot.log
 logfilename = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
@@ -560,49 +561,6 @@ debug_log = []
 # sample:
 # user_script_paths = ['scripts.myscripts']
 user_script_paths = []  # type: List[str]
-
-# ############# INTERWIKI SETTINGS ##############
-
-# Should interwiki.py report warnings for missing links between foreign
-# languages?
-interwiki_backlink = True
-
-# Should interwiki.py display every new link it discovers?
-interwiki_shownew = True
-
-# Should interwiki.py output a graph PNG file on conflicts?
-# You need pydot for this:
-# https://pypi.org/project/pydot/
-interwiki_graph = False
-
-# Specifies that the robot should process that amount of subjects at a time,
-# only starting to load new pages in the original language when the total
-# falls below that number. Default is to process (at least) 100 subjects at
-# once.
-interwiki_min_subjects = 100
-
-# If interwiki graphs are enabled, which format(s) should be used?
-# Supported formats include png, jpg, ps, and svg. See:
-# http://www.graphviz.org/doc/info/output.html
-# If you want to also dump the dot files, you can use this in your
-# user-config.py:
-# interwiki_graph_formats = ['dot', 'png']
-# If you need a PNG image with an HTML image map, use this:
-# interwiki_graph_formats = ['png', 'cmap']
-# If you only need SVG images, use:
-# interwiki_graph_formats = ['svg']
-interwiki_graph_formats = ['png']
-
-# You can post the contents of your autonomous_problems.dat to the wiki,
-# e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
-# This allows others to assist you in resolving interwiki problems.
-# To help these people, you can upload the interwiki graphs to your
-# webspace somewhere. Set the base URL here, e.g.:
-# 'https://www.example.org/~yourname/interwiki-graphs/'
-interwiki_graph_url = None
-
-# Save file with local articles without interwikis.
-without_interwiki = False
 
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
@@ -795,7 +753,7 @@ socket_timeout = (6.05, 45)
 
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
-# whitespace or positioning of interwiki and category links.
+# whitespace or positioning category links.
 
 # This is an experimental feature; handle with care and consider re-checking
 # each bot edit if enabling this!
