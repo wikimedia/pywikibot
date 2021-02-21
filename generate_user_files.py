@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2010-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,12 +24,13 @@ else:
 
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
-DISABLED_SECTIONS = {'USER INTERFACE SETTINGS',  # uses sys
-                     'EXTERNAL EDITOR SETTINGS',  # uses os
-                     }
-OBSOLETE_SECTIONS = {'ACCOUNT SETTINGS',  # already set
-                     'OBSOLETE SETTINGS',  # obsolete
-                     }
+DISABLED_SECTIONS = {
+    'USER INTERFACE SETTINGS',  # uses sys
+    'EXTERNAL EDITOR SETTINGS',  # uses os
+}
+OBSOLETE_SECTIONS = {
+    'ACCOUNT SETTINGS',  # already set
+}
 
 # Disable user-config usage as we are creating it here
 pywikibot = _import_with_no_user_config('pywikibot')
