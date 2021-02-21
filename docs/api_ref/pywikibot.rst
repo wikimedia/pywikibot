@@ -95,11 +95,6 @@ pywikibot.i18n module
 
 .. automodule:: pywikibot.i18n
 
-pywikibot.interwiki\_graph module
----------------------------------
-
-.. automodule:: pywikibot.interwiki_graph
-
 pywikibot.logentries module
 ---------------------------
 
