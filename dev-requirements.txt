@@ -12,7 +12,6 @@ werkzeug>=0.15.5
 pytest-httpbin
 
 nose
-git+https://github.com/jayvdb/nosetrim@py3
 
 pep257>=0.6
 pyflakes>=2.1.0
