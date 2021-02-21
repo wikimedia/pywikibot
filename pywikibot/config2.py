@@ -110,12 +110,20 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {
-    'available_ssl_project', 'db_hostname', 'fake_user_agent',
+    'available_ssl_project', 'copyright_check_in_source_google',
+    'copyright_check_in_source_msn', 'copyright_check_in_source_section_names',
+    'copyright_check_in_source_yahoo', 'copyright_connection_tries',
+    'copyright_economize_query', 'copyright_exceeded_in_queries',
+    'copyright_exceeded_in_queries_sleep_hours', 'copyright_google',
+    'copyright_max_query_for_page', 'copyright_msn', 'copyright_show_date',
+    'copyright_show_length', 'copyright_skip_query', 'copyright_yahoo',
+    'db_hostname', 'deIndentTables', 'fake_user_agent', 'flickr',
     'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
     'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
-    'interwiki_shownew', 'line_separator', 'LS', 'panoramio', 'proxy',
-    'special_page_limit', 'sysopnames', 'use_mwparserfromhell',
-    'use_SSL_onlogin', 'use_SSL_always', 'without_interwiki', 
+    'interwiki_shownew', 'line_separator', 'LS', 'msn_appid', 'panoramio',
+    'persistent_http', 'proxy', 'replicate_replace', 'special_page_limit',
+    'splitLongParagraphs', 'sysopnames', 'use_mwparserfromhell',
+    'use_SSL_onlogin', 'use_SSL_always', 'without_interwiki', 'yahoo_appid',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -622,15 +630,6 @@ retry_wait = 5
 # Maximum time to wait before resubmitting a failed API request.
 retry_max = 120
 
-# ############# TABLE CONVERSION BOT SETTINGS ##############
-
-# Will split long paragraphs for better reading the source.
-# Only table2wiki.py use it by now.
-splitLongParagraphs = False
-# sometimes HTML-tables are indented for better reading.
-# That can do very ugly results.
-deIndentTables = True
-
 # ############# WEBLINK CHECKER SETTINGS ##############
 
 # How many external links should weblinkchecker.py check at the same time?
@@ -661,88 +660,7 @@ db_connect_file = user_home_path('.my.cnf')
 #     user@login.toolforge.org
 db_port = 3306
 
-# ############# SEARCH ENGINE SETTINGS ##############
-# Live search web service appid settings.
-#
-# Yahoo! Search Web Services are not operational.
-# See https://phabricator.wikimedia.org/T106085
-yahoo_appid = ''
-
-# To use Windows Live Search web service you must get an AppID from
-# http://www.bing.com/dev/en-us/dev-center
-msn_appid = ''
-
-# ############# FLICKR RIPPER SETTINGS ##############
-
-# Using the Flickr api
-flickr = {
-    'api_key': '',  # Provide your key!
-    'api_secret': '',  # Api secret of your key (optional)
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': '',  # If so, under what reviewer name?
-}
-
-# ############# COPYRIGHT SETTINGS ##############
-
-# Enable/disable search engine in copyright.py script
-copyright_google = True
-copyright_yahoo = True
-copyright_msn = False
-
-# Perform a deep check, loading URLs to search if 'Wikipedia' is present.
-# This may be useful to increase the number of correct results. If you haven't
-# a fast connection, you might want to keep them disabled.
-copyright_check_in_source_google = False
-copyright_check_in_source_yahoo = False
-copyright_check_in_source_msn = False
-
-# Web pages may contain a Wikipedia text without the word 'Wikipedia' but with
-# the typical '[edit]' tag as a result of a copy & paste procedure. You want
-# no report for this kind of URLs, even if they are copyright violations.
-# However, when enabled, these URLs are logged in a file.
-copyright_check_in_source_section_names = False
-
-# Limit number of queries for page.
-copyright_max_query_for_page = 25
-
-# Skip a specified number of queries
-copyright_skip_query = 0
-
-# Number of attempts on connection error.
-copyright_connection_tries = 10
-
-# Behavior if an exceeded error occur.
-#
-# Possibilities:
-#
-#    0 = None
-#    1 = Disable search engine
-#    2 = Sleep (default)
-#    3 = Stop
-copyright_exceeded_in_queries = 2
-copyright_exceeded_in_queries_sleep_hours = 6
-
-# Append last modified date of URL to script result
-copyright_show_date = True
-
-# Append length of URL to script result
-copyright_show_length = True
-
-# By default the script tries to identify and skip text that contains a large
-# comma separated list or only numbers. But sometimes that might be the
-# only part unmodified of a slightly edited and not otherwise reported
-# copyright violation. You can disable this feature to try to increase the
-# number of results.
-copyright_economize_query = True
-
 # ############# HTTP SETTINGS ##############
-# Use a persistent http connection. An http connection has to be established
-# only once per site object, making stuff a whole lot faster. Do NOT EVER
-# use this if you share Site objects across threads without proper locking.
-#
-# DISABLED FUNCTION. Setting this variable will not have any effect.
-persistent_http = False
-
 # Default socket timeout in seconds.
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your
 # script.
@@ -791,19 +709,6 @@ cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
 cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'newitem', 'touch']
 
-# ############# REPLICATION BOT SETTINGS ################
-# You can add replicate_replace to your user-config.py.
-#
-# Use has the following format:
-#
-# replicate_replace = {
-#            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
-# }
-#
-# to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
-# liwiki. Note that this does not take the origin wiki into account.
-replicate_replace = {}  # type: Dict[str, Dict[str, str]]
-
 # ############# FURTHER SETTINGS ##############
 
 # Simulate settings
@@ -837,12 +742,6 @@ pickle_protocol = 2
 # ============================
 # End of configuration section
 # ============================
-
-# ############# OBSOLETE SETTINGS #############
-# This section contains configuration options that are no longer in use.
-# They are kept here to prevent warnings about undefined parameters.
-
-# No obsolete settings currently
 
 # #############################################
 

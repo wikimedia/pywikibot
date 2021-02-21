@@ -75,7 +75,7 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual('ACCOUNT SETTINGS', first.head)
         self.assertIn(first.head, first.section)
         self.assertIn(first.info[:10], first.section)
-        self.assertEqual('OBSOLETE SETTINGS', last.head)
+        self.assertEqual('FURTHER SETTINGS', last.head)
         self.assertIn(last.head, last.section)
         self.assertIn(last.info[:10], last.section)
 
@@ -93,11 +93,10 @@ class TestGenerateUserFiles(TestCase):
                         'EXTERNAL SCRIPT PATH SETTINGS',
                         'FURTHER SETTINGS',
                         'HTTP SETTINGS',
-                        'REPLICATION BOT SETTINGS',
                         ):
             self.assertIn(section, config_text)
         lines = config_text.splitlines()
-        self.assertGreater(len(lines), 300)
+        self.assertGreater(len(lines), 200)
 
 
 if __name__ == '__main__':  # pragma: no cover
