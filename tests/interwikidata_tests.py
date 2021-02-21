@@ -97,9 +97,7 @@ class TestInterwikidataBot(SiteAttributeTestCase):
                      site=self.wt)
 
         with self.assertRaisesRegex(
-                ValueError,
-                r'wikitech:en does not have a data repository, '
-                r'use interwiki\.py instead.'):
+                ValueError, 'wikitech:en does not have a data repository.'):
             interwikidata.IWBot(
                 generator=[pywikibot.Page(self.wt, 'User:Dalba')],
                 site=self.wt)
