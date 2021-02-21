@@ -29,9 +29,6 @@ setuptools>=20.2 ; python_version >= '3.6'
 # about the user
 mwoauth>=0.2.4,!=0.3.1
 
-# core interwiki_graph.py:
-pydot >= 1.2
-
 # cosmetic_changes and scripts/isbn
 python-stdnum >= 1.15
 

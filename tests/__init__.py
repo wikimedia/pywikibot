@@ -87,7 +87,6 @@ library_test_modules = {
     'flow_thanks',
     'http',
     'i18n',
-    'interwiki_graph',
     'interwiki_link',
     'link',
     'linter',
