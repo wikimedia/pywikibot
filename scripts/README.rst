@@ -275,8 +275,6 @@ The contents of the package
     | compat2core.py         | Helper script to convert compat 1.0 scripts to the core |
     |                        | 3.0 framework. Also works for newer Pywikibot releases. |
     +------------------------+---------------------------------------------------------+
-    | interwikidumps.py      | Convert interwiki dumps from pickle to txt format.      |
-    +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+
     | preload_sites.py       | Preload and cache site information for each WM family.  |

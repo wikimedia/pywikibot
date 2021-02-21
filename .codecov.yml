@@ -21,7 +21,6 @@ coverage:
     - scripts/archive
     - scripts/userscripts
     - scripts/maintenance/colors.py
-    - scripts/maintenance/interwikidumps.py
     - scripts/maintenance/make_i18n_dict.py
     - scripts/maintenance/preload_sites.py
     - scripts/maintenance/sorting_order.py
