@@ -12,9 +12,6 @@ To get started on proper usage of the bot framework, please refer to:
 
     `Manual:Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
 
-NOTE : Script names with # at start are not yet present in Core rather are
-       expected to be merged based on reviews and need from compat version.
-
 The contents of the package
 ---------------------------
 
@@ -33,8 +30,6 @@ The contents of the package
     | category_redirect.py   | Maintain category redirects and replace links to        |
     |                        | redirected categories.                                  |
     +------------------------+---------------------------------------------------------+
-    | #censure.py            | Bad word checker bot.                                   |
-    +------------------------+---------------------------------------------------------+
     | change_pagelang.py     | Changes the content language of pages.                  |
     +------------------------+---------------------------------------------------------+
     | checkimages.py         | Check recently uploaded files. Checks if a file         |
@@ -46,14 +41,6 @@ The contents of the package
     | clean_sandbox.py       | This bot makes the cleaned of the page of tests.        |
     +------------------------+---------------------------------------------------------+
     | coordinate_import.py   | Coordinate importing script.                            |
-    +------------------------+---------------------------------------------------------+
-    | #copyright.py          | This robot check copyright text in Google, Yahoo! and   |
-    |                        | Live Search.                                            |
-    +------------------------+---------------------------------------------------------+
-    | #copyright_clean.py    | Remove reports of copyright.py on wiki pages.           |
-    |                        | Uses YurikAPI.                                          |
-    +------------------------+---------------------------------------------------------+
-    | #copyright_put.py      | Put reports of copyright.py on wiki pages.              |
     +------------------------+---------------------------------------------------------+
     | cosmetic_changes.py    | Can do slight modifications to a wiki page source code  |
     |                        | such that the code looks cleaner.                       |
@@ -71,10 +58,6 @@ The contents of the package
     | imagetransfer.py       | Given a wiki page, check the interwiki links for        |
     |                        | images, and let the user choose among them for          |
     |                        | images to upload.                                       |
-    +------------------------+---------------------------------------------------------+
-    | #inline_images.py      | This bot looks for images that are linked inline        |
-    |                        | (i.e., they are hosted from an external server and      |
-    |                        | hotlinked).                                             |
     +------------------------+---------------------------------------------------------+
     | interwikidata.py       | Script to handle interwiki links based on Wikibase.     |
     +------------------------+---------------------------------------------------------+
@@ -96,8 +79,6 @@ The contents of the package
     | pagefromfile.py        | This bot takes its input from a file that contains a    |
     |                        | number of pages to be put on the wiki.                  |
     +------------------------+---------------------------------------------------------+
-    | #pageimport.py         | Import pages from a certain wiki to another.            |
-    +------------------------+--+------------------------------------------------------+
     | parser_function_count.py  | Find expensive templates that are subject to be      |
     |                           | converted to Lua.                                    |
     +------------------------+--+------------------------------------------------------+
@@ -122,15 +103,6 @@ The contents of the package
     | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
     |                        | for speedy deletion.                                    |
     +------------------------+---------------------------------------------------------+
-    | #spellcheck.py         | This bot spellchecks wiki pages.                        |
-    +------------------------+---+-----------------------------------------------------+
-    | #standardize_notes.py  | Converts external links and notes/references to         |
-    |                        | Footnote3 ref/note format.  Rewrites References.        |
-    +----------------------------+-----------------------------------------------------+
-    | #statistics_in_wikitable.py| This bot renders statistics provided by             |
-    |                            | [[Special:Statistics]] in a table on a wiki page.   |
-    |                            | Thus it creates and updates a statistics wikitable. |
-    +------------------------+---+-----------------------------------------------------+
     | template.py            | change one template (that is {{...}}) into another.     |
     +------------------------+---------------------------------------------------------+
     | templatecount.py       | Display the list of pages transcluding a given list     |
