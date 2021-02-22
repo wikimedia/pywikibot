@@ -184,7 +184,6 @@ class SyncSites:
     def check_page(self, pagename):
         """Check one page."""
         pywikibot.output('\nChecking ' + pagename)
-        sys.stdout.flush()
         page1 = Page(self.original, pagename)
         txt1 = page1.text
 
@@ -220,8 +219,7 @@ class SyncSites:
                 page2.text = txt1
                 page2.save(self.put_message(site))
             else:
-                sys.stdout.write('.')
-                sys.stdout.flush()
+                pywikibot.stdout('.', newline=False)
 
 
 def main(*args):
