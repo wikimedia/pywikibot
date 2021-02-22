@@ -94,6 +94,8 @@ The contents of the package
     |                        | text files. The bot can either work on a set of given   |
     |                        | pages or crawl an SQL dump.                             |
     +------------------------+---------------------------------------------------------+
+    | replicate_wiki.py      | Replicates pages in wiki to a second wiki within  family|
+    +------------------------+---------------------------------------------------------+
     | revertbot.py           | Revert edits.                                           |
     +------------------------+---------------------------------------------------------+
     | shell.py               | Spawns an interactive Python shell                      |
@@ -206,8 +208,6 @@ The contents of the package
     | reflinks.py            | Search for references which are only made of a link     |
     |                        | without title and fetch the html title from the link to |
     |                        | use it as the title of the wiki link in the reference.  |
-    +------------------------+---------------------------------------------------------+
-    | replicate_wiki.py      | Replicates pages in wiki to a second wiki within  family|
     +------------------------+---------------------------------------------------------+
     | selflink.py            | This bot goes over multiple pages of the home wiki,     |
     |                        | searches for selflinks, and allows removing them.       |

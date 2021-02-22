@@ -121,9 +121,9 @@ _deprecated_variables = {
     'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
     'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
     'interwiki_shownew', 'line_separator', 'LS', 'msn_appid', 'panoramio',
-    'persistent_http', 'proxy', 'replicate_replace', 'special_page_limit',
-    'splitLongParagraphs', 'sysopnames', 'use_mwparserfromhell',
-    'use_SSL_onlogin', 'use_SSL_always', 'without_interwiki', 'yahoo_appid',
+    'persistent_http', 'proxy', 'special_page_limit', 'splitLongParagraphs',
+    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
+    'without_interwiki', 'yahoo_appid',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -708,6 +708,19 @@ cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
 # cosmetic_changes_deny_script.append('your_script_name')
 cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'newitem', 'touch']
+
+# ############# REPLICATION BOT SETTINGS ################
+# You can add replicate_replace to your user-config.py.
+#
+# Use has the following format:
+#
+# replicate_replace = {
+#            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
+# }
+#
+# to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
+# liwiki. Note that this does not take the origin wiki into account.
+replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 
 # ############# FURTHER SETTINGS ##############
 

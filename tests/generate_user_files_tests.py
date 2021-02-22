@@ -93,6 +93,7 @@ class TestGenerateUserFiles(TestCase):
                         'EXTERNAL SCRIPT PATH SETTINGS',
                         'FURTHER SETTINGS',
                         'HTTP SETTINGS',
+                        'REPLICATION BOT SETTINGS',
                         ):
             self.assertIn(section, config_text)
         lines = config_text.splitlines()
