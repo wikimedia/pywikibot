@@ -12,8 +12,6 @@ pytest-attrib>=0.1.3
 werkzeug>=0.15.5
 pytest-httpbin
 
-nose
-
 pep257>=0.6
 pyflakes>=2.1.0
 flake8>=3.7.5

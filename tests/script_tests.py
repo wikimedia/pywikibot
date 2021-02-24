@@ -325,7 +325,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     '{} has dependencies; skipping'
                     .format(script_name))(dct[test_name])
 
-            # Disable test by default in nosetests
+            # Disable test by default in pytest
             if script_name in unrunnable_script_set:
                 # flag them as an expectedFailure due to py.test (T135594)
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -357,7 +357,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     """Test cases for scripts.
 
-    This class sets the nose 'user' attribute on every test, thereby ensuring
+    This class sets the'user' attribute on every test, thereby ensuring
     that the test runner has a username for the default site, and so that
     Site.login() is called in the test runner, which means that the scripts
     run in pwb can automatically login using the saved cookies.

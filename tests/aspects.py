@@ -294,14 +294,6 @@ def require_modules(*required_modules):
             return obj
         skip_decorator = unittest.skip('{0} not installed'.format(
             ', '.join(missing)))
-        if (inspect.isclass(obj) and issubclass(obj, TestCaseBase)
-                and 'nose' in sys.modules.keys()):
-            # There is a known bug in nosetests which causes setUpClass()
-            # to be called even if the unittest class is skipped.
-            # Here, we decorate setUpClass() as a patch to skip it
-            # because of the missing modules too.
-            # Upstream report: https://github.com/nose-devs/nose/issues/946
-            obj.setUpClass = classmethod(skip_decorator(lambda cls: None))
         return skip_decorator(obj)
 
     return test_requirement
@@ -315,7 +307,7 @@ class DisableSiteMixin(TestCaseBase):
 
     Never set a class or instance variable called 'site'
     As it will prevent tests from executing when invoked as:
-    $ nosetests -a '!site' -v
+    $ pytest -a 'not site'
     """
 
     def setUp(self):
@@ -371,7 +363,7 @@ class DisconnectedSiteMixin(TestCaseBase):
 
     Never set a class or instance variable called 'site'
     As it will prevent tests from executing when invoked as:
-    $ nosetests -a '!site' -v
+    $ pytest -a 'not site'
     """
 
     def setUp(self):
@@ -730,7 +722,7 @@ class MetaTestCaseClass(type):
                         .format(name))
 
             # If the 'site' attribute is a false value,
-            # remove it so it matches !site in nose.
+            # remove it so it matches 'not site' in pytest.
             if 'site' in dct:
                 del dct['site']
 
@@ -741,7 +733,7 @@ class MetaTestCaseClass(type):
                     .format(name))
 
             # If the 'net' attribute is a false value,
-            # remove it so it matches !net in nose.
+            # remove it so it matches 'not net' in pytest.
             if not dct['net']:
                 del dct['net']
 

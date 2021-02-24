@@ -3,8 +3,7 @@ Pywikibot tests
 ===============
 
 The Pywikibot tests are based on the `unittest framework
-<https://docs.python.org/3/library/unittest.html>`_,
-and are compatible with `nose <https://nose.readthedocs.org/>`_.
+<https://docs.python.org/3/library/unittest.html>`_.
 
 The tests package provides a function load_tests that supports the
 `load tests protocol
@@ -28,10 +27,6 @@ setup.py
 
 ::
 
-    python setup.py nosetests --tests tests
-
-::
-
     pip install pytest-runner
     python setup.py pytest
 
@@ -41,13 +36,6 @@ Module unittest
 ::
 
     python -m unittest discover -v -p "*_tests.py"
-
-nose
-~~~~
-
-::
-
-    nosetests -v
 
 pytest
 ~~~~~~
@@ -66,7 +54,7 @@ tox
 Specific tests
 --------------
 
-Individual test components can be run using unittest, nosetests, or pwb.
+Individual test components can be run using unittest, pytest or pwb.
 With -lang and -family or -site options pwb can be used to specify a site.
 
 
@@ -77,14 +65,6 @@ unittest
 
     python -m unittest -v tests.api_tests tests.site_tests
     python -m unittest -v tests.api_tests.TestParamInfo.test_init
-
-nose
-~~~~
-
-::
-
-    nosetests -v tests.api_tests tests.site_tests
-    python -m nose -v tests.api_tests:TestParamInfo.test_init
 
 pytest
 ~~~~~~
