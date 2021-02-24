@@ -173,7 +173,8 @@ class TestHttpStatus(HttpbinTestCase):
 
         r = http.fetch('http://en.wikia.com')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.url, 'https://www.fandom.com/explore')
+        self.assertEqual(r.url,
+                         'https://community.fandom.com/wiki/Community_Central')
 
 
 class UserAgentTestCase(TestCase):
