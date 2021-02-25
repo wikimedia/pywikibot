@@ -211,45 +211,25 @@ class TestTerminalOutput(UITestCase):
 
     """Terminal output tests."""
 
-    def testOutputLevels_logging_debug(self):
-        logger.log(DEBUG, 'debug', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), '')
+    tests = [
+        ('debug', DEBUG, '', ''),
+        ('verbose', VERBOSE, '', ''),
+        ('info', INFO, '', 'info\n'),
+        ('stdout', STDOUT, 'stdout\n', ''),
+        ('input', INPUT, '', 'input\n'),
+        ('WARNING', WARNING, '', 'WARNING: WARNING\n'),
+        ('ERROR', ERROR, '', 'ERROR: ERROR\n'),
+        ('CRITICAL', CRITICAL, '', 'CRITICAL: CRITICAL\n'),
+    ]
 
-    def testOutputLevels_logging_verbose(self):
-        logger.log(VERBOSE, 'verbose', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), '')
-
-    def testOutputLevels_logging_info(self):
-        logger.log(INFO, 'info', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'info\n')
-
-    def testOutputLevels_logging_stdout(self):
-        logger.log(STDOUT, 'stdout', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), 'stdout\n')
-        self.assertEqual(newstderr.getvalue(), '')
-
-    def testOutputLevels_logging_input(self):
-        logger.log(INPUT, 'input', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'input\n')
-
-    def testOutputLevels_logging_WARNING(self):
-        logger.log(WARNING, 'WARNING', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'WARNING: WARNING\n')
-
-    def testOutputLevels_logging_ERROR(self):
-        logger.log(ERROR, 'ERROR', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'ERROR: ERROR\n')
-
-    def testOutputLevels_logging_CRITICAL(self):
-        logger.log(CRITICAL, 'CRITICAL', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'CRITICAL: CRITICAL\n')
+    def test_outputlevels_logging(self):
+        """Test logger with output levels."""
+        for text, level, out, err in self.tests:
+            with self.subTest(test=text):
+                logger.log(level, text, extra=loggingcontext)
+                self.assertEqual(newstdout.getvalue(), out)
+                self.assertEqual(newstderr.getvalue(), err)
+                patch()  # reset terminal files
 
     def test_output(self):
         pywikibot.output('output')
