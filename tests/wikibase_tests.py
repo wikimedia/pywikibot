@@ -70,40 +70,6 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
         self._test_page_text()
 
 
-class TestDeprecatedAttributes(WikidataTestCase, DeprecationTestCase):
-
-    """Test deprecated lastrevid."""
-
-    def test_lastrevid(self):
-        """Test deprecated lastrevid."""
-        item = ItemPage(self.get_repo(), 'Q60')
-        self.assertFalse(hasattr(item, 'lastrevid'))
-        item.get()
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertIsInstance(item.lastrevid, int)
-        self.assertDeprecation()
-        self._reset_messages()
-
-        item.lastrevid = 1
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertTrue(hasattr(item, '_revid'))
-        self.assertEqual(item.lastrevid, 1)
-        self.assertEqual(item._revid, 1)
-        self.assertDeprecation()
-
-    def test_lastrevid_del(self):
-        """Test del with deprecated lastrevid."""
-        item = ItemPage(self.get_repo(), 'Q60')
-        item.get()
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertTrue(hasattr(item, '_revid'))
-
-        del item.lastrevid
-        self.assertFalse(hasattr(item, 'lastrevid'))
-        self.assertFalse(hasattr(item, '_revid'))
-        self.assertDeprecation()
-
-
 class TestGeneral(WikidataTestCase):
 
     """General Wikibase tests."""

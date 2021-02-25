@@ -3963,36 +3963,6 @@ class WikibasePage(BasePage, WikibaseEntity):
             # to the namespace case=first-letter.
             self._link.title)
 
-    def __getattribute__(self, name):
-        """Low-level attribute getter. Deprecates lastrevid."""
-        if name == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            name = '_revid'
-        return super().__getattribute__(name)
-
-    def __setattr__(self, attr, value):
-        """Attribute setter. Deprecates lastrevid."""
-        if attr == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            attr = '_revid'
-        return super().__setattr__(attr, value)
-
-    def __delattr__(self, attr):
-        """Attribute deleter. Deprecates lastrevid."""
-        if attr == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            attr = '_revid'
-        return super().__delattr__(attr)
-
     def namespace(self) -> int:
         """
         Return the number of the namespace of the entity.
