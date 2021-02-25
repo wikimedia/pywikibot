@@ -67,7 +67,7 @@ class LoginStatus(IntEnum):
     >>> LoginStatus.IN_PROGRESS.value
     -2
     >>> LoginStatus.NOT_LOGGED_IN.name
-    NOT_LOGGED_IN
+    'NOT_LOGGED_IN'
     >>> int(LoginStatus.AS_USER)
     0
     >>> LoginStatus(-3).name
