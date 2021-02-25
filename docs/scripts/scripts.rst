@@ -155,6 +155,11 @@ scripts.replace script
 
 .. automodule:: scripts.replace
 
+scripts.replicate\_wiki script
+------------------------------
+
+.. automodule:: scripts.replicate_wiki
+
 scripts.revertbot script
 ------------------------
 
@@ -194,6 +199,11 @@ scripts.transferbot script
 --------------------------
 
 .. automodule:: scripts.transferbot
+
+scripts.unusedfiles script
+--------------------------
+
+.. automodule:: scripts.unusedfiles
 
 scripts.upload script
 ---------------------

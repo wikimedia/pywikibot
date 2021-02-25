@@ -115,6 +115,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | transferbot.py         | Transfers pages from a source wiki to a target wiki     |
     +------------------------+---------------------------------------------------------+
+    | unusedfiles.py         | Bot appends some text to all unused images and other    |
+    |                        | text to the respective uploaders.                       |
+    +------------------------+---------------------------------------------------------+
     | upload.py              | upload an image to a wiki.                              |
     +------------------------+---------------------------------------------------------+
     | version.py             | Outputs Pywikibot's revision number, Python's version   |
@@ -227,9 +230,6 @@ The contents of the package
     | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables    |
     +------------------------+---------------------------------------------------------+
     | unlink.py              | This bot unlinks a page on every page that links to it. |
-    +------------------------+---------------------------------------------------------+
-    | unusedfiles.py         | Bot appends some text to all unused images and other    |
-    |                        | text to the respective uploaders.                       |
     +------------------------+---------------------------------------------------------+
     | watchlists.py          | Information retrieved by watchlist.py will be stored    |
     +------------------------+---------------------------------------------------------+

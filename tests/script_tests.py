@@ -95,6 +95,7 @@ auto_run_script_list = [
     'noreferences',
     'parser_function_count',
     'shell',
+    'unusedfiles',
     'upload',
     'welcome',
 ]
