@@ -911,7 +911,7 @@ def main(*args):
             with codecs.open(replacement_file, 'r', 'utf-8') as f:
                 # strip newlines, but not other characters
                 file_replacements = f.read().splitlines()
-        except (IOError, OSError) as e:
+        except OSError as e:
             pywikibot.error('Error loading {0}: {1}'.format(
                 replacement_file, e))
             return False

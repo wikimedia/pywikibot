@@ -805,10 +805,9 @@ def intersect_generators(genlist, allow_duplicates=False):
                 pass
             except KeyboardInterrupt:
                 thrlist.stop_all()
-            finally:
-                # All threads are done.
-                if thrlist.active_count() == 0:
-                    return
+            # All threads are done.
+            if thrlist.active_count() == 0:
+                return
 
 
 def roundrobin_generators(*iterables):

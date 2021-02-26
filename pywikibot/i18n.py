@@ -429,7 +429,7 @@ def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     try:
         trans_text = pkgutil.get_data(
             _messages_package_name, filename).decode('utf-8')
-    except (OSError, IOError):  # file open can cause several exceptions
+    except OSError:  # file open can cause several exceptions
         return None
 
     transdict = json.loads(trans_text)
