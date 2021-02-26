@@ -6,15 +6,19 @@ Parameters:
 
 -always         Don't be asked every time.
 -nouserwarning  Do not warn uploader about orphaned file.
+-filetemplate:  Use a custom template on unused file pages.
+-usertemplate:  Use a custom template to warn the uploader.
 -limit          Specify number of pages to work on with "-limit:n" where
                 n is the maximum number of articles to work on.
                 If not used, all pages are used.
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import re
+
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
@@ -44,18 +48,31 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
     def __init__(self, **kwargs):
         """Initializer."""
         self.available_options.update({
-            'nouserwarning': False  # do not warn uploader
+            'nouserwarning': False,  # do not warn uploader
+            'filetemplate': '',
+            'usertemplate': '',
         })
         super().__init__(**kwargs)
 
-        self.template_image = i18n.translate(self.site,
-                                             template_to_the_image)
-        self.template_user = i18n.translate(self.site,
-                                            template_to_the_user)
-        if not (self.template_image
-                and (self.template_user or self.opt.nouserwarning)):
-            raise i18n.TranslationError('This script is not localized for {0} '
-                                        'site.'.format(self.site))
+        # handle the custom templates
+        if not self.opt.filetemplate:
+            self.opt.filetemplate = i18n.translate(self.site,
+                                                   template_to_the_image)
+        elif not re.fullmatch('{{.+}}', self.opt.filetemplate):
+            self.opt.filetemplate = '{{%s}}' % self.opt.filetemplate
+
+        if not self.opt.usertemplate:
+            self.opt.usertemplate = i18n.translate(self.site,
+                                                   template_to_the_user)
+        elif not re.fullmatch('{{.+}}', self.opt.usertemplate):
+            self.opt.usertemplate = '{{%s}}' % self.opt.usertemplate
+
+        if not (self.opt.filetemplate
+                and (self.opt.usertemplate or self.opt.nouserwarning)):
+            # if no templates are given
+            raise i18n.TranslationError(
+                'This script is not localized for {} site;\n'
+                'try using -filetemplate:<template name>.'.format(self.site))
 
     def treat(self, image):
         """Process one image page."""
@@ -63,18 +80,19 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         # rather than a local page with the same name as shared media.
         if (image.get_file_url() and not image.file_is_shared()
                 and 'http://' not in image.text):
-            if self.template_image in image.text:
+            if self.opt.filetemplate in image.text:
                 pywikibot.output('{0} done already'
                                  .format(image.title(as_link=True)))
                 return
 
-            self.append_text(image, '\n\n' + self.template_image)
+            self.append_text(image, '\n\n' + self.opt.filetemplate)
             if self.opt.nouserwarning:
                 return
             uploader = image.get_file_history().pop(0)['user']
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
-            template2uploader = self.template_user % {'title': image.title()}
+            template2uploader = self.opt.usertemplate \
+                % {'title': image.title()}
             msg2uploader = self.site.expand_text(template2uploader)
             if usertalkpage.is_flow_page():
                 self.post_to_flow_board(usertalkpage, msg2uploader)
@@ -124,11 +142,15 @@ def main(*args):
         arg, sep, value = arg.partition(':')
         if arg == '-limit':
             total = value
+        elif arg == '-filetemplate':
+            options['filetemplate'] = value
+        elif arg == '-usertemplate':
+            options['usertemplate'] = value
         else:
             options[arg[1:]] = True
 
     site = pywikibot.Site()
-    gen = pagegenerators.UnusedFilesGenerator(total=total, site=site)
+    gen = site.unusedfiles(total=total)
     gen = pagegenerators.PreloadingGenerator(gen)
 
     bot = UnusedFilesBot(site=site, generator=gen, **options)
