@@ -11,6 +11,7 @@ from contextlib import suppress
 from pywikibot.tools import is_IP, PYTHON_VERSION
 
 from tests import unittest_print
+
 from tests.aspects import TestCase
 from tests.utils import expected_failure_if
 

@@ -21,12 +21,7 @@ from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion
 
 from tests import join_pages_path, mock
-from tests.aspects import (
-    DeprecationTestCase,
-    TestCase,
-    unittest,
-    WikidataTestCase,
-)
+from tests.aspects import TestCase, unittest, WikidataTestCase
 
 from tests.basepage import (
     BasePageMethodsTestBase,

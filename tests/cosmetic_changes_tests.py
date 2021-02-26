@@ -9,6 +9,7 @@ import unittest
 from contextlib import suppress
 
 from pywikibot import Page
+
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit
 
 from tests.aspects import TestCase

@@ -54,7 +54,6 @@ from pywikibot.tools import (
     deprecated_args,
     DotReadableDict,
     first_upper,
-    issue_deprecation_warning,
     redirect_func,
     remove_last_args,
 )

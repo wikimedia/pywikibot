@@ -15,6 +15,7 @@ from contextlib import suppress
 import pywikibot
 
 from tests import join_images_path
+
 from tests.aspects import TestCase
 
 

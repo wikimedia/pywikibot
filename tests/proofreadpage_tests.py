@@ -318,7 +318,7 @@ class TestProofreadPageValidSite(TestCase):
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
         with self.assertRaises(ValueError):
-            getattr(page, 'url_image')
+            page.url_image
 
 
 class TestPageQuality(TestCase):
@@ -471,7 +471,7 @@ class TestProofreadPageIndexProperty(BS4TestCase):
         self.assertFalse(hasattr(page, '_index'))
         # Test setter with wrong type.
         with self.assertRaises(TypeError):
-            setattr(page, 'index', 'invalid index')
+            page.index = 'invalid index'
         # Test setter with correct type.
         page.index = index_page
         self.assertEqual(page.index, index_page)

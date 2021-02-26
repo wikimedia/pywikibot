@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,6 @@ from pywikibot import config, __url__
 from pywikibot.comms import http
 from pywikibot.exceptions import NoUsername
 from pywikibot.tools import (
-    deprecated,
     deprecated_args, file_mode_checker, normalize_username, remove_last_args,
 )
 

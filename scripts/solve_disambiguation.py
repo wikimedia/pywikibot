@@ -95,7 +95,7 @@ from pywikibot import i18n, pagegenerators
 from pywikibot.backports import List
 from pywikibot.bot import (HighlightContextOption, ListOption,
                            OutputProxyOption, SingleSiteBot, StandardOption)
-from pywikibot.tools import deprecated, first_lower, first_upper
+from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.formatter import SequenceOutputter
 
 
