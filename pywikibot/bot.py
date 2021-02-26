@@ -1025,10 +1025,11 @@ class OptionHandler:
     """Class to get and set options.
 
     How to use options of OptionHandler and its BaseBot subclasses:
-    First define an available_options class attribute to define all
-    available options:
+    First define an available_options class attribute for your own
+    option handler to define all available options:
 
-    available_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+    >>> default_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+    >>> class MyHandler(OptionHandler): available_options = default_options
 
     Or you may update the predefined setting in the class initializer.
     BaseBot predefines a 'always' options and sets it to False:
@@ -1038,7 +1039,7 @@ class OptionHandler:
     Now you can instantiate an OptionHandler or BaseBot class passing
     options other than default values:
 
-    >>> bot = OptionHandler(baz=True)
+    >>> bot = MyHandler(baz=True)
 
     You can access bot options either as keyword item or attribute:
 
