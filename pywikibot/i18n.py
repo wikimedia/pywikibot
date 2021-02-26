@@ -675,6 +675,11 @@ def twtranslate(source,
 
     and so on.
 
+    >>> # this code snippet is running in test environment
+    >>> # ignore test message "tests: max_retries reduced from 15 to 1"
+    >>> import os
+    >>> os.environ['PYWIKIBOT_TEST_QUIET'] = '1'
+
     >>> from pywikibot import i18n
     >>> i18n.set_messages_package('tests.i18n')
     >>> # use a dictionary
