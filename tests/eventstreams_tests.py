@@ -15,7 +15,7 @@ from pywikibot.comms.eventstreams import EventStreams, EventSource
 from pywikibot import config
 from pywikibot.family import WikimediaFamily
 
-from tests.aspects import TestCase, DefaultSiteTestCase
+from tests.aspects import TestCase, DefaultSiteTestCase, require_modules
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())
@@ -288,6 +288,7 @@ class EventStreamsTestClass(EventStreams):
         del self.source
 
 
+@require_modules('sseclient')
 class TestEventSource(TestCase):
 
     """Test sseclient.EventSource."""
