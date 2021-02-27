@@ -10,6 +10,8 @@ from typing import Optional
 
 import pywikibot
 
+from pywikibot.site import BaseSite
+
 
 __all__ = (
     'AliasesDict',
@@ -67,7 +69,7 @@ class BaseDataDict(MutableMapping):
     @staticmethod
     def normalizeKey(key) -> str:
         """Helper function to return language codes of a site object."""
-        if isinstance(key, pywikibot.site.BaseSite):
+        if isinstance(key, BaseSite):
             key = key.lang
         return key
 
@@ -266,15 +268,17 @@ class ClaimCollection(MutableMapping):
                 claim_map = {
                     json['id']: json for json in diffto[prop]
                     if 'id' in json}
+
                 for claim, json in zip(self[prop], claims[prop]):
-                    if 'id' in json:
-                        claim_ids.add(json['id'])
-                        if json['id'] in claim_map:
-                            other = pywikibot.page.Claim.fromJSON(
-                                self.repo, claim_map[json['id']])
-                            if claim.same_as(other, ignore_rank=False,
-                                             ignore_refs=False):
-                                continue
+                    if 'id' not in json:
+                        continue
+                    claim_ids.add(json['id'])
+                    if json['id'] in claim_map:
+                        other = pywikibot.page.Claim.fromJSON(
+                            self.repo, claim_map[json['id']])
+                        if claim.same_as(other, ignore_rank=False,
+                                         ignore_refs=False):
+                            continue
                     temp[prop].append(json)
 
                 for claim in diffto[prop]:
@@ -326,7 +330,7 @@ class SiteLinkCollection(MutableMapping):
         @param site: The site to look up.
         @type site: pywikibot.site.BaseSite or str
         """
-        if isinstance(site, pywikibot.site.BaseSite):
+        if isinstance(site, BaseSite):
             return site.dbName()
         return site
 
@@ -442,21 +446,23 @@ class SiteLinkCollection(MutableMapping):
         if diffto:
             to_nuke = []
             for dbname, sitelink in data.items():
-                if dbname in diffto:
-                    diffto_link = diffto[dbname]
-                    if diffto_link.get('title') == sitelink.get('title'):
-                        # compare badges
-                        tmp_badges = []
-                        diffto_badges = diffto_link.get('badges', [])
-                        badges = sitelink.get('badges', [])
-                        for badge in set(diffto_badges) - set(badges):
-                            tmp_badges.append('')
-                        for badge in set(badges) - set(diffto_badges):
-                            tmp_badges.append(badge)
-                        if tmp_badges:
-                            data[dbname]['badges'] = tmp_badges
-                        else:
-                            to_nuke.append(dbname)
+                if dbname not in diffto:
+                    continue
+                diffto_link = diffto[dbname]
+                if diffto_link.get('title') == sitelink.get('title'):
+                    # compare badges
+                    tmp_badges = []
+                    diffto_badges = diffto_link.get('badges', [])
+                    badges = sitelink.get('badges', [])
+                    for badge in set(diffto_badges) - set(badges):
+                        tmp_badges.append('')
+                    for badge in set(badges) - set(diffto_badges):
+                        tmp_badges.append(badge)
+                    if tmp_badges:
+                        data[dbname]['badges'] = tmp_badges
+                    else:
+                        to_nuke.append(dbname)
+
             # find removed sitelinks
             for dbname in (set(diffto.keys()) - set(self.keys())):
                 badges = [''] * len(diffto[dbname].get('badges', []))
