@@ -67,6 +67,7 @@ library_test_modules = {
     'basesite',
     'bot',
     'category',
+    'collections',
     'cosmetic_changes',
     'date',
     'datasite',

@@ -102,6 +102,8 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
+    | _collections.py            | Structures holding data for Wikibase entities        |
+    +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by page objects                      |
     +----------------------------+------------------------------------------------------+
     | _revision.py               | Object representing page revision                    |
