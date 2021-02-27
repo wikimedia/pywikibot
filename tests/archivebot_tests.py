@@ -68,8 +68,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         site = self.get_site('frwikt')
         self.assertEqual(
             archivebot.str2localized_duration(site, '10d'), '10 jours')
-        self.assertEqual(
-            archivebot.str2localized_duration(site, '1y'), '1 an')
+        self.assertEqual(archivebot.str2localized_duration(site, '1y'), '1 an')
 
     def test_str2localized_duration_Japanese(self):
         """Test Japanese localizations of duration."""
@@ -145,10 +144,7 @@ class TestArchiveBot(TestCase):
     def test_archivebot(self, code=None):
         """Test archivebot for one site."""
         site = self.get_site(code)
-        if code != 'de':  # bug T69663
-            page = pywikibot.Page(site, 'user talk:xqt')
-        else:
-            page = pywikibot.Page(site, 'user talk:ladsgroup')
+        page = pywikibot.Page(site, 'user talk:xqt')
         talk = archivebot.DiscussionPage(page, None)
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
