@@ -518,9 +518,11 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         self.orig_output = bot.ui.output
         bot.ui._raw_input = lambda *args, **kwargs: 'dummy input'
         bot.ui.output = self._capture_output
+        self.old_cc_setting = config.cosmetic_changes_mylang_only
 
     def tearDown(self):
         """Restore the output and input methods."""
+        config.cosmetic_changes_mylang_only = self.old_cc_setting
         bot.ui._raw_input = self.orig_raw_input
         bot.ui.output = self.orig_output
         super().tearDown()
@@ -543,7 +545,6 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         page = pywikibot.Page(self.site, 'Test')
         page.text = 'Some    content    with    spaces.'
         # check cc settings
-        old_setting = config.cosmetic_changes_mylang_only
         config.cosmetic_changes_mylang_only = False
         self.assertFalse(page.isTalkPage())
         self.assertEqual(page.content_model, 'wikitext')
@@ -554,8 +555,6 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         summary = 'Working on Test page at site {}'.format(self.site)
         msg = page._cosmetic_changes_hook(summary)
         self.assertEqual(msg, summary + '; cosmetic changes')
-        # restore setting
-        config.cosmetic_changes_mylang_only = old_setting
 
 
 class TestExtractPlural(TestCase):
