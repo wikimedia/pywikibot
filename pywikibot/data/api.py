@@ -31,7 +31,7 @@ from pywikibot import config, login
 from pywikibot.backports import Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
-    Server504Error, Server414Error, FatalServerError, NoUsername,
+    CaptchaError, Server504Error, Server414Error, FatalServerError, NoUsername,
     Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.family import SubdomainFamily
@@ -2954,9 +2954,23 @@ class LoginManager(login.LoginManager):
                     _invalidate_superior_cookies(self.site.family)
                 continue
 
+            # messagecode was introduced with 1.29.0-wmf.14
+            login_throttled = False
+            if self.site.mw_version >= '1.29.0-wmf.14':
+                try:
+                    login_throttled = \
+                        response['messagecode'] == 'login-throttled'
+                except KeyError:
+                    pywikibot.log(
+                        "Missing 'messagecode' key encountered\n"
+                        'Please file the following debug message to '
+                        'Phabricator task T261061:\n{}'
+                        .format(login_result))
+                    raise CaptchaError('Captcha encountered which cannot be '
+                                       'handled:\n{}'.format(response))
+
             if (status == 'Throttled' or status == self.keyword('fail')
-                and (response['messagecode'] == 'login-throttled'
-                     or 'wait' in fail_reason)):
+                    and (login_throttled or 'wait' in fail_reason)):
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
