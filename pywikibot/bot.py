@@ -973,7 +973,8 @@ def writeToCommandLogFile():
 def open_webbrowser(page):
     """Open the web browser displaying the page and wait for input."""
     webbrowser.open(page.full_url())
-    i18n.input('pywikibot-enter-finished-browser')
+    i18n.input('pywikibot-enter-finished-browser',
+               fallback_prompt='Press Enter when finished in browser.')
 
 
 class _OptionDict(dict):

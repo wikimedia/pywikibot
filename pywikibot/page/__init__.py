@@ -1222,9 +1222,11 @@ class BasePage(ComparableMixin):
             CANCEL_MATCH, CosmeticChangesToolkit)
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL_MATCH)
         self.text = cc_toolkit.change(old)
+
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
-            summary += i18n.twtranslate(self.site, 'cosmetic_changes-append')
+            summary += i18n.twtranslate(self.site, 'cosmetic_changes-append',
+                                        fallback_prompt='; cosmetic changes')
         return summary
 
     @deprecate_arg('async', 'asynchronous')  # T106230
@@ -1319,7 +1321,8 @@ class BasePage(ComparableMixin):
         if self.exists():
             # ensure always get the page text and not to change it.
             del self.text
-            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
+            summary = i18n.twtranslate(self.site, 'pywikibot-touch',
+                                       fallback_prompt='Pywikibot touch edit')
             self.save(summary=summary, watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,

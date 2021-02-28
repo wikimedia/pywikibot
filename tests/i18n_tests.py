@@ -8,7 +8,7 @@ from contextlib import suppress
 
 import pywikibot
 
-from pywikibot import bot, i18n, plural
+from pywikibot import bot, config, i18n, plural
 
 from tests.aspects import (
     AutoDeprecationTestCase,
@@ -525,12 +525,37 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.ui.output = self.orig_output
         super().tearDown()
 
-    def test_pagegen_i18n_input(self):
+    def test_i18n_input(self):
         """Test i18n.input falls back with missing message package."""
         rv = i18n.input('pywikibot-enter-category-name',
                         fallback_prompt='dummy output')
         self.assertEqual(rv, 'dummy input')
         self.assertIn('dummy output: ', self.output_text)
+
+    def test_i18n_twtranslate(self):
+        """Test i18n.twtranslate falls back with missing message package."""
+        rv = i18n.twtranslate(self.site, 'pywikibot-enter-category-name',
+                              fallback_prompt='dummy message')
+        self.assertEqual(rv, 'dummy message')
+
+    def test_cosmetic_changes_hook(self):
+        """Test summary result of Page._cosmetic_changes_hook."""
+        page = pywikibot.Page(self.site, 'Test')
+        page.text = 'Some    content    with    spaces.'
+        # check cc settings
+        old_setting = config.cosmetic_changes_mylang_only
+        config.cosmetic_changes_mylang_only = False
+        self.assertFalse(page.isTalkPage())
+        self.assertEqual(page.content_model, 'wikitext')
+        self.assertNotIn(pywikibot.calledModuleName(),
+                         config.cosmetic_changes_deny_script)
+        self.assertFalse(config.cosmetic_changes_mylang_only)
+
+        summary = 'Working on Test page at site {}'.format(self.site)
+        msg = page._cosmetic_changes_hook(summary)
+        self.assertEqual(msg, summary + '; cosmetic changes')
+        # restore setting
+        config.cosmetic_changes_mylang_only = old_setting
 
 
 class TestExtractPlural(TestCase):
