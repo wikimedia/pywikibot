@@ -307,7 +307,7 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test ApiSite methods for getting page-specific info."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        with suppress_warnings('pywikibot.site.APISite.page_exists',
+        with suppress_warnings('pywikibot.site._apisite.APISite.page_exists',
                                DeprecationWarning):
             self.assertIsInstance(mysite.page_exists(mainpage), bool)
         self.assertIsInstance(mysite.page_restrictions(mainpage), dict)
