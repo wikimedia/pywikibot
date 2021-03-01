@@ -8,6 +8,7 @@ import calendar
 import datetime
 import logging
 import sys
+import unittest
 
 from contextlib import suppress
 from typing import Optional
@@ -28,7 +29,6 @@ from pywikibot.tools import has_module, suppress_warnings
 
 from tests import join_data_path, mock
 from tests.aspects import (
-    unittest,
     TestCase,
     DeprecationTestCase,
     WikidataTestCase,
@@ -715,7 +715,7 @@ class DryFactoryGeneratorTest(TestCase):
         """Test unsupported option."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
         with self.assertRaises(UnknownExtension):
-            gf.handleArg('-ql:2')
+            gf.handle_arg('-ql:2')
 
     def test_one_excluded_namespaces(self):
         """Test one excluded namespaces."""
@@ -1039,13 +1039,13 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         with self.assertRaises(ValueError):
-            gf.handleArg('-recentchanges:3,2,1')
+            gf.handle_arg('-recentchanges:3,2,1')
         with self.assertRaises(ValueError):
-            gf.handleArg('-recentchanges:12,-12')
+            gf.handle_arg('-recentchanges:12,-12')
         with self.assertRaises(ValueError):
-            gf.handleArg('-recentchanges:visualeditor,3,2,1')
+            gf.handle_arg('-recentchanges:visualeditor,3,2,1')
         with self.assertRaises(ValueError):
-            gf.handleArg('-recentchanges:"mobile edit,-10,20"')
+            gf.handle_arg('-recentchanges:"mobile edit,-10,20"')
 
     def test_recentchanges_rctag(self):
         """Test recentchanges generator with recent changes tag."""
@@ -1254,7 +1254,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(AssertionError):
-            gf.handleArg('-linter:dummy')
+            gf.handle_arg('-linter:dummy')
 
     def test_linter_generator_show(self):
         """Test generator of pages with lint errors."""
@@ -1265,7 +1265,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertEqual(cm.exception.code, 0)
         else:
             with self.assertRaises(UnknownExtension):
-                gf.handleArg('-linter:show')
+                gf.handle_arg('-linter:show')
 
     def test_querypage_generator_with_valid_page(self):
         """Test generator of pages with lint errors."""
@@ -1283,7 +1283,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(AssertionError):
-            gf.handleArg('-querypage:dummy')
+            gf.handle_arg('-querypage:dummy')
 
     def test_querypage_generator_with_no_page(self):
         """Test generator of pages with lint errors."""
@@ -1509,7 +1509,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertFalse(gf.handle_arg('-log'))
         self.assertFalse(gf.handle_arg('-log:text_here'))
         with self.assertRaises(NotImplementedError):
-            gf.handleArg('-logevents:anyevent')
+            gf.handle_arg('-logevents:anyevent')
         # test that old format log option is not handled by any handler method.
         gf_mock = mock.create_autospec(gf)
         self.assertFalse(factory.handle_arg(gf_mock, '-anotherlog'))
