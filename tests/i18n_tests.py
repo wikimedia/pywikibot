@@ -547,10 +547,13 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         # check cc settings
         config.cosmetic_changes_mylang_only = False
         self.assertFalse(page.isTalkPage())
-        self.assertEqual(page.content_model, 'wikitext')
         self.assertNotIn(pywikibot.calledModuleName(),
                          config.cosmetic_changes_deny_script)
         self.assertFalse(config.cosmetic_changes_mylang_only)
+
+        if page.content_model != 'wikitext':
+            self.skipTest('Wrong content model {!r} for cosmetic_changes'
+                          .format(page.content_model))
 
         summary = 'Working on Test page at site {}'.format(self.site)
         msg = page._cosmetic_changes_hook(summary)
