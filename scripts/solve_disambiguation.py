@@ -98,7 +98,6 @@ from pywikibot.bot import (HighlightContextOption, ListOption,
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.formatter import SequenceOutputter
 
-
 # Disambiguation Needed template
 dn_template = {
     'ar': '{{بحاجة لتوضيح}}',
@@ -471,7 +470,7 @@ class PrimaryIgnoreManager:
                     if line:
                         self.ignorelist.add(line)
 
-    def isIgnored(self, ref_page) -> bool:
+    def isIgnored(self, ref_page) -> bool:  # noqa: N802
         """Return if ref_page is to be ignored.
 
         @type ref_page: pywikibot.Page
@@ -576,7 +575,7 @@ class AliasOption(StandardOption):
 
 class DisambiguationRobot(SingleSiteBot):
 
-    """Disambiguation bot."""
+    """Disambiguation Bot."""
 
     ignore_contents = {
         'de': ('{{[Ii]nuse}}',
@@ -617,15 +616,13 @@ class DisambiguationRobot(SingleSiteBot):
         self.first_only = first_only
         self.minimum = minimum
         self.summary = None
-
         self.dn_template_str = i18n.translate(self.site, dn_template)
 
-    def checkContents(self, text) -> Optional[str]:
+    def checkContents(self, text: str) -> Optional[str]:  # noqa: N802
         """
         Check if the text matches any of the ignore regexes.
 
         @param text: wikitext of a page
-        @type text: str
         @return: None if none of the regular expressions
             given in the dictionary at the top of this class matches
             a substring of the text, otherwise the matched substring
@@ -636,17 +633,14 @@ class DisambiguationRobot(SingleSiteBot):
                 return match.group()
         return None
 
-    def makeAlternativesUnique(self) -> None:
+    def makeAlternativesUnique(self) -> None:  # noqa: N802
         """Remove duplicate items from self.alternatives.
 
         Preserve the order of alternatives.
-        @rtype: None
-
         """
         seen = set()
-        self.alternatives = [
-            i for i in self.alternatives if i not in seen and not seen.add(i)
-        ]
+        self.alternatives = [i for i in self.alternatives
+                             if i not in seen and not seen.add(i)]
 
     def setup(self) -> None:
         """Compile regular expressions."""
@@ -1025,7 +1019,7 @@ class DisambiguationRobot(SingleSiteBot):
 
         return 'done'
 
-    def findAlternatives(self, page) -> bool:
+    def findAlternatives(self, page) -> bool:  # noqa: N802
         """Extend self.alternatives using correctcap of disambPage.linkedPages.
 
         @param page: the disambiguation page
@@ -1266,9 +1260,9 @@ def main(*args: Tuple[str, ...]) -> None:
                 if page.exists():
                     alternatives.append(page.title())
                 elif pywikibot.input_yn(
-                    'Possibility {0} does not actually exist. Use it anyway?'
-                    .format(page.title()),
-                        default=False, automatic_quit=False):
+                    'Possibility {} does not actually exist. Use it anyway?'
+                    .format(page.title()), default=False,
+                        automatic_quit=False):
                     alternatives.append(page.title())
         elif arg == '-just':
             getAlternatives = False
