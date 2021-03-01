@@ -204,7 +204,7 @@ class URI(SparqlNode):
         super().__init__(data.get('value'))
         self.entity_url = entity_url
 
-    def getID(self):
+    def getID(self):  # noqa: N802
         """
         Get ID of Wikibase object identified by the URI.
 

@@ -18,7 +18,7 @@ class Notification:
         self.site = site
 
     @classmethod
-    def fromJSON(cls, site, data):
+    def fromJSON(cls, site, data):  # noqa: N802
         """
         Construct a Notification object from JSON data returned by the API.
 

@@ -1086,7 +1086,7 @@ _trans = {
 }
 
 
-class transliterator:
+class transliterator:  # noqa: N801
 
     """Class to transliterating text."""
 
