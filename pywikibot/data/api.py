@@ -28,7 +28,7 @@ import pywikibot
 
 from pywikibot import config, login
 
-from pywikibot.backports import Tuple
+from pywikibot.backports import removeprefix, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     CaptchaError, Server504Error, Server414Error, FatalServerError, NoUsername,
@@ -1395,18 +1395,18 @@ class Request(MutableMapping):
     def _is_wikibase_error_retryable(self, error):
         # dict of error message and current action.
         # Value is True if action type is to be ignored
-        ERR_MSG = {
+        err_msg = {
             'edit-already-exists': 'wbeditentity',
             'actionthrottledtext': True,  # T192912, T268645
         }
         messages = error.get('messages')
         message = None
-        # bug T68619; after Wikibase breaking change 1ca9cee change we have a
+        # bug T68619; after Wikibase breaking change 1ca9cee we have a
         # list of messages
         if isinstance(messages, list):
             for item in messages:
                 message = item['name']
-                action = ERR_MSG.get(message)
+                action = err_msg.get(message)
                 if action is True or action == self.action:
                     return True
             else:
@@ -1417,7 +1417,7 @@ class Request(MutableMapping):
                 message = messages['0']['name']
             except KeyError:  # unsure the new output is always a list
                 message = messages['name']
-        action = ERR_MSG.get(message)
+        action = err_msg.get(message)
         return action is True or action == self.action
 
     @staticmethod
@@ -1662,12 +1662,12 @@ class Request(MutableMapping):
 
         @raises APIMWException: internal_api_error or readonly
         """
-        IAE = 'internal_api_error_'
-        if not (code.startswith(IAE) or code == 'readonly'):
+        iae = 'internal_api_error_'
+        if not (code.startswith(iae) or code == 'readonly'):
             return False
 
         # T154011
-        class_name = code if code == 'readonly' else code[len(IAE):]
+        class_name = code if code == 'readonly' else removeprefix(code, iae)
 
         del error['code']  # is added via class_name
         e = APIMWException(class_name, **error)

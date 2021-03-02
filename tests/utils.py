@@ -425,7 +425,7 @@ class DryPage(pywikibot.Page):
     _disambig = False
     _isredir = False
 
-    def isDisambig(self):
+    def isDisambig(self):  # noqa: N802
         """Return disambig status stored in _disambig."""
         return self._disambig
 

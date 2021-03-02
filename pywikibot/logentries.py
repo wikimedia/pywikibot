@@ -390,7 +390,7 @@ class LogEntryFactory(object):
         """
         self._site = site
         if logtype is None:
-            self._creator = self._createFromData
+            self._creator = self._create_from_data
         else:
             # Bind a Class object to self._creator:
             # When called, it will initialize a new object of that class
@@ -444,7 +444,7 @@ class LogEntryFactory(object):
                 classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
-    def _createFromData(self, logdata: dict):
+    def _create_from_data(self, logdata: dict):
         """
         Check for logtype from data, and creates the correct LogEntry.
 
