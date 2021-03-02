@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import os
 import pickle
 import random
 import threading
@@ -31,6 +32,7 @@ from tests.aspects import (
     WikimediaDefaultSiteTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
+from tests.utils import expected_failure_if
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
@@ -1462,6 +1464,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
                               .format(mysite, e))
 
+    @expected_failure_if(os.environ.get('FAMILY') in ['wpbeta', 'wsbeta'])
     @suppress_warnings("where='title' is deprecated", DeprecationWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
