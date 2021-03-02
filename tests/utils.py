@@ -32,13 +32,6 @@ except ImportError:
 OSWIN32 = (sys.platform == 'win32')
 
 
-class DrySiteNote(RuntimeWarning):
-
-    """Information regarding dry site."""
-
-    pass
-
-
 def expected_failure_if(expect):
     """
     Unit test decorator to expect failure under conditions.
