@@ -747,13 +747,6 @@ class DisambiguationRobot(SingleSiteBot):
         new_targets = []
         try:
             text = ref_page.get()
-            ignore_reason = self.checkContents(text)
-            if ignore_reason:
-                pywikibot.output(
-                    '\n\nSkipping {0} because it contains {1}.\n\n'
-                    .format(ref_page.title(), ignore_reason))
-            else:
-                include = True
         except pywikibot.IsRedirectPage:
             pywikibot.output('{0} is a redirect to {1}'
                              .format(ref_page.title(), disamb_page.title()))
@@ -792,8 +785,16 @@ class DisambiguationRobot(SingleSiteBot):
             pywikibot.output(
                 'Page [[{0}]] does not seem to exist?! Skipping.'
                 .format(ref_page.title()))
-            include = False
-        if include in (True, 'redirect'):
+        else:
+            ignore_reason = self.checkContents(text)
+            if ignore_reason:
+                pywikibot.output(
+                    '\n\nSkipping {0} because it contains {1}.\n\n'
+                    .format(ref_page.title(), ignore_reason))
+            else:
+                include = True
+
+        if include:
             # save the original text so we can show the changes later
             original_text = text
             n = 0
@@ -817,9 +818,8 @@ class DisambiguationRobot(SingleSiteBot):
                     foundlink = pywikibot.Link(m.group('title'),
                                                disamb_page.site)
                     foundlink.parse()
-                except pywikibot.Error:
-                    continue
-                except ValueError:  # T111513
+                except (pywikibot.Error,
+                        ValueError):  # T111513
                     continue
 
                 # ignore interwiki links
