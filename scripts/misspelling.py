@@ -31,7 +31,6 @@ from typing import Generator, Tuple
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot
 from pywikibot.tools.formatter import color_format
 
 from scripts.solve_disambiguation import DisambiguationRobot as BaseDisambigBot
@@ -50,29 +49,19 @@ class MisspellingRobot(BaseDisambigBot):
 
     """Spelling bot."""
 
-    available_options = {
-        'always': None,
-        'start': None,
-        'main': False,
-    }
-
     misspelling_templates = {
         'wikipedia:de': ('Falschschreibung', 'Obsolete Schreibung'),
     }
 
-    # Optional: if there is a category, one can use the -start
-    # parameter.
+    # Optional: if there is a category, one can use the -start parameter
     misspelling_categories = ('Q8644265', 'Q9195708')
 
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        # handle options first;
-        # they are needed for DisambiguationRobot positional arguments
-        SingleSiteBot.__init__(self, **kwargs)
-        super().__init__(always=self.opt.always, alternatives=[],
-                         getAlternatives=True, dnSkip=False, generator=None,
-                         primary=False, main_only=self.opt.main,
-                         **self.options)  # save options
+        self.available_options.update({
+            'start': None,
+        })
+        super().__init__(**kwargs)
 
     @property
     def generator(self) -> Generator[pywikibot.Page, None, None]:
@@ -124,7 +113,7 @@ class MisspellingRobot(BaseDisambigBot):
         @return: True if alternate link was appended
         """
         if page.isRedirectPage():
-            self.alternatives.append(page.getRedirectTarget().title())
+            self.opt.pos.append(page.getRedirectTarget().title())
             return True
 
         sitename = page.site.sitename
@@ -143,12 +132,12 @@ class MisspellingRobot(BaseDisambigBot):
                 # misspelling is ambiguous, see for example:
                 # https://de.wikipedia.org/wiki/Buthan
                 for match in self.linkR.finditer(correct_spelling):
-                    self.alternatives.append(match.group('title'))
+                    self.opt.pos.append(match.group('title'))
 
-                if not self.alternatives:
+                if not self.opt.pos:
                     # There were no links in the parameter, so there is
                     # only one correct spelling.
-                    self.alternatives.append(correct_spelling)
+                    self.opt.pos.append(correct_spelling)
                 return True
         return False
 
