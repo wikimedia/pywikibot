@@ -1408,7 +1408,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self.warning_log = []
 
         self.expect_warning_filename = inspect.getfile(self.__class__)
-        if self.expect_warning_filename.endswith(('.pyc', '.pyo')):
+        if self.expect_warning_filename.endswith('.pyc'):
             self.expect_warning_filename = self.expect_warning_filename[:-1]
 
         self._do_test_warning_filename = True
@@ -1430,18 +1430,17 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     @classmethod
     def _build_message(cls, deprecated, instead):
-        if deprecated is None:
-            if instead is None:
-                msg = None
-            elif instead is True:
-                msg = cls.INSTEAD
-            else:
-                assert instead is False
-                msg = cls.NO_INSTEAD
-        else:
+        if deprecated is not None:
             msg = '{0} is deprecated'.format(deprecated)
             if instead:
                 msg += '; use {0} instead.'.format(instead)
+        elif instead is None:
+            msg = None
+        elif instead is True:
+            msg = cls.INSTEAD
+        else:
+            assert instead is False
+            msg = cls.NO_INSTEAD
         return msg
 
     def assertDeprecationParts(self, deprecated=None, instead=None):
