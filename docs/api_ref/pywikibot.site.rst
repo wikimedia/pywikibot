@@ -39,7 +39,7 @@ pywikibot.site.\_interwikimap module
 pywikibot.site.\_namespace module
 ---------------------------------
 
-.. automodule:: pywikibot._namespace
+.. automodule:: pywikibot.site._namespace
 
 pywikibot.site.\_obsoletesites module
 -------------------------------------
