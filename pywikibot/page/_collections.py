@@ -247,46 +247,47 @@ class ClaimCollection(MutableMapping):
         """
         claims = {}
         for prop in self:
-            if len(self[prop]) > 0:
+            if self[prop]:
                 claims[prop] = [claim.toJSON() for claim in self[prop]]
 
-        if diffto:
-            temp = defaultdict(list)
-            props_add = set(claims.keys())
-            props_orig = set(diffto.keys())
-            for prop in (props_orig | props_add):
-                if prop not in props_orig:
-                    temp[prop].extend(claims[prop])
-                    continue
-                if prop not in props_add:
-                    temp[prop].extend(
-                        {'id': claim['id'], 'remove': ''}
-                        for claim in diffto[prop] if 'id' in claim)
+        if not diffto:
+            return claims
+
+        temp = defaultdict(list)
+        props_add = set(claims.keys())
+        props_orig = set(diffto.keys())
+        for prop in (props_orig | props_add):
+            if prop not in props_orig:
+                temp[prop].extend(claims[prop])
+                continue
+
+            if prop not in props_add:
+                temp[prop].extend({'id': claim['id'], 'remove': ''}
+                                  for claim in diffto[prop] if 'id' in claim)
+                continue
+
+            claim_ids = set()
+            claim_map = {json['id']: json for json in diffto[prop]
+                         if 'id' in json}
+
+            for claim, json in zip(self[prop], claims[prop]):
+                if 'id' not in json:
                     continue
 
-                claim_ids = set()
-                claim_map = {
-                    json['id']: json for json in diffto[prop]
-                    if 'id' in json}
-
-                for claim, json in zip(self[prop], claims[prop]):
-                    if 'id' not in json:
+                claim_ids.add(json['id'])
+                if json['id'] in claim_map:
+                    other = pywikibot.page.Claim.fromJSON(
+                        self.repo, claim_map[json['id']])
+                    if claim.same_as(other, ignore_rank=False,
+                                     ignore_refs=False):
                         continue
-                    claim_ids.add(json['id'])
-                    if json['id'] in claim_map:
-                        other = pywikibot.page.Claim.fromJSON(
-                            self.repo, claim_map[json['id']])
-                        if claim.same_as(other, ignore_rank=False,
-                                         ignore_refs=False):
-                            continue
-                    temp[prop].append(json)
+                temp[prop].append(json)
 
-                for claim in diffto[prop]:
-                    if 'id' in claim and claim['id'] not in claim_ids:
-                        temp[prop].append({'id': claim['id'], 'remove': ''})
+            for claim in diffto[prop]:
+                if 'id' in claim and claim['id'] not in claim_ids:
+                    temp[prop].append({'id': claim['id'], 'remove': ''})
 
-            claims = temp
-
+        claims = temp
         return claims
 
     def set_on_item(self, item):
