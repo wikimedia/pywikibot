@@ -1,6 +1,6 @@
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from contextlib import suppress
 
 from pywikibot.site import Namespace, NamespacesDict
+from pywikibot.site._namespace import BuiltinNamespace
 
 from tests.aspects import TestCase, unittest
 
@@ -50,6 +51,16 @@ class TestNamespaceObject(TestCase):
     """Test cases for Namespace class."""
 
     net = False
+
+    def test_enums(self):
+        """Test builtin namespace enum in Namespace."""
+        self.assertEqual(BuiltinNamespace.MAIN, 0)
+        self.assertEqual(Namespace.MAIN, BuiltinNamespace.MAIN)
+        self.assertEqual(Namespace.MEDIA, -2)
+        self.assertGreater(Namespace.MAIN, Namespace.MEDIA)
+        self.assertLess(Namespace.MEDIA, Namespace.MAIN)
+        self.assertEqual(Namespace.CATEGORY, 14)
+        self.assertGreater(Namespace.CATEGORY, Namespace.HELP_TALK)
 
     def testNamespaceTypes(self):
         """Test cases for methods manipulating Namespace names."""
