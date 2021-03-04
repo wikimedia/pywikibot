@@ -1564,24 +1564,6 @@ class BasePage(ComparableMixin):
         """
         return self.site.getredirtarget(self)
 
-    @deprecated('moved_target()', since='20150524', future_warning=True)
-    def getMovedTarget(self):  # pragma: no cover
-        """
-        Return a Page object for the target this Page was moved to.
-
-        DEPRECATED: Use Page.moved_target().
-
-        If this page was not moved, it will raise a NoPage exception.
-        This method also works if the source was already deleted.
-
-        @rtype: pywikibot.page.Page
-        @raises pywikibot.exceptions.NoPage: this page was not moved
-        """
-        try:
-            return self.moved_target()
-        except pywikibot.NoMoveTarget:
-            raise pywikibot.NoPage(self)
-
     def moved_target(self):
         """
         Return a Page object for the target this Page was moved to.

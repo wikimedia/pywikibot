@@ -318,40 +318,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
             self.assertDeprecation()  # T271044
         self._reset_messages()  # T271044
 
-    def test_get_moved_target(self, key):
-        """Test getMovedTarget method."""
-        # main page was moved around
-        if self.sites[key]['target'] is None:
-            self.skipTest('No moved target')
-        mainpage = self.get_mainpage(self.site)
-        target = mainpage.getMovedTarget()
-        self.assertIsInstance(target, pywikibot.Page)
-        self.assertEqual(target.title(),
-                         self.sites[key]['target'])
-        # main page was moved back again, we test it.
-        self.assertEqual(mainpage, target.getMovedTarget())
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()', 2)
-
-    def test_moved_target_fail_old(self):
-        """Test getMovedTarget method failing on older wiki."""
-        site = self.get_site('old')
-        with self.assertRaises(pywikibot.NoPage):
-            self.get_mainpage(site).getMovedTarget()
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
-
-    def test_moved_target_fail_de(self):
-        """Test getMovedTarget method failing on de-wiki."""
-        page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
-        with self.assertRaises(pywikibot.NoPage):
-            page.getMovedTarget()
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
-
 
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
