@@ -61,6 +61,11 @@ scripts.clean\_sandbox script
 
 .. automodule:: scripts.clean_sandbox
 
+scripts.commons\_information script
+-----------------------------------
+
+.. automodule:: scripts.commons_information
+
 scripts.coordinate\_import script
 ---------------------------------
 
