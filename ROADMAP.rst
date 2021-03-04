@@ -14,6 +14,14 @@ Breaking changes
 Other changes
 ^^^^^^^^^^^^^
 
+* Ensure that BaseBot.generator is a Generator
+* Add additional info into log if 'messagecode' is missing during login (T261061, T269503)
+* Use hardcoded messages if i18n system is not available (T275981)
+* Move wikibase data structures to page/_collections.py
+* Remove deprecated Wikibase.lastrevid attribute
+* L10N updates
+* Add support for altwiki (T271984)
+* Add support for mniwiki and mniwiktionary (T273467, T273462)
 * config settings of archived scripts were removed (T223826)
 * Drop startsort/endsort parameter for site.categorymembers method (T74101)
 * Don't use mime parameter as boolean in api.Request (T274723)
