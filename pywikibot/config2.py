@@ -14,13 +14,7 @@ shown if user-config.py was not loaded. To prevent these warnings, set
 PYWIKIBOT_NO_USER_CONFIG=2. If pywikibot is installed as a site-package
 the behaviour is like PYWIKIBOT_NO_USER_CONFIG=2 is set.
 
-Provides two functions to register family classes which can be used in
-the user-config:
-
- - register_family_file
- - register_families_folder
-
-Other functions made available to user-config:
+Functions made available to user-config:
 
  - user_home_path
 
@@ -32,7 +26,7 @@ build paths relative to base_dir:
  - shortpath
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -400,8 +394,6 @@ def register_family_file(family_name, file_path):
     Parameter file_path may be a path or an url.
     family.AutoFamily function is used when the url is given.
     """
-    usernames[family_name] = {}
-    disambiguation_comment[family_name] = {}
     family_files[family_name] = file_path
 
 
@@ -569,6 +561,21 @@ debug_log = []
 # sample:
 # user_script_paths = ['scripts.myscripts']
 user_script_paths = []  # type: List[str]
+
+# ############# EXTERNAL FAMILIES SETTINGS ##############
+# Set your own family path to lookup for your family files.
+#
+# Your private family path may be either an absolute or a relative path.
+# You may have multiple paths defined in user_families_paths list.
+#
+# You may also define various family files stored in the user_families
+# dict. Use the family name as dict key and the path or an url als value.
+#
+# samples:
+# user_families_paths = ['data/families']
+# user_families = {'mywiki': 'https://de.wikipedia.org'}
+user_families_paths = []  # type: List[str]
+user_families = {}  # type: dict
 
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
@@ -1010,6 +1017,11 @@ if (not ignore_file_security_warnings
           " permission or set 'ignore_file_security_warnings' to true.")
     sys.exit(1)
 
+# Setup custom family files
+for file_path in user_families_paths:
+    register_families_folder(file_path)
+for name, path in user_families.items():
+    register_family_file(name, path)
 #
 # When called as main program, list all configuration variables
 #
