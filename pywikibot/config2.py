@@ -47,9 +47,9 @@ from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Dict, List, removesuffix, Tuple
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning, deprecated
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -388,6 +388,7 @@ for arg in sys.argv[1:]:
 family_files = {}
 
 
+@deprecated('family_files[family_name] = file_path', since='20210305')
 def register_family_file(family_name, file_path):
     """Register a single family class file.
 
@@ -399,11 +400,11 @@ def register_family_file(family_name, file_path):
 
 def register_families_folder(folder_path):
     """Register all family class files contained in a directory."""
+    suffix = '_family.py'
     for file_name in os.listdir(folder_path):
-        if file_name.endswith('_family.py'):
-            family_name = file_name[:-len('_family.py')]
-            register_family_file(family_name, os.path.join(folder_path,
-                                                           file_name))
+        if file_name.endswith(suffix):
+            family_name = removesuffix(file_name, suffix)
+            family_files[family_name] = os.path.join(folder_path, file_name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
@@ -568,14 +569,14 @@ user_script_paths = []  # type: List[str]
 # Your private family path may be either an absolute or a relative path.
 # You may have multiple paths defined in user_families_paths list.
 #
-# You may also define various family files stored in the user_families
-# dict. Use the family name as dict key and the path or an url als value.
+# You may also define various family files stored directly in
+# family_files dict. Use the family name as dict key and the path or an
+# url as value.
 #
 # samples:
+# family_files['mywiki'] = 'https://de.wikipedia.org'
 # user_families_paths = ['data/families']
-# user_families = {'mywiki': 'https://de.wikipedia.org'}
 user_families_paths = []  # type: List[str]
-user_families = {}  # type: dict
 
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
@@ -1020,8 +1021,6 @@ if (not ignore_file_security_warnings
 # Setup custom family files
 for file_path in user_families_paths:
     register_families_folder(file_path)
-for name, path in user_families.items():
-    register_family_file(name, path)
 #
 # When called as main program, list all configuration variables
 #
