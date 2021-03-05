@@ -7,9 +7,8 @@ sure this bot account is well known on your home wiki before using.
 
 The following parameters are supported:
 
-   -family:FF
-   -lang:LL     Log in to the LL language of the FF family.
-                Example: -family:wiktionary -lang:fr will log you in at
+   -family:FF   Log in to the LL language of the FF family.
+   -lang:LL     Example: -family:wiktionary -lang:fr will log you in at
                 fr.wiktionary.org.
 
    -site:FF:LL  Log in to the LL language of the FF family
@@ -54,7 +53,7 @@ To log out, throw away the *.lwp file that is created in the data
 subdirectory.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,26 +81,24 @@ def _oauth_login(site) -> None:
     login_manager.login()
     identity = login_manager.identity
     if identity is None:
-        pywikibot.error('Invalid OAuth info for %(site)s.' %
-                        {'site': site})
+        pywikibot.error('Invalid OAuth info for {site}.'.format(site=site))
     elif site.username() != identity['username']:
-        pywikibot.error('Logged in on %(site)s via OAuth as %(wrong)s, '
-                        'but expect as %(right)s'
-                        % {'site': site,
-                           'wrong': identity['username'],
-                           'right': site.username()})
+        pywikibot.error(
+            'Logged in on {site} via OAuth as {wrong}, but expect as {right}'
+            .format(site=site,
+                    wrong=identity['username'], right=site.username()))
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
-        pywikibot.output('Logged in on %(site)s as %(username)s'
-                         'via OAuth consumer %(consumer)s'
-                         % {'site': site,
-                            'username': site.username(),
-                            'consumer': consumer_key})
-        pywikibot.output('NOTE: To use OAuth, you need to copy the '
-                         'following line to your user-config.py:')
-        pywikibot.output("authenticate['%(hostname)s'] = %(oauth_token)s" %
-                         {'hostname': site.hostname(),
-                          'oauth_token': oauth_token})
+        pywikibot.output('Logged in on {site} as {username}'
+                         'via OAuth consumer {consumer}\n'
+                         'NOTE: To use OAuth, you need to copy the '
+                         'following line to your user-config.py:\n'
+                         'authenticate[{hostname!r}] = {oauth_token}'
+                         .format(site=site,
+                                 username=site.username(),
+                                 consumer=consumer_key,
+                                 hostname=site.hostname(),
+                                 oauth_token=oauth_token))
 
 
 def main(*args) -> None:
@@ -159,27 +156,28 @@ def main(*args) -> None:
         for lang in namedict[family_name]:
             try:
                 site = pywikibot.Site(code=lang, fam=family_name)
-                if oauth:
-                    _oauth_login(site)
-                    continue
-                if logout:
-                    site.logout()
-                else:
-                    site.login(autocreate=autocreate)
-                user = site.user()
-                if user:
-                    pywikibot.output(
-                        'Logged in on {0} as {1}.'.format(site, user))
-                else:
-                    if logout:
-                        pywikibot.output('Logged out of {0}.'.format(site))
-                    else:
-                        pywikibot.output(
-                            'Not logged in on {0}.'.format(site))
             except SiteDefinitionError:
-                pywikibot.output('{0}.{1} is not a valid site, '
-                                 'please remove it from your config'
+                pywikibot.output('{1}:{0} is not a valid site, '
+                                 'please remove it from your user-config'
                                  .format(lang, family_name))
+                continue
+
+            if oauth:
+                _oauth_login(site)
+                continue
+
+            if logout:
+                site.logout()
+            else:
+                site.login(autocreate=autocreate)
+
+            user = site.user()
+            if user:
+                pywikibot.output('Logged in on {} as {}.'.format(site, user))
+            elif logout:
+                pywikibot.output('Logged out of {}.'.format(site))
+            else:
+                pywikibot.output('Not logged in on {}.'.format(site))
 
 
 if __name__ == '__main__':
