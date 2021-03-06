@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1821,15 +1821,7 @@ def concat_options(message, line_length, options):
     return '{} ({}):'.format(message, option_msg)
 
 
-def _py2():
-    """Function for deprecated PY2 variable used by wrapper below."""
-    return (PYTHON_VERSION[0] == 2)
-
-
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
                              replacement_name='tools.frozenmap',
                              since='20201109', future_warning=True)
-wrapper._add_deprecated_attr('PY2', _py2(),
-                             replacement_name='sys.version_info[0] == 2',
-                             since='20201224', future_warning=True)
