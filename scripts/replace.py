@@ -57,7 +57,10 @@ Furthermore, the following command line parameters are supported:
 
 -summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
                   the predefined message texts with original and replacements
-                  inserted. Can't be used with -automaticsummary.
+                  inserted. To add the replacements to your summary use the
+                  %(description)s placeholder, for example:
+                  -summary:"Bot operated replacement: %(description)s"
+                  Can't be used with -automaticsummary.
 
 -automaticsummary Uses an automatic summary for all replacements which don't
                   have a summary defined. Can't be used with -summary.
@@ -640,19 +643,20 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 summary_messages.add(replacement.edit_summary)
             elif replacement.default_summary:
                 default_summaries.add((replacement.old, replacement.new))
+
         summary_messages = sorted(summary_messages)
         if default_summaries:
             if self.opt.summary:
-                summary_messages.insert(0, self.opt.summary)
+                msg = self.opt.summary
             else:
-                comma = self.site.mediawiki_message('comma-separator')
-                default_summary = comma.join(
-                    '-{0} +{1}'.format(*default_summary)
-                    for default_summary in default_summaries)
-                summary_messages.insert(0, i18n.twtranslate(
-                    self.site, 'replace-replacing',
-                    {'description': ' ({0})'.format(default_summary)}
-                ))
+                msg = i18n.twtranslate(self.site, 'replace-replacing')
+            comma = self.site.mediawiki_message('comma-separator')
+            default_summary = comma.join(
+                '-{} +{}'.format(*default_summary)
+                for default_summary in default_summaries)
+            desc = {'description': ' ({})'.format(default_summary)}
+            summary_messages.insert(0, msg % desc)
+
         semicolon = self.site.mediawiki_message('semicolon-separator')
         return semicolon.join(summary_messages)
 
