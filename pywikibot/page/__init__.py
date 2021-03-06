@@ -2822,7 +2822,7 @@ class User(Page):
             pywikibot.output(
                 'This is an autoblock ID, you can only use to unblock it.')
 
-    @deprecated('User.username', since='20160504')
+    @deprecated('User.username', since='20160504', future_warning=True)
     def name(self) -> str:  # pragma: no cover
         """
         The username.
