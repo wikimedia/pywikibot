@@ -956,11 +956,6 @@ class APISite(
         """Return this site's internal id."""
         return self.siteinfo['wikiid']
 
-    @deprecated('APISite.lang', since='20150629', future_warning=True)
-    def language(self):  # pragma: no cover
-        """Return the code for the language of this Site."""
-        return self.lang
-
     @property
     def lang(self):
         """Return the code for the language of this Site."""
