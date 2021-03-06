@@ -78,8 +78,8 @@ class DownloadDumpBot(Bot):
 
         download_filename = '{wikiname}-{dumpdate}-{filename}'.format_map(
             self.opt)
-        temp_filename = download_filename + '-' + \
-            binascii.b2a_hex(urandom(8)).decode('ascii') + '.part'
+        temp_filename = download_filename + '-' \
+            + binascii.b2a_hex(urandom(8)).decode('ascii') + '.part'
 
         file_final_storepath = os.path.join(
             self.opt.storepath, download_filename)

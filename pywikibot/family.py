@@ -619,8 +619,8 @@ class Family:
 
     def category_redirects(self, code, fallback='_default'):
         """Return list of category redirect templates."""
-        if not hasattr(self, '_catredirtemplates') or \
-           code not in self._catredirtemplates:
+        if not hasattr(self, '_catredirtemplates') \
+           or code not in self._catredirtemplates:
             self._get_cr_templates(code, fallback)
         return self._catredirtemplates[code]
 

@@ -480,8 +480,8 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
         # If builtins or standard_lib is None,
         # only include package if a version was found.
-        if (builtins is None and name in builtin_packages) or \
-                (standard_lib is None and name in std_lib_packages):
+        if builtins is None and name in builtin_packages \
+           or standard_lib is None and name in std_lib_packages:
             if 'ver' in info:
                 data[name] = info
             else:

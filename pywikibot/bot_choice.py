@@ -286,8 +286,8 @@ class LinkChoice(Choice):
             if self.replacer.current_link.anchor is None:
                 kwargs['label'] = self.replacer.current_groups['title']
                 if self.replacer.current_groups['section']:
-                    kwargs['label'] += '#' + \
-                                       self.replacer.current_groups['section']
+                    kwargs['label'] += '#' \
+                        + self.replacer.current_groups['section']
             else:
                 kwargs['label'] = self.replacer.current_link.anchor
         return pywikibot.Link.create_separated(

@@ -4509,8 +4509,8 @@ class APISite(
                             # TODO: catch and process foreseeable errors
                             if error.code == 'uploaddisabled':
                                 self._uploaddisabled = True
-                            elif error.code == 'stashfailed' and \
-                                    'offset' in error.other:
+                            elif error.code == 'stashfailed' \
+                                    and 'offset' in error.other:
                                 # TODO: Ask MediaWiki to change this
                                 # ambiguous error code.
 

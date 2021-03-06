@@ -490,8 +490,8 @@ class ParamInfo(Sized, Container):
                         break
                 else:
                     param = {}
-                assert param['name'] == 'generator' and \
-                    submodules >= set(param['type'])
+                assert param['name'] == 'generator' \
+                    and submodules >= set(param['type'])
 
     def _normalize_modules(self, modules) -> set:
         """Add query+ to any query module name not also in action modules."""
@@ -1846,8 +1846,8 @@ class Request(MutableMapping):
                 continue
 
             # Phab. tickets T48535, T64126, T68494, T68619
-            if code == 'failed-save' and \
-               self._is_wikibase_error_retryable(result['error']):
+            if code == 'failed-save' \
+               and self._is_wikibase_error_retryable(result['error']):
                 self.wait()
                 continue
 
@@ -2147,13 +2147,15 @@ class APIGenerator(_RequestWrapper):
         n = 0
         while True:
             self.request[self.continue_name] = offset
-            pywikibot.debug('%s: Request: %s' % (
-                self.__class__.__name__, self.request), _logger)
+            pywikibot.debug('{}: Request: {}'
+                            .format(self.__class__.__name__, self.request),
+                            _logger)
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
-            pywikibot.debug('%s: Retrieved %d items' % (
-                self.__class__.__name__, n_items), _logger)
+            pywikibot.debug('{}: Retrieved {} items'
+                            .format(self.__class__.__name__, n_items),
+                            _logger)
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item

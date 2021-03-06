@@ -690,8 +690,8 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         """Test WbGeoShape error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:TemplateData/TemplateData.tab')
-        regex = r"^Page must be in 'Data:' namespace and end in '\.map' " + \
-                r'for geo-shape\.$'
+        regex = (r"^Page must be in 'Data:' namespace and end in '\.map' "
+                 r'for geo-shape\.$')
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
@@ -766,8 +766,8 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         """Test WbTabularData error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
-        regex = r"^Page must be in 'Data:' namespace and end in '\.tab' " + \
-                r'for tabular-data\.$'
+        regex = (r"^Page must be in 'Data:' namespace and end in '\.tab' "
+                 r'for tabular-data\.$')
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
@@ -1251,8 +1251,8 @@ class TestItemLoad(WikidataTestCase):
         """Test ItemPage.from_entity_uri with unexpected item repo."""
         repo = self.get_repo()
         entity_uri = 'http://test.wikidata.org/entity/Q124'
-        regex = r'^The supplied data repository \(.+\) does not ' + \
-                r'correspond to that of the item \(.+\)$'
+        regex = (r'^The supplied data repository \(.+\) does not '
+                 r'correspond to that of the item \(.+\)$')
         with self.assertRaisesRegex(ValueError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
@@ -2028,8 +2028,8 @@ class TestOwnClient(TestCase):
         """Test that page_from_repository method fails."""
         site = self.get_site(key)
         dummy_item = 'Q1'
-        regex = r'^page_from_repository method is not implemented ' + \
-                r'for Wikibase .+\.$'
+        regex = (r'^page_from_repository method is not implemented '
+                 r'for Wikibase .+\.$')
         with self.assertRaisesRegex(NotImplementedError, regex):
             site.page_from_repository(dummy_item)
 

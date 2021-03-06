@@ -76,11 +76,11 @@ class BaseSite(ComparableMixin):
                 pywikibot.log('Site %s instantiated and marked "obsolete" '
                               'to prevent access' % self)
         elif self.__code not in self.languages():
-            if self.__family.name in self.__family.langs and \
-               len(self.__family.langs) == 1:
+            if self.__family.name in self.__family.langs \
+               and len(self.__family.langs) == 1:
                 self.__code = self.__family.name
                 if self.__family == pywikibot.config.family \
-                        and code == pywikibot.config.mylang:
+                   and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
                          '"%s" while instantiating site %s'

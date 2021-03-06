@@ -710,8 +710,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         else:
             pywikibot.log("Didn't move pages/subcategories, because the "
                           "category page hasn't been moved.")
-        if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
-                ((self.newcat and self.move_oldcat) or not self.newcat):
+        if self.oldcat.isEmptyCategory() and self.delete_oldcat \
+           and (self.newcat and self.move_oldcat or not self.newcat):
             self._delete(can_move_page, can_move_talk)
 
     def _delete(self, moved_page, moved_talk) -> None:

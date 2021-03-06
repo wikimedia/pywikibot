@@ -706,8 +706,8 @@ class WbQuantity(_WbRepresentation):
         self.site = site or Site().data_repository()
 
         # also allow entity URIs to be provided via unit parameter
-        if isinstance(unit, str) and \
-                unit.partition('://')[0] not in ('http', 'https'):
+        if isinstance(unit, str) \
+           and unit.partition('://')[0] not in ('http', 'https'):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
         if error is None and not self._require_errors(site):
@@ -905,8 +905,8 @@ class _WbDataPage(_WbRepresentation):
         # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.tab$/u' for tabular-data
         # As we have already checked for existence the following simplified
         # check should be enough.
-        if not page.title().startswith('Data:') or \
-                not page.title().endswith(ending):
+        if not page.title().startswith('Data:') \
+           or not page.title().endswith(ending):
             raise ValueError(
                 "Page must be in 'Data:' namespace and end in '{0}' "
                 'for {1}.'.format(ending, label))

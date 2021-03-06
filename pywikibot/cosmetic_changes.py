@@ -51,7 +51,7 @@ or by adding a list to the given one:
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -801,8 +801,8 @@ class CosmeticChangesToolkit:
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         builder = _MultiTemplateMatchBuilder(self.site)
 
-        if self.site.family.name in deprecatedTemplates and \
-           self.site.code in deprecatedTemplates[self.site.family.name]:
+        if self.site.family.name in deprecatedTemplates \
+           and self.site.code in deprecatedTemplates[self.site.family.name]:
             for template in deprecatedTemplates[
                     self.site.family.name][self.site.code]:
                 old, new = template

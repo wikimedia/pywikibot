@@ -1094,11 +1094,10 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite=site)
     if s:
-        if site.code in site.family.interwiki_attop or \
-           '<!-- interwiki at top -->' in oldtext:
+        if site.code in site.family.interwiki_attop \
+           or '<!-- interwiki at top -->' in oldtext:
             # do not add separator if interwiki links are on one line
-            newtext = s + ('' if site.code
-                           in site.family.interwiki_on_one_line
+            newtext = s + ('' if site.code in site.family.interwiki_on_one_line
                            else separator) + s2.replace(marker, '').strip()
         else:
             # calculate what was after the language links on the page
@@ -1116,8 +1115,8 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             elif site.code in site.family.categories_last:
                 cats = getCategoryLinks(s2, site=site)
                 s2 = removeCategoryLinksAndSeparator(
-                    s2.replace(marker, cseparatorstripped).strip(), site) + \
-                    separator + s
+                    s2.replace(marker, cseparatorstripped).strip(), site) \
+                    + separator + s
                 newtext = replaceCategoryLinks(s2, cats, site=site,
                                                addOnly=True)
             # for Wikitravel's language links position.

@@ -293,14 +293,14 @@ class BasePage(ComparableMixin):
             else:
                 target_code = config.mylang
                 target_family = config.family
-            if force_interwiki or \
-               (allow_interwiki
-                and (self.site.family.name != target_family
-                     or self.site.code != target_code)):
+            if force_interwiki \
+               or (allow_interwiki
+                   and (self.site.family.name != target_family
+                        or self.site.code != target_code)):
                 if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
-                    title = '%s:%s:%s' % (
-                        self.site.family.name, self.site.code, title)
+                    title = '{site.family.name}:{site.code}:{title}'.format(
+                        site=self.site, title=title)
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
@@ -5344,13 +5344,11 @@ class Link(BaseLink):
         # often be unreachable due to the way web browsers deal
         # * with 'relative' URLs. Forbid them explicitly.
 
-        if '.' in t and (
-                t in ('.', '..')
-                or t.startswith(('./', '../'))
-                or '/./' in t
-                or '/../' in t
-                or t.endswith(('/.', '/..'))
-        ):
+        if '.' in t and (t in ('.', '..')
+                         or t.startswith(('./', '../'))
+                         or '/./' in t
+                         or '/../' in t
+                         or t.endswith(('/.', '/..'))):
             raise pywikibot.InvalidTitle(
                 "(contains . / combinations): '%s'"
                 % self._text)

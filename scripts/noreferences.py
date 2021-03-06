@@ -29,7 +29,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -542,8 +542,8 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def lacksReferences(self, text) -> bool:
         """Check whether or not the page is lacking a references tag."""
         oldTextCleaned = textlib.removeDisabledParts(text)
-        if self.referencesR.search(oldTextCleaned) or \
-           self.referencesTagR.search(oldTextCleaned):
+        if self.referencesR.search(oldTextCleaned) \
+           or self.referencesTagR.search(oldTextCleaned):
             if self.opt.verbose:
                 pywikibot.output('No changes necessary: references tag found.')
             return False
