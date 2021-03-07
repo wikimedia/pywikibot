@@ -462,16 +462,12 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         pywikibot.stdout('HTTP error ({}) for {} on {}'
                          .format(err_num, link, pagetitleaslink))
 
-    def getPDFTitle(self, ref, f):
-        """Use pdfinfo to retrieve title from a PDF.
-
-        FIXME: Unix-only, I'm afraid.
-
-        """
+    def getPDFTitle(self, ref, response):
+        """Use pdfinfo to retrieve title from a PDF."""
         pywikibot.output('PDF file.')
         fd, infile = tempfile.mkstemp()
         urlobj = os.fdopen(fd, 'w+')
-        urlobj.write(f.text)
+        urlobj.write(response.text)
 
         try:
             pdfinfo_out = subprocess.Popen([r'pdfinfo', '/dev/stdin'],
@@ -535,16 +531,16 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             ref = RefLink(link, match.group('name'), site=self.site)
 
             try:
-                f = comms.http.fetch(
+                r = comms.http.fetch(
                     ref.url, use_fake_user_agent=self._use_fake_user_agent)
 
                 # Try to get Content-Type from server
-                content_type = f.headers.get('content-type')
+                content_type = r.headers.get('content-type')
                 if content_type and not self.MIME.search(content_type):
                     if ref.link.lower().endswith('.pdf') \
                        and not self.opt.ignorepdf:
                         # If file has a PDF suffix
-                        self.getPDFTitle(ref, f)
+                        self.getPDFTitle(ref, r)
                     else:
                         pywikibot.output(color_format(
                             '{lightyellow}WARNING{default} : media : {} ',
@@ -566,7 +562,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     continue
 
                 # Get the real url where we end (http redirects !)
-                redir = f.url
+                redir = r.url
                 if redir != ref.link \
                    and domain.findall(redir) == domain.findall(link):
                     if soft404.search(redir) \
@@ -583,21 +579,21 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                             'Redirect to root : {0} ', ref.link))
                         continue
 
-                if f.status_code != codes.ok:
+                if r.status_code != codes.ok:
                     pywikibot.stdout('HTTP error ({}) for {} on {}'
-                                     .format(f.status_code, ref.url,
+                                     .format(r.status_code, ref.url,
                                              page.title(as_link=True)))
                     # 410 Gone, indicates that the resource has been
                     # purposely removed
-                    if f.status_code == 410 \
-                       or (f.status_code == 404
+                    if r.status_code == 410 \
+                       or (r.status_code == 404
                            and '\t{}\t'.format(
                                ref.url) in self.dead_links):
                         repl = ref.refDead()
                         new_text = new_text.replace(match.group(), repl)
                     continue
 
-                linkedpagetext = f.content
+                linkedpagetext = r.content
 
             except UnicodeError:
                 # example:
@@ -636,15 +632,13 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     # use charset from html
                     s = self.CHARSET.search(tag)
             if s:
+                # Use encoding if found. Else use chardet apparent encoding
                 encoding = s.group('enc').strip('"\' ').lower()
                 naked = re.sub(r'[ _\-]', '', encoding)
                 # Convert to python correct encoding names
                 if naked == 'xeucjp':
                     encoding = 'euc_jp'
-                f.data.encoding = encoding
-            else:
-                pywikibot.output('No charset found for ' + ref.link)
-                f.data.encoding = None
+                r.encoding = encoding
 
             if not content_type:
                 pywikibot.output('No content-type found for ' + ref.link)
@@ -658,10 +652,8 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 new_text = new_text.replace(match.group(), repl)
                 continue
 
-            u = f.text
-
             # Retrieves the first non empty string inside <title> tags
-            for m in self.TITLE.finditer(u):
+            for m in self.TITLE.finditer(r.text):
                 t = m.group()
                 if t:
                     ref.title = t
