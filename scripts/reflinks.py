@@ -319,6 +319,7 @@ class DuplicateReferences:
                 v[1].append(match.group())
             else:
                 v = [None, [match.group()], False, False]
+
             name = self.NAMES.match(params)
             if name:
                 quoted = name.group('quote') == '"'
@@ -328,7 +329,6 @@ class DuplicateReferences:
                         named_repl[name] = [v[0], v[2]]
                 else:
                     # First name associated with this content
-
                     if name == 'population':
                         pywikibot.output(content)
                     if name not in found_ref_names:
@@ -344,24 +344,26 @@ class DuplicateReferences:
                 found_ref_names[name] = 1
             groupdict[content] = v
 
-        id = 1
-        while self.autogen + str(id) in found_ref_names:
-            id += 1
+        id_ = 1
+        while self.autogen + str(id_) in found_ref_names:
+            id_ += 1
+
         for (g, d) in found_refs.items():
+            group = ''
             if g:
                 group = 'group=\"{}\" '.format(group)
-            else:
-                group = ''
 
             for (k, v) in d.items():
                 if len(v[1]) == 1 and not v[3]:
                     continue
+
                 name = v[0]
                 if not name:
-                    name = '"{}{}"'.format(self.autogen, id)
-                    id += 1
+                    name = '"{}{}"'.format(self.autogen, id_)
+                    id_ += 1
                 elif v[2]:
                     name = '{!r}'.format(name)
+
                 named = '<ref {}name={}>{}</ref>'.format(group, name, k)
                 text = text.replace(v[1][0], named, 1)
 
@@ -383,6 +385,7 @@ class DuplicateReferences:
             name = v[0]
             if v[1]:
                 name = '{!r}'.format(name)
+
             text = re.sub(
                 '<ref name\\s*=\\s*(?P<quote>"?)\\s*{}\\s*(?P=quote)\\s*/>'
                 .format(k),
@@ -395,7 +398,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     """References bot."""
 
     def __init__(self, **kwargs):
-        """- generator : Page generator."""
+        """Initializer."""
         self.available_options.update({
             'ignorepdf': False,  # boolean
             'limit': 0,  # int, stop after n modified pages
@@ -414,6 +417,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 break
         if code:
             manual += '/{}'.format(code)
+
         if self.opt.summary:
             self.msg = self.opt.summary
         else:
@@ -421,9 +425,10 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         local = i18n.translate(self.site, badtitles)
         if local:
-            bad = '(' + globalbadtitles + '|' + local + ')'
+            bad = '({}|{})'.format(globalbadtitles, local)
         else:
             bad = globalbadtitles
+
         self.titleBlackList = re.compile(bad, re.I | re.S | re.X)
         self.norefbot = noreferences.NoReferencesBot(verbose=False)
         self.deduplicator = DuplicateReferences(self.site)
@@ -558,7 +563,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         repl = ref.refLink()
 
                     new_text = new_text.replace(match.group(), repl)
-                    return
+                    continue
 
                 # Get the real url where we end (http redirects !)
                 redir = f.url
@@ -569,14 +574,14 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         pywikibot.output(color_format(
                             '{lightyellow}WARNING{default} : '
                             'Redirect 404 : {0} ', ref.link))
-                        return
+                        continue
 
                     if dirIndex.match(redir) \
                        and not dirIndex.match(ref.link):
                         pywikibot.output(color_format(
                             '{lightyellow}WARNING{default} : '
                             'Redirect to root : {0} ', ref.link))
-                        return
+                        continue
 
                 if f.status_code != codes.ok:
                     pywikibot.stdout('HTTP error ({}) for {} on {}'
@@ -590,7 +595,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                                ref.url) in self.dead_links):
                         repl = ref.refDead()
                         new_text = new_text.replace(match.group(), repl)
-                    return
+                    continue
 
                 linkedpagetext = f.content
 
@@ -601,7 +606,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 pywikibot.output(color_format(
                     '{lightred}Bad link{default} : {0} in {1}',
                     ref.url, page.title(as_link=True)))
-                return
+                continue
 
             except (URLError,
                     socket.error,
@@ -612,7 +617,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     pywikibot.Server504Error) as e:
                 pywikibot.output("Can't retrieve page {} : {}"
                                  .format(ref.url, e))
-                return
+                continue
 
             # remove <script>/<style>/comments/CDATA tags
             linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
@@ -643,7 +648,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
             if not content_type:
                 pywikibot.output('No content-type found for ' + ref.link)
-                return
+                continue
 
             if not self.MIME.search(content_type):
                 pywikibot.output(color_format(
@@ -651,7 +656,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     ref.link))
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
-                return
+                continue
 
             u = f.text
 
@@ -668,7 +673,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
                 pywikibot.output('{} : No title found...'.format(ref.link))
-                return
+                continue
 
             if self.titleBlackList.match(ref.title):
                 repl = ref.refLink()
@@ -676,7 +681,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 pywikibot.output(color_format(
                     '{lightred}WARNING{default} {0} : '
                     'Blacklisted title ({1})', ref.link, ref.title))
-                return
+                continue
 
             # Truncate long titles. 175 is arbitrary
             if len(ref.title) > 175:
