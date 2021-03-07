@@ -48,6 +48,7 @@ import subprocess
 import tempfile
 
 from functools import partial
+from textwrap import shorten
 from urllib.error import URLError
 
 from requests import codes
@@ -195,32 +196,31 @@ class RefLink:
 
     def __init__(self, link, name, site=None):
         """Initializer."""
-        self.refname = name
+        self.name = name
         self.link = link
         self.site = site or pywikibot.Site()
-        self.linkComment = i18n.twtranslate(self.site, 'reflinks-comment')
+        self.comment = i18n.twtranslate(self.site, 'reflinks-comment')
         self.url = re.sub('#.*', '', self.link)
         self.title = None
 
     def refTitle(self):
         """Return the <ref> with its new title."""
-        return '<ref%s>[%s %s<!-- %s -->]</ref>' % (self.refname, self.link,
-                                                    self.title,
-                                                    self.linkComment)
+        return '<ref{r.name}>[{r.link} {r.title}<!-- {r.comment} -->]</ref>' \
+               .format(r=self)
 
     def refLink(self):
         """No title has been found, return the unbracketed link."""
-        return '<ref%s>%s</ref>' % (self.refname, self.link)
+        return '<ref{r.name}>{r.link}</ref>'.format(r=self)
 
     def refDead(self):
         """Dead link, tag it with a {{dead link}}."""
         tag = i18n.translate(self.site, deadLinkTag)
         if not tag:
             dead_link = self.refLink()
-        elif '%s' in tag:
-            dead_link = '<ref%s>%s</ref>' % (self.refname, tag % self.link)
         else:
-            dead_link = '<ref%s>%s</ref>' % (self.refname, tag)
+            if '%s' in tag:
+                tag %= self.link
+            dead_link = '<ref{}>{}</ref>'.format(self.name, tag)
         return dead_link
 
     def transform(self, ispdf=False):
@@ -477,10 +477,10 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                                            shell=False).communicate()[0]
             for aline in pdfinfo_out.splitlines():
                 if aline.lower().startswith('title'):
-                    ref.title = aline.split(None)[1:]
-                    ref.title = ' '.join(ref.title)
-                    if ref.title != '':
+                    ref.title = ' '.join(aline.split()[1:])
+                    if ref.title:
                         pywikibot.output('title: ' + ref.title)
+                        break
             pywikibot.output('PDF done.')
         except ValueError:
             pywikibot.output('pdfinfo value error.')
@@ -673,8 +673,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 continue
 
             # Truncate long titles. 175 is arbitrary
-            if len(ref.title) > 175:
-                ref.title = ref.title[:175] + '...'
+            ref.title = shorten(ref.title, width=178, placeholder='...')
 
             repl = ref.refTitle()
             new_text = new_text.replace(match.group(), repl)
@@ -686,6 +685,9 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         new_text = self.deduplicator.process(new_text)
         old_text = page.text
+
+        if old_text == page.text:
+            return
 
         self.userPut(page, old_text, new_text, summary=self.msg,
                      ignore_save_related_errors=True,
