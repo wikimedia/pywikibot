@@ -153,7 +153,13 @@ scripts.protect script
 
 scripts.redirect script
 -----------------------
+
 .. automodule:: scripts.redirect
+
+scripts.reflinks script
+-----------------------
+
+.. automodule:: scripts.reflinks
 
 scripts.replace script
 ----------------------

@@ -91,6 +91,10 @@ The contents of the package
     |                        | solve_disambiguation also has functions which treat     |
     |                        | redirects.                                              |
     +------------------------+---------------------------------------------------------+
+    | reflinks.py            | Search for references which are only made of a link     |
+    |                        | without title and fetch the html title from the link to |
+    |                        | use it as the title of the wiki link in the reference.  |
+    +------------------------+---------------------------------------------------------+
     | replace.py             | Search articles for a text and replace it by another    |
     |                        | text. Both text are set in two configurable             |
     |                        | text files. The bot can either work on a set of given   |
@@ -133,6 +137,7 @@ The contents of the package
 
     +------------------------+---------------------------------------------------------+
     | archive                | Scripts no longer maintained.                           |
+    |                        | Please open a Phabricator task if you want to use one.  |
     +========================+=========================================================+
     | blockpagechecker.py    | Deletes any protection templates that are on pages      |
     |                        | which aren't actually protected.                        |
@@ -209,10 +214,6 @@ The contents of the package
     |                        | new article text if it differs from the original.       |
     +------------------------+---------------------------------------------------------+
     | protect.py             | Protect and unprotect pages en masse.                   |
-    +------------------------+---------------------------------------------------------+
-    | reflinks.py            | Search for references which are only made of a link     |
-    |                        | without title and fetch the html title from the link to |
-    |                        | use it as the title of the wiki link in the reference.  |
     +------------------------+---------------------------------------------------------+
     | selflink.py            | This bot goes over multiple pages of the home wiki,     |
     |                        | searches for selflinks, and allows removing them.       |
