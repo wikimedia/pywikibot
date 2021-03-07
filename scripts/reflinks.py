@@ -2,19 +2,17 @@
 """
 Fetch and add titles for bare links in references.
 
-This bot will search for references which are only made of a link without title
-(i.e. <ref>[https://www.google.fr/]</ref> or <ref>https://www.google.fr/</ref>)
-and will fetch the html title from the link to use it as the title of the wiki
-link in the reference, i.e.
+This bot will search for references which are only made of a link
+without title (i.e. <ref>[https://www.google.fr/]</ref> or
+<ref>https://www.google.fr/</ref>) and will fetch the html title from
+the link to use it as the title of the wiki link in the reference, i.e.
 <ref>[https://www.google.fr/search?q=test test - Google Search]</ref>
 
-The bot checks every 20 edits a special stop page. If the page has been edited,
-it stops.
+The bot checks every 20 edits a special stop page. If the page has been
+edited, it stops.
 
-Warning: Running this script on German Wikipedia is not allowed anymore.
-
-As it uses it, you need to configure noreferences.py for your wiki, or it will
-not work.
+As it uses it, you need to configure noreferences.py for your wiki, or it
+will not work.
 
 pdfinfo is needed for parsing pdf titles.
 
@@ -22,22 +20,22 @@ The following parameters are supported:
 
 -limit:n          Stops after n edits
 
--xml:dump.xml     Should be used instead of a simple page fetching method from
-                  pagegenerators.py for performance and load issues
+-xml:dump.xml     Should be used instead of a simple page fetching method
+                  from pagegenerators.py for performance and load issues
 
 -xmlstart         Page to start with when using an XML dump
 
--ignorepdf        Do not handle PDF files (handy if you use Windows and can't
-                  get pdfinfo)
+-ignorepdf        Do not handle PDF files (handy if you use Windows and
+                  can't get pdfinfo)
 
--summary          Use a custom edit summary. Otherwise it uses the default
-                  one from i18n/reflinks.py
+-summary          Use a custom edit summary. Otherwise it uses the
+                  default one from translatewiki
 
 The following generators and filters are supported:
 
 &params;
 """
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -739,24 +737,17 @@ def main(*args):
     gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-summary:'):
-            options['summary'] = arg[9:]
-        elif arg in ('-always', '-ignorepdf'):
-            options[arg[1:]] = True
-        elif arg.startswith('-limit:'):
-            options['limit'] = int(arg[7:])
-        elif arg.startswith('-xmlstart'):
-            if len(arg) == 9:
-                xml_start = pywikibot.input(
-                    'Please enter the dumped article to start with:')
-            else:
-                xml_start = arg[10:]
-        elif arg.startswith('-xml'):
-            if len(arg) == 4:
-                xml_filename = pywikibot.input(
-                    "Please enter the XML dump's filename:")
-            else:
-                xml_filename = arg[5:]
+        opt, _, value = arg.partition(':')
+        if opt in ('-summary', '-limit'):
+            options[opt[1:]] = value
+        elif opt in ('-always', '-ignorepdf'):
+            options[opt[1:]] = True
+        elif opt == '-xmlstart':
+            xml_start = value or pywikibot.input(
+                'Please enter the dumped article to start with:')
+        elif opt == '-xml':
+            xml_filename = value or pywikibot.input(
+                "Please enter the XML dump's filename:")
         else:
             gen_factory.handle_arg(arg)
 
