@@ -522,11 +522,9 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 textlib.removeDisabledParts(page.get())):
 
             link = match.group('url')
-            # debugging purpose
-            # print link
             if 'jstor.org' in link:
                 # TODO: Clean URL blacklist
-                return
+                continue
 
             ref = RefLink(link, match.group('name'), site=self.site)
 
@@ -593,8 +591,6 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         new_text = new_text.replace(match.group(), repl)
                     continue
 
-                linkedpagetext = r.content
-
             except UnicodeError:
                 # example:
                 # http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
@@ -615,6 +611,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                                  .format(ref.url, e))
                 continue
 
+            linkedpagetext = r.content
             # remove <script>/<style>/comments/CDATA tags
             linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
