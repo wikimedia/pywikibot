@@ -464,24 +464,18 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     def getPDFTitle(self, ref, response):
         """Use pdfinfo to retrieve title from a PDF."""
-        pywikibot.output('PDF file.')
-        fd, infile = tempfile.mkstemp()
-        urlobj = os.fdopen(fd, 'w+')
-        urlobj.write(response.text)
+        # pdfinfo is Unix-only
+        pywikibot.output('Reading PDF file...')
 
         try:
+            fd, infile = tempfile.mkstemp()
+            urlobj = os.fdopen(fd, 'w+')
+            urlobj.write(response.text)
             pdfinfo_out = subprocess.Popen([r'pdfinfo', '/dev/stdin'],
                                            stdin=urlobj,
                                            stdout=subprocess.PIPE,
                                            stderr=subprocess.PIPE,
                                            shell=False).communicate()[0]
-            for aline in pdfinfo_out.splitlines():
-                if aline.lower().startswith('title'):
-                    ref.title = ' '.join(aline.split()[1:])
-                    if ref.title:
-                        pywikibot.output('title: ' + ref.title)
-                        break
-            pywikibot.output('PDF done.')
         except ValueError:
             pywikibot.output('pdfinfo value error.')
         except OSError:
@@ -489,6 +483,14 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         except Exception:  # Ignore errors
             pywikibot.output('PDF processing error.')
             pywikibot.exception()
+        else:
+            for aline in pdfinfo_out.splitlines():
+                if aline.lower().startswith('title'):
+                    ref.title = ' '.join(aline.split()[1:])
+                    if ref.title:
+                        pywikibot.output('title: ' + ref.title)
+                        break
+            pywikibot.output('PDF done.')
         finally:
             urlobj.close()
             os.unlink(infile)
