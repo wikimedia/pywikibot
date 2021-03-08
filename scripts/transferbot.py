@@ -45,12 +45,13 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
 from pywikibot.bot import suggest_help
+from pywikibot.i18n import twtranslate
 from pywikibot import pagegenerators
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -162,17 +163,21 @@ def main(*args) -> None:
         pywikibot.log('Getting page text.')
         text = page.get(get_redirect=True)
         source_link = page.title(as_link=True, insite=targetpage.site)
-        text += ('<noinclude>\n\n<small>This page was moved from {0}. Its '
-                 'edit history can be viewed at {1}</small></noinclude>'
-                 .format(source_link,
-                         edithistpage.title(as_link=True,
-                                            insite=targetpage.site)))
+
+        note = twtranslate(
+            tosite, 'transferbot-target',
+            {'source': source_link,
+             'history': edithistpage.title(as_link=True,
+                                           insite=targetpage.site)}
+        )
+        text += '<noinclude>\n\n<small>{}</small></noinclude>'.format(note)
 
         pywikibot.log('Getting edit history.')
         historytable = page.getVersionHistoryTable()
 
         pywikibot.log('Putting edit history.')
-        summary = 'Moved page from {source}'.format(source=source_link)
+        summary = twtranslate(tosite, 'transferbot-summary',
+                              {'source': source_link})
         edithistpage.put(historytable, summary=summary)
 
         pywikibot.log('Putting page text.')
