@@ -310,11 +310,6 @@ def error_handling_callback(response):
     if response.status_code not in (200, 207):
         warning('Http response status {}'.format(response.status_code))
 
-    if isinstance(response.encoding, UnicodeDecodeError):
-        error('An error occurred for uri {}: '
-              'no encoding detected!'.format(response.request.url))
-        raise response.encoding from None
-
 
 @deprecated_args(callback=True, body='data')
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
@@ -422,7 +417,7 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     return response
 
 
-def _get_encoding_from_response_headers(response):
+def _get_encoding_from_response_headers(response) -> Optional[str]:
     """Return charset given by the response header."""
     content_type = response.headers.get('content-type')
 
@@ -449,11 +444,19 @@ def _get_encoding_from_response_headers(response):
     return header_encoding
 
 
-def _decide_encoding(response, charset):
+def _decide_encoding(response, charset) -> Optional[str]:
     """Detect the response encoding."""
     def _try_decode(content, encoding):
         """Helper function to try decoding."""
-        content.decode(encoding)
+        if encoding is None:
+            return None
+        try:
+            content.decode(encoding)
+        except (LookupError, UnicodeDecodeError):
+            pywikibot.warning('Unknown or invalid encoding {!r}'
+                              .format(encoding))
+            # let chardet do the job
+            return None
         return encoding
 
     header_encoding = _get_encoding_from_response_headers(response)
@@ -475,14 +478,22 @@ def _decide_encoding(response, charset):
         return _try_decode(response.content, charset)
 
     # Both charset and header_encoding are available.
-    if codecs.lookup(header_encoding) != codecs.lookup(charset):
+    try:
+        header_codecs = codecs.lookup(header_encoding)
+    except LookupError:
+        header_codecs = None
+
+    try:
+        charset_codecs = codecs.lookup(charset)
+    except LookupError:
+        charset_codecs = None
+
+    if header_codecs and charset_codecs and header_codecs != charset_codecs:
         pywikibot.warning(
             'Encoding "{}" requested but "{}" received in the '
             'response header.'.format(charset, header_encoding))
 
-    try:
-        _encoding = _try_decode(response.content, header_encoding)
-    except UnicodeDecodeError:
-        _encoding = _try_decode(response.content, charset)
+    _encoding = _try_decode(response.content, header_encoding) \
+        or _try_decode(response.content, charset)
 
     return _encoding
