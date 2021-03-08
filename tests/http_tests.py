@@ -488,41 +488,22 @@ class CharsetTestCase(TestCase):
 
     def test_invalid_charset(self):
         """Test decoding with different and invalid charsets."""
-        charset = 'utf16'
-        resp = CharsetTestCase._create_response(
-            data=CharsetTestCase.LATIN1_BYTES)
-        # Ignore WARNING: Encoding "utf16" requested but "utf-8" received
-        with patch('pywikibot.warning'):
-            with self.assertRaisesRegex(
-                    UnicodeDecodeError,
-                    self.CODEC_CANT_DECODE_RE):
-                http._decide_encoding(resp, charset)
-        self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
+        invalid_charsets = ('utf16', 'win-1251')
+        for charset in invalid_charsets:
+            with self.subTest(charset=charset):
+                resp = CharsetTestCase._create_response(
+                    data=CharsetTestCase.LATIN1_BYTES)
 
-        try:
-            resp.encoding = http._decide_encoding(resp, charset)
-        except UnicodeDecodeError as e:
-            resp.encoding = e
+                with patch('pywikibot.warning'):  # Ignore WARNING:
+                    resp.encoding = http._decide_encoding(resp, charset)
+                self.assertIsNone(resp.encoding)
+                self.assertIsNotNone(resp.apparent_encoding)
+                self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
 
-        with patch('pywikibot.error'):
-            with self.assertRaisesRegex(
-                    UnicodeDecodeError,
-                    self.CODEC_CANT_DECODE_RE):
-                http.error_handling_callback(resp)
-
-        # TODO: this is a breaking change
-        # self.assertRaisesRegex(
-        #     UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: resp.text)
-
-        # Response() would do:
-        # encoding = UnicodeDecodeError -> str(self.content, errors='replace')
-        self.assertEqual(
-            resp.text, str(resp.content, errors='replace'))
-        # encoding = None -> str(resp.content, resp.encoding, errors='replace')
-        resp.encoding = None
-        self.assertEqual(
-            resp.text,
-            str(resp.content, resp.apparent_encoding, errors='replace'))
+                # test Response.apparent_encoding
+                self.assertEqual(resp.text, str(resp.content,
+                                                resp.apparent_encoding,
+                                                errors='replace'))
 
 
 class BinaryTestCase(TestCase):
