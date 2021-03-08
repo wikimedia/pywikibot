@@ -688,7 +688,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         new_text = self.deduplicator.process(new_text)
         old_text = page.text
 
-        if old_text == page.text:
+        if old_text == new_text:
             return
 
         self.userPut(page, old_text, new_text, summary=self.msg,
