@@ -707,7 +707,7 @@ class DryFactoryGeneratorTest(TestCase):
         gf.handle_arg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
         self.assertIsInstance(gf.namespaces, frozenset)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(RuntimeError):
             gf.handle_arg('-ns:0')
         self.assertEqual(gf.namespaces, {1, 6})
 

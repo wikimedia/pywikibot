@@ -927,7 +927,9 @@ class GeneratorFactory:
 
     def _handle_namespaces(self, value):
         """Handle `-namespaces` argument."""
-        assert not isinstance(self._namespaces, frozenset)
+        if isinstance(self._namespaces, frozenset):
+            raise RuntimeError('-namespace/ns option must be provided before '
+                               '-newpages/-random/-randomredirect/-linter')
         if not value:
             value = pywikibot.input('What namespace are you filtering on?')
         NOT_KEY = 'not:'
