@@ -103,6 +103,7 @@ from collections import defaultdict, OrderedDict
 from hashlib import md5
 from math import ceil
 from typing import Any, Optional, Pattern
+from warnings import warn
 
 import pywikibot
 
@@ -462,18 +463,21 @@ class DiscussionPage(pywikibot.Page):
             pywikibot.output('{} thread(s) found on {}'
                              .format(len(self.threads), self))
 
-    def is_full(self, max_archive_size=(250 * 1024, 'B')) -> bool:
+    def is_full(self, max_archive_size: Size) -> bool:
         """Check whether archive size exceeded."""
-        if max_archive_size[1] == 'B':
-            if self.size() >= max_archive_size[0]:
-                self.full = True  # xxx: this is one-way flag
-        elif max_archive_size[1] == 'T':
-            if len(self.threads) >= max_archive_size[0]:
+        size, unit = max_archive_size
+        if self.size() > self.archiver.maxsize:
+            self.full = True  # xxx: this is one-way flag
+        elif unit == 'B':
+            if self.size() >= size:
+                self.full = True
+        elif unit == 'T':
+            if len(self.threads) >= size:
                 self.full = True
         return self.full
 
     def feed_thread(self, thread: DiscussionThread,
-                    max_archive_size=(250 * 1024, 'B')) -> bool:
+                    max_archive_size: Size) -> bool:
         """Append a new thread to the archive."""
         self.threads.append(thread)
         self.archived_threads += 1
@@ -546,6 +550,13 @@ class PageArchiver:
         for n, (long, short) in enumerate(self.site.months_names, start=1):
             self.month_num2orig_names[n] = {'long': long, 'short': short}
 
+        # read maxarticlesize
+        try:
+            # keep a gap of 1 KB not to block later changes
+            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
+        except KeyError:  # mw < 1.28
+            self.maxsize = 2096128  # 2 MB - 1 KB gap
+
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
         return self.attributes.get(attr, [default])[0]
@@ -554,6 +565,14 @@ class PageArchiver:
         """Set an archiver attribute."""
         if attr == 'archive':
             value = value.replace('_', ' ')
+        elif attr == 'maxarchivesize':
+            size, unit = str2size(value)
+            if unit == 'B':
+                if size > self.maxsize:
+                    value = '{} K'.format(self.maxsize // 1024)
+                    warn('Siteinfo "maxarticlesize" exceeded. Decreasing '
+                         '"maxarchivesize" to ' + value,
+                         ResourceWarning, stacklevel=2)
         self.attributes[attr] = [value, out]
 
     def saveables(self) -> List[str]:
