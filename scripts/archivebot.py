@@ -88,7 +88,7 @@ Options (may be omitted):
   -salt:SALT      specify salt
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -337,14 +337,8 @@ class DiscussionThread:
     :Reply, etc. ~~~~
     """
 
-    def __init__(self, title: str, _now=None, timestripper=None) -> None:
+    def __init__(self, title: str, timestripper: TimeStripper) -> None:
         """Initializer."""
-        if _now is not None:
-            issue_deprecation_warning(
-                'Argument "now" in DiscussionThread.__init__()',
-                warning_class=FutureWarning,
-                since='20200727')
-        assert timestripper is not None
         self.title = title
         self.ts = timestripper
         self.code = self.ts.site.code
@@ -448,8 +442,8 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.header = header + footer
         for thread_heading, thread_content in threads:
-            cur_thread = DiscussionThread(
-                thread_heading.strip('= '), timestripper=self.timestripper)
+            cur_thread = DiscussionThread(thread_heading.strip('= '),
+                                          self.timestripper)
             # remove heading line
             _, *lines = thread_content.replace(marker, '').splitlines()
             for line in lines:
@@ -632,20 +626,6 @@ class PageArchiver:
         if title not in self.archives:
             self.archives[title] = DiscussionPage(archive, self, params)
         return self.archives[title]
-
-    @deprecated(since='20200727', future_warning=True)
-    def feed_archive(self, archive: pywikibot.Page, thread: DiscussionThread,
-                     max_archive_size: Size, params=None) -> bool:
-        """
-        Feed the thread to one of the archives.
-
-        Also check for security violations.
-
-        @return: whether the archive is full
-        """
-        archive_page = self.get_archive_page(
-            archive.title(with_ns=True), params)
-        return archive_page.feed_thread(thread, max_archive_size)
 
     def get_params(self, timestamp, counter: int) -> dict:
         """Make params for archiving template."""
