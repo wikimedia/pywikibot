@@ -1174,13 +1174,17 @@ class BaseBot(OptionHandler):
     _current_page = None
 
     def __init__(self, **kwargs):
-        """
-        Only accept options defined in available_options.
+        """Only accept 'generator' and options defined in available_options.
 
         @param kwargs: bot options
+        @keyword generator: a generator processed by run method
         """
         if 'generator' in kwargs:
-            self.generator = kwargs.pop('generator')
+            if hasattr(self, 'generator'):
+                pywikibot.warn('{} has a generator already. Ignoring argument.'
+                               .format(self.__class__.__name__))
+            else:
+                self.generator = kwargs.pop('generator')
 
         super().__init__(**kwargs)
 
