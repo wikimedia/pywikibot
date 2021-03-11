@@ -20,23 +20,9 @@ The following parameters are supported:
                 all sites, or with -family and -lang to log out of a specific
                 site.
 
-   -force       Ignores if the user is already logged in, and tries to log in.
-
-   -pass        Useful in combination with -all when you have accounts for
-                several sites and use the same password for all of them.
-                Asks you for the password, then logs in on all given sites.
-
-   -pass:XXXX   Uses XXXX as password. Be careful if you use this
-                parameter because your password will be shown on your
-                screen, and will probably be saved in your command line
-                history. This is NOT RECOMMENDED for use on computers
-                where others have either physical or remote access.
-                Use -pass instead.
-
    -oauth       Generate OAuth authentication information.
                 NOTE: Need to copy OAuth tokens to your user-config.py
-                manually. -logout, -pass, -force and -pass:XXXX are not
-                compatible with -oauth.
+                manually. -logout is not compatible with -oauth.
 
    -autocreate  Auto-create an account using unified login when necessary.
                 Note: the global account must exist already before using this.
@@ -57,8 +43,6 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-from os.path import join
-
 import pywikibot
 
 from pywikibot.backports import Tuple
@@ -110,27 +94,14 @@ def main(*args) -> None:
     @param args: command line arguments
     @type args: str
     """
-    password = None
     logall = False
     logout = False
     oauth = False
     autocreate = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-pass'):
-            if len(arg) == 5:
-                password = pywikibot.input(
-                    'Password for all accounts (no characters will be shown):',
-                    password=True)
-            else:
-                password = arg[6:]
-        elif arg == '-all':
+        if arg == '-all':
             logall = True
-        elif arg == '-force':
-            pywikibot.output('To force a re-login, please delete the '
-                             "revelant lines from '{0}' (or the entire file) "
-                             'and try again.'
-                             .format(join(config.base_dir, 'pywikibot.lwp')))
         elif arg == '-logout':
             logout = True
         elif arg == '-oauth':
@@ -142,10 +113,6 @@ def main(*args) -> None:
 
     if pywikibot.bot.suggest_help(unknown_parameters=unknown_args):
         return
-
-    if password is not None:
-        pywikibot.warning('The -pass argument is not implemented yet. See: '
-                          'https://phabricator.wikimedia.org/T102477')
 
     if logall:
         namedict = config.usernames
