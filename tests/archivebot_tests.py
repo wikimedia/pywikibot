@@ -219,22 +219,16 @@ class TestArchiveBotAfterDateUpdate(TestCase):
                     THREADS_WITH_UPDATED_FORMAT[code]))
 
         for thread in talk.threads:
-            self.assertIsInstance(thread, archivebot.DiscussionThread)
-            self.assertIsInstance(thread.title, str)
-            self.assertIsInstance(thread.ts, TimeStripper)
-            self.assertEqual(thread.ts, talk.timestripper)
-            self.assertIsInstance(thread.code, str)
-            self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertIsInstance(thread.content, str)
-            try:
+            with self.subTest(thread=thread.title,
+                              content=thread.content[-72:]):
+                self.assertIsInstance(thread, archivebot.DiscussionThread)
+                self.assertIsInstance(thread.title, str)
+                self.assertIsInstance(thread.ts, TimeStripper)
+                self.assertEqual(thread.ts, talk.timestripper)
+                self.assertIsInstance(thread.code, str)
+                self.assertEqual(thread.code, talk.timestripper.site.code)
+                self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
-            except AssertionError:
-                if thread.code not in self.expected_failures:
-                    pywikibot.output('code {}: {}'
-                                     .format(thread.code, thread.content))
-                raise
-
-    expected_failures = []
 
 
 class TestDiscussionPageObject(TestCase):
