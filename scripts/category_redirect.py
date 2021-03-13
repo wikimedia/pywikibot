@@ -286,23 +286,21 @@ class CategoryRedirectBot(SingleSiteBot):
                               .format(self.site))
             return
 
-        user = self.site.user()  # invokes login()
-        newredirs = []
+        self.user = self.site.user()  # invokes login()
+        self.newredirs = []
 
         localtime = time.localtime()
         today = '%04d-%02d-%02d' % localtime[:3]
-        edit_request_page = pywikibot.Page(
-            self.site, 'User:{}/category edit requests'.format(user))
-        datafile = pywikibot.config.datafilepath('{}-catmovebot-data'
-                                                 .format(self.site.dbName()))
+        self.datafile = pywikibot.config.datafilepath(
+            '{}-catmovebot-data'.format(self.site.dbName()))
         try:
-            with open(datafile, 'rb') as inp:
-                record = pickle.load(inp)
+            with open(self.datafile, 'rb') as inp:
+                self.record = pickle.load(inp)
         except IOError:
-            record = {}
-        if record:
-            with open(datafile + '.bak', 'wb') as f:
-                pickle.dump(record, f, protocol=config.pickle_protocol)
+            self.record = {}
+        if self.record:
+            with open(self.datafile + '.bak', 'wb') as f:
+                pickle.dump(self.record, f, protocol=config.pickle_protocol)
         # regex to match soft category redirects
         # TODO: enhance and use textlib._MultiTemplateMatchBuilder
         #  note that any templates containing optional "category:" are
@@ -344,11 +342,11 @@ class CategoryRedirectBot(SingleSiteBot):
                 if 'size' in catdata and int(catdata['size']):
                     # save those categories that have contents
                     nonemptypages.append(cat)
-            if cat_title not in record:
-                # make sure every redirect has a record entry
-                record[cat_title] = {today: None}
+            if cat_title not in self.record:
+                # make sure every redirect has a self.record entry
+                self.record[cat_title] = {today: None}
                 with suppress(pywikibot.Error):
-                    newredirs.append('*# {} → {}'.format(
+                    self.newredirs.append('*# {} → {}'.format(
                         cat.title(as_link=True, textlink=True),
                         cat.getCategoryRedirectTarget().title(
                             as_link=True, textlink=True)))
@@ -356,11 +354,11 @@ class CategoryRedirectBot(SingleSiteBot):
                 with suppress(Exception):
                     cat.save()
 
-        # delete record entries for non-existent categories
-        for cat_name in list(record.keys()):
+        # delete self.record entries for non-existent categories
+        for cat_name in list(self.record):
             if pywikibot.Category(self.site,
                                   self.catprefix + cat_name) not in catpages:
-                del record[cat_name]
+                del self.record[cat_name]
 
         pywikibot.output('\nMoving pages out of {} redirected categories.'
                          .format(len(nonemptypages)))
@@ -448,7 +446,7 @@ class CategoryRedirectBot(SingleSiteBot):
                     })
                 self.log_text.append(message)
             elif found:
-                record[cat_title][today] = found
+                self.record[cat_title][today] = found
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-moved', {
                         'oldcat': cat.title(as_link=True, textlink=True),
@@ -461,23 +459,29 @@ class CategoryRedirectBot(SingleSiteBot):
             with suppress(Exception):
                 cat.save()
 
-        with open(datafile, 'wb') as f:
-            pickle.dump(record, f, protocol=config.pickle_protocol)
+        self.teardown()
+
+    def teardown(self):
+        """Write self.record to file and save logs."""
+        with open(self.datafile, 'wb') as f:
+            pickle.dump(self.record, f, protocol=config.pickle_protocol)
 
         self.log_text.sort()
         self.problems.sort()
-        newredirs.sort()
+        self.newredirs.sort()
         comment = i18n.twtranslate(self.site, self.maint_comment)
         message = i18n.twtranslate(self.site, 'category_redirect-log-new')
         self.log_page.text = ('\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n'
                               % time.gmtime()[:6]
                               + '\n'.join(self.log_text)
                               + '\n* ' + message + '\n'
-                              + '\n'.join(newredirs)
+                              + '\n'.join(self.newredirs)
                               + '\n' + '\n'.join(self.problems)
                               + '\n' + self.get_log_text())
         self.log_page.save(comment)
         if self.edit_requests:
+            edit_request_page = pywikibot.Page(
+                self.site, 'User:{}/category edit requests'.format(self.user))
             edit_request_page.text = (self.edit_request_text
                                       % {'itemlist': '\n' + '\n'.join(
                                           (self.edit_request_item % item)
