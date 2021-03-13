@@ -112,9 +112,7 @@ from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
-from pywikibot.tools import (
-    deprecated, frozenmap, issue_deprecation_warning,
-)
+from pywikibot.tools import frozenmap, issue_deprecation_warning
 
 
 ShouldArchive = Tuple[str, str]
@@ -380,12 +378,6 @@ class DiscussionThread:
     def to_text(self) -> str:
         """Return wikitext discussion thread."""
         return '== {} ==\n\n{}'.format(self.title, self.content)
-
-    @deprecated('PageArchiver.should_archive_thread(thread)', since='20200727',
-                future_warning=True)
-    def should_be_archived(self, archiver) -> Optional[ShouldArchive]:
-        """Check whether thread has to be archived."""
-        return archiver.should_archive_thread(self)
 
 
 class DiscussionPage(pywikibot.Page):
