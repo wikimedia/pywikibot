@@ -309,14 +309,21 @@ class TestTerminalInput(UITestCase):
     def testInput(self):
         newstdin.write('input to read\n')
         newstdin.seek(0)
-
         returned = pywikibot.input('question')
 
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'question: ')
-
         self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'input to read')
+
+    def test_input_yn(self):
+        newstdin.write('\n')
+        newstdin.seek(0)
+        returned = pywikibot.input_yn('question', False, automatic_quit=False)
+
+        self.assertEqual(newstdout.getvalue(), '')
+        self.assertEqual(newstderr.getvalue(), 'question ([y]es, [N]o): ')
+        self.assertFalse(returned)
 
     def _call_input_choice(self):
         rv = pywikibot.input_choice(
@@ -334,7 +341,6 @@ class TestTerminalInput(UITestCase):
     def testInputChoiceDefault(self):
         newstdin.write('\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(returned, 'a')
@@ -342,32 +348,25 @@ class TestTerminalInput(UITestCase):
     def testInputChoiceCapital(self):
         newstdin.write('N\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
-
         self.assertEqual(returned, 'n')
 
     def testInputChoiceNonCapital(self):
         newstdin.write('n\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
-
         self.assertEqual(returned, 'n')
 
     def testInputChoiceIncorrectAnswer(self):
         newstdin.write('X\nN\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
-        self.assertEqual(newstderr.getvalue(),
-                         self.input_choice_output * 2)
-
+        self.assertEqual(newstderr.getvalue(), self.input_choice_output * 2)
         self.assertEqual(returned, 'n')
 
 
