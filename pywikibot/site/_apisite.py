@@ -3750,7 +3750,8 @@ class APISite(
         'cantdelete':
             'Could not delete [[%(title)s]]. Maybe it was deleted already.',
         'cantundelete': 'Could not undelete [[%(title)s]]. '
-                        'Revision may not exist or was already undeleted.'
+                        'Revision may not exist or was already undeleted.',
+        'nodeleteablefile': 'No such old version of file'
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
@@ -3769,6 +3770,54 @@ class APISite(
         """
         token = self.tokens['delete']
         params = {'action': 'delete', 'token': token, 'reason': reason}
+
+        if isinstance(page, pywikibot.Page):
+            params['title'] = page
+            msg = page.title(withSection=False)
+        else:
+            pageid = int(page)
+            params['pageid'] = pageid
+            msg = pageid
+
+        req = self._simple_request(**params)
+        self.lock_page(page)
+        try:
+            req.submit()
+        except api.APIError as err:
+            errdata = {
+                'site': self,
+                'title': msg,
+                'user': self.user(),
+            }
+            if err.code in self._dl_errors:
+                raise Error(self._dl_errors[err.code] % errdata)
+            pywikibot.debug("delete: Unexpected error code '%s' received."
+                            % err.code,
+                            _logger)
+            raise
+        else:
+            page.clear_cache()
+        finally:
+            self.unlock_page(page)
+
+    @need_right('delete')
+    def deleteoldimage(self, page, oldimage, reason: str):
+        """Delete a specific version of a file. Requires appropriate privileges.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        The oldimage identifier for the specific version of the image must be
+        provided.
+
+        @param page: Page to be deleted or its pageid
+        @type page: Page or, in case of pageid, int or str
+        @param oldimage: oldimageid of the file version to be deleted.
+        @param reason: Deletion reason.
+        @raises TypeError, ValueError: page has wrong type/value.
+
+        """
+        token = self.tokens['delete']
+        params = {'action': 'delete', 'oldimage': oldimage,
+                  'token': token, 'reason': reason}
 
         if isinstance(page, pywikibot.Page):
             params['title'] = page
@@ -3822,6 +3871,43 @@ class APISite(
                                    reason=reason,
                                    token=token,
                                    timestamps=revisions)
+        try:
+            req.submit()
+        except api.APIError as err:
+            errdata = {
+                'site': self,
+                'title': page.title(with_section=False),
+                'user': self.user(),
+            }
+            if err.code in self._dl_errors:
+                raise Error(self._dl_errors[err.code] % errdata)
+            pywikibot.debug("delete: Unexpected error code '%s' received."
+                            % err.code,
+                            _logger)
+            raise
+        finally:
+            self.unlock_page(page)
+
+    @need_right('undelete')
+    def undelete_file_versions(self, page, reason: str, fileids=None):
+        """Undelete page from the wiki. Requires appropriate privilege level.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+
+        @param page: Page to be deleted.
+        @type page: pywikibot.BasePage
+        @param reason: Undeletion reason.
+        @param fileids: List of fileids to restore.
+        @type fileids: list
+        """
+        token = self.tokens['delete']
+        self.lock_page(page)
+
+        req = self._simple_request(action='undelete',
+                                   title=page,
+                                   reason=reason,
+                                   token=token,
+                                   fileids=fileids)
         try:
             req.submit()
         except api.APIError as err:

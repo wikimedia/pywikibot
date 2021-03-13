@@ -2165,6 +2165,43 @@ class TestSiteSysopWrite(TestCase):
         revs = list(p.revisions())
         self.assertGreater(len(revs), 2)
 
+    def test_delete_oldimage(self):
+        """Test deleting and undeleting specific versions of files."""
+        site = self.get_site()
+        fp = pywikibot.FilePage(site, 'File:T276725.png')
+
+        # Verify state
+        gen = site.filearchive(start='T276725.png', end='T276725.pngg')
+        fileid = None
+
+        for filearchive in gen:
+            fileid = filearchive['id']
+            break
+
+        if fileid is not None:
+            site.undelete_file_versions(fp, 'pywikibot unit tests',
+                                        fileids=[fileid])
+
+        # Delete the older version of file
+        hist = fp.get_file_history()
+        ts = pywikibot.Timestamp(2021, 3, 8, 2, 38, 57)
+        oldimageid = hist[ts]['archivename']
+
+        site.deleteoldimage(fp, oldimageid, 'pywikibot unit tests')
+
+        # Undelete the older revision of file
+        gen = site.filearchive(start='T276725.png', end='T276725.pngg')
+        fileid = None
+
+        for filearchive in gen:
+            fileid = filearchive['id']
+            break
+
+        self.assertIsNotNone(fileid)
+
+        site.undelete_file_versions(fp, 'pywikibot unit tests',
+                                    fileids=[fileid])
+
 
 class TestUsernameInUsers(DefaultSiteTestCase):
 
