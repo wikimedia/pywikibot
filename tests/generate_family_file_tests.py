@@ -29,7 +29,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         super().getapis()
         self.langs = save
 
-    def writefile(self):
+    def writefile(self, verify):
         """Pass writing."""
         pass
 
