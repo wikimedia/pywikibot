@@ -1,6 +1,6 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2010-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,7 +28,7 @@ class MWSite:
 
     """Minimal wiki site class."""
 
-    def __init__(self, fromurl):
+    def __init__(self, fromurl, **kwargs):
         """
         Initializer.
 
@@ -39,7 +39,8 @@ class MWSite:
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
-        r = fetch(fromurl)
+
+        r = fetch(fromurl, **kwargs)
         check_response(r)
 
         if fromurl != r.url:
