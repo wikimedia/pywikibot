@@ -3072,6 +3072,72 @@ class APISite(
                                    total=total,
                                    parameters=parameters)
 
+    @need_right('deleterevision')
+    def deleterevs(self, targettype: str, ids, *,
+                   hide=None, show=None, reason='', target=None):
+        """Delete or undelete specified page revisions, file versions or logs.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Revisiondelete}
+
+        If more than one target id is provided, the same action is taken for
+        all of them.
+
+        @param targettype: Type of target. One of "archive", "filearchive",
+            "logging", "oldimage", "revision".
+        @param ids: Identifiers for the revision, log, file version or archive.
+        @type ids: int, str, or list of int or str
+        @param hide: What to delete. Can be "comment", "content", "user" or a
+            combination of them in pipe-separate form such as "comment|user".
+        @type hide: str or list of str
+        @param show: What to undelete. Can be "comment", "content", "user" or
+            a combination of them in pipe-separate form such as "comment|user".
+        @type show: str or list of str
+        @param reason: Deletion reason.
+        @param target: Page object or page title, if required for the type.
+        """
+        if isinstance(target, pywikibot.Page):
+            page = target
+            target = page.title()
+        elif target:
+            page = pywikibot.Page(self, target)
+
+        token = self.tokens['delete']
+        params = {
+            'action': 'revisiondelete',
+            'token': token,
+            'type': targettype,
+            'ids': ids,
+            'hide': hide,
+            'show': show,
+            'target': target,
+            'reason': reason}
+
+        req = self._simple_request(**params)
+
+        if target:
+            self.lock_page(page)
+
+        try:
+            req.submit()
+        except api.APIError as err:
+            errdata = {
+                'site': self,
+                'title': target,
+                'user': self.user(),
+            }
+            if err.code in self._dl_errors:
+                raise Error(self._dl_errors[err.code] % errdata)
+            pywikibot.debug("revdelete: Unexpected error code '%s' received."
+                            % err.code,
+                            _logger)
+            raise
+        else:
+            if target:
+                page.clear_cache()
+        finally:
+            if target:
+                self.unlock_page(page)
+
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
 

@@ -40,6 +40,7 @@ class Revision(Mapping):
         map_.update(anon='anon' in map_)
         map_.update(minor='minor' in map_)
         map_.update(userhidden='userhidden' in map_)
+        map_.update(commenthidden='commenthidden' in map_)
 
         map_.setdefault('comment', '')
         map_.setdefault('user', '')
