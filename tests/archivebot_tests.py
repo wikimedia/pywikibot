@@ -239,6 +239,15 @@ class TestDiscussionPageObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    def load_page(self, title: str):
+        """Load the given page."""
+        page = pywikibot.Page(self.site, title)
+        tmpl = pywikibot.Page(self.site, 'User:MiszaBot/config')
+        archiver = archivebot.PageArchiver(page=page, template=tmpl, salt='')
+        page = archivebot.DiscussionPage(page, archiver)
+        page.load_page()
+        self.page = page
+
     def testTwoThreadsWithCommentedOutThread(self):
         """Test recognizing two threads and ignoring a commented out thread.
 
@@ -258,14 +267,8 @@ class TestDiscussionPageObject(TestCase):
          == B ==
          foo bar bar bar
         """
-        site = self.get_site()
-        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot')
-        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
-        archiver = archivebot.PageArchiver(
-            page=page, template=tmpl, salt='', force=False)
-        page = archivebot.DiscussionPage(page, archiver)
-        page.load_page()
-        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+        self.load_page('Talk:For-pywikibot-archivebot')
+        self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
 
     def testThreadsWithSubsections(self):
         """Test recognizing threads with subsections.
@@ -287,14 +290,26 @@ class TestDiscussionPageObject(TestCase):
          == B ==
          foo bar bar bar
         """
-        site = self.get_site()
-        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot/testcase2')
-        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
-        archiver = archivebot.PageArchiver(
-            page=page, template=tmpl, salt='', force=False)
-        page = archivebot.DiscussionPage(page, archiver)
-        page.load_page()
-        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+        self.load_page('Talk:For-pywikibot-archivebot/testcase2')
+        self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
+
+    def test_is_full_method(self):
+        """Test DiscussionPage.is_full method."""
+        self.load_page('Talk:For-pywikibot-archivebot')
+        page = self.page
+        self.assertEqual(page.archiver.maxsize, 2096128)
+        self.assertEqual(page.size(), 181)
+        self.assertTrue(page.is_full((100, 'B')))
+        page.full = False
+        self.assertFalse(page.is_full((1000, 'B')))
+        page.full = False
+        self.assertFalse(page.is_full((3, 'T')))
+        page.full = False
+        self.assertTrue(page.is_full((2, 'T')))
+        self.assertTrue(page.is_full((3, 'T')))  # page.full is kept
+        page.full = False
+        page.archiver.maxsize = 100
+        self.assertTrue(page.is_full((1000, 'B')))  # maxsize is used
 
 
 class TestPageArchiverObject(TestCase):
