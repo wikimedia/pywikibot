@@ -18,16 +18,16 @@ coverage:
     - pywikibot/data/mysql.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
-    - scripts/archive
-    - scripts/userscripts
+    - scripts/archive/
+    - scripts/userscripts/
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
     - scripts/maintenance/preload_sites.py
     - scripts/maintenance/sorting_order.py
     - scripts/maintenance/update_linktrails.py
     - scripts/maintenance/wikimedia_sites.py
-    - tests/archive
-    - tests/pwb
+    - tests/archive/
+    - tests/pwb/
 
   notify:
     irc:
