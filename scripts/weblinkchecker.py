@@ -687,7 +687,7 @@ def main(*args):
             bot.run()
         except ImportError:
             suggest_help(missing_dependencies=('memento_client',))
-            return False
+            return
         finally:
             waitTime = 0
             # Don't wait longer than 30 seconds for threads to finish.

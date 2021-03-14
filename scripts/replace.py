@@ -903,12 +903,12 @@ def main(*args):
 
     if len(commandline_replacements) % 2:
         pywikibot.error('Incomplete command line pattern replacement pair.')
-        return False
+        return
 
     if replacement_file_arg_misplaced:
         pywikibot.error(
             '-pairsfile used between a pattern replacement pair.')
-        return False
+        return
 
     if replacement_file:
         try:
@@ -918,13 +918,13 @@ def main(*args):
         except OSError as e:
             pywikibot.error('Error loading {0}: {1}'.format(
                 replacement_file, e))
-            return False
+            return
 
         if len(file_replacements) % 2:
             pywikibot.error(
                 '{0} contains an incomplete pattern replacement pair.'.format(
                     replacement_file))
-            return False
+            return
 
         # Strip BOM from first line
         file_replacements[0].lstrip('\uFEFF')

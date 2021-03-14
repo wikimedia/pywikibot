@@ -174,7 +174,7 @@ class MWSite:
     def api(self) -> Optional[str]:
         """Get api URL."""
         if self.server is None or self.scriptpath is None:
-            return
+            return None
 
         return self.server + self.scriptpath + '/api.php'
 

@@ -1273,7 +1273,7 @@ class BaseBot(OptionHandler):
         if oldtext.rstrip() == newtext.rstrip():
             pywikibot.output('No changes were needed on %s'
                              % page.title(as_link=True))
-            return
+            return False
 
         self.current_page = page
 

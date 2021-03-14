@@ -742,7 +742,7 @@ class WelcomeBot(SingleSiteBot):
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
                 globalvar.randomSign = False
-                return
+                return None
 
             sign_page = pywikibot.Page(self.site, sign_page_name)
             if sign_page.exists():

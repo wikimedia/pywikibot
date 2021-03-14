@@ -485,7 +485,7 @@ class TerminalHandler(logging.Handler):
             # Each warning appears twice
             # the second time it has a 'message'
             if 'message' in record.__dict__:
-                return
+                return None
 
             record.__dict__.setdefault('newline', '\n')
 
