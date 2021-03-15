@@ -4,7 +4,7 @@
 To create a new distribution:
 -----------------------------
 
-- replace the developmental version string in ``pywikibot.__metadata.py``
+- replace the developmental version string in ``pywikibot.__metadata__.py``
   by the corresponing final release
 - create the package with::
 
@@ -16,11 +16,11 @@ To create a new distribution:
     twine upload dist/*
 
 - create a new tag with the version number of the final release
-- move the existing 'stable' tag to that new tag
-- delete 'stable' tag in gerrit to be overridden later
 - synchronize the local tags with the remote repositoy
-- prepare the next release by increasing the version number in
-  ``pywikibot.__metadata.py`` and adding developmental identifier
+- merge current master branch to stable branch
+- push new stable branch to gerrit and merge it the stable repository
+- prepare the next master release by increasing the version number in
+  ``pywikibot.__metadata__.py`` and adding developmental identifier
 - upload this patchset to gerrit and merge it.
 """
 #
