@@ -593,10 +593,7 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         image = pywikibot.FilePage(site, 'File:Jean-Léon Gérôme 003.jpg')
 
-        if site.mw_version < '1.20':
-            with self.assertRaises(NotImplementedError):
-                mainpage.page_image()
-        elif site.has_extension('PageImages'):
+        if site.has_extension('PageImages'):
             mainpage_image = mainpage.page_image()
             if mainpage_image is not None:
                 self.assertIsInstance(mainpage_image, pywikibot.FilePage)
