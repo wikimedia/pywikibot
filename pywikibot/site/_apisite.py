@@ -2748,9 +2748,12 @@ class APISite(
         return rcgen
 
     @deprecated_args(number='total', step=None, key='searchstring',
-                     getredirects='get_redirects')
-    def search(self, searchstring: str, namespaces=None, where='text',
-               get_redirects=False, total=None, content=False):
+                     getredirects=True, get_redirects=None)
+    def search(self, searchstring: str, *,
+               namespaces=None,
+               where: str = 'text',
+               total: Optional[int] = None,
+               content: bool = False):
         """Iterate Pages that contain the searchstring.
 
         Note that this may include non-existing Pages if the wiki's database
@@ -2765,8 +2768,6 @@ class APISite(
         @type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param get_redirects: if True, include redirects in results. Since
-            version MediaWiki 1.23 it will always return redirects.
         @param content: if True, load the current content of each iterated page
             (default False)
         @raises KeyError: a namespace identifier was not resolved
@@ -2800,8 +2801,6 @@ class APISite(
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces,
                                 total=total, g_content=content)
-        if self.mw_version < '1.23':
-            srgen.request['gsrredirects'] = get_redirects
         return srgen
 
     @deprecated_args(step=None, showMinor='minor')
