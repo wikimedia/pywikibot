@@ -1,5 +1,50 @@
 # Schripts Changelog
 
+## 6.0.0
+*15 March 2021*
+
+### general
+* interwikidumps.py, cfd.py and featured.py scripts were deleted (T223826)
+* Long time unused scripts were archived (T223826). Ask to recover if needed.
+* pagegenerators.handle_args() is used in several scripts
+
+### archivebot
+* Always take 'maxarticlesize' into account when saving (T276937)
+* Remove deprecated parts
+
+### category
+* add 'namespaces' option to category 'listify'
+
+### commons_information
+* New script to wrap Commons file descriptions in language templates
+
+### generate_family_file
+* Ignore ssl certificate validation (T265210)
+
+### login
+* update help string
+
+### maintenance
+* Add a preload_sites.py script to preload site informations (T226157)
+
+### reflinks
+* Force pdf file to be closed (T276747)
+* Fix http.fetch response data attribute
+* Fix treat process flow
+
+### replace
+* Add replacement description to -summary message
+
+### replicate_wiki
+* replace pages in all sites (T275291)
+
+### solve_disambiguation
+* Deprecated methods were removed
+
+### unusedfiles
+* Update unusedfiles.py to add custom templates
+
+
 ## 5.6.0
 *24 January 2021*
 
