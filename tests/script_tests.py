@@ -364,7 +364,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     run in pwb can automatically login using the saved cookies.
     """
 
-    user = True
+    login = True
 
     _expected_failures = {
         'catall',          # stdout user interaction

@@ -24,7 +24,7 @@ class TestFlowCreateTopic(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def test_create_topic(self):
@@ -47,7 +47,7 @@ class TestFlowReply(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     @classmethod
@@ -164,7 +164,7 @@ class TestFlowLockTopic(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def test_lock_unlock_topic(self):
@@ -189,7 +189,7 @@ class TestFlowEditFailure(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = -1
 
     def test_reply_to_locked_topic(self):
@@ -215,7 +215,7 @@ class FlowTests(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def setUp(self):

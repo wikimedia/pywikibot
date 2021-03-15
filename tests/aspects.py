@@ -516,21 +516,18 @@ class SiteWriteMixin(TestCaseBase):
                 .format(cls.__name__, site.code, site.family.name))
 
 
-class RequireUserMixin(TestCaseBase):
+class RequireLoginMixin(TestCaseBase):
 
     """Run tests against a specific site, with a login."""
 
-    user = True
+    login = True
 
     @classmethod
-    def require_site_user(cls, family, code, sysop=False):
+    def require_site_user(cls, family, code):
         """Check the user config has a valid login to the site."""
         if not cls.has_site_user(family, code):
-            raise unittest.SkipTest(
-                '{}: No {}username for {}:{}'
-                .format(cls.__name__,
-                        'sysop ' if sysop else '',
-                        family, code))
+            raise unittest.SkipTest('{}: No username for {}:{}'
+                                    .format(cls.__name__, family, code))
 
     @classmethod
     def setUpClass(cls):
@@ -542,11 +539,11 @@ class RequireUserMixin(TestCaseBase):
         """
         super().setUpClass()
 
-        sysop = hasattr(cls, 'sysop') and cls.sysop
+        # currently 'sysop' attribute is an alias for 'login'
+        # sysop = hasattr(cls, 'sysop') and cls.sysop
 
         for site_dict in cls.sites.values():
-            cls.require_site_user(
-                site_dict['family'], site_dict['code'], sysop)
+            cls.require_site_user(site_dict['family'], site_dict['code'])
 
             if hasattr(cls, 'oauth') and cls.oauth:
                 continue
@@ -593,7 +590,7 @@ class RequireUserMixin(TestCaseBase):
 
             if not site.logged_in():
                 site.login()
-            assert(site.user())
+            assert site.user()
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
@@ -759,8 +756,8 @@ class MetaTestCaseClass(type):
             dct.setdefault('user', True)
             bases = cls.add_base(bases, SiteWriteMixin)
 
-        if dct.get('user') or dct.get('sysop'):
-            bases = cls.add_base(bases, RequireUserMixin)
+        if dct.get('login') or dct.get('sysop'):
+            bases = cls.add_base(bases, RequireLoginMixin)
 
         for test in tests:
             test_func = dct[test]
