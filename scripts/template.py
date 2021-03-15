@@ -105,7 +105,7 @@ user talk pages (namespace #3):
 
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -267,7 +267,7 @@ def main(*args) -> None:
 
     if not template_names:
         pywikibot.bot.suggest_help(missing_parameters=['templates'])
-        return False
+        return
 
     if bool(options.get('subst', False)) ^ options.get('remove', False):
         for template_name in template_names:

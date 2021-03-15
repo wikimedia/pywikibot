@@ -854,6 +854,7 @@ def _detect_win32_editor():
                     break
             else:
                 return editor
+    return None
 
 
 # System-level and User-level changes.

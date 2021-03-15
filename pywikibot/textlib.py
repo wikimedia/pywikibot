@@ -1361,7 +1361,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     catNamespace = '|'.join(site.namespaces.CATEGORY)
     title = oldcat.title(with_ns=False)
     if not title:
-        return
+        return oldtext
     # title might contain regex special characters
     title = re.escape(title)
     # title might not be capitalized correctly on the wiki

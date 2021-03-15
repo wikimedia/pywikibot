@@ -94,7 +94,7 @@ class Revision(Mapping):
 
         if key == 'rollbacktoken':
             warning('"rollbacktoken" has been deprecated since MediaWiki 1.24')
-            return None
+            return
 
         # raise AttributeError instead of KeyError for backward compatibility
         raise AttributeError("'{}' object has no attribute '{}'"
