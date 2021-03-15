@@ -10,7 +10,7 @@ import pywikibot.family
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import InconsistentTitleReceived, SiteDefinitionError
-from pywikibot.site._decorators import need_extension, need_right, need_version
+from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import deprecate_arg, deprecated_args, merge_unique_dicts
 
 
@@ -71,7 +71,6 @@ class ProofreadPageMixin:
 
     """APISite mixin for ProofreadPage extension."""
 
-    @need_version('1.21')
     @need_extension('ProofreadPage')
     def _cache_proofreadinfo(self, expiry=False):
         """Retrieve proofreadinfo from site and cache response.
