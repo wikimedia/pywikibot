@@ -961,7 +961,7 @@ class APISite(
         """Return the code for the language of this Site."""
         return self.siteinfo['lang']
 
-    def version(self):
+    def version(self) -> str:
         """Return live project version number as a string.
 
         Use L{pywikibot.site.mw_version} to compare MediaWiki versions.
@@ -976,18 +976,10 @@ class APISite(
             raise
 
         if MediaWikiVersion(version) < '1.23':
-            warn('\n'
-                 + fill('Support of MediaWiki {version} will be dropped. '
-                        'It is recommended to use MediaWiki 1.23 or above. '
-                        'You may use every Pywikibot 5.X for older MediaWiki '
-                        'versions. See T268979 for further information.'
-                        .format(version=version)), FutureWarning)
-
-        if MediaWikiVersion(version) < '1.19':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
-                'Use Pywikibot prior to "5.0" or "python2" branch '
-                'instead.'.format(pywikibot.__version__, version))
+                'Use Pywikibot prior to "6.0" branch instead.'
+                .format(pywikibot.__version__, version))
         return version
 
     @property
@@ -1518,15 +1510,8 @@ class APISite(
         Valid tokens depend on mw version.
         """
         mw_ver = self.mw_version
-        if mw_ver < '1.20':
-            types_wiki = self._paraminfo.parameter('query+info',
-                                                   'token')['type']
-            types_wiki.append('patrol')
-            valid_types = [token for token in types if token in types_wiki]
-
-        elif mw_ver < '1.24wmf19':
-            types_wiki = self._paraminfo.parameter('tokens',
-                                                   'type')['type']
+        if mw_ver < '1.24wmf19':
+            types_wiki = self._paraminfo.parameter('tokens', 'type')['type']
             valid_types = [token for token in types if token in types_wiki]
         else:
             types_wiki_old = self._paraminfo.parameter('query+info',
@@ -1537,16 +1522,15 @@ class APISite(
                                                    'type')['type']
             valid_types = [token for token in types if token in types_wiki]
             for token in types:
-                if (token not in valid_types
-                        and (token in types_wiki_old or token
-                             in types_wiki_action)):
+                if (token in types_wiki_old or token in types_wiki_action) \
+                   and token not in valid_types:
                     valid_types.append('csrf')
         return valid_types
 
-    def get_tokens(self, types, all=False):
+    def get_tokens(self, types, all: bool = False) -> dict:
         """Preload one or multiple tokens.
 
-        For MediaWiki version 1.19, only one token can be retrieved at once.
+        For MediaWiki version 1.23, only one token can be retrieved at once.
         For MediaWiki versions since 1.24wmfXXX a new token
         system was introduced which reduced the amount of tokens available.
         Most of them were merged into the 'csrf' token. If the token type in
@@ -1554,14 +1538,11 @@ class APISite(
 
         The other token types available are:
          - deleteglobalaccount
-         - patrol (*)
+         - patrol
          - rollback
          - setglobalaccountstatus
          - userrights
          - watch
-
-         (*) For v1.19, the patrol token must be obtained from the query
-             list recentchanges.
 
         @see: U{https://www.mediawiki.org/wiki/API:Tokens}
 
@@ -1570,10 +1551,8 @@ class APISite(
         @type types: iterable
         @param all: load all available tokens, if None only if it can be done
             in one request.
-        @type all: bool
 
         return: a dict with retrieved valid tokens.
-        rtype: dict
         """
         def warn_handler(mod, text):
             """Filter warnings for not available tokens."""
@@ -1581,72 +1560,32 @@ class APISite(
                 r'Action \'\w+\' is not allowed for the current user', text)
 
         user_tokens = {}
-        mw_ver = self.mw_version
-        if mw_ver < '1.20':
-            if all:
-                types_wiki = self._paraminfo.parameter('query+info',
-                                                       'token')['type']
+        if self.mw_version < '1.24wmf19':
+            if all is not False:
+                types_wiki = self._paraminfo.parameter('tokens',
+                                                       'type')['type']
                 types.extend(types_wiki)
-            valid_tokens = set(self.validate_tokens(types))
-            # don't request patrol
-            query = api.PropertyGenerator(
-                'info',
-                site=self,
-                parameters={
-                    'intoken': valid_tokens - {'patrol'},
-                    'titles': 'Dummy page'})
-            query.request._warning_handler = warn_handler
-
-            for item in query:
-                pywikibot.debug(str(item), _logger)
-                for tokentype in valid_tokens:
-                    if (tokentype + 'token') in item:
-                        user_tokens[tokentype] = item[tokentype + 'token']
-
-            # patrol token require special handling.
-            # TODO: try to catch exceptions?
-            if 'patrol' in valid_tokens:
-                req = self._simple_request(action='query',
-                                           list='recentchanges',
-                                           rctoken='patrol', rclimit=1)
-
-                req._warning_handler = warn_handler
-                data = req.submit()
-
-                if 'query' in data:
-                    data = data['query']
-                if 'recentchanges' in data:
-                    item = data['recentchanges'][0]
-                    pywikibot.debug(str(item), _logger)
-                    if 'patroltoken' in item:
-                        user_tokens['patrol'] = item['patroltoken']
+            req = self._simple_request(action='tokens',
+                                       type=self.validate_tokens(types))
         else:
-            if mw_ver < '1.24wmf19':
-                if all is not False:
-                    types_wiki = self._paraminfo.parameter('tokens',
-                                                           'type')['type']
-                    types.extend(types_wiki)
-                req = self._simple_request(action='tokens',
-                                           type=self.validate_tokens(types))
-            else:
-                if all is not False:
-                    types_wiki = self._paraminfo.parameter('query+tokens',
-                                                           'type')['type']
-                    types.extend(types_wiki)
+            if all is not False:
+                types_wiki = self._paraminfo.parameter('query+tokens',
+                                                       'type')['type']
+                types.extend(types_wiki)
 
-                req = self._simple_request(action='query', meta='tokens',
-                                           type=self.validate_tokens(types))
+            req = self._simple_request(action='query', meta='tokens',
+                                       type=self.validate_tokens(types))
 
-            req._warning_handler = warn_handler
-            data = req.submit()
+        req._warning_handler = warn_handler
+        data = req.submit()
 
-            if 'query' in data:
-                data = data['query']
+        if 'query' in data:
+            data = data['query']
 
-            if 'tokens' in data and data['tokens']:
-                user_tokens = {key[:-5]: val
-                               for key, val in data['tokens'].items()
-                               if val != '+\\'}
+        if 'tokens' in data and data['tokens']:
+            user_tokens = {key[:-5]: val
+                           for key, val in data['tokens'].items()
+                           if val != '+\\'}
 
         return user_tokens
 
@@ -2041,17 +1980,15 @@ class APISite(
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
 
-    def _rvprops(self, content=False) -> list:
+    def _rvprops(self, content: bool = False) -> List[str]:
         """Setup rvprop items for loadrevisions and preloadpages.
 
         @return: rvprop items
         """
-        props = ['comment', 'ids', 'flags', 'parsedcomment', 'sha1', 'size',
-                 'tags', 'timestamp', 'user', 'userid']
+        props = ['comment', 'contentmodel', 'flags', 'ids', 'parsedcomment',
+                 'sha1', 'size', 'tags', 'timestamp', 'user', 'userid']
         if content:
             props.append('content')
-        if self.mw_version >= '1.21':
-            props.append('contentmodel')
         if self.mw_version >= '1.32':
             props.append('roles')
         return props
@@ -4073,13 +4010,7 @@ class APISite(
         revid = revid or set()
         revision = revision or set()
 
-        # TODO: remove exception for mw < 1.22
-        if (revid or revision) and self.mw_version < '1.22':
-            raise NotImplementedError(
-                'Support of "revid" parameter\n'
-                'is not implemented in MediaWiki version < "1.22"')
-        else:
-            combined_revid = set(revid) | {r.revid for r in revision}
+        combined_revid = set(revid) | {r.revid for r in revision}
 
         gen = itertools.chain(
             zip_longest(rcid, [], fillvalue='rcid'),
@@ -4191,7 +4122,7 @@ class APISite(
         return data
 
     @need_right('editmywatchlist')
-    def watch(self, pages, unwatch=False) -> bool:
+    def watch(self, pages, unwatch: bool = False) -> bool:
         """Add or remove pages from watchlist.
 
         @see: U{https://www.mediawiki.org/wiki/API:Watch}
@@ -4203,32 +4134,17 @@ class APISite(
             if False add them (default).
         @return: True if API returned expected response; False otherwise
         @raises KeyError: 'watch' isn't in API response
-
         """
-        parameters = {'action': 'watch',
-                      'token': self.tokens['watch'],
-                      'unwatch': unwatch}
+        parameters = {
+            'action': 'watch',
+            'titles': pages,
+            'token': self.tokens['watch'],
+            'unwatch': unwatch,
+        }
+        req = self._simple_request(**parameters)
+        results = req.submit()
         unwatch = 'unwatched' if unwatch else 'watched'
-        if self.mw_version >= '1.23':
-            parameters['titles'] = pages
-            req = self._simple_request(**parameters)
-            results = req.submit()
-            return all(unwatch in r for r in results['watch'])
-
-        # MW version < 1.23
-        if isinstance(pages, str):
-            if '|' in pages:
-                pages = pages.split('|')
-            else:
-                pages = (pages,)
-
-        for page in pages:
-            parameters['title'] = page
-            req = self._simple_request(**parameters)
-            result = req.submit()
-            if unwatch not in result['watch']:
-                return False
-        return True
+        return all(unwatch in r for r in results['watch'])
 
     @need_right('editmywatchlist')
     @deprecated('Site().watch', since='20160102', future_warning=True)
@@ -4345,10 +4261,18 @@ class APISite(
 
     @deprecate_arg('imagepage', 'filepage')
     @need_right('upload')
-    def upload(self, filepage, source_filename=None, source_url=None,
-               comment=None, text=None, watch=False, ignore_warnings=False,
-               chunk_size: int = 0, _file_key: Optional[str] = None,
-               _offset=0, _verify_stash=None, report_success=None):
+    def upload(self, filepage, *,
+               source_filename: Optional[str] = None,
+               source_url: Optional[str] = None,
+               comment: Optional[str] = None,
+               text: Optional[str] = None,
+               watch: bool = False,
+               ignore_warnings=False,
+               chunk_size: int = 0,
+               _file_key: Optional[str] = None,
+               _offset: Union[bool, int] = 0,
+               _verify_stash: Optional[bool] = None,
+               report_success: Optional[bool] = None) -> bool:
         """
         Upload a file to the wiki.
 
@@ -4376,23 +4300,21 @@ class APISite(
             or None it'll raise an UploadWarning exception if the static
             boolean is False.
         @type ignore_warnings: bool or callable or iterable of str
-        @param chunk_size: The chunk size in bytesfor chunked uploading (see
-            U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
-            will only upload in chunks, if the version number is 1.20 or higher
-            and the chunk size is positive but lower than the file size.
+        @param chunk_size: The chunk size in bytes for chunked uploading (see
+            U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}).
+            It will only upload in chunks, if the chunk size is positive
+            but lower than the file size.
         @param _file_key: Reuses an already uploaded file using the filekey. If
             None (default) it will upload the file.
         @param _offset: When file_key is not None this can be an integer to
             continue a previously canceled chunked upload. If False it treats
             that as a finished upload. If True it requests the stash info from
             the server to determine the offset. By default starts at 0.
-        @type _offset: int or bool
         @param _verify_stash: Requests the SHA1 and file size uploaded and
             compares it to the local file. Also verifies that _offset is
             matching the file size if the _offset is an int. If _offset is
             False if verifies that the file size match with the local file. If
             None it'll verifies the stash when a file key and offset is given.
-        @type _verify_stash: bool or None
         @param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadWarning if a warning occurred. If it's None
@@ -4400,7 +4322,6 @@ class APISite(
             otherwise. If it's True or None ignore_warnings must be a bool.
         @return: It returns True if the upload was successful and False
             otherwise.
-        @rtype: bool
         """
         def create_warnings_list(response):
             return [
@@ -4437,7 +4358,7 @@ class APISite(
         # An offset != 0 doesn't make sense without a file key
         assert(_offset == 0 or _file_key is not None)
         # check for required parameters
-        if bool(source_filename) == bool(source_url):
+        if source_filename and source_url:
             raise ValueError('APISite.upload: must provide either '
                              'source_filename or source_url, not both.')
         if comment is None:
@@ -4545,8 +4466,7 @@ class APISite(
             # upload local file
             throttle = True
             filesize = os.path.getsize(source_filename)
-            chunked_upload = (
-                0 < chunk_size < filesize and self.mw_version >= '1.20')
+            chunked_upload = 0 < chunk_size < filesize
             with open(source_filename, 'rb') as f:
                 final_request = self._request(
                     throttle=throttle, parameters={
@@ -4640,10 +4560,18 @@ class APISite(
                                     # can be ignored
                                     if restart:
                                         return self.upload(
-                                            filepage, source_filename,
-                                            source_url, comment, text, watch,
-                                            True, chunk_size, None, 0,
-                                            report_success=False)
+                                            filepage,
+                                            source_filename=source_filename,
+                                            source_url=source_url,
+                                            comment=comment,
+                                            text=text,
+                                            watch=watch,
+                                            ignore_warnings=True,
+                                            chunk_size=chunk_size,
+                                            _file_key=None,
+                                            _offset=0,
+                                            report_success=False
+                                        )
 
                                     ignore_warnings = True
                                     ignore_all_warnings = True
@@ -4691,6 +4619,7 @@ class APISite(
             final_request = self._simple_request(
                 action='upload', filename=file_page_title,
                 url=source_url, comment=comment, text=text, token=token)
+
         if not result:
             final_request['watch'] = watch
             final_request['ignorewarnings'] = ignore_all_warnings
@@ -4715,15 +4644,19 @@ class APISite(
             else:
                 _file_key = None
                 pywikibot.warning('No filekey defined.')
+
             if not report_success:
                 result.setdefault('offset', True)
                 if ignore_warnings(create_warnings_list(result)):
                     return self.upload(
-                        filepage, source_filename, source_url, comment, text,
-                        watch, True, chunk_size, _file_key,
-                        result['offset'], report_success=False)
-                else:
-                    return False
+                        filepage, source_filename=source_filename,
+                        source_url=source_url, comment=comment, text=text,
+                        watch=watch, ignore_warnings=True,
+                        chunk_size=chunk_size, _file_key=_file_key,
+                        _offset=result['offset'], report_success=False
+                    )
+                return False
+
             warn('When ignore_warnings=False in APISite.upload will change '
                  'from raising an UploadWarning into behaving like being a '
                  'callable returning False.', DeprecationWarning, 3)
@@ -4740,6 +4673,7 @@ class APISite(
                                     offset=result.get('offset', False))
         elif 'result' not in result:
             pywikibot.output('Upload: unrecognized response: %s' % result)
+
         if result['result'] == 'Success':
             if report_success:
                 pywikibot.output('Upload successful.')
@@ -4747,6 +4681,7 @@ class APISite(
             # mode, don't attempt to access imageinfo
             if 'nochange' not in result:
                 filepage._load_file_revisions([result['imageinfo']])
+
         return result['result'] == 'Success'
 
     @deprecated_args(number='total', repeat=None, namespace='namespaces',
@@ -5052,31 +4987,27 @@ class APISite(
             return self.allpages(namespace=namespaces[0], protect_level=level,
                                  protect_type=type, total=total)
 
-    @need_version('1.21')
-    def get_property_names(self, force=False):
+    def get_property_names(self, force: bool = False):
         """
         Get property names for pages_with_property().
 
         @see: U{https://www.mediawiki.org/wiki/API:Pagepropnames}
 
         @param force: force to retrieve userinfo ignoring cache
-        @type force: bool
         """
         if force or not hasattr(self, '_property_names'):
             ppngen = self._generator(api.ListGenerator, 'pagepropnames')
             self._property_names = [pn['propname'] for pn in ppngen]
         return self._property_names
 
-    @need_version('1.21')
-    def pages_with_property(self, propname, *, total=None):
+    def pages_with_property(self, propname: str, *,
+                            total: Optional[int] = None):
         """Yield Page objects from Special:PagesWithProp.
 
         @see: U{https://www.mediawiki.org/wiki/API:Pageswithprop}
 
         @param propname: must be a valid property.
-        @type propname: str
         @param total: number of pages to return
-        @type total: int or None
         @return: return a generator of Page objects
         @rtype: iterator
         """
