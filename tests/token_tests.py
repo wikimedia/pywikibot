@@ -55,7 +55,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
         self.mysite.version = lambda: test_version
 
-        for ttype in ('edit', 'move', additional_token):
+        for ttype in ('edit', 'move', 'delete', 'patrol', additional_token):
             tokentype = self.mysite.validate_tokens([ttype])
             try:
                 token = self.mysite.tokens[ttype]
@@ -77,21 +77,9 @@ class TestSiteTokens(DefaultSiteTestCase):
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
 
-    def test_tokens_in_mw_119(self):
+    def test_tokens_in_mw_123_124wmf18(self):
         """Test ability to get page tokens."""
-        self._test_tokens(None, '1.19', 'delete')
-
-    def test_patrol_tokens_in_mw_119(self):
-        """Test ability to get patrol token on MW 1.19 wiki."""
-        self._test_tokens('1.19', '1.19', 'patrol')
-
-    def test_tokens_in_mw_120_124wmf18(self):
-        """Test ability to get page tokens."""
-        self._test_tokens('1.20', '1.21', 'deleteglobalaccount')
-
-    def test_patrol_tokens_in_mw_120(self):
-        """Test ability to get patrol token."""
-        self._test_tokens('1.19', '1.20', 'patrol')
+        self._test_tokens('1.23', '1.24wmf18', 'deleteglobalaccount')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
@@ -168,9 +156,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         result = result[0]
         self.assertIsInstance(result, dict)
 
-        params = {'rcid': 0}
-        if mysite.mw_version >= '1.22':
-            params['revid'] = [0, 1]
+        params = {'rcid': 0, 'revid': [0, 1]}
 
         raised = False
         try:

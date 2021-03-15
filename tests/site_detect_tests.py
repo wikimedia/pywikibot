@@ -97,7 +97,7 @@ class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
 
     def test_tfwiki(self):
         """Test detection of MediaWiki sites for tfwiki.net."""
-        self.assertSite('http://tfwiki.net/wiki/$1')
+        self.assertNoSite('http://tfwiki.net/wiki/$1')  # 1.19.5-1+deb7u1
 
 
 class Pre119SiteTestCase(SiteDetectionTestCase):

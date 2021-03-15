@@ -440,8 +440,8 @@ class MediaWikiVersion(Version):
     version is greater if the normal version or dev version is greater. For
     example:
 
-        1.24 < 1.24.1 < 1.25wmf1 < 1.25alpha < 1.25beta1 < 1.25beta2
-        < 1.25-rc-1 < 1.25-rc.2 < 1.25
+        1.34 < 1.34.1 < 1.35wmf1 < 1.35alpha < 1.35beta1 < 1.35beta2
+        < 1.35-rc-1 < 1.35-rc.2 < 1.35
 
     Any other suffixes are considered invalid.
     """

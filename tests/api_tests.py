@@ -139,10 +139,8 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertLength(pi, pi.preloaded_modules)
 
-        if site.mw_version >= '1.21':
-            # 'generator' was added to 'pageset' in 1.21
-            generators_param = pi.parameter('pageset', 'generator')
-            self.assertGreater(len(generators_param['type']), 1)
+        generators_param = pi.parameter('pageset', 'generator')
+        self.assertGreater(len(generators_param['type']), 1)
 
     def test_generators(self):
         """Test requesting the generator parameter."""
@@ -156,12 +154,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('pageset', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
 
-        if site.mw_version >= '1.21':
-            # 'generator' was added to 'pageset' in 1.21
-            pageset_generators_param = pi.parameter('pageset', 'generator')
-            query_generators_param = pi.parameter('query', 'generator')
+        pageset_generators_param = pi.parameter('pageset', 'generator')
+        query_generators_param = pi.parameter('query', 'generator')
 
-            self.assertEqual(pageset_generators_param, query_generators_param)
+        self.assertEqual(pageset_generators_param, query_generators_param)
 
     def test_with_module_info(self):
         """Test requesting the module info."""

@@ -425,16 +425,16 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.pagetemplates."""
         tl_gen = self.site.pagetemplates(self.mainpage)
         expected_params = {
-            'titles': [self.mainpage.title()],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
+            'continue': [True],
             'inprop': ['protection'],
             'iilimit': ['max'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                       'sha1', 'metadata'],
+            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1',
+                       'metadata'],
+            'indexpageids': [True],
             'generator': ['templates'], 'action': ['query'],
-            'indexpageids': [True]}
-        if self.site.mw_version >= '1.21':
-            expected_params['continue'] = [True]
+            'prop': ['info', 'imageinfo', 'categoryinfo'],
+            'titles': [self.mainpage.title()],
+        }
 
         self.assertEqual(tl_gen.request._params, expected_params)
 
@@ -460,19 +460,19 @@ class TestSiteGenerators(DefaultSiteTestCase):
         links_gen = self.site.pagelinks(self.mainpage)
         gen_params = links_gen.request._params.copy()
         expected_params = {
-            'redirects': [False],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
+            'action': ['query'], 'indexpageids': [True],
+            'continue': [True],
             'inprop': ['protection'],
             'iilimit': ['max'],
             'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                        'sha1', 'metadata'], 'generator': ['links'],
-            'action': ['query'], 'indexpageids': [True]}
+            'prop': ['info', 'imageinfo', 'categoryinfo'],
+            'redirects': [False],
+        }
         if 'pageids' in gen_params:
             expected_params['pageids'] = [str(self.mainpage.pageid)]
         else:
             expected_params['titles'] = [self.mainpage.title()]
-        if self.site.mw_version >= '1.21':
-            expected_params['continue'] = [True]
 
         self.assertEqual(gen_params, expected_params)
 
@@ -875,8 +875,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_pages_with_property(self):
         """Test pages_with_property method."""
-        if self.site.mw_version < '1.21':
-            self.skipTest('requires v1.21+')
         mysite = self.get_site()
         pnames = mysite.get_property_names()
         for item in ('defaultsort', 'disambiguation', 'displaytitle',

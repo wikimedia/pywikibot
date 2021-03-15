@@ -1106,8 +1106,7 @@ class Request(MutableMapping):
                     'API write action by unexpected username {} commenced.\n'
                     'userinfo: {!r}'.format(username, self.site.userinfo))
 
-        # MediaWiki 1.23 allows assertion for any action,
-        # make sure user is logged in
+        # Make sure user is logged in
         if self.write:
             pywikibot.debug('Adding user assertion', _logger)
             self['assert'] = 'user'

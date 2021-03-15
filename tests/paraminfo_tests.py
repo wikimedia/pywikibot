@@ -1,6 +1,6 @@
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -91,12 +91,10 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
 
     def test_watchlist_type(self):
         """Test watchlist type."""
-        known = ['edit', 'new', 'log']
+        known = ['edit', 'external', 'new', 'log']
 
         mw_ver = self.site.mw_version
 
-        if mw_ver >= '1.20':
-            known.append('external')
         if mw_ver.version >= (1, 27):
             if mw_ver >= '1.27.0-wmf.4' or mw_ver.suffix == 'alpha':
                 known.append('categorize')
