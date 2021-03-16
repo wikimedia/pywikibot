@@ -5,12 +5,13 @@
 # Distributed under the terms of the MIT license.
 #
 import sys
+import unittest
 
 from contextlib import suppress
 
 from pywikibot.data.wikistats import WikiStats
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class WikiStatsTestCase(TestCase):

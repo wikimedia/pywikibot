@@ -45,8 +45,6 @@ The contents of the package
     | i18n.py                    | Helper functions for both the internal translation   |
     |                            | system and for TranslateWiki-based translations      |
     +----------------------------+------------------------------------------------------+
-    | interwiki_graph.py         | Possible create graph with interwiki.py script       |
-    +----------------------------+------------------------------------------------------+
     | logentries.py              | Objects representing Mediawiki log entries           |
     +----------------------------+------------------------------------------------------+
     | logging.py                 | Logging and output functions                         |
@@ -84,8 +82,6 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | http.py                    | Basic HTTP access interface                          |
     +----------------------------+------------------------------------------------------+
-    | threadedhttp.py            | HTTP requests wrapper                                |
-    +----------------------------+------------------------------------------------------+
 
 
     +----------------------------+------------------------------------------------------+
@@ -106,6 +102,10 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
+    | _collections.py            | Structures holding data for Wikibase entities        |
+    +----------------------------+------------------------------------------------------+
+    | _decorators.py             | Decorators used by page objects                      |
+    +----------------------------+------------------------------------------------------+
     | _revision.py               | Object representing page revision                    |
     +----------------------------+------------------------------------------------------+
 
@@ -115,14 +115,22 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |
     +----------------------------+------------------------------------------------------+
-    | _basesite.py               | Objects representingsite methods independent of the  |
+    | _apisite.py                | Objects representing API interface to MediaWiki site |
+    +----------------------------+------------------------------------------------------+
+    | _basesite.py               | Objects representing site methods independent of the |
     |                            | communication interface                              |
     +----------------------------+------------------------------------------------------+
+    | _datasite.py               | Objects representing API interface to Wikibase       |
+    +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by site models                       |
+    +----------------------------+------------------------------------------------------+
+    | _extensions.py             | API interfaces to MediaWiki extensions               |
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+
     | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
+    +----------------------------+------------------------------------------------------+
+    | _obsoletesites.py          | Objects representing obsolete MediaWiki sites        |
     +----------------------------+------------------------------------------------------+
     | _siteinfo.py               | Objects representing site info data contents         |
     +----------------------------+------------------------------------------------------+

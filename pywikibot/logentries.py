@@ -1,17 +1,18 @@
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
+from contextlib import suppress
 from typing import Optional
 
 import pywikibot
 
 from pywikibot.backports import List
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import classproperty, deprecated
+from pywikibot.tools import deprecated
 
 
 _logger = 'wiki'
@@ -43,7 +44,7 @@ class LogEntry(UserDict):
             raise Error('Wrong log type! Expecting %s, received %s instead.'
                         % (expected_type, self.type()))
 
-    def __missing__(self, key):
+    def __missing__(self, key: str):
         """Debug when the key is missing.
 
         HiddenKeyError is raised when the user does not have permission.
@@ -60,10 +61,11 @@ class LogEntry(UserDict):
             raise HiddenKeyError(
                 "Log entry ({}) has a hidden '{}' key and you don't have "
                 'permission to view it.'.format(self['type'], key))
+
         raise KeyError("Log entry ({}) has no '{}' key"
                        .format(self['type'], key))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of LogEntry object."""
         return '<{0}({1}, logid={2})>'.format(type(self).__name__,
                                               self.site.sitename, self.logid())
@@ -72,7 +74,7 @@ class LogEntry(UserDict):
         """Combine site and logid as the hash."""
         return self.logid() ^ hash(self.site)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
             pywikibot.debug("'{0}' cannot be compared with '{1}'"
@@ -96,10 +98,10 @@ class LogEntry(UserDict):
 
         @rtype: dict or None
         """
-        if 'params' in self:
+        with suppress(KeyError):
             return self['params']
-        else:  # try old mw style preceding mw 1.19
-            return self[self._expected_type]
+
+        return self[self._expected_type]
 
     @deprecated('page()', since='20150617', future_warning=True)
     def title(self):
@@ -188,8 +190,8 @@ class BlockEntry(LogEntry):
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
             return self._blockid
-        else:
-            return super().page()
+
+        return super().page()
 
     def flags(self) -> List[str]:
         """
@@ -203,7 +205,7 @@ class BlockEntry(LogEntry):
             return []
         if not hasattr(self, '_flags'):
             self._flags = self._params['flags']
-            # pre mw 1.19 returned a delimited string.
+            # pre mw 1.25 returned a delimited string.
             if isinstance(self._flags, str):
                 if self._flags:
                     self._flags = self._flags.split(',')
@@ -250,16 +252,18 @@ class RightsEntry(LogEntry):
     def oldgroups(self):
         """Return old rights groups."""
         params = self._params
-        if 'old' in params:  # old mw style
+        if 'old' in params:  # old mw style (mw < 1.25)
             return params['old'].split(',') if params['old'] else []
+
         return params['oldgroups']
 
     @property
     def newgroups(self):
         """Return new rights groups."""
         params = self._params
-        if 'new' in params:  # old mw style
+        if 'new' in params:  # old mw style (mw < 1.25)
             return params['new'].split(',') if params['new'] else []
+
         return params['newgroups']
 
 
@@ -294,7 +298,7 @@ class MoveEntry(LogEntry):
     @property
     def target_ns(self):
         """Return namespace object of target page."""
-        # key has been changed in mw 1.19
+        # key has been changed in mw 1.25 to 'target_ns'
         return self.site.namespaces[self._params['target_ns']
                                     if 'target_ns' in self._params
                                     else self._params['new_ns']]
@@ -307,7 +311,7 @@ class MoveEntry(LogEntry):
     @property
     def target_title(self):
         """Return the target title."""
-        # key has been changed in mw 1.19
+        # key has been changed in mw 1.25 to 'target_title'
         return (self._params['target_title']
                 if 'target_title' in self._params
                 else self._params['new_title'])
@@ -323,12 +327,8 @@ class MoveEntry(LogEntry):
             self._target_page = pywikibot.Page(self.site, self.target_title)
         return self._target_page
 
-    def suppressedredirect(self):
-        """
-        Return True if no redirect was created during the move.
-
-        @rtype: bool
-        """
+    def suppressedredirect(self) -> bool:
+        """Return True if no redirect was created during the move."""
         # Introduced in MW r47901
         return 'suppressedredirect' in self._params
 
@@ -342,7 +342,7 @@ class PatrolEntry(LogEntry):
     @property
     def current_id(self) -> int:
         """Return the current id."""
-        # key has been changed in mw 1.19; try the new mw style first
+        # key has been changed in mw 1.25; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['curid']
                    if 'curid' in self._params else self._params['cur'])
@@ -350,13 +350,13 @@ class PatrolEntry(LogEntry):
     @property
     def previous_id(self) -> int:
         """Return the previous id."""
-        # key has been changed in mw 1.19; try the new mw style first
+        # key has been changed in mw 1.25; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['previd']
                    if 'previd' in self._params else self._params['prev'])
 
     @property
-    def auto(self):
+    def auto(self) -> bool:
         """Return auto patrolled."""
         return 'auto' in self._params and self._params['auto'] != 0
 
@@ -390,19 +390,12 @@ class LogEntryFactory(object):
         """
         self._site = site
         if logtype is None:
-            self._creator = self._createFromData
+            self._creator = self._create_from_data
         else:
             # Bind a Class object to self._creator:
             # When called, it will initialize a new object of that class
             logclass = self.get_valid_entry_class(logtype)
             self._creator = lambda data: logclass(data, self._site)
-
-    @classproperty
-    @deprecated('Site.logtypes or LogEntryFactory.get_entry_class(logtype)',
-                since='20160918', future_warning=True)
-    def logtypes(cls):
-        """DEPRECATED LogEntryFactory class attribute of log types."""
-        return cls._logtypes
 
     def create(self, logdata):
         """
@@ -425,6 +418,7 @@ class LogEntryFactory(object):
         """
         if logtype not in self._site.logtypes:
             raise KeyError('{} is not a valid logtype'.format(logtype))
+
         return LogEntryFactory.get_entry_class(logtype)
 
     @classmethod
@@ -450,7 +444,7 @@ class LogEntryFactory(object):
                 classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
-    def _createFromData(self, logdata: dict):
+    def _create_from_data(self, logdata: dict):
         """
         Check for logtype from data, and creates the correct LogEntry.
 
@@ -463,6 +457,7 @@ class LogEntryFactory(object):
             pywikibot.debug('API log entry received:\n{0}'.format(logdata),
                             _logger)
             raise Error("Log entry has no 'type' key")
+
         return LogEntryFactory.get_entry_class(logtype)(logdata, self._site)
 
 

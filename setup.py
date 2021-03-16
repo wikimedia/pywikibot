@@ -4,7 +4,7 @@
 To create a new distribution:
 -----------------------------
 
-- replace the developmental version string in ``pywikibot.__metadata.py``
+- replace the developmental version string in ``pywikibot.__metadata__.py``
   by the corresponing final release
 - create the package with::
 
@@ -16,11 +16,11 @@ To create a new distribution:
     twine upload dist/*
 
 - create a new tag with the version number of the final release
-- move the existing 'stable' tag to that new tag
-- delete 'stable' tag in gerrit to be overridden later
 - synchronize the local tags with the remote repositoy
-- prepare the next release by increasing the version number in
-  ``pywikibot.__metadata.py`` and adding developmental identifier
+- merge current master branch to stable branch
+- push new stable branch to gerrit and merge it the stable repository
+- prepare the next master release by increasing the version number in
+  ``pywikibot.__metadata__.py`` and adding developmental identifier
 - upload this patchset to gerrit and merge it.
 """
 #
@@ -58,8 +58,7 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.15'],
-    'Graphviz': ['pydot>=1.2'],
+    'isbn': ['python-stdnum>=1.16'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': [  # vulnerability found in Pillow<6.2.2
@@ -74,6 +73,7 @@ extra_deps = {
         'flake8>=3.7.5',
         'pydocstyle>=4.0.0',
         'hacking',
+        'flake8-bugbear',
         'flake8-coding',
         'flake8-colors>=0.1.9',
         'flake8-comprehensions>=3.1.4;python_version>="3.8"',
@@ -94,14 +94,6 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
-    'flickrripper.py': [
-        'flickrapi>=2.2',
-    ] + extra_deps['Tkinter'],
-    'imageharvest.py': extra_deps['html'],
-    'isbn.py': extra_deps['isbn'],
-    'match_images.py': extra_deps['Tkinter'],
-    'patrol.py': extra_deps['mwparserfromhell'],
-    'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
 }
 
@@ -113,19 +105,14 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 dependencies = [
     'requests>=2.20.1,<2.26.0;python_version<"3.6"',
     'requests>=2.20.1;python_version>="3.6"',
+    # PEP 440
+    'setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < "3.6"',
+    'setuptools>=20.2 ; python_version >= "3.6"',
 ]
-
-try:
-    import bz2
-except ImportError:  # pragma: no cover
-    # Use bz2file if the python is not compiled with bz2 support.
-    dependencies.append('bz2file')
-else:
-    assert bz2
 
 
 # ------- setup tests_require ------- #
-test_deps = ['bz2file', 'mock']
+test_deps = ['mock']
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.
@@ -242,7 +229,11 @@ def read_desc(filename):  # pragma: no cover
 
 def get_packages(name):  # pragma: no cover
     """Find framework packages."""
-    from setuptools import find_namespace_packages
+    try:
+        from setuptools import find_namespace_packages
+    except ImportError:
+        sys.exit(
+            'setuptools >= 40.1.0 is required to create a new distribution.')
     packages = find_namespace_packages(include=[name + '.*'])
     return [str(name)] + packages
 

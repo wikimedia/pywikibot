@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,6 @@ from pywikibot import config, __url__
 from pywikibot.comms import http
 from pywikibot.exceptions import NoUsername
 from pywikibot.tools import (
-    deprecated,
     deprecated_args, file_mode_checker, normalize_username, remove_last_args,
 )
 
@@ -67,7 +66,7 @@ class LoginStatus(IntEnum):
     >>> LoginStatus.IN_PROGRESS.value
     -2
     >>> LoginStatus.NOT_LOGGED_IN.name
-    NOT_LOGGED_IN
+    'NOT_LOGGED_IN'
     >>> int(LoginStatus.AS_USER)
     0
     >>> LoginStatus(-3).name
@@ -185,18 +184,6 @@ class LoginManager:
 
         # No bot policies on other sites
         return True
-
-    @deprecated('login_to_site', since='20201227', future_warning=True)
-    @remove_last_args(['remember', 'captcha'])
-    def getCookie(self):
-        """
-        Login to the site.
-
-        @see: U{https://www.mediawiki.org/wiki/API:Login}
-
-        @return: cookie data if successful, None otherwise.
-        """
-        self.login_to_site()
 
     def login_to_site(self):
         """Login to the site."""
@@ -336,12 +323,14 @@ class LoginManager:
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
-                return self.login(retry=True)
-            else:
-                return False
-        self.storecookiedata()
-        pywikibot.log('Should be logged in now')
-        return True
+                return self.login(retry=False)
+
+        else:
+            self.storecookiedata()
+            pywikibot.log('Should be logged in now')
+            return True
+
+        return False
 
 
 class BotPassword:

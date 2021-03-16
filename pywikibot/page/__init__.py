@@ -21,7 +21,6 @@ import re
 import unicodedata
 
 from collections import Counter, defaultdict, OrderedDict
-from collections.abc import MutableMapping
 from contextlib import suppress
 from html.entities import name2codepoint
 from itertools import chain
@@ -43,10 +42,16 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.family import Family
+from pywikibot.page._collections import (
+    AliasesDict,
+    ClaimCollection,
+    LanguageDict,
+    SiteLinkCollection,
+)
+from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._revision import Revision
-from pywikibot.site import DataSite, Namespace, need_version
+from pywikibot.site import DataSite, Namespace
 from pywikibot.tools import (
-    add_full_name,
     compute_file_hash,
     ComparableMixin,
     deprecated,
@@ -54,8 +59,6 @@ from pywikibot.tools import (
     deprecated_args,
     DotReadableDict,
     first_upper,
-    issue_deprecation_warning,
-    manage_wrapping,
     redirect_func,
     remove_last_args,
 )
@@ -88,49 +91,6 @@ __all__ = (
 )
 
 logger = logging.getLogger('pywiki.wiki.page')
-
-
-@add_full_name
-def allow_asynchronous(func):
-    """
-    Decorator to make it possible to run a BasePage method asynchronously.
-
-    This is done when the method is called with kwarg asynchronous=True.
-    Optionally, you can also provide kwarg callback, which, if provided, is
-    a callable that gets the page as the first and a possible exception that
-    occurred during saving in the second thread or None as the second argument.
-    """
-    def handle(func, self, *args, **kwargs):
-        do_async = kwargs.pop('asynchronous', False)
-        callback = kwargs.pop('callback', None)
-        err = None
-        try:
-            func(self, *args, **kwargs)
-        # TODO: other "expected" error types to catch?
-        except pywikibot.Error as edit_err:
-            err = edit_err  # edit_err will be deleted in the end of the scope
-            link = self.title(as_link=True)
-            if do_async:
-                pywikibot.error('page {} not saved due to {}\n'
-                                .format(link, err))
-            pywikibot.log('Error saving page %s (%s)\n' % (link, err),
-                          exc_info=True)
-            if not callback and not do_async:
-                if isinstance(err, pywikibot.PageSaveRelatedError):
-                    raise err
-                raise pywikibot.OtherPageSaveError(self, err)
-        if callback:
-            callback(self, err)
-
-    def wrapper(self, *args, **kwargs):
-        if kwargs.get('asynchronous'):
-            pywikibot.async_request(handle, func, self, *args, **kwargs)
-        else:
-            handle(func, self, *args, **kwargs)
-
-    manage_wrapping(wrapper, func)
-
-    return wrapper
 
 
 # Note: Link objects (defined later on) represent a wiki-page's title, while
@@ -257,7 +217,6 @@ class BasePage(ComparableMixin):
         If it cannot be reliably determined via the API,
         None is returned.
         """
-        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
         if not hasattr(self, '_contentmodel'):
             self.site.loadpageinfo(self)
         return self._contentmodel
@@ -334,14 +293,14 @@ class BasePage(ComparableMixin):
             else:
                 target_code = config.mylang
                 target_family = config.family
-            if force_interwiki or \
-               (allow_interwiki
-                and (self.site.family.name != target_family
-                     or self.site.code != target_code)):
+            if force_interwiki \
+               or (allow_interwiki
+                   and (self.site.family.name != target_family
+                        or self.site.code != target_code)):
                 if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
-                    title = '%s:%s:%s' % (
-                        self.site.family.name, self.site.code, title)
+                    title = '{site.family.name}:{site.code}:{title}'.format(
+                        site=self.site, title=title)
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
@@ -1263,9 +1222,11 @@ class BasePage(ComparableMixin):
             CANCEL_MATCH, CosmeticChangesToolkit)
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL_MATCH)
         self.text = cc_toolkit.change(old)
+
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
-            summary += i18n.twtranslate(self.site, 'cosmetic_changes-append')
+            summary += i18n.twtranslate(self.site, 'cosmetic_changes-append',
+                                        fallback_prompt='; cosmetic changes')
         return summary
 
     @deprecate_arg('async', 'asynchronous')  # T106230
@@ -1360,7 +1321,8 @@ class BasePage(ComparableMixin):
         if self.exists():
             # ensure always get the page text and not to change it.
             del self.text
-            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
+            summary = i18n.twtranslate(self.site, 'pywikibot-touch',
+                                       fallback_prompt='Pywikibot touch edit')
             self.save(summary=summary, watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,
@@ -1576,7 +1538,6 @@ class BasePage(ComparableMixin):
             return None
         return list(self._coords)
 
-    @need_version('1.20')
     def page_image(self):
         """
         Return the most appropriate image on the page.
@@ -1602,24 +1563,6 @@ class BasePage(ComparableMixin):
         @rtype: pywikibot.Page
         """
         return self.site.getredirtarget(self)
-
-    @deprecated('moved_target()', since='20150524', future_warning=True)
-    def getMovedTarget(self):  # pragma: no cover
-        """
-        Return a Page object for the target this Page was moved to.
-
-        DEPRECATED: Use Page.moved_target().
-
-        If this page was not moved, it will raise a NoPage exception.
-        This method also works if the source was already deleted.
-
-        @rtype: pywikibot.page.Page
-        @raises pywikibot.exceptions.NoPage: this page was not moved
-        """
-        try:
-            return self.moved_target()
-        except pywikibot.NoMoveTarget:
-            raise pywikibot.NoPage(self)
 
     def moved_target(self):
         """
@@ -1961,7 +1904,7 @@ class BasePage(ComparableMixin):
         sortKey='sort_key', inPlace='in_place')
     def change_category(
         self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
-        include=[]
+        include=None
     ) -> bool:
         """
         Remove page from oldCat and add it to newCat.
@@ -1990,7 +1933,7 @@ class BasePage(ComparableMixin):
         # duplicates
         cats = []
         for cat in textlib.getCategoryLinks(self.text, site=self.site,
-                                            include=include):
+                                            include=include or []):
             if cat not in cats:
                 cats.append(cat)
 
@@ -2347,17 +2290,16 @@ class FilePage(Page):
             self.site.loadimageinfo(self, history=True)
         return self._file_revisions
 
-    def getImagePageHtml(self):
-        """
-        Download the file page, and return the HTML, as a string.
+    def getImagePageHtml(self) -> str:
+        """Download the file page, and return the HTML, as a string.
 
         Caches the HTML code, so that if you run this method twice on the
         same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
-            path = '%s/index.php?title=%s' \
-                   % (self.site.scriptpath(), self.title(as_url=True))
-            self._imagePageHtml = http.request(self.site, path)
+            path = '{}/index.php?title={}'.format(self.site.scriptpath(),
+                                                  self.title(as_url=True))
+            self._imagePageHtml = http.request(self.site, path).text
         return self._imagePageHtml
 
     @deprecated('get_file_url', since='20160609', future_warning=True)
@@ -2464,8 +2406,8 @@ class FilePage(Page):
         @type ignore_warnings: bool or callable or iterable of str
         @keyword chunk_size: The chunk size in bytesfor chunked uploading (see
             U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
-            will only upload in chunks, if the version number is 1.20 or higher
-            and the chunk size is positive but lower than the file size.
+            will only upload in chunks, if the chunk size is positive but lower
+            than the file size.
         @type chunk_size: int
         @keyword _file_key: Reuses an already uploaded file using the filekey.
             If None (default) it will upload the file.
@@ -2641,7 +2583,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix')
+    @deprecated_args(startFrom='startprefix', startsort=None, endsort=None)
     def articles(self,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,
@@ -2650,11 +2592,8 @@ class Category(Page):
                  sortby: Optional[str] = None,
                  reverse: bool = False,
                  starttime=None, endtime=None,
-                 startsort: Optional[str] = None,
-                 endsort: Optional[str] = None,
                  startprefix: Optional[str] = None,
-                 endprefix: Optional[str] = None,
-                 ):
+                 endprefix: Optional[str] = None):
         """
         Yield all articles in the current category.
 
@@ -2682,32 +2621,24 @@ class Category(Page):
         @param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         @type endtime: pywikibot.Timestamp
-        @param startsort: if provided, only generate pages that have a
-            sortkey >= startsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
-        @param endsort: if provided, only generate pages that have a
-            sortkey <= endsort; not valid if sortby="timestamp"
-            (Deprecated in MW 1.24)
         @param startprefix: if provided, only generate pages >= this title
-            lexically; not valid if sortby="timestamp"; overrides "startsort"
+            lexically; not valid if sortby="timestamp"
         @param endprefix: if provided, only generate pages < this title
-            lexically; not valid if sortby="timestamp"; overrides "endsort"
+            lexically; not valid if sortby="timestamp"
         @rtype: typing.Iterable[pywikibot.Page]
         """
         seen = set()
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 total=total,
-                                                content=content, sortby=sortby,
+                                                content=content,
+                                                sortby=sortby,
                                                 reverse=reverse,
                                                 starttime=starttime,
                                                 endtime=endtime,
-                                                startsort=startsort,
-                                                endsort=endsort,
                                                 startprefix=startprefix,
                                                 endprefix=endprefix,
-                                                member_type=['page', 'file']
-                                                ):
+                                                member_type=['page', 'file']):
             if recurse:
                 seen.add(hash(member))
             yield member
@@ -2715,22 +2646,21 @@ class Category(Page):
                 total -= 1
                 if total == 0:
                     return
+
         if recurse:
             if not isinstance(recurse, bool) and recurse:
-                recurse = recurse - 1
+                recurse -= 1
             for subcat in self.subcategories():
-                for article in subcat.articles(recurse, total=total,
+                for article in subcat.articles(recurse=recurse,
+                                               total=total,
                                                content=content,
                                                namespaces=namespaces,
                                                sortby=sortby,
                                                reverse=reverse,
                                                starttime=starttime,
                                                endtime=endtime,
-                                               startsort=startsort,
-                                               endsort=endsort,
                                                startprefix=startprefix,
-                                               endprefix=endprefix,
-                                               ):
+                                               endprefix=endprefix):
                     hash_value = hash(article)
                     if hash_value in seen:
                         continue
@@ -2892,7 +2822,7 @@ class User(Page):
             pywikibot.output(
                 'This is an autoblock ID, you can only use to unblock it.')
 
-    @deprecated('User.username', since='20160504')
+    @deprecated('User.username', since='20160504', future_warning=True)
     def name(self) -> str:  # pragma: no cover
         """
         The username.
@@ -3254,402 +3184,6 @@ class User(Page):
         return self.isRegistered() and 'bot' not in self.groups()
 
 
-class BaseDataDict(MutableMapping):
-
-    """
-    Base structure holding data for a Wikibase entity.
-
-    Data are mappings from a language to a value. It will be
-    specialised in subclasses.
-    """
-
-    def __init__(self, data=None):
-        super().__init__()
-        self._data = {}
-        if data:
-            self.update(data)
-
-    @classmethod
-    def new_empty(cls, repo):
-        return cls()
-
-    def __getitem__(self, key):
-        key = self.normalizeKey(key)
-        return self._data[key]
-
-    def __setitem__(self, key, value):
-        key = self.normalizeKey(key)
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        key = self.normalizeKey(key)
-        del self._data[key]
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def __len__(self):
-        return len(self._data)
-
-    def __contains__(self, key):
-        key = self.normalizeKey(key)
-        return key in self._data
-
-    def __repr__(self):
-        return '{}({})'.format(type(self), self._data)
-
-    @staticmethod
-    def normalizeKey(key) -> str:
-        """Helper function to return language codes of a site object."""
-        if isinstance(key, pywikibot.site.BaseSite):
-            key = key.lang
-        return key
-
-
-class LanguageDict(BaseDataDict):
-
-    """
-    A structure holding language data for a Wikibase entity.
-
-    Language data are mappings from a language to a string. It can be
-    labels, descriptions and others.
-    """
-
-    @classmethod
-    def fromJSON(cls, data, repo=None):
-        this = cls({key: value['value'] for key, value in data.items()})
-        return this
-
-    @classmethod
-    def normalizeData(cls, data):
-        norm_data = {}
-        for key, value in data.items():
-            if isinstance(value, str):
-                norm_data[key] = {'language': key, 'value': value}
-            else:
-                norm_data[key] = value
-        return norm_data
-
-    def toJSON(self, diffto=None):
-        data = {}
-        diffto = diffto or {}
-        for key in diffto.keys() - self.keys():
-            data[key] = {'language': key, 'value': ''}
-        for key in self.keys() - diffto.keys():
-            data[key] = {'language': key, 'value': self[key]}
-        for key in self.keys() & diffto.keys():
-            if self[key] != diffto[key]['value']:
-                data[key] = {'language': key, 'value': self[key]}
-        return data
-
-
-class AliasesDict(BaseDataDict):
-
-    """
-    A structure holding aliases for a Wikibase entity.
-
-    It is a mapping from a language to a list of strings.
-    """
-
-    @classmethod
-    def fromJSON(cls, data, repo=None):
-        this = cls()
-        for key, value in data.items():
-            this[key] = [val['value'] for val in value]
-        return this
-
-    @classmethod
-    def normalizeData(cls, data):
-        norm_data = {}
-        for key, values in data.items():
-            if isinstance(values, list):
-                strings = []
-                for value in values:
-                    if isinstance(value, str):
-                        strings.append({'language': key, 'value': value})
-                    else:
-                        strings.append(value)
-                norm_data[key] = strings
-        return norm_data
-
-    def toJSON(self, diffto=None):
-        data = {}
-        diffto = diffto or {}
-        for lang in diffto.keys() & self.keys():
-            if (sorted(val['value'] for val in diffto[lang])
-                    != sorted(self[lang])):
-                data[lang] = [{'language': lang, 'value': i}
-                              for i in self[lang]]
-        for lang in diffto.keys() - self.keys():
-            data[lang] = [
-                {'language': lang, 'value': i['value'], 'remove': ''}
-                for i in diffto[lang]]
-        for lang in self.keys() - diffto.keys():
-            data[lang] = [{'language': lang, 'value': i} for i in self[lang]]
-        return data
-
-
-class ClaimCollection(MutableMapping):
-    """A structure holding claims for a Wikibase entity."""
-
-    def __init__(self, repo):
-        super().__init__()
-        self.repo = repo
-        self._data = {}
-
-    @classmethod
-    def fromJSON(cls, data, repo):
-        this = cls(repo)
-        for key, claims in data.items():
-            this[key] = [Claim.fromJSON(repo, claim) for claim in claims]
-        return this
-
-    @classmethod
-    def new_empty(cls, repo):
-        return cls(repo)
-
-    def __getitem__(self, key):
-        return self._data[key]
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        del self._data[key]
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def __len__(self):
-        return len(self._data)
-
-    def __contains__(self, key):
-        return key in self._data
-
-    def __repr__(self):
-        return '{}({})'.format(type(self), self._data)
-
-    @classmethod
-    def normalizeData(cls, data):
-        # no normalization here, should there be?
-        return data
-
-    def toJSON(self, diffto=None):
-        claims = {}
-        for prop in self:
-            if len(self[prop]) > 0:
-                claims[prop] = [claim.toJSON() for claim in self[prop]]
-
-        if diffto:
-            temp = defaultdict(list)
-            props_add = set(claims.keys())
-            props_orig = set(diffto.keys())
-            for prop in (props_orig | props_add):
-                if prop not in props_orig:
-                    temp[prop].extend(claims[prop])
-                    continue
-                if prop not in props_add:
-                    temp[prop].extend(
-                        {'id': claim['id'], 'remove': ''}
-                        for claim in diffto[prop] if 'id' in claim)
-                    continue
-
-                claim_ids = set()
-                claim_map = {
-                    json['id']: json for json in diffto[prop]
-                    if 'id' in json}
-                for claim, json in zip(self[prop], claims[prop]):
-                    if 'id' in json:
-                        claim_ids.add(json['id'])
-                        if json['id'] in claim_map:
-                            other = Claim.fromJSON(
-                                self.repo, claim_map[json['id']])
-                            if claim.same_as(other, ignore_rank=False,
-                                             ignore_refs=False):
-                                continue
-                    temp[prop].append(json)
-
-                for claim in diffto[prop]:
-                    if 'id' in claim and claim['id'] not in claim_ids:
-                        temp[prop].append({'id': claim['id'], 'remove': ''})
-
-            claims = temp
-
-        return claims
-
-    def set_on_item(self, item):
-        """Set Claim.on_item attribute for all claims in this collection."""
-        for claims in self.values():
-            for claim in claims:
-                claim.on_item = item
-
-
-class SiteLinkCollection(MutableMapping):
-    """A structure holding SiteLinks for a Wikibase item."""
-
-    def __init__(self, repo, data=None):
-        """
-        Initializer.
-
-        @param repo: the Wikibase site on which badges are defined
-        @type repo: pywikibot.site.DataSite
-        """
-        super().__init__()
-        self.repo = repo
-        self._data = {}
-        if data:
-            self.update(data)
-
-    @classmethod
-    def new_empty(cls, repo):
-        """Construct a new empty SiteLinkCollection."""
-        return cls(repo)
-
-    @classmethod
-    def fromJSON(cls, data, repo):
-        """Construct a new SiteLinkCollection from JSON."""
-        return cls(repo, data)
-
-    @staticmethod
-    def getdbName(site):
-        """
-        Helper function to obtain a dbName for a Site.
-
-        @param site: The site to look up.
-        @type site: pywikibot.site.BaseSite or str
-        """
-        if isinstance(site, pywikibot.site.BaseSite):
-            return site.dbName()
-        return site
-
-    def __getitem__(self, key):
-        """
-        Get the SiteLink with the given key.
-
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @rtype: pywikibot.page.SiteLink
-        """
-        key = self.getdbName(key)
-        return self._data[key]
-
-    def __setitem__(self, key, val):
-        """
-        Set the SiteLink for a given key.
-
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @param val: page name as a string or JSON containing SiteLink data
-        @type val: dict or str
-        @rtype: pywikibot.page.SiteLink
-        """
-        if isinstance(val, str):
-            val = SiteLink(val, key)
-        else:
-            val = SiteLink.fromJSON(val, self.repo)
-        key = self.getdbName(key)
-        self._data[key] = val
-
-    def __delitem__(self, key):
-        key = self.getdbName(key)
-        del self._data[key]
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def __len__(self):
-        return len(self._data)
-
-    def __contains__(self, key):
-        key = self.getdbName(key)
-        return key in self._data
-
-    @classmethod
-    def _extract_JSON(cls, obj):
-        if isinstance(obj, SiteLink):
-            return obj.toJSON()
-        elif isinstance(obj, BaseLink):
-            db_name = cls.getdbName(obj.site)
-            return {'site': db_name, 'title': obj.title}
-        elif isinstance(obj, Page):
-            db_name = cls.getdbName(obj.site)
-            return {'site': db_name, 'title': obj.title()}
-        else:
-            return obj
-
-    @classmethod
-    def normalizeData(cls, data) -> dict:
-        """
-        Helper function to expand data into the Wikibase API structure.
-
-        @param data: Data to normalize
-        @type data: list or dict
-
-        @return: The dict with normalized data
-        """
-        norm_data = {}
-        if isinstance(data, dict):
-            for key, obj in data.items():
-                key = cls.getdbName(key)
-                json = cls._extract_JSON(obj)
-                if isinstance(json, str):
-                    json = {'site': key, 'title': json}
-                elif key != json['site']:
-                    raise ValueError(
-                        "Key '{}' doesn't match the site of the value: '{}'"
-                        .format(key, json['site']))
-                norm_data[key] = json
-        else:
-            for obj in data:
-                json = cls._extract_JSON(obj)
-                if not isinstance(json, dict):
-                    raise ValueError(
-                        "Couldn't determine the site and title of the value: "
-                        '{!r}'.format(json))
-                db_name = json['site']
-                norm_data[db_name] = json
-        return norm_data
-
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
-        """
-        Create JSON suitable for Wikibase API.
-
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
-
-        @param diffto: JSON containing entity data
-        """
-        data = {dbname: sitelink.toJSON()
-                for (dbname, sitelink) in self.items()}
-        if diffto:
-            to_nuke = []
-            for dbname, sitelink in data.items():
-                if dbname in diffto:
-                    diffto_link = diffto[dbname]
-                    if diffto_link.get('title') == sitelink.get('title'):
-                        # compare badges
-                        tmp_badges = []
-                        diffto_badges = diffto_link.get('badges', [])
-                        badges = sitelink.get('badges', [])
-                        for badge in set(diffto_badges) - set(badges):
-                            tmp_badges.append('')
-                        for badge in set(badges) - set(diffto_badges):
-                            tmp_badges.append(badge)
-                        if tmp_badges:
-                            data[dbname]['badges'] = tmp_badges
-                        else:
-                            to_nuke.append(dbname)
-            # find removed sitelinks
-            for dbname in (set(diffto.keys()) - set(self.keys())):
-                badges = [''] * len(diffto[dbname].get('badges', []))
-                data[dbname] = {'site': dbname, 'title': ''}
-                if badges:
-                    data[dbname]['badges'] = badges
-            for dbname in to_nuke:
-                del data[dbname]
-        return data
-
-
 class WikibaseEntity:
 
     """
@@ -3854,8 +3388,8 @@ class WikibaseEntity:
         self.latest_revision_id = self._content.get('lastrevid')
 
         data = {}
-        # todo: this initializes all data,
-        # make use of lazy initialization (T245809)
+
+        # This initializes all data,
         for key, cls in self.DATA_ATTRIBUTES.items():
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
@@ -3883,8 +3417,14 @@ class WikibaseEntity:
         if getattr(self, 'id', '-1') == '-1':
             self.__init__(self.repo, updates['entity']['id'])
 
-        self._content = updates['entity']
-        self.get()
+        # the response also contains some data under the 'entity' key
+        # but it is NOT the actual content
+        # see also [[d:Special:Diff/1356933963]]
+        # TODO: there might be some circumstances under which
+        # the content can be safely reused
+        if hasattr(self, '_content'):
+            del self._content
+        self.latest_revision_id = updates['entity'].get('lastrevid')
 
     def concept_uri(self):
         """
@@ -4005,36 +3545,6 @@ class WikibasePage(BasePage, WikibaseEntity):
             # stripping whitespace and uppercasing the first letter according
             # to the namespace case=first-letter.
             self._link.title)
-
-    def __getattribute__(self, name):
-        """Low-level attribute getter. Deprecates lastrevid."""
-        if name == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            name = '_revid'
-        return super().__getattribute__(name)
-
-    def __setattr__(self, attr, value):
-        """Attribute setter. Deprecates lastrevid."""
-        if attr == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            attr = '_revid'
-        return super().__setattr__(attr, value)
-
-    def __delattr__(self, attr):
-        """Attribute deleter. Deprecates lastrevid."""
-        if attr == 'lastrevid':
-            issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id',
-                warning_class=FutureWarning,
-                since='20150607')
-            attr = '_revid'
-        return super().__delattr__(attr)
 
     def namespace(self) -> int:
         """
@@ -5834,13 +5344,11 @@ class Link(BaseLink):
         # often be unreachable due to the way web browsers deal
         # * with 'relative' URLs. Forbid them explicitly.
 
-        if '.' in t and (
-                t in ('.', '..')
-                or t.startswith(('./', '../'))
-                or '/./' in t
-                or '/../' in t
-                or t.endswith(('/.', '/..'))
-        ):
+        if '.' in t and (t in ('.', '..')
+                         or t.startswith(('./', '../'))
+                         or '/./' in t
+                         or '/../' in t
+                         or t.endswith(('/.', '/..'))):
             raise pywikibot.InvalidTitle(
                 "(contains . / combinations): '%s'"
                 % self._text)

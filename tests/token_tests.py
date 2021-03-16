@@ -1,6 +1,6 @@
 """Tests for tokens."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,7 +55,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
         self.mysite.version = lambda: test_version
 
-        for ttype in ('edit', 'move', additional_token):
+        for ttype in ('edit', 'move', 'delete', 'patrol', additional_token):
             tokentype = self.mysite.validate_tokens([ttype])
             try:
                 token = self.mysite.tokens[ttype]
@@ -77,21 +77,9 @@ class TestSiteTokens(DefaultSiteTestCase):
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
 
-    def test_tokens_in_mw_119(self):
+    def test_tokens_in_mw_123_124wmf18(self):
         """Test ability to get page tokens."""
-        self._test_tokens(None, '1.19', 'delete')
-
-    def test_patrol_tokens_in_mw_119(self):
-        """Test ability to get patrol token on MW 1.19 wiki."""
-        self._test_tokens('1.19', '1.19', 'patrol')
-
-    def test_tokens_in_mw_120_124wmf18(self):
-        """Test ability to get page tokens."""
-        self._test_tokens('1.20', '1.21', 'deleteglobalaccount')
-
-    def test_patrol_tokens_in_mw_120(self):
-        """Test ability to get patrol token."""
-        self._test_tokens('1.19', '1.20', 'patrol')
+        self._test_tokens('1.23', '1.24wmf18', 'deleteglobalaccount')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
@@ -99,8 +87,8 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_invalid_token(self):
         """Test invalid token."""
-        self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t],
-                          'invalidtype')
+        with self.assertRaises(pywikibot.Error):
+            self.mysite.tokens['invalidtype']
 
 
 class TokenTestBase(TestCaseBase):
@@ -153,7 +141,8 @@ class PatrolTestCase(TokenTestBase, TestCase):
         rc = rc[0]
 
         # site.patrol() needs params
-        self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
+        with self.assertRaises(pywikibot.Error):
+            list(mysite.patrol())
         try:
             result = list(mysite.patrol(rcid=rc['rcid']))
         except api.APIError as error:
@@ -167,9 +156,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         result = result[0]
         self.assertIsInstance(result, dict)
 
-        params = {'rcid': 0}
-        if mysite.mw_version >= '1.22':
-            params['revid'] = [0, 1]
+        params = {'rcid': 0, 'revid': [0, 1]}
 
         raised = False
         try:
@@ -182,24 +169,6 @@ class PatrolTestCase(TokenTestBase, TestCase):
             # expected result
             raised = True
         self.assertTrue(raised, msg='pywikibot.Error not raised')
-
-
-class TestDeprecatedEditTokenFunctions(TokenTestBase,
-                                       DefaultSiteTestCase,
-                                       DeprecationTestCase):
-
-    """Test cases for Site edit token deprecated methods."""
-
-    cached = True
-    user = True
-    token_type = 'edit'
-
-    def test_get_token(self):
-        """Test ability to get page tokens using site.getToken."""
-        self.mysite = self.site
-        self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
-        self.assertOneDeprecationParts('pywikibot.site.APISite.getToken',
-                                       "the 'tokens' property")
 
 
 class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):

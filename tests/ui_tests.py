@@ -29,7 +29,6 @@ import os
 import subprocess
 import sys
 import time
-import warnings
 
 from contextlib import suppress
 
@@ -212,62 +211,30 @@ class TestTerminalOutput(UITestCase):
 
     """Terminal output tests."""
 
-    def testOutputLevels_logging_debug(self):
-        logger.log(DEBUG, 'debug', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), '')
+    tests = [
+        ('debug', DEBUG, '', ''),
+        ('verbose', VERBOSE, '', ''),
+        ('info', INFO, '', 'info\n'),
+        ('stdout', STDOUT, 'stdout\n', ''),
+        ('input', INPUT, '', 'input\n'),
+        ('WARNING', WARNING, '', 'WARNING: WARNING\n'),
+        ('ERROR', ERROR, '', 'ERROR: ERROR\n'),
+        ('CRITICAL', CRITICAL, '', 'CRITICAL: CRITICAL\n'),
+    ]
 
-    def testOutputLevels_logging_verbose(self):
-        logger.log(VERBOSE, 'verbose', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), '')
-
-    def testOutputLevels_logging_info(self):
-        logger.log(INFO, 'info', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'info\n')
-
-    def testOutputLevels_logging_stdout(self):
-        logger.log(STDOUT, 'stdout', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), 'stdout\n')
-        self.assertEqual(newstderr.getvalue(), '')
-
-    def testOutputLevels_logging_input(self):
-        logger.log(INPUT, 'input', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'input\n')
-
-    def testOutputLevels_logging_WARNING(self):
-        logger.log(WARNING, 'WARNING', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'WARNING: WARNING\n')
-
-    def testOutputLevels_logging_ERROR(self):
-        logger.log(ERROR, 'ERROR', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'ERROR: ERROR\n')
-
-    def testOutputLevels_logging_CRITICAL(self):
-        logger.log(CRITICAL, 'CRITICAL', extra=loggingcontext)
-        self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'CRITICAL: CRITICAL\n')
+    def test_outputlevels_logging(self):
+        """Test logger with output levels."""
+        for text, level, out, err in self.tests:
+            with self.subTest(test=text):
+                logger.log(level, text, extra=loggingcontext)
+                self.assertEqual(newstdout.getvalue(), out)
+                self.assertEqual(newstderr.getvalue(), err)
+                patch()  # reset terminal files
 
     def test_output(self):
-        pywikibot.output('output', toStdout=False)
+        pywikibot.output('output')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'output\n')
-
-    def test_output_stdout(self):
-        with warnings.catch_warnings(record=True) as w:
-            pywikibot.output('output', toStdout=True)
-            self.assertEqual(newstdout.getvalue(), 'output\n')
-            self.assertLength(w, 1)
-            self.assertEqual(w[0].category, FutureWarning)
-            message = str(w[0].message)
-            self.assertTrue(
-                message.startswith('"toStdout" parameter is deprecated'))
-            self.assertTrue(
-                message.endswith('use pywikibot.stdout() instead.'))
 
     def test_stdout(self):
         pywikibot.stdout('output')
@@ -342,14 +309,21 @@ class TestTerminalInput(UITestCase):
     def testInput(self):
         newstdin.write('input to read\n')
         newstdin.seek(0)
-
         returned = pywikibot.input('question')
 
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'question: ')
-
         self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'input to read')
+
+    def test_input_yn(self):
+        newstdin.write('\n')
+        newstdin.seek(0)
+        returned = pywikibot.input_yn('question', False, automatic_quit=False)
+
+        self.assertEqual(newstdout.getvalue(), '')
+        self.assertEqual(newstderr.getvalue(), 'question ([y]es, [N]o): ')
+        self.assertFalse(returned)
 
     def _call_input_choice(self):
         rv = pywikibot.input_choice(
@@ -367,7 +341,6 @@ class TestTerminalInput(UITestCase):
     def testInputChoiceDefault(self):
         newstdin.write('\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(returned, 'a')
@@ -375,32 +348,25 @@ class TestTerminalInput(UITestCase):
     def testInputChoiceCapital(self):
         newstdin.write('N\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
-
         self.assertEqual(returned, 'n')
 
     def testInputChoiceNonCapital(self):
         newstdin.write('n\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
-
         self.assertEqual(returned, 'n')
 
     def testInputChoiceIncorrectAnswer(self):
         newstdin.write('X\nN\n')
         newstdin.seek(0)
-
         returned = self._call_input_choice()
 
-        self.assertEqual(newstderr.getvalue(),
-                         self.input_choice_output * 2)
-
+        self.assertEqual(newstderr.getvalue(), self.input_choice_output * 2)
         self.assertEqual(returned, 'n')
 
 
@@ -705,7 +671,7 @@ class FakeUITest(TestCase):
 
     def _encounter_color(self, color, target_stream):
         """Patched encounter_color method."""
-        assert False, 'This method should not be invoked'
+        raise AssertionError('This method should not be invoked')
 
     def test_no_color(self):
         """Test a string without any colors."""

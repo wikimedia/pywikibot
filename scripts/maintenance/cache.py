@@ -64,7 +64,7 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -343,10 +343,12 @@ def empty_response(entry):
 def not_accessed(entry):
     """Entry has never been accessed."""
     if not hasattr(entry, 'stinfo'):
-        return
+        return None
 
     if entry.stinfo.st_atime <= entry.stinfo.st_mtime:
         return entry
+
+    return None
 
 
 def incorrect_hash(entry):
@@ -374,6 +376,7 @@ def older_than_one_day(entry):
     """Find more than one day old entries."""
     if older_than(entry, datetime.timedelta(days=1)):
         return entry
+    return None
 
 
 def recent(entry):
@@ -454,14 +457,14 @@ def main():
     if output:
         output_func = _parse_command(output, 'output')
         if output_func is None:
-            return False
+            return
     else:
         output_func = None
 
     if command:
         filter_func = _parse_command(command, 'filter')
         if filter_func is None:
-            return False
+            return
     else:
         filter_func = None
 

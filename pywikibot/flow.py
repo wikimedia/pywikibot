@@ -325,7 +325,7 @@ class Post:
         self._content = {}
 
     @classmethod
-    def fromJSON(cls, page, post_uuid: str, data: dict):
+    def fromJSON(cls, page, post_uuid: str, data: dict):  # noqa: N802
         """
         Create a Post object using the data returned from the API call.
 

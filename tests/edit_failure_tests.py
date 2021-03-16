@@ -48,28 +48,35 @@ class TestSaveFailure(TestCase):
             self.skipTest(
                 'Testing failure of edit protected with a sysop account')
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
-        self.assertRaises(LockedPage, page.save)
+        with self.assertRaises(LockedPage):
+            page.save()
 
     def test_spam(self):
         """Test that spam in content raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
         try:
-            self.assertRaisesRegex(SpamblacklistError, 'badsite.com',
-                                   page.save)
+            with self.assertRaisesRegex(
+                    SpamblacklistError,
+                    'badsite.com'):
+                page.save()
         except OtherPageSaveError as e:
             self.skipTest(e)
 
     def test_titleblacklist(self):
         """Test that title blacklist raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
-        self.assertRaises(TitleblacklistError, page.save)
+        with self.assertRaises(TitleblacklistError):
+            page.save()
 
     def test_nobots(self):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
         with patch.object(config, 'ignore_bot_templates', False):
-            self.assertRaisesRegex(OtherPageSaveError, 'nobots', page.save)
+            with self.assertRaisesRegex(
+                    OtherPageSaveError,
+                    'nobots'):
+                page.save()
 
     def test_touch(self):
         """Test that Page.touch() does not do a real edit."""
@@ -83,18 +90,22 @@ class TestSaveFailure(TestCase):
     def test_createonly(self):
         """Test that Page.save with createonly fails if page exists."""
         page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
-        self.assertRaises(PageCreatedConflict, page.save, createonly=True)
+        with self.assertRaises(PageCreatedConflict):
+            page.save(createonly=True)
 
     def test_nocreate(self):
         """Test that Page.save with nocreate fails if page does not exist."""
         page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
-        self.assertRaises(NoCreateError, page.save, nocreate=True)
+        with self.assertRaises(NoCreateError):
+            page.save(nocreate=True)
 
     def test_no_recreate(self):
         """Test that Page.save with recreate disabled fails if page existed."""
         page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
-        self.assertRaisesRegex(OtherPageSaveError, "Page .* doesn't exist",
-                               page.save, recreate=False)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                "Page .* doesn't exist"):
+            page.save(recreate=False)
 
 
 class TestActionFailure(TestCase):
@@ -116,13 +127,13 @@ class TestActionFailure(TestCase):
                 "movepage test requires 'move' token not given to user on {}"
                 .format(self.site))
 
-        self.assertRaises(Error, mysite.movepage,
-                          mainpage, mainpage.title(), 'test')
+        with self.assertRaises(Error):
+            mysite.movepage(mainpage, mainpage.title(), 'test')
 
         page_from = self.get_missing_article()
         if not page_from.exists():
-            self.assertRaises(NoPage, mysite.movepage,
-                              page_from, 'Main Page', 'test')
+            with self.assertRaises(NoPage):
+                mysite.movepage(page_from, 'Main Page', 'test')
 
 
 class TestWikibaseSaveTest(WikibaseTestCase):
@@ -139,7 +150,8 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         """Test ItemPage save method inherited from superclass Page."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q6')
-        self.assertRaises(pywikibot.PageSaveRelatedError, item.save)
+        with self.assertRaises(pywikibot.PageSaveRelatedError):
+            item.save()
 
     def _make_WbMonolingualText_claim(self, repo, text, language):
         """Make a WbMonolingualText and set its value."""
@@ -154,11 +166,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text='Test this!',
                                                    language='foo')
-        self.assertRaisesRegex(
-            OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
-            r'modification-failed: "foo" is not a known language code.',
-            item.addClaim, claim)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
+                r'modification-failed: "foo" is not a known language code.'):
+            item.addClaim(claim)
 
     def test_WbMonolingualText_invalid_text(self):
         """Attempt adding a monolingual text with invalid non-string text."""
@@ -166,10 +178,10 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text=123456,
                                                    language='en')
-        self.assertRaisesRegex(
-            OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:',
-            item.addClaim, claim)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                r'Edit to page \[\[(wikidata:test:)?Q68]] failed:'):
+            item.addClaim(claim)
 
     def test_math_invalid_function(self):
         """Attempt adding invalid latex to a math claim."""
@@ -177,11 +189,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P717', datatype='math')
         claim.setTarget('\foo')
-        self.assertRaisesRegex(
-            OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
-            r'modification-failed: Malformed input:',
-            item.addClaim, claim)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
+                r'modification-failed: Malformed input:'):
+            item.addClaim(claim)
 
     def test_url_malformed_url(self):
         """Attempt adding a malformed URL to a url claim."""
@@ -189,11 +201,13 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
         claim.setTarget('Not a URL at all')
-        self.assertRaisesRegex(
-            OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
-            r'modification-failed: This URL misses a scheme like "https://": '
-            r'Not a URL at all', item.addClaim, claim)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
+                r'modification-failed: This URL misses a scheme like '
+                r'"https://": '
+                r'Not a URL at all'):
+            item.addClaim(claim)
 
     def test_url_invalid_protocol(self):
         """Attempt adding a URL with an invalid protocol to a url claim."""
@@ -201,11 +215,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
         claim.setTarget('wtf://wikiba.se')
-        self.assertRaisesRegex(
-            OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
-            r'modification-failed: An URL scheme "wtf" is not supported.',
-            item.addClaim, claim)
+        with self.assertRaisesRegex(
+                OtherPageSaveError,
+                r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
+                r'modification-failed: An URL scheme "wtf" is not supported.'):
+            item.addClaim(claim)
 
 
 if __name__ == '__main__':  # pragma: no cover

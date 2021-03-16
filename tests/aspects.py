@@ -2,8 +2,7 @@
 Test aspects to allow fine grained control over what tests are executed.
 
 Several parts of the test infrastructure are implemented as mixins,
-such as API result caching and excessive test durations. An unused
-mixin to show cache usage is included.
+such as API result caching and excessive test durations.
 """
 #
 # (C) Pywikibot team, 2014-2021
@@ -295,14 +294,6 @@ def require_modules(*required_modules):
             return obj
         skip_decorator = unittest.skip('{0} not installed'.format(
             ', '.join(missing)))
-        if (inspect.isclass(obj) and issubclass(obj, TestCaseBase)
-                and 'nose' in sys.modules.keys()):
-            # There is a known bug in nosetests which causes setUpClass()
-            # to be called even if the unittest class is skipped.
-            # Here, we decorate setUpClass() as a patch to skip it
-            # because of the missing modules too.
-            # Upstream report: https://github.com/nose-devs/nose/issues/946
-            obj.setUpClass = classmethod(skip_decorator(lambda cls: None))
         return skip_decorator(obj)
 
     return test_requirement
@@ -316,7 +307,7 @@ class DisableSiteMixin(TestCaseBase):
 
     Never set a class or instance variable called 'site'
     As it will prevent tests from executing when invoked as:
-    $ nosetests -a '!site' -v
+    $ pytest -a 'not site'
     """
 
     def setUp(self):
@@ -372,7 +363,7 @@ class DisconnectedSiteMixin(TestCaseBase):
 
     Never set a class or instance variable called 'site'
     As it will prevent tests from executing when invoked as:
-    $ nosetests -a '!site' -v
+    $ pytest -a 'not site'
     """
 
     def setUp(self):
@@ -731,7 +722,7 @@ class MetaTestCaseClass(type):
                         .format(name))
 
             # If the 'site' attribute is a false value,
-            # remove it so it matches !site in nose.
+            # remove it so it matches 'not site' in pytest.
             if 'site' in dct:
                 del dct['site']
 
@@ -742,7 +733,7 @@ class MetaTestCaseClass(type):
                     .format(name))
 
             # If the 'net' attribute is a false value,
-            # remove it so it matches !net in nose.
+            # remove it so it matches 'not net' in pytest.
             if not dct['net']:
                 del dct['net']
 
@@ -1417,7 +1408,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self.warning_log = []
 
         self.expect_warning_filename = inspect.getfile(self.__class__)
-        if self.expect_warning_filename.endswith(('.pyc', '.pyo')):
+        if self.expect_warning_filename.endswith('.pyc'):
             self.expect_warning_filename = self.expect_warning_filename[:-1]
 
         self._do_test_warning_filename = True
@@ -1439,18 +1430,17 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     @classmethod
     def _build_message(cls, deprecated, instead):
-        if deprecated is None:
-            if instead is None:
-                msg = None
-            elif instead is True:
-                msg = cls.INSTEAD
-            else:
-                assert instead is False
-                msg = cls.NO_INSTEAD
-        else:
+        if deprecated is not None:
             msg = '{0} is deprecated'.format(deprecated)
             if instead:
                 msg += '; use {0} instead.'.format(instead)
+        elif instead is None:
+            msg = None
+        elif instead is True:
+            msg = cls.INSTEAD
+        else:
+            assert instead is False
+            msg = cls.NO_INSTEAD
         return msg
 
     def assertDeprecationParts(self, deprecated=None, instead=None):

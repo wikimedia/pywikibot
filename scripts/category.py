@@ -62,7 +62,7 @@ Options for "move" action:
                 An alternative method to keep sortKey is to use -inplace
                 option.
 
-Options for "tidy" action:
+Options for "listify" and "tidy" actions:
 
  -namespaces    Filter the arcitles in the specified namespaces. Separate
  -namespace     multiple namespace numbers or names with commas. Examples:
@@ -710,8 +710,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         else:
             pywikibot.log("Didn't move pages/subcategories, because the "
                           "category page hasn't been moved.")
-        if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
-                ((self.newcat and self.move_oldcat) or not self.newcat):
+        if self.oldcat.isEmptyCategory() and self.delete_oldcat \
+           and (self.newcat and self.move_oldcat or not self.newcat):
             self._delete(can_move_page, can_move_talk)
 
     def _delete(self, moved_page, moved_talk) -> None:
@@ -894,9 +894,10 @@ class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
 
+    @deprecated_args(subCats=True)
     def __init__(self, catTitle, listTitle, editSummary, append=False,
-                 overwrite=False, showImages=False, subCats=False,
-                 talkPages=False, recurse=False, prefix='*') -> None:
+                 overwrite=False, showImages=False, *, talkPages=False,
+                 recurse=False, prefix='*', namespaces=None) -> None:
         """Initializer."""
         self.editSummary = editSummary
         self.append = append
@@ -905,10 +906,11 @@ class CategoryListifyRobot:
         self.site = pywikibot.Site()
         self.cat = pywikibot.Category(self.site, catTitle)
         self.list = pywikibot.Page(self.site, listTitle)
-        self.subCats = subCats
         self.talkPages = talkPages
         self.recurse = recurse
         self.prefix = prefix
+        self.namespaces = self.site.namespaces.resolve(namespaces or [])
+        self.subCats = not self.namespaces or 'Category' in self.namespaces
 
     def run(self) -> None:
         """Start bot."""
@@ -920,12 +922,13 @@ class CategoryListifyRobot:
                 '-overwrite option to overwrite the output page.'))
             return
 
-        set_of_articles = set(self.cat.articles(recurse=self.recurse))
+        set_of_articles = set(self.cat.articles(recurse=self.recurse,
+                                                namespaces=self.namespaces))
         if self.subCats:
             set_of_articles |= set(self.cat.subcategories())
 
         list_string = ''
-        for article in set_of_articles:
+        for article in sorted(set_of_articles):
             textlink = not (article.is_filepage() and self.showImages)
             list_string += '{} {}'.format(
                 self.prefix, article.title(as_link=True, textlink=textlink))
@@ -1498,9 +1501,10 @@ def main(*args: Tuple[str, ...]) -> None:
             new_cat_title = pywikibot.input(
                 'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
-                                   append, overwrite, showimages, subCats=True,
+                                   append, overwrite, showimages,
                                    talkPages=talkpages, recurse=recurse,
-                                   prefix=prefix)
+                                   prefix=prefix,
+                                   namespaces=gen_factory.namespaces)
 
     if bot:
         pywikibot.Site().login()

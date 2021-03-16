@@ -1,18 +1,16 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
-pytest
+pytest >= 5.3
 pytest-cov >= 2.6.1
 pytest-timeout
 pytest-runner
+pytest-subtests >= 0.3.2
 pytest-attrib>=0.1.3
 # pytest-httpbin needs httpbin needs werkzeug >= 0.14.1
 # Python 3.8 needs werkzeug >= 0.15.5
 # github vulnerable depedency suggests werkzeug >= 0.15.3
 werkzeug>=0.15.5
 pytest-httpbin
-
-nose
-git+https://github.com/jayvdb/nosetrim@py3
 
 pep257>=0.6
 pyflakes>=2.1.0

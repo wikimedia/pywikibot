@@ -1,6 +1,6 @@
 """Test Interwiki Link functionality."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -81,11 +81,12 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
     def test_via_local_non_local(self):
         """Test de:translatewiki:Main Page on English Wikipedia."""
         link = Link('de:translatewiki:Main Page', self.get_site('wp'))
-        self.assertRaisesRegex(
-            InvalidTitle,
-            'de:translatewiki:Main Page links to a non local site i18n:i18n '
-            'via an interwiki link to wikipedia:de',
-            link.parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                'de:translatewiki:Main Page links to a non local '
+                'site i18n:i18n '
+                'via an interwiki link to wikipedia:de'):
+            link.parse()
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -33,6 +33,7 @@ exclude_patterns:
 - "docs/"
 - "!docs/conf.py"
 - "scripts/archive/"
+- "tests/archive/"
 - "*.rst"
 - "*.txt"
 

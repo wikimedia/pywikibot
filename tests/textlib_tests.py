@@ -727,6 +727,25 @@ class TestGenericTemplateParams(PatchingTestCase):
         self.assertTrue(self._mwpfh)
 
 
+class TestDisabledParts(DefaultDrySiteTestCase):
+
+    """Test the removeDisabledParts function in textlib."""
+
+    def test_remove_disabled_parts(self):
+        """Test removeDisabledParts function."""
+        tests = {
+            'comment': '<!-- No comment yet -->',
+            'link': '[[Target link]]',
+            'source': '<source>foo := bar</source>',
+            'template': '{{Infobox\n|foo = bar}}',
+            'unknown': '<Unknown>This is an unknown pattern</unKnown>',
+        }
+        for test, pattern in tests.items():
+            with self.subTest(test=test):
+                self.assertEqual(
+                    textlib.removeDisabledParts(pattern, tags=[test]), '')
+
+
 class TestReplaceLinks(TestCase):
 
     """Test the replace_links function in textlib."""
@@ -1179,6 +1198,11 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                allowoverlap=True,
                                                site=self.site),
                          '2221')
+        self.assertEqual(textlib.replaceExcept('1\n= 1 =\n', '1', ' \n= 1 =\n',
+                                               ['header'],
+                                               allowoverlap=True,
+                                               site=self.site),
+                         ' \n= 1 =\n\n= 1 =\n')
 
     def test_replace_exception(self):
         """Test replacing not inside a specific regex."""
@@ -1189,6 +1213,11 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                [re.compile(r'\w123')],
                                                site=self.site),
                          '000x123')
+        self.assertEqual(
+            textlib.replaceExcept(
+                '1\n= 1 =\n', '1', 'verylongreplacement', ['header'],
+                site=self.site),
+            'verylongreplacement\n= 1 =\n')
 
     def test_replace_tags(self):
         """Test replacing not inside various tags."""

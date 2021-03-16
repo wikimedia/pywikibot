@@ -8,6 +8,7 @@ import calendar
 import datetime
 import logging
 import sys
+import unittest
 
 from contextlib import suppress
 from typing import Optional
@@ -28,7 +29,6 @@ from pywikibot.tools import has_module, suppress_warnings
 
 from tests import join_data_path, mock
 from tests.aspects import (
-    unittest,
     TestCase,
     DeprecationTestCase,
     WikidataTestCase,
@@ -78,7 +78,7 @@ class TestDryPageGenerators(TestCase):
     def assertFunction(self, obj):
         """Assert function test."""
         self.assertTrue(hasattr(pagegenerators, obj))
-        self.assertTrue(hasattr(getattr(pagegenerators, obj), '__call__'))
+        self.assertTrue(callable(getattr(pagegenerators, obj)))
 
     def test_module_import(self):
         """Test module import."""
@@ -252,7 +252,7 @@ class TestQualityFilterPageGenerator(BasetitleTestCase):
         """Test QualityFilterPageGenerator."""
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
-        gen = pagegenerators.QualityFilterPageGenerator(gen, [0])
+        gen = pagegenerators.QualityFilterPageGenerator(gen, [0, 3])
         self.assertLength(tuple(gen), 7)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.QualityFilterPageGenerator(gen, [4])
@@ -324,11 +324,11 @@ class RedirectFilterPageGeneratorTestCase(TestCase):
     code = 'en'
 
     def test_redirect_filter(self):
-        """Test RedirectFilterPageGenerator."""
+        """Test RedirectFilterPageGenerator with handle_args()."""
         from pywikibot.pagegenerators import RedirectFilterPageGenerator
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handle_arg('-randomredirect:3')
-        gf.handle_arg('-page:Main_Page')
+        args = gf.handle_args(['-randomredirect:3', '-page:Main_Page'])
+        self.assertIsEmpty(args)
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         gen = RedirectFilterPageGenerator(pages, no_redirects=True)
@@ -535,11 +535,15 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     def test_start_0(self):
         """Test for day page generator with startMonth 0."""
-        self.assertRaises(calendar.IllegalMonthError, self._run_test, 0)
+        with self.assertRaises(
+                calendar.IllegalMonthError):
+            self._run_test(0)
 
     def test_end_13(self):
         """Test for day page generator with endMonth 13."""
-        self.assertRaises(calendar.IllegalMonthError, self._run_test, 12, 13)
+        with self.assertRaises(
+                calendar.IllegalMonthError):
+            self._run_test(12, 13)
 
 
 class TestPreloadingGenerator(DefaultSiteTestCase):
@@ -703,14 +707,15 @@ class DryFactoryGeneratorTest(TestCase):
         gf.handle_arg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
         self.assertIsInstance(gf.namespaces, frozenset)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(RuntimeError):
             gf.handle_arg('-ns:0')
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_unsupported_quality_level_filter(self):
         """Test unsupported option."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        self.assertRaises(UnknownExtension, gf.handleArg, '-ql:2')
+        with self.assertRaises(UnknownExtension):
+            gf.handle_arg('-ql:2')
 
     def test_one_excluded_namespaces(self):
         """Test one excluded namespaces."""
@@ -999,10 +1004,10 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-ns:3,1')
         # allpages only accepts a single namespace, and will raise a
         # TypeError if self.namespaces contains more than one namespace.
-        self.assertRaises(
+        with self.assertRaisesRegex(
             TypeError,
-            'allpages module does not support multiple namespaces',
-            gf.getCombinedGenerator)
+                'allpages module does not support multiple namespaces'):
+            gf.getCombinedGenerator()
 
     def test_prefixing_default(self):
         """Test prefixindex generator."""
@@ -1033,12 +1038,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-recentchanges:120,70')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertRaises(ValueError, gf.handleArg, '-recentchanges:3,2,1')
-        self.assertRaises(ValueError, gf.handleArg, '-recentchanges:12,-12')
-        self.assertRaises(
-            ValueError, gf.handleArg, '-recentchanges:visualeditor,3,2,1')
-        self.assertRaises(
-            ValueError, gf.handleArg, '-recentchanges:"mobile edit,-10,20"')
+        with self.assertRaises(ValueError):
+            gf.handle_arg('-recentchanges:3,2,1')
+        with self.assertRaises(ValueError):
+            gf.handle_arg('-recentchanges:12,-12')
+        with self.assertRaises(ValueError):
+            gf.handle_arg('-recentchanges:visualeditor,3,2,1')
+        with self.assertRaises(ValueError):
+            gf.handle_arg('-recentchanges:"mobile edit,-10,20"')
 
     def test_recentchanges_rctag(self):
         """Test recentchanges generator with recent changes tag."""
@@ -1168,8 +1175,6 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_pages_with_property_generator(self):
         """Test the pages_with_property_generator method."""
         mysite = self.get_site()
-        if mysite.mw_version < '1.21':
-            self.skipTest('requires v1.21+')
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
@@ -1246,7 +1251,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('The site {0} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertRaises(AssertionError, gf.handleArg, '-linter:dummy')
+        with self.assertRaises(AssertionError):
+            gf.handle_arg('-linter:dummy')
 
     def test_linter_generator_show(self):
         """Test generator of pages with lint errors."""
@@ -1256,7 +1262,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 gf.handle_arg('-linter:show')
             self.assertEqual(cm.exception.code, 0)
         else:
-            self.assertRaises(UnknownExtension, gf.handleArg, '-linter:show')
+            with self.assertRaises(UnknownExtension):
+                gf.handle_arg('-linter:show')
 
     def test_querypage_generator_with_valid_page(self):
         """Test generator of pages with lint errors."""
@@ -1273,7 +1280,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_querypage_generator_with_invalid_page(self):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertRaises(AssertionError, gf.handleArg, '-querypage:dummy')
+        with self.assertRaises(AssertionError):
+            gf.handle_arg('-querypage:dummy')
 
     def test_querypage_generator_with_no_page(self):
         """Test generator of pages with lint errors."""
@@ -1498,8 +1506,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gf = factory()
         self.assertFalse(gf.handle_arg('-log'))
         self.assertFalse(gf.handle_arg('-log:text_here'))
-        self.assertRaises(NotImplementedError,
-                          gf.handleArg, '-logevents:anyevent')
+        with self.assertRaises(NotImplementedError):
+            gf.handle_arg('-logevents:anyevent')
         # test that old format log option is not handled by any handler method.
         gf_mock = mock.create_autospec(gf)
         self.assertFalse(factory.handle_arg(gf_mock, '-anotherlog'))
@@ -1651,9 +1659,9 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         if self.site.data_repository():
             self.skipTest('Site is using a Wikibase repository')
         with self.assertRaises(ValueError):
-            for page in pagegenerators.UnconnectedPageGenerator(self.site,
-                                                                total=5):
-                assert False  # this shouldn't be reached
+            for _ in pagegenerators.UnconnectedPageGenerator(self.site,
+                                                             total=5):
+                raise AssertionError("this shouldn't be reached")
 
 
 class TestLinksearchPageGenerator(TestCase):
@@ -1687,8 +1695,11 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_opposite_protocols(self):
         """Test LinksearchPageGenerator with two opposite protocols."""
-        self.assertRaises(ValueError, pagegenerators.LinksearchPageGenerator,
-                          'http://w.wiki', protocol='https', site=self.site)
+        with self.assertRaises(ValueError):
+            pagegenerators.LinksearchPageGenerator(
+                'http://w.wiki',
+                protocol='https',
+                site=self.site)
 
     def test_double_same_protocols(self):
         """Test LinksearchPageGenerator with two same protocols."""

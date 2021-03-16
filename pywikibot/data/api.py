@@ -7,7 +7,6 @@
 import datetime
 import hashlib
 import inspect
-import json
 import os
 import pickle
 import pprint
@@ -29,19 +28,25 @@ import pywikibot
 
 from pywikibot import config, login
 
-from pywikibot.backports import Tuple
+from pywikibot.backports import removeprefix, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
-    Server504Error, Server414Error, FatalServerError, NoUsername,
-    Error, TimeoutError, MaxlagTimeoutError, InvalidTitle, UnsupportedPage
+    CaptchaError,
+    Error,
+    FatalServerError,
+    InvalidTitle,
+    MaxlagTimeoutError,
+    NoUsername,
+    Server414Error,
+    Server504Error,
+    SiteDefinitionError,
+    TimeoutError,
+    UnsupportedPage,
 )
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
-from pywikibot.tools import (
-    issue_deprecation_warning,
-    itergroup,
-    PYTHON_VERSION,
-)
+from pywikibot.textlib import removeHTMLParts
+from pywikibot.tools import itergroup, PYTHON_VERSION
 from pywikibot.tools.formatter import color_format
 
 
@@ -495,8 +500,8 @@ class ParamInfo(Sized, Container):
                         break
                 else:
                     param = {}
-                assert param['name'] == 'generator' and \
-                    submodules >= set(param['type'])
+                assert param['name'] == 'generator' \
+                    and submodules >= set(param['type'])
 
     def _normalize_modules(self, modules) -> set:
         """Add query+ to any query module name not also in action modules."""
@@ -973,8 +978,12 @@ class Request(MutableMapping):
     # To make sure the default value of 'parameters' can be identified.
     _PARAM_DEFAULT = object()
 
-    def __init__(self, site=None, mime=None, throttle=True,
-                 max_retries=None, retry_wait=None, use_get=None,
+    def __init__(self, site=None,
+                 mime: Optional[dict] = None,
+                 throttle: bool = True,
+                 max_retries: Optional[int] = None,
+                 retry_wait: Optional[int] = None,
+                 use_get: Optional[bool] = None,
                  parameters=_PARAM_DEFAULT, **kwargs):
         """
         Create a new Request instance with the given parameters.
@@ -1006,14 +1015,13 @@ class Request(MutableMapping):
                None). Parameters which should only be transferred via mime
                mode are defined via this parameter (even an empty dict means
                mime shall be used).
-        @type mime: None or dict
-        @param max_retries: (optional) Maximum number of times to retry after
+        @param max_retries: Maximum number of times to retry after
                errors, defaults to config.max_retries.
-        @param retry_wait: (optional) Minimum time in seconds to wait after an
+        @param retry_wait: Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
                until config.retry_max seconds is reached).
-        @param use_get: (optional) Use HTTP GET request if possible. If False
-               it uses a POST request. If None, it'll try to determine via
+        @param use_get: Use HTTP GET request if possible. If False it
+               uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
         @param parameters: The parameters used for the request to the API.
         @type parameters: dict
@@ -1025,12 +1033,11 @@ class Request(MutableMapping):
                  .format(self.site), RuntimeWarning, 2)
         else:
             self.site = site
+
         self.mime = mime
-        if isinstance(mime, bool):  # type(mime) == bool is deprecated.
-            issue_deprecation_warning(
-                'Bool values of mime param in api.Request()',
-                depth=3, warning_class=FutureWarning, since='20201028')
-            self.mime = {} if mime is True else None
+        if isinstance(mime, bool):
+            raise TypeError('mime param in api.Request() must not be boolean')
+
         self.throttle = throttle
         self.use_get = use_get
         if max_retries is None:
@@ -1099,22 +1106,10 @@ class Request(MutableMapping):
                     'API write action by unexpected username {} commenced.\n'
                     'userinfo: {!r}'.format(username, self.site.userinfo))
 
-        # MediaWiki 1.23 allows assertion for any action,
-        # whereas earlier WMF wikis and others used an extension which
-        # could only allow assert for action=edit.
-        #
-        # When we can't easily check whether the extension is loaded,
-        # to avoid cyclic recursion in the Pywikibot codebase, assume
-        # that it is present, which will cause an API warning emitted
-        # to the logging (console) if it is not present, but will not
-        # otherwise be a problem.
-        # This situation is only tripped when one of the first actions
-        # on the site is a write action and the extension isn't installed.
-        if (self.write and self.site.mw_version >= '1.23'
-            or self.action == 'edit'
-                and self.site.has_extension('AssertEdit')):
+        # Make sure user is logged in
+        if self.write:
             pywikibot.debug('Adding user assertion', _logger)
-            self['assert'] = 'user'  # make sure user is logged in
+            self['assert'] = 'user'
 
     @classmethod
     def create_simple(cls, req_site, **kwargs):
@@ -1409,18 +1404,18 @@ class Request(MutableMapping):
     def _is_wikibase_error_retryable(self, error):
         # dict of error message and current action.
         # Value is True if action type is to be ignored
-        ERR_MSG = {
+        err_msg = {
             'edit-already-exists': 'wbeditentity',
             'actionthrottledtext': True,  # T192912, T268645
         }
         messages = error.get('messages')
         message = None
-        # bug T68619; after Wikibase breaking change 1ca9cee change we have a
+        # bug T68619; after Wikibase breaking change 1ca9cee we have a
         # list of messages
         if isinstance(messages, list):
             for item in messages:
                 message = item['name']
-                action = ERR_MSG.get(message)
+                action = err_msg.get(message)
                 if action is True or action == self.action:
                     return True
             else:
@@ -1431,7 +1426,7 @@ class Request(MutableMapping):
                 message = messages['0']['name']
             except KeyError:  # unsure the new output is always a list
                 message = messages['name']
-        action = ERR_MSG.get(message)
+        action = err_msg.get(message)
         return action is True or action == self.action
 
     @staticmethod
@@ -1534,16 +1529,17 @@ class Request(MutableMapping):
                         _logger)
         return use_get, uri, body, headers
 
-    def _http_request(self, use_get, uri, body, headers, paramstring) -> tuple:
+    def _http_request(self, use_get: bool, uri: str, data, headers,
+                      paramstring) -> tuple:
         """Get or post a http request with exception handling.
 
-        @return: a tuple containing data from request and use_get value
+        @return: a tuple containing requests.Response object from
+            http.request and use_get value
         """
         try:
-            data = http.request(
-                self.site, uri=uri,
-                method='GET' if use_get else 'POST',
-                data=body, headers=headers)
+            response = http.request(self.site, uri=uri,
+                                    method='GET' if use_get else 'POST',
+                                    data=data, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
         except Server414Error:
@@ -1564,32 +1560,45 @@ class Request(MutableMapping):
             pywikibot.error(traceback.format_exc())
             pywikibot.log('{}, {}'.format(uri, paramstring))
         else:
-            return data, use_get
+            return response, use_get
         self.wait()
         return None, use_get
 
-    def _json_loads(self, data: Union[str, bytes]) -> Optional[dict]:
-        """Read source text and return a dict.
+    def _json_loads(self, response) -> Optional[dict]:
+        """Return a dict from requests.Response.
 
-        @param data: raw data string
+        @param response: a requests.Response object
+        @type response: requests.Response
         @return: a data dict
         @raises APIError: unknown action found
         @raises APIError: unknown query result type
         """
-        if not isinstance(data, str):
-            data = data.decode(self.site.encoding())
-        pywikibot.debug(('API response received from {}:\n'
-                         .format(self.site)) + data, _logger)
-        if data.startswith('unknown_action'):
-            raise APIError(data[:14], data[16:])
         try:
-            result = json.loads(data)
+            result = response.json()
         except ValueError:
-            # if the result isn't valid JSON, there must be a server
+            # if the result isn't valid JSON, there may be a server
             # problem. Wait a few seconds and try again
-            pywikibot.warning(
-                'Non-JSON response received from server {}; '
-                'the server may be down.'.format(self.site))
+            # Show 20 lines of bare text
+            text = '\n'.join(removeHTMLParts(response.text).splitlines()[:20])
+            msg = """\
+Non-JSON response received from server {site} for url
+{resp.url}
+The server may be down.
+Status code: {resp.status_code}
+
+The text message is:
+{text}
+""".format(site=self.site, resp=response, text=text)
+
+            # Do not retry for AutoFamily but raise a SiteDefinitionError
+            # Note: family.AutoFamily is a function to create that class
+            if self.site.family.__class__.__name__ == 'AutoFamily':
+                pywikibot.debug(msg, _logger)
+                raise SiteDefinitionError('Invalid AutoFamily({!r})'
+                                          .format(self.site.family.domain))
+
+            pywikibot.warning(msg)
+
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
                 if param.endswith('limit'):
@@ -1600,11 +1609,6 @@ class Request(MutableMapping):
                         pywikibot.output('Set {} = {}'
                                          .format(param, self[param]))
         else:
-            if result and not isinstance(result, dict):
-                raise APIError('Unknown',
-                               'Unable to process query response of type {}.'
-                               .format(type(result)),
-                               data=result)
             return result or {}
         self.wait()
         return None
@@ -1684,12 +1688,12 @@ class Request(MutableMapping):
 
         @raises APIMWException: internal_api_error or readonly
         """
-        IAE = 'internal_api_error_'
-        if not (code.startswith(IAE) or code == 'readonly'):
+        iae = 'internal_api_error_'
+        if not (code.startswith(iae) or code == 'readonly'):
             return False
 
         # T154011
-        class_name = code if code == 'readonly' else code[len(IAE):]
+        class_name = code if code == 'readonly' else removeprefix(code, iae)
 
         del error['code']  # is added via class_name
         e = APIMWException(class_name, **error)
@@ -1804,12 +1808,12 @@ class Request(MutableMapping):
 
             use_get, uri, body, headers = self._get_request_params(use_get,
                                                                    paramstring)
-            rawdata, use_get = self._http_request(use_get, uri, body, headers,
-                                                  paramstring)
-            if rawdata is None:
+            response, use_get = self._http_request(use_get, uri, body, headers,
+                                                   paramstring)
+            if response is None:
                 continue
 
-            result = self._json_loads(rawdata)
+            result = self._json_loads(response)
             if result is None:
                 continue
 
@@ -1862,13 +1866,14 @@ class Request(MutableMapping):
                                  'help': result['error']['help']}}
 
             pywikibot.warning('API error %s: %s' % (code, info))
+            pywikibot.log('           headers=\n{}'.format(response.headers))
 
             if self._internal_api_error(code, error, result):
                 continue
 
             # Phab. tickets T48535, T64126, T68494, T68619
-            if code == 'failed-save' and \
-               self._is_wikibase_error_retryable(result['error']):
+            if code == 'failed-save' \
+               and self._is_wikibase_error_retryable(result['error']):
                 self.wait()
                 continue
 
@@ -2168,13 +2173,15 @@ class APIGenerator(_RequestWrapper):
         n = 0
         while True:
             self.request[self.continue_name] = offset
-            pywikibot.debug('%s: Request: %s' % (
-                self.__class__.__name__, self.request), _logger)
+            pywikibot.debug('{}: Request: {}'
+                            .format(self.__class__.__name__, self.request),
+                            _logger)
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
-            pywikibot.debug('%s: Retrieved %d items' % (
-                self.__class__.__name__, n_items), _logger)
+            pywikibot.debug('{}: Retrieved {} items'
+                            .format(self.__class__.__name__, n_items),
+                            _logger)
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item
@@ -2247,14 +2254,10 @@ class QueryGenerator(_RequestWrapper):
                         % self.__class__.__name__)
 
         parameters['indexpageids'] = True  # always ask for list of pageids
-        if self.site.mw_version < '1.21':
-            self.continue_name = 'query-continue'
-            self.continue_update = self._query_continue
-        else:
-            self.continue_name = 'continue'
-            self.continue_update = self._continue
-            # Explicitly enable the simplified continuation
-            parameters['continue'] = True
+        self.continue_name = 'continue'
+        self.continue_update = self._continue
+        # Explicitly enable the simplified continuation
+        parameters['continue'] = True
         self.request = self.request_class(**kwargs)
 
         self.site._paraminfo.fetch('query+' + mod for mod in self.modules)
@@ -2874,7 +2877,7 @@ class LogEntryListGenerator(ListGenerator):
 
 class LoginManager(login.LoginManager):
 
-    """Supply getCookie() method to use API interface."""
+    """Supply login_to_site method to use API interface."""
 
     # API login parameters mapping
     mapping = {
@@ -2892,14 +2895,11 @@ class LoginManager(login.LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    def login_to_site(self):
+    def login_to_site(self) -> None:
         """Login to the site.
 
-        Note, this doesn't actually return or do anything with cookies.
-        The http module takes care of all the cookie stuff, this just
-        has a legacy name for now and should be renamed in the future.
-
-        @return: empty string if successful, throws exception on failure
+        Note, this doesn't do anything with cookies. The http module
+        takes care of all the cookie stuff. Throws exception on failure.
         """
         if hasattr(self, '_waituntil'):
             if datetime.datetime.now() < self._waituntil:
@@ -2964,7 +2964,7 @@ class LoginManager(login.LoginManager):
             status = response[result_key]
             fail_reason = response.get(self.keyword('reason'), '')
             if status == self.keyword('success'):
-                return None
+                return
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
@@ -2982,9 +2982,23 @@ class LoginManager(login.LoginManager):
                     _invalidate_superior_cookies(self.site.family)
                 continue
 
+            # messagecode was introduced with 1.29.0-wmf.14
+            login_throttled = False
+            if self.site.mw_version >= '1.29.0-wmf.14':
+                try:
+                    login_throttled = \
+                        response['messagecode'] == 'login-throttled'
+                except KeyError:
+                    pywikibot.log(
+                        "Missing 'messagecode' key encountered\n"
+                        'Please file the following debug message to '
+                        'Phabricator task T261061:\n{}'
+                        .format(login_result))
+                    raise CaptchaError('Captcha encountered which cannot be '
+                                       'handled:\n{}'.format(response))
+
             if (status == 'Throttled' or status == self.keyword('fail')
-                and (response['messagecode'] == 'login-throttled'
-                     or 'wait' in fail_reason)):
+                    and (login_throttled or 'wait' in fail_reason)):
                 wait = response.get('wait')
                 if wait:
                     delta = datetime.timedelta(seconds=int(wait))
@@ -3001,8 +3015,8 @@ class LoginManager(login.LoginManager):
 
         if 'error' in login_result:
             raise APIError(**response)
-        info = fail_reason
-        raise APIError(code=status, info=info)
+
+        raise APIError(code=status, info=fail_reason)
 
     def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.
@@ -3087,18 +3101,7 @@ def _update_protection(page, pagedict: dict):
 
 def _update_revisions(page, revisions):
     """Update page revisions."""
-    content_model = {'.js': 'javascript', '.css': 'css'}
     for rev in revisions:
-        if page.site.mw_version < '1.21':
-            # T102735: use content model depending on the page suffix
-            title = page.title(with_ns=False)
-            for suffix, cm in content_model.items():
-                if title.endswith(suffix):
-                    rev['contentmodel'] = cm
-                    break
-            else:
-                rev['contentmodel'] = 'wikitext'
-
         page._revisions[rev['revid']] = pywikibot.page.Revision(**rev)
 
 
@@ -3198,6 +3201,8 @@ def update_page(page, pagedict: dict, props=None):
 
     if 'pageprops' in pagedict:
         page._pageprops = pagedict['pageprops']
+    elif 'pageprops' in props:
+        page._pageprops = {}
 
     if 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']

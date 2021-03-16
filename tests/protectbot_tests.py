@@ -1,9 +1,11 @@
 """Tests for scripts/protect.py."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -11,7 +13,7 @@ import pywikibot.page
 
 from scripts import protect
 
-from tests.aspects import unittest, ScriptMainTestCase
+from tests.aspects import ScriptMainTestCase
 
 
 class TestProtectionBot(ScriptMainTestCase):

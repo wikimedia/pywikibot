@@ -16,9 +16,4 @@ pywikibot.comms.http module
 
 .. automodule:: pywikibot.comms.http
 
-pywikibot.comms.threadedhttp module
------------------------------------
-
-.. automodule:: pywikibot.comms.threadedhttp
-
 

@@ -38,7 +38,7 @@ The following parameters are supported:
  destination_wiki       destination wiki(s)
 """
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -184,7 +184,6 @@ class SyncSites:
     def check_page(self, pagename):
         """Check one page."""
         pywikibot.output('\nChecking ' + pagename)
-        sys.stdout.flush()
         page1 = Page(self.original, pagename)
         txt1 = page1.text
 
@@ -216,12 +215,11 @@ class SyncSites:
                 pywikibot.output('\n {0} DIFFERS'.format(site))
                 self.differences[site].append(pagename)
 
-        if self.options.replace:
-            page2.text = txt1
-            page2.save(self.put_message(site))
-        else:
-            sys.stdout.write('.')
-            sys.stdout.flush()
+            if self.options.replace:
+                page2.text = txt1
+                page2.save(self.put_message(site))
+            else:
+                pywikibot.stdout('.', newline=False)
 
 
 def main(*args):

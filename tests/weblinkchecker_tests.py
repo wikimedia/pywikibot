@@ -1,17 +1,18 @@
 """weblinkchecker test module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import unittest
 
 from contextlib import suppress
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from urllib.parse import urlparse
 
 from scripts import weblinkchecker
-from tests.aspects import unittest, require_modules, TestCase
+from tests.aspects import require_modules, TestCase
 
 
 @require_modules('memento_client')
@@ -69,9 +70,10 @@ class TestMementoDefault(MementoTestCase):
     def test_invalid(self):
         """Test getting memento for invalid URL."""
         # memento_client raises 'Exception', not a subclass.
-        self.assertRaisesRegex(
-            Exception, 'Only HTTP URIs are supported',
-            self._get_archive_url, 'invalid')
+        with self.assertRaisesRegex(
+                Exception,
+                'Only HTTP URIs are supported'):
+            self._get_archive_url('invalid')
 
 
 if __name__ == '__main__':  # pragma: no cover

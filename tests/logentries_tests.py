@@ -5,6 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import unittest
 
 from contextlib import suppress
 
@@ -17,7 +18,7 @@ from pywikibot.logentries import (
 
 from tests import unittest_print
 from tests.aspects import (
-    unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
+    MetaTestCaseClass, TestCase, DeprecationTestCase
 )
 
 
@@ -28,9 +29,9 @@ class TestLogentriesBase(TestCase):
 
     It uses the German Wikipedia for a current representation of the
     log entries and the test Wikipedia for the future representation.
-    It also tests on a wiki with MW 1.19 to check that it can still read
-    the older format. It currently uses wowwiki which as of this commit
-    uses 1.19.24.
+    It also tests on a wiki with MW < 1.25 to check that it can still
+    read the older format. It currently uses portalwiki which as of this
+    commit uses 1.23.16.
     """
 
     sites = {
@@ -50,10 +51,9 @@ class TestLogentriesBase(TestCase):
             'target': None,
         },
         'old': {
-            'family': AutoFamily('btrfs',
-                                 # /api.php required for scriptpath()
-                                 'https://btrfs.wiki.kernel.org/api.php'),
-            'code': 'btrfs',
+            'family': AutoFamily('portalwiki',
+                                 'https://theportalwiki.com/wiki/Main_Page'),
+            'code': 'en',
             'target': None,
         }
     }
@@ -64,7 +64,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertLess(self.site.mw_version, '1.20')
+            self.assertLess(self.site.mw_version, '1.25')
         try:
             le = next(iter(self.site.logevents(logtype=logtype, total=1)))
         except StopIteration:
@@ -122,7 +122,8 @@ class TestLogentriesBase(TestCase):
             else:
                 self.assertIsInstance(logentry.page(), pywikibot.Page)
         else:
-            self.assertRaises(KeyError, logentry.page)
+            with self.assertRaises(KeyError):
+                logentry.page()
 
         self.assertEqual(logentry.type(), logtype)
         self.assertIsInstance(logentry.user(), str)
@@ -312,43 +313,10 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
                 self.assertIsInstance(logentry.title(), pywikibot.Page)
                 self.assertIs(logentry.title(), logentry.page())
             else:
-                self.assertRaises(KeyError, logentry.title)
+                with self.assertRaises(KeyError):
+                    logentry.title()
             self.assertDeprecation()  # T271044
         self._reset_messages()  # T271044
-
-    def test_get_moved_target(self, key):
-        """Test getMovedTarget method."""
-        # main page was moved around
-        if self.sites[key]['target'] is None:
-            self.skipTest('No moved target')
-        mainpage = self.get_mainpage(self.site)
-        target = mainpage.getMovedTarget()
-        self.assertIsInstance(target, pywikibot.Page)
-        self.assertEqual(target.title(),
-                         self.sites[key]['target'])
-        # main page was moved back again, we test it.
-        self.assertEqual(mainpage, target.getMovedTarget())
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()', 2)
-
-    def test_moved_target_fail_old(self):
-        """Test getMovedTarget method failing on older wiki."""
-        site = self.get_site('old')
-        with self.assertRaises(pywikibot.NoPage):
-            self.get_mainpage(site).getMovedTarget()
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
-
-    def test_moved_target_fail_de(self):
-        """Test getMovedTarget method failing on de-wiki."""
-        page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
-        with self.assertRaises(pywikibot.NoPage):
-            page.getMovedTarget()
-
-        self.assertOneDeprecationParts(
-            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
 
 
 if __name__ == '__main__':  # pragma: no cover

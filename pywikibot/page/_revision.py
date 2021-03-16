@@ -94,7 +94,7 @@ class Revision(Mapping):
 
         if key == 'rollbacktoken':
             warning('"rollbacktoken" has been deprecated since MediaWiki 1.24')
-            return None
+            return
 
         # raise AttributeError instead of KeyError for backward compatibility
         raise AttributeError("'{}' object has no attribute '{}'"
@@ -122,7 +122,5 @@ class Revision(Mapping):
         this returns the content model of the main slot.
 
         @return: content model
-        @raises AssertionError: content model not supplied to the constructor
-            which always occurs for MediaWiki versions lower than 1.21.
         """
         return self.contentmodel

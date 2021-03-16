@@ -104,7 +104,7 @@ Loads all wiki pages where dead links were found during a prior run:
     python pwb.py weblinkchecker -repeat
 """
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -517,11 +517,9 @@ class DeadLinkReportThread(threading.Thread):
                     content = ''
 
                 if archiveURL:
-                    archiveMsg = '\n' + \
-                                 i18n.twtranslate(
-                                     containingPage.site,
-                                     'weblinkchecker-archive_msg',
-                                     {'URL': archiveURL})
+                    archiveMsg = '\n' + i18n.twtranslate(
+                        containingPage.site, 'weblinkchecker-archive_msg',
+                        {'URL': archiveURL})
                 else:
                     archiveMsg = ''
                 # The caption will default to "Dead link". But if there
@@ -689,7 +687,7 @@ def main(*args):
             bot.run()
         except ImportError:
             suggest_help(missing_dependencies=('memento_client',))
-            return False
+            return
         finally:
             waitTime = 0
             # Don't wait longer than 30 seconds for threads to finish.

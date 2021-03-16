@@ -59,7 +59,8 @@ class TestDjVuFile(TestCase):
         """Test file existence checks."""
         djvu = DjVuFile(self.file_djvu)
         self.assertEqual(os.path.abspath(self.file_djvu), djvu.file)
-        self.assertRaises(IOError, DjVuFile, self.file_djvu_not_existing)
+        with self.assertRaises(IOError):
+            DjVuFile(self.file_djvu_not_existing)
 
     def test_number_of_images(self):
         """Test page number generator."""
@@ -95,23 +96,27 @@ class TestDjVuFile(TestCase):
         """Test error is raised if djvu page number is out of range."""
         djvu = DjVuFile(self.file_djvu)
         self.assertTrue(djvu.has_text())
-        self.assertRaises(ValueError, djvu.get_page, 100)
+        with self.assertRaises(ValueError):
+            djvu.get_page(100)
 
     def test_get_not_existing_page(self):
         """Test error is raised if djvu file has no text."""
         djvu = DjVuFile(self.file_djvu_wo_text)
         self.assertFalse(djvu.has_text())
-        self.assertRaises(ValueError, djvu.get_page, 1)
+        with self.assertRaises(ValueError):
+            djvu.get_page(1)
 
     def test_whiten_not_existing_page_number(self):
         """Test djvu page cannot be whitend if page number is out of range."""
         djvu = DjVuFile(self.file_djvu)
-        self.assertRaises(ValueError, djvu.whiten_page, 100)
+        with self.assertRaises(ValueError):
+            djvu.whiten_page(100)
 
     def test_delete_not_existing_page_number(self):
         """Test djvu page cannot be deleted if page number is out of range."""
         djvu = DjVuFile(self.file_djvu)
-        self.assertRaises(ValueError, djvu.delete_page, 100)
+        with self.assertRaises(ValueError):
+            djvu.delete_page(100)
 
     def test_clear_cache(self):
         """Test if djvu file contains text."""

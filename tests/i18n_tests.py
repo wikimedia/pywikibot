@@ -1,6 +1,6 @@
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,7 +8,7 @@ from contextlib import suppress
 
 import pywikibot
 
-from pywikibot import bot, i18n, plural
+from pywikibot import bot, config, i18n, plural
 
 from tests.aspects import (
     AutoDeprecationTestCase,
@@ -33,7 +33,7 @@ class Site:
         """Initializer."""
         self.code = code
         self.family = self.Family()
-        setattr(self.family, 'name', family)
+        self.family.name = family
 
     def __repr__(self):
         return "'{site.family.name}:{site.code}'".format(site=self)
@@ -295,8 +295,8 @@ class TestTWTranslate(TWNTestCaseBase):
 
     def testNoEnglish(self):
         """Test translating into English with missing entry."""
-        self.assertRaises(i18n.TranslationError, i18n.twtranslate,
-                          'en', 'test-no-english')
+        with self.assertRaises(i18n.TranslationError):
+            i18n.twtranslate('en', 'test-no-english')
 
 
 class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
@@ -466,8 +466,8 @@ class ScriptMessagesTestCase(TWNTestCaseBase, AutoDeprecationTestCase):
 
     def test_missing(self):
         """Test a missing message from a real message bundle."""
-        self.assertRaises(i18n.TranslationError,
-                          i18n.twntranslate, 'en', 'pywikibot-missing-key')
+        with self.assertRaises(i18n.TranslationError):
+            i18n.twntranslate('en', 'pywikibot-missing-key')
 
 
 class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
@@ -518,19 +518,46 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         self.orig_output = bot.ui.output
         bot.ui._raw_input = lambda *args, **kwargs: 'dummy input'
         bot.ui.output = self._capture_output
+        self.old_cc_setting = config.cosmetic_changes_mylang_only
 
     def tearDown(self):
         """Restore the output and input methods."""
+        config.cosmetic_changes_mylang_only = self.old_cc_setting
         bot.ui._raw_input = self.orig_raw_input
         bot.ui.output = self.orig_output
         super().tearDown()
 
-    def test_pagegen_i18n_input(self):
+    def test_i18n_input(self):
         """Test i18n.input falls back with missing message package."""
         rv = i18n.input('pywikibot-enter-category-name',
                         fallback_prompt='dummy output')
         self.assertEqual(rv, 'dummy input')
         self.assertIn('dummy output: ', self.output_text)
+
+    def test_i18n_twtranslate(self):
+        """Test i18n.twtranslate falls back with missing message package."""
+        rv = i18n.twtranslate(self.site, 'pywikibot-enter-category-name',
+                              fallback_prompt='dummy message')
+        self.assertEqual(rv, 'dummy message')
+
+    def test_cosmetic_changes_hook(self):
+        """Test summary result of Page._cosmetic_changes_hook."""
+        page = pywikibot.Page(self.site, 'Test')
+        page.text = 'Some    content    with    spaces.'
+        # check cc settings
+        config.cosmetic_changes_mylang_only = False
+        self.assertFalse(page.isTalkPage())
+        self.assertNotIn(pywikibot.calledModuleName(),
+                         config.cosmetic_changes_deny_script)
+        self.assertFalse(config.cosmetic_changes_mylang_only)
+
+        if page.content_model != 'wikitext':
+            self.skipTest('Wrong content model {!r} for cosmetic_changes'
+                          .format(page.content_model))
+
+        summary = 'Working on Test page at site {}'.format(self.site)
+        msg = page._cosmetic_changes_hook(summary)
+        self.assertEqual(msg, summary + '; cosmetic changes')
 
 
 class TestExtractPlural(TestCase):

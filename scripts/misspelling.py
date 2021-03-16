@@ -12,15 +12,16 @@ Command line options:
                some choices for XY don't make sense and will result in a loop,
                e.g. "l" or "m".
 
+   -main       only check pages in the main namespace, not in the talk,
+               wikipedia, user, etc. namespaces.
+
    -start:XY   goes through all misspellings in the category on your wiki
                that is defined (to the bot) as the category containing
                misspelling pages, starting at XY. If the -start argument is not
                given, it starts at the beginning.
-
-   -main       only check pages in the main namespace, not in the talk,
-               wikipedia, user, etc. namespaces.
 """
-# (C) Pywikibot team, 2007-2020
+#
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,7 +34,7 @@ from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
 from pywikibot.tools.formatter import color_format
 
-from scripts.solve_disambiguation import DisambiguationRobot as DisambigBotBase
+from scripts.solve_disambiguation import DisambiguationRobot as BaseDisambigBot
 
 HELP_MSG = """\n
 misspelling.py does not support site {site}.
@@ -45,7 +46,7 @@ with category containing misspelling pages or a template for
 these misspellings.\n"""
 
 
-class MisspellingRobot(DisambigBotBase):
+class MisspellingRobot(BaseDisambigBot):
 
     """Spelling bot."""
 
@@ -112,15 +113,13 @@ class MisspellingRobot(DisambigBotBase):
             pywikibot.output(HELP_MSG.format(site=self.site))
             return
 
-        generator = chain(*generators)
-        preloadingGen = pagegenerators.PreloadingGenerator(generator)
-        yield from preloadingGen
+        yield from pagegenerators.PreloadingGenerator(chain(*generators))
 
     def findAlternatives(self, page) -> bool:
         """
         Append link target to a list of alternative links.
 
-        Overrides the DisambigBotBase method.
+        Overrides the BaseDisambigBot method.
 
         @return: True if alternate link was appended
         """
@@ -157,11 +156,11 @@ class MisspellingRobot(DisambigBotBase):
         """
         Setup the summary message.
 
-        Overrides the DisambiguationRobot method.
+        Overrides the BaseDisambigBot method.
         """
         # TODO: setSummaryMessage() in solve_disambiguation now has parameters
         # new_targets and unlink. Make use of these here.
-        self.comment = i18n.twtranslate(self.site, 'misspelling-fixing',
+        self.summary = i18n.twtranslate(self.site, 'misspelling-fixing',
                                         {'page': page.title()})
 
 

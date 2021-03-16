@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -300,7 +300,7 @@ class CaseChecker:
             return
 
         firstItem = True
-        for pageID, page in data['query']['pages'].items():
+        for page in data['query']['pages'].values():
             printed = False
             title = page['title']
             self.currentTitle = title

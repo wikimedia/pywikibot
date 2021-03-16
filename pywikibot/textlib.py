@@ -6,7 +6,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -436,7 +436,7 @@ def replaceExcept(text: str, old, new, exceptions: list,
     return text
 
 
-def removeDisabledParts(text: str, tags=None, include=[], site=None) -> str:
+def removeDisabledParts(text: str, tags=None, include=None, site=None) -> str:
     """
     Return text without portions where wiki markup is disabled.
 
@@ -453,7 +453,7 @@ def removeDisabledParts(text: str, tags=None, include=[], site=None) -> str:
 
     @param include: Or, in alternative, default parts that shall not
         be removed.
-    @type include: list, set or tuple
+    @type include: list, set, tuple or None
 
     @param site: Site to be used for site-dependent regexes. Default
         disabled parts listed above do not need it.
@@ -462,16 +462,18 @@ def removeDisabledParts(text: str, tags=None, include=[], site=None) -> str:
     @return: text stripped from disabled parts.
     """
     if not tags:
-        tags = ('comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight')
-    tags = set(tags) - set(include)
+        tags = {'comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight'}
+    else:
+        tags = set(tags)
+    if include:
+        tags -= set(include)
     regexes = _get_regexes(tags, site)
-    toRemoveR = re.compile('|'.join(x.pattern for x in regexes),
-                           re.IGNORECASE | re.DOTALL)
-    return toRemoveR.sub('', text)
+    for regex in regexes:
+        text = regex.sub('', text)
+    return text
 
 
-def removeHTMLParts(text: str,
-                    keeptags=['tt', 'nowiki', 'small', 'sup']) -> str:
+def removeHTMLParts(text: str, keeptags: Optional[List[str]] = None) -> str:
     """
     Return text without portions where HTML markup is disabled.
 
@@ -485,6 +487,8 @@ def removeHTMLParts(text: str,
     # thanks to:
     # https://www.hellboundhackers.org/articles/read-article.php?article_id=841
     parser = _GetDataHTML()
+    if keeptags is None:
+        keeptags = ['tt', 'nowiki', 'small', 'sup']
     with parser:
         parser.keeptags = keeptags
         parser.feed(text)
@@ -1090,11 +1094,10 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite=site)
     if s:
-        if site.code in site.family.interwiki_attop or \
-           '<!-- interwiki at top -->' in oldtext:
+        if site.code in site.family.interwiki_attop \
+           or '<!-- interwiki at top -->' in oldtext:
             # do not add separator if interwiki links are on one line
-            newtext = s + ('' if site.code
-                           in site.family.interwiki_on_one_line
+            newtext = s + ('' if site.code in site.family.interwiki_on_one_line
                            else separator) + s2.replace(marker, '').strip()
         else:
             # calculate what was after the language links on the page
@@ -1112,8 +1115,8 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             elif site.code in site.family.categories_last:
                 cats = getCategoryLinks(s2, site=site)
                 s2 = removeCategoryLinksAndSeparator(
-                    s2.replace(marker, cseparatorstripped).strip(), site) + \
-                    separator + s
+                    s2.replace(marker, cseparatorstripped).strip(), site) \
+                    + separator + s
                 newtext = replaceCategoryLinks(s2, cats, site=site,
                                                addOnly=True)
             # for Wikitravel's language links position.
@@ -1241,7 +1244,8 @@ def interwikiSort(sites, insite=None):
 # Functions dealing with category links
 # -------------------------------------
 
-def getCategoryLinks(text: str, site=None, include: list = [],
+def getCategoryLinks(text: str, site=None,
+                     include: Optional[List[str]] = None,
                      expand_text: bool = False) -> list:
     """Return a list of category links found in text.
 
@@ -1255,7 +1259,7 @@ def getCategoryLinks(text: str, site=None, include: list = [],
         site = pywikibot.Site()
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
-    text = removeDisabledParts(text, include=include)
+    text = removeDisabledParts(text, include=include or [])
     catNamespace = '|'.join(site.namespaces.CATEGORY)
     R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
                    % catNamespace, re.I)
@@ -1357,7 +1361,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     catNamespace = '|'.join(site.namespaces.CATEGORY)
     title = oldcat.title(with_ns=False)
     if not title:
-        return
+        return oldtext
     # title might contain regex special characters
     title = re.escape(title)
     # title might not be capitalized correctly on the wiki

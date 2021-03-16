@@ -9,7 +9,6 @@ import types
 
 from collections import defaultdict
 from contextlib import suppress
-from urllib.parse import unquote_to_bytes
 
 import pywikibot.data.api as api
 import pywikibot.family
@@ -27,105 +26,7 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
 )
 from tests import patch
-from tests.utils import FakeLoginManager, PatchedHttp
-
-
-class TestAPIMWException(DefaultSiteTestCase):
-
-    """Test raising an APIMWException."""
-
-    user = True
-
-    data = {'error': {'code': 'internal_api_error_fake',
-                      'info': 'Fake error message'},
-            'servedby': 'unittest',
-            }
-
-    def _dummy_request(self, *args, **kwargs):
-        self.assertLength(args, 1)  # one positional argument for http.request
-        site = args[0]
-        self.assertIsInstance(site, pywikibot.BaseSite)
-        self.assertIn('data', kwargs)
-        self.assertIn('uri', kwargs)
-        if kwargs['data'] is None:
-            # use uri and remove script path
-            parameters = kwargs['uri']
-            prefix = site.scriptpath() + '/api.php?'
-            self.assertEqual(prefix, parameters[:len(prefix)])
-            parameters = parameters[len(prefix):]
-        else:
-            parameters = kwargs['data']
-        parameters = parameters.encode('ascii')  # it should be bytes anyway
-        # Extract parameter data from the body, it's ugly but allows us
-        # to verify that we actually test the right request
-        parameters = [p.split(b'=', 1) for p in parameters.split(b'&')]
-        keys = [p[0].decode('ascii') for p in parameters]
-        values = [unquote_to_bytes(p[1]) for p in parameters]
-        values = [v.decode(site.encoding()) for v in values]
-        values = [v.replace('+', ' ') for v in values]
-        values = [set(v.split('|')) for v in values]
-        parameters = dict(zip(keys, values))
-
-        if 'fake' not in parameters:
-            return False  # do an actual request
-        if self.assert_parameters:
-            for param, value in self.assert_parameters.items():
-                self.assertIn(param, parameters)
-                if value is not None:
-                    if isinstance(value, str):
-                        value = value.split('|')
-                    self.assertLessEqual(set(value), parameters[param])
-        return self.data
-
-    def setUp(self):
-        """Mock warning and error."""
-        super().setUp()
-        self.warning_patcher = patch.object(pywikibot, 'warning')
-        self.error_patcher = patch.object(pywikibot, 'error')
-        self.warning_patcher.start()
-        self.error_patcher.start()
-
-    def tearDown(self):
-        """Check warning and error calls."""
-        self.warning_patcher.stop()
-        self.error_patcher.stop()
-        super().tearDown()
-
-    def _test_assert_called_with(self, req):
-        with self.assertRaises(api.APIMWException):
-            req.submit()
-        pywikibot.warning.assert_called_with(
-            'API error internal_api_error_fake: Fake error message')
-        pywikibot.error.assert_called_with(
-            'Detected MediaWiki API exception internal_api_error_fake: '
-            'Fake error message\n[servedby: unittest]; raising')
-
-    def test_API_error(self):
-        """Test a static request."""
-        req = api.Request(site=self.site, parameters={'action': 'query',
-                                                      'fake': True})
-        with PatchedHttp(api, self.data):
-            self._test_assert_called_with(req)
-
-    def test_API_error_encoding_ASCII(self):
-        """Test a Page instance as parameter using ASCII chars."""
-        page = pywikibot.page.Page(self.site, 'ASCII')
-        req = api.Request(site=self.site, parameters={'action': 'query',
-                                                      'fake': True,
-                                                      'titles': page})
-        self.assert_parameters = {'fake': ''}
-        with PatchedHttp(api, self._dummy_request):
-            self._test_assert_called_with(req)
-
-    def test_API_error_encoding_Unicode(self):
-        """Test a Page instance as parameter using non-ASCII chars."""
-        page = pywikibot.page.Page(self.site, 'Ümlä  üt')
-        req = api.Request(site=self.site, parameters={'action': 'query',
-                                                      'fake': True,
-                                                      'titles': page})
-        self.assert_parameters = {'fake': ''}
-        with PatchedHttp(api, self._dummy_request):
-            self._test_assert_called_with(req)
+from tests.utils import FakeLoginManager
 
 
 class TestApiFunctions(DefaultSiteTestCase):
@@ -238,10 +139,8 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertLength(pi, pi.preloaded_modules)
 
-        if site.mw_version >= '1.21':
-            # 'generator' was added to 'pageset' in 1.21
-            generators_param = pi.parameter('pageset', 'generator')
-            self.assertGreater(len(generators_param['type']), 1)
+        generators_param = pi.parameter('pageset', 'generator')
+        self.assertGreater(len(generators_param['type']), 1)
 
     def test_generators(self):
         """Test requesting the generator parameter."""
@@ -255,12 +154,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('pageset', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
 
-        if site.mw_version >= '1.21':
-            # 'generator' was added to 'pageset' in 1.21
-            pageset_generators_param = pi.parameter('pageset', 'generator')
-            query_generators_param = pi.parameter('query', 'generator')
+        pageset_generators_param = pi.parameter('pageset', 'generator')
+        query_generators_param = pi.parameter('query', 'generator')
 
-            self.assertEqual(pageset_generators_param, query_generators_param)
+        self.assertEqual(pageset_generators_param, query_generators_param)
 
     def test_with_module_info(self):
         """Test requesting the module info."""

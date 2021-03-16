@@ -1,10 +1,11 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from collections.abc import Iterable, Mapping
+from enum import IntEnum
 from typing import Optional, Union
 
 from pywikibot.backports import List
@@ -14,6 +15,30 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     SelfCallMixin,
 )
+
+
+class BuiltinNamespace(IntEnum):
+
+    """Builtin namespace enum."""
+
+    MEDIA = -2
+    SPECIAL = -1
+    MAIN = 0
+    TALK = 1
+    USER = 2
+    USER_TALK = 3
+    PROJECT = 4
+    PROJECT_TALK = 5
+    FILE = 6
+    FILE_TALK = 7
+    MEDIAWIKI = 8
+    MEDIAWIKI_TALK = 9
+    TEMPLATE = 10
+    TEMPLATE_TALK = 11
+    HELP = 12
+    HELP_TALK = 13
+    CATEGORY = 14
+    CATEGORY_TALK = 15
 
 
 class Namespace(Iterable, ComparableMixin):
@@ -35,25 +60,6 @@ class Namespace(Iterable, ComparableMixin):
     If only one of canonical_name and custom_name are available, both
     properties will have the same value.
     """
-
-    MEDIA = -2
-    SPECIAL = -1
-    MAIN = 0
-    TALK = 1
-    USER = 2
-    USER_TALK = 3
-    PROJECT = 4
-    PROJECT_TALK = 5
-    FILE = 6
-    FILE_TALK = 7
-    MEDIAWIKI = 8
-    MEDIAWIKI_TALK = 9
-    TEMPLATE = 10
-    TEMPLATE_TALK = 11
-    HELP = 12
-    HELP_TALK = 13
-    CATEGORY = 14
-    CATEGORY_TALK = 15
 
     # These are the MediaWiki built-in names for MW 1.14+.
     # Namespace prefixes are always case-insensitive, but the
@@ -299,6 +305,11 @@ class Namespace(Iterable, ComparableMixin):
         return False
 
 
+# Set Namespace.FOO to be BuiltinNamespace.FOO for each builtin namespace
+for item in BuiltinNamespace:
+    setattr(Namespace, item.name, item)
+
+
 class NamespacesDict(Mapping, SelfCallMixin):
 
     """
@@ -330,7 +341,11 @@ class NamespacesDict(Mapping, SelfCallMixin):
         @param key: namespace key
         """
         if isinstance(key, (Namespace, int)):
-            return self._namespaces[key]
+            try:
+                return self._namespaces[key]
+            except KeyError:
+                raise KeyError('{} is not a known namespace. Maybe you should '
+                               'clear the api cache.'.format(key))
 
         namespace = self.lookup_name(key)
         if namespace:

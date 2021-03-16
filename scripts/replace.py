@@ -57,7 +57,10 @@ Furthermore, the following command line parameters are supported:
 
 -summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
                   the predefined message texts with original and replacements
-                  inserted. Can't be used with -automaticsummary.
+                  inserted. To add the replacements to your summary use the
+                  %(description)s placeholder, for example:
+                  -summary:"Bot operated replacement: %(description)s"
+                  Can't be used with -automaticsummary.
 
 -automaticsummary Uses an automatic summary for all replacements which don't
                   have a summary defined. Can't be used with -summary.
@@ -135,7 +138,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -525,7 +528,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     """
 
     @deprecated_args(acceptall='always', addedCat='addcat')
-    def __init__(self, generator, replacements, exceptions={}, **kwargs):
+    def __init__(self, generator, replacements, exceptions=None, **kwargs):
         """Initializer."""
         self.available_options.update({
             'addcat': None,
@@ -546,7 +549,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 replacements[i] = Replacement.from_compiled(replacement[0],
                                                             replacement[1])
         self.replacements = replacements
-        self.exceptions = exceptions
+        self.exceptions = exceptions or {}
 
         if self.opt.addcat and isinstance(self.opt.addcat, str):
             self.opt.addcat = pywikibot.Category(self.site, self.opt.addcat)
@@ -640,19 +643,20 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 summary_messages.add(replacement.edit_summary)
             elif replacement.default_summary:
                 default_summaries.add((replacement.old, replacement.new))
+
         summary_messages = sorted(summary_messages)
         if default_summaries:
             if self.opt.summary:
-                summary_messages.insert(0, self.opt.summary)
+                msg = self.opt.summary
             else:
-                comma = self.site.mediawiki_message('comma-separator')
-                default_summary = comma.join(
-                    '-{0} +{1}'.format(*default_summary)
-                    for default_summary in default_summaries)
-                summary_messages.insert(0, i18n.twtranslate(
-                    self.site, 'replace-replacing',
-                    {'description': ' ({0})'.format(default_summary)}
-                ))
+                msg = i18n.twtranslate(self.site, 'replace-replacing')
+            comma = self.site.mediawiki_message('comma-separator')
+            default_summary = comma.join(
+                '-{} +{}'.format(*default_summary)
+                for default_summary in default_summaries)
+            desc = {'description': ' ({})'.format(default_summary)}
+            summary_messages.insert(0, msg % desc)
+
         semicolon = self.site.mediawiki_message('semicolon-separator')
         return semicolon.join(summary_messages)
 
@@ -832,13 +836,11 @@ def main(*args):
     replacement_file_arg_misplaced = False
 
     # Read commandline parameters.
-
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
+    local_args = genFactory.handle_args(local_args)
 
     for arg in local_args:
-        if genFactory.handle_arg(arg):
-            continue
         if arg == '-regex':
             regex = True
         elif arg.startswith('-xmlstart'):
@@ -901,28 +903,28 @@ def main(*args):
 
     if len(commandline_replacements) % 2:
         pywikibot.error('Incomplete command line pattern replacement pair.')
-        return False
+        return
 
     if replacement_file_arg_misplaced:
         pywikibot.error(
             '-pairsfile used between a pattern replacement pair.')
-        return False
+        return
 
     if replacement_file:
         try:
             with codecs.open(replacement_file, 'r', 'utf-8') as f:
                 # strip newlines, but not other characters
                 file_replacements = f.read().splitlines()
-        except (IOError, OSError) as e:
+        except OSError as e:
             pywikibot.error('Error loading {0}: {1}'.format(
                 replacement_file, e))
-            return False
+            return
 
         if len(file_replacements) % 2:
             pywikibot.error(
                 '{0} contains an incomplete pattern replacement pair.'.format(
                     replacement_file))
-            return False
+            return
 
         # Strip BOM from first line
         file_replacements[0].lstrip('\uFEFF')

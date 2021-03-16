@@ -15,7 +15,7 @@ __init__.py, and a message bundle called 'pywikibot' containing messages.
 See L{twtranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -429,7 +429,7 @@ def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     try:
         trans_text = pkgutil.get_data(
             _messages_package_name, filename).decode('utf-8')
-    except (OSError, IOError):  # file open can cause several exceptions
+    except OSError:  # file open can cause several exceptions
         return None
 
     transdict = json.loads(trans_text)
@@ -641,8 +641,9 @@ def translate(code,
 @deprecated_args(code='source')
 def twtranslate(source,
                 twtitle: str,
-                parameters: Optional[Mapping] = None,
+                parameters: Optional[Mapping] = None, *,
                 fallback: bool = True,
+                fallback_prompt: Optional[str] = None,
                 only_plural: bool = False) -> Optional[str]:
     r"""
     Translate a message using JSON files in messages_package_name.
@@ -675,6 +676,11 @@ def twtranslate(source,
 
     and so on.
 
+    >>> # this code snippet is running in test environment
+    >>> # ignore test message "tests: max_retries reduced from 15 to 1"
+    >>> import os
+    >>> os.environ['PYWIKIBOT_TEST_QUIET'] = '1'
+
     >>> from pywikibot import i18n
     >>> i18n.set_messages_package('tests.i18n')
     >>> # use a dictionary
@@ -699,7 +705,7 @@ def twtranslate(source,
         They are also used for plural entries in which case they must be a
         Mapping and will cause a TypeError otherwise.
     @param fallback: Try an alternate language code
-    @type fallback: boolean
+    @param fallback_prompt: The English message if i18n is not available
     @param only_plural: Define whether the parameters should be only applied to
         plural instances. If this is False it will apply the parameters also
         to the resulting string. If this is True the placeholders must be
@@ -708,6 +714,11 @@ def twtranslate(source,
         defined for the given translation template.
     """
     if not messages_available():
+        if fallback_prompt:
+            if parameters and not only_plural:
+                return fallback_prompt % parameters
+            return fallback_prompt
+
         raise TranslationError(
             'Unable to load messages package %s for bundle %s'
             '\nIt can happen due to lack of i18n submodule or files. '

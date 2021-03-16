@@ -11,7 +11,7 @@ This module is responsible for
     - Basic HTTP error handling
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -96,7 +96,7 @@ class _UserAgentFormatter(Formatter):
 
     def get_value(self, key, args, kwargs):
         """Get field as usual except for version and revision."""
-        # This is the Pywikibot revision; also map it to {version} at present.
+        # This is the Pywikibot version; also map it to {revision} at present.
         if key == 'version' or key == 'revision':
             return pywikibot.version.getversiondict()['rev']
         return super().get_value(key, args, kwargs)
@@ -143,16 +143,10 @@ def user_agent(site=None, format_string: str = None) -> str:
     @return: The formatted user agent
     """
     values = USER_AGENT_PRODUCTS.copy()
-
-    script_name = pywikibot.bot.calledModuleName()
-
-    values['script'] = script_name
-
-    # TODO: script_product should add the script version, if known
-    values['script_product'] = script_name
+    values.update(dict.fromkeys(['script', 'script_product'],
+                                pywikibot.bot.calledModuleName()))
 
     script_comments = []
-    username = ''
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
@@ -161,6 +155,7 @@ def user_agent(site=None, format_string: str = None) -> str:
     values['lang'] = ''  # TODO: use site.lang, if known
     values['site'] = ''
 
+    username = ''
     if site:
         script_comments.append(str(site))
 
@@ -215,25 +210,26 @@ def fake_user_agent() -> str:
 
 
 @deprecated_args(body='data')
-def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
+def request(site,
+            uri: Optional[str] = None,
+            headers: Optional[dict] = None,
+            **kwargs) -> requests.Response:
     """
     Request to Site with default error handling and response decoding.
 
     See L{requests.Session.request} for additional parameters.
 
-    If the site argument is provided, the uri is a relative uri from
-    and including the document root '/'.
-
-    If the site argument is None, the uri must be absolute.
+    The optional uri is a relative uri from site base uri including the
+    document root '/'.
 
     @param site: The Site to connect to
-    @type site: L{pywikibot.site.BaseSite}
+    @type: site: pywikibot.site.BaseSite
     @param uri: the URI to retrieve
     @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
-    @return: The received data
+    @return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
     old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
@@ -254,7 +250,7 @@ def request(site, uri: Optional[str] = None, headers=None, **kwargs) -> str:
     baseuri = site.base_url(uri)
     r = fetch(baseuri, headers=headers, **kwargs)
     site.throttle.retry_after = int(r.headers.get('retry-after', 0))
-    return r.text
+    return r
 
 
 def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
@@ -313,11 +309,6 @@ def error_handling_callback(response):
     # used by the version module.
     if response.status_code not in (200, 207):
         warning('Http response status {}'.format(response.status_code))
-
-    if isinstance(response.encoding, UnicodeDecodeError):
-        error('An error occurred for uri {}: '
-              'no encoding detected!'.format(response.request.url))
-        raise response.encoding from None
 
 
 @deprecated_args(callback=True, body='data')
@@ -423,40 +414,10 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     for callback in callbacks:
         callback(response)
 
-    return _ResponseDeprecationWrapper(response)
+    return response
 
 
-class _ResponseDeprecationWrapper(requests.Response):
-
-    """Helper class for the deprecation of HttpRequests.
-
-    This class will be removed ASAP. Its only purpose is to allow
-    a graceful deprecation of HttpRequests.
-    DO NOT USE!
-
-    """
-
-    def __init__(self, response):
-        self.__response = response
-
-    def __getattr__(self, attr):
-        return getattr(self.__response, attr)
-
-    def __setattr__(self, attr, val):
-        if attr == '_ResponseDeprecationWrapper__response':
-            object.__setattr__(self, attr, val)
-
-        return setattr(self.__response, attr, val)
-
-    @property
-    @deprecated('attribute/methods of Response(), '
-                'which is now returned from http.fetch()',
-                since='20210110', future_warning=True)
-    def data(self):
-        return self
-
-
-def _get_encoding_from_response_headers(response):
+def _get_encoding_from_response_headers(response) -> Optional[str]:
     """Return charset given by the response header."""
     content_type = response.headers.get('content-type')
 
@@ -483,11 +444,19 @@ def _get_encoding_from_response_headers(response):
     return header_encoding
 
 
-def _decide_encoding(response, charset):
+def _decide_encoding(response, charset) -> Optional[str]:
     """Detect the response encoding."""
     def _try_decode(content, encoding):
         """Helper function to try decoding."""
-        content.decode(encoding)
+        if encoding is None:
+            return None
+        try:
+            content.decode(encoding)
+        except (LookupError, UnicodeDecodeError):
+            pywikibot.warning('Unknown or invalid encoding {!r}'
+                              .format(encoding))
+            # let chardet do the job
+            return None
         return encoding
 
     header_encoding = _get_encoding_from_response_headers(response)
@@ -509,14 +478,22 @@ def _decide_encoding(response, charset):
         return _try_decode(response.content, charset)
 
     # Both charset and header_encoding are available.
-    if codecs.lookup(header_encoding) != codecs.lookup(charset):
+    try:
+        header_codecs = codecs.lookup(header_encoding)
+    except LookupError:
+        header_codecs = None
+
+    try:
+        charset_codecs = codecs.lookup(charset)
+    except LookupError:
+        charset_codecs = None
+
+    if header_codecs and charset_codecs and header_codecs != charset_codecs:
         pywikibot.warning(
             'Encoding "{}" requested but "{}" received in the '
             'response header.'.format(charset, header_encoding))
 
-    try:
-        _encoding = _try_decode(response.content, header_encoding)
-    except UnicodeDecodeError:
-        _encoding = _try_decode(response.content, charset)
+    _encoding = _try_decode(response.content, header_encoding) \
+        or _try_decode(response.content, charset)
 
     return _encoding

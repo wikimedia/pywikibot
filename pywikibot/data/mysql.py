@@ -56,7 +56,7 @@ def mysql_query(query: str, params=None,
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    with closing(pymysql.connect(config.db_hostname,
+    with closing(pymysql.connect(config.db_hostname_format.format(dbname),
                                  db=config.db_name_format.format(dbname),
                                  port=config.db_port,
                                  charset='utf8',

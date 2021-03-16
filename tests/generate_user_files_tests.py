@@ -1,12 +1,13 @@
 """Test generate_user_files script."""
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import re
+import unittest
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 import generate_user_files as guf
 
@@ -74,7 +75,7 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual('ACCOUNT SETTINGS', first.head)
         self.assertIn(first.head, first.section)
         self.assertIn(first.info[:10], first.section)
-        self.assertEqual('OBSOLETE SETTINGS', last.head)
+        self.assertEqual('FURTHER SETTINGS', last.head)
         self.assertIn(last.head, last.section)
         self.assertIn(last.info[:10], last.section)
 
@@ -90,14 +91,13 @@ class TestGenerateUserFiles(TestCase):
         self.assertIsNotNone(config_text)
         for section in ('LOGFILE SETTINGS',
                         'EXTERNAL SCRIPT PATH SETTINGS',
-                        'INTERWIKI SETTINGS',
                         'FURTHER SETTINGS',
                         'HTTP SETTINGS',
                         'REPLICATION BOT SETTINGS',
                         ):
             self.assertIn(section, config_text)
         lines = config_text.splitlines()
-        self.assertGreater(len(lines), 350)
+        self.assertGreater(len(lines), 200)
 
 
 if __name__ == '__main__':  # pragma: no cover

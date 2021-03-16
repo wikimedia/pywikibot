@@ -6,6 +6,7 @@
 #
 import copy
 import json
+import unittest
 
 from contextlib import suppress
 from decimal import Decimal
@@ -13,20 +14,12 @@ from decimal import Decimal
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.page import (
-    WikibasePage, ItemPage, PropertyPage, Page, LanguageDict, AliasesDict,
-    ClaimCollection, SiteLinkCollection,
-)
+from pywikibot.page import ItemPage, Page, PropertyPage, WikibasePage
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion
 
 from tests import join_pages_path, mock
-from tests.aspects import (
-    DeprecationTestCase,
-    TestCase,
-    unittest,
-    WikidataTestCase,
-)
+from tests.aspects import TestCase, WikidataTestCase
 
 from tests.basepage import (
     BasePageMethodsTestBase,
@@ -68,40 +61,6 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
-
-
-class TestDeprecatedAttributes(WikidataTestCase, DeprecationTestCase):
-
-    """Test deprecated lastrevid."""
-
-    def test_lastrevid(self):
-        """Test deprecated lastrevid."""
-        item = ItemPage(self.get_repo(), 'Q60')
-        self.assertFalse(hasattr(item, 'lastrevid'))
-        item.get()
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertIsInstance(item.lastrevid, int)
-        self.assertDeprecation()
-        self._reset_messages()
-
-        item.lastrevid = 1
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertTrue(hasattr(item, '_revid'))
-        self.assertEqual(item.lastrevid, 1)
-        self.assertEqual(item._revid, 1)
-        self.assertDeprecation()
-
-    def test_lastrevid_del(self):
-        """Test del with deprecated lastrevid."""
-        item = ItemPage(self.get_repo(), 'Q60')
-        item.get()
-        self.assertTrue(hasattr(item, 'lastrevid'))
-        self.assertTrue(hasattr(item, '_revid'))
-
-        del item.lastrevid
-        self.assertFalse(hasattr(item, 'lastrevid'))
-        self.assertFalse(hasattr(item, '_revid'))
-        self.assertDeprecation()
 
 
 class TestGeneral(WikidataTestCase):
@@ -349,7 +308,8 @@ class TestWbTime(WbRepresentationTestCase):
 
         t = pywikibot.WbTime(site=repo, year=-2010, hour=12, minute=43)
         regex = r'^You cannot turn BC dates into a Timestamp$'
-        self.assertRaisesRegex(ValueError, regex, t.toTimestamp)
+        with self.assertRaisesRegex(ValueError, regex):
+            t.toTimestamp()
 
         t = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                              minute=43, second=0)
@@ -730,8 +690,8 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         """Test WbGeoShape error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:TemplateData/TemplateData.tab')
-        regex = r"^Page must be in 'Data:' namespace and end in '\.map' " + \
-                r'for geo-shape\.$'
+        regex = (r"^Page must be in 'Data:' namespace and end in '\.map' "
+                 r'for geo-shape\.$')
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
@@ -806,8 +766,8 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         """Test WbTabularData error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
-        regex = r"^Page must be in 'Data:' namespace and end in '\.tab' " + \
-                r'for tabular-data\.$'
+        regex = (r"^Page must be in 'Data:' namespace and end in '\.tab' "
+                 r'for tabular-data\.$')
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
@@ -1065,13 +1025,17 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(numeric_id, 7)
         self.assertFalse(hasattr(item, '_content'))
         regex = r"^Page .+ doesn't exist\.$"
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(
+                pywikibot.NoPage,
+                regex):
+            item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item.id, 'Q7')
         self.assertEqual(item.getID(), 'Q7')
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.title(), 'Q7')
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+            item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.getID(), 'Q7')
@@ -1085,7 +1049,8 @@ class TestItemLoad(WikidataTestCase):
         self.assertFalse(item.exists())
         self.assertEqual(item.getID(), 'Q9999999999999999999')
         regex = r"^Page .+ doesn't exist\.$"
-        self.assertRaisesRegex(pywikibot.NoPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+            item.get()
 
     def test_fromPage_noprops(self):
         """Test item from page without properties."""
@@ -1264,7 +1229,8 @@ class TestItemLoad(WikidataTestCase):
         # without a full debug log.
         # It should raise NoPage on the source page, with title 'Test page'
         # as that is what the bot operator needs to see in the log output.
-        self.assertRaisesRegex(pywikibot.NoPage, 'Test page', item.get)
+        with self.assertRaisesRegex(pywikibot.NoPage, 'Test page'):
+            item.get()
 
     def test_from_entity_uri(self):
         """Test ItemPage.from_entity_uri."""
@@ -1285,8 +1251,8 @@ class TestItemLoad(WikidataTestCase):
         """Test ItemPage.from_entity_uri with unexpected item repo."""
         repo = self.get_repo()
         entity_uri = 'http://test.wikidata.org/entity/Q124'
-        regex = r'^The supplied data repository \(.+\) does not ' + \
-                r'correspond to that of the item \(.+\)$'
+        regex = (r'^The supplied data repository \(.+\) does not '
+                 r'correspond to that of the item \(.+\)$')
         with self.assertRaisesRegex(ValueError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
@@ -1329,8 +1295,8 @@ class TestRedirects(WikidataTestCase):
         self.assertFalse(item.isRedirectPage())
         self.assertTrue(item.exists())
         regex = r'^Page .+ is not a redirect page\.$'
-        self.assertRaisesRegex(pywikibot.IsNotRedirectPage, regex,
-                               item.getRedirectTarget)
+        with self.assertRaisesRegex(pywikibot.IsNotRedirectPage, regex):
+            item.getRedirectTarget()
 
     def test_redirect_item(self):
         """Test redirect item."""
@@ -1344,7 +1310,8 @@ class TestRedirects(WikidataTestCase):
         self.assertEqual(item.getRedirectTarget(), target)
         self.assertIsInstance(item.getRedirectTarget(), ItemPage)
         regex = r'^Page .+ is a redirect page\.$'
-        self.assertRaisesRegex(pywikibot.IsRedirectPage, regex, item.get)
+        with self.assertRaisesRegex(pywikibot.IsRedirectPage, regex):
+            item.get()
 
     def test_redirect_item_without_get(self):
         """Test redirect item without explicit get operation."""
@@ -1788,243 +1755,6 @@ class TestLinks(WikidataTestCase):
         self.assertLength(wvlinks, 2)
 
 
-class DataCollectionTestCase(WikidataTestCase):
-
-    """Test case for a Wikibase collection class."""
-
-    collection_class = None
-
-    def _test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        cls = self.collection_class
-        result = cls.new_empty(self.get_repo())
-        self.assertIsEmpty(result)
-
-
-class TestLanguageDict(DataCollectionTestCase):
-
-    """Test cases covering LanguageDict methods."""
-
-    collection_class = LanguageDict
-
-    family = 'wikipedia'
-    code = 'en'
-
-    dry = True
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        self.site = self.get_site()
-        self.lang_out = {'en': 'foo', 'zh': 'bar'}
-
-    def test_init(self):
-        """Test LanguageDict initializer."""
-        ld = LanguageDict()
-        self.assertLength(ld, 0)
-        ld = LanguageDict(self.lang_out)
-        self.assertLength(ld, 2)
-
-    def test_setitem(self):
-        """Test LanguageDict.__setitem__ metamethod."""
-        ld = LanguageDict(self.lang_out)
-        self.assertIn('en', ld)
-        ld[self.site] = 'bar'
-        self.assertIn('en', ld)
-
-    def test_getitem(self):
-        """Test LanguageDict.__getitem__ metamethod."""
-        ld = LanguageDict(self.lang_out)
-        self.assertEqual(ld['en'], 'foo')
-        self.assertEqual(ld[self.site], 'foo')
-        self.assertIsNone(ld.get('de'))
-
-    def test_delitem(self):
-        """Test LanguageDict.__delitem__ metamethod."""
-        ld = LanguageDict(self.lang_out)
-        ld.pop(self.site)
-        ld.pop('zh')
-        self.assertNotIn('en', ld)
-        self.assertNotIn('zh', ld)
-        self.assertLength(ld, 0)
-
-    def test_fromJSON(self):
-        """Test LanguageDict.fromJSON method."""
-        ld = LanguageDict.fromJSON(
-            {'en': {'language': 'en', 'value': 'foo'},
-             'zh': {'language': 'zh', 'value': 'bar'}})
-        self.assertIsInstance(ld, LanguageDict)
-        self.assertEqual(ld, LanguageDict(self.lang_out))
-
-    def test_toJSON(self):
-        """Test LanguageDict.toJSON method."""
-        ld = LanguageDict()
-        self.assertEqual(ld.toJSON(), {})
-        ld = LanguageDict(self.lang_out)
-        self.assertEqual(
-            ld.toJSON(), {'en': {'language': 'en', 'value': 'foo'},
-                          'zh': {'language': 'zh', 'value': 'bar'}})
-
-    def test_toJSON_diffto(self):
-        """Test LanguageDict.toJSON method."""
-        ld = LanguageDict({'de': 'foo', 'zh': 'bar'})
-        diffto = {
-            'de': {'language': 'de', 'value': 'bar'},
-            'en': {'language': 'en', 'value': 'foo'}}
-        self.assertEqual(
-            ld.toJSON(diffto=diffto),
-            {'de': {'language': 'de', 'value': 'foo'},
-             'en': {'language': 'en', 'value': ''},
-             'zh': {'language': 'zh', 'value': 'bar'}})
-
-    def test_normalizeData(self):
-        """Test LanguageDict.normalizeData method."""
-        self.assertEqual(
-            LanguageDict.normalizeData(self.lang_out),
-            {'en': {'language': 'en', 'value': 'foo'},
-             'zh': {'language': 'zh', 'value': 'bar'}})
-
-    def test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        self._test_new_empty()
-
-
-class TestAliasesDict(DataCollectionTestCase):
-
-    """Test cases covering AliasesDict methods."""
-
-    collection_class = AliasesDict
-
-    family = 'wikipedia'
-    code = 'en'
-
-    dry = True
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        self.site = self.get_site()
-        self.lang_out = {'en': ['foo', 'bar'],
-                         'zh': ['foo', 'bar']}
-
-    def test_init(self):
-        """Test AliasesDict initializer."""
-        ad = AliasesDict()
-        self.assertLength(ad, 0)
-        ad = AliasesDict(self.lang_out)
-        self.assertLength(ad, 2)
-
-    def test_setitem(self):
-        """Test AliasesDict.__setitem__ metamethod."""
-        ad = AliasesDict(self.lang_out)
-        self.assertIn('en', ad)
-        self.assertIn('zh', ad)
-        ad[self.site] = ['baz']
-        self.assertIn('en', ad)
-
-    def test_getitem(self):
-        """Test AliasesDict.__getitem__ metamethod."""
-        ad = AliasesDict(self.lang_out)
-        self.assertEqual(ad['en'], ['foo', 'bar'])
-        self.assertEqual(ad[self.site], ['foo', 'bar'])
-        self.assertIsNone(ad.get('de'))
-
-    def test_delitem(self):
-        """Test AliasesDict.__delitem__ metamethod."""
-        ad = AliasesDict(self.lang_out)
-        ad.pop(self.site)
-        ad.pop('zh')
-        self.assertNotIn('en', ad)
-        self.assertNotIn('zh', ad)
-        self.assertLength(ad, 0)
-
-    def test_fromJSON(self):
-        """Test AliasesDict.fromJSON method."""
-        ad = AliasesDict.fromJSON(
-            {'en': [{'language': 'en', 'value': 'foo'},
-                    {'language': 'en', 'value': 'bar'}],
-             'zh': [{'language': 'zh', 'value': 'foo'},
-                    {'language': 'zh', 'value': 'bar'}],
-             })
-        self.assertIsInstance(ad, AliasesDict)
-        self.assertEqual(ad, AliasesDict(self.lang_out))
-
-    def test_toJSON(self):
-        """Test AliasesDict.toJSON method."""
-        ad = AliasesDict()
-        self.assertEqual(ad.toJSON(), {})
-        ad = AliasesDict(self.lang_out)
-        self.assertEqual(
-            ad.toJSON(),
-            {'en': [{'language': 'en', 'value': 'foo'},
-                    {'language': 'en', 'value': 'bar'}],
-             'zh': [{'language': 'zh', 'value': 'foo'},
-                    {'language': 'zh', 'value': 'bar'}],
-             })
-
-    def test_toJSON_diffto(self):
-        """Test AliasesDict.toJSON method."""
-        ad = AliasesDict(self.lang_out)
-        diffto = {
-            'de': [
-                {'language': 'de', 'value': 'foo'},
-                {'language': 'de', 'value': 'bar'},
-            ],
-            'en': [
-                {'language': 'en', 'value': 'foo'},
-                {'language': 'en', 'value': 'baz'},
-            ]}
-        self.assertEqual(
-            ad.toJSON(diffto=diffto),
-            {'de': [{'language': 'de', 'value': 'foo', 'remove': ''},
-                    {'language': 'de', 'value': 'bar', 'remove': ''}],
-             'en': [{'language': 'en', 'value': 'foo'},
-                    {'language': 'en', 'value': 'bar'}],
-             'zh': [{'language': 'zh', 'value': 'foo'},
-                    {'language': 'zh', 'value': 'bar'}]
-             })
-
-    def test_normalizeData(self):
-        """Test AliasesDict.normalizeData method."""
-        data_in = {'en': [
-            {'language': 'en', 'value': 'foo'},
-            'bar',
-            {'language': 'en', 'value': 'baz', 'remove': ''},
-        ]}
-        data_out = {'en': [
-            {'language': 'en', 'value': 'foo'},
-            {'language': 'en', 'value': 'bar'},
-            {'language': 'en', 'value': 'baz', 'remove': ''},
-        ]}
-        self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
-
-    def test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        self._test_new_empty()
-
-
-class TestClaimCollection(DataCollectionTestCase):
-
-    """Test cases covering ClaimCollection methods."""
-
-    collection_class = ClaimCollection
-
-    def test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        self._test_new_empty()
-
-
-class TestSiteLinkCollection(DataCollectionTestCase):
-
-    """Test cases covering SiteLinkCollection methods."""
-
-    collection_class = SiteLinkCollection
-
-    def test_new_empty(self):
-        """Test that new_empty method returns empty collection."""
-        self._test_new_empty()
-
-
 class TestWriteNormalizeData(TestCase):
 
     """Test cases for routines that normalize data for writing to Wikidata.
@@ -2114,9 +1844,11 @@ class TestNamespaces(WikidataTestCase):
         wikidata = self.get_repo()
         page = WikibasePage(wikidata)
         regex = r' object has no attribute '
-        self.assertRaisesRegex(AttributeError, regex, page.namespace)
+        with self.assertRaisesRegex(AttributeError, regex):
+            page.namespace()
         page = WikibasePage(wikidata, title='')
-        self.assertRaisesRegex(AttributeError, regex, page.namespace)
+        with self.assertRaisesRegex(AttributeError, regex):
+            page.namespace()
 
         page = WikibasePage(wikidata, ns=0)
         self.assertEqual(page.namespace(), 0)
@@ -2296,8 +2028,8 @@ class TestOwnClient(TestCase):
         """Test that page_from_repository method fails."""
         site = self.get_site(key)
         dummy_item = 'Q1'
-        regex = r'^page_from_repository method is not implemented ' + \
-                r'for Wikibase .+\.$'
+        regex = (r'^page_from_repository method is not implemented '
+                 r'for Wikibase .+\.$')
         with self.assertRaisesRegex(NotImplementedError, regex):
             site.page_from_repository(dummy_item)
 
@@ -2331,8 +2063,8 @@ class TestUnconnectedClient(TestCase):
         regex = r' has no data repository$'
         with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
             ItemPage.fromPage(self.wdp)
-        self.assertRaisesRegex(pywikibot.WikiBaseError, regex,
-                               self.wdp.data_item)
+        with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
+            self.wdp.data_item()
 
     def test_has_data_repository(self, key):
         """Test that site has no data repository."""
@@ -2351,8 +2083,6 @@ class TestUnconnectedClient(TestCase):
 class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
-
-    dry = True
 
     def setUp(self):
         """Setup test."""
@@ -2426,56 +2156,6 @@ class TestJSON(WikidataTestCase):
         }
         diff = self.wdp.toJSON(diffto=self.wdp._content)
         self.assertEqual(diff, expected)
-
-
-class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
-
-    """Test deprecated DataSite get_* methods."""
-
-    cached = True
-
-    def test_get_info(self):
-        """Test get_info."""
-        data = self.repo.get_info(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('title', data)
-        self.assertEqual(data['title'], 'Q60')
-
-    def test_get_labels(self):
-        """Test get_labels."""
-        data = self.repo.get_labels(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('en', data)
-
-    def test_get_aliases(self):
-        """Test get_aliases."""
-        data = self.repo.get_aliases(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('fr', data)  # T170073
-
-    def test_get_descriptions(self):
-        """Test get_descriptions."""
-        data = self.repo.get_descriptions(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('en', data)
-
-    def test_get_sitelinks(self):
-        """Test get_sitelinks."""
-        data = self.repo.get_sitelinks(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('enwiki', data)
-
-    def test_get_urls(self):
-        """Test get_urls."""
-        data = self.repo.get_urls(60)
-        self.assertOneDeprecation()
-        self.assertIsInstance(data, dict)
-        self.assertIn('enwiki', data)
 
 
 if __name__ == '__main__':  # pragma: no cover

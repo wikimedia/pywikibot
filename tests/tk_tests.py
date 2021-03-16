@@ -1,15 +1,16 @@
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os
+import unittest
 
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+from tests.aspects import TestCase, DefaultSiteTestCase
 
 
 if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':

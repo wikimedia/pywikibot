@@ -1,6 +1,6 @@
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,30 +66,34 @@ class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
         cc = CosmeticChangesToolkit(self.site, namespace=0)
 
         # Invalid characters
-        self.assertRaisesRegex(AnyIsbnValidationException,
-                               '|'.join((self.ISBN_DIGITERROR_RE,
-                                         self.ISBN_INVALIDERROR_RE,
-                                         self.ISBN_INVALIDLENGTHERROR_RE)),
-                               cc.fix_ISBN, 'ISBN 0975229LOL')
+        with self.assertRaisesRegex(
+                AnyIsbnValidationException,
+                '|'.join((self.ISBN_DIGITERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE))):
+            cc.fix_ISBN('ISBN 0975229LOL')
         # Invalid checksum
-        self.assertRaisesRegex(AnyIsbnValidationException,
-                               '|'.join((self.ISBN_CHECKSUMERROR_RE,
-                                         self.ISBN_INVALIDERROR_RE,
-                                         self.ISBN_INVALIDLENGTHERROR_RE,
-                                         self.ISBN_INVALIDCHECKERROR_RE)),
-                               cc.fix_ISBN, 'ISBN 0975229801')
+        with self.assertRaisesRegex(
+                AnyIsbnValidationException,
+                '|'.join((self.ISBN_CHECKSUMERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE,
+                          self.ISBN_INVALIDCHECKERROR_RE))):
+            cc.fix_ISBN('ISBN 0975229801')
         # Invalid length
-        self.assertRaisesRegex(AnyIsbnValidationException,
-                               '|'.join((self.ISBN_DIGITERROR_RE,
-                                         self.ISBN_INVALIDERROR_RE,
-                                         self.ISBN_INVALIDLENGTHERROR_RE)),
-                               cc.fix_ISBN, 'ISBN 09752298')
+        with self.assertRaisesRegex(
+                AnyIsbnValidationException,
+                '|'.join((self.ISBN_DIGITERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE))):
+            cc.fix_ISBN('ISBN 09752298')
         # X in the middle
-        self.assertRaisesRegex(AnyIsbnValidationException,
-                               '|'.join((self.ISBN_INVALIDCHARERROR_RE,
-                                         self.ISBN_INVALIDERROR_RE,
-                                         self.ISBN_INVALIDLENGTHERROR_RE)),
-                               cc.fix_ISBN, 'ISBN 09752X9801')
+        with self.assertRaisesRegex(
+            AnyIsbnValidationException,
+            '|'.join((self.ISBN_INVALIDCHARERROR_RE,
+                      self.ISBN_INVALIDERROR_RE,
+                      self.ISBN_INVALIDLENGTHERROR_RE))):
+            cc.fix_ISBN('ISBN 09752X9801')
 
     def test_ignore_invalid_isbn(self):
         """Test fixing ISBN numbers with an invalid ISBN."""

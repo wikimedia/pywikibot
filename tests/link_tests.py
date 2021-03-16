@@ -14,7 +14,7 @@ from pywikibot import config2 as config
 from pywikibot import Site
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import InvalidTitle, TimeoutError
+from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 
 from tests.aspects import (
     unittest,
@@ -376,9 +376,9 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
         self.assertEqual(link.namespace, 4)
 
 
-class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
+class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
 
-    """Test link to a different family."""
+    """Test link to a different family with and without preleading colon."""
 
     sites = {
         'enws': {
@@ -392,43 +392,49 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
     }
     cached = True
 
+    PATTERN = '{colon}{first}:{second}:{title}'
+
     def setUp(self):
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':en:wikipedia:Main Page' on enws is namespace 0."""
-        link = Link(':en:wikipedia:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 0)
+    def test_fully_qualified_NS0(self):
+        """Test that fully qualified link is in namespace 0."""
+        family, code = 'wikipedia:en'.split(':')
+        for colon in ('', ':'):  # with or without preleading colon
+            # switch code:family sequence en:wikipedia or wikipedia:en
+            for first, second in [(family, code), (code, family)]:
+                with self.subTest(colon=colon,
+                                  site='{}:{}'.format(first, second)):
+                    link_title = self.PATTERN.format(colon=colon,
+                                                     first=first,
+                                                     second=second,
+                                                     title='Main Page')
+                    link = Link(link_title)
+                    link.parse()
+                    self.assertEqual(link.site, self.get_site('enwp'))
+                    self.assertEqual(link.title, 'Main Page')
+                    self.assertEqual(link.namespace, 0)
 
-    def test_fully_qualified_NS1_code(self):
-        """Test ':en:wikipedia:Main Page' on enwp is namespace 1."""
-        link = Link(':en:wikipedia:Talk:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 1)
-
-    def test_fully_qualified_NS0_family(self):
-        """Test ':wikipedia:en:Main Page' on enws is namespace 0."""
-        link = Link(':wikipedia:en:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 0)
-
-    def test_fully_qualified_NS1_family(self):
-        """Test ':wikipedia:en:Talk:Main Page' on enws is namespace 1."""
-        link = Link(':wikipedia:en:Talk:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 1)
+    def test_fully_qualified_NS1(self):
+        """Test that fully qualified link is in namespace 1."""
+        family, code = 'wikipedia:en'.split(':')
+        for colon in ('', ':'):  # with or without preleading colon
+            # switch code:family sequence en:wikipedia or wikipedia:en
+            for first, second in [(family, code), (code, family)]:
+                with self.subTest(colon=colon,
+                                  site='{}:{}'.format(first, second)):
+                    link_title = self.PATTERN.format(colon=colon,
+                                                     first=first,
+                                                     second=second,
+                                                     title='Talk:Main Page')
+                    link = Link(link_title)
+                    link.parse()
+                    self.assertEqual(link.site, self.get_site('enwp'))
+                    self.assertEqual(link.title, 'Main Page')
+                    self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
@@ -720,61 +726,6 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
         self.assertEqual(link.namespace, 4)
 
 
-class TestFullyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
-
-    """Test link to a different family without preleading colon."""
-
-    sites = {
-        'enws': {
-            'family': 'wikisource',
-            'code': 'en'
-        },
-        'enwp': {
-            'family': 'wikipedia',
-            'code': 'en'
-        }
-    }
-    cached = True
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikisource'
-
-    def test_fully_qualified_NS0_code(self):
-        """Test 'en:wikipedia:Main Page' on enws is namespace 0."""
-        link = Link('en:wikipedia:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 0)
-
-    def test_fully_qualified_NS1_code(self):
-        """Test 'en:wikipedia:Main Page' on enws is namespace 1."""
-        link = Link('en:wikipedia:Talk:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 1)
-
-    def test_fully_qualified_NS0_family(self):
-        """Test 'wikipedia:en:Main Page' on enws is namespace 0."""
-        link = Link('wikipedia:en:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 0)
-
-    def test_fully_qualified_NS1_family(self):
-        """Test 'wikipedia:en:Talk:Main Page' on enws is namespace 1."""
-        link = Link('wikipedia:en:Talk:Main Page')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('enwp'))
-        self.assertEqual(link.title, 'Main Page')
-        self.assertEqual(link.namespace, 1)
-
-
 class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
 
     """Test implicit link from family without lang code to other family."""
@@ -942,15 +893,18 @@ class TestEmptyTitle(TestCase):
     def test_interwiki_namespace_without_title(self):
         """Test that Link doesn't allow links without a title."""
         link = Link('en:Help:', self.get_site())
-        self.assertRaisesRegex(
-            InvalidTitle, "'en:Help:' has no title.", link.parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                "'en:Help:' has no title."):
+            link.parse()
 
     def test_no_text(self):
         """Test that Link doesn't allow empty."""
         link = Link('', self.get_site())
-        self.assertRaisesRegex(
-            InvalidTitle, 'The link does not contain a page title',
-            link.parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                'The link does not contain a page title'):
+            link.parse()
 
     def test_namespace_lookalike(self):
         """Test that Link does only detect valid namespaces."""
@@ -978,12 +932,10 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         """Test that Link fails if the interwiki prefix is not a wiki."""
         link = Link('bugzilla:1337', source=self.site)
         # bugzilla does not return a json content but redirects to phab.
-        # api.Request._json_loads cannot detect this problem and retries
-        # reloading due to 'the server may be down'
-
-        # ignore Timeout when trying to load siteninfo;
-        # the site is created anyway but the title cannot be parsed
-        with suppress(TimeoutError):
+        # api.Request._json_loads cannot detect this problem and raises
+        # a SiteDefinitionError. The site is created anyway but the title
+        # cannot be parsed
+        with self.assertRaises(SiteDefinitionError):
             link.site
         self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
         self.assertTrue(link._is_interwiki)

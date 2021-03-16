@@ -1,6 +1,6 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2010-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,25 +21,26 @@ from pywikibot.tools import MediaWikiVersion
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
-MIN_VERSION = MediaWikiVersion('1.19')
+MIN_VERSION = MediaWikiVersion('1.23')
 
 
 class MWSite:
 
     """Minimal wiki site class."""
 
-    def __init__(self, fromurl):
+    def __init__(self, fromurl, **kwargs):
         """
         Initializer.
 
         @raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
         @raises Timeout: a timeout occurred while loading the site
-        @raises RuntimeError: Version not found or version less than 1.19
+        @raises RuntimeError: Version not found or version less than 1.23
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
-        r = fetch(fromurl)
+
+        r = fetch(fromurl, **kwargs)
         check_response(r)
 
         if fromurl != r.url:
@@ -173,7 +174,7 @@ class MWSite:
     def api(self) -> Optional[str]:
         """Get api URL."""
         if self.server is None or self.scriptpath is None:
-            return
+            return None
 
         return self.server + self.scriptpath + '/api.php'
 

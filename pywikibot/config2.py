@@ -14,13 +14,7 @@ shown if user-config.py was not loaded. To prevent these warnings, set
 PYWIKIBOT_NO_USER_CONFIG=2. If pywikibot is installed as a site-package
 the behaviour is like PYWIKIBOT_NO_USER_CONFIG=2 is set.
 
-Provides two functions to register family classes which can be used in
-the user-config:
-
- - register_family_file
- - register_families_folder
-
-Other functions made available to user-config:
+Functions made available to user-config:
 
  - user_home_path
 
@@ -32,7 +26,7 @@ build paths relative to base_dir:
  - shortpath
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,9 +47,9 @@ from typing import Optional, Union
 from warnings import warn
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Dict, List, removesuffix, Tuple
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning, deprecated
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -110,9 +104,20 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {
-    'available_ssl_project', 'fake_user_agent', 'interwiki_contents_on_disk',
-    'line_separator', 'LS', 'panoramio', 'proxy', 'special_page_limit',
+    'available_ssl_project', 'copyright_check_in_source_google',
+    'copyright_check_in_source_msn', 'copyright_check_in_source_section_names',
+    'copyright_check_in_source_yahoo', 'copyright_connection_tries',
+    'copyright_economize_query', 'copyright_exceeded_in_queries',
+    'copyright_exceeded_in_queries_sleep_hours', 'copyright_google',
+    'copyright_max_query_for_page', 'copyright_msn', 'copyright_show_date',
+    'copyright_show_length', 'copyright_skip_query', 'copyright_yahoo',
+    'db_hostname', 'deIndentTables', 'fake_user_agent', 'flickr',
+    'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
+    'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
+    'interwiki_shownew', 'line_separator', 'LS', 'msn_appid', 'panoramio',
+    'persistent_http', 'proxy', 'special_page_limit', 'splitLongParagraphs',
     'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
+    'without_interwiki', 'yahoo_appid',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -383,24 +388,23 @@ for arg in sys.argv[1:]:
 family_files = {}
 
 
+@deprecated('family_files[family_name] = file_path', since='20210305')
 def register_family_file(family_name, file_path):
     """Register a single family class file.
 
     Parameter file_path may be a path or an url.
     family.AutoFamily function is used when the url is given.
     """
-    usernames[family_name] = {}
-    disambiguation_comment[family_name] = {}
     family_files[family_name] = file_path
 
 
 def register_families_folder(folder_path):
     """Register all family class files contained in a directory."""
+    suffix = '_family.py'
     for file_name in os.listdir(folder_path):
-        if file_name.endswith('_family.py'):
-            family_name = file_name[:-len('_family.py')]
-            register_family_file(family_name, os.path.join(folder_path,
-                                                           file_name))
+        if file_name.endswith(suffix):
+            family_name = removesuffix(file_name, suffix)
+            family_files[family_name] = os.path.join(folder_path, file_name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
@@ -513,15 +517,14 @@ editor_filename_extension = 'wiki'
 # saved in the 'logs' subdirectory.
 #
 # Example:
-#     log = ['interwiki', 'weblinkchecker', 'table2wiki']
+#     log = ['redirect', 'replace', 'weblinkchecker']
 # It is also possible to enable logging for all scripts, using this line:
 #     log = ['*']
 # To disable all logging, use this:
 #     log = []
-# Per default, logging of interwiki.py is enabled because its logfiles can
-# be used to generate so-called warnfiles.
+# Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = ['interwiki']
+log = []
 # filename defaults to modulename-bot.log
 logfilename = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
@@ -560,48 +563,20 @@ debug_log = []
 # user_script_paths = ['scripts.myscripts']
 user_script_paths = []  # type: List[str]
 
-# ############# INTERWIKI SETTINGS ##############
-
-# Should interwiki.py report warnings for missing links between foreign
-# languages?
-interwiki_backlink = True
-
-# Should interwiki.py display every new link it discovers?
-interwiki_shownew = True
-
-# Should interwiki.py output a graph PNG file on conflicts?
-# You need pydot for this:
-# https://pypi.org/project/pydot/
-interwiki_graph = False
-
-# Specifies that the robot should process that amount of subjects at a time,
-# only starting to load new pages in the original language when the total
-# falls below that number. Default is to process (at least) 100 subjects at
-# once.
-interwiki_min_subjects = 100
-
-# If interwiki graphs are enabled, which format(s) should be used?
-# Supported formats include png, jpg, ps, and svg. See:
-# http://www.graphviz.org/doc/info/output.html
-# If you want to also dump the dot files, you can use this in your
-# user-config.py:
-# interwiki_graph_formats = ['dot', 'png']
-# If you need a PNG image with an HTML image map, use this:
-# interwiki_graph_formats = ['png', 'cmap']
-# If you only need SVG images, use:
-# interwiki_graph_formats = ['svg']
-interwiki_graph_formats = ['png']
-
-# You can post the contents of your autonomous_problems.dat to the wiki,
-# e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
-# This allows others to assist you in resolving interwiki problems.
-# To help these people, you can upload the interwiki graphs to your
-# webspace somewhere. Set the base URL here, e.g.:
-# 'https://www.example.org/~yourname/interwiki-graphs/'
-interwiki_graph_url = None
-
-# Save file with local articles without interwikis.
-without_interwiki = False
+# ############# EXTERNAL FAMILIES SETTINGS ##############
+# Set your own family path to lookup for your family files.
+#
+# Your private family path may be either an absolute or a relative path.
+# You may have multiple paths defined in user_families_paths list.
+#
+# You may also define various family files stored directly in
+# family_files dict. Use the family name as dict key and the path or an
+# url as value.
+#
+# samples:
+# family_files['mywiki'] = 'https://de.wikipedia.org'
+# user_families_paths = ['data/families']
+user_families_paths = []  # type: List[str]
 
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
@@ -663,15 +638,6 @@ retry_wait = 5
 # Maximum time to wait before resubmitting a failed API request.
 retry_max = 120
 
-# ############# TABLE CONVERSION BOT SETTINGS ##############
-
-# Will split long paragraphs for better reading the source.
-# Only table2wiki.py use it by now.
-splitLongParagraphs = False
-# sometimes HTML-tables are indented for better reading.
-# That can do very ugly results.
-deIndentTables = True
-
 # ############# WEBLINK CHECKER SETTINGS ##############
 
 # How many external links should weblinkchecker.py check at the same time?
@@ -689,10 +655,10 @@ weblink_dead_days = 7
 # db_name_format can be used to manipulate the dbName of site.
 #
 # Example for a pywikibot running on wmflabs:
-# db_hostname = 'enwiki.analytics.db.svc.eqiad.wmflabs'
+# db_hostname_format = '{0}.analytics.db.svc.eqiad.wmflabs'
 # db_name_format = '{0}_p'
 # db_connect_file = user_home_path('replica.my.cnf')
-db_hostname = 'localhost'
+db_hostname_format = 'localhost'
 db_username = ''
 db_password = ''
 db_name_format = '{0}'
@@ -702,88 +668,7 @@ db_connect_file = user_home_path('.my.cnf')
 #     user@login.toolforge.org
 db_port = 3306
 
-# ############# SEARCH ENGINE SETTINGS ##############
-# Live search web service appid settings.
-#
-# Yahoo! Search Web Services are not operational.
-# See https://phabricator.wikimedia.org/T106085
-yahoo_appid = ''
-
-# To use Windows Live Search web service you must get an AppID from
-# http://www.bing.com/dev/en-us/dev-center
-msn_appid = ''
-
-# ############# FLICKR RIPPER SETTINGS ##############
-
-# Using the Flickr api
-flickr = {
-    'api_key': '',  # Provide your key!
-    'api_secret': '',  # Api secret of your key (optional)
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': '',  # If so, under what reviewer name?
-}
-
-# ############# COPYRIGHT SETTINGS ##############
-
-# Enable/disable search engine in copyright.py script
-copyright_google = True
-copyright_yahoo = True
-copyright_msn = False
-
-# Perform a deep check, loading URLs to search if 'Wikipedia' is present.
-# This may be useful to increase the number of correct results. If you haven't
-# a fast connection, you might want to keep them disabled.
-copyright_check_in_source_google = False
-copyright_check_in_source_yahoo = False
-copyright_check_in_source_msn = False
-
-# Web pages may contain a Wikipedia text without the word 'Wikipedia' but with
-# the typical '[edit]' tag as a result of a copy & paste procedure. You want
-# no report for this kind of URLs, even if they are copyright violations.
-# However, when enabled, these URLs are logged in a file.
-copyright_check_in_source_section_names = False
-
-# Limit number of queries for page.
-copyright_max_query_for_page = 25
-
-# Skip a specified number of queries
-copyright_skip_query = 0
-
-# Number of attempts on connection error.
-copyright_connection_tries = 10
-
-# Behavior if an exceeded error occur.
-#
-# Possibilities:
-#
-#    0 = None
-#    1 = Disable search engine
-#    2 = Sleep (default)
-#    3 = Stop
-copyright_exceeded_in_queries = 2
-copyright_exceeded_in_queries_sleep_hours = 6
-
-# Append last modified date of URL to script result
-copyright_show_date = True
-
-# Append length of URL to script result
-copyright_show_length = True
-
-# By default the script tries to identify and skip text that contains a large
-# comma separated list or only numbers. But sometimes that might be the
-# only part unmodified of a slightly edited and not otherwise reported
-# copyright violation. You can disable this feature to try to increase the
-# number of results.
-copyright_economize_query = True
-
 # ############# HTTP SETTINGS ##############
-# Use a persistent http connection. An http connection has to be established
-# only once per site object, making stuff a whole lot faster. Do NOT EVER
-# use this if you share Site objects across threads without proper locking.
-#
-# DISABLED FUNCTION. Setting this variable will not have any effect.
-persistent_http = False
-
 # Default socket timeout in seconds.
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your
 # script.
@@ -794,7 +679,7 @@ socket_timeout = (6.05, 45)
 
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
-# whitespace or positioning of interwiki and category links.
+# whitespace or positioning category links.
 
 # This is an experimental feature; handle with care and consider re-checking
 # each bot edit if enabling this!
@@ -878,12 +763,6 @@ pickle_protocol = 2
 # ============================
 # End of configuration section
 # ============================
-
-# ############# OBSOLETE SETTINGS #############
-# This section contains configuration options that are no longer in use.
-# They are kept here to prevent warnings about undefined parameters.
-
-# No obsolete settings currently
 
 # #############################################
 
@@ -975,6 +854,7 @@ def _detect_win32_editor():
                     break
             else:
                 return editor
+    return None
 
 
 # System-level and User-level changes.
@@ -1139,6 +1019,9 @@ if (not ignore_file_security_warnings
           " permission or set 'ignore_file_security_warnings' to true.")
     sys.exit(1)
 
+# Setup custom family files
+for file_path in user_families_paths:
+    register_families_folder(file_path)
 #
 # When called as main program, list all configuration variables
 #

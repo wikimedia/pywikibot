@@ -4,9 +4,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from pywikibot.titletranslate import translate
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class TestTitleTranslate(TestCase):

@@ -68,8 +68,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         site = self.get_site('frwikt')
         self.assertEqual(
             archivebot.str2localized_duration(site, '10d'), '10 jours')
-        self.assertEqual(
-            archivebot.str2localized_duration(site, '1y'), '1 an')
+        self.assertEqual(archivebot.str2localized_duration(site, '1y'), '1 an')
 
     def test_str2localized_duration_Japanese(self):
         """Test Japanese localizations of duration."""
@@ -145,10 +144,7 @@ class TestArchiveBot(TestCase):
     def test_archivebot(self, code=None):
         """Test archivebot for one site."""
         site = self.get_site(code)
-        if code != 'de':  # bug T69663
-            page = pywikibot.Page(site, 'user talk:xqt')
-        else:
-            page = pywikibot.Page(site, 'user talk:ladsgroup')
+        page = pywikibot.Page(site, 'user talk:xqt')
         talk = archivebot.DiscussionPage(page, None)
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
@@ -163,20 +159,16 @@ class TestArchiveBot(TestCase):
             .format(len(talk.threads), talk, THREADS[code]))
 
         for thread in talk.threads:
-            self.assertIsInstance(thread, archivebot.DiscussionThread)
-            self.assertIsInstance(thread.title, str)
-            self.assertIsInstance(thread.ts, TimeStripper)
-            self.assertEqual(thread.ts, talk.timestripper)
-            self.assertIsInstance(thread.code, str)
-            self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertIsInstance(thread.content, str)
-            try:
+            with self.subTest(thread=thread.title,
+                              content=thread.content[-72:]):
+                self.assertIsInstance(thread, archivebot.DiscussionThread)
+                self.assertIsInstance(thread.title, str)
+                self.assertIsInstance(thread.ts, TimeStripper)
+                self.assertEqual(thread.ts, talk.timestripper)
+                self.assertIsInstance(thread.code, str)
+                self.assertEqual(thread.code, talk.timestripper.site.code)
+                self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
-            except AssertionError:
-                if thread.code not in self.expected_failures:
-                    pywikibot.output('code {}: {}'
-                                     .format(thread.code, thread.content))
-                raise
 
     expected_failures = ['ar', 'eo', 'pdc', 'th']
     # FIXME: see TestArchiveBotAfterDateUpdate()
@@ -227,22 +219,16 @@ class TestArchiveBotAfterDateUpdate(TestCase):
                     THREADS_WITH_UPDATED_FORMAT[code]))
 
         for thread in talk.threads:
-            self.assertIsInstance(thread, archivebot.DiscussionThread)
-            self.assertIsInstance(thread.title, str)
-            self.assertIsInstance(thread.ts, TimeStripper)
-            self.assertEqual(thread.ts, talk.timestripper)
-            self.assertIsInstance(thread.code, str)
-            self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertIsInstance(thread.content, str)
-            try:
+            with self.subTest(thread=thread.title,
+                              content=thread.content[-72:]):
+                self.assertIsInstance(thread, archivebot.DiscussionThread)
+                self.assertIsInstance(thread.title, str)
+                self.assertIsInstance(thread.ts, TimeStripper)
+                self.assertEqual(thread.ts, talk.timestripper)
+                self.assertIsInstance(thread.code, str)
+                self.assertEqual(thread.code, talk.timestripper.site.code)
+                self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
-            except AssertionError:
-                if thread.code not in self.expected_failures:
-                    pywikibot.output('code {}: {}'
-                                     .format(thread.code, thread.content))
-                raise
-
-    expected_failures = []
 
 
 class TestDiscussionPageObject(TestCase):
@@ -252,6 +238,15 @@ class TestDiscussionPageObject(TestCase):
     cached = True
     family = 'wikipedia'
     code = 'test'
+
+    def load_page(self, title: str):
+        """Load the given page."""
+        page = pywikibot.Page(self.site, title)
+        tmpl = pywikibot.Page(self.site, 'User:MiszaBot/config')
+        archiver = archivebot.PageArchiver(page=page, template=tmpl, salt='')
+        page = archivebot.DiscussionPage(page, archiver)
+        page.load_page()
+        self.page = page
 
     def testTwoThreadsWithCommentedOutThread(self):
         """Test recognizing two threads and ignoring a commented out thread.
@@ -272,14 +267,8 @@ class TestDiscussionPageObject(TestCase):
          == B ==
          foo bar bar bar
         """
-        site = self.get_site()
-        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot')
-        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
-        archiver = archivebot.PageArchiver(
-            page=page, template=tmpl, salt='', force=False)
-        page = archivebot.DiscussionPage(page, archiver)
-        page.load_page()
-        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+        self.load_page('Talk:For-pywikibot-archivebot')
+        self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
 
     def testThreadsWithSubsections(self):
         """Test recognizing threads with subsections.
@@ -301,14 +290,26 @@ class TestDiscussionPageObject(TestCase):
          == B ==
          foo bar bar bar
         """
-        site = self.get_site()
-        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot/testcase2')
-        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
-        archiver = archivebot.PageArchiver(
-            page=page, template=tmpl, salt='', force=False)
-        page = archivebot.DiscussionPage(page, archiver)
-        page.load_page()
-        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+        self.load_page('Talk:For-pywikibot-archivebot/testcase2')
+        self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
+
+    def test_is_full_method(self):
+        """Test DiscussionPage.is_full method."""
+        self.load_page('Talk:For-pywikibot-archivebot')
+        page = self.page
+        self.assertEqual(page.archiver.maxsize, 2096128)
+        self.assertEqual(page.size(), 181)
+        self.assertTrue(page.is_full((100, 'B')))
+        page.full = False
+        self.assertFalse(page.is_full((1000, 'B')))
+        page.full = False
+        self.assertFalse(page.is_full((3, 'T')))
+        page.full = False
+        self.assertTrue(page.is_full((2, 'T')))
+        self.assertTrue(page.is_full((3, 'T')))  # page.full is kept
+        page.full = False
+        page.archiver.maxsize = 100
+        self.assertTrue(page.is_full((1000, 'B')))  # maxsize is used
 
 
 class TestPageArchiverObject(TestCase):

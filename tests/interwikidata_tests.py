@@ -1,9 +1,11 @@
 """Tests for scripts/interwikidata.py."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -12,7 +14,7 @@ from pywikibot import Link
 
 from scripts import interwikidata
 
-from tests.aspects import unittest, SiteAttributeTestCase
+from tests.aspects import SiteAttributeTestCase
 from tests.utils import empty_sites
 
 
@@ -90,17 +92,15 @@ class TestInterwikidataBot(SiteAttributeTestCase):
     def test_without_repo(self):
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
-        self.assertRaises(ValueError, DummyBot, generator=[wt_page],
-                          site=self.wt)
+        with self.assertRaises(ValueError):
+            DummyBot(generator=[wt_page],
+                     site=self.wt)
 
-        self.assertRaisesRegex(
-            ValueError,
-            r'wikitech:en does not have a data repository, '
-            r'use interwiki\.py instead.',
-            interwikidata.IWBot,
-            generator=[pywikibot.Page(self.wt, 'User:Dalba')],
-            site=self.wt,
-        )
+        with self.assertRaisesRegex(
+                ValueError, 'wikitech:en does not have a data repository.'):
+            interwikidata.IWBot(
+                generator=[pywikibot.Page(self.wt, 'User:Dalba')],
+                site=self.wt)
 
 
 if __name__ == '__main__':  # pragma: no cover

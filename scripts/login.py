@@ -7,9 +7,8 @@ sure this bot account is well known on your home wiki before using.
 
 The following parameters are supported:
 
-   -family:FF
-   -lang:LL     Log in to the LL language of the FF family.
-                Example: -family:wiktionary -lang:fr will log you in at
+   -family:FF   Log in to the LL language of the FF family.
+   -lang:LL     Example: -family:wiktionary -lang:fr will log you in at
                 fr.wiktionary.org.
 
    -site:FF:LL  Log in to the LL language of the FF family
@@ -21,23 +20,9 @@ The following parameters are supported:
                 all sites, or with -family and -lang to log out of a specific
                 site.
 
-   -force       Ignores if the user is already logged in, and tries to log in.
-
-   -pass        Useful in combination with -all when you have accounts for
-                several sites and use the same password for all of them.
-                Asks you for the password, then logs in on all given sites.
-
-   -pass:XXXX   Uses XXXX as password. Be careful if you use this
-                parameter because your password will be shown on your
-                screen, and will probably be saved in your command line
-                history. This is NOT RECOMMENDED for use on computers
-                where others have either physical or remote access.
-                Use -pass instead.
-
    -oauth       Generate OAuth authentication information.
                 NOTE: Need to copy OAuth tokens to your user-config.py
-                manually. -logout, -pass, -force and -pass:XXXX are not
-                compatible with -oauth.
+                manually. -logout is not compatible with -oauth.
 
    -autocreate  Auto-create an account using unified login when necessary.
                 Note: the global account must exist already before using this.
@@ -54,12 +39,10 @@ To log out, throw away the *.lwp file that is created in the data
 subdirectory.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
-from os.path import join
-
 import pywikibot
 
 from pywikibot.backports import Tuple
@@ -82,26 +65,24 @@ def _oauth_login(site) -> None:
     login_manager.login()
     identity = login_manager.identity
     if identity is None:
-        pywikibot.error('Invalid OAuth info for %(site)s.' %
-                        {'site': site})
+        pywikibot.error('Invalid OAuth info for {site}.'.format(site=site))
     elif site.username() != identity['username']:
-        pywikibot.error('Logged in on %(site)s via OAuth as %(wrong)s, '
-                        'but expect as %(right)s'
-                        % {'site': site,
-                           'wrong': identity['username'],
-                           'right': site.username()})
+        pywikibot.error(
+            'Logged in on {site} via OAuth as {wrong}, but expect as {right}'
+            .format(site=site,
+                    wrong=identity['username'], right=site.username()))
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
-        pywikibot.output('Logged in on %(site)s as %(username)s'
-                         'via OAuth consumer %(consumer)s'
-                         % {'site': site,
-                            'username': site.username(),
-                            'consumer': consumer_key})
-        pywikibot.output('NOTE: To use OAuth, you need to copy the '
-                         'following line to your user-config.py:')
-        pywikibot.output("authenticate['%(hostname)s'] = %(oauth_token)s" %
-                         {'hostname': site.hostname(),
-                          'oauth_token': oauth_token})
+        pywikibot.output('Logged in on {site} as {username}'
+                         'via OAuth consumer {consumer}\n'
+                         'NOTE: To use OAuth, you need to copy the '
+                         'following line to your user-config.py:\n'
+                         'authenticate[{hostname!r}] = {oauth_token}'
+                         .format(site=site,
+                                 username=site.username(),
+                                 consumer=consumer_key,
+                                 hostname=site.hostname(),
+                                 oauth_token=oauth_token))
 
 
 def main(*args) -> None:
@@ -113,27 +94,14 @@ def main(*args) -> None:
     @param args: command line arguments
     @type args: str
     """
-    password = None
     logall = False
     logout = False
     oauth = False
     autocreate = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-pass'):
-            if len(arg) == 5:
-                password = pywikibot.input(
-                    'Password for all accounts (no characters will be shown):',
-                    password=True)
-            else:
-                password = arg[6:]
-        elif arg == '-all':
+        if arg == '-all':
             logall = True
-        elif arg == '-force':
-            pywikibot.output('To force a re-login, please delete the '
-                             "revelant lines from '{0}' (or the entire file) "
-                             'and try again.'
-                             .format(join(config.base_dir, 'pywikibot.lwp')))
         elif arg == '-logout':
             logout = True
         elif arg == '-oauth':
@@ -146,10 +114,6 @@ def main(*args) -> None:
     if pywikibot.bot.suggest_help(unknown_parameters=unknown_args):
         return
 
-    if password is not None:
-        pywikibot.warning('The -pass argument is not implemented yet. See: '
-                          'https://phabricator.wikimedia.org/T102477')
-
     if logall:
         namedict = config.usernames
     else:
@@ -159,27 +123,28 @@ def main(*args) -> None:
         for lang in namedict[family_name]:
             try:
                 site = pywikibot.Site(code=lang, fam=family_name)
-                if oauth:
-                    _oauth_login(site)
-                    continue
-                if logout:
-                    site.logout()
-                else:
-                    site.login(autocreate=autocreate)
-                user = site.user()
-                if user:
-                    pywikibot.output(
-                        'Logged in on {0} as {1}.'.format(site, user))
-                else:
-                    if logout:
-                        pywikibot.output('Logged out of {0}.'.format(site))
-                    else:
-                        pywikibot.output(
-                            'Not logged in on {0}.'.format(site))
             except SiteDefinitionError:
-                pywikibot.output('{0}.{1} is not a valid site, '
-                                 'please remove it from your config'
+                pywikibot.output('{1}:{0} is not a valid site, '
+                                 'please remove it from your user-config'
                                  .format(lang, family_name))
+                continue
+
+            if oauth:
+                _oauth_login(site)
+                continue
+
+            if logout:
+                site.logout()
+            else:
+                site.login(autocreate=autocreate)
+
+            user = site.user()
+            if user:
+                pywikibot.output('Logged in on {} as {}.'.format(site, user))
+            elif logout:
+                pywikibot.output('Logged out of {}.'.format(site))
+            else:
+                pywikibot.output('Not logged in on {}.'.format(site))
 
 
 if __name__ == '__main__':

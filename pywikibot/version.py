@@ -1,6 +1,6 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,11 +23,12 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated
 
-cache = None
+
 _logger = 'version'
 
 
@@ -63,7 +64,7 @@ def getversion(online: bool = True) -> str:
         'master': 'branches/master',
         'stable': 'branches/stable',
     }
-    data = dict(getversiondict())  # copy dict to prevent changes in 'cache'
+    data = getversiondict()
     data['cmp_ver'] = 'n/a'
     local_hsh = data.get('hsh', '')
     hsh = {}
@@ -82,6 +83,7 @@ def getversion(online: bool = True) -> str:
     return '{tag} ({hsh}, {rev}, {date}, {cmp_ver})'.format_map(data)
 
 
+@cache
 def getversiondict():
     """Get version info for the package.
 
@@ -92,10 +94,6 @@ def getversiondict():
         - hash (git hash for the current revision)
     @rtype: C{dict} of four C{str}
     """
-    global cache
-    if cache:
-        return cache
-
     _program_dir = _get_program_dir()
     exceptions = {}
 
@@ -132,11 +130,10 @@ def getversiondict():
         warn('Unable to detect package date', UserWarning)
         datestring = '-2 (unknown)'
 
-    cache = {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
-    return cache
+    return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
 
 
-def svn_rev_info(path):
+def svn_rev_info(path):  # pragma: no cover
     """Fetch information about the current revision of a Subversion checkout.
 
     @param path: directory of the Subversion checkout
@@ -187,7 +184,7 @@ order by revision desc, changed_date desc""")
     return tag, rev, date
 
 
-def github_svn_rev2hash(tag: str, rev):
+def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
     """Convert a Subversion revision to a Git hash using Github.
 
     @param tag: name of the Subversion repo on Github
@@ -207,7 +204,7 @@ def github_svn_rev2hash(tag: str, rev):
     return hsh, date
 
 
-def getversion_svn(path=None):
+def getversion_svn(path=None):  # pragma: no cover
     """Get version info for a Subversion checkout.
 
     @param path: directory of the Subversion checkout
@@ -290,7 +287,7 @@ def getversion_git(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_nightly(path=None):
+def getversion_nightly(path=None):  # pragma: no cover
     """Get version info for a nightly release.
 
     @param path: directory of the uncompressed nightly.
@@ -350,7 +347,7 @@ def getversion_onlinerepo(path='branches/master'):
 
 
 @deprecated('pywikibot.__version__', since='20201003')
-def get_module_version(module) -> Optional[str]:
+def get_module_version(module) -> Optional[str]:  # pragma: no cover
     """
     Retrieve __version__ variable from an imported module.
 
@@ -483,8 +480,8 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
         # If builtins or standard_lib is None,
         # only include package if a version was found.
-        if (builtins is None and name in builtin_packages) or \
-                (standard_lib is None and name in std_lib_packages):
+        if builtins is None and name in builtin_packages \
+           or standard_lib is None and name in std_lib_packages:
             if 'ver' in info:
                 data[name] = info
             else:

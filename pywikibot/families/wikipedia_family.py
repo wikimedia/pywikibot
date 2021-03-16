@@ -17,7 +17,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
-        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mus', 'ng', 'ten',
+        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'ng',
+        'ten',
     ]
 
     removed_wikis = [
@@ -31,32 +32,32 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'vi', 'ja', 'arz', 'zh', 'ar', 'uk', 'pt', 'fa', 'ca', 'sr', 'id',
         'no', 'ko', 'fi', 'hu', 'cs', 'sh', 'zh-min-nan', 'ro', 'tr', 'eu',
         'ce', 'ms', 'eo', 'he', 'hy', 'bg', 'tt', 'da', 'azb', 'sk', 'kk',
-        'hr', 'min', 'et', 'be', 'lt', 'el', 'simple', 'az', 'gl', 'sl', 'ur',
-        'nn', 'ka', 'hi', 'th', 'uz', 'ta', 'la', 'cy', 'vo', 'mk', 'ast',
-        'zh-yue', 'lv', 'bn', 'tg', 'my', 'af', 'mg', 'oc', 'bs', 'nds', 'sq',
-        'ky', 'be-tarask', 'new', 'ml', 'te', 'mr', 'br', 'vec', 'pms', 'jv',
-        'ht', 'sw', 'su', 'pnb', 'lb', 'tl', 'ba', 'ga', 'szl', 'is', 'lmo',
-        'cv', 'fy', 'sco', 'wuu', 'diq', 'an', 'ku', 'pa', 'yo', 'ne', 'bar',
+        'min', 'et', 'hr', 'be', 'lt', 'el', 'simple', 'az', 'gl', 'sl', 'ur',
+        'nn', 'ka', 'hi', 'uz', 'th', 'ta', 'la', 'cy', 'vo', 'mk', 'ast',
+        'zh-yue', 'lv', 'bn', 'tg', 'my', 'af', 'mg', 'oc', 'bs', 'sq', 'nds',
+        'ky', 'be-tarask', 'ml', 'new', 'te', 'mr', 'br', 'vec', 'pms', 'jv',
+        'ht', 'pnb', 'sw', 'su', 'lb', 'tl', 'ba', 'ga', 'szl', 'is', 'cv',
+        'lmo', 'fy', 'sco', 'wuu', 'diq', 'an', 'ku', 'pa', 'yo', 'ne', 'bar',
         'io', 'gu', 'ckb', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn',
-        'bat-smg', 'si', 'nv', 'or', 'xmf', 'cdo', 'ilo', 'gd', 'yi', 'am',
+        'bat-smg', 'si', 'nv', 'xmf', 'or', 'cdo', 'ilo', 'gd', 'yi', 'am',
         'nap', 'bug', 'sd', 'hsb', 'wa', 'mai', 'fo', 'map-bms', 'mzn', 'li',
         'sah', 'os', 'frr', 'eml', 'avk', 'ace', 'ps', 'sa', 'gor', 'bcl',
-        'zh-classical', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'pam', 'crh',
-        'hyw', 'nso', 'km', 'shn', 'as', 'rue', 'se', 'lij', 'bh', 'zu', 'vls',
-        'nds-nl', 'mi', 'ha', 'nah', 'sc', 'sn', 'vep', 'gan', 'ban', 'myv',
-        'glk', 'ab', 'kab', 'bo', 'so', 'co', 'tk', 'sat', 'fiu-vro', 'ie',
+        'zh-classical', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'crh', 'pam',
+        'hyw', 'lij', 'nso', 'ha', 'km', 'as', 'shn', 'rue', 'se', 'zu', 'bh',
+        'vls', 'nds-nl', 'mi', 'nah', 'sc', 'sn', 'vep', 'ban', 'gan', 'myv',
+        'glk', 'ab', 'kab', 'so', 'bo', 'co', 'tk', 'sat', 'fiu-vro', 'ie',
         'kv', 'csb', 'pcd', 'gv', 'udm', 'ug', 'ay', 'zea', 'frp', 'nrm', 'kw',
-        'lez', 'gn', 'lfn', 'stq', 'mwl', 'rm', 'mt', 'lo', 'lad', 'gom',
-        'olo', 'koi', 'fur', 'ary', 'bjn', 'skr', 'ang', 'dty', 'dsb', 'ext',
-        'ln', 'tyv', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'pi', 'pag', 'smn',
-        'av', 'awa', 'haw', 'bxr', 'xal', 'ig', 'krc', 'pap', 'rw', 'za',
-        'pdc', 'kaa', 'szy', 'arc', 'to', 'nov', 'kbp', 'inh', 'jam', 'tpi',
-        'wo', 'kbd', 'na', 'ki', 'tet', 'atj', 'tcy', 'ak', 'lld', 'jbo',
-        'roa-rup', 'bi', 'lbe', 'lg', 'kg', 'ty', 'mdf', 'xh', 'fj', 'srn',
-        'om', 'gcr', 'ltg', 'sm', 'chr', 'nqo', 'got', 'mnw', 'nia', 'st',
-        'pih', 'kl', 'cu', 'ny', 'tw', 'tn', 'ts', 'bm', 'mad', 'rmy', 'chy',
-        'rn', 'tum', 'ss', 'ch', 'iu', 'ks', 'pnt', 'ady', 've', 'ee', 'alt',
-        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr', 'lrc', 'mni',
+        'lez', 'gn', 'lfn', 'stq', 'mwl', 'mt', 'rm', 'lo', 'lad', 'gom',
+        'olo', 'ary', 'koi', 'fur', 'bjn', 'skr', 'ang', 'dty', 'dsb', 'ext',
+        'ln', 'tyv', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'smn', 'pi', 'pag',
+        'av', 'awa', 'haw', 'mni', 'bxr', 'xal', 'ig', 'pap', 'krc', 'rw',
+        'za', 'pdc', 'kaa', 'szy', 'arc', 'to', 'inh', 'nov', 'kbp', 'jam',
+        'tpi', 'wo', 'kbd', 'na', 'ki', 'tet', 'atj', 'tcy', 'ak', 'lld', 'lg',
+        'jbo', 'roa-rup', 'bi', 'lbe', 'kg', 'ty', 'mdf', 'xh', 'fj', 'srn',
+        'om', 'gcr', 'ltg', 'sm', 'chr', 'nqo', 'nia', 'mnw', 'got', 'st',
+        'pih', 'kl', 'cu', 'ny', 'tw', 'tn', 'mad', 'ts', 'bm', 'rmy', 'chy',
+        'rn', 'tum', 'ss', 'ch', 'iu', 'ks', 'pnt', 'ady', 'alt', 've', 'ee',
+        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
@@ -212,18 +213,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                'Rfc-archiv-start',),
         'de': ('Archiv',),
     }
-
-    def get_known_families(self, code):
-        """Override the family interwiki prefixes for each site."""
-        # In Swedish Wikipedia 's:' is part of page title not a family
-        # prefix for 'wikisource'.
-        if code == 'sv':
-            d = self.known_families.copy()
-            d.pop('s')
-            d['src'] = 'wikisource'
-            return d
-
-        return self.known_families
 
     def encodings(self, code):
         """Return a list of historical encodings for a specific site."""

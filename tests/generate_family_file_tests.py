@@ -1,16 +1,18 @@
 """Test generate_family_file script."""
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 from random import sample
 from urllib.parse import urlparse
 
 from pywikibot import Site
 
-from tests.aspects import unittest, DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase
 
 import generate_family_file
 
@@ -27,7 +29,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         super().getapis()
         self.langs = save
 
-    def writefile(self):
+    def writefile(self, verify):
         """Pass writing."""
         pass
 

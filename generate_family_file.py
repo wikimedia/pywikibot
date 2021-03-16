@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """This script generates a family file from a given URL."""
 #
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2010-2021
 #
 # Distributed under the terms of the MIT license
 #
@@ -49,11 +49,31 @@ class FamilyFileGenerator:
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
+    def get_wiki(self):
+        """Get wiki from base_url."""
+        import pywikibot
+        print('Generating family file from ' + self.base_url)
+        for verify in (True, False):
+            try:
+                w = self.Wiki(self.base_url, verify=verify)
+            except pywikibot.FatalServerError:
+                print('ERROR: '
+                      + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
+                pywikibot.exception()
+                if not pywikibot.bot.input_yn(
+                    'Retry with disabled ssl certificate validation',
+                        automatic_quit=False):
+                    break
+            else:
+                return w, verify
+        return None, None
+
     def run(self):
         """Main method, generate family file."""
-        print('Generating family file from ' + self.base_url)
+        w, verify = self.get_wiki()
+        if w is None:
+            return
 
-        w = self.Wiki(self.base_url)
         self.wikis[w.lang] = w
         print('\n=================================='
               '\nAPI url: {w.api}'
@@ -62,7 +82,7 @@ class FamilyFileGenerator:
 
         self.getlangs(w)
         self.getapis()
-        self.writefile()
+        self.writefile(verify)
 
     def getlangs(self, w):
         """Determine language of a site."""
@@ -82,13 +102,14 @@ class FamilyFileGenerator:
                                'prefix': w.lang,
                                'url': w.iwpath})
 
-        if len(self.langs) > 1:
+        code_len = len(self.langs)
+        if code_len > 1:
             if self.dointerwiki is None:
                 makeiw = input(
-                    '\nThere are %i languages available.'
+                    '\nThere are {} languages available.'
                     '\nDo you want to generate interwiki links? '
                     'This might take a long time. ([y]es/[N]o/[e]dit)'
-                    % len(self.langs)).lower()
+                    .format(code_len)).lower()
             else:
                 makeiw = self.dointerwiki
 
@@ -124,7 +145,7 @@ class FamilyFileGenerator:
             else:
                 print('in cache')
 
-    def writefile(self):
+    def writefile(self, verify):
         """Write the family file."""
         fn = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                           'pywikibot', 'families',
@@ -153,12 +174,20 @@ class FamilyFileGenerator:
                 code=k, protocol=urlparse(w.server).scheme
             ) for k, w in self.wikis.items())
 
+        content = family_template % {
+            'url': self.base_url, 'name': self.name,
+            'code_hostname_pairs': code_hostname_pairs,
+            'code_path_pairs': code_path_pairs,
+            'code_protocol_pairs': code_protocol_pairs}
+        if not verify:
+            # assuming this is the same for all codes
+            content += """
+
+    def verify_SSL_certificate(self, code: str) -> bool:
+        return False
+"""
         with codecs.open(fn, 'w', 'utf-8') as fh:
-            fh.write(family_template % {
-                'url': self.base_url, 'name': self.name,
-                'code_hostname_pairs': code_hostname_pairs,
-                'code_path_pairs': code_path_pairs,
-                'code_protocol_pairs': code_protocol_pairs})
+            fh.write(content)
 
 
 family_template = """\

@@ -1,14 +1,16 @@
 """Tests for the C{pywikibot.tools.formatter} module."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 from pywikibot.tools import formatter
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import TestCase
 
 
 class TestListOutputter(TestCase):
@@ -61,29 +63,33 @@ class TestColorFormat(TestCase):
         """Test with colors in template string."""
         self.assert_format('{0}{black}', '42\03{black}', 42)
         self.assert_format('{ans}{black}', '42\03{black}', ans=42)
-        self.assertRaisesRegex(
-            ValueError, r'.*conversion.*', formatter.color_format,
-            '{0}{black!r}', 42)
-        self.assertRaisesRegex(
-            ValueError, r'.*format spec.*', formatter.color_format,
-            '{0}{black:03}', 42)
+        with self.assertRaisesRegex(
+                ValueError,
+                r'.*conversion.*'):
+            formatter.color_format('{0}{black!r}', 42)
+        with self.assertRaisesRegex(
+                ValueError,
+                r'.*format spec.*'):
+            formatter.color_format('{0}{black:03}', 42)
 
     def test_marker(self):
         r"""Test that the \03 marker is only allowed in front of colors."""
         self.assert_format('{0}\03{black}', '42\03{black}', 42)
         # literal before a normal field
-        self.assertRaisesRegex(
-            ValueError, r'.*\\03', formatter.color_format,
-            '\03{0}{black}', 42)
+        with self.assertRaisesRegex(
+                ValueError,
+                r'.*\\03'):
+            formatter.color_format('\03{0}{black}', 42)
         # literal before a color field
-        self.assertRaisesRegex(
-            ValueError, r'.*\\03', formatter.color_format,
-            '{0}\03before{black}', 42)
+        with self.assertRaisesRegex(
+                ValueError,
+                r'.*\\03'):
+            formatter.color_format('{0}\03before{black}', 42)
 
     def test_color_kwargs(self):
         """Test with a color as keyword argument."""
-        self.assertRaises(ValueError,
-                          formatter.color_format, '{aqua}{black}', aqua=42)
+        with self.assertRaises(ValueError):
+            formatter.color_format('{aqua}{black}', aqua=42)
 
     def test_non_ascii(self):
         """Test non-ASCII replacements."""
@@ -94,9 +100,10 @@ class TestColorFormat(TestCase):
 
     def test_bytes_format(self):
         """Test that using `bytes` is not allowed."""
-        self.assertRaises(TypeError, formatter.color_format, b'{0}', 'a')
-        self.assertRaises(TypeError, formatter.color_format, b'{black}{0}',
-                          'a')
+        with self.assertRaises(TypeError):
+            formatter.color_format(b'{0}', 'a')
+        with self.assertRaises(TypeError):
+            formatter.color_format(b'{black}{0}', 'a')
 
     def test_variant_colors(self):
         """Test variant colors with {color} parameter."""

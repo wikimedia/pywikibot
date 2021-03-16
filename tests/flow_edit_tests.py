@@ -198,11 +198,14 @@ class TestFlowEditFailure(TestCase):
         content = 'I am a reply to a locked topic. This is not good!'
         topic = Topic(self.site, 'Topic:Smxnipjfs8umm1wt')
         # Reply (should raise a LockedPage exception)
-        self.assertRaises(LockedPage, topic.reply, content, 'wikitext')
+        with self.assertRaises(LockedPage):
+            topic.reply(content, 'wikitext')
         topic_root = topic.root
-        self.assertRaises(LockedPage, topic_root.reply, content, 'wikitext')
+        with self.assertRaises(LockedPage):
+            topic_root.reply(content, 'wikitext')
         topic_reply = topic.root.replies(force=True)[0]
-        self.assertRaises(LockedPage, topic_reply.reply, content, 'wikitext')
+        with self.assertRaises(LockedPage):
+            topic_reply.reply(content, 'wikitext')
 
 
 class FlowTests(TestCase):

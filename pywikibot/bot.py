@@ -94,6 +94,7 @@ import time
 import warnings
 import webbrowser
 
+from collections.abc import Generator
 from contextlib import closing
 from importlib import import_module
 from pathlib import Path
@@ -892,19 +893,19 @@ def showHelp(module_name=None):  # pragma: no cover
     return show_help(module_name)
 
 
-def suggest_help(missing_parameters=[], missing_generator=False,
-                 unknown_parameters=[], exception=None,
-                 missing_action=False, additional_text: str = '',
-                 missing_dependencies=[]) -> bool:
+def suggest_help(missing_parameters: Optional[List[str]] = None,
+                 missing_generator: bool = False,
+                 unknown_parameters: Optional[List[str]] = None,
+                 exception=None,
+                 missing_action: bool = False,
+                 additional_text: str = '',
+                 missing_dependencies: Optional[List[str]] = None) -> bool:
     """
     Output error message to use -help with additional text before it.
 
     @param missing_parameters: A list of parameters which are missing.
-    @type missing_parameters: list of str
     @param missing_generator: Whether a generator is missing.
-    @type missing_generator: bool
     @param unknown_parameters: A list of parameters which are unknown.
-    @type unknown_parameters: list of str
     @param exception: An exception thrown.
     @type exception: Exception
     @param missing_action: Add an entry that no action was defined.
@@ -973,7 +974,8 @@ def writeToCommandLogFile():
 def open_webbrowser(page):
     """Open the web browser displaying the page and wait for input."""
     webbrowser.open(page.full_url())
-    i18n.input('pywikibot-enter-finished-browser')
+    i18n.input('pywikibot-enter-finished-browser',
+               fallback_prompt='Press Enter when finished in browser.')
 
 
 class _OptionDict(dict):
@@ -1025,10 +1027,11 @@ class OptionHandler:
     """Class to get and set options.
 
     How to use options of OptionHandler and its BaseBot subclasses:
-    First define an available_options class attribute to define all
-    available options:
+    First define an available_options class attribute for your own
+    option handler to define all available options:
 
-    available_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+    >>> default_options = {'foo': 'bar', 'bar': 42, 'baz': False}
+    >>> class MyHandler(OptionHandler): available_options = default_options
 
     Or you may update the predefined setting in the class initializer.
     BaseBot predefines a 'always' options and sets it to False:
@@ -1038,7 +1041,7 @@ class OptionHandler:
     Now you can instantiate an OptionHandler or BaseBot class passing
     options other than default values:
 
-    >>> bot = OptionHandler(baz=True)
+    >>> bot = MyHandler(baz=True)
 
     You can access bot options either as keyword item or attribute:
 
@@ -1171,13 +1174,17 @@ class BaseBot(OptionHandler):
     _current_page = None
 
     def __init__(self, **kwargs):
-        """
-        Only accept options defined in available_options.
+        """Only accept 'generator' and options defined in available_options.
 
         @param kwargs: bot options
+        @keyword generator: a generator processed by run method
         """
         if 'generator' in kwargs:
-            self.generator = kwargs.pop('generator')
+            if hasattr(self, 'generator'):
+                pywikibot.warn('{} has a generator already. Ignoring argument.'
+                               .format(self.__class__.__name__))
+            else:
+                self.generator = kwargs.pop('generator')
 
         super().__init__(**kwargs)
 
@@ -1266,7 +1273,7 @@ class BaseBot(OptionHandler):
         if oldtext.rstrip() == newtext.rstrip():
             pywikibot.output('No changes were needed on %s'
                              % page.title(as_link=True))
-            return
+            return False
 
         self.current_page = page
 
@@ -1453,6 +1460,9 @@ class BaseBot(OptionHandler):
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable {}.generator not set.'
                                       .format(self.__class__.__name__))
+        if not isinstance(self.generator, Generator):
+            # to provide close() method
+            self.generator = (item for item in self.generator)
         try:
             for item in self.generator:
                 # preprocessing of the page
@@ -1717,10 +1727,10 @@ class ConfigParserBot(BaseBot):
                 if not conf.has_option(section, option):
                     continue
                 # use a convenience parser method, default to get()
-                default = getattr(conf, 'get')
+                default = conf.get
                 value_type = type(value).__name__
                 if value_type == 'bool':
-                    method = getattr(conf, 'getboolean')
+                    method = conf.getboolean
                 else:
                     method = getattr(conf, 'get' + value_type, default)
                 options[option] = method(section, option)

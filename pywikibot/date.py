@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -526,8 +526,11 @@ class MonthNames(Mapping):
     def __getitem__(self, lang):
         if lang not in self.months:
             site = Site()
-            months = list(site.mediawiki_messages(enMonthNames,
-                                                  lang=lang).values())
+            # may_long differs
+            keys = ['january', 'february', 'march', 'april', 'may_long',
+                    'june', 'july', 'august', 'september', 'october',
+                    'november', 'december']
+            months = list(site.mediawiki_messages(keys, lang=lang).values())
             self.months[lang] = lambda v: slh(v, months)
 
         return self.months[lang]

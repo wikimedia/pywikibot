@@ -1,9 +1,11 @@
 """Tests for the category bot script."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -12,7 +14,7 @@ from pywikibot import BaseSite
 from scripts.category import CategoryPreprocess, CategoryMoveRobot
 
 from tests import patch, Mock
-from tests.aspects import unittest, DefaultSiteTestCase, TestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 MOCKED_USERNAME = Mock(return_value='FakeUsername')

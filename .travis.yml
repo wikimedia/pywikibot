@@ -18,7 +18,6 @@ dist: xenial  # required for Python >= 3.7
 addons:
   apt:
     packages:
-      - libssl1.0.0
       - djvulibre-bin
 
 before_install:
@@ -26,11 +25,12 @@ before_install:
   # default 'install' step to install all dependencies listed in
   # requirements.txt to verify that a minimal install works as expected.
   # Instead install requests in the before_script step below.
-  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then rm requirements.txt ; fi
+  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then 
+      printf "# Empty requirements with PYSETUP_TEST_EXTRA" > requirements.txt ;
+    fi
 
-  # When the env variable USE_NOSE or USE_PYTEST is set, the appropriate
-  # tool is used, else PYTEST is taken as the default
-  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' && "$USE_NOSE" != '1' && "$USE_PYTEST" != '1' ]]; then
+  # PYTEST is taken as the default
+  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
       export USE_PYTEST=1 ;
     fi
 
@@ -46,17 +46,17 @@ before_install:
       export PYWIKIBOT_TEST_WRITE_FAIL=1 ;
     fi
 
-before_script:
+install:
   - pip install -U setuptools
-  # Make Travis reinstall default pytest (T255349)
-  - pip uninstall -y pytest
   - pip install -r dev-requirements.txt
+  - pip install -r requirements.txt
 
-script:
+before_script:
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
       pip install -e .[mwoauth];
     fi
 
+script:
   - mkdir ~/.pywikibot
 
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz 'n'
@@ -66,9 +66,8 @@ script:
   - if [[ $FAMILY == 'wsbeta' ]]; then
       python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
     fi
-  - if [[ $FAMILY == 'btrfswiki' ]]; then
-      python -m generate_family_file 'https://btrfs.wiki.kernel.org/index.php/Main_Page' 'btrfswiki' 'y' ;
-      export PYWIKIBOT_USERNAME="$BTRFS_PYWIKIBOT_USERNAME" ;
+  - if [[ $FAMILY == 'portalwiki' ]]; then
+      python -m generate_family_file 'https://theportalwiki.com/wiki/Main_Page' 'portalwiki' 'y' ;
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"
@@ -102,14 +101,7 @@ script:
 
   - python -c "import setuptools; print(setuptools.__version__)"
 
-  - if [[ "$USE_NOSE" == "1" ]]; then
-      nosetests --version ;
-      if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
-        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" --with-trim --with-coverage --cover-package=. ;
-      else
-        python setup.py nosetests --tests tests --verbosity=2 --with-trim --with-coverage --cover-package=. ;
-      fi ;
-    elif [[ "$USE_PYTEST" == "1" ]]; then
+  - if [[ "$USE_PYTEST" == "1" ]]; then
       if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
         python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -rsxX -a \"family=='$FAMILY' and code=='$LANGUAGE'\"" ;
       else
@@ -119,10 +111,7 @@ script:
       coverage run -m unittest discover -vv -p "*_tests.py" ;
     fi
 
-after_success:
-    codecov
-
-after_failure:
+after_script:
     codecov
 
 env:
@@ -143,7 +132,6 @@ matrix:
         apt:
           packages:
             - djvulibre-bin
-            - graphviz
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
     - python: '3.6'
@@ -163,12 +151,10 @@ matrix:
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.8'
-      env: LANGUAGE=en FAMILY=btrfswiki
+      env: LANGUAGE=en FAMILY=portalwiki
   allow_failures:
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
-    - python: '3.8'
-      env: LANGUAGE=en FAMILY=btrfswiki
 
 notifications:
   email:

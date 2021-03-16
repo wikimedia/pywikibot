@@ -25,7 +25,7 @@ The following generators and filters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -129,14 +129,11 @@ def main(*args):
     # to work on.
     gen_factory = pagegenerators.GeneratorFactory()
 
+    # Process the pagegenerators options
+    local_args = gen_factory.handle_args(local_args)
+
     # Parse command line arguments
     for arg in local_args:
-
-        # Catch the pagegenerators options
-        if gen_factory.handle_arg(arg):
-            continue  # nothing to do here
-
-        # Now pick up custom options
         arg, sep, value = arg.partition(':')
         option = arg[1:]
         if option == 'summary':

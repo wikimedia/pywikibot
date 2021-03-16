@@ -78,8 +78,8 @@ class DownloadDumpBot(Bot):
 
         download_filename = '{wikiname}-{dumpdate}-{filename}'.format_map(
             self.opt)
-        temp_filename = download_filename + '-' + \
-            binascii.b2a_hex(urandom(8)).decode('ascii') + '.part'
+        temp_filename = download_filename + '-' \
+            + binascii.b2a_hex(urandom(8)).decode('ascii') + '.part'
 
         file_final_storepath = os.path.join(
             self.opt.storepath, download_filename)
@@ -157,12 +157,12 @@ class DownloadDumpBot(Bot):
                     replace(file_current_storepath, file_final_storepath)
                     break
 
-            except (OSError, IOError):
+            except OSError:
                 pywikibot.exception()
 
                 try:
                     remove(file_current_storepath)
-                except (OSError, IOError):
+                except OSError:
                     pywikibot.exception()
 
                 # If the atomic download fails, try without a temporary file

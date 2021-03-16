@@ -1,6 +1,6 @@
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,7 +155,7 @@ class MockCachedRequestKeyTests(TestCase):
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
-                return '1.19'  # lowest supported release
+                return '1.23'  # lowest supported release
 
             def protocol(self):
                 return 'http'
@@ -243,16 +243,17 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         """Test Request object when not a user."""
         self.site._userinfo = {}
         with self.subTest(userinfo=self.site._userinfo):
-            self.assertRaisesRegex(pywikibot.Error,
-                                   'API write action attempted without user',
-                                   Request, site=self.site,
-                                   parameters={'action': 'edit'})
+            with self.assertRaisesRegex(
+                    pywikibot.Error,
+                    'API write action attempted without user'):
+                Request(site=self.site, parameters={'action': 'edit'})
 
         self.site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
         with self.subTest(userinfo=self.site._userinfo):
-            self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
-                                   Request, site=self.site,
-                                   parameters={'action': 'edit'})
+            with self.assertRaisesRegex(
+                    pywikibot.Error,
+                    " as IP '1.2.3.4'"):
+                Request(site=self.site, parameters={'action': 'edit'})
 
     def test_unexpected_user(self):
         """Test Request object when username is not correct."""
@@ -301,24 +302,6 @@ class DryMimeTests(TestCase):
                      {'filename': local_filename})
         })
         self.assertNotEqual(body.find(file_content), -1)
-
-
-class MimeTests(DefaultDrySiteTestCase):
-
-    """Test MIME request handling with a real site."""
-
-    def test_upload_object(self):
-        """Test Request object prepared to upload."""
-        # fake write test needs the config username
-        site = self.get_site()
-        site._username = 'myusername'
-        site._userinfo = {'name': 'myusername', 'groups': [], 'id': '1'}
-        parameters = {'action': 'upload', 'file': 'MP_sounds.png',
-                      'filename': join_images_path('MP_sounds.png')}
-        req = Request(site=site, mime=True, parameters=parameters)
-        with self.assertRaises(AssertionError):
-            assert req.mime is True
-        self.assertEqual(req.mime, {})
 
 
 class ParamInfoDictTests(DefaultDrySiteTestCase):

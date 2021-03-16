@@ -1,6 +1,6 @@
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2010-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -101,7 +101,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger='',
     logger.log(_level, text, extra=context, **kwargs)
 
 
-def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
+def output(text, decoder=None, newline=True, **kwargs):
     r"""Output a message to the user via the userinterface.
 
     Works like print, but uses the encoding used by the user's console
@@ -111,10 +111,6 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     should be encoded in the given encoding.
 
     If newline is True, a line feed will be added after printing the text.
-
-    If toStdout is True, the text will be sent to standard output,
-    so that it can be piped to another process. All other text will
-    be sent to stderr. See: https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
 
     text can contain special sequences to create colored output. These
     consist of the escape character \03 and the color name in curly braces,
@@ -126,18 +122,15 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     only argument that is useful is "exc_info=True", which causes the
     log message to include an exception traceback.
     """
-    if toStdout:  # maintained for backwards-compatibity only
-        from pywikibot.tools import issue_deprecation_warning
-        issue_deprecation_warning('"toStdout" parameter', 'pywikibot.stdout()',
-                                  warning_class=FutureWarning,
-                                  since='20160228')
-        logoutput(text, decoder, newline, STDOUT, **kwargs)
-    else:
-        logoutput(text, decoder, newline, INFO, **kwargs)
+    logoutput(text, decoder, newline, INFO, **kwargs)
 
 
 def stdout(text, decoder=None, newline=True, **kwargs):
     """Output script results to the user via the userinterface.
+
+    The text will be sent to standard output, so that it can be piped to
+    another process. All other text will be sent to stderr.
+    See: https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
 
     @param text: the message printed via stdout logger to the user.
     @param decoder: If None, text should be a unicode string else it should

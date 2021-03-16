@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -440,8 +440,8 @@ class MediaWikiVersion(Version):
     version is greater if the normal version or dev version is greater. For
     example:
 
-        1.24 < 1.24.1 < 1.25wmf1 < 1.25alpha < 1.25beta1 < 1.25beta2
-        < 1.25-rc-1 < 1.25-rc.2 < 1.25
+        1.34 < 1.34.1 < 1.35wmf1 < 1.35alpha < 1.35beta1 < 1.35beta2
+        < 1.35-rc-1 < 1.35-rc.2 < 1.35
 
     Any other suffixes are considered invalid.
     """
@@ -805,10 +805,9 @@ def intersect_generators(genlist, allow_duplicates=False):
                 pass
             except KeyboardInterrupt:
                 thrlist.stop_all()
-            finally:
-                # All threads are done.
-                if thrlist.active_count() == 0:
-                    return
+            # All threads are done.
+            if thrlist.active_count() == 0:
+                return
 
 
 def roundrobin_generators(*iterables):
@@ -1822,15 +1821,7 @@ def concat_options(message, line_length, options):
     return '{} ({}):'.format(message, option_msg)
 
 
-def _py2():
-    """Function for deprecated PY2 variable used by wrapper below."""
-    return (PYTHON_VERSION[0] == 2)
-
-
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
                              replacement_name='tools.frozenmap',
                              since='20201109', future_warning=True)
-wrapper._add_deprecated_attr('PY2', _py2(),
-                             replacement_name='sys.version_info[0] == 2',
-                             since='20201224', future_warning=True)

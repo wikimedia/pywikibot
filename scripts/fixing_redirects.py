@@ -217,7 +217,7 @@ def main(*args):
             suggest_help(
                 unknown_parameters=['-featured'],
                 additional_text='Option is not available for this site.')
-            return False
+            return
     else:
         gen = genFactory.getCombinedGenerator()
         if gen:

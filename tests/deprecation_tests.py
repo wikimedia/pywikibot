@@ -61,18 +61,15 @@ class DecoratorFullNameTestCase(DeprecationTestCase):
 
     def test_add_full_name_decorator(self):
         """Test add_decorated_full_name() method."""
-        self.assertRaisesRegex(
-            Exception,
-            __name__ + '.decorated_func',
-            decorated_func)
-        self.assertRaisesRegex(
-            Exception,
-            __name__ + '.decorated_func2',
-            decorated_func2)
-        self.assertRaisesRegex(
-            Exception,
-            __name__ + '.decorated_func3',
-            decorated_func3)
+        with self.assertRaisesRegex(Exception,
+                                    __name__ + '.decorated_func'):
+            decorated_func()
+        with self.assertRaisesRegex(Exception,
+                                    __name__ + '.decorated_func2'):
+            decorated_func2()
+        with self.assertRaisesRegex(Exception,
+                                    __name__ + '.decorated_func3'):
+            decorated_func3()
 
 
 @deprecated()
@@ -446,11 +443,12 @@ class DeprecatorTestCase(DeprecationTestCase):
             self.assertEqual(rv, 1)
             self.assertNoDeprecation()
 
-            self.assertRaisesRegex(
-                TypeError,
-                r'deprecated_func_arg2?\(\) got multiple values for '
-                "(keyword )?argument 'foo'", func, 'a', bah='b'
-            )
+            with self.assertRaisesRegex(
+                    TypeError,
+                    r'deprecated_func_arg2?\(\) got multiple values for '
+                    "(keyword )?argument 'foo'"):
+                func('a', bah='b')
+
             self._reset_messages()
 
         tests(deprecated_func_arg)
@@ -607,45 +605,43 @@ class DeprecatorTestCase(DeprecationTestCase):
 
     def test_remove_last_args_invalid(self):
         """Test invalid @remove_last_args on functions."""
-        self.assertRaisesRegex(
-            TypeError,
-            r'deprecated_all2\(\) missing 1 required positional argument: '
-            r"'foo'",
-            deprecated_all2)
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) missing 1 required positional argument: '
+                r"'foo'"):
+            deprecated_all2()
 
-        self.assertRaisesRegex(
-            TypeError,
-            r"deprecated_all2\(\) got an unexpected keyword argument 'hello'",
-            deprecated_all2,
-            hello='world')
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) got an unexpected keyword argument '
+                r"'hello'"):
+            deprecated_all2(hello='world')
 
-        self.assertRaisesRegex(
-            TypeError,
-            r'deprecated_all2\(\) takes (exactly )?1 (positional )?argument'
-            r' (but 2 were given|\(2 given\))',
-            deprecated_all2,
-            1, 2, 3)
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) takes (exactly )?1 (positional )?'
+                r'argument (but 2 were given|\(2 given\))'):
+            deprecated_all2(1, 2, 3)
 
         f = DeprecatedMethodClass()
 
-        self.assertRaisesRegex(
-            TypeError,
-            r'deprecated_all2\(\) missing 1 required positional argument: '
-            r"'foo'",
-            f.deprecated_all2)
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) missing 1 required positional argument: '
+                r"'foo'"):
+            f.deprecated_all2()
 
-        self.assertRaisesRegex(
-            TypeError,
-            r"deprecated_all2\(\) got an unexpected keyword argument 'hello'",
-            f.deprecated_all2,
-            hello='world')
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) got an unexpected keyword argument '
+                r"'hello'"):
+            f.deprecated_all2(hello='world')
 
-        self.assertRaisesRegex(
-            TypeError,
-            r'deprecated_all2\(\) takes (exactly )?2 (positional )?arguments '
-            r'(but 3 were given|\(3 given\))',
-            f.deprecated_all2,
-            1, 2, 3)
+        with self.assertRaisesRegex(
+                TypeError,
+                r'deprecated_all2\(\) takes (exactly )?2 (positional )?'
+                r'arguments (but 3 were given|\(3 given\))'):
+            f.deprecated_all2(1, 2, 3)
 
     def test_deprecated_instance_method_zero_arg(self):
         """Test @deprecate_arg with classes, without arguments."""

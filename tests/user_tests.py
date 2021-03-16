@@ -1,6 +1,6 @@
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -133,10 +133,14 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isEmailable())
         self.assertIn('invalid', user.getprops())
         self.assertTrue(user._isAutoblock)
-        self.assertRaisesRegex(AutoblockUser, 'This is an autoblock ID',
-                               user.getUserPage)
-        self.assertRaisesRegex(AutoblockUser, 'This is an autoblock ID',
-                               user.getUserTalkPage)
+        with self.assertRaisesRegex(
+                AutoblockUser,
+                'This is an autoblock ID'):
+            user.getUserPage()
+        with self.assertRaisesRegex(
+                AutoblockUser,
+                'This is an autoblock ID'):
+            user.getUserTalkPage()
 
     def test_autoblocked_user_with_namespace(self):
         """Test autoblocked user."""
@@ -153,10 +157,14 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isEmailable())
         self.assertIn('invalid', user.getprops())
         self.assertTrue(user._isAutoblock)
-        self.assertRaisesRegex(AutoblockUser, 'This is an autoblock ID',
-                               user.getUserPage)
-        self.assertRaisesRegex(AutoblockUser, 'This is an autoblock ID',
-                               user.getUserTalkPage)
+        with self.assertRaisesRegex(
+                AutoblockUser,
+                'This is an autoblock ID'):
+            user.getUserPage()
+        with self.assertRaisesRegex(
+                AutoblockUser,
+                'This is an autoblock ID'):
+            user.getUserTalkPage()
 
 
 class TestUserMethods(DefaultSiteTestCase):

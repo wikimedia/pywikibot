@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -387,6 +387,7 @@ class PatchManager:
             for pending in range(start, end, step):
                 if super_hunks[pending].reviewed == Hunk.PENDING:
                     return pending
+            return None
 
         # TODO: Missing commands (compared to git --patch): edit and search
         help_msg = {'y': 'accept this hunk',

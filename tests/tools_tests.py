@@ -1,13 +1,14 @@
 #!/usr/bin/python
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 import decimal
 import os.path
 import subprocess
 import tempfile
+import unittest
 
 from collections.abc import Mapping
 from collections import OrderedDict
@@ -18,7 +19,7 @@ from pywikibot import tools
 from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path, mock
-from tests.aspects import unittest, require_modules, TestCase
+from tests.aspects import require_modules, TestCase
 
 
 class OpenArchiveTestCase(TestCase):
@@ -81,10 +82,10 @@ class OpenArchiveTestCase(TestCase):
                             'used when bz2 and bz2file are not importable')
         try:
             tools.bz2 = ImportError(bz2_import_error)
-            self.assertRaisesRegex(ImportError,
-                                   bz2_import_error,
-                                   self._get_content,
-                                   self.base_file + '.bz2')
+            with self.assertRaisesRegex(
+                    ImportError,
+                    bz2_import_error):
+                self._get_content(self.base_file + '.bz2')
         finally:
             tools.bz2 = old_bz2
 
@@ -101,11 +102,11 @@ class OpenArchiveTestCase(TestCase):
             self.skipTest('7za not installed')
         self.assertEqual(
             self._get_content(self.base_file + '.7z'), self.original_content)
-        self.assertRaisesRegex(OSError,
-                               'Unexpected STDERR output from 7za ',
-                               self._get_content,
-                               self.base_file + '_invalid.7z',
-                               use_extension=True)
+        with self.assertRaisesRegex(
+                OSError,
+                'Unexpected STDERR output from 7za '):
+            self._get_content(self.base_file + '_invalid.7z',
+                              use_extension=True)
 
     def test_open_archive_lzma(self):
         """Test open_archive with lzma compressor in the standard library."""
@@ -128,14 +129,14 @@ class OpenArchiveTestCase(TestCase):
                              'used when lzma is not importable')
         try:
             tools.lzma = ImportError(lzma_import_error)
-            self.assertRaisesRegex(ImportError,
-                                   lzma_import_error,
-                                   self._get_content,
-                                   self.base_file + '.lzma')
-            self.assertRaisesRegex(ImportError,
-                                   lzma_import_error,
-                                   self._get_content,
-                                   self.base_file + '.xz')
+            with self.assertRaisesRegex(
+                    ImportError,
+                    lzma_import_error):
+                self._get_content(self.base_file + '.lzma')
+            with self.assertRaisesRegex(
+                    ImportError,
+                    lzma_import_error):
+                self._get_content(self.base_file + '.xz')
         finally:
             tools.lzma = old_lzma
 
@@ -169,23 +170,23 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_invalid_modes(self):
         """Test various invalid mode configurations."""
-        self.assertRaisesRegex(ValueError,
-                               'Invalid mode: "ra"',
-                               tools.open_archive,
-                               '/dev/null', 'ra')  # two modes besides
-        self.assertRaisesRegex(ValueError,
-                               'Invalid mode: "rt"',
-                               tools.open_archive,
-                               '/dev/null', 'rt')  # text mode
-        self.assertRaisesRegex(ValueError,
-                               'Invalid mode: "br"',
-                               tools.open_archive,
-                               '/dev/null', 'br')  # binary at front
-        self.assertRaisesRegex(ValueError,
-                               'Magic number detection only when reading',
-                               tools.open_archive,
-                               # writing without extension
-                               '/dev/null', 'wb', False)
+        with self.assertRaisesRegex(
+                ValueError,
+                'Invalid mode: "ra"'):
+            tools.open_archive('/dev/null', 'ra')  # two modes besides
+        with self.assertRaisesRegex(
+                ValueError,
+                'Invalid mode: "rt"'):
+            tools.open_archive('/dev/null', 'rt')  # text mode
+        with self.assertRaisesRegex(
+                ValueError,
+                'Invalid mode: "br"'):
+            tools.open_archive('/dev/null', 'br')  # binary at front
+        with self.assertRaisesRegex(
+                ValueError,
+                'Magic number detection only when reading'):
+            tools.open_archive('/dev/null',  # writing without extension
+                               'wb', False)
 
     def test_binary_mode(self):
         """Test that it uses binary mode."""
@@ -206,11 +207,10 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_write_archive_7z(self):
         """Test writing an archive as a 7z archive."""
-        self.assertRaisesRegex(NotImplementedError,
-                               'It is not possible to write a 7z file.',
-                               tools.open_archive,
-                               '/dev/null.7z',
-                               mode='wb')
+        with self.assertRaisesRegex(
+                NotImplementedError,
+                'It is not possible to write a 7z file.'):
+            tools.open_archive('/dev/null.7z', mode='wb')
 
     def test_write_archive_lzma(self):
         """Test writing a lzma archive."""
@@ -259,13 +259,12 @@ class MergeUniqueDicts(TestCase):
 
     def test_conflict(self):
         """Test that it detects conflicts."""
-        self.assertRaisesRegex(
-            ValueError, '42', tools.merge_unique_dicts, self.dct1,
-            **{'42': 'bad'})
-        self.assertRaisesRegex(
-            ValueError, '42', tools.merge_unique_dicts, self.dct1, self.dct1)
-        self.assertRaisesRegex(
-            ValueError, '42', tools.merge_unique_dicts, self.dct1, **self.dct1)
+        with self.assertRaisesRegex(ValueError, '42'):
+            tools.merge_unique_dicts(self.dct1, **{'42': 'bad'})
+        with self.assertRaisesRegex(ValueError, '42'):
+            tools.merge_unique_dicts(self.dct1, self.dct1)
+        with self.assertRaisesRegex(ValueError, '42'):
+            tools.merge_unique_dicts(self.dct1, **self.dct1)
 
 
 class TestIsSliceWithEllipsis(TestCase):
@@ -451,7 +450,8 @@ class TestFilterUnique(TestCase):
             else:
                 self.assertEqual(deduped, {1, 2, 3, 4})
 
-        self.assertRaises(StopIteration, next, deduper)
+        with self.assertRaises(StopIteration):
+            next(deduper)
 
     def _test_dedup_str(self, deduped, deduper, key=None):
         """Test filter_unique results for str."""
@@ -478,7 +478,8 @@ class TestFilterUnique(TestCase):
             else:
                 self.assertEqual(deduped, {key(i) for i in self.strs})
 
-        self.assertRaises(StopIteration, next, deduper)
+        with self.assertRaises(StopIteration):
+            next(deduper)
 
     def test_set(self):
         """Test filter_unique with a set."""
@@ -530,7 +531,8 @@ class TestFilterUnique(TestCase):
         self.assertIsEmpty(deduped)
         for _ in self.decs:
             self.assertEqual(id(next(deduper)), deduped.pop())
-        self.assertRaises(StopIteration, next, deduper)
+        with self.assertRaises(StopIteration):
+            next(deduper)
         # len(Decimal with distinct ids) != len(Decimal with distinct value).
         deduper_ids = list(tools.filter_unique(self.decs, key=id))
         self.assertNotEqual(len(deduper_ids), len(set(deduper_ids)))
@@ -558,7 +560,8 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped, [1, 3, 2])
         last = next(gen2)
         self.assertEqual(last, 4)
-        self.assertRaises(StopIteration, next, gen2)
+        with self.assertRaises(StopIteration):
+            next(gen2)
 
     def test_skip(self):
         """Test filter_unique with a container that skips items."""
@@ -586,7 +589,8 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped, {1, 3})
 
         # And it should not resume
-        self.assertRaises(StopIteration, next, deduper)
+        with self.assertRaises(StopIteration):
+            next(deduper)
 
         deduped = AddStopList()
         deduped.stop_list = [4]
@@ -596,7 +600,8 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped, {1, 2, 3})
 
         # And it should not resume
-        self.assertRaises(StopIteration, next, deduper)
+        with self.assertRaises(StopIteration):
+            next(deduper)
 
 
 class TestFileModeChecker(TestCase):

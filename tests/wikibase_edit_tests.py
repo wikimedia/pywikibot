@@ -5,17 +5,18 @@ Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failiure_tests.py
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import time
+import unittest
 
 from contextlib import suppress
 
 import pywikibot
 
-from tests.aspects import unittest, WikibaseTestCase
+from tests.aspects import WikibaseTestCase
 
 
 class TestWikibaseWriteGeneral(WikibaseTestCase):

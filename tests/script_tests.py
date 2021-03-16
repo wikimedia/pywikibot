@@ -86,29 +86,17 @@ script_input = {
 }
 
 auto_run_script_list = [
-    'blockpageschecker',
-    'casechecker',
-    'catall',
     'category_redirect',
     'checkimages',
     'clean_sandbox',
-    'disambredir',
-    'followlive',
-    'imagerecat',
     'login',
-    'lonelypages',
     'misspelling',
     'revertbot',
     'noreferences',
-    'nowcommons',
     'parser_function_count',
-    'patrol',
     'shell',
-    'standardize_interwiki',
-    'states_redirect',
     'unusedfiles',
     'upload',
-    'watchlist',
     'welcome',
 ]
 
@@ -207,7 +195,10 @@ class TestScriptMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        def test_execution(script_name, args=[]):
+        def test_execution(script_name, args=None):
+            if args is None:
+                args = []
+
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_list)
 
@@ -335,7 +326,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     '{} has dependencies; skipping'
                     .format(script_name))(dct[test_name])
 
-            # Disable test by default in nosetests
+            # Disable test by default in pytest
             if script_name in unrunnable_script_set:
                 # flag them as an expectedFailure due to py.test (T135594)
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -367,7 +358,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     """Test cases for scripts.
 
-    This class sets the nose 'user' attribute on every test, thereby ensuring
+    This class sets the'user' attribute on every test, thereby ensuring
     that the test runner has a username for the default site, and so that
     Site.login() is called in the test runner, which means that the scripts
     run in pwb can automatically login using the saved cookies.

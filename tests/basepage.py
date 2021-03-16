@@ -121,8 +121,8 @@ class BasePageMethodsTestBase(BasePageTestBase):
         self.assertIsInstance(self._page.latest_revision_id, int)
         self.assertGreaterEqual(self._page.latest_revision_id, 1)
 
-        self.assertIsInstance(self._page.latest_revision.parent_id, int)
-        self.assertGreaterEqual(self._page.latest_revision.parent_id, 0)
+        self.assertIsInstance(self._page.latest_revision.parentid, int)
+        self.assertGreaterEqual(self._page.latest_revision.parentid, 0)
 
         self._page.botMayEdit()
 

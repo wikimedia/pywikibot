@@ -25,13 +25,13 @@
 .. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=week&units=international_system&left_color=black&right_color=blue&left_text=weekly
    :alt: Weekly downloads
    :target: https://pepy.tech/project/pywikibot
- 
+
 Pywikibot
 =========
 
 The Pywikibot framework is a Python library that interfaces with the
 `MediaWiki API <https://www.mediawiki.org/wiki/API:Main_page>`_
-version 1.19 or higher.
+version 1.23 or higher.
 
 Also included are various general function scripts that can be adapted for
 different tasks.

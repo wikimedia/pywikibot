@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,11 +76,11 @@ class BaseSite(ComparableMixin):
                 pywikibot.log('Site %s instantiated and marked "obsolete" '
                               'to prevent access' % self)
         elif self.__code not in self.languages():
-            if self.__family.name in self.__family.langs and \
-               len(self.__family.langs) == 1:
+            if self.__family.name in self.__family.langs \
+               and len(self.__family.langs) == 1:
                 self.__code = self.__family.name
                 if self.__family == pywikibot.config.family \
-                        and code == pywikibot.config.mylang:
+                   and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
                          '"%s" while instantiating site %s'
@@ -242,53 +242,6 @@ class BaseSite(ComparableMixin):
         yield base_path + '/'
         yield base_path + '?title='
         yield self.article_path
-
-    def interwiki(self, prefix):
-        """
-        Return the site for a corresponding interwiki prefix.
-
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
-        """
-        return self._interwikimap[prefix].site
-
-    def interwiki_prefix(self, site):
-        """
-        Return the interwiki prefixes going to that site.
-
-        The interwiki prefixes are ordered first by length (shortest first)
-        and then alphabetically. L{interwiki(prefix)} is not guaranteed to
-        equal C{site} (i.e. the parameter passed to this function).
-
-        @param site: The targeted site, which might be it's own.
-        @type site: L{BaseSite}
-        @return: The interwiki prefixes
-        @rtype: list (guaranteed to be not empty)
-        @raises KeyError: if there is no interwiki prefix for that site.
-        """
-        assert site is not None, 'Site must not be None'
-        prefixes = set()
-        for url in site._interwiki_urls():
-            prefixes.update(self._interwikimap.get_by_url(url))
-        if not prefixes:
-            raise KeyError(
-                "There is no interwiki prefix to '{0}'".format(site))
-        return sorted(prefixes, key=lambda p: (len(p), p))
-
-    def local_interwiki(self, prefix):
-        """
-        Return whether the interwiki prefix is local.
-
-        A local interwiki prefix is handled by the target site like a normal
-        link. So if that link also contains an interwiki link it does follow
-        it as long as it's a local link.
-
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
-        """
-        return self._interwikimap[prefix].local
 
     @deprecated('APISite.namespaces.lookup_name', since='20150703',
                 future_warning=True)
@@ -523,10 +476,3 @@ class BaseSite(ComparableMixin):
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
-
-
-class RemovedSite(BaseSite):
-
-    """Site removed from a family."""
-
-    pass

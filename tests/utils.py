@@ -5,24 +5,16 @@
 # Distributed under the terms of the MIT license.
 #
 import inspect
-import json
 import os
 import sys
 import warnings
 
-from collections.abc import Mapping
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
 from types import ModuleType
 
-try:
-    from cryptography import __version__ as cryptography_version
-    cryptography_version = list(map(int, cryptography_version.split('.')))
-except ImportError:
-    cryptography_version = None
-
 import pywikibot
-from pywikibot.comms import threadedhttp
+
 from pywikibot import config
 from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
@@ -30,15 +22,14 @@ from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
 from tests import _pwb_py, unittest
 
+try:
+    from cryptography import __version__ as cryptography_version
+    cryptography_version = list(map(int, cryptography_version.split('.')))
+except ImportError:
+    cryptography_version = None
+
 
 OSWIN32 = (sys.platform == 'win32')
-
-
-class DrySiteNote(RuntimeWarning):
-
-    """Information regarding dry site."""
-
-    pass
 
 
 def expected_failure_if(expect):
@@ -64,7 +55,7 @@ def fixed_generator(iterable):
 
 def entered_loop(iterable):
     """Return True if iterable contains items."""
-    for iterable_item in iterable:
+    for _ in iterable:
         return True
     return False
 
@@ -427,7 +418,7 @@ class DryPage(pywikibot.Page):
     _disambig = False
     _isredir = False
 
-    def isDisambig(self):
+    def isDisambig(self):  # noqa: N802
         """Return disambig status stored in _disambig."""
         return self._disambig
 
@@ -445,122 +436,6 @@ class FakeLoginManager(pywikibot.data.api.LoginManager):
     def password(self, value):
         """Ignore password changes."""
         pass
-
-
-class DummyHttp(object):
-
-    """A class simulating the http module."""
-
-    def __init__(self, wrapper):
-        """Initializer with the given PatchedHttp instance."""
-        self.__wrapper = wrapper
-
-    def request(self, *args, **kwargs):
-        """The patched request method."""
-        result = self.__wrapper.before_request(*args, **kwargs)
-        if result is False:
-            result = self.__wrapper._old_http.request(*args, **kwargs)
-        elif isinstance(result, Mapping):
-            result = json.dumps(result)
-        elif not isinstance(result, str):
-            raise ValueError('The result is not a valid type '
-                             '"{0}"'.format(type(result)))
-        response = self.__wrapper.after_request(result, *args, **kwargs)
-        if response is None:
-            response = result
-        return response
-
-    def fetch(self, *args, **kwargs):
-        """The patched fetch method."""
-        result = self.__wrapper.before_fetch(*args, **kwargs)
-        if result is False:
-            result = self.__wrapper._old_http.fetch(*args, **kwargs)
-        elif not isinstance(result, threadedhttp.HttpRequest):
-            raise ValueError('The result is not a valid type '
-                             '"{0}"'.format(type(result)))
-        response = self.__wrapper.after_fetch(result, *args, **kwargs)
-        if response is None:
-            response = result
-        return response
-
-
-class PatchedHttp(object):
-
-    """
-    A ContextWrapper to handle any data going through the http module.
-
-    This patches the C{http} import in the given module to a class simulating
-    C{request} and C{fetch}. It has a C{data} attribute which is either a
-    static value which the requests will return or it's a callable returning
-    the data. If it's a callable it'll be called with the same parameters as
-    the original function in the L{http} module. For fine grained control it's
-    possible to override/monkey patch the C{before_request} and C{before_fetch}
-    methods. By default they just return C{data} directory or call it if it's
-    callable.
-
-    Even though L{http.request} is calling L{http.fetch}, it won't call the
-    patched method.
-
-    The data returned for C{request} may either be C{False}, a C{str} or a
-    C{Mapping} which is converted into a json string. The data returned for
-    C{fetch} can only be C{False} or a L{threadedhttp.HttpRequest}. For both
-    variants any other types are not allowed and if it is False it'll use the
-    original method and do an actual request.
-
-    Afterwards it is always calling C{after_request} or C{after_fetch} with the
-    response and given arguments. That can return a different response too, but
-    can also return None so that the original response is forwarded.
-    """
-
-    def __init__(self, module, data=None):
-        """
-        Initializer.
-
-        @param module: The given module to patch. It must have the http module
-            imported as http.
-        @type module: Module
-        @param data: The data returned for any request or fetch.
-        @type data: callable or False (or other depending on request/fetch)
-        """
-        super().__init__()
-        self._module = module
-        self.data = data
-
-    def _handle_data(self, *args, **kwargs):
-        """Return the data after it may have been called."""
-        if self.data is None:
-            raise ValueError('No handler is defined.')
-
-        if callable(self.data):
-            return self.data(*args, **kwargs)
-
-        return self.data
-
-    def before_request(self, *args, **kwargs):
-        """Return the value which should is returned by request."""
-        return self._handle_data(*args, **kwargs)
-
-    def before_fetch(self, *args, **kwargs):
-        """Return the value which should is returned by fetch."""
-        return self._handle_data(*args, **kwargs)
-
-    def after_request(self, response, *args, **kwargs):
-        """Handle the response after request."""
-        pass
-
-    def after_fetch(self, response, *args, **kwargs):
-        """Handle the response after fetch."""
-        pass
-
-    def __enter__(self):
-        """Patch the http module property."""
-        self._old_http = self._module.http
-        self._module.http = DummyHttp(self)
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Reset the http module property."""
-        self._module.http = self._old_http
 
 
 def execute(command, data_in=None, timeout=None, error=None):
