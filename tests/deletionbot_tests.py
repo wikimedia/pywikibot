@@ -57,7 +57,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def test_delete_mark(self):
@@ -83,7 +83,7 @@ class TestDeletionBot(ScriptMainTestCase):
     code = 'test'
 
     cached = True
-    user = True
+    login = True
 
     delete_args = []
     undelete_args = []

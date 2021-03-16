@@ -150,7 +150,7 @@ class TestIsbnBot(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def setUp(self):

@@ -1123,7 +1123,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
 
     """Test site method using a user."""
 
-    user = True
+    login = True
 
     def test_methods(self):
         """Test user related methods."""
@@ -1379,7 +1379,7 @@ class TestUserRecentChanges(DefaultSiteTestCase):
 
     """Test recentchanges method requiring a user."""
 
-    user = True
+    login = True
 
     def test_patrolled(self):
         """Test the site.recentchanges() with patrolled boolean flags."""
@@ -1398,7 +1398,7 @@ class TestUserWatchedPages(DefaultSiteTestCase):
 
     """Test user watched pages."""
 
-    user = True
+    login = True
 
     def test_watched_pages(self):
         """Test the site.watched_pages() method."""
@@ -1489,7 +1489,7 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
 
     """Test site method site.usercontribs() with bot user."""
 
-    user = True
+    login = True
 
     def test_basic(self):
         """Test the site.usercontribs() method."""
@@ -1615,7 +1615,7 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
 
     """Test site method site.alldeletedrevisions() with bot user."""
 
-    user = True
+    login = True
 
     @classmethod
     def setUpClass(cls):
@@ -1802,7 +1802,7 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
     """Test site method watchlist_revs()."""
 
-    user = True
+    login = True
 
     def test_watchlist_revs(self):
         """Test the site.watchlist_revs() method."""
@@ -2204,7 +2204,7 @@ class TestUsernameInUsers(DefaultSiteTestCase):
 
     """Test that the user account can be found in users list."""
 
-    user = True
+    login = True
     cached = True
 
     def test_username_in_users(self):
@@ -2705,7 +2705,7 @@ class TestUploadEnabledSite(TestCase):
         }
     }
 
-    user = True
+    login = True
 
     def test_is_uploaddisabled(self, key):
         """Test is_uploaddisabled()."""
@@ -3469,7 +3469,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 
     """Test for login and logout methods."""
 
-    user = True
+    login = True
 
     def test_login_logout(self):
         """Validate login and logout methods by toggling the state."""
@@ -3504,7 +3504,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 class TestClearCookies(TestCase):
     """Test cookies are cleared after logout."""
 
-    user = True
+    login = True
 
     family = 'wikisource'
     code = 'zh'

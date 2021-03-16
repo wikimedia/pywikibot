@@ -736,7 +736,7 @@ class TestPageBotMayEdit(TestCase):
     code = 'test'
 
     cached = True
-    user = True
+    login = True
 
     def setUp(self):
         """Setup test."""
@@ -1009,7 +1009,7 @@ class TestPageUserAction(DefaultSiteTestCase):
 
     """Test page user actions."""
 
-    user = True
+    login = True
 
     def test_purge(self):
         """Test purging the mainpage."""
@@ -1237,7 +1237,7 @@ class TestPermalink(TestCase):
 class TestShortLink(TestCase):
     """Test that short link management is correct."""
 
-    user = True
+    login = True
 
     family = 'wikipedia'
     code = 'test'
