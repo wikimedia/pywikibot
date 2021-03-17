@@ -524,6 +524,14 @@ class PageArchiver:
         self.site = page.site
         self.tpl = template
         self.timestripper = TimeStripper(site=self.site)
+
+        # read maxarticlesize
+        try:
+            # keep a gap of 1 KB not to block later changes
+            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
+        except KeyError:  # mw < 1.28
+            self.maxsize = 2096128  # 2 MB - 1 KB gap
+
         self.page = DiscussionPage(page, self)
         self.load_config()
         self.comment_params = {
@@ -535,13 +543,6 @@ class PageArchiver:
         self.month_num2orig_names = {}
         for n, (long, short) in enumerate(self.site.months_names, start=1):
             self.month_num2orig_names[n] = {'long': long, 'short': short}
-
-        # read maxarticlesize
-        try:
-            # keep a gap of 1 KB not to block later changes
-            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
-        except KeyError:  # mw < 1.28
-            self.maxsize = 2096128  # 2 MB - 1 KB gap
 
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
