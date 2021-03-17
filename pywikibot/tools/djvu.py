@@ -91,6 +91,7 @@ class DjVuFile:
         """Return a string representation."""
         return str("{}('{}')").format(self.__class__.__name__, self._filename)
 
+    @staticmethod
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""
         cache = ['_page_count', '_has_text', '_page_info']
@@ -104,6 +105,7 @@ class DjVuFile:
             return _res
         return wrapper
 
+    @staticmethod
     def check_page_number(fn):
         """Decorator to check if page number is valid.
 
@@ -314,7 +316,3 @@ class DjVuFile:
 
         return True
 
-    # This is to be used only if this class is subclassed and the decorators
-    # needs to be used by the child.
-    check_page_number = staticmethod(check_page_number)
-    check_cache = staticmethod(check_cache)
