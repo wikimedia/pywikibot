@@ -361,7 +361,7 @@ class PatrolEntry(LogEntry):
         return 'auto' in self._params and self._params['auto'] != 0
 
 
-class LogEntryFactory(object):
+class LogEntryFactory:
 
     """
     LogEntry Factory.
