@@ -2629,7 +2629,7 @@ class GoogleSearchPageGenerator:
             pywikibot.error('ERROR: generator GoogleSearchPageGenerator '
                             "depends on package 'google'.\n"
                             'To install, please run: pip install google.')
-            exit(1)
+            sys.exit(1)
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
         yield from google.search(query)
 
