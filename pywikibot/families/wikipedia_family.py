@@ -144,7 +144,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     # Languages that used to be coded in iso-8859-1
     latin1old = {
-        'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'es', 'et', 'eu', 'fi',
+        'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'et', 'eu', 'fi',
         'fr', 'fy', 'ga', 'gl', 'ia', 'id', 'it', 'la', 'lt', 'lv', 'mi', 'mr',
         'na', 'nds', 'nl', 'no', 'pt', 'simple', 'sl', 'sv', 'sw', 'test',
         'tt', 'uk', 'vi', 'vo'
