@@ -1081,5 +1081,4 @@ class CosmeticChangesToolkit:
 
     def fix_ISBN(self, text):
         """Hyphenate ISBN numbers."""
-        return _reformat_ISBNs(
-            text, strict=False if self.ignore == CANCEL_MATCH else True)
+        return _reformat_ISBNs(text, strict=self.ignore != CANCEL_MATCH)
