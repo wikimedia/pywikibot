@@ -124,8 +124,7 @@ class Namespace(Iterable, ComparableMixin):
     def _distinct(self):
         if self.custom_name == self.canonical_name:
             return [self.canonical_name] + self.aliases
-        else:
-            return [self.custom_name, self.canonical_name] + self.aliases
+        return [self.custom_name, self.canonical_name] + self.aliases
 
     def _contains_lowercase_name(self, name):
         """Determine a lowercase normalised name is a name of this namespace.
@@ -155,8 +154,7 @@ class Namespace(Iterable, ComparableMixin):
         """Obtain length of the iterable."""
         if self.custom_name == self.canonical_name:
             return len(self.aliases) + 1
-        else:
-            return len(self.aliases) + 2
+        return len(self.aliases) + 2
 
     def __iter__(self):
         """Return an iterator."""

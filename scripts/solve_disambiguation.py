@@ -376,8 +376,7 @@ def correctcap(link, text: str) -> str:
     linklower = first_lower(linkupper)
     if '[[%s]]' % linklower in text or '[[%s|' % linklower in text:
         return linklower
-    else:
-        return linkupper
+    return linkupper
 
 
 class ReferringPageGeneratorWithIgnore:

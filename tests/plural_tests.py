@@ -43,8 +43,7 @@ class MetaPluralRulesTest(MetaTestCaseClass):
             # Don't already fail on creation
             if callable(rule.get('plural')):
                 return test_callable_rule
-            else:
-                return test_static_rule
+            return test_static_rule
 
         for lang, rule in plural.plural_rules.items():
             cls.add_method(dct, 'test_{0}'.format(lang.replace('-', '_')),

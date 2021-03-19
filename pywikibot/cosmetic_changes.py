@@ -323,8 +323,7 @@ class CosmeticChangesToolkit:
                                   .format(self.title))
                 pywikibot.exception(e)
                 return False
-            else:
-                raise
+            raise
         else:
             if self.show_diff:
                 pywikibot.showDiff(text, new_text)

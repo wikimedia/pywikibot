@@ -1309,9 +1309,8 @@ class checkImagesBot:
             if skip_number == 1:
                 pywikibot.output('')
             return True
-        else:
-            pywikibot.output('')
-            return False
+        pywikibot.output('')
+        return False
 
     @staticmethod
     def wait(generator, wait_time) -> Generator[pywikibot.FilePage, None,

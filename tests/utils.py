@@ -41,8 +41,7 @@ def expected_failure_if(expect):
     """
     if expect:
         return unittest.expectedFailure
-    else:
-        return lambda orig: orig
+    return lambda orig: orig
 
 
 def fixed_generator(iterable):

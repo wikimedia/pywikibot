@@ -1134,6 +1134,5 @@ class transliterator:  # noqa: N801
         if char == 'ຫ':
             if next in 'ງຍນຣລຼຼວ':
                 return ''
-            else:
-                return 'h'
+            return 'h'
         return default

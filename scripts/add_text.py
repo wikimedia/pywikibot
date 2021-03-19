@@ -130,9 +130,8 @@ def put_text(page, new: str, summary: str, count: int,
             pywikibot.output('Server Error! Wait..')
             pywikibot.sleep(config.retry_wait)
             return None
-        else:
-            raise pywikibot.ServerError(
-                'Server Error! Maximum retries exceeded')
+        raise pywikibot.ServerError(
+            'Server Error! Maximum retries exceeded')
     except pywikibot.SpamblacklistError as e:
         pywikibot.output(
             'Cannot change {} because of blacklist entry {}'

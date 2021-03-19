@@ -1022,9 +1022,8 @@ class CapturingTestCase(TestCase):
                 if hasattr(context, '__enter__'):
                     return self._delay_assertion(context, assertion, args,
                                                  kwargs)
-                else:
-                    self.after_assert(assertion, *args, **kwargs)
-                    return context
+                self.after_assert(assertion, *args, **kwargs)
+                return context
             finally:
                 self._patched = False
         return inner_assert
@@ -1034,8 +1033,7 @@ class CapturingTestCase(TestCase):
         result = super().__getattribute__(attr)
         if attr.startswith('assert') and not self._patched:
             return self.patch_assert(result)
-        else:
-            return result
+        return result
 
 
 class PatchingTestCase(TestCase):
@@ -1595,8 +1593,7 @@ class HttpbinTestCase(TestCase):
         """
         if hasattr(self, 'httpbin'):
             return self.httpbin.url + path
-        else:
-            return 'http://httpbin.org' + path
+        return 'http://httpbin.org' + path
 
     def get_httpbin_hostname(self):
         """
@@ -1607,5 +1604,4 @@ class HttpbinTestCase(TestCase):
         """
         if hasattr(self, 'httpbin'):
             return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
-        else:
-            return 'httpbin.org'
+        return 'httpbin.org'

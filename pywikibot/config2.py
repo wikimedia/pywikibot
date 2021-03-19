@@ -308,8 +308,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
         directory = os.path.abspath(directory)
         if directory == test_directory:
             return True
-        else:
-            return os.path.exists(os.path.join(directory, 'user-config.py'))
+        return os.path.exists(os.path.join(directory, 'user-config.py'))
 
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
@@ -902,18 +901,16 @@ def _assert_default_type(name, value, default_value):
     if (value is None or default_value is None
             or isinstance(value, type(default_value))):
         return value
-    elif isinstance(value, int) and isinstance(default_value, float):
+    if isinstance(value, int) and isinstance(default_value, float):
         return float(value)
-    else:
-        raise _DifferentTypeError(name, type(value), [type(default_value)])
+    raise _DifferentTypeError(name, type(value), [type(default_value)])
 
 
 def _assert_types(name, value, types):
     """Return the value if it's one of the types."""
     if isinstance(value, types):
         return value
-    else:
-        raise _DifferentTypeError(name, type(value), types)
+    raise _DifferentTypeError(name, type(value), types)
 
 
 DEPRECATED_VARIABLE = (

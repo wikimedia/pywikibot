@@ -177,8 +177,7 @@ def str2localized_duration(site, string: str) -> str:
         # replace plural variants
         exp = i18n.translate(site.code, template, {'$1': int(duration)})
         return exp.replace('$1', to_local_digits(duration, site.code))
-    else:
-        return to_local_digits(string, site.code)
+    return to_local_digits(string, site.code)
 
 
 def str2time(string: str, timestamp=None) -> datetime.timedelta:
@@ -216,8 +215,7 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
     if timestamp:
         return apply_month_delta(
             timestamp.date(), month_delta=duration) - timestamp.date()
-    else:
-        return datetime.timedelta(days=days)
+    return datetime.timedelta(days=days)
 
 
 def checkstr(string: str) -> Tuple[str, str]:
@@ -742,8 +740,7 @@ class PageArchiver:
                                  for i in sorted(keep_threads)]
             self.set_attr('counter', str(counter))
             return whys
-        else:
-            return set()
+        return set()
 
     def run(self) -> None:
         """Process a single DiscussionPage object."""

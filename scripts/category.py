@@ -335,12 +335,11 @@ class CategoryDatabase:
         # if we already know which subcategories exist here
         if supercat in self.catContentDB:
             return self.catContentDB[supercat][0]
-        else:
-            subcatset = set(supercat.subcategories())
-            articleset = set(supercat.articles())
-            # add to dictionary
-            self.catContentDB[supercat] = (subcatset, articleset)
-            return subcatset
+        subcatset = set(supercat.subcategories())
+        articleset = set(supercat.articles())
+        # add to dictionary
+        self.catContentDB[supercat] = (subcatset, articleset)
+        return subcatset
 
     def getArticles(self, cat) -> Set[pywikibot.Page]:
         """Return the list of pages for a given category.
@@ -352,12 +351,11 @@ class CategoryDatabase:
         # if we already know which articles exist here.
         if cat in self.catContentDB:
             return self.catContentDB[cat][1]
-        else:
-            subcatset = set(cat.subcategories())
-            articleset = set(cat.articles())
-            # add to dictionary
-            self.catContentDB[cat] = (subcatset, articleset)
-            return articleset
+        subcatset = set(cat.subcategories())
+        articleset = set(cat.articles())
+        # add to dictionary
+        self.catContentDB[cat] = (subcatset, articleset)
+        return articleset
 
     def getSupercats(self, subcat) -> Set[pywikibot.Category]:
         """Return the supercategory (or a set of) for a given subcategory."""
@@ -365,11 +363,10 @@ class CategoryDatabase:
         # if we already know which subcategories exist here.
         if subcat in self.superclassDB:
             return self.superclassDB[subcat]
-        else:
-            supercatset = set(subcat.categories())
-            # add to dictionary
-            self.superclassDB[subcat] = supercatset
-            return supercatset
+        supercatset = set(subcat.categories())
+        # add to dictionary
+        self.superclassDB[subcat] = supercatset
+        return supercatset
 
     def dump(self, filename=None) -> None:
         """Save the dictionaries to disk if not empty.
@@ -447,8 +444,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
             sorted_key = split_string[1] + ', ' + split_string[0]
             # give explicit sort key
             return pywikibot.Page(site, catlink.title() + '|' + sorted_key)
-        else:
-            return pywikibot.Page(site, catlink.title())
+        return pywikibot.Page(site, catlink.title())
 
     def treat(self, page) -> None:
         """Process one page."""

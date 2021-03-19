@@ -412,8 +412,7 @@ class UploadRobot(BaseBot):
                 pywikibot.output('Upload of %s successful.' % filename)
                 self._save_counter += 1
                 return filename  # data['filename']
-            else:
-                pywikibot.output('Upload aborted.')
+            pywikibot.output('Upload aborted.')
         return None
 
     def skip_run(self):

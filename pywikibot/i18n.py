@@ -786,8 +786,7 @@ def twtranslate(source,
 
     if not only_plural and parameters:
         return trans % parameters
-    else:
-        return trans
+    return trans
 
 
 @deprecated('twtranslate', since='20151009', future_warning=True)

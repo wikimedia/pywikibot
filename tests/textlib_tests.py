@@ -790,7 +790,7 @@ class TestReplaceLinks(TestCase):
             self.assertEqual(link.site, self.wp_site)
             if link.title == 'World':
                 return pywikibot.Link('Homeworld', link.site)
-            elif link.title.lower() == 'you':
+            if link.title.lower() == 'you':
                 return False
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
@@ -805,9 +805,8 @@ class TestReplaceLinks(TestCase):
                     return pywikibot.Link(
                         '{0}#{1}'
                         .format(self._count, link.section), link.site)
-                else:
-                    return pywikibot.Link('{0}'
-                                          .format(self._count), link.site)
+                return pywikibot.Link('{0}'
+                                      .format(self._count), link.site)
         self._count = 0  # buffer number of found instances
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),

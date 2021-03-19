@@ -360,9 +360,8 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     def assign_user_agent(user_agent_format_string):
         if not user_agent_format_string or '{' in user_agent_format_string:
             return user_agent(None, user_agent_format_string)
-        else:
-            # do nothing, it is already a UA
-            return user_agent_format_string
+        # do nothing, it is already a UA
+        return user_agent_format_string
 
     # If not already specified.
     if 'user-agent' not in headers:

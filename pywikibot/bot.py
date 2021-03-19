@@ -633,8 +633,7 @@ class InteractiveReplace:
                     break
             self._current_match = None  # don't reset in case of an exception
             return answer
-        else:
-            return None
+        return None
 
     @property
     def choices(self):
@@ -2173,8 +2172,7 @@ class WikidataBot(Bot, ExistingPageBot):
         result = self.user_edit_entity(item, data, summary=summary, **kwargs)
         if result:
             return item
-        else:
-            return None
+        return None
 
     def treat_page(self):
         """Treat a page."""

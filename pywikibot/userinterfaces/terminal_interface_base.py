@@ -517,5 +517,4 @@ class MaxLevelFilter(logging.Filter):
         """Return true if the level is below or equal to the set level."""
         if self.level:
             return record.levelno <= self.level
-        else:
-            return True
+        return True
