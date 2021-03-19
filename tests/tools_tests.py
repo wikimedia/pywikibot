@@ -658,10 +658,6 @@ class TestFileShaCalculator(TestCase):
 
     filename = join_xml_data_path('article-pear-0.10.xml')
 
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-
     def test_md5_complete_calculation(self):
         """Test md5 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='md5')
