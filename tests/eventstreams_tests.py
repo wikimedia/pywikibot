@@ -159,7 +159,7 @@ class TestEventStreamsSettingTests(TestCase):
         self.assertLength(self.es.filter['all'], 2)
 
 
-class TestEventStreamsFilterTests(TestCase):
+class TestEventStreamsFilter(TestCase):
 
     """Filter tests for eventstreams module."""
 
@@ -252,11 +252,8 @@ class TestEventStreamsFilterTests(TestCase):
         for none_type in (False, True):
             for all_type in (False, True):
                 for any_type in (False, True, None):
-                    if none_type is False and all_type is True and (
-                            any_type is None or any_type is True):
-                        result = True
-                    else:
-                        result = False
+                    result = none_type is False and all_type is True \
+                        and (any_type is None or any_type is True)
                     self._test_filter(none_type, all_type, any_type, result)
 
 
