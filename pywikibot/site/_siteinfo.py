@@ -280,7 +280,7 @@ class Siteinfo(Container):
             expiry = 0
         # If expiry is a float or int convert to timedelta
         # Note: bool is an instance of int
-        if isinstance(expiry, float) or type(expiry) == int:
+        if isinstance(expiry, float) or type(expiry) is int:
             expiry = datetime.timedelta(expiry)
 
         # expire = 0 (or timedelta(0)) are always expired and their bool is
