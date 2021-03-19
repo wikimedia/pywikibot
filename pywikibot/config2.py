@@ -654,8 +654,8 @@ weblink_dead_days = 7
 # Setting to connect the database or replica of the database of the wiki.
 # db_name_format can be used to manipulate the dbName of site.
 #
-# Example for a pywikibot running on wmflabs:
-# db_hostname_format = '{0}.analytics.db.svc.eqiad.wmflabs'
+# Example for a pywikibot running on Wikimedia Cloud (Toolforge):
+# db_hostname_format = '{0}.analytics.db.svc.wikimedia.cloud'
 # db_name_format = '{0}_p'
 # db_connect_file = user_home_path('replica.my.cnf')
 db_hostname_format = 'localhost'
