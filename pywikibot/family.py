@@ -1173,7 +1173,7 @@ class WikimediaFamily(Family):
         if cls.name in (cls.multi_language_content_families
                         + cls.other_content_families):
             return cls.name + '.org'
-        elif cls.name in cls.wikimedia_org_families:
+        if cls.name in cls.wikimedia_org_families:
             return 'wikimedia.org'
 
         raise NotImplementedError(

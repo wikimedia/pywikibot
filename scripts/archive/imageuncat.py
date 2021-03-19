@@ -1279,7 +1279,7 @@ def isUncat(page):
             # Already tagged with a template, skip it
             pywikibot.output('Already tagged, skip it')
             return False
-        elif template in ignoreTemplates:
+        if template in ignoreTemplates:
             # template not relevant for categorization
             pywikibot.output('Ignore ' + template)
         else:

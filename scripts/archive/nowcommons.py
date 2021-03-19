@@ -202,8 +202,7 @@ class NowCommonsDeleteBot(Bot):
         """Return nowcommons templates."""
         if self.site.lang in nowCommons:
             return nowCommons[self.site.lang]
-        else:
-            return nowCommons['_default']
+        return nowCommons['_default']
 
     @property
     def nc_templates(self):

@@ -118,8 +118,7 @@ class FullHeader:
         """Return a string representation."""
         if self._has_div:
             return FullHeader.TEMPLATE_V1.format(self)
-        else:
-            return FullHeader.TEMPLATE_V2.format(self)
+        return FullHeader.TEMPLATE_V2.format(self)
 
 
 class ProofreadPage(pywikibot.Page):
@@ -638,8 +637,7 @@ class ProofreadPage(pywikibot.Page):
         if error:
             pywikibot.error('OCR query %s: %s' % (cmd_uri, _text))
             return error, _text
-        else:
-            return error, parser_func(_text)
+        return error, parser_func(_text)
 
     def _do_hocr(self):
         """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
@@ -734,9 +732,8 @@ class ProofreadPage(pywikibot.Page):
 
         if not error:
             return text
-        else:
-            raise ValueError(
-                '{0}: not possible to perform OCR. {1}'.format(self, text))
+        raise ValueError(
+            '{0}: not possible to perform OCR. {1}'.format(self, text))
 
 
 class PurgeRequest(Request):
@@ -811,8 +808,7 @@ class IndexPage(pywikibot.Page):
         title = p_href.search(href)
         if title:
             return title.group(1)
-        else:
-            return None
+        return None
 
     def save(self, *args, **kwargs):  # See Page.save().
         """

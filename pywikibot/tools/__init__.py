@@ -92,9 +92,8 @@ def has_module(module, version=None):
         else:
             if module_version >= LooseVersion(version):
                 return True
-            else:
-                warn('Module version {} is lower than requested version {}'
-                     .format(module_version, version), ImportWarning)
+            warn('Module version {} is lower than requested version {}'
+                 .format(module_version, version), ImportWarning)
     return False
 
 
@@ -963,8 +962,7 @@ class DequeGenerator(Iterator, collections.deque):
         """Iterator method."""
         if len(self):
             return self.popleft()
-        else:
-            raise StopIteration
+        raise StopIteration
 
 
 def open_archive(filename, mode='rb', use_extension=True):
@@ -1218,8 +1216,7 @@ def add_full_name(obj):
                 and callable(outer_args[0])):
             add_decorated_full_name(outer_args[0])
             return obj(outer_args[0])
-        else:
-            return inner_wrapper
+        return inner_wrapper
 
     if not __debug__:
         return obj

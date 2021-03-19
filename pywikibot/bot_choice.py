@@ -67,8 +67,7 @@ class Option:
         """
         if self.test(value):
             return self
-        else:
-            return None
+        return None
 
     def format(self, default=None):
         """Return a formatted string for that option."""
@@ -128,8 +127,7 @@ class StandardOption(Option):
             return '{0}[{1}]{2}'.format(
                 self.option[:index], shortcut,
                 self.option[index + len(self.shortcut):])
-        else:
-            return '{0} [{1}]'.format(self.option, shortcut)
+        return '{0} [{1}]'.format(self.option, shortcut)
 
     def result(self, value):
         """Return the lowercased shortcut."""
@@ -388,8 +386,7 @@ class IntegerOption(Option):
         """Return integer from value with prefix removed."""
         if value.lower().startswith(self.prefix.lower()):
             return int(value[len(self.prefix):])
-        else:
-            raise ValueError('Value does not start with prefix')
+        raise ValueError('Value does not start with prefix')
 
     def result(self, value):
         """Return the value converted into int."""

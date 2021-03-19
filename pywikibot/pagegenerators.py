@@ -574,7 +574,7 @@ class GeneratorFactory:
                 pywikibot.warning('filter(s) specified but no generators.')
             return None
 
-        elif len(self.gens) == 1:
+        if len(self.gens) == 1:
             dupfiltergen = self.gens[0]
             if hasattr(self, '_single_gen_filter_unique'):
                 dupfiltergen = _filter_unique_pages(dupfiltergen)

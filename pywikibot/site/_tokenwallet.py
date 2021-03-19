@@ -67,13 +67,12 @@ class TokenWallet:
 
         if key in user_tokens:
             return user_tokens[key]
-        else:
-            # token not allowed for self.site.user() on self.site
-            self.failed_cache.add(failed_cache_key)
-            # to be changed back to a plain KeyError?
-            raise Error(
-                "Action '{0}' is not allowed for user {1} on {2} wiki."
-                .format(key, self.site.user(), self.site))
+        # token not allowed for self.site.user() on self.site
+        self.failed_cache.add(failed_cache_key)
+        # to be changed back to a plain KeyError?
+        raise Error(
+            "Action '{0}' is not allowed for user {1} on {2} wiki."
+            .format(key, self.site.user(), self.site))
 
     def __contains__(self, key):
         """Return True if the given token name is cached."""

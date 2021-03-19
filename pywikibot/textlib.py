@@ -637,8 +637,7 @@ def replace_links(text: str, replace, site=None) -> str:
     def replace_callable(link, text, groups, rng):
         if replace_list[0] == link:
             return replace_list[1]
-        else:
-            return None
+        return None
 
     def check_classes(replacement):
         """Normalize the replacement into a list."""
@@ -1057,8 +1056,7 @@ def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
         newtext = removeLanguageLinks(text, site, mymarker)
         mymarker = expandmarker(newtext, mymarker, separator)
         return newtext.replace(mymarker, marker)
-    else:
-        return removeLanguageLinks(text, site, marker)
+    return removeLanguageLinks(text, site, marker)
 
 
 def replaceLanguageLinks(oldtext: str, new: dict, site=None,
@@ -1339,8 +1337,7 @@ def removeCategoryLinksAndSeparator(text: str, site=None, marker: str = '',
         newtext = removeCategoryLinks(text, site, mymarker)
         mymarker = expandmarker(newtext, mymarker, separator)
         return newtext.replace(mymarker, marker)
-    else:
-        return removeCategoryLinks(text, site, marker)
+    return removeCategoryLinks(text, site, marker)
 
 
 def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
@@ -1626,8 +1623,7 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
 
     if use_regex:
         return extract_templates_and_params_regex(text, False, strip)
-    else:
-        return extract_templates_and_params_mwpfh(text, strip)
+    return extract_templates_and_params_mwpfh(text, strip)
 
 
 def extract_templates_and_params_mwpfh(text: str, strip=False):
@@ -2083,8 +2079,7 @@ class TimeStripper:
             else:
                 txt = pat.sub(marker, txt)
             return (txt, m)
-        else:
-            return (txt, None)
+        return (txt, None)
 
     @staticmethod
     def _valid_date_dict_positions(dateDict):

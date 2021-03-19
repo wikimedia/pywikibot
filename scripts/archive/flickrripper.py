@@ -404,8 +404,7 @@ def getPhotos(flickr, user_id='', group_id='', photoset_id='',
                         if photo.attrib['id'] == end_id:
                             pywikibot.output('Found end_id')
                             return
-                        else:
-                            yield photo.attrib['id']
+                        yield photo.attrib['id']
             except flickrapi.exceptions.FlickrError:
                 gotPhotos = False
                 pywikibot.output('Flickr api problem, sleeping')
