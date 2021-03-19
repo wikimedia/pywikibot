@@ -72,6 +72,7 @@ import datetime
 import hashlib
 import os
 import pickle
+import sys
 
 import pywikibot
 
@@ -418,13 +419,11 @@ def main():
             command = 'has_password(entry)'
         elif arg == '-c':
             if command:
-                pywikibot.error('Only one command may be executed.')
-                exit(1)
+                sys.exit('Only one command may be executed.')
             command = ''
         elif arg == '-o':
             if output:
-                pywikibot.error('Only one output may be defined.')
-                exit(1)
+                sys.exit('Only one output may be defined.')
             output = ''
         else:
             if not cache_paths:

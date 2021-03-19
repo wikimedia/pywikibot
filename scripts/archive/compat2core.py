@@ -25,13 +25,14 @@ to show warnings about deprecated methods:
     python pwb.py compat2core <scriptname> -warnonly
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import codecs
 import os
 import re
+import sys
 
 import pywikibot
 
@@ -155,7 +156,7 @@ class ConvertBot:
                     'Please input the .py file to convert '
                     '(no input to leave):')
             if not self.source:
-                exit()
+                sys.exit()
             if not self.source.endswith('.py'):
                 self.source += '.py'
             if os.path.exists(self.source):
@@ -174,7 +175,7 @@ class ConvertBot:
                 'Destination file is {}.'.format(self.dest),
                 default=True, automatic_quit=False):
             pywikibot.output('Quitting...')
-            exit()
+            sys.exit()
 
     def convert(self):
         """Convert script."""

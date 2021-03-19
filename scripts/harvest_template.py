@@ -92,6 +92,7 @@ will not add duplicate claims for the same member:
 # Distributed under the terms of MIT License.
 #
 import signal
+import sys
 
 from typing import Any, Optional
 
@@ -182,9 +183,7 @@ class HarvestRobot(WikidataBot):
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
         if not temp.exists():
-            pywikibot.error('Template {} does not exist.'
-                            .format(temp.title()))
-            exit()
+            sys.exit('Template {} does not exist.'.format(temp.title()))
 
         # Put some output here since it can take a while
         pywikibot.output('Finding redirects...')
