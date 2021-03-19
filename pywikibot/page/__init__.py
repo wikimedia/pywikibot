@@ -2113,8 +2113,8 @@ class Page(BasePage):
                         if k < 1 or k >= i:
                             named[str(k)] = intkeys[k]
                     break
-            for name in named:
-                positional.append('%s=%s' % (name, named[name]))
+            for item in named.items():
+                positional.append('{}={}'.format(*item))
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
