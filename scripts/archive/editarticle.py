@@ -40,7 +40,7 @@ from pywikibot.backports import Tuple
 from pywikibot.editor import TextEditor
 
 
-class ArticleEditor(object):
+class ArticleEditor:
 
     """Edit a wiki page."""
 

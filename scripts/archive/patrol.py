@@ -352,7 +352,7 @@ class PatrolBot(SingleSiteBot):
                              .format(title(as_link=True)))
 
 
-class LinkedPagesRule(object):
+class LinkedPagesRule:
 
     """Matches of page site title and linked pages title."""
 
