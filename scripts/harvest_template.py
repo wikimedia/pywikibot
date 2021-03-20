@@ -243,8 +243,7 @@ class HarvestRobot(WikidataBot):
         local = handler.opt[option]
         if isinstance(default, bool) and isinstance(local, bool):
             return default is not local
-        else:
-            return local or default
+        return local or default
 
     def treat_page_and_item(self, page, item) -> None:
         """Process a single page/item."""

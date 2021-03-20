@@ -50,8 +50,7 @@ class TestDisambiguationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
                     answer = callback.handle_answer(choice)
                     callback._current_match = None
                     return answer
-                else:
-                    return None
+                return None
 
             callback = original(old, new)
             return _patched_callback

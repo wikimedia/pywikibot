@@ -638,8 +638,7 @@ class CaseChecker:
         """Colorize code word."""
         if not toScreen:
             return self._ColorCodeWordHtml(word)
-        else:
-            return self._ColorCodeWordScreen(word)
+        return self._ColorCodeWordScreen(word)
 
     def _ColorCodeWordHtml(self, word):
         res = '<b>'

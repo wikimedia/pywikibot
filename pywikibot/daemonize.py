@@ -59,11 +59,10 @@ def daemonize(close_fd=True, chdir=True, redirect_std=None):
             if chdir:
                 os.chdir('/')
             return
-        else:
-            # Write out the pid
-            path = os.path.basename(sys.argv[0]) + '.pid'
-            with codecs.open(path, 'w', 'utf-8') as f:
-                f.write(str(pid))
+        # Write out the pid
+        path = os.path.basename(sys.argv[0]) + '.pid'
+        with codecs.open(path, 'w', 'utf-8') as f:
+            f.write(str(pid))
     # Exit to return control to the terminal
     # os._exit to prevent the cleanup to run
     os._exit(0)

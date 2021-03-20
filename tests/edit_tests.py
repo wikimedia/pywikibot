@@ -27,7 +27,7 @@ class TestGeneralWrite(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def test_createonly(self):

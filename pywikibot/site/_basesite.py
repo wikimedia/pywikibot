@@ -184,8 +184,7 @@ class BaseSite(ComparableMixin):
         """Return the currently-logged in bot username, or None."""
         if self.logged_in():
             return self.username()
-        else:
-            return None
+        return None
 
     @remove_last_args(['sysop'])
     def username(self):
@@ -402,8 +401,7 @@ class BaseSite(ComparableMixin):
                 ns = self.namespaces.lookup_name(ns)
             if not delim or not ns:
                 return default_ns, title
-            else:
-                return ns, name
+            return ns, name
 
         # Replace underscores with spaces and multiple combinations of them
         # with only one space

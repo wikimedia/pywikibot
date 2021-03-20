@@ -73,7 +73,7 @@ class _InterwikiMap:
             raise KeyError("'{0}' is not an interwiki prefix.".format(prefix))
         if isinstance(self._iw_sites[prefix].site, pywikibot.site.BaseSite):
             return self._iw_sites[prefix]
-        elif isinstance(self._iw_sites[prefix].site, Exception):
+        if isinstance(self._iw_sites[prefix].site, Exception):
             raise self._iw_sites[prefix].site
         else:
             raise TypeError('_iw_sites[%s] is wrong type: %s'

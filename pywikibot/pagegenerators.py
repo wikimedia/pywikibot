@@ -574,7 +574,7 @@ class GeneratorFactory:
                 pywikibot.warning('filter(s) specified but no generators.')
             return None
 
-        elif len(self.gens) == 1:
+        if len(self.gens) == 1:
             dupfiltergen = self.gens[0]
             if hasattr(self, '_single_gen_filter_unique'):
                 dupfiltergen = _filter_unique_pages(dupfiltergen)
@@ -2629,7 +2629,7 @@ class GoogleSearchPageGenerator:
             pywikibot.error('ERROR: generator GoogleSearchPageGenerator '
                             "depends on package 'google'.\n"
                             'To install, please run: pip install google.')
-            exit(1)
+            sys.exit(1)
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
         yield from google.search(query)
 

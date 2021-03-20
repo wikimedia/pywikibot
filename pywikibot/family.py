@@ -330,11 +330,13 @@ class Family:
         'szl': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
         'szy': '',
         'ta': '[஀-௿]*',
+        'tay': '',
         'te': '[ఁ-౯]*',
         'tet': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
         'tg': '[a-zабвгдеёжзийклмнопрстуфхчшъэюяғӣқўҳҷцщыь]*',
         'tk': '[a-zÄäÇçĞğŇňÖöŞşÜüÝýŽž]*',
         'tr': '[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
+        'trv': '',
         'tt': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӘәӨөҮүҖҗҢңҺһ]*',
         'ty': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
         'tyv': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -1173,7 +1175,7 @@ class WikimediaFamily(Family):
         if cls.name in (cls.multi_language_content_families
                         + cls.other_content_families):
             return cls.name + '.org'
-        elif cls.name in cls.wikimedia_org_families:
+        if cls.name in cls.wikimedia_org_families:
             return 'wikimedia.org'
 
         raise NotImplementedError(

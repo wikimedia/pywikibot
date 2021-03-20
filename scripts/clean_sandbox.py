@@ -246,7 +246,7 @@ class SandboxBot(Bot, ConfigParserBot):
             if self.opt.no_repeat:
                 pywikibot.output('\nDone.')
                 return
-            elif not wait:
+            if not wait:
                 if self.opt.hours < 1.0:
                     pywikibot.output('\nSleeping {} minutes, now {}'.format(
                         (self.opt.hours * 60), now))

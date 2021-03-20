@@ -162,8 +162,7 @@ class Formatter:
                 "Required format code needs 'outputlang' parameter set.")
         if num is None:
             return fmt.format(page=self)
-        else:
-            return fmt.format(num=num, page=self)
+        return fmt.format(num=num, page=self)
 
 
 def main(*args) -> None:

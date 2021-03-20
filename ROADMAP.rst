@@ -1,6 +1,11 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* Add support for taywiki, trvwiki and mnwwiktionary (T275838, T276128, T276250)
+
+6.0.0
+~~~~~
+
 Breaking changes
 ^^^^^^^^^^^^^^^^
 

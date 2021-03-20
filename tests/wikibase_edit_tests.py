@@ -26,7 +26,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
     family = 'wikidata'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def test_label_set(self):
@@ -204,7 +204,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
     family = 'wikidata'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def _clean_item(self, repo, prop: str):
@@ -405,7 +405,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
     family = 'wikidata'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def setUp(self):
@@ -482,7 +482,7 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
     family = 'wikidata'
     code = 'test'
 
-    user = True
+    login = True
     write = True
 
     def setUp(self):

@@ -184,43 +184,42 @@ class LonelyPagesBot(SingleSiteBot):
             pywikibot.output("{0} isn't orphan! Skip..."
                              .format(page.title()))
             return
+        # no refs, no redirect; check if there's already the template
+        try:
+            oldtxt = page.get()
+        except pywikibot.NoPage:
+            pywikibot.output("{0} doesn't exist! Skip..."
+                             .format(page.title()))
+            return
+        except pywikibot.IsRedirectPage:
+            pywikibot.output('{0} is a redirect! Skip...'
+                             .format(page.title()))
+            return
+        if self.settings.regex.search(oldtxt):
+            pywikibot.output(
+                'Your regex has found something in {0}, skipping...'
+                .format(page.title()))
+            return
+        if (page.isDisambig()
+                and self.opt.disambigPage is not None):
+            pywikibot.output('{0} is a disambig page, report..'
+                             .format(page.title()))
+            if not page.title().lower() in self.disambigtext.lower():
+                self.disambigtext = '{0}\n*[[{1}]]'.format(
+                    self.disambigtext, page.title())
+                self.disambigpage.text = self.disambigtext
+                self.disambigpage.save(self.commentdisambig)
+                return
+        # Is the page a disambig but there's not disambigPage? Skip!
+        elif page.isDisambig():
+            pywikibot.output('{0} is a disambig page, skip...'
+                             .format(page.title()))
+            return
         else:
-            # no refs, no redirect; check if there's already the template
-            try:
-                oldtxt = page.get()
-            except pywikibot.NoPage:
-                pywikibot.output("{0} doesn't exist! Skip..."
-                                 .format(page.title()))
-                return
-            except pywikibot.IsRedirectPage:
-                pywikibot.output('{0} is a redirect! Skip...'
-                                 .format(page.title()))
-                return
-            if self.settings.regex.search(oldtxt):
-                pywikibot.output(
-                    'Your regex has found something in {0}, skipping...'
-                    .format(page.title()))
-                return
-            if (page.isDisambig()
-                    and self.opt.disambigPage is not None):
-                pywikibot.output('{0} is a disambig page, report..'
-                                 .format(page.title()))
-                if not page.title().lower() in self.disambigtext.lower():
-                    self.disambigtext = '{0}\n*[[{1}]]'.format(
-                        self.disambigtext, page.title())
-                    self.disambigpage.text = self.disambigtext
-                    self.disambigpage.save(self.commentdisambig)
-                    return
-            # Is the page a disambig but there's not disambigPage? Skip!
-            elif page.isDisambig():
-                pywikibot.output('{0} is a disambig page, skip...'
-                                 .format(page.title()))
-                return
-            else:
-                # Ok, the page need the template. Let's put it there!
-                # Adding the template in the text
-                newtxt = '{0}\n{1}'.format(self.settings.template, oldtxt)
-                self.userPut(page, oldtxt, newtxt, summary=self.comment)
+            # Ok, the page need the template. Let's put it there!
+            # Adding the template in the text
+            newtxt = '{0}\n{1}'.format(self.settings.template, oldtxt)
+            self.userPut(page, oldtxt, newtxt, summary=self.comment)
 
 
 def main(*args):

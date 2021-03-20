@@ -37,27 +37,27 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'zh-yue', 'lv', 'bn', 'tg', 'my', 'af', 'mg', 'oc', 'bs', 'sq', 'nds',
         'ky', 'be-tarask', 'ml', 'new', 'te', 'mr', 'br', 'vec', 'pms', 'jv',
         'ht', 'pnb', 'sw', 'su', 'lb', 'tl', 'ba', 'ga', 'szl', 'is', 'cv',
-        'lmo', 'fy', 'sco', 'wuu', 'diq', 'an', 'ku', 'pa', 'yo', 'ne', 'bar',
+        'lmo', 'fy', 'wuu', 'sco', 'diq', 'an', 'ku', 'pa', 'yo', 'ne', 'bar',
         'io', 'gu', 'ckb', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn',
         'bat-smg', 'si', 'nv', 'xmf', 'or', 'cdo', 'ilo', 'gd', 'yi', 'am',
-        'nap', 'bug', 'sd', 'hsb', 'wa', 'mai', 'fo', 'map-bms', 'mzn', 'li',
-        'sah', 'os', 'frr', 'eml', 'avk', 'ace', 'ps', 'sa', 'gor', 'bcl',
-        'zh-classical', 'mrj', 'mhr', 'hif', 'hak', 'roa-tara', 'crh', 'pam',
-        'hyw', 'lij', 'nso', 'ha', 'km', 'as', 'shn', 'rue', 'se', 'zu', 'bh',
+        'nap', 'bug', 'sd', 'hsb', 'mai', 'wa', 'fo', 'map-bms', 'mzn', 'li',
+        'sah', 'os', 'frr', 'avk', 'eml', 'ace', 'ps', 'sa', 'gor', 'bcl',
+        'zh-classical', 'mrj', 'mhr', 'hif', 'lij', 'hak', 'roa-tara', 'crh',
+        'pam', 'hyw', 'ha', 'nso', 'as', 'km', 'shn', 'rue', 'se', 'zu', 'bh',
         'vls', 'nds-nl', 'mi', 'nah', 'sc', 'sn', 'vep', 'ban', 'gan', 'myv',
-        'glk', 'ab', 'kab', 'so', 'bo', 'co', 'tk', 'sat', 'fiu-vro', 'ie',
+        'glk', 'ab', 'kab', 'so', 'bo', 'tk', 'co', 'sat', 'fiu-vro', 'ie',
         'kv', 'csb', 'pcd', 'gv', 'udm', 'ug', 'ay', 'zea', 'frp', 'nrm', 'kw',
-        'lez', 'gn', 'lfn', 'stq', 'mwl', 'mt', 'rm', 'lo', 'lad', 'gom',
-        'olo', 'ary', 'koi', 'fur', 'bjn', 'skr', 'ang', 'dty', 'dsb', 'ext',
+        'lez', 'gn', 'lfn', 'stq', 'mwl', 'mt', 'rm', 'lo', 'lad', 'olo',
+        'gom', 'ary', 'koi', 'skr', 'fur', 'bjn', 'ang', 'dty', 'dsb', 'ext',
         'ln', 'tyv', 'cbk-zam', 'dv', 'ksh', 'gag', 'pfl', 'smn', 'pi', 'pag',
         'av', 'awa', 'haw', 'mni', 'bxr', 'xal', 'ig', 'pap', 'krc', 'rw',
         'za', 'pdc', 'kaa', 'szy', 'arc', 'to', 'inh', 'nov', 'kbp', 'jam',
-        'tpi', 'wo', 'kbd', 'na', 'ki', 'tet', 'atj', 'tcy', 'ak', 'lld', 'lg',
+        'tpi', 'wo', 'kbd', 'na', 'atj', 'ki', 'tet', 'tcy', 'ak', 'lld', 'lg',
         'jbo', 'roa-rup', 'bi', 'lbe', 'kg', 'ty', 'mdf', 'xh', 'fj', 'srn',
-        'om', 'gcr', 'ltg', 'sm', 'chr', 'nqo', 'nia', 'mnw', 'got', 'st',
-        'pih', 'kl', 'cu', 'ny', 'tw', 'tn', 'mad', 'ts', 'bm', 'rmy', 'chy',
-        'rn', 'tum', 'ss', 'ch', 'iu', 'ks', 'pnt', 'ady', 'alt', 've', 'ee',
-        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr',
+        'om', 'gcr', 'ltg', 'sm', 'chr', 'nqo', 'nia', 'mnw', 'got', 'pih',
+        'st', 'kl', 'cu', 'ny', 'tw', 'mad', 'tn', 'ts', 'bm', 'rmy', 'chy',
+        'rn', 'tum', 'ss', 'ch', 'iu', 'ks', 'pnt', 'ady', 've', 'alt', 'ee',
+        'ik', 'ff', 'sg', 'din', 'dz', 'ti', 'cr', 'tay', 'trv',
     ]
 
     # Sites we want to edit but not count as real languages
@@ -144,10 +144,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     # Languages that used to be coded in iso-8859-1
     latin1old = {
-        'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'es', 'et', 'eu', 'fi',
-        'fr', 'fy', 'ga', 'gl', 'ia', 'id', 'it', 'la', 'lt', 'lv', 'mi', 'mr',
-        'na', 'nds', 'nl', 'no', 'pt', 'simple', 'sl', 'sv', 'sw', 'test',
-        'tt', 'uk', 'vi', 'vo'
+        'af', 'bs', 'co', 'cs', 'da', 'de', 'en', 'es', 'et', 'eu', 'fi', 'fr',
+        'fy', 'ga', 'gl', 'ia', 'id', 'it', 'la', 'lt', 'lv', 'mi', 'mr', 'na',
+        'nds', 'nl', 'no', 'pt', 'simple', 'sl', 'sv', 'sw', 'test', 'tt',
+        'uk', 'vi', 'vo'
     }
 
     # Subpages for documentation.

@@ -311,8 +311,7 @@ class BasePage(ComparableMixin):
                 with_ns = True
             if with_ns:
                 return '[[%s%s]]' % (title, section)
-            else:
-                return '[[%s%s|%s]]' % (title, section, label)
+            return '[[%s%s|%s]]' % (title, section, label)
         if not with_ns and self.namespace() != 0:
             title = label + section
         else:
@@ -439,8 +438,7 @@ class BasePage(ComparableMixin):
         if (hasattr(self, '_revid') and self._revid in self._revisions
                 and self._revisions[self._revid].text is not None):
             return self._revisions[self._revid]
-        else:
-            return None
+        return None
 
     def _getInternals(self):
         """
@@ -978,11 +976,10 @@ class BasePage(ComparableMixin):
         p_types = set(self.site.protection_types())
         if not self.exists():
             return {'create'} if 'create' in p_types else set()
-        else:
-            p_types.remove('create')  # no existing page allows that
-            if not self.is_filepage():  # only file pages allow upload
-                p_types.remove('upload')
-            return p_types
+        p_types.remove('create')  # no existing page allows that
+        if not self.is_filepage():  # only file pages allow upload
+            p_types.remove('upload')
+        return p_types
 
     def has_permission(self, action: str = 'edit') -> bool:
         """Determine whether the page can be modified.
@@ -1407,8 +1404,7 @@ class BasePage(ComparableMixin):
 
         if include_obsolete:
             return self._langlinks
-        else:
-            return [i for i in self._langlinks if not i.site.obsolete]
+        return [i for i in self._langlinks if not i.site.obsolete]
 
     def iterlanglinks(self,
                       total: Optional[int] = None,
@@ -2113,8 +2109,8 @@ class Page(BasePage):
                         if k < 1 or k >= i:
                             named[str(k)] = intkeys[k]
                     break
-            for name in named:
-                positional.append('%s=%s' % (name, named[name]))
+            for item in named.items():
+                positional.append('{}={}'.format(*item))
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
@@ -2477,11 +2473,10 @@ class FilePage(Page):
 
             sha1 = compute_file_hash(filename)
             return sha1 == revision.sha1
-        else:
-            pywikibot.warning(
-                'Unsuccessfull request ({}): {}'
-                .format(req.status_code, req.url))
-            return False
+        pywikibot.warning(
+            'Unsuccessfull request ({}): {}'
+            .format(req.status_code, req.url))
+        return False
 
     def globalusage(self, total=None):
         """
@@ -2841,8 +2836,7 @@ class User(Page):
         """
         if self._isAutoblock:
             return '#' + self.title(with_ns=False)
-        else:
-            return self.title(with_ns=False)
+        return self.title(with_ns=False)
 
     def isRegistered(self, force: bool = False) -> bool:
         """
@@ -3226,9 +3220,8 @@ class WikibaseEntity:
         if self.id != '-1':
             return 'pywikibot.page.{0}({1!r}, {2!r})'.format(
                 self.__class__.__name__, self.repo, self.id)
-        else:
-            return 'pywikibot.page.{0}({1!r})'.format(
-                self.__class__.__name__, self.repo)
+        return 'pywikibot.page.{0}({1!r})'.format(
+            self.__class__.__name__, self.repo)
 
     @classmethod
     def is_valid_id(cls, entity_id: str) -> bool:
@@ -3248,8 +3241,7 @@ class WikibaseEntity:
                 for key, cls in self.DATA_ATTRIBUTES.items():
                     setattr(self, key, cls.new_empty(self.repo))
                 return getattr(self, name)
-            else:
-                return self.get()[name]
+            return self.get()[name]
 
         return super().__getattr__(name)
 
@@ -3280,8 +3272,7 @@ class WikibaseEntity:
         """
         if numeric:
             return int(self.id[1:]) if self.id != '-1' else -1
-        else:
-            return self.id
+        return self.id
 
     def get_data_for_new_entity(self) -> dict:
         """
@@ -4214,8 +4205,7 @@ class Property:
         """
         if numeric:
             return int(self.id[1:])
-        else:
-            return self.id
+        return self.id
 
 
 class PropertyPage(WikibasePage, Property):
@@ -4979,8 +4969,7 @@ class BaseLink(ComparableMixin):
             ns = self.site.namespaces.lookup_name(self._nskey)
             if ns:
                 return ns
-            else:
-                self._nskey = default_nskey
+            self._nskey = default_nskey
 
         if isinstance(self._nskey, int):
             try:
@@ -5021,8 +5010,7 @@ class BaseLink(ComparableMixin):
         if self.namespace != Namespace.MAIN:
             return '%s:%s' % (self.site.namespace(self.namespace),
                               self.title)
-        else:
-            return self.title
+        return self.title
 
     def ns_title(self, onsite=None):
         """
@@ -5051,8 +5039,7 @@ class BaseLink(ComparableMixin):
 
         if self.namespace != Namespace.MAIN:
             return '%s:%s' % (name, self.title)
-        else:
-            return self.title
+        return self.title
 
     def astext(self, onsite=None):
         """

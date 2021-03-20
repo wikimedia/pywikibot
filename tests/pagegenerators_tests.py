@@ -1498,7 +1498,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         if len(newuser_logevents) == 0:
             raise unittest.SkipTest('No newuser logs found to test with.')
 
-    user = True
+    login = True
 
     def test_logevents_parse(self):
         """Test wrong logevents option."""

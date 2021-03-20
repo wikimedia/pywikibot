@@ -100,9 +100,8 @@ def match_image_pages(imagePageA, imagePageB):
     if averageScore > 0.8:
         pywikibot.output('We have a match!')
         return True
-    else:
-        pywikibot.output('Not the same.')
-        return False
+    pywikibot.output('Not the same.')
+    return False
 
 
 def get_image_from_image_page(imagePage):

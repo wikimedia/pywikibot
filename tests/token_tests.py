@@ -31,7 +31,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     """
 
-    user = True
+    login = True
 
     def setUp(self):
         """Store version."""
@@ -125,9 +125,9 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    user = True
     token_type = 'patrol'
+
+    login = True
     write = True
 
     def test_patrol(self):
@@ -176,7 +176,7 @@ class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
     """Test cases for Site patrol token deprecated methods."""
 
     cached = True
-    user = True
+    login = True
 
     def test_get_patrol_token(self):
         """Test site.getPatrolToken."""

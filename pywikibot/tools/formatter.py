@@ -71,8 +71,7 @@ class _ColorFormatter(Formatter):
         """Get value, filling in 'color' when it is a valid color."""
         if key == 'color' and kwargs.get('color') in self.colors:
             return '\03{{{0}}}'.format(kwargs[key])
-        else:
-            return super().get_value(key, args, kwargs)
+        return super().get_value(key, args, kwargs)
 
     def parse(self, format_string: str):
         """Yield results similar to parse but skip colors."""

@@ -141,8 +141,7 @@ class Siteinfo(Container):
                 invalid_properties.extend(
                     prop.strip() for prop in matched.group(1).split(','))
                 return True
-            else:
-                return False
+            return False
 
         props = [prop] if isinstance(prop, str) else prop
         if not props:
@@ -169,14 +168,13 @@ class Siteinfo(Container):
                     pywikibot.log(
                         "Unable to get siprop '{0}'".format(props[0]))
                     return {props[0]: (Siteinfo._get_default(props[0]), False)}
-                else:
-                    pywikibot.log('Unable to get siteinfo, because at least '
-                                  "one property is unknown: '{0}'".format(
-                                      "', '".join(props)))
-                    results = {}
-                    for prop in props:
-                        results.update(self._get_siteinfo(prop, expiry))
-                    return results
+                pywikibot.log('Unable to get siteinfo, because at least '
+                              "one property is unknown: '{0}'".format(
+                                  "', '".join(props)))
+                results = {}
+                for prop in props:
+                    results.update(self._get_siteinfo(prop, expiry))
+                return results
             raise
         else:
             result = {}
@@ -245,8 +243,7 @@ class Siteinfo(Container):
                 return default_info[key]
         if key in self._cache['general'][0]:
             return self._cache['general'][0][key], self._cache['general']
-        else:
-            return None
+        return None
 
     def __getitem__(self, key: str):
         """Return a siteinfo property, caching and not forcing it."""
@@ -280,7 +277,7 @@ class Siteinfo(Container):
             expiry = 0
         # If expiry is a float or int convert to timedelta
         # Note: bool is an instance of int
-        if isinstance(expiry, float) or type(expiry) == int:
+        if isinstance(expiry, float) or type(expiry) is int:
             expiry = datetime.timedelta(expiry)
 
         # expire = 0 (or timedelta(0)) are always expired and their bool is
@@ -318,8 +315,7 @@ class Siteinfo(Container):
             if key in self._cache['general'][0]:
                 return (self._cache['general'][0][key],
                         self._cache['general'][1])
-            else:
-                return self._cache[key]
+            return self._cache[key]
         raise KeyError(key)
 
     def __contains__(self, key: str) -> bool:
@@ -361,5 +357,4 @@ class Siteinfo(Container):
         result = self.get(key, expiry=force)
         if not dump:
             return result
-        else:
-            return self._cache
+        return self._cache

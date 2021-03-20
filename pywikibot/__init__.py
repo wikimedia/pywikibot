@@ -665,7 +665,7 @@ class WbQuantity(_WbRepresentation):
         """
         if isinstance(value, Decimal):
             return value
-        elif value is None:
+        if value is None:
             return None
         return Decimal(str(value))
 

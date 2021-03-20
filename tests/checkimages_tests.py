@@ -18,7 +18,7 @@ class TestSettings(TestCase):
 
     family = 'commons'
     code = 'commons'
-    user = True
+    login = True
 
     def test_load(self):
         """Test loading settings."""

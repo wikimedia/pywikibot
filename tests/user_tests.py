@@ -171,7 +171,7 @@ class TestUserMethods(DefaultSiteTestCase):
 
     """Test User methods with bot user."""
 
-    user = True
+    login = True
 
     def test_contribution(self):
         """Test the User.usercontribs() method."""

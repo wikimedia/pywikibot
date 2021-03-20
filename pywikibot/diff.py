@@ -158,8 +158,7 @@ class Hunk:
                 colored_line = color_format('{color}{0}{default}',
                                             line, color=self.colors[color])
                 return colored_line
-            else:
-                return line
+            return line
 
         colored_line = ''
         color_closed = True

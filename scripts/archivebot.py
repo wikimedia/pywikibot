@@ -177,8 +177,7 @@ def str2localized_duration(site, string: str) -> str:
         # replace plural variants
         exp = i18n.translate(site.code, template, {'$1': int(duration)})
         return exp.replace('$1', to_local_digits(duration, site.code))
-    else:
-        return to_local_digits(string, site.code)
+    return to_local_digits(string, site.code)
 
 
 def str2time(string: str, timestamp=None) -> datetime.timedelta:
@@ -216,8 +215,7 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
     if timestamp:
         return apply_month_delta(
             timestamp.date(), month_delta=duration) - timestamp.date()
-    else:
-        return datetime.timedelta(days=days)
+    return datetime.timedelta(days=days)
 
 
 def checkstr(string: str) -> Tuple[str, str]:
@@ -524,6 +522,14 @@ class PageArchiver:
         self.site = page.site
         self.tpl = template
         self.timestripper = TimeStripper(site=self.site)
+
+        # read maxarticlesize
+        try:
+            # keep a gap of 1 KB not to block later changes
+            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
+        except KeyError:  # mw < 1.28
+            self.maxsize = 2096128  # 2 MB - 1 KB gap
+
         self.page = DiscussionPage(page, self)
         self.load_config()
         self.comment_params = {
@@ -535,13 +541,6 @@ class PageArchiver:
         self.month_num2orig_names = {}
         for n, (long, short) in enumerate(self.site.months_names, start=1):
             self.month_num2orig_names[n] = {'long': long, 'short': short}
-
-        # read maxarticlesize
-        try:
-            # keep a gap of 1 KB not to block later changes
-            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
-        except KeyError:  # mw < 1.28
-            self.maxsize = 2096128  # 2 MB - 1 KB gap
 
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
@@ -741,8 +740,7 @@ class PageArchiver:
                                  for i in sorted(keep_threads)]
             self.set_attr('counter', str(counter))
             return whys
-        else:
-            return set()
+        return set()
 
     def run(self) -> None:
         """Process a single DiscussionPage object."""

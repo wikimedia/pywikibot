@@ -284,8 +284,7 @@ def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
     tmp = value.translate(digitsToLocalDict)         # Test
     if tmp == value:
         return int(value.translate(localToDigitsDict))    # Convert
-    else:
-        raise ValueError('string contains regular digits')
+    raise ValueError('string contains regular digits')
 
 
 # Helper for roman numerals number representation
@@ -456,12 +455,11 @@ def dh(value: int, pattern, encf, decf, filter=None):
         params = tuple(_make_parameter(decoders[i], param)
                        for i, param in enumerate(params))
         return strPattern % params
-    else:
-        assert len(decoders) == 1, (
-            'A single parameter does not match {0} decoders.'
-            .format(len(decoders)))
-        # convert integer parameter into its textual representation
-        return strPattern % _make_parameter(decoders[0], params)
+    assert len(decoders) == 1, (
+        'A single parameter does not match {0} decoders.'
+        .format(len(decoders)))
+    # convert integer parameter into its textual representation
+    return strPattern % _make_parameter(decoders[0], params)
 
 
 @dh.register(str)
@@ -1668,7 +1666,7 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     """
     if makeUpperCase is None:
         return [pattern % monthName(lang, m) for m in range(1, 13)]
-    elif makeUpperCase:
+    if makeUpperCase:
         f = first_upper
     else:
         f = first_lower
@@ -1983,8 +1981,7 @@ def formatYear(lang, year):
     """Return year name in a language."""
     if year < 0:
         return formats['YearBC'][lang](-year)
-    else:
-        return formats['YearAD'][lang](year)
+    return formats['YearAD'][lang](year)
 
 
 def apply_month_delta(date, month_delta=1, add_overlap=False):

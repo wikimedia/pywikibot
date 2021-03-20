@@ -103,7 +103,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 'n', automatic_quit=False)
         if answer == 'n':
             return
-        elif answer == 'e':
+        if answer == 'e':
             editor = TextEditor()
             newtext = editor.edit(text, highlight=self.spam_external_url,
                                   jumpIndex=text.find(self.spam_external_url))

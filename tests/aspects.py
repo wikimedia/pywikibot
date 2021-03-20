@@ -516,21 +516,18 @@ class SiteWriteMixin(TestCaseBase):
                 .format(cls.__name__, site.code, site.family.name))
 
 
-class RequireUserMixin(TestCaseBase):
+class RequireLoginMixin(TestCaseBase):
 
     """Run tests against a specific site, with a login."""
 
-    user = True
+    login = True
 
     @classmethod
-    def require_site_user(cls, family, code, sysop=False):
+    def require_site_user(cls, family, code):
         """Check the user config has a valid login to the site."""
         if not cls.has_site_user(family, code):
-            raise unittest.SkipTest(
-                '{}: No {}username for {}:{}'
-                .format(cls.__name__,
-                        'sysop ' if sysop else '',
-                        family, code))
+            raise unittest.SkipTest('{}: No username for {}:{}'
+                                    .format(cls.__name__, family, code))
 
     @classmethod
     def setUpClass(cls):
@@ -542,11 +539,11 @@ class RequireUserMixin(TestCaseBase):
         """
         super().setUpClass()
 
-        sysop = hasattr(cls, 'sysop') and cls.sysop
+        # currently 'sysop' attribute is an alias for 'login'
+        # sysop = hasattr(cls, 'sysop') and cls.sysop
 
         for site_dict in cls.sites.values():
-            cls.require_site_user(
-                site_dict['family'], site_dict['code'], sysop)
+            cls.require_site_user(site_dict['family'], site_dict['code'])
 
             if hasattr(cls, 'oauth') and cls.oauth:
                 continue
@@ -593,7 +590,7 @@ class RequireUserMixin(TestCaseBase):
 
             if not site.logged_in():
                 site.login()
-            assert(site.user())
+            assert site.user()
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
@@ -759,8 +756,8 @@ class MetaTestCaseClass(type):
             dct.setdefault('user', True)
             bases = cls.add_base(bases, SiteWriteMixin)
 
-        if dct.get('user') or dct.get('sysop'):
-            bases = cls.add_base(bases, RequireUserMixin)
+        if dct.get('login') or dct.get('sysop'):
+            bases = cls.add_base(bases, RequireLoginMixin)
 
         for test in tests:
             test_func = dct[test]
@@ -1025,9 +1022,8 @@ class CapturingTestCase(TestCase):
                 if hasattr(context, '__enter__'):
                     return self._delay_assertion(context, assertion, args,
                                                  kwargs)
-                else:
-                    self.after_assert(assertion, *args, **kwargs)
-                    return context
+                self.after_assert(assertion, *args, **kwargs)
+                return context
             finally:
                 self._patched = False
         return inner_assert
@@ -1037,8 +1033,7 @@ class CapturingTestCase(TestCase):
         result = super().__getattribute__(attr)
         if attr.startswith('assert') and not self._patched:
             return self.patch_assert(result)
-        else:
-            return result
+        return result
 
 
 class PatchingTestCase(TestCase):
@@ -1598,8 +1593,7 @@ class HttpbinTestCase(TestCase):
         """
         if hasattr(self, 'httpbin'):
             return self.httpbin.url + path
-        else:
-            return 'http://httpbin.org' + path
+        return 'http://httpbin.org' + path
 
     def get_httpbin_hostname(self):
         """
@@ -1610,5 +1604,4 @@ class HttpbinTestCase(TestCase):
         """
         if hasattr(self, 'httpbin'):
             return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
-        else:
-            return 'httpbin.org'
+        return 'httpbin.org'

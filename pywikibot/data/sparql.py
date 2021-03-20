@@ -213,8 +213,7 @@ class URI(SparqlNode):
         urllen = len(self.entity_url)
         if self.value.startswith(self.entity_url):
             return self.value[urllen:]
-        else:
-            return None
+        return None
 
     def __repr__(self):
         return '<' + self.value + '>'

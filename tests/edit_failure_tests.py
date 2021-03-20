@@ -36,7 +36,7 @@ class TestSaveFailure(TestCase):
 
     """Test cases for edits which should fail to save."""
 
-    user = True
+    login = True
     write = -1
 
     family = 'wikipedia'
@@ -112,7 +112,7 @@ class TestActionFailure(TestCase):
 
     """Test cases for actions which should fail to save."""
 
-    user = True
+    login = True
     write = -1
 
     family = 'wikipedia'
@@ -143,7 +143,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
     family = 'wikidata'
     code = 'test'
 
-    user = True
+    login = True
     write = -1
 
     def test_itempage_save(self):

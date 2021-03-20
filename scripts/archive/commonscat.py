@@ -465,7 +465,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 if m:
                     if m.group('newcat1'):
                         return self.checkCommonscatLink(m.group('newcat1'))
-                    elif m.group('newcat2'):
+                    if m.group('newcat2'):
                         return self.checkCommonscatLink(m.group('newcat2'))
                 else:
                     pywikibot.output(
