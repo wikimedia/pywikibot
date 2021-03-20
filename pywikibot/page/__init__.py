@@ -2254,7 +2254,7 @@ class FilePage(Page):
 
         @return: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         latest_ts = max(self._file_revisions)
         return self._file_revisions[latest_ts]
@@ -2269,7 +2269,7 @@ class FilePage(Page):
 
         @return: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         oldest_ts = min(self._file_revisions)
         return self._file_revisions[oldest_ts]
@@ -2282,7 +2282,7 @@ class FilePage(Page):
             key: timestamp of the entry
             value: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         return self._file_revisions
 
