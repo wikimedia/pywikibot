@@ -2914,7 +2914,7 @@ class User(Page):
 
         @param force: if True, forces reloading the data from API
         """
-        return (not self.isAnonymous() and 'emailable' in self.getprops(force))
+        return not self.isAnonymous() and 'emailable' in self.getprops(force)
 
     def groups(self, force: bool = False) -> list:
         """

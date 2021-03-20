@@ -1898,10 +1898,10 @@ def _format_limit_dom(days):
 
 
 for monthId in range(12):
-    if (monthId + 1) in (1, 3, 5, 7, 8, 10, 12):
+    if monthId + 1 in (1, 3, 5, 7, 8, 10, 12):
         # 31 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(31)
-    elif (monthId + 1) == 2:  # February
+    elif monthId + 1 == 2:  # February
         # 29 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(29)
     else:
