@@ -492,16 +492,6 @@ class APISite(
         if hasattr(self, '_userinfo'):
             del self._userinfo
 
-    @deprecated('userinfo property and userinfo deleter', since='20210110')
-    def getuserinfo(self, force: bool = False) -> dict:
-        """DEPRECATED. Retrieve userinfo from site.
-
-        @param force: force to retrieve userinfo ignoring cache
-        """
-        if force:
-            del self.userinfo
-        return self.userinfo
-
     @property
     def globaluserinfo(self):
         """Retrieve globaluserinfo from site and cache it.
@@ -531,11 +521,6 @@ class APISite(
             iso_ts = pywikibot.Timestamp.fromISOformat(ts)
             self._globaluserinfo['registration'] = iso_ts
         return self._globaluserinfo
-
-    @deprecated('globaluserinfo property', since='20210110')
-    def getglobaluserinfo(self):
-        """DEPRECATED. Retrieve globaluserinfo."""
-        return self.globaluserinfo
 
     @remove_last_args(['sysop'])
     def is_blocked(self):
