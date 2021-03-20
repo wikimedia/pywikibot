@@ -960,9 +960,16 @@ class DequeGenerator(Iterator, collections.deque):
 
     def __next__(self):
         """Iterator method."""
-        if len(self):
+        if self:
             return self.popleft()
         raise StopIteration
+
+    def __repr__(self):
+        """Provide an object representation without clearing the content."""
+        items = list(self)
+        result = '{}({})'.format(self.__class__.__name__, items)
+        self.extend(items)
+        return result
 
 
 def open_archive(filename, mode='rb', use_extension=True):
