@@ -135,7 +135,6 @@ script_test_modules = {
     'cache',
     'category_bot',
     'checkimages',
-    'compat2core',
     'deletionbot',
     'fixing_redirects',
     'generate_family_file',
