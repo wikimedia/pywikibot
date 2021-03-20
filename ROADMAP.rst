@@ -1,7 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* Add support for taywiki, trvwiki and mnwwiktionary (T275838, T276128, T276250)
 
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
