@@ -160,8 +160,7 @@ class UploadRobot(BaseBot):
                     #    {'Range': 'bytes=file_len-'}
                     if response.status_code == 416 and path.stat().st_size:
                         break
-                    else:
-                        raise FatalServerError(str(e)) from e
+                    raise FatalServerError(str(e)) from e
 
             if size and size == path.stat().st_size:
                 break
@@ -203,7 +202,7 @@ class UploadRobot(BaseBot):
             if this_answer is False:
                 answer = False
                 break
-            elif this_answer is None:
+            if this_answer is None:
                 answer = None
         if answer is None:
             answer = pywikibot.input_yn('Do you want to ignore?',
@@ -296,8 +295,7 @@ class UploadRobot(BaseBot):
                             automatic_quit=False)
                     if not overwrite:
                         continue
-                    else:
-                        break
+                    break
 
                 pywikibot.output('File with name {} already exists and '
                                  'cannot be overwritten.'.format(filename))

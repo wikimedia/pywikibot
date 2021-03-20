@@ -494,9 +494,8 @@ class DeadLinkReportThread(threading.Thread):
             if len(self.queue) == 0:
                 if self.finishing:
                     break
-                else:
-                    time.sleep(0.1)
-                    continue
+                time.sleep(0.1)
+                continue
 
             with self.semaphore:
                 url, errorReport, containingPage, archiveURL = self.queue[0]

@@ -178,8 +178,7 @@ def main(*args) -> None:
         if always:
             url = None
             break
-        else:
-            pywikibot.output(error)
+        pywikibot.output(error)
         url = pywikibot.input('URL, file or directory where files are now:')
 
     if always and (aborts is not True and ignorewarn is not True
