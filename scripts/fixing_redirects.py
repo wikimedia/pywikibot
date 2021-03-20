@@ -66,17 +66,15 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                     or mysite.isInterwikiLink(m.group('title'))
                     or isDisabled(text, m.start())):
                 continue
-            else:
-                actualLinkPage = pywikibot.Page(
-                    targetPage.site, m.group('title'))
-                # Check whether the link found is to page.
-                try:
-                    actualLinkPage.title()
-                except InvalidTitle:
-                    pywikibot.exception()
-                    continue
-                if actualLinkPage != linkedPage:
-                    continue
+            actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
+            # Check whether the link found is to page.
+            try:
+                actualLinkPage.title()
+            except InvalidTitle:
+                pywikibot.exception()
+                continue
+            if actualLinkPage != linkedPage:
+                continue
 
             # The link looks like this:
             # [[page_title|link_text]]trailing_chars

@@ -1469,9 +1469,9 @@ class Subject(interwiki_graph.Subject):
                 if answer == 'a':  # accept this one
                     result[site] = pages[0]
                     break
-                elif answer == 'g':  # give up
+                if answer == 'g':  # give up
                     return None
-                elif answer == 'r':  # reject
+                if answer == 'r':  # reject
                     # None acceptable
                     break
         return result

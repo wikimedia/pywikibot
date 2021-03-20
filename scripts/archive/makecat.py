@@ -214,10 +214,10 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                     break
                 self.include(pl)
                 break
-            elif answer == 'n':
+            if answer == 'n':
                 excludefile.write('%s\n' % pl.title())
                 break
-            elif answer == 'i':
+            if answer == 'i':
                 break
             if answer in 'er':
                 self.treat_options = self.option_bar[answer]

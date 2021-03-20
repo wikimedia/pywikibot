@@ -4574,8 +4574,7 @@ class APISite(
                                     ignore_all_warnings = True
                                     offset = data['offset']
                                     continue
-                                else:
-                                    return False
+                                return False
                             result = data
                             result.setdefault('offset', 0)
                             break

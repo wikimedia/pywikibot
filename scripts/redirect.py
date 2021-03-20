@@ -596,13 +596,12 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                                              'redirect-remove-loop')
                         self.delete_redirect(redir, 'redirect-remove-loop')
                     break
-                else:  # redirect target found
-                    if targetPage.isStaticRedirect():
-                        pywikibot.output(
-                            '   Redirect target is STATICREDIRECT.')
-                    else:
-                        newRedir = targetPage
-                        continue
+                # redirect target found
+                if targetPage.isStaticRedirect():
+                    pywikibot.output('   Redirect target is STATICREDIRECT.')
+                else:
+                    newRedir = targetPage
+                    continue
             oldText = redir.get(get_redirect=True)
             if self.is_repo and redir.namespace() == self.repo.item_namespace:
                 redir = pywikibot.ItemPage(self.repo, redir.title())
