@@ -537,7 +537,7 @@ def isDisabled(text: str, index: int, tags=None) -> bool:
     marker = findmarker(text)
     text = text[:index] + marker + text[index:]
     text = removeDisabledParts(text, tags)
-    return (marker not in text)
+    return marker not in text
 
 
 def findmarker(text: str, startwith: str = '@@',
