@@ -37,8 +37,8 @@ def expected_failure_if(expect):
     """
     Unit test decorator to expect failure under conditions.
 
-    @param expect: Flag to check if failure is expected
-    @type expect: bool
+    :param expect: Flag to check if failure is expected
+    :type expect: bool
     """
     if expect:
         return unittest.expectedFailure
@@ -91,9 +91,9 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         """
         Initializer.
 
-        @param skip_list: List of objects to be skipped. The source of any
+        :param skip_list: List of objects to be skipped. The source of any
             warning that matches the skip_list won't be adjusted.
-        @type skip_list: list of object or (obj, str, int, int)
+        :type skip_list: list of object or (obj, str, int, int)
         """
         super().__init__(record=True)
         self.skip_list = skip_list
@@ -103,7 +103,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         """
         Return list of filename and line ranges to skip.
 
-        @rtype: list of (obj, str, int, int)
+        :rtype: list of (obj, str, int, int)
         """
         return self._skip_list
 
@@ -112,8 +112,8 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         """
         Set list of objects to be skipped.
 
-        @param value: List of objects to be skipped
-        @type value: list of object or (obj, str, int, int)
+        :param value: List of objects to be skipped
+        :type value: list of object or (obj, str, int, int)
         """
         self._skip_list = []
         for item in value:
@@ -180,10 +180,10 @@ class AssertAPIErrorContextManager:
     """
     Context manager to assert certain APIError exceptions.
 
-    This is build similar to the L{unittest.TestCase.assertError}
-    implementation which creates a context manager. It then calls L{handle}
-    which either returns this manager if no executing object given or calls
-    the callable object.
+    This is build similar to the :py:obj:`unittest.TestCase.assertError`
+    implementation which creates a context manager. It then calls
+    :py:obj:`handle` which either returns this manager if no executing
+    object given or calls the callable object.
     """
 
     def __init__(self, code, info, msg, test_case):
@@ -219,7 +219,7 @@ class AssertAPIErrorContextManager:
 
 class DryParamInfo(dict):
 
-    """Dummy class to use instead of L{pywikibot.data.api.ParamInfo}."""
+    """Dummy class to use instead of :py:obj:`pywikibot.data.api.ParamInfo`."""
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
@@ -245,7 +245,7 @@ class DryParamInfo(dict):
 
 class DummySiteinfo:
 
-    """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
+    """Dummy class to use instead of :py:obj:`pywikibot.site.Siteinfo`."""
 
     def __init__(self, cache):
         """Initializer."""
@@ -294,7 +294,7 @@ class DummySiteinfo:
 
 class DryRequest(CachedRequest):
 
-    """Dummy class to use instead of L{pywikibot.data.api.Request}."""
+    """Dummy class to use instead of :py:obj:`pywikibot.data.api.Request`."""
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
@@ -321,7 +321,7 @@ class DryRequest(CachedRequest):
 
 class DrySite(pywikibot.site.APISite):
 
-    """Dummy class to use instead of L{pywikibot.site.APISite}."""
+    """Dummy class to use instead of :py:obj:`pywikibot.site.APISite`."""
 
     _loginstatus = LoginStatus.NOT_ATTEMPTED
 
@@ -398,7 +398,7 @@ class DrySite(pywikibot.site.APISite):
 
 class DryDataSite(DrySite, pywikibot.site.DataSite):
 
-    """Dummy class to use instead of L{pywikibot.site.DataSite}."""
+    """Dummy class to use instead of :py:obj:`pywikibot.site.DataSite`."""
 
     def _build_namespaces(self):
         namespaces = super()._build_namespaces()
@@ -441,8 +441,8 @@ def execute(command, data_in=None, timeout=None, error=None):
     """
     Execute a command and capture outputs.
 
-    @param command: executable to run and arguments to use
-    @type command: list of str
+    :param command: executable to run and arguments to use
+    :type command: list of str
     """
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
@@ -489,10 +489,10 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
     """
     Execute the pwb.py script and capture outputs.
 
-    @param args: list of arguments for pwb.py
-    @type args: typing.Sequence[str]
-    @param overrides: mapping of pywikibot symbols to test replacements
-    @type overrides: dict
+    :param args: list of arguments for pwb.py
+    :type args: typing.Sequence[str]
+    :param overrides: mapping of pywikibot symbols to test replacements
+    :type overrides: dict
     """
     command = [sys.executable]
 

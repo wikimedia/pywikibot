@@ -85,7 +85,10 @@ class TestReplacementsMain(TWNBotTestCase):
         return 'TESTRUN'
 
     def _run(self, *args):
-        """Run the L{replace.main} with the given args and summary and page."""
+        """Run the :py:obj:`replace.main` with the given args.
+
+        It also adds -site and -page parameter.
+        """
         # -page to not have an empty generator
         # -site as it will use Site() otherwise
         with suppress_warnings(WARN_SITE_OBJ, category=UserWarning):

@@ -4,7 +4,7 @@ Module to define and load pywikibot configuration default and user preferences.
 User preferences are loaded from a python file called `user-config.py`,
 which may be located in directory specified by the environment variable
 `PYWIKIBOT_DIR`, or the same directory as `pwb.py`, or in a directory
-within the users home. See L{get_base_dir} for more information.
+within the users home. See :py:obj:`get_base_dir` for more information.
 
 If user-config.py cannot be found in any of those locations, this module
 will fail to load unless the environment variable `PYWIKIBOT_NO_USER_CONFIG`
@@ -299,7 +299,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
     Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading `user-config.py`
     or install Pywikibot as a site-package.
 
-    @param test_directory: Assume that a user config file exists in this
+    :param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
     """
@@ -400,9 +400,9 @@ def register_family_file(family_name, file_path):
 def register_families_folder(folder_path: str):
     """Register all family class files contained in a directory.
 
-    @param folder_path: The path of a folder containing family files.
+    :param folder_path: The path of a folder containing family files.
         The families may also be inside a zip archive structure.
-    @raises NotADirectoryError: folder_path is not a directory
+    :raises NotADirectoryError: folder_path is not a directory
     """
     suffix = '_family.py'
     if os.path.isdir(folder_path):
@@ -481,7 +481,7 @@ userinterface = 'terminal'
 userinterface_init_kwargs = {}  # type: Dict[str, str]
 
 # i18n setting for user interface language
-# default is obtained from L{locale.getdefaultlocale}
+# default is obtained from :py:obj:`locale.getdefaultlocale`
 userinterface_lang = None
 
 # Should we transliterate characters that do not exist in the console
@@ -848,8 +848,8 @@ def makepath(path: str, create: bool = True):
 
     from holger@trillke.net 2002/03/18
 
-    @param path: path in the filesystem
-    @param create: create the directory if it is True. Otherwise do not change
+    :param path: path in the filesystem
+    :param create: create the directory if it is True. Otherwise do not change
         the filesystem. Default is True.
     """
     dpath = os.path.normpath(os.path.dirname(path))
@@ -866,11 +866,11 @@ def datafilepath(*filename, **kwargs):
     directories in the path that do not already exist are created if create
     is True, otherwise the filesystem keeps unchanged.
 
-    @param path: path in the filesystem
-    @type path: str
-    @keyword create: create the directory if it is True. Otherwise don't change
+    :param path: path in the filesystem
+    :type path: str
+    :keyword create: create the directory if it is True. Otherwise don't change
         the filesystem. Default is True.
-    @type create: bool
+    :type create: bool
     """
     create = kwargs.get('create', True)
     return makepath(os.path.join(base_dir, *filename), create=create)

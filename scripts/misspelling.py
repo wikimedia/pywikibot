@@ -109,7 +109,7 @@ class MisspellingRobot(BaseDisambigBot):
 
         Overrides the BaseDisambigBot method.
 
-        @return: True if alternate link was appended
+        :return: True if alternate link was appended
         """
         if page.isRedirectPage():
             self.opt.pos.append(page.getRedirectTarget().title())
@@ -158,7 +158,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
     for arg in pywikibot.handle_args(args):

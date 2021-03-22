@@ -573,9 +573,9 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         the references tag. Also repair malformed references tags.
         Set the edit summary accordingly.
 
-        @param oldText: page text to be modified
-        @type oldText: str
-        @return: The modified pagetext
+        :param oldText: page text to be modified
+        :type oldText: str
+        :return: The modified pagetext
         """
         # Do we have a malformed <reference> tag which could be repaired?
         # Set the edit summary for this case
@@ -689,15 +689,15 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def createReferenceSection(self, oldText, index, ident='==') -> str:
         """Create a reference section and insert it into the given text.
 
-        @param oldText: page text that is going to be be amended
-        @type oldText: str
-        @param index: the index of oldText where the reference section should
+        :param oldText: page text that is going to be be amended
+        :type oldText: str
+        :param index: the index of oldText where the reference section should
             be inserted at
-        @type index: int
-        @param ident: symbols to be inserted before and after reference section
+        :type index: int
+        :param ident: symbols to be inserted before and after reference section
             title
-        @type ident: str
-        @return: the amended page text with reference section added
+        :type ident: str
+        :return: the amended page text with reference section added
         """
         if self.site.code in noTitleRequired:
             ref_section = '\n\n{}\n'.format(self.referencesText)
@@ -742,8 +742,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     gen = None

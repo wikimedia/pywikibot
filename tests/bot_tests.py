@@ -37,27 +37,29 @@ class FakeSaveBotTestCase(TestCase):
     """
     An abstract test case which patches the bot class to not actually write.
 
-    It redirects the bot's _save_page to it's own C{bot_save} method. Currently
-    userPut, put_current and user_edit_entity call it. By default it'll call
-    the original method but replace the function called to actually save the
-    page by C{page_save}. It patches the bot class as soon as this class'
-    attribute bot is defined. It also sets the bot's 'always' option to True to
-    avoid user interaction.
+    It redirects the bot's _save_page to it's own ``bot_save`` method.
+    Currently userPut, put_current and user_edit_entity call it. By
+    default it'll call the original method but replace the function
+    called to actually save the page by ``page_save``. It patches the
+    bot class as soon as this class' attribute bot is defined. It also
+    sets the bot's 'always' option to True to avoid user interaction.
 
-    The C{bot_save} method compares the save counter before the call and
+    The ``bot_save`` method compares the save counter before the call and
     asserts that it has increased by one after the call. It also stores
-    locally in C{save_called} if C{page_save} has been called. If C{bot_save}
-    or C{page_save} are implemented they should call super's method at some
-    point to make sure these assertions work. At C{tearDown} it checks that
-    the pages are saved often enough. The attribute C{default_assert_saves}
-    defines the number of saves which must happen and compares it to the
-    difference using the save counter. It is possible to define C{assert_saves}
-    after C{setUp} to overwrite the default value for certain tests. By default
-    the number of saves it asserts are 1. Additionally C{save_called} increases
-    by 1 on each call of C{page_save} and should be equal to C{assert_saves}.
+    locally in ``save_called`` if ``page_save`` has been called. If
+    ``bot_save`` or ``page_save`` are implemented they should call
+    super's method at some point to make sure these assertions work. At
+    ``tearDown`` it checks that the pages are saved often enough. The
+    attribute ``default_assert_saves`` defines the number of saves which
+    must happen and compares it to the difference using the save counter.
+    It is possible to define ``assert_saves`` after ``setUp`` to
+    overwrite the default value for certain tests. By default the number
+    of saves it asserts are 1. Additionally ``save_called`` increases by
+    1 on each call of ``page_save`` and should be equal to
+    ``assert_saves``.
 
     This means if the bot class actually does other writes, like using
-    L{pywikibot.page.Page.save} manually, it'll still write.
+    :py:obj:`pywikibot.page.Page.save` manually, it'll still write.
     """
 
     @property

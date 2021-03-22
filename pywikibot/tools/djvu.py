@@ -18,13 +18,13 @@ def _call_cmd(args, lib='djvulibre') -> tuple:
     """
     Tiny wrapper around subprocess.Popen().
 
-    @param args: same as Popen()
-    @type args: str or typing.Sequence[string]
+    :param args: same as Popen()
+    :type args: str or typing.Sequence[string]
 
-    @param lib: library to be logged in logging messages
-    @type lib: str
+    :param lib: library to be logged in logging messages
+    :type lib: str
 
-    @return: returns a tuple (res, stdoutdata), where
+    :return: returns a tuple (res, stdoutdata), where
         res is True if dp.returncode != 0 else False
     """
     if not isinstance(args, str):
@@ -63,7 +63,7 @@ class DjVuFile:
         """
         Initializer.
 
-        @param file: filename (including path) to djvu file
+        :param file: filename (including path) to djvu file
         """
         self._filename = file
         filename = os.path.expanduser(file)
@@ -105,7 +105,7 @@ class DjVuFile:
     def check_page_number(fn):
         """Decorator to check if page number is valid.
 
-        @raises ValueError
+        :raises ValueError
         """
         def wrapper(obj, *args, **kwargs):
             n = args[0]
@@ -123,8 +123,8 @@ class DjVuFile:
         """
         Return the number of images in the djvu file.
 
-        @param force: if True, refresh the cached data
-        @type force: bool
+        :param force: if True, refresh the cached data
+        :type force: bool
         """
         if not hasattr(self, '_page_count'):
             res, stdoutdata = _call_cmd(['djvused', '-e', 'n', self.file])
@@ -138,8 +138,8 @@ class DjVuFile:
         """
         Return a tuple (id, (size, dpi)) for page n of djvu file.
 
-        @param force: if True, refresh the cached data
-        @type force: bool
+        :param force: if True, refresh the cached data
+        :type force: bool
         """
         if not hasattr(self, '_page_info') or force:
             self._get_page_info(force=force)
@@ -150,8 +150,8 @@ class DjVuFile:
         """
         Return a dict of tuples (id, (size, dpi)) for all pages of djvu file.
 
-        @param force: if True, refresh the cached data
-        @type force: bool
+        :param force: if True, refresh the cached data
+        :type force: bool
         """
         if not hasattr(self, '_page_info'):
             self._page_info = {}
@@ -198,8 +198,8 @@ class DjVuFile:
         """
         Test if the djvu file has a text-layer.
 
-        @param force: if True, refresh the cached data
-        @type force: bool
+        :param force: if True, refresh the cached data
+        :type force: bool
         """
         if not hasattr(self, '_has_text'):
             self._get_page_info(force=force)
@@ -227,8 +227,8 @@ class DjVuFile:
         """
         Get page n for djvu file.
 
-        @param force: if True, refresh the cached data
-        @type force: bool
+        :param force: if True, refresh the cached data
+        :type force: bool
         """
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'

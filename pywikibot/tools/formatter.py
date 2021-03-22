@@ -18,15 +18,15 @@ class SequenceOutputter:
     """A class formatting a list of items.
 
     It is possible to customize the appearance by changing
-    C{format_string} which is used by C{str.format} with C{index},
-    C{width} and C{item}. Each line is joined by the separator and the
+    ``format_string`` which is used by ``str.format`` with ``index``,
+    ``width`` and ``item``. Each line is joined by the separator and the
     complete text is surrounded by the prefix and the suffix. All three
     are by default a new line. The index starts at 1 and for the width
     it's using the width of the sequence's length written as a decimal
     number. So a length of 100 will result in a with of 3 and a length
     of 99 in a width of 2.
 
-    It is iterating over C{self.sequence} to generate the text. That
+    It is iterating over ``self.sequence`` to generate the text. That
     sequence can be any iterator but the result is better when it has
     an order.
     """
@@ -111,10 +111,10 @@ class _ColorFormatter(Formatter):
                 kwargs: Mapping[str, Any]) -> str:
         """Return the format result but verify no colors are keywords.
 
-        @param format_string: The format template string
-        @param args: The positional field values
-        @param kwargs: The named field values
-        @return: The formatted string
+        :param format_string: The format template string
+        :param args: The positional field values
+        :param kwargs: The named field values
+        :return: The formatted string
         """
         if self.colors.intersection(kwargs):  # kwargs use colors
             raise ValueError('Keyword argument(s) use valid color(s): '
@@ -124,7 +124,7 @@ class _ColorFormatter(Formatter):
 
 def color_format(text: str, *args, **kwargs) -> str:
     r"""
-    Do C{str.format} without having to worry about colors.
+    Do ``str.format`` without having to worry about colors.
 
     It is automatically adding \03 in front of color fields so it's
     unnecessary to add them manually. Any other \03 in the text is
@@ -133,7 +133,7 @@ def color_format(text: str, *args, **kwargs) -> str:
     You may use a variant {color} by assigning a valid color to a named
     parameter color.
 
-    @param text: The format template string
-    @return: The formatted string
+    :param text: The format template string
+    :return: The formatted string
     """
     return _ColorFormatter().format(text, *args, **kwargs)

@@ -34,15 +34,15 @@ class SparqlQuery:
         """
         Create endpoint.
 
-        @param endpoint: SPARQL endpoint URL
-        @param entity_url: URL prefix for any entities returned in a query.
-        @param repo: The Wikibase site which we want to run queries on. If
+        :param endpoint: SPARQL endpoint URL
+        :param entity_url: URL prefix for any entities returned in a query.
+        :param repo: The Wikibase site which we want to run queries on. If
             provided this overrides any value in endpoint and entity_url.
             Defaults to Wikidata.
-        @type repo: pywikibot.site.DataSite
-        @param max_retries: (optional) Maximum number of times to retry after
+        :type repo: pywikibot.site.DataSite
+        :param max_retries: (optional) Maximum number of times to retry after
                errors, defaults to config.max_retries.
-        @param retry_wait: (optional) Minimum time in seconds to wait after an
+        :param retry_wait: (optional) Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
                until config.retry_max is reached).
         """
@@ -85,7 +85,7 @@ class SparqlQuery:
         """
         Return last received response.
 
-        @return: Response object from last request or None
+        :return: Response object from last request or None
         """
         return self.last_response
 
@@ -97,9 +97,9 @@ class SparqlQuery:
         The response is assumed to be in format defined by:
         https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
-        @param query: Query text
-        @param full_data: Whether return full data objects or only values
-        @return: List of query results or None if query failed
+        :param query: Query text
+        :param full_data: Whether return full data objects or only values
+        :return: List of query results or None if query failed
         """
         data = self.query(query, headers=headers)
         if data and 'results' in data:
@@ -128,7 +128,7 @@ class SparqlQuery:
         """
         Run SPARQL query and return parsed JSON result.
 
-        @param query: Query text
+        :param query: Query text
         """
         url = '{}?query={}'.format(self.endpoint, quote(query))
         while True:
@@ -158,7 +158,7 @@ class SparqlQuery:
         """
         Run SPARQL ASK query and return boolean result.
 
-        @param query: Query text
+        :param query: Query text
         """
         data = self.query(query, headers=headers)
         return data['boolean']
@@ -169,14 +169,14 @@ class SparqlQuery:
 
         Items are returned as Wikibase IDs.
 
-        @param query: Query string. Must contain ?{item_name} as one of the
+        :param query: Query string. Must contain ?{item_name} as one of the
             projected values.
-        @param item_name: Name of the value to extract
-        @param result_type: type of the iterable in which
+        :param item_name: Name of the value to extract
+        :param result_type: type of the iterable in which
               SPARQL results are stored (default set)
-        @type result_type: iterable
-        @return: item ids, e.g. Q1234
-        @rtype: same as result_type
+        :type result_type: iterable
+        :return: item ids, e.g. Q1234
+        :rtype: same as result_type
         """
         res = self.select(query, full_data=True)
         if res:
@@ -207,7 +207,7 @@ class URI(SparqlNode):
         """
         Get ID of Wikibase object identified by the URI.
 
-        @return: ID of Wikibase object, e.g. Q1234
+        :return: ID of Wikibase object, e.g. Q1234
         """
         urllen = len(self.entity_url)
         if self.value.startswith(self.entity_url):

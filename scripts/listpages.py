@@ -124,16 +124,16 @@ class Formatter:
         """
         Initializer.
 
-        @param page: the page to be formatted.
-        @type page: Page object.
-        @param outputlang: language code in which namespace before title should
+        :param page: the page to be formatted.
+        :type page: Page object.
+        :param outputlang: language code in which namespace before title should
             be translated.
 
             Page ns will be searched in Site(outputlang, page.site.family)
             and, if found, its custom name will be used in page.title().
 
-        @type outputlang: str or None, if no translation is wanted.
-        @param default: default string to be used if no corresponding
+        :type outputlang: str or None, if no translation is wanted.
+        :param default: default string to be used if no corresponding
             namespace is found when outputlang is not None.
 
         """
@@ -172,8 +172,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     notitle = False
     fmt = '1'

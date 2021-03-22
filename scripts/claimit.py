@@ -69,12 +69,12 @@ class ClaimRobot(WikidataBot):
         """
         Initializer.
 
-        @param generator: A generator that yields Page objects.
-        @type generator: iterator
-        @param claims: A list of wikidata claims
-        @type claims: list
-        @param exists_arg: String specifying how to handle duplicate claims
-        @type exists_arg: str
+        :param generator: A generator that yields Page objects.
+        :type generator: iterator
+        :param claims: A list of wikidata claims
+        :type claims: list
+        :param exists_arg: String specifying how to handle duplicate claims
+        :type exists_arg: str
         """
         self.available_options['always'] = True
         super().__init__()
@@ -89,10 +89,10 @@ class ClaimRobot(WikidataBot):
     def treat_page_and_item(self, page, item) -> None:
         """Treat each page.
 
-        @param page: The page to update and change
-        @type page: pywikibot.page.BasePage
-        @param item: The item to treat
-        @type item: pywikibot.page.ItemPage
+        :param page: The page to update and change
+        :type page: pywikibot.page.BasePage
+        :param item: The item to treat
+        :type item: pywikibot.page.ItemPage
         """
         for claim in self.claims:
             # The generator might yield pages from multiple sites
@@ -107,8 +107,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     exists_arg = ''
     commandline_claims = []

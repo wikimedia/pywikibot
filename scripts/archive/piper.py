@@ -64,9 +64,9 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         """
         Initializer.
 
-        @param generator: The page generator that determines on which pages
+        :param generator: The page generator that determines on which pages
             to work on.
-        @type generator: generator
+        :type generator: generator
         """
         self.available_options.update({
             'filters': [],
@@ -81,7 +81,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
     def pipe(self, program: str, text: str) -> str:
         """Pipe a given text through a given program.
 
-        @return: processed text after piping
+        :return: processed text after piping
         """
         pipe = pipes.Template()
         pipe.append(program, '--')

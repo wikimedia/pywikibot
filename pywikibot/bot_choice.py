@@ -29,13 +29,13 @@ class Option(ABC):
     * result(value)
     * test(value)
 
-    The methods C{test} and C{handled} are in such a relationship that
-    when C{handled} returns itself that C{test} must return True for
-    that value. So if C{test} returns False C{handled} may not return
+    The methods ``test`` and ``handled`` are in such a relationship that
+    when ``handled`` returns itself that ``test`` must return True for
+    that value. So if ``test`` returns False ``handled`` may not return
     itself but it may return not None.
 
-    Also C{result} only returns a sensible value when C{test} returns True for
-    the same value.
+    Also ``result`` only returns a sensible value when ``test`` returns
+    True for the same value.
     """
 
     def __init__(self, stop=True) -> None:
@@ -47,10 +47,10 @@ class Option(ABC):
         """
         Create a text with the options formatted into it.
 
-        @param text: Text into which options are to be formatted
-        @param options: Option instances to be formatted
-        @type options: Iterable
-        @return: Text with the options formatted into it
+        :param text: Text into which options are to be formatted
+        :param options: Option instances to be formatted
+        :type options: Iterable
+        :return: Text with the options formatted into it
         """
         formatted_options = []
         for option in options:
@@ -139,8 +139,8 @@ class StandardOption(Option):
         """
         Initializer.
 
-        @param option: option string
-        @param shortcut: Shortcut of the option
+        :param option: option string
+        :param shortcut: Shortcut of the option
         """
         super().__init__(**kwargs)
         self.option = option
@@ -478,8 +478,8 @@ class ShowingListOption(ListOption, OutputOption):
                  post: Optional[str] = None, **kwargs):
         """Initializer.
 
-        @param pre: Additional comment printed before the list.
-        @param post: Additional comment printed after the list.
+        :param pre: Additional comment printed before the list.
+        :param post: Additional comment printed after the list.
         """
         super().__init__(sequence, prefix, **kwargs)
         self.pre = pre

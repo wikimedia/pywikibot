@@ -98,7 +98,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
 

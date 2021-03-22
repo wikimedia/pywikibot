@@ -148,8 +148,8 @@ def get_validated_version():  # pragma: no cover
     Verify that the new release is higher than the last repository tag
     and is not a developmental release.
 
-    @return: pywikibot module version string
-    @rtype: str
+    :return: pywikibot module version string
+    :rtype: str
     """
     version = metadata.__version__
     if 'sdist' not in sys.argv:

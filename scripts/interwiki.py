@@ -463,8 +463,8 @@ class InterwikiBotConfig:
         """Output a notification message with.
 
         The text will be printed only if conf.quiet isn't set.
-        @param text: text to be shown
-        @type text: str
+        :param text: text to be shown
+        :type text: str
         """
         if not self.quiet:
             pywikibot.output('NOTE: ' + text)
@@ -581,10 +581,10 @@ class PageTree(SizedKeyCollection):
         list of pages to the user when he'll be asked to resolve
         conflicts.
 
-        @ivar data: dictionary with Site as keys and list of page as values.
+        :ivar data: dictionary with Site as keys and list of page as values.
             All pages found within Site are kept in self.data[site].
 
-        @type data: defaultdict(list)
+        :type data: defaultdict(list)
         """
         super().__init__('site')
 
@@ -2205,7 +2205,7 @@ def page_empty_check(page):
     category pages and contain less than 4 characters excluding interlanguage
     links and categories.
 
-    @rtype: bool
+    :rtype: bool
     """
     txt = page.text
     # Check if the page is in content namespace
@@ -2235,7 +2235,7 @@ class InterwikiDumps(OptionHandler):
     def __init__(self, **kwargs):
         """Initializer.
 
-        @keyword do_continue: If true, continue alphabetically starting at the
+        :keyword do_continue: If true, continue alphabetically starting at the
             last of the dumped pages.
         """
         self.site = kwargs.pop('site', pywikibot.Site())
@@ -2261,7 +2261,7 @@ class InterwikiDumps(OptionHandler):
     def remove(self, filename: str):
         """Remove filename from restored files.
 
-        @param filename: A filename to be removed from restored set.
+        :param filename: A filename to be removed from restored set.
         """
         with suppress(KeyError):
             self.restored_files.remove(filename)
@@ -2288,7 +2288,7 @@ class InterwikiDumps(OptionHandler):
     def read_dump(self):
         """Read the dump file.
 
-        @rtype: generator
+        :rtype: generator
         """
         for tail, site in self.files:
             filename = os.path.join(self.path, tail)
@@ -2314,9 +2314,9 @@ class InterwikiDumps(OptionHandler):
     def write_dump(self, iterable, append: bool = True):
         """Write dump file.
 
-        @param iterable: an iterable of page titles to be dumped.
-        @type iterable: iterable
-        @param append: if a dump already exits, append the page titles to it
+        :param iterable: an iterable of page titles to be dumped.
+        :type iterable: iterable
+        :param append: if a dump already exits, append the page titles to it
             if True else overwrite it.
         """
         filename = os.path.join(self.path,
@@ -2347,8 +2347,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     singlePageTitle = ''
     opthintsonly = False

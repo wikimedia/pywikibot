@@ -42,7 +42,7 @@ def get_toolforge_hostname() -> Optional[str]:
 
     *New in version 3.0.*
 
-    @return: The hostname of the currently running host,
+    :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
     """
     if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
@@ -53,7 +53,7 @@ def get_toolforge_hostname() -> Optional[str]:
 def getversion(online: bool = True) -> str:
     """Return a pywikibot version string.
 
-    @param online: Include information obtained online
+    :param online: Include information obtained online
     """
     branches = {
         'master': 'branches/master',
@@ -82,12 +82,12 @@ def getversion(online: bool = True) -> str:
 def getversiondict():
     """Get version info for the package.
 
-    @return:
+    :return:
         - tag (name for the repository),
         - rev (current revision identifier),
         - date (date of current revision),
         - hash (git hash for the current revision)
-    @rtype: C{dict} of four C{str}
+    :rtype: ``dict`` of four ``str``
     """
     _program_dir = _get_program_dir()
     exceptions = {}
@@ -131,12 +131,12 @@ def getversiondict():
 def svn_rev_info(path):  # pragma: no cover
     """Fetch information about the current revision of a Subversion checkout.
 
-    @param path: directory of the Subversion checkout
-    @return:
+    :param path: directory of the Subversion checkout
+    :return:
         - tag (name for the repository),
         - rev (current Subversion revision identifier),
         - date (date of current revision),
-    @rtype: C{tuple} of two C{str} and a C{time.struct_time}
+    :rtype: ``tuple`` of two ``str`` and a ``time.struct_time``
     """
     if not os.path.isdir(os.path.join(path, '.svn')):
         path = os.path.join(path, '..')
@@ -182,9 +182,9 @@ order by revision desc, changed_date desc""")
 def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
     """Convert a Subversion revision to a Git hash using Github.
 
-    @param tag: name of the Subversion repo on Github
-    @param rev: Subversion revision identifier
-    @return: the git hash
+    :param tag: name of the Subversion repo on Github
+    :param rev: Subversion revision identifier
+    :return: the git hash
     """
     uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
     request = fetch(uri, method='PROPFIND',
@@ -202,13 +202,13 @@ def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
 def getversion_svn(path=None):  # pragma: no cover
     """Get version info for a Subversion checkout.
 
-    @param path: directory of the Subversion checkout
-    @return:
+    :param path: directory of the Subversion checkout
+    :return:
         - tag (name for the repository),
         - rev (current Subversion revision identifier),
         - date (date of current revision),
         - hash (git hash for the Subversion revision)
-    @rtype: C{tuple} of three C{str} and a C{time.struct_time}
+    :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
     _program_dir = path or _get_program_dir()
     tag, rev, date = svn_rev_info(_program_dir)
@@ -230,13 +230,13 @@ def getversion_svn(path=None):  # pragma: no cover
 def getversion_git(path=None):
     """Get version info for a Git clone.
 
-    @param path: directory of the Git checkout
-    @return:
+    :param path: directory of the Git checkout
+    :return:
         - tag (name for the repository),
         - rev (current revision identifier),
         - date (date of current revision),
         - hash (git hash for the current revision)
-    @rtype: C{tuple} of three C{str} and a C{time.struct_time}
+    :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
     _program_dir = path or _get_program_dir()
     cmd = 'git'
@@ -285,13 +285,13 @@ def getversion_git(path=None):
 def getversion_nightly(path=None):  # pragma: no cover
     """Get version info for a nightly release.
 
-    @param path: directory of the uncompressed nightly.
-    @return:
+    :param path: directory of the uncompressed nightly.
+    :return:
         - tag (name for the repository),
         - rev (current revision identifier),
         - date (date of current revision),
         - hash (git hash for the current revision)
-    @rtype: C{tuple} of three C{str} and a C{time.struct_time}
+    :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
     if not path:
         path = _get_program_dir()
@@ -309,13 +309,13 @@ def getversion_nightly(path=None):  # pragma: no cover
 def getversion_package(path=None):
     """Get version info for an installed package.
 
-    @param path: Unused argument
-    @return:
+    :param path: Unused argument
+    :return:
         - tag: 'pywikibot/__init__.py'
         - rev: '-1 (unknown)'
         - date (date the package was installed locally),
         - hash (git hash for the current revision of 'pywikibot/__init__.py')
-    @rtype: C{tuple} of four C{str}
+    :rtype: ``tuple`` of four ``str``
     """
     hsh = ''
     date = get_module_mtime(pywikibot).timetuple()
@@ -347,9 +347,9 @@ def get_module_version(module) -> Optional[str]:  # pragma: no cover
     """
     Retrieve __version__ variable from an imported module.
 
-    @param module: The module instance.
-    @type module: module
-    @return: The version hash without the surrounding text. If not present
+    :param module: The module instance.
+    :type module: module
+    :return: The version hash without the surrounding text. If not present
         return None.
     """
     if hasattr(module, '__version__'):
@@ -365,9 +365,9 @@ def get_module_filename(module) -> Optional[str]:
     with py and another character the last character is discarded when the py
     file exist.
 
-    @param module: The module instance.
-    @type module: module
-    @return: The filename if it's a pywikibot module otherwise None.
+    :param module: The module instance.
+    :type module: module
+    :return: The filename if it's a pywikibot module otherwise None.
     """
     if hasattr(module, '__file__'):
         filename = module.__file__
@@ -384,10 +384,10 @@ def get_module_mtime(module):
     """
     Retrieve the modification time from an imported module.
 
-    @param module: The module instance.
-    @type module: module
-    @return: The modification time if it's a pywikibot module otherwise None.
-    @rtype: datetime or None
+    :param module: The module instance.
+    :type module: module
+    :return: The modification time if it's a pywikibot module otherwise None.
+    :rtype: datetime or None
     """
     filename = get_module_filename(module)
     if filename:
@@ -401,12 +401,12 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     When builtins or standard_lib are None, they will be included only
     if a version was found in the package.
 
-    @param modules: Modules to inspect
-    @type modules: list of strings
-    @param builtins: Include builtins
-    @type builtins: Boolean, or None for automatic selection
-    @param standard_lib: Include standard library packages
-    @type standard_lib: Boolean, or None for automatic selection
+    :param modules: Modules to inspect
+    :type modules: list of strings
+    :param builtins: Include builtins
+    :type builtins: Boolean, or None for automatic selection
+    :param standard_lib: Include standard library packages
+    :type standard_lib: Boolean, or None for automatic selection
     """
     if not modules:
         modules = sys.modules.keys()

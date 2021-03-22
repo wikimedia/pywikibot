@@ -792,12 +792,12 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         """
         Test given claim on sample (India) page.
 
-        @param prop: the property to check
-        @param claim: the claim the property should contain
-        @param qualifiers: qualifiers to check or None
-        @param valid: true if the page should be yielded by the generator,
+        :param prop: the property to check
+        :param claim: the claim the property should contain
+        :param qualifiers: qualifiers to check or None
+        :param valid: true if the page should be yielded by the generator,
             false otherwise
-        @param negate: true to swap the filters' behavior
+        :param negate: true to swap the filters' behavior
         """
         item = pywikibot.ItemPage(self.get_repo(), 'Q668')
         gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop, claim,

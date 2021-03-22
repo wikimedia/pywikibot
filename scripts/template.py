@@ -128,9 +128,9 @@ class TemplateRobot(ReplaceBot):
         """
         Initializer.
 
-        @param generator: the pages to work on
-        @type generator: iterable
-        @param templates: a dictionary which maps old template names to
+        :param generator: the pages to work on
+        :type generator: iterable
+        :param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
         """
@@ -213,8 +213,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     template_names = []
     templates = {}

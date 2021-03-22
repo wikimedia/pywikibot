@@ -400,9 +400,9 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
     def get_sd_template(self, site=None) -> Optional[str]:
         """Look for speedy deletion template and return it.
 
-        @param site: site for which the template has to be given
-        @type site: pywikibot.BaseSite
-        @return: A valid speedy deletion template.
+        :param site: site for which the template has to be given
+        :type site: pywikibot.BaseSite
+        :return: A valid speedy deletion template.
         """
         title = None
         if site:
@@ -662,8 +662,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}  # type: Dict[str, Any]
     gen_options = {}  # type: Dict[str, Any]

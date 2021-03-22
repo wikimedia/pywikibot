@@ -97,7 +97,7 @@ class XmlDump:
     Reads the local file at initialization,
     parses it, and offers access to the resulting XmlEntries via a generator.
 
-    @param allrevisions: boolean
+    :param allrevisions: boolean
         If True, parse all revisions instead of only the latest one.
         Default: False.
     """

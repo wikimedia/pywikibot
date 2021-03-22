@@ -75,11 +75,11 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         """
         Create a new ProtectionRobot.
 
-        @param generator: the page generator
-        @type generator: generator
-        @param protections: protections as a dict with "type": "level"
-        @type protections: dict
-        @param kwargs: additional arguments directly feed to super().__init__()
+        :param generator: the page generator
+        :type generator: generator
+        :param protections: protections as a dict with "type": "level"
+        :type protections: dict
+        :param kwargs: additional arguments directly feed to super().__init__()
         """
         self.available_options.update({
             'summary': None,
@@ -112,8 +112,8 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 def check_protection_level(operation, level, levels, default=None):
     """Check if the protection level is valid or ask if necessary.
 
-    @return: a valid protection level
-    @rtype: str
+    :return: a valid protection level
+    :rtype: str
     """
     if level in levels:
         return level
@@ -148,8 +148,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     message_properties = {}

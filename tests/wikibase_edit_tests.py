@@ -106,7 +106,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.claims['P115'][0].addQualifier(end_date)
 
     def test_edit_entity_new_item(self):
-        """Test creating a new item using C{ItemPage.editEntity}."""
+        """Test creating a new item using ``ItemPage.editEntity``."""
         testsite = self.get_repo()
         ts = str(time.time())
         data = {
@@ -127,7 +127,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editEntity(data)
 
     def test_edit_entity_new_property(self):
-        """Test creating a new property using C{PropertyPage.editEntity}."""
+        """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
         ts = str(time.time())
         data = {
@@ -210,11 +210,11 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         """
         Return an item without any existing claims of the given property.
 
-        @param repo: repository to fetch item from
-        @type repo: pywikibot.site.DataSite
-        @param prop: P-value of the property to scrub
-        @return: scrubbed item
-        @rtype: pywikibot.ItemPage
+        :param repo: repository to fetch item from
+        :type repo: pywikibot.site.DataSite
+        :param prop: P-value of the property to scrub
+        :return: scrubbed item
+        :rtype: pywikibot.ItemPage
         """
         item = pywikibot.ItemPage(repo, 'Q68')
         item.get()

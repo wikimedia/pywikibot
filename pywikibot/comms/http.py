@@ -10,16 +10,16 @@ This module is responsible for
     - URL-encoding all data
     - Basic HTTP error handling
 
-This module creates and uses its own C{requests.Session} object.
+This module creates and uses its own ``requests.Session`` object.
 The session is closed if the module terminates.
 If required you can use your own Session object passing it to the
-C{http.session} variable::
+``http.session`` variable::
 
     from pywikibot.comms import http
     session = requests.Session()
     http.session = session
 
-L{flush()} can be called to close the session object.
+:py:obj:`flush()` can be called to close the session object.
 """
 #
 # (C) Pywikibot team, 2007-2021
@@ -149,11 +149,11 @@ def user_agent(site=None, format_string: str = None) -> str:
     """
     Generate the user agent string for a given site and format.
 
-    @param site: The site for which this user agent is intended. May be None.
-    @type site: BaseSite
-    @param format_string: The string to which the values will be added using
+    :param site: The site for which this user agent is intended. May be None.
+    :type site: BaseSite
+    :param format_string: The string to which the values will be added using
         str.format. Is using config.user_agent_format when it is None.
-    @return: The formatted user agent
+    :return: The formatted user agent
     """
     values = USER_AGENT_PRODUCTS.copy()
     values.update(dict.fromkeys(['script', 'script_product'],
@@ -203,7 +203,7 @@ def get_fake_user_agent():
 
     Deprecated, use fake_user_agent() instead.
 
-    @rtype: str
+    :rtype: str
     """
     if isinstance(config.fake_user_agent, str):
         return config.fake_user_agent
@@ -230,19 +230,19 @@ def request(site,
     """
     Request to Site with default error handling and response decoding.
 
-    See L{requests.Session.request} for additional parameters.
+    See :py:obj:`requests.Session.request` for additional parameters.
 
     The optional uri is a relative uri from site base uri including the
     document root '/'.
 
-    @param site: The Site to connect to
-    @type site: pywikibot.site.BaseSite
-    @param uri: the URI to retrieve
-    @keyword charset: Either a valid charset (usable for str.decode()) or None
+    :param site: The Site to connect to
+    :type site: pywikibot.site.BaseSite
+    :param uri: the URI to retrieve
+    :keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
-    @type charset: CodecInfo, str, None
-    @return: The received data Response
+    :type charset: CodecInfo, str, None
+    :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
     old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
@@ -270,8 +270,8 @@ def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
     """
     Retrieve authentication token.
 
-    @param uri: the URI to access
-    @return: authentication token
+    :param uri: the URI to access
+    :return: authentication token
     """
     parsed_uri = requests.utils.urlparse(uri)
     netloc_parts = parsed_uri.netloc.split('.')
@@ -294,8 +294,8 @@ def error_handling_callback(response):
     """
     Raise exceptions and log alerts.
 
-    @param response: Response returned by Session.request().
-    @type response: L{requests.Response}
+    :param response: Response returned by Session.request().
+    :type response: :py:obj:`requests.Response`
     """
     # TODO: do some error correcting stuff
     if isinstance(response, requests.exceptions.SSLError):
@@ -331,25 +331,25 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     """
     HTTP request.
 
-    See L{requests.Session.request} for parameters.
+    See :py:obj:`requests.Session.request` for parameters.
 
-    @param uri: URL to send
-    @param method: HTTP method of the request (default: GET)
-    @param headers: dictionary of headers of the request
-    @param default_error_handling: Use default error handling
-    @param use_fake_user_agent: Set to True to use fake UA, False to use
+    :param uri: URL to send
+    :param method: HTTP method of the request (default: GET)
+    :param headers: dictionary of headers of the request
+    :param default_error_handling: Use default error handling
+    :param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
 
-    @kwarg charset: Either a valid charset (usable for str.decode()) or None
+    :keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
-    @type charset: CodecInfo, str, None
-    @kwarg verify: verify the SSL certificate (default is True)
-    @type verify: bool or path to certificates
-    @kwarg callbacks: Methods to call once data is fetched
-    @type callbacks: list of callable
-    @rtype: L{requests.Response}
+    :type charset: CodecInfo, str, None
+    :keyword verify: verify the SSL certificate (default is True)
+    :type verify: bool or path to certificates
+    :keyword callbacks: Methods to call once data is fetched
+    :type callbacks: list of callable
+    :rtype: :py:obj:`requests.Response`
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.

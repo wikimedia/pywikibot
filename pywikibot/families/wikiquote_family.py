@@ -70,7 +70,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """
         Return a list of historical encodings for a specific language.
 
-        @param code: site code
+        :param code: site code
         """
         # Historic compatibility
         if code == 'pl':

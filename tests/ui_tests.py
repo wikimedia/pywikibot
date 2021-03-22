@@ -41,8 +41,8 @@ class Stream:
         """
         Create a new stream with a StringIO instance.
 
-        @param name: The part after 'std' (e.g. 'err').
-        @param patched_streams: A mapping which maps the original stream to
+        :param name: The part after 'std' (e.g. 'err').
+        :param patched_streams: A mapping which maps the original stream to
             the patched stream.
         """
         self._stream = io.StringIO()

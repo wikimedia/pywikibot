@@ -55,38 +55,38 @@ class UploadRobot(BaseBot):
         *Changed in version 6.2:* asynchronous upload is used if
         *asynchronous* parameter is set.
 
-        @param url: path to url or local file, or list of urls or paths
+        :param url: path to url or local file, or list of urls or paths
             to local files.
-        @param description: Description of file for its page. If multiple files
+        :param description: Description of file for its page. If multiple files
             are uploading the same description is used for every file.
-        @type description: str
-        @param use_filename: Specify title of the file's page. If multiple
+        :type description: str
+        :param use_filename: Specify title of the file's page. If multiple
             files are uploading it asks to change the name for second, third,
             etc. files, otherwise the last file will overwrite the other.
-        @param keep_filename: Set to True to keep original names of urls and
+        :param keep_filename: Set to True to keep original names of urls and
             files, otherwise it will ask to enter a name for each file.
-        @param summary: Summary of the upload
-        @param verify_description: Set to True to proofread the description.
-        @param ignore_warning: Set this to True to upload even if another file
+        :param summary: Summary of the upload
+        :param verify_description: Set to True to proofread the description.
+        :param ignore_warning: Set this to True to upload even if another file
             would be overwritten or another mistake would be risked. Set it to
             an array of warning codes to selectively ignore specific warnings.
-        @param target_site: Set the site to upload to. If target site is not
+        :param target_site: Set the site to upload to. If target site is not
             given it's taken from user-config.py.
-        @type target_site: object
-        @param aborts: List of the warning types to abort upload on. Set to
+        :type target_site: object
+        :param aborts: List of the warning types to abort upload on. Set to
             True to abort on any warning.
-        @param chunk_size: Upload the file in chunks (more overhead, but
+        :param chunk_size: Upload the file in chunks (more overhead, but
             restartable) specified in bytes. If no value is specified the file
             will be uploaded as whole.
-        @param asynchronous: Make potentially large file operations
+        :param asynchronous: Make potentially large file operations
             asynchronous on the server side when possible.
-        @param filename_prefix: Specify prefix for the title of every
+        :param filename_prefix: Specify prefix for the title of every
             file's page.
-        @keyword always: Disables any input, requires that either
+        :keyword always: Disables any input, requires that either
             ignore_warning or aborts are set to True and that the
             description is also set. It overwrites verify_description to
             False and keep_filename to True.
-        @type always: bool
+        :type always: bool
         """
         super().__init__(**kwargs)
         if self.opt.always:
@@ -184,8 +184,8 @@ class UploadRobot(BaseBot):
     def _handle_warning(self, warning: str) -> Optional[bool]:
         """Return whether the warning cause an abort or be ignored.
 
-        @param warning: The warning name
-        @return: False if this warning should cause an abort, True if it should
+        :param warning: The warning name
+        :return: False if this warning should cause an abort, True if it should
             be ignored or None if this warning has no default handler.
         """
         if self.aborts is not True:
@@ -365,7 +365,7 @@ class UploadRobot(BaseBot):
         """
         Determine if the warning message should be ignored.
 
-        @param warn_code: The warning message
+        :param warn_code: The warning message
         """
         return self.ignore_warning is True or warn_code in self.ignore_warning
 
@@ -373,7 +373,7 @@ class UploadRobot(BaseBot):
         """
         Upload the image at file_url to the target wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Upload}
+        :see: https://www.mediawiki.org/wiki/API:Upload
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.

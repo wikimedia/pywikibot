@@ -81,7 +81,7 @@ class WikiStats:
     def get(self, table: str) -> list:
         """Get a list of a table of data.
 
-        @param table: table of data to fetch
+        :param table: table of data to fetch
         """
         if table in self._data:
             return self._data[table]
@@ -103,7 +103,7 @@ class WikiStats:
     def get_dict(self, table: str) -> dict:
         """Get dictionary of a table of data.
 
-        @param table: table of data to fetch
+        :param table: table of data to fetch
         """
         return {data['prefix']: data for data in self.get(table)}
 
@@ -112,12 +112,12 @@ class WikiStats:
         """
         Reverse numerical sort of data.
 
-        @param table: name of table of data
-        @param key: data table key
-        @param reverse: If set to True the sorting order is reversed.
+        :param table: name of table of data
+        :param key: data table key
+        :param reverse: If set to True the sorting order is reversed.
             If None the sorting order for numeric keys are reversed whereas
             alphanumeric keys are sorted in normal way.
-        @return: The sorted table
+        :return: The sorted table
         """
         table = self.get(table)
 

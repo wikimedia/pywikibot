@@ -137,15 +137,15 @@ class ImageTransferBot(SingleSiteBot):
     def __init__(self, **kwargs):
         """Initializer.
 
-        @keyword generator: the pages to work on
-        @type generator: iterable
-        @keyword target_site: Site to send image to, default none
-        @type target_site: pywikibot.site.APISite
-        @keyword interwiki: Look for images in interwiki links, default false
-        @type interwiki: boolean
-        @keyword keep_name: Keep the filename and do not verify description
+        :keyword generator: the pages to work on
+        :type generator: iterable
+        :keyword target_site: Site to send image to, default none
+        :type target_site: pywikibot.site.APISite
+        :keyword interwiki: Look for images in interwiki links, default false
+        :type interwiki: boolean
+        :keyword keep_name: Keep the filename and do not verify description
             while replacing, default false
-        @type keep_name: boolean
+        :type keep_name: boolean
         """
         self.available_options.update({
             'ignore_warning': False,  # not implemented yet
@@ -164,7 +164,7 @@ class ImageTransferBot(SingleSiteBot):
         """
         Download image and its description, and upload it to another site.
 
-        @return: the filename which was used to upload the image
+        :return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
         pywikibot.output(
@@ -322,8 +322,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     target_code = None
     target_family = None

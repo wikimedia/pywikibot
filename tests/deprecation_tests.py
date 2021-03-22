@@ -130,7 +130,7 @@ def deprecated_func_docstring_arg2(foo=None):
     """
     DEPRECATED.
 
-    @param foo: Foo. DEPRECATED.
+    :param foo: Foo. DEPRECATED.
     """
     return foo
 
@@ -309,7 +309,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             (deprecated_func_docstring_arg, 'Deprecated.\n\n'
              '@param foo: Foo. DEPRECATED.'),
             (deprecated_func_docstring_arg2, '\n    DEPRECATED.\n\n'
-             '    @param foo: Foo. DEPRECATED.\n    '),
+             '    :param foo: Foo. DEPRECATED.\n    '),
         ]
         for rv, doc in testcases:
             self.assertEqual(rv.__doc__, doc)

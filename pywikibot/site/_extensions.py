@@ -25,10 +25,10 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        @keyword format: If specified, notifications will be returned formatted
+        :keyword format: If specified, notifications will be returned formatted
             this way. Its value is either 'model', 'special' or None. Default
             is 'special'.
-        @type format: str or None
+        :type format: str or None
 
         Refer API reference for other keywords.
         """
@@ -55,8 +55,8 @@ class EchoMixin:
     def notifications_mark_read(self, **kwargs):
         """Mark selected notifications as read.
 
-        @return: whether the action was successful
-        @rtype: bool
+        :return: whether the action was successful
+        :rtype: bool
         """
         # TODO: ensure that the 'echomarkread' action
         # is supported by the site
@@ -90,11 +90,11 @@ class ProofreadPageMixin:
             {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
              3: 'Proofread', 4: 'Validated'}
 
-        @param expiry: either a number of days or a datetime.timedelta object
-        @type expiry: int (days), L{datetime.timedelta}, False (config)
-        @return: A tuple containing _proofread_index_ns,
+        :param expiry: either a number of days or a datetime.timedelta object
+        :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)
+        :return: A tuple containing _proofread_index_ns,
             self._proofread_page_ns and self._proofread_levels.
-        @rtype: Namespace, Namespace, dict
+        :rtype: Namespace, Namespace, dict
         """
         if (not hasattr(self, '_proofread_index_ns')
                 or not hasattr(self, '_proofread_page_ns')
@@ -167,10 +167,10 @@ class PageImagesMixin:
         """
         Load [[mw:Extension:PageImages]] info.
 
-        @param page: The page for which to obtain the image
-        @type page: pywikibot.Page
+        :param page: The page for which to obtain the image
+        :type page: pywikibot.Page
 
-        @raises APIError: PageImages extension is not installed
+        :raises APIError: PageImages extension is not installed
         """
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
@@ -188,11 +188,11 @@ class GlobalUsageMixin:
     def globalusage(self, page, total=None):
         """Iterate global image usage for a given FilePage.
 
-        @param page: the page to return global image usage for.
-        @type page: pywikibot.FilePage
-        @param total: iterate no more than this number of pages in total.
-        @raises TypeError: input page is not a FilePage.
-        @raises pywikibot.exceptions.SiteDefinitionError: Site could not be
+        :param page: the page to return global image usage for.
+        :type page: pywikibot.FilePage
+        :param total: iterate no more than this number of pages in total.
+        :raises TypeError: input page is not a FilePage.
+        :raises pywikibot.exceptions.SiteDefinitionError: Site could not be
             defined for a returned entry in API response.
         """
         if not isinstance(page, pywikibot.FilePage):
@@ -238,7 +238,7 @@ class WikibaseClientMixin:
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('UnconnectedPages', total)
 
@@ -252,28 +252,28 @@ class LinterMixin:
                      namespaces=None, pageids=None, lint_from=None):
         """Return a generator to pages containing linter errors.
 
-        @param lint_categories: categories of lint errors
-        @type lint_categories: an iterable that returns values (str),
+        :param lint_categories: categories of lint errors
+        :type lint_categories: an iterable that returns values (str),
             or a pipe-separated string of values.
 
-        @param total: if not None, yielding this many items in total
-        @type total: int
+        :param total: if not None, yielding this many items in total
+        :type total: int
 
-        @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param namespaces: only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
 
-        @param pageids: only include lint errors from the specified pageids
-        @type pageids: an iterable that returns pageids (str or int),
+        :param pageids: only include lint errors from the specified pageids
+        :type pageids: an iterable that returns pageids (str or int),
             or a comma- or pipe-separated string of pageids
             (e.g. '945097,1483753, 956608' or '945097|483753|956608')
 
-        @param lint_from: Lint ID to start querying from
-        @type lint_from: str representing digit or integer
+        :param lint_from: Lint ID to start querying from
+        :type lint_from: str representing digit or integer
 
-        @return: pages with Linter errors.
-        @rtype: typing.Iterable[pywikibot.Page]
+        :return: pages with Linter errors.
+        :rtype: typing.Iterable[pywikibot.Page]
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',
                                 total=total,  # Will set lntlimit
@@ -310,12 +310,12 @@ class ThanksMixin:
     def thank_revision(self, revid, source=None):
         """Corresponding method to the 'action=thank' API action.
 
-        @param revid: Revision ID for the revision to be thanked.
-        @type revid: int
-        @param source: A source for the thanking operation.
-        @type source: str
-        @raise APIError: On thanking oneself or other API errors.
-        @return: The API response.
+        :param revid: Revision ID for the revision to be thanked.
+        :type revid: int
+        :param source: A source for the thanking operation.
+        :type source: str
+        :raise APIError: On thanking oneself or other API errors.
+        :return: The API response.
         """
         token = self.tokens['csrf']
         req = self._simple_request(action='thank', rev=revid, token=token,
@@ -335,10 +335,10 @@ class ThanksFlowMixin:
     def thank_post(self, post):
         """Corresponding method to the 'action=flowthank' API action.
 
-        @param post: The post to be thanked for.
-        @type post: Post
-        @raise APIError: On thanking oneself or other API errors.
-        @return: The API response.
+        :param post: The post to be thanked for.
+        :type post: Post
+        :raise APIError: On thanking oneself or other API errors.
+        :return: The API response.
         """
         post_id = post.uuid
         token = self.tokens['csrf']
@@ -359,10 +359,10 @@ class FlowMixin:
         """
         Retrieve the data for a Flow board.
 
-        @param page: A Flow board
-        @type page: Board
-        @return: A dict representing the board's metadata.
-        @rtype: dict
+        :param page: A Flow board
+        :type page: Board
+        :return: A dict representing the board's metadata.
+        :rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
                                    submodule='view-topiclist',
@@ -378,26 +378,26 @@ class FlowMixin:
         """
         Retrieve the topiclist of a Flow board.
 
-        @param page: A Flow board
-        @type page: Board
-        @param content_format: The content format to request the data in.
+        :param page: A Flow board
+        :type page: Board
+        :param content_format: The content format to request the data in.
             must be either 'wikitext', 'html', or 'fixed-html'
-        @param limit: The number of topics to fetch in each request.
-        @type limit: int
-        @param sortby: Algorithm to sort topics by.
-        @type sortby: str (either 'newest' or 'updated')
-        @param toconly: Whether to only include information for the TOC.
-        @type toconly: bool
-        @param offset: The timestamp to start at (when sortby is 'updated').
-        @type offset: Timestamp or equivalent str
-        @param offset_id: The topic UUID to start at (when sortby is 'newest').
-        @type offset_id: str (in the form of a UUID)
-        @param reverse: Whether to reverse the topic ordering.
-        @type reverse: bool
-        @param include_offset: Whether to include the offset topic.
-        @type include_offset: bool
-        @return: A dict representing the board's topiclist.
-        @rtype: dict
+        :param limit: The number of topics to fetch in each request.
+        :type limit: int
+        :param sortby: Algorithm to sort topics by.
+        :type sortby: str (either 'newest' or 'updated')
+        :param toconly: Whether to only include information for the TOC.
+        :type toconly: bool
+        :param offset: The timestamp to start at (when sortby is 'updated').
+        :type offset: Timestamp or equivalent str
+        :param offset_id: The topic UUID to start at (when sortby is 'newest').
+        :type offset_id: str (in the form of a UUID)
+        :param reverse: Whether to reverse the topic ordering.
+        :type reverse: bool
+        :param include_offset: Whether to include the offset topic.
+        :type include_offset: bool
+        :return: A dict representing the board's topiclist.
+        :rtype: dict
         """
         if offset:
             offset = pywikibot.Timestamp.fromtimestampformat(offset)
@@ -419,12 +419,12 @@ class FlowMixin:
         """
         Retrieve the data for a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param content_format: The content format to request the data in.
+        :param page: A Flow topic
+        :type page: Topic
+        :param content_format: The content format to request the data in.
             Must ne either 'wikitext', 'html', or 'fixed-html'
-        @return: A dict representing the topic's data.
-        @rtype: dict
+        :return: A dict representing the topic's data.
+        :rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
                                    submodule='view-topic',
@@ -438,14 +438,14 @@ class FlowMixin:
         """
         Retrieve the data for a post to a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param post_id: The UUID of the Post
-        @type post_id: str
-        @param content_format: The content format used for the returned
+        :param page: A Flow topic
+        :type page: Topic
+        :param post_id: The UUID of the Post
+        :type post_id: str
+        :param content_format: The content format used for the returned
             content; must be either 'wikitext', 'html', or 'fixed-html'
-        @return: A dict representing the post data for the given UUID.
-        @rtype: dict
+        :return: A dict representing the post data for the given UUID.
+        :rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
                                    submodule='view-post', vppostId=post_id,
@@ -460,16 +460,16 @@ class FlowMixin:
         """
         Create a new topic on a Flow board.
 
-        @param page: A Flow board
-        @type page: Board
-        @param title: The title of the new topic (must be in plaintext)
-        @type title: str
-        @param content: The content of the topic's initial post
-        @type content: str
-        @param content_format: The content format of the supplied content
-        @type content_format: str (either 'wikitext' or 'html')
-        @return: The metadata of the new topic
-        @rtype: dict
+        :param page: A Flow board
+        :type page: Board
+        :param title: The title of the new topic (must be in plaintext)
+        :type title: str
+        :param content: The content of the topic's initial post
+        :type content: str
+        :param content_format: The content format of the supplied content
+        :type content_format: str (either 'wikitext' or 'html')
+        :return: The metadata of the new topic
+        :rtype: dict
         """
         token = self.tokens['csrf']
         params = {'action': 'flow', 'page': page, 'token': token,
@@ -486,13 +486,13 @@ class FlowMixin:
                       content_format: str) -> dict:
         """Reply to a post on a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param reply_to_uuid: The UUID of the Post to create a reply to
-        @param content: The content of the reply
-        @param content_format: The content format used for the supplied
+        :param page: A Flow topic
+        :type page: Topic
+        :param reply_to_uuid: The UUID of the Post to create a reply to
+        :param content: The content of the reply
+        :param content_format: The content format used for the supplied
             content; must be either 'wikitext' or 'html'
-        @return: Metadata returned by the API
+        :return: Metadata returned by the API
         """
         token = self.tokens['csrf']
         params = {'action': 'flow', 'page': page, 'token': token,
@@ -508,14 +508,14 @@ class FlowMixin:
         """
         Lock or unlock a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param lock: Whether to lock or unlock the topic
-        @type lock: bool (True corresponds to locking the topic.)
-        @param reason: The reason to lock or unlock the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param lock: Whether to lock or unlock the topic
+        :type lock: bool (True corresponds to locking the topic.)
+        :param reason: The reason to lock or unlock the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         status = 'lock' if lock else 'unlock'
         token = self.tokens['csrf']
@@ -532,14 +532,14 @@ class FlowMixin:
         """
         Moderate a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param state: The new moderation state
-        @type state: str
-        @param reason: The reason to moderate the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param state: The new moderation state
+        :type state: str
+        :param reason: The reason to moderate the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         token = self.tokens['csrf']
         params = {'action': 'flow', 'page': page, 'token': token,
@@ -555,12 +555,12 @@ class FlowMixin:
         """
         Delete a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param reason: The reason to delete the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param reason: The reason to delete the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_topic(page, 'delete', reason)
 
@@ -570,12 +570,12 @@ class FlowMixin:
         """
         Hide a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param reason: The reason to hide the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param reason: The reason to hide the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_topic(page, 'hide', reason)
 
@@ -585,12 +585,12 @@ class FlowMixin:
         """
         Suppress a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param reason: The reason to suppress the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param reason: The reason to suppress the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_topic(page, 'suppress', reason)
 
@@ -600,12 +600,12 @@ class FlowMixin:
         """
         Restore a Flow topic.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param reason: The reason to restore the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param page: A Flow topic
+        :type page: Topic
+        :param reason: The reason to restore the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_topic(page, 'restore', reason)
 
@@ -615,14 +615,14 @@ class FlowMixin:
         """
         Moderate a Flow post.
 
-        @param post: A Flow post
-        @type post: Post
-        @param state: The new moderation state
-        @type state: str
-        @param reason: The reason to moderate the topic
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param post: A Flow post
+        :type post: Post
+        :param state: The new moderation state
+        :type state: str
+        :param reason: The reason to moderate the topic
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         page = post.page
         uuid = post.uuid
@@ -640,12 +640,12 @@ class FlowMixin:
         """
         Delete a Flow post.
 
-        @param post: A Flow post
-        @type post: Post
-        @param reason: The reason to delete the post
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param post: A Flow post
+        :type post: Post
+        :param reason: The reason to delete the post
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_post(post, 'delete', reason)
 
@@ -655,12 +655,12 @@ class FlowMixin:
         """
         Hide a Flow post.
 
-        @param post: A Flow post
-        @type post: Post
-        @param reason: The reason to hide the post
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param post: A Flow post
+        :type post: Post
+        :param reason: The reason to hide the post
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_post(post, 'hide', reason)
 
@@ -670,12 +670,12 @@ class FlowMixin:
         """
         Suppress a Flow post.
 
-        @param post: A Flow post
-        @type post: Post
-        @param reason: The reason to suppress the post
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param post: A Flow post
+        :type post: Post
+        :param reason: The reason to suppress the post
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_post(post, 'suppress', reason)
 
@@ -685,12 +685,12 @@ class FlowMixin:
         """
         Restore a Flow post.
 
-        @param post: A Flow post
-        @type post: Post
-        @param reason: The reason to restore the post
-        @type reason: str
-        @return: Metadata returned by the API
-        @rtype: dict
+        :param post: A Flow post
+        :type post: Post
+        :param reason: The reason to restore the post
+        :type reason: str
+        :return: Metadata returned by the API
+        :rtype: dict
         """
         return self.moderate_post(post, 'restore', reason)
 
@@ -707,10 +707,10 @@ class UrlShortenerMixin:
         Note that on Wikimedia wikis only metawiki supports this action,
         and this wiki can process links to all WM domains.
 
-        @param url: The link to reduce, with propotol prefix.
-        @type url: str
-        @return: The reduced link, without protocol prefix.
-        @rtype: str
+        :param url: The link to reduce, with propotol prefix.
+        :type url: str
+        :return: The reduced link, without protocol prefix.
+        :rtype: str
         """
         req = self._simple_request(action='shortenurl', url=url)
         data = req.submit()

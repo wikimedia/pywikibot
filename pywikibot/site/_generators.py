@@ -52,7 +52,7 @@ class GeneratorsMixin:
         Pageids are filtered and only one page is returned in case of
         duplicate pageids.
 
-        @param pageids: an iterable that returns pageids (str or int),
+        :param pageids: an iterable that returns pageids (str or int),
             or a comma- or pipe-separated string of pageids
             (e.g. '945097,1483753, 956608' or '945097|483753|956608')
         """
@@ -110,17 +110,17 @@ class GeneratorsMixin:
         Pages are iterated in the same order than in the underlying pagelist.
         In case of duplicates in a groupsize batch, return the first entry.
 
-        @param pagelist: an iterable that returns Page objects
-        @param groupsize: how many Pages to query at a time
-        @type groupsize: int
-        @param templates: preload pages (typically templates) transcluded in
+        :param pagelist: an iterable that returns Page objects
+        :param groupsize: how many Pages to query at a time
+        :type groupsize: int
+        :param templates: preload pages (typically templates) transcluded in
             the provided pages
-        @type templates: bool
-        @param langlinks: preload all language links from the provided pages
+        :type templates: bool
+        :param langlinks: preload all language links from the provided pages
             to other languages
-        @type langlinks: bool
-        @param pageprops: preload various properties defined in page content
-        @type pageprops: bool
+        :type langlinks: bool
+        :param pageprops: preload various properties defined in page content
+        :type pageprops: bool
 
         """
         props = 'revisions|info|categoryinfo'
@@ -215,25 +215,25 @@ class GeneratorsMixin:
                       content=False):
         """Iterate all pages that link to the given page.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Backlinks}
+        :see: https://www.mediawiki.org/wiki/API:Backlinks
 
-        @param page: The Page to get links to.
-        @param follow_redirects: Also return links to redirects pointing to
+        :param page: The Page to get links to.
+        :param follow_redirects: Also return links to redirects pointing to
             the given page.
-        @param filter_redirects: If True, only return redirects to the given
+        :param filter_redirects: If True, only return redirects to the given
             page. If False, only return non-redirect links. If None, return
             both (no filtering).
-        @param namespaces: If present, only return links from the namespaces
+        :param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param total: Maximum number of pages to retrieve in total.
-        @param content: if True, load the current content of each iterated page
+        :param total: Maximum number of pages to retrieve in total.
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @rtype: typing.Iterable[pywikibot.Page]
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :rtype: typing.Iterable[pywikibot.Page]
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         bltitle = page.title(with_section=False).encode(self.encoding())
@@ -278,22 +278,22 @@ class GeneratorsMixin:
                         total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Embeddedin}
+        :see: https://www.mediawiki.org/wiki/API:Embeddedin
 
-        @param page: The Page to get inclusions for.
-        @param filter_redirects: If True, only return redirects that embed
+        :param page: The Page to get inclusions for.
+        :param filter_redirects: If True, only return redirects that embed
             the given page. If False, only return non-redirect links. If
             None, return both (no filtering).
-        @param namespaces: If present, only return links from the namespaces
+        :param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @rtype: typing.Iterable[pywikibot.Page]
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :rtype: typing.Iterable[pywikibot.Page]
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         eiargs = {'geititle':
@@ -317,14 +317,14 @@ class GeneratorsMixin:
         """
         Convenience method combining pagebacklinks and page_embeddedin.
 
-        @param namespaces: If present, only return links from the namespaces
+        :param namespaces: If present, only return links from the namespaces
             in this list.
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @rtype: typing.Iterable[pywikibot.Page]
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :rtype: typing.Iterable[pywikibot.Page]
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if only_template_inclusion:
@@ -353,19 +353,19 @@ class GeneratorsMixin:
                   total=None, content=False):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Links}
+        :see: https://www.mediawiki.org/wiki/API:Links
 
-        @param namespaces: Only iterate pages in these namespaces
+        :param namespaces: Only iterate pages in these namespaces
             (default: all)
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param follow_redirects: if True, yields the target of any redirects,
+        :param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         plargs = {}
@@ -384,9 +384,9 @@ class GeneratorsMixin:
     def pagecategories(self, page, *, total=None, content=False):
         """Iterate categories to which page belongs.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Categories}
+        :see: https://www.mediawiki.org/wiki/API:Categories
 
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the
             category description page, not the pages contained in the category
         """
@@ -404,9 +404,9 @@ class GeneratorsMixin:
     def pageimages(self, page, *, total=None, content=False):
         """Iterate images used (not just linked) on the page.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Images}
+        :see: https://www.mediawiki.org/wiki/API:Images
 
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
             description page, not the image itself
 
@@ -421,17 +421,17 @@ class GeneratorsMixin:
                       content=False):
         """Iterate templates transcluded (not just linked) on the page.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Templates}
+        :see: https://www.mediawiki.org/wiki/API:Templates
 
-        @param namespaces: Only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param namespaces: Only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
 
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         tltitle = page.title(with_section=False).encode(self.encoding())
@@ -453,40 +453,40 @@ class GeneratorsMixin:
                         endprefix: Optional[str] = None):
         """Iterate members of specified category.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Categorymembers}
+        :see: https://www.mediawiki.org/wiki/API:Categorymembers
 
-        @param category: The Category to iterate.
-        @param namespaces: If present, only return category members from
+        :param category: The Category to iterate.
+        :param namespaces: If present, only return category members from
             these namespaces. To yield subcategories or files, use
             parameter member_type instead.
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param sortby: determines the order in which results are generated,
+        :param sortby: determines the order in which results are generated,
             valid values are "sortkey" (default, results ordered by category
             sort key) or "timestamp" (results ordered by time page was
             added to the category)
-        @param reverse: if True, generate results in reverse order
+        :param reverse: if True, generate results in reverse order
             (default False)
-        @param starttime: if provided, only generate pages added after this
+        :param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
-        @type starttime: pywikibot.Timestamp
-        @param endtime: if provided, only generate pages added before this
+        :type starttime: pywikibot.Timestamp
+        :param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
-        @param startprefix: if provided, only generate pages >= this title
+        :param startprefix: if provided, only generate pages >= this title
             lexically; not valid if sortby="timestamp"
-        @param endprefix: if provided, only generate pages < this title
+        :param endprefix: if provided, only generate pages < this title
             lexically; not valid if sortby="timestamp"
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @param member_type: member type; if member_type includes 'page' and is
+        :param member_type: member type; if member_type includes 'page' and is
             used in conjunction with sortby="timestamp", the API may limit
             results to only pages in the first 50 namespaces.
-        @type member_type: str or iterable of str;
+        :type member_type: str or iterable of str;
             values: page, subcat, file
-        @rtype: typing.Iterable[pywikibot.Page]
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :rtype: typing.Iterable[pywikibot.Page]
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if category.namespace() != 14:
@@ -590,7 +590,7 @@ class GeneratorsMixin:
     def _rvprops(self, content: bool = False) -> List[str]:
         """Setup rvprop items for loadrevisions and preloadpages.
 
-        @return: rvprop items
+        :return: rvprop items
         """
         props = ['comment', 'contentmodel', 'flags', 'ids', 'parsedcomment',
                  'sha1', 'size', 'tags', 'timestamp', 'user', 'userid']
@@ -615,31 +615,31 @@ class GeneratorsMixin:
         endid if both are specified; likewise, starttime must be greater
         than endtime. If rvdir is True, these relationships are reversed.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Revisions}
+        :see: https://www.mediawiki.org/wiki/API:Revisions
 
-        @param page: retrieve revisions of this Page and hold the data.
-        @type page: pywikibot.Page
-        @param content: if True, retrieve the wiki-text of each revision;
+        :param page: retrieve revisions of this Page and hold the data.
+        :type page: pywikibot.Page
+        :param content: if True, retrieve the wiki-text of each revision;
             otherwise, only retrieve the revision metadata (default)
-        @type content: bool
-        @param section: if specified, retrieve only this section of the text
+        :type content: bool
+        :param section: if specified, retrieve only this section of the text
             (content must be True); section must be given by number (top of
             the article is section 0), not name
-        @type section: int
-        @keyword revids: retrieve only the specified revision ids (raise
+        :type section: int
+        :keyword revids: retrieve only the specified revision ids (raise
             Exception if any of revids does not correspond to page)
-        @type revids: an int, a str or a list of ints or strings
-        @keyword startid: retrieve revisions starting with this revid
-        @keyword endid: stop upon retrieving this revid
-        @keyword starttime: retrieve revisions starting at this Timestamp
-        @keyword endtime: stop upon reaching this Timestamp
-        @keyword rvdir: if false, retrieve newest revisions first (default);
+        :type revids: an int, a str or a list of ints or strings
+        :keyword startid: retrieve revisions starting with this revid
+        :keyword endid: stop upon retrieving this revid
+        :keyword starttime: retrieve revisions starting at this Timestamp
+        :keyword endtime: stop upon reaching this Timestamp
+        :keyword rvdir: if false, retrieve newest revisions first (default);
             if true, retrieve oldest first
-        @keyword user: retrieve only revisions authored by this user
-        @keyword excludeuser: retrieve all revisions not authored by this user
-        @keyword total: number of revisions to retrieve
-        @raises ValueError: invalid startid/endid or starttime/endtime values
-        @raises pywikibot.exceptions.Error: revids belonging to a different
+        :keyword user: retrieve only revisions authored by this user
+        :keyword excludeuser: retrieve all revisions not authored by this user
+        :keyword total: number of revisions to retrieve
+        :raises ValueError: invalid startid/endid or starttime/endtime values
+        :raises pywikibot.exceptions.Error: revids belonging to a different
             page
         """
         latest = all(val is None for val in kwargs.values())
@@ -738,11 +738,11 @@ class GeneratorsMixin:
 
         *New in version 6.2:* *include_empty_titles* parameter was added.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Langlinks}
+        :see: https://www.mediawiki.org/wiki/API:Langlinks
 
-        @param include_obsolete: if true, yield even Link objects whose
+        :param include_obsolete: if true, yield even Link objects whose
             site is obsolete
-        @param include_empty_titles: if true, yield even Link objects whose
+        :param include_empty_titles: if true, yield even Link objects whose
             title is empty but redirects to a site like [[en:]]
         """
         lltitle = page.title(with_section=False)
@@ -769,7 +769,7 @@ class GeneratorsMixin:
     def page_extlinks(self, page, *, total=None):
         """Iterate all external links on page, yielding URL strings.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Extlinks}
+        :see: https://www.mediawiki.org/wiki/API:Extlinks
         """
         eltitle = page.title(with_section=False)
         elquery = self._generator(api.PropertyGenerator, type_arg='extlinks',
@@ -791,32 +791,32 @@ class GeneratorsMixin:
                  total=None, content=False):
         """Iterate pages in a single namespace.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Allpages}
+        :see: https://www.mediawiki.org/wiki/API:Allpages
 
-        @param start: Start at this title (page need not exist).
-        @param prefix: Only yield pages starting with this string.
-        @param namespace: Iterate pages from this (single) namespace
-        @type namespace: int or Namespace.
-        @param filterredir: if True, only yield redirects; if False (and not
+        :param start: Start at this title (page need not exist).
+        :param prefix: Only yield pages starting with this string.
+        :param namespace: Iterate pages from this (single) namespace
+        :type namespace: int or Namespace.
+        :param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
-        @param filterlanglinks: if True, only yield pages with language links;
+        :param filterlanglinks: if True, only yield pages with language links;
             if False (and not None), only yield pages without language links
             (default: yield both)
-        @param minsize: if present, only yield pages at least this many
+        :param minsize: if present, only yield pages at least this many
             bytes in size
-        @param maxsize: if present, only yield pages at most this many bytes
+        :param maxsize: if present, only yield pages at most this many bytes
             in size
-        @param protect_type: only yield pages that have a protection of the
+        :param protect_type: only yield pages that have a protection of the
             specified type
-        @type protect_type: str
-        @param protect_level: only yield pages that have protection at this
+        :type protect_type: str
+        :param protect_level: only yield pages that have protection at this
             level; can only be used if protect_type is specified
-        @param reverse: if True, iterate in reverse Unicode lexigraphic
+        :param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @raises KeyError: the namespace identifier was not resolved
-        @raises TypeError: the namespace identifier has an inappropriate
+        :raises KeyError: the namespace identifier was not resolved
+        :raises TypeError: the namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one namespace
         """
         # backward compatibility test
@@ -867,19 +867,19 @@ class GeneratorsMixin:
         been deleted may not have been removed from the links table, so this
         method can return false positives.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Alllinks}
+        :see: https://www.mediawiki.org/wiki/API:Alllinks
 
-        @param start: Start at this title (page need not exist).
-        @param prefix: Only yield pages starting with this string.
-        @param namespace: Iterate pages from this (single) namespace
-        @type namespace: int or Namespace
-        @param unique: If True, only iterate each link title once (default:
+        :param start: Start at this title (page need not exist).
+        :param prefix: Only yield pages starting with this string.
+        :param namespace: Iterate pages from this (single) namespace
+        :type namespace: int or Namespace
+        :param unique: If True, only iterate each link title once (default:
             iterate once for each linking page)
-        @param fromids: if True, include the pageid of the page containing
+        :param fromids: if True, include the pageid of the page containing
             each link (default: False) as the '_fromid' attribute of the Page;
             cannot be combined with unique
-        @raises KeyError: the namespace identifier was not resolved
-        @raises TypeError: the namespace identifier has an inappropriate
+        :raises KeyError: the namespace identifier was not resolved
+        :raises TypeError: the namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one namespace
         """
         if unique and fromids:
@@ -906,13 +906,13 @@ class GeneratorsMixin:
         were found on pages that have been deleted may not have been removed
         from the database table, so this method can return false positives.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Allcategories}
+        :see: https://www.mediawiki.org/wiki/API:Allcategories
 
-        @param start: Start at this category title (category need not exist).
-        @param prefix: Only yield categories starting with this string.
-        @param reverse: if True, iterate in reverse Unicode lexigraphic
+        :param start: Start at this category title (category need not exist).
+        :param prefix: Only yield categories starting with this string.
+        :param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the category
             description page, not the pages that are members of the category
         """
@@ -953,12 +953,12 @@ class GeneratorsMixin:
         will be a list of str; all the other values are str and should
         always be present.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Allusers}
+        :see: https://www.mediawiki.org/wiki/API:Allusers
 
-        @param start: start at this username (name need not exist)
-        @param prefix: only iterate usernames starting with this substring
-        @param group: only iterate users that are members of this group
-        @type group: str
+        :param start: start at this username (name need not exist)
+        :param prefix: only iterate usernames starting with this substring
+        :param group: only iterate users that are members of this group
+        :type group: str
         """
         augen = self._generator(api.ListGenerator, type_arg='allusers',
                                 auprop='editcount|groups|registration',
@@ -977,17 +977,17 @@ class GeneratorsMixin:
 
         Yields FilePages, but these pages need not exist on the wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Allimages}
+        :see: https://www.mediawiki.org/wiki/API:Allimages
 
-        @param start: start at this title (name need not exist)
-        @param prefix: only iterate titles starting with this substring
-        @param minsize: only iterate images of at least this many bytes
-        @param maxsize: only iterate images of no more than this many bytes
-        @param reverse: if True, iterate in reverse lexigraphic order
-        @param sha1: only iterate image (it is theoretically possible there
+        :param start: start at this title (name need not exist)
+        :param prefix: only iterate titles starting with this substring
+        :param minsize: only iterate images of at least this many bytes
+        :param maxsize: only iterate images of no more than this many bytes
+        :param reverse: if True, iterate in reverse lexigraphic order
+        :param sha1: only iterate image (it is theoretically possible there
             could be more than one) with this sha1 hash
-        @param sha1base36: same as sha1 but in base 36
-        @param content: if True, load the current content of each iterated page
+        :param sha1base36: same as sha1 but in base 36
+        :param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
             description page, not the image itself
         """
@@ -1015,16 +1015,16 @@ class GeneratorsMixin:
 
         Yields dict of file archive informations.
 
-        @see: U{https://www.mediawiki.org/wiki/API:filearchive}
+        :see: https://www.mediawiki.org/wiki/API:filearchive
 
-        @param start: start at this title (name need not exist)
-        @param end: end at this title (name need not exist)
-        @param reverse: if True, iterate in reverse lexigraphic order
-        @param total: maximum number of pages to retrieve in total
-        @keyword prefix: only iterate titles starting with this substring
-        @keyword sha1: only iterate image with this sha1 hash
-        @keyword sha1base36: same as sha1 but in base 36
-        @keyword prop: Image information to get. Default is timestamp
+        :param start: start at this title (name need not exist)
+        :param end: end at this title (name need not exist)
+        :param reverse: if True, iterate in reverse lexigraphic order
+        :param total: maximum number of pages to retrieve in total
+        :keyword prefix: only iterate titles starting with this substring
+        :keyword sha1: only iterate image with this sha1 hash
+        :keyword sha1base36: same as sha1 but in base 36
+        :keyword prop: Image information to get. Default is timestamp
         """
         if start and end:
             self.assert_valid_iter_params(
@@ -1049,26 +1049,26 @@ class GeneratorsMixin:
         The iterator yields dicts containing keys corresponding to the
         block properties.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Blocks}
+        :see: https://www.mediawiki.org/wiki/API:Blocks
 
-        @note: logevents only logs user blocks, while this method
+        :note: logevents only logs user blocks, while this method
             iterates all blocks including IP ranges.
-        @note: C{iprange} parameter cannot be used together with C{users}.
+        :note: ``iprange`` parameter cannot be used together with ``users``.
 
-        @param starttime: start iterating at this Timestamp
-        @type starttime: pywikibot.Timestamp
-        @param endtime: stop iterating at this Timestamp
-        @type endtime: pywikibot.Timestamp
-        @param reverse: if True, iterate oldest blocks first (default: newest)
-        @type reverse: bool
-        @param blockids: only iterate blocks with these id numbers. Numbers
+        :param starttime: start iterating at this Timestamp
+        :type starttime: pywikibot.Timestamp
+        :param endtime: stop iterating at this Timestamp
+        :type endtime: pywikibot.Timestamp
+        :param reverse: if True, iterate oldest blocks first (default: newest)
+        :type reverse: bool
+        :param blockids: only iterate blocks with these id numbers. Numbers
             must be separated by '|' if given by a str.
-        @type blockids: str, tuple or list
-        @param users: only iterate blocks affecting these usernames or IPs
-        @type users: str, tuple or list
-        @param iprange: a single IP or an IP range. Ranges broader than
+        :type blockids: str, tuple or list
+        :param users: only iterate blocks affecting these usernames or IPs
+        :type users: str, tuple or list
+        :param iprange: a single IP or an IP range. Ranges broader than
             IPv4/16 or IPv6/19 are not accepted.
-        @param total: total amount of block entries
+        :param total: total amount of block entries
         """
         if starttime and endtime:
             self.assert_valid_iter_params('blocks', starttime, endtime,
@@ -1104,15 +1104,15 @@ class GeneratorsMixin:
                     total: Optional[int] = None, content=False):
         """Iterate Pages that contain links to the given URL.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
+        :see: https://www.mediawiki.org/wiki/API:Exturlusage
 
-        @param url: The URL to search for (with or without the protocol
+        :param url: The URL to search for (with or without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
             of the hostname
-        @param namespaces: list of namespace numbers to fetch contribs from
-        @type namespaces: list of int
-        @param total: Maximum number of pages to retrieve in total
-        @param protocol: Protocol to search for, likely http or https, http by
+        :param namespaces: list of namespace numbers to fetch contribs from
+        :type namespaces: list of int
+        :param total: Maximum number of pages to retrieve in total
+        :param protocol: Protocol to search for, likely http or https, http by
                 default. Full list shown on Special:LinkSearch wikipage
         """
         if url is not None:
@@ -1142,21 +1142,21 @@ class GeneratorsMixin:
                    total=None, content=False):
         """Iterate Pages that contain links to the given FilePage.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Imageusage}
+        :see: https://www.mediawiki.org/wiki/API:Imageusage
 
-        @param image: the image to search for (FilePage need not exist on
+        :param image: the image to search for (FilePage need not exist on
             the wiki)
-        @type image: pywikibot.FilePage
-        @param namespaces: If present, only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :type image: pywikibot.FilePage
+        :param namespaces: If present, only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param filterredir: if True, only yield redirects; if False (and not
+        :param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         iuargs = {'giutitle': image.title(with_section=False)}
@@ -1175,32 +1175,32 @@ class GeneratorsMixin:
                   total: Optional[int] = None):
         """Iterate all log entries.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Logevents}
+        :see: https://www.mediawiki.org/wiki/API:Logevents
 
-        @note: logevents with logtype='block' only logs user blocks whereas
+        :note: logevents with logtype='block' only logs user blocks whereas
             site.blocks iterates all blocks including IP ranges.
 
-        @param logtype: only iterate entries of this type
+        :param logtype: only iterate entries of this type
             (see mediawiki api documentation for available types)
-        @param user: only iterate entries that match this user name
-        @param page: only iterate entries affecting this page
-        @type page: pywikibot.Page or str
-        @param namespace: namespace(s) to retrieve logevents from
-        @type namespace: int or Namespace or an iterable of them
-        @note: due to an API limitation, if namespace param contains multiple
+        :param user: only iterate entries that match this user name
+        :param page: only iterate entries affecting this page
+        :type page: pywikibot.Page or str
+        :param namespace: namespace(s) to retrieve logevents from
+        :type namespace: int or Namespace or an iterable of them
+        :note: due to an API limitation, if namespace param contains multiple
             namespaces, log entries from all namespaces will be fetched from
             the API and will be filtered later during iteration.
-        @param start: only iterate entries from and after this Timestamp
-        @type start: Timestamp or ISO date string
-        @param end: only iterate entries up to and through this Timestamp
-        @type end: Timestamp or ISO date string
-        @param reverse: if True, iterate oldest entries first (default: newest)
-        @param tag: only iterate entries tagged with this tag
-        @param total: maximum number of events to iterate
-        @rtype: iterable
+        :param start: only iterate entries from and after this Timestamp
+        :type start: Timestamp or ISO date string
+        :param end: only iterate entries up to and through this Timestamp
+        :type end: Timestamp or ISO date string
+        :param reverse: if True, iterate oldest entries first (default: newest)
+        :param tag: only iterate entries tagged with this tag
+        :param total: maximum number of events to iterate
+        :rtype: iterable
 
-        @raises KeyError: the namespace identifier was not resolved
-        @raises TypeError: the namespace identifier has an inappropriate
+        :raises KeyError: the namespace identifier was not resolved
+        :raises TypeError: the namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one namespace
         """
         if start and end:
@@ -1251,37 +1251,37 @@ class GeneratorsMixin:
                       tag: Optional[str] = None):
         """Iterate recent changes.
 
-        @see: U{https://www.mediawiki.org/wiki/API:RecentChanges}
+        :see: https://www.mediawiki.org/wiki/API:RecentChanges
 
-        @param start: Timestamp to start listing from
-        @type start: pywikibot.Timestamp
-        @param end: Timestamp to end listing at
-        @type end: pywikibot.Timestamp
-        @param reverse: if True, start with oldest changes (default: newest)
-        @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param start: Timestamp to start listing from
+        :type start: pywikibot.Timestamp
+        :param end: Timestamp to end listing at
+        :type end: pywikibot.Timestamp
+        :param reverse: if True, start with oldest changes (default: newest)
+        :param namespaces: only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param changetype: only iterate changes of this type ("edit" for
+        :param changetype: only iterate changes of this type ("edit" for
             edits to existing pages, "new" for new pages, "log" for log
             entries)
-        @param minor: if True, only list minor edits; if False, only list
+        :param minor: if True, only list minor edits; if False, only list
             non-minor edits; if None, list all
-        @param bot: if True, only list bot edits; if False, only list
+        :param bot: if True, only list bot edits; if False, only list
             non-bot edits; if None, list all
-        @param anon: if True, only list anon edits; if False, only list
+        :param anon: if True, only list anon edits; if False, only list
             non-anon edits; if None, list all
-        @param redirect: if True, only list edits to redirect pages; if
+        :param redirect: if True, only list edits to redirect pages; if
             False, only list edits to non-redirect pages; if None, list all
-        @param patrolled: if True, only list patrolled edits; if False,
+        :param patrolled: if True, only list patrolled edits; if False,
             only list non-patrolled edits; if None, list all
-        @param top_only: if True, only list changes that are the latest
+        :param top_only: if True, only list changes that are the latest
             revision (default False)
-        @param user: if not None, only list edits by this user or users
-        @param excludeuser: if not None, exclude edits by this user or users
-        @param tag: a recent changes tag
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :param user: if not None, only list edits by this user or users
+        :param excludeuser: if not None, exclude edits by this user or users
+        :param tag: a recent changes tag
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if start and end:
@@ -1332,19 +1332,19 @@ class GeneratorsMixin:
         Note that this may include non-existing Pages if the wiki's database
         table contains outdated entries.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Search}
+        :see: https://www.mediawiki.org/wiki/API:Search
 
-        @param searchstring: the text to search for
-        @param where: Where to search; value must be "text", "title" or
+        :param searchstring: the text to search for
+        :param where: Where to search; value must be "text", "title" or
             "nearmatch" (many wikis do not support title or nearmatch search)
-        @param namespaces: search only in these namespaces (defaults to all)
-        @type namespaces: iterable of str or Namespace key,
+        :param namespaces: search only in these namespaces (defaults to all)
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param content: if True, load the current content of each iterated page
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         where_types = ['nearmatch', 'text', 'title', 'titles']
@@ -1384,27 +1384,27 @@ class GeneratorsMixin:
 
         Iterated values are in the same format as recentchanges.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Usercontribs}
+        :see: https://www.mediawiki.org/wiki/API:Usercontribs
 
-        @param user: Iterate contributions by this user (name or IP)
-        @param userprefix: Iterate contributions by all users whose names
+        :param user: Iterate contributions by this user (name or IP)
+        :param userprefix: Iterate contributions by all users whose names
             or IPs start with this substring
-        @param start: Iterate contributions starting at this Timestamp
-        @param end: Iterate contributions ending at this Timestamp
-        @param reverse: Iterate oldest contributions first (default: newest)
-        @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param start: Iterate contributions starting at this Timestamp
+        :param end: Iterate contributions ending at this Timestamp
+        :param reverse: Iterate oldest contributions first (default: newest)
+        :param namespaces: only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param minor: if True, iterate only minor edits; if False and
+        :param minor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
-        @param total: limit result to this number of pages
-        @param top_only: if True, iterate only edits which are the latest
+        :param total: limit result to this number of pages
+        :param top_only: if True, iterate only edits which are the latest
             revision (default: False)
-        @raises pywikibot.exceptions.Error: either user or userprefix must be
+        :raises pywikibot.exceptions.Error: either user or userprefix must be
             non-empty
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if not (user or userprefix):
@@ -1442,23 +1442,23 @@ class GeneratorsMixin:
 
         Iterated values will be in same format as recentchanges.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Watchlist}
+        :see: https://www.mediawiki.org/wiki/API:Watchlist
 
-        @param start: Iterate revisions starting at this Timestamp
-        @param end: Iterate revisions ending at this Timestamp
-        @param reverse: Iterate oldest revisions first (default: newest)
-        @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param start: Iterate revisions starting at this Timestamp
+        :param end: Iterate revisions ending at this Timestamp
+        :param reverse: Iterate oldest revisions first (default: newest)
+        :param namespaces: only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param minor: if True, only list minor edits; if False (and not
+        :param minor: if True, only list minor edits; if False (and not
             None), only list non-minor edits
-        @param bot: if True, only list bot edits; if False (and not
+        :param bot: if True, only list bot edits; if False (and not
             None), only list non-bot edits
-        @param anon: if True, only list anon edits; if False (and not
+        :param anon: if True, only list anon edits; if False (and not
             None), only list non-anon edits
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if start and end:
@@ -1484,9 +1484,9 @@ class GeneratorsMixin:
     def _check_view_deleted(self, msg_prefix: str, prop: List[str]) -> None:
         """Check if the user can view deleted comments and content.
 
-        @param msg_prefix: The calling method name
-        @param prop: Requested props to check
-        @raises UserRightsError: user cannot view a requested prop
+        :param msg_prefix: The calling method name
+        :param prop: Requested props to check
+        :raises UserRightsError: user cannot view a requested prop
         """
         err = '{}: User:{} not authorized to view '.format(msg_prefix,
                                                            self.user())
@@ -1513,25 +1513,25 @@ class GeneratorsMixin:
         when 'content' parameter is set. For older wikis a 'token' key is
         also given with the content request.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Deletedrevisions}
+        :see: https://www.mediawiki.org/wiki/API:Deletedrevisions
 
-        @param titles: The page titles to check for deleted revisions
-        @type titles: str (multiple titles delimited with '|')
+        :param titles: The page titles to check for deleted revisions
+        :type titles: str (multiple titles delimited with '|')
             or pywikibot.Page or typing.Iterable[pywikibot.Page]
             or typing.Iterable[str]
-        @keyword revids: Get revisions by their ID
+        :keyword revids: Get revisions by their ID
 
-        @note: either titles or revids must be set but not both
+        :note: either titles or revids must be set but not both
 
-        @param start: Iterate revisions starting at this Timestamp
-        @param end: Iterate revisions ending at this Timestamp
-        @param reverse: Iterate oldest revisions first (default: newest)
-        @param content: If True, retrieve the content of each revision
-        @param total: number of revisions to retrieve
-        @keyword user: List revisions by this user
-        @keyword excludeuser: Exclude revisions by this user
-        @keyword tag: Only list revision tagged with this tag
-        @keyword prop: Which properties to get. Defaults are ids, user,
+        :param start: Iterate revisions starting at this Timestamp
+        :param end: Iterate revisions ending at this Timestamp
+        :param reverse: Iterate oldest revisions first (default: newest)
+        :param content: If True, retrieve the content of each revision
+        :param total: number of revisions to retrieve
+        :keyword user: List revisions by this user
+        :keyword excludeuser: Exclude revisions by this user
+        :keyword tag: Only list revision tagged with this tag
+        :keyword prop: Which properties to get. Defaults are ids, user,
             comment, flags and timestamp
         """
         def handle_props(props):
@@ -1620,26 +1620,26 @@ class GeneratorsMixin:
         """
         Iterate all deleted revisions.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Alldeletedrevisions}
+        :see: https://www.mediawiki.org/wiki/API:Alldeletedrevisions
 
-        @param namespaces: Only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param namespaces: Only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param reverse: Iterate oldest revisions first (default: newest)
-        @param content: If True, retrieve the content of each revision
-        @param total: Number of revisions to retrieve
-        @keyword from: Start listing at this title
-        @keyword to: Stop listing at this title
-        @keyword prefix: Search for all page titles that begin with this value
-        @keyword excludeuser: Exclude revisions by this user
-        @keyword tag: Only list revisions tagged with this tag
-        @keyword user: List revisions by this user
-        @keyword start: Iterate revisions starting at this Timestamp
-        @keyword end: Iterate revisions ending at this Timestamp
-        @keyword prop: Which properties to get. Defaults are ids, timestamp,
+        :param reverse: Iterate oldest revisions first (default: newest)
+        :param content: If True, retrieve the content of each revision
+        :param total: Number of revisions to retrieve
+        :keyword from: Start listing at this title
+        :keyword to: Stop listing at this title
+        :keyword prefix: Search for all page titles that begin with this value
+        :keyword excludeuser: Exclude revisions by this user
+        :keyword tag: Only list revisions tagged with this tag
+        :keyword user: List revisions by this user
+        :keyword start: Iterate revisions starting at this Timestamp
+        :keyword end: Iterate revisions ending at this Timestamp
+        :keyword prop: Which properties to get. Defaults are ids, timestamp,
             flags, user, and comment (if you have the right to view).
-        @type prop: List[str]
+        :type prop: List[str]
         """
         if 'start' in kwargs and 'end' in kwargs:
             self.assert_valid_iter_params('alldeletedrevisions',
@@ -1667,10 +1667,10 @@ class GeneratorsMixin:
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Users}
+        :see: https://www.mediawiki.org/wiki/API:Users
 
-        @param usernames: a list of user names
-        @type usernames: list, or other iterable, of str
+        :param usernames: a list of user names
+        :type usernames: list, or other iterable, of str
         """
         usprop = ['blockinfo', 'gender', 'groups', 'editcount', 'registration',
                   'rights', 'emailable']
@@ -1684,26 +1684,26 @@ class GeneratorsMixin:
                     redirects=False, content=False):
         """Iterate a number of random pages.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Random}
+        :see: https://www.mediawiki.org/wiki/API:Random
 
         Pages are listed in a fixed sequence, only the starting point is
         random.
 
-        @param total: the maximum number of pages to iterate
-        @param namespaces: only iterate pages in these namespaces.
-        @type namespaces: iterable of str or Namespace key,
+        :param total: the maximum number of pages to iterate
+        :param namespaces: only iterate pages in these namespaces.
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param redirects: if True, include only redirect pages in results,
+        :param redirects: if True, include only redirect pages in results,
             False does not include redirects and None (MW 1.26+) include both
             types. (default: False)
-        @type redirects: bool or None
-        @param content: if True, load the current content of each iterated page
+        :type redirects: bool or None
+        :param content: if True, load the current content of each iterated page
             (default False)
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
-        @raises AssertError: unsupported redirects parameter
+        :raises AssertError: unsupported redirects parameter
         """
         mapping = {False: None, True: 'redirects', None: 'all'}
         assert redirects in mapping
@@ -1740,25 +1740,25 @@ class GeneratorsMixin:
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Patrol}
+        :see: https://www.mediawiki.org/wiki/API:Patrol
 
         Pages to be patrolled are identified by rcid, revid or revision.
         At least one of the parameters is mandatory.
         See https://www.mediawiki.org/wiki/API:Patrol.
 
-        @param rcid: an int/string/iterable/iterator providing rcid of pages
+        :param rcid: an int/string/iterable/iterator providing rcid of pages
             to be patrolled.
-        @type rcid: iterable/iterator which returns a number or string which
+        :type rcid: iterable/iterator which returns a number or string which
              contains only digits; it also supports a string (as above) or int
-        @param revid: an int/string/iterable/iterator providing revid of pages
+        :param revid: an int/string/iterable/iterator providing revid of pages
             to be patrolled.
-        @type revid: iterable/iterator which returns a number or string which
+        :type revid: iterable/iterator which returns a number or string which
              contains only digits; it also supports a string (as above) or int.
-        @param revision: an Revision/iterable/iterator providing Revision
+        :param revision: an Revision/iterable/iterator providing Revision
             object of pages to be patrolled.
-        @type revision: iterable/iterator which returns a Revision object; it
+        :type revision: iterable/iterator which returns a Revision object; it
             also supports a single Revision.
-        @rtype: iterator of dict with 'rcid', 'ns' and 'title'
+        :rtype: iterator of dict with 'rcid', 'ns' and 'title'
             of the patrolled page.
 
         """
@@ -1839,12 +1839,12 @@ class GeneratorsMixin:
         timestamp (str), length (int), an empty string, username or IP
         address (str), comment (str).
 
-        @param namespaces: only iterate pages in these namespaces
-        @type namespaces: iterable of str or Namespace key,
+        :param namespaces: only iterate pages in these namespaces
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         # TODO: update docstring
@@ -1893,13 +1893,13 @@ class GeneratorsMixin:
     def querypage(self, special_page, total=True):
         """Yield Page objects retrieved from Special:{special_page}.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Querypage}
+        :see: https://www.mediawiki.org/wiki/API:Querypage
 
         Generic function for all special pages supported by the site MW API.
 
-        @param special_page: Special page to query
-        @param total: number of pages to return
-        @raise AssertionError: special_page is not supported in SpecialPages.
+        :param special_page: Special page to query
+        :param total: number of pages to return
+        :raise AssertionError: special_page is not supported in SpecialPages.
         """
         param = self._paraminfo.parameter('query+querypage', 'page')
         assert special_page in param['type'], (
@@ -1915,7 +1915,7 @@ class GeneratorsMixin:
 
         Yields a tuple of Page object, length(int).
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         lpgen = self._generator(api.ListGenerator,
                                 type_arg='querypage', qppage='Longpages',
@@ -1930,7 +1930,7 @@ class GeneratorsMixin:
 
         Yields a tuple of Page object, length(int).
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         spgen = self._generator(api.ListGenerator,
                                 type_arg='querypage', qppage='Shortpages',
@@ -1943,7 +1943,7 @@ class GeneratorsMixin:
     def deadendpages(self, total=None):
         """Yield Page objects retrieved from Special:Deadendpages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Deadendpages', total)
 
@@ -1951,7 +1951,7 @@ class GeneratorsMixin:
     def ancientpages(self, total=None):
         """Yield Pages, datestamps from Special:Ancientpages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         apgen = self._generator(api.ListGenerator,
                                 type_arg='querypage', qppage='Ancientpages',
@@ -1964,7 +1964,7 @@ class GeneratorsMixin:
     def lonelypages(self, total=None):
         """Yield Pages retrieved from Special:Lonelypages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Lonelypages', total)
 
@@ -1972,7 +1972,7 @@ class GeneratorsMixin:
     def unwatchedpages(self, total=None):
         """Yield Pages from Special:Unwatchedpages (requires Admin privileges).
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Unwatchedpages', total)
 
@@ -1980,21 +1980,21 @@ class GeneratorsMixin:
     def wantedpages(self, total=None):
         """Yield Pages from Special:Wantedpages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Wantedpages', total)
 
     def wantedfiles(self, total=None):
         """Yield Pages from Special:Wantedfiles.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Wantedfiles', total)
 
     def wantedtemplates(self, total=None):
         """Yield Pages from Special:Wantedtemplates.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Wantedtemplates', total)
 
@@ -2002,7 +2002,7 @@ class GeneratorsMixin:
     def wantedcategories(self, total=None):
         """Yield Pages from Special:Wantedcategories.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Wantedcategories', total)
 
@@ -2010,7 +2010,7 @@ class GeneratorsMixin:
     def uncategorizedcategories(self, total=None):
         """Yield Categories from Special:Uncategorizedcategories.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Uncategorizedcategories', total)
 
@@ -2018,7 +2018,7 @@ class GeneratorsMixin:
     def uncategorizedimages(self, total=None):
         """Yield FilePages from Special:Uncategorizedimages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Uncategorizedimages', total)
 
@@ -2029,7 +2029,7 @@ class GeneratorsMixin:
     def uncategorizedpages(self, total=None):
         """Yield Pages from Special:Uncategorizedpages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Uncategorizedpages', total)
 
@@ -2037,7 +2037,7 @@ class GeneratorsMixin:
     def uncategorizedtemplates(self, total=None):
         """Yield Pages from Special:Uncategorizedtemplates.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Uncategorizedtemplates', total)
 
@@ -2045,7 +2045,7 @@ class GeneratorsMixin:
     def unusedcategories(self, total=None):
         """Yield Category objects from Special:Unusedcategories.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Unusedcategories', total)
 
@@ -2053,7 +2053,7 @@ class GeneratorsMixin:
     def unusedfiles(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Unusedimages', total)
 
@@ -2061,7 +2061,7 @@ class GeneratorsMixin:
     def withoutinterwiki(self, total=None):
         """Yield Pages without language links from Special:Withoutinterwiki.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Withoutinterwiki', total)
 
@@ -2069,7 +2069,7 @@ class GeneratorsMixin:
     def broken_redirects(self, total=None):
         """Yield Pages with broken redirects from Special:BrokenRedirects.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('BrokenRedirects', total)
 
@@ -2077,7 +2077,7 @@ class GeneratorsMixin:
     def double_redirects(self, total=None):
         """Yield Pages with double redirects from Special:DoubleRedirects.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('DoubleRedirects', total)
 
@@ -2085,7 +2085,7 @@ class GeneratorsMixin:
     def redirectpages(self, total=None):
         """Yield redirect pages from Special:ListRedirects.
 
-        @param total: number of pages to return
+        :param total: number of pages to return
         """
         return self.querypage('Listredirects', total)
 
@@ -2095,20 +2095,21 @@ class GeneratorsMixin:
         """
         Return protected pages depending on protection level and type.
 
-        For protection types which aren't 'create' it uses L{APISite.allpages},
-        while it uses for 'create' the 'query+protectedtitles' module.
+        For protection types which aren't 'create' it uses
+        :py:obj:`APISite.allpages`, while it uses for 'create' the
+        'query+protectedtitles' module.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Protectedtitles}
+        :see: https://www.mediawiki.org/wiki/API:Protectedtitles
 
-        @param namespace: The searched namespace.
-        @type namespace: int or Namespace or str
-        @param type: The protection type to search for (default 'edit').
-        @type type: str
-        @param level: The protection level (like 'autoconfirmed'). If False it
+        :param namespace: The searched namespace.
+        :type namespace: int or Namespace or str
+        :param type: The protection type to search for (default 'edit').
+        :type type: str
+        :param level: The protection level (like 'autoconfirmed'). If False it
             shows all protection levels.
-        @type level: str or False
-        @return: The pages which are protected.
-        @rtype: typing.Iterable[pywikibot.Page]
+        :type level: str or False
+        :return: The pages which are protected.
+        :rtype: typing.Iterable[pywikibot.Page]
         """
         namespaces = self.namespaces.resolve(namespace)
         # always assert that, so we are be sure that type could be 'create'
@@ -2125,12 +2126,12 @@ class GeneratorsMixin:
                             total: Optional[int] = None):
         """Yield Page objects from Special:PagesWithProp.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Pageswithprop}
+        :see: https://www.mediawiki.org/wiki/API:Pageswithprop
 
-        @param propname: must be a valid property.
-        @param total: number of pages to return
-        @return: return a generator of Page objects
-        @rtype: iterator
+        :param propname: must be a valid property.
+        :param total: number of pages to return
+        :return: return a generator of Page objects
+        :rtype: iterator
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(
@@ -2143,15 +2144,15 @@ class GeneratorsMixin:
         """
         Return watchlist.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Watchlistraw}
+        :see: https://www.mediawiki.org/wiki/API:Watchlistraw
 
-        @param force: Reload watchlist
-        @type force: bool
-        @param total: if not None, limit the generator to yielding this many
+        :param force: Reload watchlist
+        :type force: bool
+        :param total: if not None, limit the generator to yielding this many
             items in total
-        @type total: int
-        @return: list of pages in watchlist
-        @rtype: list of pywikibot.Page objects
+        :type total: int
+        :return: list of pages in watchlist
+        :rtype: list of pywikibot.Page objects
         """
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',

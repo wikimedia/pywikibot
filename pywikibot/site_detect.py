@@ -33,10 +33,10 @@ class MWSite:
         """
         Initializer.
 
-        @raises pywikibot.exceptions.ServerError: a server error occurred
+        :raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
-        @raises Timeout: a timeout occurred while loading the site
-        @raises RuntimeError: Version not found or version less than 1.23
+        :raises Timeout: a timeout occurred while loading the site
+        :raises RuntimeError: Version not found or version less than 1.23
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]

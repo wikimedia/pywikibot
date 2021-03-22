@@ -187,7 +187,7 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
     """
     Return a timedelta for a shorthand duration.
 
-    @param string: a string defining a time period:
+    :param string: a string defining a time period:
 
     Examples::
 
@@ -197,10 +197,10 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
         2w - 2 weeks (14 days)
         1y - 1 year
 
-    @param timestamp: a timestamp to calculate a more accurate duration offset
+    :param timestamp: a timestamp to calculate a more accurate duration offset
         used by years
-    @type timestamp: datetime.datetime
-    @return: the corresponding timedelta object
+    :type timestamp: datetime.datetime
+    :return: the corresponding timedelta object
     """
     key, duration = checkstr(string)
 
@@ -229,7 +229,7 @@ def checkstr(string: str) -> Tuple[str, str]:
     """
     Return the key and duration extracted from the string.
 
-    @param string: a string defining a time period
+    :param string: a string defining a time period
 
     Examples::
 
@@ -239,7 +239,7 @@ def checkstr(string: str) -> Tuple[str, str]:
         2w - 2 weeks (14 days)
         1y - 1 year
 
-    @return: key and duration extracted form the string
+    :return: key and duration extracted form the string
     """
     if len(string) < 2:
         raise MalformedConfigError('Time period should be a numeric value '
@@ -267,8 +267,8 @@ def str2size(string: str) -> Size:
       150K - 150 kilobytes
       2M - 2 megabytes
 
-    @Returns: a tuple ``(size, unit)``, where C{size} is an integer and
-        unit is C{'B'} (bytes) or C{'T'} (threads).
+    @Returns: a tuple ``(size, unit)``, where ``size`` is an integer and
+        unit is ``'B'`` (bytes) or ``'T'`` (threads).
     """
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
     if not match:
@@ -291,8 +291,8 @@ def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
     It supports the transcluding variant as well as localized namespaces and
     case-insensitivity depending on the namespace.
 
-    @param tpl_page: The template page
-    @type tpl_page: pywikibot.page.Page
+    :param tpl_page: The template page
+    :type tpl_page: pywikibot.page.Page
     """
     ns = tpl_page.site.namespaces[tpl_page.namespace()]
     marker = '?' if ns.id == 10 else ''
@@ -520,12 +520,12 @@ class PageArchiver:
     def __init__(self, page, template, salt: str, force: bool = False) -> None:
         """Initializer.
 
-        @param page: a page object to be archived
-        @type page: L{pywikibot.Page}
-        @param template: a template with configuration settings
-        @type template: L{pywikibot.Page}
-        @param salt: salt value
-        @param force: override security value
+        :param page: a page object to be archived
+        :type page: :py:obj:`pywikibot.Page`
+        :param template: a template with configuration settings
+        :type template: :py:obj:`pywikibot.Page`
+        :param salt: salt value
+        :param force: override security value
         """
         self.attributes = OrderedDict([
             ('archive', ['', False]),
@@ -619,7 +619,7 @@ class PageArchiver:
         """
         Check whether a thread has to be archived.
 
-        @return: the archivation reason as a tuple of localization args
+        :return: the archivation reason as a tuple of localization args
         """
         # Archived by timestamp
         algo = self.get_attr('algo')
@@ -825,8 +825,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     filename = None
     pagename = None

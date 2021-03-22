@@ -187,9 +187,9 @@ class CategoryPreprocess(BaseBot):
         """
         Return page to be categorized by type.
 
-        @param page: Existing, missing or redirect page to be processed.
-        @type page: pywikibot.Page
-        @return: Page to be categorized.
+        :param page: Existing, missing or redirect page to be processed.
+        :type page: pywikibot.Page
+        :return: Page to be categorized.
         """
         if page.exists():
             if page.isRedirectPage():
@@ -245,9 +245,9 @@ class CategoryPreprocess(BaseBot):
 
         TODO: decide if/how to enable/disable this feature.
 
-        @param page: Page to be processed.
-        @type page: pywikibot.Page
-        @return: Page to be categorized.
+        :param page: Page to be processed.
+        :type page: pywikibot.Page
+        :return: Page to be categorized.
         """
         if page.namespace() != page.site.namespaces.TEMPLATE:
             self.includeonly = []
@@ -543,34 +543,34 @@ class CategoryMoveRobot(CategoryPreprocess):
                  keep_sortkey=None) -> None:
         """Store all given parameters in the objects attributes.
 
-        @param oldcat: The move source.
-        @param newcat: The move target.
-        @param batch: If True the user has not to confirm the deletion.
-        @param comment: The edit summary for all pages where the category is
+        :param oldcat: The move source.
+        :param newcat: The move target.
+        :param batch: If True the user has not to confirm the deletion.
+        :param comment: The edit summary for all pages where the category is
             changed, and also for moves and deletions if not overridden.
-        @param inplace: If True the categories are not reordered.
-        @param move_oldcat: If True the category page (and talkpage) is
+        :param inplace: If True the categories are not reordered.
+        :param move_oldcat: If True the category page (and talkpage) is
             copied to the new category.
-        @param delete_oldcat: If True the oldcat page and talkpage are
+        :param delete_oldcat: If True the oldcat page and talkpage are
             deleted (or nominated for deletion) if it is empty.
-        @param title_regex: Only pages (and subcats) with a title that
+        :param title_regex: Only pages (and subcats) with a title that
             matches the regex are moved.
-        @param history: If True the history of the oldcat is posted on
+        :param history: If True the history of the oldcat is posted on
             the talkpage of newcat.
-        @param pagesonly: If True only move pages, not subcategories.
-        @param deletion_comment: Either string or special value:
+        :param pagesonly: If True only move pages, not subcategories.
+        :param deletion_comment: Either string or special value:
             DELETION_COMMENT_AUTOMATIC: use a generated message,
             DELETION_COMMENT_SAME_AS_EDIT_COMMENT: use the same message for
             delete that is used for the edit summary of the pages whose
             category was changed (see the comment param above). If the value
             is not recognized, it's interpreted as DELETION_COMMENT_AUTOMATIC.
-        @param move_comment: If set, uses this as the edit summary on the
+        :param move_comment: If set, uses this as the edit summary on the
             actual move of the category page. Otherwise, defaults to the value
             of the comment parameter.
-        @param wikibase: If True, update the Wikibase item of the
+        :param wikibase: If True, update the Wikibase item of the
             old category.
-        @param allow_split: If False only moves page and talk page together.
-        @param move_together: If True moves the pages/subcategories only if
+        :param allow_split: If False only moves page and talk page together.
+        :param move_together: If True moves the pages/subcategories only if
             page and talk page could be moved or both source page and target
             page don't exist.
         """
@@ -719,10 +719,10 @@ class CategoryMoveRobot(CategoryPreprocess):
         Do not use this function from outside the class. Automatically marks
         the pages if they can't be removed due to missing permissions.
 
-        @param moved_page: Category page to delete
-        @param moved_talk: Talk page to delete
-        @type moved_page: pywikibot.page.BasePage
-        @type moved_talk: pywikibot.page.BasePage
+        :param moved_page: Category page to delete
+        :param moved_talk: Talk page to delete
+        :type moved_page: pywikibot.page.BasePage
+        :type moved_talk: pywikibot.page.BasePage
 
         """
         if moved_page and self.oldcat.exists():
@@ -738,7 +738,7 @@ class CategoryMoveRobot(CategoryPreprocess):
 
         Do not use this function from outside the class.
 
-        @param gen: Generator containing pages or categories.
+        :param gen: Generator containing pages or categories.
         """
         for page in pagegenerators.PreloadingGenerator(gen):
             if not self.title_regex or re.search(self.title_regex,
@@ -763,13 +763,13 @@ class CategoryMoveRobot(CategoryPreprocess):
     def check_move(name, old_page, new_page) -> bool:
         """Return if the old page can be safely moved to the new page.
 
-        @param name: Title of the new page
-        @type name: str
-        @param old_page: Page to be moved
-        @type old_page: pywikibot.page.BasePage
-        @param new_page: Page to be moved to
-        @type new_page: pywikibot.page.BasePage
-        @return: True if possible to move page, False if not page move
+        :param name: Title of the new page
+        :type name: str
+        :param old_page: Page to be moved
+        :type old_page: pywikibot.page.BasePage
+        :param new_page: Page to be moved to
+        :type new_page: pywikibot.page.BasePage
+        :return: True if possible to move page, False if not page move
             not possible
         """
         move_possible = True
@@ -882,7 +882,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         Checks if the instance given is a Category object and returns it.
         Otherwise creates a new object using the value as the title (for
         backwards compatibility).
-        @param var: Either the title as a string or a Category object.
+        :param var: Either the title as a string or a Category object.
         """
         if not isinstance(var, pywikibot.Category):
             var = pywikibot.Category(self.site, var)
@@ -968,12 +968,12 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     helping you to find out what the page is about and in which other
     categories it currently is.
 
-    @param cat_title: a title of the category to process.
-    @param cat_db: a CategoryDatabase object.
-    @type cat_db: CategoryDatabase object
-    @param namespaces: namespaces to focus on.
-    @type namespaces: iterable of pywikibot.Namespace
-    @param comment: a custom summary for edits.
+    :param cat_title: a title of the category to process.
+    :param cat_db: a CategoryDatabase object.
+    :type cat_db: CategoryDatabase object
+    :param namespaces: namespaces to focus on.
+    :type namespaces: iterable of pywikibot.Namespace
+    :param comment: a custom summary for edits.
     """
 
     def __init__(self, cat_title: str, cat_db, namespaces=None,
@@ -1001,12 +1001,12 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         NOTE: current_cat is only used for internal recursion. You
         should always use current_cat = original_cat.
 
-        @param member: a page to process.
-        @type member: pywikibot.Page
-        @param original_cat: original category to replace.
-        @type original_cat: pywikibot.Category
-        @param current_cat: a category which is questioned.
-        @type current_cat: pywikibot.Category
+        :param member: a page to process.
+        :type member: pywikibot.Page
+        :param original_cat: original category to replace.
+        :type original_cat: pywikibot.Category
+        :param current_cat: a category which is questioned.
+        :type current_cat: pywikibot.Category
         """
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
@@ -1041,9 +1041,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 category titles and output category titles as enumerated
                 options.
 
-                @param cat_list: sorted iterable of category titles to output.
-                @type cat_list: iterable of str
-                @param prefix: a prefix to assigned number index.
+                :param cat_list: sorted iterable of category titles to output.
+                :type cat_list: iterable of str
+                :param prefix: a prefix to assigned number index.
                 """
                 # can we can output in two columns?
                 count = len(cat_list)
@@ -1310,7 +1310,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments.
+    :param args: command line arguments.
     """
     from_given = False
     to_given = False

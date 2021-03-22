@@ -114,8 +114,8 @@ class PageWithRefs(Page):
         If namespaces is None, all namespaces are checked.
         Returns a set with namespaces where a ref to page is present.
 
-        @param namespaces: Namespace to check
-        @type namespaces: iterable of Namespace objects
+        :param namespaces: Namespace to check
+        :type namespaces: iterable of Namespace objects
         """
         if namespaces is None:
             namespaces = self.site.namespaces()
@@ -131,9 +131,9 @@ class DeletionRobot(CurrentPageBot):
         """
         Initializer.
 
-        @param generator: the pages to work on
-        @type generator: iterable
-        @param summary: the reason for the (un)deletion
+        :param generator: the pages to work on
+        :type generator: iterable
+        :param summary: the reason for the (un)deletion
         """
         self.available_options.update({
             'undelete': False,
@@ -224,7 +224,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     page_name = ''
     summary = None

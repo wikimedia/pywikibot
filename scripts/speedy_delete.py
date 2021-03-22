@@ -316,8 +316,8 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def __init__(self, **kwargs):
         """Initializer.
 
-        @keyword site: the site to work on
-        @type site: pywikibot.APISite
+        :keyword site: the site to work on
+        :type site: pywikibot.APISite
         """
         super().__init__(**kwargs)
         csd_cat = i18n.translate(self.site, self.csd_cat_title)

@@ -173,7 +173,7 @@ class ProofreadPage(pywikibot.Page):
     def __init__(self, source, title=''):
         """Instantiate a ProofreadPage object.
 
-        @raise UnknownExtensionError: source Site has no ProofreadPage
+        :raise UnknownExtensionError: source Site has no ProofreadPage
             Extension.
         """
         if not isinstance(source, pywikibot.site.BaseSite):
@@ -218,7 +218,7 @@ class ProofreadPage(pywikibot.Page):
         - extension = 'jpg'
         - number = None
 
-        @return: (base, ext, num).
+        :return: (base, ext, num).
         """
         left, sep, right = self.title(with_ns=False).rpartition('/')
         if sep:
@@ -244,8 +244,8 @@ class ProofreadPage(pywikibot.Page):
 
         To force reload, delete index and call it again.
 
-        @return: the Index page for this ProofreadPage
-        @rtype: IndexPage or None
+        :return: the Index page for this ProofreadPage
+        :rtype: IndexPage or None
         """
         if not hasattr(self, '_index'):
             index_ns = self.site.proofread_index_ns
@@ -443,9 +443,9 @@ class ProofreadPage(pywikibot.Page):
         Mainly for use within the class, called by other methods.
         Use self.header, self.body and self.footer to set page content,
 
-        @param value: New value or None
+        :param value: New value or None
 
-        @raise Error: the page is not formatted according to ProofreadPage
+        :raise Error: the page is not formatted according to ProofreadPage
             extension.
         """
         self._text = value
@@ -462,7 +462,7 @@ class ProofreadPage(pywikibot.Page):
     def _decompose_page(self):
         """Split Proofread Page text in header, body and footer.
 
-        @raise Error: the page is not formatted according to ProofreadPage
+        :raise Error: the page is not formatted according to ProofreadPage
             extension.
         """
         def _assert_len(len_oq, len_cq, title):
@@ -540,11 +540,11 @@ class ProofreadPage(pywikibot.Page):
     def url_image(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        @return: file url of the scan ProofreadPage or None.
+        :return: file url of the scan ProofreadPage or None.
 
-        @raises Exception: in case of http errors
-        @raise ImportError: if bs4 is not installed, _bs4_soup() will raise
-        @raises ValueError: in case of no prp_page_image src found for scan
+        :raises Exception: in case of http errors
+        :raise ImportError: if bs4 is not installed, _bs4_soup() will raise
+        :raises ValueError: in case of no prp_page_image src found for scan
         """
         # wrong link fails with various possible Exceptions.
         if not hasattr(self, '_url_image'):
@@ -580,7 +580,7 @@ class ProofreadPage(pywikibot.Page):
     def _ocr_callback(self, cmd_uri, parser_func=None, ocr_tool=None):
         """OCR callback function.
 
-        @return: tuple (error, text [error description in case of error]).
+        :return: tuple (error, text [error description in case of error]).
         """
         def identity(x):
             return x
@@ -647,7 +647,7 @@ class ProofreadPage(pywikibot.Page):
         This is the main method for 'phetools'.
         Fallback method is ocr.
 
-        @raise ImportError: if bs4 is not installed, _bs4_soup() will raise
+        :raise ImportError: if bs4 is not installed, _bs4_soup() will raise
         """
         def parse_hocr_text(txt):
             """Parse hocr text."""
@@ -706,12 +706,12 @@ class ProofreadPage(pywikibot.Page):
 
         It is the user's responsibility to reset quality level accordingly.
 
-        @param ocr_tool: 'phetools' or 'googleOCR', default is 'phetools'
+        :param ocr_tool: 'phetools' or 'googleOCR', default is 'phetools'
 
-        @return: OCR text for the page.
+        :return: OCR text for the page.
 
-        @raise TypeError: wrong ocr_tool keyword arg.
-        @raise ValueError: something went wrong with OCR process.
+        :raise TypeError: wrong ocr_tool keyword arg.
+        :raise ValueError: something went wrong with OCR process.
         """
         if ocr_tool is None:  # default value
             ocr_tool = self._PHETOOLS
@@ -781,9 +781,9 @@ class IndexPage(pywikibot.Page):
         possibility to define range, filter by quality levels and page
         existence.
 
-        @raise UnknownExtensionError: source Site has no ProofreadPage
+        :raise UnknownExtensionError: source Site has no ProofreadPage
             Extension.
-        @raise ImportError: bs4 is not installed.
+        :raise ImportError: bs4 is not installed.
         """
         # Check if BeautifulSoup is imported.
         if isinstance(BeautifulSoup, ImportError):
@@ -960,7 +960,7 @@ class IndexPage(pywikibot.Page):
     def num_pages(self) -> int:
         """Return total number of pages in Index.
 
-        @return: total number of pages in Index
+        :return: total number of pages in Index
         """
         return len(self._page_from_numbers)
 
@@ -971,14 +971,14 @@ class IndexPage(pywikibot.Page):
 
         Range is [start ... end], extremes included.
 
-        @param start: first page, defaults to 1
-        @param end: num_pages if end is None
-        @param filter_ql: filters quality levels
+        :param start: first page, defaults to 1
+        :param end: num_pages if end is None
+        :param filter_ql: filters quality levels
                           if None: all but 'Without Text'.
-        @type filter_ql: list of ints (corresponding to ql constants
+        :type filter_ql: list of ints (corresponding to ql constants
                          defined in ProofreadPage).
-        @param only_existing: yields only existing pages.
-        @param content: preload content.
+        :param only_existing: yields only existing pages.
+        :param content: preload content.
         """
         if end is None:
             end = self.num_pages
@@ -1014,8 +1014,8 @@ class IndexPage(pywikibot.Page):
 
         There is a 1-to-1 correspondence (each page has a label).
 
-        @param page: Page instance
-        @return: page label
+        :param page: Page instance
+        :return: page label
         """
         try:
             return self._labels_from_page[page]
@@ -1028,7 +1028,7 @@ class IndexPage(pywikibot.Page):
 
         There is a 1-to-1 correspondence (each page has a label).
 
-        @return: page label
+        :return: page label
         """
         try:
             return self._labels_from_page_number[page_number]
@@ -1055,7 +1055,7 @@ class IndexPage(pywikibot.Page):
         There is a 1-to-many correspondence (a label can be the same for
         several pages).
 
-        @return: set containing page numbers corresponding to page label.
+        :return: set containing page numbers corresponding to page label.
         """
         return self._get_from_label(self._page_numbers_from_label, label)
 
@@ -1066,7 +1066,7 @@ class IndexPage(pywikibot.Page):
         There is a 1-to-many correspondence (a label can be the same for
         several pages).
 
-        @return: set containing pages corresponding to page label.
+        :return: set containing pages corresponding to page label.
         """
         return self._get_from_label(self._pages_from_label, label)
 
@@ -1082,7 +1082,7 @@ class IndexPage(pywikibot.Page):
     def pages(self) -> list:
         """Return the list of pages in Index, sorted by page number.
 
-        @return: list of pages
+        :return: list of pages
         """
         return [self._page_from_numbers[i]
                 for i in range(1, self.num_pages + 1)]

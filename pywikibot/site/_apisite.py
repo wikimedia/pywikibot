@@ -105,7 +105,7 @@ class APISite(
 
     """API interface to MediaWiki site.
 
-    Do not instantiate directly; use L{pywikibot.Site} function.
+    Do not instantiate directly; use :py:obj:`pywikibot.Site` function.
     """
 
     @remove_last_args(['sysop'])
@@ -136,9 +136,9 @@ class APISite(
         """
         Return the site for a corresponding interwiki prefix.
 
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
+        :raises pywikibot.exceptions.SiteDefinitionError: if the url given in
             the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
+        :raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].site
 
@@ -147,14 +147,15 @@ class APISite(
         Return the interwiki prefixes going to that site.
 
         The interwiki prefixes are ordered first by length (shortest first)
-        and then alphabetically. L{interwiki(prefix)} is not guaranteed to
-        equal C{site} (i.e. the parameter passed to this function).
+        and then alphabetically. :py:obj:`interwiki(prefix)` is not
+        guaranteed to equal ``site`` (i.e. the parameter passed to this
+        function).
 
-        @param site: The targeted site, which might be it's own.
-        @type site: L{BaseSite}
-        @return: The interwiki prefixes
-        @rtype: list (guaranteed to be not empty)
-        @raises KeyError: if there is no interwiki prefix for that site.
+        :param site: The targeted site, which might be it's own.
+        :type site: :py:obj:`BaseSite`
+        :return: The interwiki prefixes
+        :rtype: list (guaranteed to be not empty)
+        :raises KeyError: if there is no interwiki prefix for that site.
         """
         assert site is not None, 'Site must not be None'
         prefixes = set()
@@ -173,9 +174,9 @@ class APISite(
         link. So if that link also contains an interwiki link it does follow
         it as long as it's a local link.
 
-        @raises pywikibot.exceptions.SiteDefinitionError: if the url given in
+        :raises pywikibot.exceptions.SiteDefinitionError: if the url given in
             the interwiki table doesn't match any of the existing families.
-        @raises KeyError: if the prefix is not an interwiki prefix.
+        :raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].local
 
@@ -184,12 +185,12 @@ class APISite(
         """
         Create a site from a database name using the sitematrix.
 
-        @param dbname: database name
-        @type dbname: str
-        @param site: Site to load sitematrix from. (Default meta.wikimedia.org)
-        @type site: pywikibot.site.APISite
-        @return: site object for the database name
-        @rtype: pywikibot.site.APISite
+        :param dbname: database name
+        :type dbname: str
+        :param site: Site to load sitematrix from. (Default meta.wikimedia.org)
+        :type site: pywikibot.site.APISite
+        :return: site object for the database name
+        :rtype: pywikibot.site.APISite
         """
         # TODO this only works for some WMF sites
         if not site:
@@ -222,21 +223,21 @@ class APISite(
         except for 'g_content' which is passed as a normal parameter to
         the generator's Initializer.
 
-        @param gen_class: the type of generator to construct (must be
+        :param gen_class: the type of generator to construct (must be
             a subclass of pywikibot.data.api._RequestWrapper)
-        @param type_arg: query type argument to be passed to generator's
+        :param type_arg: query type argument to be passed to generator's
             constructor unchanged (not all types require this)
-        @param namespaces: if not None, limit the query to namespaces in
+        :param namespaces: if not None, limit the query to namespaces in
             this list
-        @type namespaces: iterable of str or Namespace key,
+        :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param total: if not None, limit the generator to yielding this
+        :param total: if not None, limit the generator to yielding this
             many items in total
-        @return: iterable with parameters set
-        @rtype: _RequestWrapper
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :return: iterable with parameters set
+        :rtype: _RequestWrapper
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         req_args = {'site': self}
@@ -289,7 +290,7 @@ class APISite(
         The expected usernames are those provided as the user parameter
         at instantiation.
 
-        @rtype: bool
+        :rtype: bool
         """
         if not hasattr(self, '_userinfo'):
             return False
@@ -308,7 +309,7 @@ class APISite(
         """
         Check whether OAuth token is set for this site.
 
-        @rtype: bool
+        :rtype: bool
         """
         auth_token = get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
@@ -317,14 +318,14 @@ class APISite(
         """
         Log the user in if not already logged in.
 
-        @param autocreate: if true, allow auto-creation of the account
+        :param autocreate: if true, allow auto-creation of the account
             using unified login
-        @param user: bot user name. Overrides the username set by
+        :param user: bot user name. Overrides the username set by
             BaseSite initializer parameter or user-config.py setting
 
-        @raises pywikibot.exceptions.NoUsernameError: Username is not
+        :raises pywikibot.exceptions.NoUsernameError: Username is not
             recognised by the site.
-        @see: U{https://www.mediawiki.org/wiki/API:Login}
+        :see: https://www.mediawiki.org/wiki/API:Login
         """
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the
@@ -413,9 +414,9 @@ class APISite(
         Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
-        U{https://www.mediawiki.org/wiki/API:Logout}
+        https://www.mediawiki.org/wiki/API:Logout
 
-        @raises APIError: Logout is not available when OAuth enabled.
+        :raises APIError: Logout is not available when OAuth enabled.
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
@@ -452,7 +453,7 @@ class APISite(
           - message: present if user has a new message on talk page
           - blockinfo: present if user is blocked (dict)
 
-        U{https://www.mediawiki.org/wiki/API:Userinfo}
+        https://www.mediawiki.org/wiki/API:Userinfo
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self._simple_request(
@@ -514,9 +515,9 @@ class APISite(
 
         To check whether a user can perform an action,
         the method has_right should be used.
-        U{https://www.mediawiki.org/wiki/API:Userinfo}
+        https://www.mediawiki.org/wiki/API:Userinfo
 
-        @rtype: bool
+        :rtype: bool
         """
         return 'blockinfo' in self.userinfo
 
@@ -528,9 +529,9 @@ class APISite(
         Otherwise it returns the user preferences. It caches the last result
         and returns it, if the username or login status hasn't changed.
 
-        @param force: Whether the cache should be discarded.
-        @return: The namespaces which are searched by default.
-        @rtype: C{set} of L{Namespace}
+        :param force: Whether the cache should be discarded.
+        :return: The namespaces which are searched by default.
+        :rtype: ``set`` of :py:obj:`Namespace`
         """
         # TODO: Integrate into _userinfo
         if (force or not hasattr(self, '_useroptions')
@@ -567,16 +568,16 @@ class APISite(
                                  is_ts=True):
         """Validate iterating API parameters.
 
-        @param msg_prefix: The calling method name
-        @type msg_prefix: str
-        @param start: The start value to compare
-        @param end: The end value to compare
-        @param reverse: The reverse option
-        @type reverse: bool
-        @param is_ts: When comparing timestamps (with is_ts=True) the start
+        :param msg_prefix: The calling method name
+        :type msg_prefix: str
+        :param start: The start value to compare
+        :param end: The end value to compare
+        :param reverse: The reverse option
+        :type reverse: bool
+        :param is_ts: When comparing timestamps (with is_ts=True) the start
             is usually greater than end. Comparing titles this is vice versa.
-        @type is_ts: bool
-        @raises AssertionError: start/end values are in wrong order
+        :type is_ts: bool
+        :raises AssertionError: start/end values are in wrong order
         """
         if reverse ^ is_ts:
             low, high = end, start
@@ -596,10 +597,10 @@ class APISite(
         """Return true if and only if the user has a specific right.
 
         Possible values of 'right' may vary depending on wiki settings.
-        U{https://www.mediawiki.org/wiki/API:Userinfo}
+        https://www.mediawiki.org/wiki/API:Userinfo
 
-        @param right: a specific right to be validated
-        @type right: str
+        :param right: a specific right to be validated
+        :type right: str
         """
         return right.lower() in self.userinfo['rights']
 
@@ -609,7 +610,7 @@ class APISite(
 
         Possible values of 'group' may vary depending on wiki settings,
         but will usually include bot.
-        U{https://www.mediawiki.org/wiki/API:Userinfo}
+        https://www.mediawiki.org/wiki/API:Userinfo
         """
         return group.lower() in self.userinfo['groups']
 
@@ -623,12 +624,12 @@ class APISite(
 
         The returned dict uses each key to store the associated message.
 
-        @see: https://www.mediawiki.org/wiki/API:Allmessages
+        :see: https://www.mediawiki.org/wiki/API:Allmessages
 
-        @param keys: MediaWiki messages to fetch
-        @type keys: iterable of str
-        @param lang: a language code, default is self.lang
-        @rtype: OrderedDict
+        :param keys: MediaWiki messages to fetch
+        :type keys: iterable of str
+        :param lang: a language code, default is self.lang
+        :rtype: OrderedDict
         """
         amlang = lang or self.lang
         if not all(amlang in _mw_msg_cache
@@ -660,34 +661,34 @@ class APISite(
     def mediawiki_message(self, key, lang=None) -> str:
         """Fetch the text for a MediaWiki message.
 
-        @param key: name of MediaWiki message
-        @type key: str
-        @param lang: a language code, default is self.lang
-        @type lang: str or None
+        :param key: name of MediaWiki message
+        :type key: str
+        :param lang: a language code, default is self.lang
+        :type lang: str or None
         """
         return self.mediawiki_messages([key], lang=lang)[key]
 
     def has_mediawiki_message(self, key, lang=None):
         """Determine if the site defines a MediaWiki message.
 
-        @param key: name of MediaWiki message
-        @type key: str
-        @param lang: a language code, default is self.lang
-        @type lang: str or None
+        :param key: name of MediaWiki message
+        :type key: str
+        :param lang: a language code, default is self.lang
+        :type lang: str or None
 
-        @rtype: bool
+        :rtype: bool
         """
         return self.has_all_mediawiki_messages([key], lang=lang)
 
     def has_all_mediawiki_messages(self, keys, lang=None):
         """Confirm that the site defines a set of MediaWiki messages.
 
-        @param keys: names of MediaWiki messages
-        @type keys: iterable of str
-        @param lang: a language code, default is self.lang
-        @type lang: str or None
+        :param keys: names of MediaWiki messages
+        :type keys: iterable of str
+        :param lang: a language code, default is self.lang
+        :type lang: str or None
 
-        @rtype: bool
+        :rtype: bool
         """
         try:
             self.mediawiki_messages(keys, lang=lang)
@@ -702,8 +703,8 @@ class APISite(
         The list is zero-indexed, ordered by month in calendar, and should
         be in the original site language.
 
-        @return: list of tuples (month name, abbreviation)
-        @rtype: list
+        :return: list of tuples (month name, abbreviation)
+        :rtype: list
         """
         if hasattr(self, '_months_names'):
             return self._months_names
@@ -731,7 +732,7 @@ class APISite(
         If more than two arguments are given, other arguments are
         joined using MediaWiki message 'comma-separator'.
 
-        @param args: text to be expanded
+        :param args: text to be expanded
         """
         needed_mw_messages = ('and', 'comma-separator', 'word-separator')
         if not args:
@@ -757,12 +758,12 @@ class APISite(
         <nowiki></nowiki> tags unchanges etc. Can be used to parse
         magic parser words like {{CURRENTTIMESTAMP}}.
 
-        @param text: text to be expanded
-        @type text: str
-        @param title: page title without section
-        @type title: str
-        @param includecomments: if True do not strip comments
-        @type includecomments: bool
+        :param text: text to be expanded
+        :type text: str
+        :param title: page title without section
+        :type title: str
+        :param includecomments: if True do not strip comments
+        :type includecomments: bool
         """
         if not isinstance(text, str):
             raise ValueError('text must be a string')
@@ -784,11 +785,11 @@ class APISite(
         """
         Return the server time as a MediaWiki timestamp string.
 
-        It calls L{server_time} first so it queries the server to get the
-        current server time.
+        It calls :py:obj:`server_time` first so it queries the server to
+        get the current server time.
 
-        @return: the server time
-        @rtype: str (as 'yyyymmddhhmmss')
+        :return: the server time
+        :rtype: str (as 'yyyymmddhhmmss')
         """
         return self.server_time().totimestampformat()
 
@@ -799,8 +800,8 @@ class APISite(
         It uses the 'time' property of the siteinfo 'general'. It'll force a
         reload before returning the time.
 
-        @return: the current server time
-        @rtype: L{Timestamp}
+        :return: the current server time
+        :rtype: :py:obj:`Timestamp`
         """
         return pywikibot.Timestamp.fromISOformat(
             self.siteinfo.get('time', expiry=True))
@@ -893,10 +894,10 @@ class APISite(
     def has_extension(self, name):
         """Determine whether extension `name` is loaded.
 
-        @param name: The extension to check for, case sensitive
-        @type name: str
-        @return: If the extension is loaded
-        @rtype: bool
+        :param name: The extension to check for, case sensitive
+        :type name: str
+        :return: If the extension is loaded
+        :rtype: bool
         """
         extensions = self.siteinfo['extensions']
         for ext in extensions:
@@ -921,7 +922,7 @@ class APISite(
     def version(self) -> str:
         """Return live project version number as a string.
 
-        Use L{pywikibot.site.mw_version} to compare MediaWiki versions.
+        Use :py:obj:`pywikibot.site.mw_version` to compare MediaWiki versions.
         """
         try:
             version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
@@ -944,7 +945,7 @@ class APISite(
         """Return self.version() as a MediaWikiVersion object.
 
         Cache the result for 24 hours.
-        @rtype: MediaWikiVersion
+        :rtype: MediaWikiVersion
         """
         mw_ver, cache_time = getattr(self, '_mw_version_time', (None, None))
         if mw_ver is None or time.time() - cache_time > 60 * 60 * 24:
@@ -975,8 +976,8 @@ class APISite(
         """
         Return the data repository connected to this site.
 
-        @return: The data repository if one is connected or None otherwise.
-        @rtype: pywikibot.site.DataSite or None
+        :return: The data repository if one is connected or None otherwise.
+        :rtype: pywikibot.site.DataSite or None
         """
         def handle_warning(mod, warning):
             return (mod == 'query' and re.match(
@@ -1013,15 +1014,15 @@ class APISite(
         """
         Return a Page for this site object specified by Wikibase item.
 
-        @param item: id number of item, "Q###",
-        @type item: str
-        @return: Page, or Category object given by Wikibase item number
+        :param item: id number of item, "Q###",
+        :type item: str
+        :return: Page, or Category object given by Wikibase item number
             for this site object.
-        @rtype: pywikibot.Page or None
+        :rtype: pywikibot.Page or None
 
-        @raises pywikibot.exceptions.UnknownExtensionError: site has no
+        :raises pywikibot.exceptions.UnknownExtensionError: site has no
             Wikibase extension
-        @raises NotimplementedError: method not implemented for a Wikibase site
+        :raises NotimplementedError: method not implemented for a Wikibase site
         """
         if not self.has_data_repository:
             raise UnknownExtensionError(
@@ -1052,12 +1053,12 @@ class APISite(
         If optional argument 'all' is true, return all recognized
         values for this namespace.
 
-        @param num: Namespace constant.
-        @type num: int
-        @param all: If True return a Namespace object. Otherwise
+        :param num: Namespace constant.
+        :type num: int
+        :param all: If True return a Namespace object. Otherwise
             return the namespace name.
-        @return: local name or Namespace object
-        @rtype: str or Namespace
+        :return: local name or Namespace object
+        :rtype: str or Namespace
         """
         if all:
             return self.namespaces[num]
@@ -1066,14 +1067,14 @@ class APISite(
     def _update_page(self, page, query, verify_imageinfo: bool = False):
         """Update page attributes.
 
-        @param page: page object to be updated
-        @param query: a api.QueryGenerator
-        @param verify_imageinfo: if given, every pageitem is checked
+        :param page: page object to be updated
+        :param query: a api.QueryGenerator
+        :param verify_imageinfo: if given, every pageitem is checked
             whether 'imageinfo' is missing. In that case an exception
             is raised.
 
-        @raises NoPageError: 'missing' key is found in pageitem
-        @raises PageRelatedError: 'imageinfo' is missing in pageitem
+        :raises NoPageError: 'missing' key is found in pageitem
+        :raises PageRelatedError: 'imageinfo' is missing in pageitem
         """
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
@@ -1090,7 +1091,7 @@ class APISite(
     def loadpageinfo(self, page, preload=False):
         """Load page info from api and store in page attributes.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Info}
+        :see: https://www.mediawiki.org/wiki/API:Info
         """
         title = page.title(with_section=False)
         inprop = 'protection'
@@ -1117,14 +1118,14 @@ class APISite(
         """Load image info from api and save in page attributes.
 
         Parameters correspond to iiprops in:
-        [1] U{https://www.mediawiki.org/wiki/API:Imageinfo}
+        [1] https://www.mediawiki.org/wiki/API:Imageinfo
 
         Parameters validation and error handling left to the API call.
 
-        @param history: if true, return the image's version history
-        @param url_width: see iiurlwidth in [1]
-        @param url_height: see iiurlheigth in [1]
-        @param url_param: see iiurlparam in [1]
+        :param history: if true, return the image's version history
+        :param url_width: see iiurlwidth in [1]
+        :param url_height: see iiurlheigth in [1]
+        :param url_param: see iiurlparam in [1]
 
         """
         title = page.title(with_section=False)
@@ -1160,13 +1161,13 @@ class APISite(
         Return True if the bot has the permission of needed restriction level
         for the given action type.
 
-        @param page: a pywikibot.Page object
-        @type page: pywikibot.Page
-        @param action: a valid restriction type like 'edit', 'move'
-        @type action: str
-        @rtype: bool
+        :param page: a pywikibot.Page object
+        :type page: pywikibot.Page
+        :param action: a valid restriction type like 'edit', 'move'
+        :type action: str
+        :rtype: bool
 
-        @raises ValueError: invalid action parameter
+        :raises ValueError: invalid action parameter
         """
         if action not in self.siteinfo.get('restrictions')['types']:
             raise ValueError('{}.page_can_be_edited(): Invalid value "{}" for '
@@ -1195,17 +1196,17 @@ class APISite(
         """
         Return page object for the redirect target of page.
 
-        @param page: page to search redirects for
-        @type page: pywikibot.page.BasePage
-        @return: redirect target of page
-        @rtype: pywikibot.Page
+        :param page: page to search redirects for
+        :type page: pywikibot.page.BasePage
+        :return: redirect target of page
+        :rtype: pywikibot.Page
 
-        @raises pywikibot.exceptions.IsNotRedirectPageError: page is not a
+        :raises pywikibot.exceptions.IsNotRedirectPageError: page is not a
             redirect
-        @raises RuntimeError: no redirects found
-        @raises pywikibot.exceptions.CircularRedirectError: page is a circular
+        :raises RuntimeError: no redirects found
+        :raises pywikibot.exceptions.CircularRedirectError: page is a circular
             redirect
-        @raises pywikibot.exceptions.InterwikiRedirectPageError: the redirect
+        :raises pywikibot.exceptions.InterwikiRedirectPageError: the redirect
             target is on another site
         """
         if not self.page_isredirect(page):
@@ -1331,12 +1332,12 @@ class APISite(
          - userrights
          - watch
 
-        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
+        :see: https://www.mediawiki.org/wiki/API:Tokens
 
-        @param types: the types of token (e.g., "edit", "move", "delete");
+        :param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
-        @type types: iterable
-        @param all: load all available tokens, if None only if it can be done
+        :type types: iterable
+        :param all: load all available tokens, if None only if it can be done
             in one request.
 
         return: a dict with retrieved valid tokens.
@@ -1380,7 +1381,7 @@ class APISite(
     def get_parsed_page(self, page):
         """Retrieve parsed text of the page using action=parse.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Parse}
+        :see: https://www.mediawiki.org/wiki/API:Parse
         """
         req = self._simple_request(action='parse', page=page)
         data = req.submit()
@@ -1392,7 +1393,7 @@ class APISite(
     def getcategoryinfo(self, category):
         """Retrieve data on contents of category.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Categoryinfo}
+        :see: https://www.mediawiki.org/wiki/API:Categoryinfo
         """
         cititle = category.title(with_section=False)
         ciquery = self._generator(api.PropertyGenerator,
@@ -1425,25 +1426,25 @@ class APISite(
                    hide=None, show=None, reason='', target=None):
         """Delete or undelete specified page revisions, file versions or logs.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Revisiondelete}
+        :see: https://www.mediawiki.org/wiki/API:Revisiondelete
 
         If more than one target id is provided, the same action is taken for
         all of them.
 
         *New in version 6.0.*
 
-        @param targettype: Type of target. One of "archive", "filearchive",
+        :param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
-        @param ids: Identifiers for the revision, log, file version or archive.
-        @type ids: int, str, or list of int or str
-        @param hide: What to delete. Can be "comment", "content", "user" or a
+        :param ids: Identifiers for the revision, log, file version or archive.
+        :type ids: int, str, or list of int or str
+        :param hide: What to delete. Can be "comment", "content", "user" or a
             combination of them in pipe-separate form such as "comment|user".
-        @type hide: str or list of str
-        @param show: What to undelete. Can be "comment", "content", "user" or
+        :type hide: str or list of str
+        :param show: What to undelete. Can be "comment", "content", "user" or
             a combination of them in pipe-separate form such as "comment|user".
-        @type show: str or list of str
-        @param reason: Deletion reason.
-        @param target: Page object or page title, if required for the type.
+        :type show: str or list of str
+        :param reason: Deletion reason.
+        :param target: Page object or page title, if required for the type.
         """
         if isinstance(target, pywikibot.Page):
             page = target
@@ -1530,43 +1531,43 @@ class APISite(
                  watch=None, **kwargs) -> bool:
         """Submit an edit to be saved to the wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Edit}
+        :see: https://www.mediawiki.org/wiki/API:Edit
 
-        @param page: The Page to be saved.
+        :param page: The Page to be saved.
             By default its .text property will be used
             as the new text to be saved to the wiki
-        @param summary: the edit summary
-        @param minor: if True (default), mark edit as minor
-        @param notminor: if True, override account preferences to mark edit
+        :param summary: the edit summary
+        :param minor: if True (default), mark edit as minor
+        :param notminor: if True, override account preferences to mark edit
             as non-minor
-        @param recreate: if True (default), create new page even if this
+        :param recreate: if True (default), create new page even if this
             title has previously been deleted
-        @param createonly: if True, raise an error if this title already
+        :param createonly: if True, raise an error if this title already
             exists on the wiki
-        @param nocreate: if True, raise an error if the page does not exist
-        @param watch: Specify how the watchlist is affected by this edit, set
+        :param nocreate: if True, raise an error if the page does not exist
+        :param watch: Specify how the watchlist is affected by this edit, set
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
             * unwatch: remove the page from the watchlist
             * preferences: use the preference settings (default)
             * nochange: don't change the watchlist
-        @param bot: if True, mark edit with bot flag
-        @kwarg text: Overrides Page.text
-        @type text: str
-        @kwarg section: Edit an existing numbered section or
+        :param bot: if True, mark edit with bot flag
+        :keyword text: Overrides Page.text
+        :type text: str
+        :keyword section: Edit an existing numbered section or
             a new section ('new')
-        @type section: int or str
-        @kwarg prependtext: Prepend text. Overrides Page.text
-        @type text: str
-        @kwarg appendtext: Append text. Overrides Page.text.
-        @type text: str
-        @kwarg undo: Revision id to undo. Overrides Page.text
-        @type undo: int
-        @return: True if edit succeeded, False if it failed
-        @raises pywikibot.exceptions.Error: No text to be saved
-        @raises pywikibot.exceptions.NoPageError: recreate is disabled and page
+        :type section: int or str
+        :keyword prependtext: Prepend text. Overrides Page.text
+        :type text: str
+        :keyword appendtext: Append text. Overrides Page.text.
+        :type text: str
+        :keyword undo: Revision id to undo. Overrides Page.text
+        :type undo: int
+        :return: True if edit succeeded, False if it failed
+        :raises pywikibot.exceptions.Error: No text to be saved
+        :raises pywikibot.exceptions.NoPageError: recreate is disabled and page
             does not exist
-        @raises pywikibot.exceptions.CaptchaError: config.solve_captcha is
+        :raises pywikibot.exceptions.CaptchaError: config.solve_captcha is
             False and saving the page requires solving a captcha
         """
         basetimestamp = True
@@ -1761,22 +1762,22 @@ class APISite(
                       reason: Optional[str] = None):
         """Merge revisions from one page into another.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Mergehistory}
+        :see: https://www.mediawiki.org/wiki/API:Mergehistory
 
         Revisions dating up to the given timestamp in the source will be
         moved into the destination page history. History merge fails if
         the timestamps of source and dest revisions overlap (all source
         revisions must be dated before the earliest dest revision).
 
-        @param source: Source page from which revisions will be merged
-        @type source: pywikibot.Page
-        @param dest: Destination page to which revisions will be merged
-        @type dest: pywikibot.Page
-        @param timestamp: Revisions from this page dating up to this timestamp
+        :param source: Source page from which revisions will be merged
+        :type source: pywikibot.Page
+        :param dest: Destination page to which revisions will be merged
+        :type dest: pywikibot.Page
+        :param timestamp: Revisions from this page dating up to this timestamp
             will be merged into the destination page (if not given or False,
             all revisions will be merged)
-        @type timestamp: pywikibot.Timestamp
-        @param reason: Optional reason for the history merge
+        :type timestamp: pywikibot.Timestamp
+        :param reason: Optional reason for the history merge
         """
         # Data for error messages
         errdata = {
@@ -1876,16 +1877,16 @@ class APISite(
                  noredirect=False):
         """Move a Page to a new title.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Move}
+        :see: https://www.mediawiki.org/wiki/API:Move
 
-        @param page: the Page to be moved (must exist)
-        @param newtitle: the new title for the Page
-        @param summary: edit summary (required!)
-        @param movetalk: if True (default), also move the talk page if possible
-        @param noredirect: if True, suppress creation of a redirect from the
+        :param page: the Page to be moved (must exist)
+        :param newtitle: the new title for the Page
+        :param summary: edit summary (required!)
+        :param movetalk: if True (default), also move the talk page if possible
+        :param noredirect: if True, suppress creation of a redirect from the
             old title to the new one
-        @return: Page object with the new title
-        @rtype: pywikibot.Page
+        :return: Page object with the new title
+        :rtype: pywikibot.Page
         """
         oldtitle = page.title(with_section=False)
         newlink = pywikibot.Link(newtitle, self)
@@ -1979,7 +1980,7 @@ class APISite(
     def rollbackpage(self, page, **kwargs):
         """Roll back page to version before last user's edits.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Rollback}
+        :see: https://www.mediawiki.org/wiki/API:Rollback
 
         The keyword arguments are those supported by the rollback API.
 
@@ -1987,8 +1988,8 @@ class APISite(
         the page history contains at least two revisions, and at least
         one that is not by the same user who made the last edit.
 
-        @param page: the Page to be rolled back (must exist)
-        @keyword user: the last user to be rollbacked;
+        :param page: the Page to be rolled back (must exist)
+        :keyword user: the last user to be rollbacked;
             default is page.latest_revision.user
         """
         if len(page._revisions) < 2:
@@ -2050,7 +2051,7 @@ class APISite(
 
         Requires appropriate privileges.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        :see: https://www.mediawiki.org/wiki/API:Delete
         Page to be deleted can be given either as Page object or as pageid.
         To delete a specific version of an image the oldimage identifier
         must be provided.
@@ -2059,13 +2060,14 @@ class APISite(
 
         *New in version 6.1:* keyword only parameter *oldimage* was added.
 
-        @param page: Page to be deleted or its pageid.
-        @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
-        @param reason: Deletion reason.
-        @param oldimage: oldimage id of the file version to be deleted.
+        :param page: Page to be deleted or its pageid.
+        :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
+            int or str
+        :param reason: Deletion reason.
+        :param oldimage: oldimage id of the file version to be deleted.
             If a BasePage object is given with page parameter, it has to
             be a FilePage.
-        @raises TypeError, ValueError: page has wrong type/value.
+        :raises TypeError, ValueError: page has wrong type/value.
         """
         if oldimage and isinstance(page, pywikibot.page.BasePage) \
            and not isinstance(page, pywikibot.FilePage):
@@ -2114,13 +2116,14 @@ class APISite(
     def deletepage(self, page, reason: str):
         """Delete page from the wiki. Requires appropriate privilege level.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        :see: https://www.mediawiki.org/wiki/API:Delete
         Page to be deleted can be given either as Page object or as pageid.
 
-        @param page: Page to be deleted or its pageid.
-        @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
-        @param reason: Deletion reason.
-        @raises TypeError, ValueError: page has wrong type/value.
+        :param page: Page to be deleted or its pageid.
+        :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
+            int or str
+        :param reason: Deletion reason.
+        :raises TypeError, ValueError: page has wrong type/value.
         """
         self.delete(page, reason)
 
@@ -2129,15 +2132,15 @@ class APISite(
     def deleteoldimage(self, page, oldimage: str, reason: str):
         """Delete a specific version of a file. Requires appropriate privileges.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        :see: https://www.mediawiki.org/wiki/API:Delete
         The oldimage identifier for the specific version of the image must be
         provided.
 
-        @param page: Page to be deleted or its pageid
-        @type page: FilePage or, in case of pageid, int or str
-        @param oldimage: oldimageid of the file version to be deleted.
-        @param reason: Deletion reason.
-        @raises TypeError, ValueError: page has wrong type/value.
+        :param page: Page to be deleted or its pageid
+        :type page: FilePage or, in case of pageid, int or str
+        :param oldimage: oldimageid of the file version to be deleted.
+        :param reason: Deletion reason.
+        :raises TypeError, ValueError: page has wrong type/value.
         """
         self.delete(page, reason, oldimage=oldimage)
 
@@ -2145,7 +2148,7 @@ class APISite(
     def undelete(self, page, reason: str, *, revisions=None, fileids=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+        :see: https://www.mediawiki.org/wiki/API:Undelete
 
         *Renamed in version 6.1.*
 
@@ -2153,14 +2156,14 @@ class APISite(
 
         *Changed in verson 6.1:* keyword argument required for *revisions*.
 
-        @param page: Page to be deleted.
-        @type page: pywikibot.BasePage
-        @param reason: Undeletion reason.
-        @param revisions: List of timestamps to restore.
+        :param page: Page to be deleted.
+        :type page: pywikibot.BasePage
+        :param reason: Undeletion reason.
+        :param revisions: List of timestamps to restore.
             If None, restores all revisions.
-        @type revisions: list
-        @param fileids: List of fileids to restore.
-        @type fileids: list
+        :type revisions: list
+        :param fileids: List of fileids to restore.
+        :type fileids: list
         """
         token = self.tokens['delete']
         params = {
@@ -2196,14 +2199,14 @@ class APISite(
     def undelete_page(self, page, reason: str, revisions=None):
         """DEPRECATED. Undelete page from the wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+        :see: https://www.mediawiki.org/wiki/API:Undelete
 
-        @param page: Page to be deleted.
-        @type page: pywikibot.BasePage
-        @param revisions: List of timestamps to restore.
+        :param page: Page to be deleted.
+        :type page: pywikibot.BasePage
+        :param revisions: List of timestamps to restore.
             If None, restores all revisions.
-        @type revisions: list
-        @param reason: Undeletion reason.
+        :type revisions: list
+        :param reason: Undeletion reason.
         """
         self.undelete(page, reason, revisions=revisions)
 
@@ -2212,13 +2215,13 @@ class APISite(
     def undelete_file_versions(self, page, reason: str, fileids=None):
         """DEPRECATED. Undelete page from the wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+        :see: https://www.mediawiki.org/wiki/API:Undelete
 
-        @param page: Page to be deleted.
-        @type page: pywikibot.BasePage
-        @param reason: Undeletion reason.
-        @param fileids: List of fileids to restore.
-        @type fileids: list
+        :param page: Page to be deleted.
+        :type page: pywikibot.BasePage
+        :param reason: Undeletion reason.
+        :param fileids: List of fileids to restore.
+        :type fileids: list
         """
         self.undelete(page, reason, fileids=fileids)
 
@@ -2237,9 +2240,9 @@ class APISite(
         """
         Return the protection types available on this site.
 
-        @return: protection types available
-        @rtype: set of str instances
-        @see: L{Siteinfo._get_default()}
+        :return: protection types available
+        :rtype: set of str instances
+        :see: :py:obj:`Siteinfo._get_default()`
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
@@ -2247,9 +2250,9 @@ class APISite(
         """
         Return the protection levels available on this site.
 
-        @return: protection types available
-        @rtype: set of str instances
-        @see: L{Siteinfo._get_default()}
+        :return: protection types available
+        :rtype: set of str instances
+        :see: :py:obj:`Siteinfo._get_default()`
         """
         # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
@@ -2260,18 +2263,18 @@ class APISite(
                 reason: str, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Protect}
+        :see: https://www.mediawiki.org/wiki/API:Protect
 
-        @param protections: A dict mapping type of protection to protection
+        :param protections: A dict mapping type of protection to protection
             level of that type. Valid restriction types are 'edit', 'create',
             'move' and 'upload'. Valid restriction levels are '' (equivalent
             to 'none' or 'all'), 'autoconfirmed', and 'sysop'.
             If None is given, however, that protection will be skipped.
-        @param reason: Reason for the action
-        @param expiry: When the block should expire. This expiry will be
+        :param reason: Reason for the action
+        :param expiry: When the block should expire. This expiry will be
             applied to all protections. If None, 'infinite', 'indefinite',
             'never', or '' is given, there is no expiry.
-        @type expiry: pywikibot.Timestamp, string in GNU timestamp format
+        :type expiry: pywikibot.Timestamp, string in GNU timestamp format
             (including ISO 8601).
         """
         token = self.tokens['protect']
@@ -2319,42 +2322,42 @@ class APISite(
         """
         Block a user for certain amount of time and for a certain reason.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Block}
+        :see: https://www.mediawiki.org/wiki/API:Block
 
-        @param user: The username/IP to be blocked without a namespace.
-        @type user: L{pywikibot.User}
-        @param expiry: The length or date/time when the block expires. If
+        :param user: The username/IP to be blocked without a namespace.
+        :type user: :py:obj:`pywikibot.User`
+        :param expiry: The length or date/time when the block expires. If
             'never', 'infinite', 'indefinite' it never does. If the value is
             given as a str it's parsed by php's strtotime function:
 
-                U{https://www.php.net/manual/en/function.strtotime.php}
+                https://www.php.net/manual/en/function.strtotime.php
 
             The relative format is described there:
 
-                U{https://www.php.net/manual/en/datetime.formats.relative.php}
+                https://www.php.net/manual/en/datetime.formats.relative.php
 
             It is recommended to not use a str if possible to be
             independent of the API.
-        @type expiry: Timestamp/datetime (absolute),
+        :type expiry: Timestamp/datetime (absolute),
             str (relative/absolute) or False ('never')
-        @param reason: The reason for the block.
-        @param anononly: Disable anonymous edits for this IP.
-        @type anononly: boolean
-        @param nocreate: Prevent account creation.
-        @type nocreate: boolean
-        @param autoblock: Automatically block the last used IP address and all
+        :param reason: The reason for the block.
+        :param anononly: Disable anonymous edits for this IP.
+        :type anononly: boolean
+        :param nocreate: Prevent account creation.
+        :type nocreate: boolean
+        :param autoblock: Automatically block the last used IP address and all
             subsequent IP addresses from which this account logs in.
-        @type autoblock: boolean
-        @param noemail: Prevent user from sending email through the wiki.
-        @type noemail: boolean
-        @param reblock: If the user is already blocked, overwrite the existing
+        :type autoblock: boolean
+        :param noemail: Prevent user from sending email through the wiki.
+        :type noemail: boolean
+        :param reblock: If the user is already blocked, overwrite the existing
             block.
-        @type reblock: boolean
-        @param allowusertalk: Whether the user can edit their talk page while
+        :type reblock: boolean
+        :param allowusertalk: Whether the user can edit their talk page while
             blocked.
-        @type allowusertalk: boolean
-        @return: The data retrieved from the API request.
-        @rtype: dict
+        :type allowusertalk: boolean
+        :return: The data retrieved from the API request.
+        :rtype: dict
         """
         token = self.tokens['block']
         if expiry is False:
@@ -2374,11 +2377,11 @@ class APISite(
         """
         Remove the block for the user.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Block}
+        :see: https://www.mediawiki.org/wiki/API:Block
 
-        @param user: The username/IP without a namespace.
-        @type user: L{pywikibot.User}
-        @param reason: Reason for the unblock.
+        :param user: The username/IP without a namespace.
+        :type user: :py:obj:`pywikibot.User`
+        :param reason: Reason for the unblock.
         """
         req = self._simple_request(action='unblock',
                                    user=user.username,
@@ -2392,15 +2395,15 @@ class APISite(
     def watch(self, pages, unwatch: bool = False) -> bool:
         """Add or remove pages from watchlist.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Watch}
+        :see: https://www.mediawiki.org/wiki/API:Watch
 
-        @param pages: A single page or a sequence of pages.
-        @type pages: A page object, a page-title string, or sequence of them.
+        :param pages: A single page or a sequence of pages.
+        :type pages: A page object, a page-title string, or sequence of them.
             Also accepts a single pipe-separated string like 'title1|title2'.
-        @param unwatch: If True, remove pages from watchlist;
+        :param unwatch: If True, remove pages from watchlist;
             if False add them (default).
-        @return: True if API returned expected response; False otherwise
-        @raises KeyError: 'watch' isn't in API response
+        :return: True if API returned expected response; False otherwise
+        :raises KeyError: 'watch' isn't in API response
         """
         parameters = {
             'action': 'watch',
@@ -2421,16 +2424,16 @@ class APISite(
         """
         Purge the server's cache for one or multiple pages.
 
-        @param pages: list of Page objects
-        @param redirects: Automatically resolve redirects.
-        @type redirects: bool
-        @param converttitles: Convert titles to other variants if necessary.
+        :param pages: list of Page objects
+        :param redirects: Automatically resolve redirects.
+        :type redirects: bool
+        :param converttitles: Convert titles to other variants if necessary.
             Only works if the wiki's content language supports variant
             conversion.
-        @param forcelinkupdate: Update the links tables.
-        @param forcerecursivelinkupdate: Update the links table, and update the
+        :param forcelinkupdate: Update the links tables.
+        :param forcerecursivelinkupdate: Update the links table, and update the
             links tables for any page that uses this page as a template.
-        @return: True if API returned expected response; False otherwise
+        :return: True if API returned expected response; False otherwise
         """
         req = self._simple_request(action='purge', titles=list(set(pages)))
         if converttitles:
@@ -2496,7 +2499,7 @@ class APISite(
     def stash_info(self, file_key, props=None):
         """Get the stash info for a given file key.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Stashimageinfo}
+        :see: https://www.mediawiki.org/wiki/API:Stashimageinfo
         """
         props = props or False
         req = self._simple_request(
@@ -2522,7 +2525,7 @@ class APISite(
         """
         Upload a file to the wiki.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Upload}
+        :see: https://www.mediawiki.org/wiki/API:Upload
 
         Either source_filename or source_url, but not both, must be provided.
 
@@ -2532,17 +2535,17 @@ class APISite(
         *Changed in version 6.2:* asynchronous upload is used if
         *asynchronous* parameter is set.
 
-        @param filepage: a FilePage object from which the wiki-name of the
+        :param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.
-        @param source_filename: path to the file to be uploaded
-        @param source_url: URL of the file to be uploaded
-        @param comment: Edit summary; if this is not provided, then
+        :param source_filename: path to the file to be uploaded
+        :param source_url: URL of the file to be uploaded
+        :param comment: Edit summary; if this is not provided, then
             filepage.text will be used. An empty summary is not permitted.
             This may also serve as the initial page text (see below).
-        @param text: Initial page text; if this is not set, then
+        :param text: Initial page text; if this is not set, then
             filepage.text will be used, or comment.
-        @param watch: If true, add filepage to the bot user's watchlist
-        @param ignore_warnings: It may be a static boolean, a callable
+        :param watch: If true, add filepage to the bot user's watchlist
+        :param ignore_warnings: It may be a static boolean, a callable
             returning a boolean or an iterable. The callable gets a list of
             UploadError instances and the iterable should contain the warning
             codes for which an equivalent callable would return True if all
@@ -2551,30 +2554,30 @@ class APISite(
             and reattempt to upload the file. NOTE: If report_success is True
             or None it'll raise an UploadError exception if the static
             boolean is False.
-        @type ignore_warnings: bool or callable or iterable of str
-        @param chunk_size: The chunk size in bytes for chunked uploading (see
-            U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}).
+        :type ignore_warnings: bool or callable or iterable of str
+        :param chunk_size: The chunk size in bytes for chunked uploading (see
+            https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading).
             It will only upload in chunks, if the chunk size is positive
             but lower than the file size.
-        @param asynchronous: Make potentially large file operations
+        :param asynchronous: Make potentially large file operations
             asynchronous on the server side when possible.
-        @param _file_key: Reuses an already uploaded file using the filekey. If
+        :param _file_key: Reuses an already uploaded file using the filekey. If
             None (default) it will upload the file.
-        @param _offset: When file_key is not None this can be an integer to
+        :param _offset: When file_key is not None this can be an integer to
             continue a previously canceled chunked upload. If False it treats
             that as a finished upload. If True it requests the stash info from
             the server to determine the offset. By default starts at 0.
-        @param _verify_stash: Requests the SHA1 and file size uploaded and
+        :param _verify_stash: Requests the SHA1 and file size uploaded and
             compares it to the local file. Also verifies that _offset is
             matching the file size if the _offset is an int. If _offset is
             False if verifies that the file size match with the local file. If
             None it'll verifies the stash when a file key and offset is given.
-        @param report_success: If the upload was successful it'll print a
+        :param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadError if a warning occurred. If it's None
             (default) it'll be True if ignore_warnings is a bool and False
             otherwise. If it's True or None ignore_warnings must be a bool.
-        @return: It returns True if the upload was successful and False
+        :return: It returns True if the upload was successful and False
             otherwise.
         """
         def create_warnings_list(response):
@@ -2996,9 +2999,9 @@ class APISite(
         """
         Get property names for pages_with_property().
 
-        @see: U{https://www.mediawiki.org/wiki/API:Pagepropnames}
+        :see: https://www.mediawiki.org/wiki/API:Pagepropnames
 
-        @param force: force to retrieve userinfo ignoring cache
+        :param force: force to retrieve userinfo ignoring cache
         """
         if force or not hasattr(self, '_property_names'):
             ppngen = self._generator(api.ListGenerator, 'pagepropnames')
@@ -3009,16 +3012,16 @@ class APISite(
         """
         Corresponding method to the 'action=compare' API action.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Compare}
+        :see: https://www.mediawiki.org/wiki/API:Compare
 
         See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
         Use pywikibot.diff's html_comparator() method to parse result.
-        @param old: starting revision ID, title, Page, or Revision
-        @type old: int, str, pywikibot.Page, or pywikibot.Page.Revision
-        @param diff: ending revision ID, title, Page, or Revision
-        @type diff: int, str, pywikibot.Page, or pywikibot.Page.Revision
-        @return: Returns an HTML string of a diff between two revisions.
-        @rtype: str
+        :param old: starting revision ID, title, Page, or Revision
+        :type old: int, str, pywikibot.Page, or pywikibot.Page.Revision
+        :param diff: ending revision ID, title, Page, or Revision
+        :type diff: int, str, pywikibot.Page, or pywikibot.Page.Revision
+        :return: Returns an HTML string of a diff between two revisions.
+        :rtype: str
         """
         # check old and diff types
         def get_param(item):

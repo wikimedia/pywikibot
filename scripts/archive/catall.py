@@ -34,8 +34,8 @@ from pywikibot.exceptions import IsRedirectPageError
 def choosecats(pagetext: str) -> List[str]:
     """Choose categories.
 
-    @param pagetext: The text of the page
-    @return: chosen list which contains all the choices
+    :param pagetext: The text of the page
+    :return: chosen list which contains all the choices
     """
     chosen = []
     done = False
@@ -75,9 +75,9 @@ q: quit.""")
 def make_categories(page, list: list, site=None):
     """Make categories.
 
-    @param page: The page to update and save
-    @type page: pywikibot.page.BasePage
-    @param list: The list which contains categories
+    :param page: The page to update and save
+    :type page: pywikibot.page.BasePage
+    :param list: The list which contains categories
     """
     if site is None:
         site = pywikibot.Site()
@@ -95,7 +95,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     docorrections = True
     start = 'A'

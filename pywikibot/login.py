@@ -92,13 +92,13 @@ class LoginManager:
 
         All parameters default to defaults in user-config.
 
-        @param site: Site object to log into
-        @type site: BaseSite
-        @param user: username to use.
+        :param site: Site object to log into
+        :type site: BaseSite
+        :param user: username to use.
             If user is None, the username is loaded from config.usernames.
-        @param password: password to use
+        :param password: password to use
 
-        @raises pywikibot.exceptions.NoUsernameError: No username is configured
+        :raises pywikibot.exceptions.NoUsernameError: No username is configured
             for the requested site.
         """
         site = self.site = site or pywikibot.Site()
@@ -126,9 +126,9 @@ class LoginManager:
         """
         Check that the username exists on the site.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Users}
+        :see: https://www.mediawiki.org/wiki/API:Users
 
-        @raises pywikibot.exceptions.NoUsernameError: Username doesn't exist in
+        :raises pywikibot.exceptions.NoUsernameError: Username doesn't exist in
             user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
@@ -276,16 +276,16 @@ class LoginManager:
         """
         Attempt to log into the server.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Login}
+        :see: https://www.mediawiki.org/wiki/API:Login
 
-        @param retry: infinitely retry if the API returns an unknown error
-        @type retry: bool
+        :param retry: infinitely retry if the API returns an unknown error
+        :type retry: bool
 
-        @param autocreate: if true, allow auto-creation of the account
+        :param autocreate: if true, allow auto-creation of the account
                            using unified login
-        @type autocreate: bool
+        :type autocreate: bool
 
-        @raises pywikibot.exceptions.NoUsernameError: Username is not
+        :raises pywikibot.exceptions.NoUsernameError: Username is not
             recognised by the site.
         """
         if not self.password:
@@ -339,10 +339,10 @@ class BotPassword:
         BotPassword function by using a separate password paired with a
         suffixed username of the form <username>@<suffix>.
 
-        @param suffix: Suffix of the login name
-        @param password: bot password
+        :param suffix: Suffix of the login name
+        :param password: bot password
 
-        @raises _PasswordFileWarning: suffix improperly specified
+        :raises _PasswordFileWarning: suffix improperly specified
         """
         if '@' in suffix:
             warn('The BotPassword entry should only include the suffix',
@@ -354,7 +354,7 @@ class BotPassword:
         """
         Construct the login name from the username and suffix.
 
-        @param user: username (without suffix)
+        :param user: username (without suffix)
         """
         return '{}@{}'.format(username, self.suffix)
 
@@ -374,14 +374,14 @@ class OauthLoginManager(LoginManager):
 
         All parameters default to defaults in user-config.
 
-        @param site: Site object to log into
-        @type site: BaseSite
-        @param user: consumer key
-        @param password: consumer secret
+        :param site: Site object to log into
+        :type site: BaseSite
+        :param user: consumer key
+        :param password: consumer secret
 
-        @raises pywikibot.exceptions.NoUsernameError: No username is configured
+        :raises pywikibot.exceptions.NoUsernameError: No username is configured
             for the requested site.
-        @raises ImportError: mwoauth isn't installed
+        :raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
             raise ImportError('mwoauth is not installed: {}.'.format(mwoauth))
@@ -399,13 +399,13 @@ class OauthLoginManager(LoginManager):
         """
         Attempt to log into the server.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Login}
+        :see: https://www.mediawiki.org/wiki/API:Login
 
-        @param retry: infinitely retry if exception occurs during
+        :param retry: infinitely retry if exception occurs during
             authentication.
-        @type retry: bool
-        @param force: force to re-authenticate
-        @type force: bool
+        :type retry: bool
+        :param force: force to re-authenticate
+        :type force: bool
         """
         if self.access_token is None or force:
             pywikibot.output(
@@ -438,9 +438,9 @@ class OauthLoginManager(LoginManager):
         """
         Return OAuth consumer key token and secret token.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
+        :see: https://www.mediawiki.org/wiki/API:Tokens
 
-        @rtype: tuple of two str
+        :rtype: tuple of two str
         """
         return self._consumer_token
 
@@ -449,9 +449,9 @@ class OauthLoginManager(LoginManager):
         """
         Return OAuth access key token and secret token.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
+        :see: https://www.mediawiki.org/wiki/API:Tokens
 
-        @rtype: tuple of two str
+        :rtype: tuple of two str
         """
         return self._access_token
 

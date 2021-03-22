@@ -80,28 +80,28 @@ class EventStreams:
     def __init__(self, **kwargs):
         """Initializer.
 
-        @keyword site: a project site object. Used when no url is given
-        @type site: APISite
-        @keyword since: a timestamp for older events; there will likely be
+        :keyword site: a project site object. Used when no url is given
+        :type site: APISite
+        :keyword since: a timestamp for older events; there will likely be
             between 7 and 31 days of history available but is not guaranteed.
             It may be given as a pywikibot.Timestamp, an ISO 8601 string
             or a mediawiki timestamp string.
-        @type since: pywikibot.Timestamp or str
-        @keyword streams: event stream types. Mandatory when no url is given.
+        :type since: pywikibot.Timestamp or str
+        :keyword streams: event stream types. Mandatory when no url is given.
             Multiple streams may be given as a string with comma separated
             stream types or an iterable of strings
             Refer https://stream.wikimedia.org/?doc for available
             Wikimedia stream types.
-        @type streams: str or iterable
-        @keyword timeout: a timeout value indication how long to wait to send
+        :type streams: str or iterable
+        :keyword timeout: a timeout value indication how long to wait to send
             data before giving up
-        @type timeout: int, float or a tuple of two values of int or float
-        @keyword url: an url retrieving events from. Will be set up to a
+        :type timeout: int, float or a tuple of two values of int or float
+        :keyword url: an url retrieving events from. Will be set up to a
             default url using _site.family settings, stream types and timestamp
-        @type url: str
-        @param kwargs: keyword arguments passed to SSEClient and requests lib
-        @raises ImportError: sseclient is not installed
-        @raises NotImplementedError: no stream types specified
+        :type url: str
+        :param kwargs: keyword arguments passed to SSEClient and requests lib
+        :raises ImportError: sseclient is not installed
+        :raises NotImplementedError: no stream types specified
         """
         if isinstance(EventSource, Exception):
             raise ImportError('sseclient is required for EventStreams;\n'
@@ -146,7 +146,7 @@ class EventStreams:
     def url(self):
         """Get the EventStream's url.
 
-        @raises NotImplementedError: no stream types specified
+        :raises NotImplementedError: no stream types specified
         """
         if not hasattr(self, '_url'):
             if self._streams is None:
@@ -168,7 +168,7 @@ class EventStreams:
         If not called, most queries will continue as long as there is
         more data to be retrieved from the stream.
 
-        @param value: The value of maximum number of items to be retrieved
+        :param value: The value of maximum number of items to be retrieved
             in total to set.
         """
         if value is not None:
@@ -189,9 +189,9 @@ class EventStreams:
         You may register multiple filters for each type of filter.
         The behaviour of filter type is as follows:
 
-        - B{'none'}: Skip if the any filter matches. Otherwise check 'all'.
-        - B{'all'}: Skip if not all filter matches. Otherwise check 'any':
-        - B{'any'}: Skip if no given filter matches. Otherwise pass.
+        - **'none'**: Skip if the any filter matches. Otherwise check 'all'.
+        - **'all'**: Skip if not all filter matches. Otherwise check 'any':
+        - **'any'**: Skip if no given filter matches. Otherwise pass.
 
         Filter functions:
 
@@ -205,34 +205,34 @@ class EventStreams:
 
         The data dict from event is passed to the external filter function as
         a parameter and that method must handle it in a proper way and return
-        C{True} if the filter matches and C{False} otherwise.
+        ``True`` if the filter matches and ``False`` otherwise.
 
         Filter keys and values:
 
         Another method to register a filter is to pass pairs of keys and values
         as keyword arguments to this method. The key must be a key of the event
         data dict and the value must be any value or an iterable of values the
-        C{data['key']} may match or be part of it. Samples::
+        ``data['key']`` may match or be part of it. Samples::
 
             register_filter(server_name='de.wikipedia.org')  # 1
             register_filter(type=('edit', 'log'))  # 2
             register_filter(ftype='none', bot=True)  # 3
 
         Explanation for the result of the filter function:
-        1. C{return data['sever_name'] == 'de.wikipedia.org'}
-        2. C{return data['type'] in ('edit', 'log')}
-        3. C{return data['bot'] is True}
+        1. ``return data['sever_name'] == 'de.wikipedia.org'``
+        2. ``return data['type'] in ('edit', 'log')``
+        3. ``return data['bot'] is True``
 
-        @keyword ftype: The filter type, one of 'all', 'any', 'none'.
+        :keyword ftype: The filter type, one of 'all', 'any', 'none'.
             Default value is 'all'
-        @type ftype: str
-        @param args: You may pass your own filter functions here.
+        :type ftype: str
+        :param args: You may pass your own filter functions here.
             Every function should be able to handle the data dict from events.
-        @type args: callable
-        @param kwargs: Any key returned by event data with an event data value
+        :type args: callable
+        :param kwargs: Any key returned by event data with an event data value
             for this given key.
-        @type kwargs: str, list, tuple or other sequence
-        @raise TypeError: A given args parameter is not a callable.
+        :type kwargs: str, list, tuple or other sequence
+        :raise TypeError: A given args parameter is not a callable.
         """
         def _is(data, key=None, value=None):
             return key in data and data[key] is value
@@ -269,7 +269,7 @@ class EventStreams:
 
         See the description of register_filter() how it works.
 
-        @param data: event data dict used by filter functions
+        :param data: event data dict used by filter functions
         """
         if any(function(data) for function in self.filter['none']):
             return False
@@ -332,12 +332,12 @@ class EventStreams:
 def site_rc_listener(site, total: Optional[int] = None):
     """Yield changes received from EventStream.
 
-    @param site: the Pywikibot.Site object to yield live recent changes for
-    @type site: Pywikibot.BaseSite
-    @param total: the maximum number of changes to return
+    :param site: the Pywikibot.Site object to yield live recent changes for
+    :type site: Pywikibot.BaseSite
+    :param total: the maximum number of changes to return
 
-    @return: pywikibot.comms.eventstream.rc_listener configured for given site
-    @raises ImportError: sseclient installation is required
+    :return: pywikibot.comms.eventstream.rc_listener configured for given site
+    :raises ImportError: sseclient installation is required
     """
     if isinstance(EventSource, Exception):
         raise ImportError('sseclient is required for EventStreams;\n'

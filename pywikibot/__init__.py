@@ -133,8 +133,8 @@ class Timestamp(datetime.datetime):
     def _ISO8601Format(cls, sep: str = 'T') -> str:
         """ISO8601 format string.
 
-        @param sep: one-character separator, placed between the date and time
-        @return: ISO8601 format string
+        :param sep: one-character separator, placed between the date and time
+        :return: ISO8601 format string
         """
         assert len(sep) == 1
         return '%Y-%m-%d{}%H:%M:%SZ'.format(sep)
@@ -143,11 +143,11 @@ class Timestamp(datetime.datetime):
     def fromISOformat(cls, ts, sep: str = 'T'):
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
-        @param ts: ISO 8601 timestamp or a Timestamp object already
-        @type ts: str or Timestamp
-        @param sep: one-character separator, placed between the date and time
-        @return: Timestamp object
-        @rtype: Timestamp
+        :param ts: ISO 8601 timestamp or a Timestamp object already
+        :type ts: str or Timestamp
+        :param sep: one-character separator, placed between the date and time
+        :return: Timestamp object
+        :rtype: Timestamp
         """
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
@@ -219,20 +219,20 @@ class Coordinate(_WbRepresentation):
         """
         Represent a geo coordinate.
 
-        @param lat: Latitude
-        @param lon: Longitude
-        @param alt: Altitude? TODO FIXME
-        @param precision: precision
-        @param globe: Which globe the point is on
-        @param typ: The type of coordinate point
-        @param name: The name
-        @param dim: Dimension (in meters)
-        @param site: The Wikibase site
-        @param globe_item: The Wikibase item for the globe, or the entity URI
+        :param lat: Latitude
+        :param lon: Longitude
+        :param alt: Altitude? TODO FIXME
+        :param precision: precision
+        :param globe: Which globe the point is on
+        :param typ: The type of coordinate point
+        :param name: The name
+        :param dim: Dimension (in meters)
+        :param site: The Wikibase site
+        :param globe_item: The Wikibase item for the globe, or the entity URI
                            of this Wikibase item. Takes precedence over 'globe'
                            if present.
-        @type globe_item: pywikibot.ItemPage or str
-        @param primary: True for a primary set of coordinates
+        :type globe_item: pywikibot.ItemPage or str
+        :param primary: True for a primary set of coordinates
         """
         self.lat = lat
         self.lon = lon
@@ -272,7 +272,7 @@ class Coordinate(_WbRepresentation):
 
         FIXME: Should this be in the DataSite object?
 
-        @return: Wikibase JSON
+        :return: Wikibase JSON
         """
         return {'latitude': self.lat,
                 'longitude': self.lon,
@@ -286,9 +286,9 @@ class Coordinate(_WbRepresentation):
         """
         Constructor to create an object from Wikibase's JSON output.
 
-        @param data: Wikibase JSON
-        @param site: The Wikibase site
-        @rtype: Coordinate
+        :param data: Wikibase JSON
+        :param site: The Wikibase site
+        :rtype: Coordinate
         """
         globe = None
 
@@ -390,10 +390,10 @@ class Coordinate(_WbRepresentation):
         A successful lookup is stored as an internal value to avoid the need
         for repeated lookups.
 
-        @param repo: the Wikibase site for the globe, if different from that
+        :param repo: the Wikibase site for the globe, if different from that
             provided with the Coordinate.
-        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
-        @return: pywikibot.ItemPage
+        :param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        :return: pywikibot.ItemPage
         """
         if isinstance(self._entity, ItemPage):
             return self._entity
@@ -458,20 +458,20 @@ class WbTime(_WbRepresentation):
           of the event, in the range −180° to 180°, multiplied by 4 to convert
           to minutes.
 
-        @param year: The year as a signed integer of between 1 and 16 digits.
-        @param month: Month
-        @param day: Day
-        @param hour: Hour
-        @param minute: Minute
-        @param second: Second
-        @param precision: The unit of the precision of the time.
-        @param before: Number of units after the given time it could be, if
+        :param year: The year as a signed integer of between 1 and 16 digits.
+        :param month: Month
+        :param day: Day
+        :param hour: Hour
+        :param minute: Minute
+        :param second: Second
+        :param precision: The unit of the precision of the time.
+        :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param after: Number of units before the given time it could be, if
+        :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param timezone: Timezone information in minutes.
-        @param calendarmodel: URI identifying the calendar model
-        @param site: The Wikibase site
+        :param timezone: Timezone information in minutes.
+        :param calendarmodel: URI identifying the calendar model
+        :param site: The Wikibase site
         """
         if year is None:
             raise ValueError('no year given')
@@ -537,17 +537,17 @@ class WbTime(_WbRepresentation):
         * The Z is discarded since time zone is determined from the timezone
           param.
 
-        @param datetimestr: Timestamp in a format resembling ISO 8601,
+        :param datetimestr: Timestamp in a format resembling ISO 8601,
             e.g. +2013-01-01T00:00:00Z
-        @param precision: The unit of the precision of the time.
-        @param before: Number of units after the given time it could be, if
+        :param precision: The unit of the precision of the time.
+        :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param after: Number of units before the given time it could be, if
+        :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param timezone: Timezone information in minutes.
-        @param calendarmodel: URI identifying the calendar model
-        @param site: The Wikibase site
-        @rtype: pywikibot.WbTime
+        :param timezone: Timezone information in minutes.
+        :param calendarmodel: URI identifying the calendar model
+        :param site: The Wikibase site
+        :rtype: pywikibot.WbTime
         """
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
@@ -566,17 +566,17 @@ class WbTime(_WbRepresentation):
         """
         Create a new WbTime object from a pywikibot.Timestamp.
 
-        @param timestamp: Timestamp
-        @type timestamp: pywikibot.Timestamp
-        @param precision: The unit of the precision of the time.
-        @param before: Number of units after the given time it could be, if
+        :param timestamp: Timestamp
+        :type timestamp: pywikibot.Timestamp
+        :param precision: The unit of the precision of the time.
+        :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param after: Number of units before the given time it could be, if
+        :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
-        @param timezone: Timezone information in minutes.
-        @param calendarmodel: URI identifying the calendar model
-        @param site: The Wikibase site
-        @rtype: pywikibot.WbTime
+        :param timezone: Timezone information in minutes.
+        :param calendarmodel: URI identifying the calendar model
+        :param site: The Wikibase site
+        :rtype: pywikibot.WbTime
         """
         return cls.fromTimestr(timestamp.isoformat(), precision=precision,
                                before=before, after=after,
@@ -590,8 +590,8 @@ class WbTime(_WbRepresentation):
         See fromTimestr() for differences between output with and without
         force_iso.
 
-        @param force_iso: whether the output should be forced to ISO 8601
-        @return: Timestamp in a format resembling ISO 8601
+        :param force_iso: whether the output should be forced to ISO 8601
+        :return: Timestamp in a format resembling ISO 8601
         """
         if force_iso:
             return Timestamp._ISO8601Format_new.format(
@@ -604,7 +604,7 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a pywikibot.Timestamp.
 
-        @raises ValueError: instance value cannot be represented using
+        :raises ValueError: instance value cannot be represented using
             Timestamp
         """
         if self.year <= 0:
@@ -616,7 +616,7 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a JSON object for the Wikibase API.
 
-        @return: Wikibase JSON
+        :return: Wikibase JSON
         """
         json = {'time': self.toTimestr(),
                 'precision': self.precision,
@@ -632,9 +632,9 @@ class WbTime(_WbRepresentation):
         """
         Create a WbTime from the JSON data given by the Wikibase API.
 
-        @param wb: Wikibase JSON
-        @param site: The Wikibase site
-        @rtype: pywikibot.WbTime
+        :param wb: Wikibase JSON
+        :param site: The Wikibase site
+        :rtype: pywikibot.WbTime
         """
         return cls.fromTimestr(wb['time'], wb['precision'],
                                wb['before'], wb['after'],
@@ -654,7 +654,7 @@ class WbQuantity(_WbRepresentation):
 
         If no site item is supplied it raises a warning and returns True.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         if not site:
             warning(
@@ -670,7 +670,7 @@ class WbQuantity(_WbRepresentation):
 
         None value is returned as is.
 
-        @param value: decimal number to convert
+        :param value: decimal number to convert
         """
         if isinstance(value, Decimal):
             return value
@@ -685,7 +685,7 @@ class WbQuantity(_WbRepresentation):
 
         None value is returned as is.
 
-        @param value: decimal number to convert
+        :param value: decimal number to convert
         """
         if value is None:
             return None
@@ -696,16 +696,16 @@ class WbQuantity(_WbRepresentation):
         """
         Create a new WbQuantity object.
 
-        @param amount: number representing this quantity
-        @type amount: str or Decimal. Other types are accepted, and
+        :param amount: number representing this quantity
+        :type amount: str or Decimal. Other types are accepted, and
             converted via str to Decimal.
-        @param unit: the Wikibase item for the unit or the entity URI of this
+        :param unit: the Wikibase item for the unit or the entity URI of this
             Wikibase item.
-        @type unit: pywikibot.ItemPage, str or None
-        @param error: the uncertainty of the amount (e.g. ±1)
-        @type error: same as amount, or tuple of two values, where the first
+        :type unit: pywikibot.ItemPage, str or None
+        :param error: the uncertainty of the amount (e.g. ±1)
+        :type error: same as amount, or tuple of two values, where the first
             value is the upper error and the second is the lower error value.
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         if amount is None:
             raise ValueError('no amount given')
@@ -751,10 +751,10 @@ class WbQuantity(_WbRepresentation):
         A successful lookup is stored as an internal value to avoid the need
         for repeated lookups.
 
-        @param repo: the Wikibase site for the unit, if different from that
+        :param repo: the Wikibase site for the unit, if different from that
             provided with the WbQuantity.
-        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
-        @return: pywikibot.ItemPage
+        :param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        :return: pywikibot.ItemPage
         """
         if not isinstance(self._unit, str):
             return self._unit
@@ -767,7 +767,7 @@ class WbQuantity(_WbRepresentation):
         """
         Convert the data to a JSON object for the Wikibase API.
 
-        @return: Wikibase JSON
+        :return: Wikibase JSON
         """
         json = {'amount': self._fromdecimal(self.amount),
                 'upperBound': self._fromdecimal(self.upperBound),
@@ -781,9 +781,9 @@ class WbQuantity(_WbRepresentation):
         """
         Create a WbQuantity from the JSON data given by the Wikibase API.
 
-        @param wb: Wikibase JSON
-        @param site: The Wikibase site
-        @rtype: pywikibot.WbQuantity
+        :param wb: Wikibase JSON
+        :param site: The Wikibase site
+        :rtype: pywikibot.WbQuantity
         """
         amount = cls._todecimal(wb['amount'])
         upperBound = cls._todecimal(wb.get('upperBound'))
@@ -808,8 +808,8 @@ class WbMonolingualText(_WbRepresentation):
         """
         Create a new WbMonolingualText object.
 
-        @param text: text string
-        @param language: language code of the string
+        :param text: text string
+        :param language: language code of the string
         """
         if not text or not language:
             raise ValueError('text and language cannot be empty')
@@ -820,7 +820,7 @@ class WbMonolingualText(_WbRepresentation):
         """
         Convert the data to a JSON object for the Wikibase API.
 
-        @return: Wikibase JSON
+        :return: Wikibase JSON
         """
         json = {'text': self.text,
                 'language': self.language
@@ -832,8 +832,8 @@ class WbMonolingualText(_WbRepresentation):
         """
         Create a WbMonolingualText from the JSON data given by Wikibase API.
 
-        @param wb: Wikibase JSON
-        @rtype: pywikibot.WbMonolingualText
+        :param wb: Wikibase JSON
+        :rtype: pywikibot.WbMonolingualText
         """
         return cls(wb['text'], wb['language'])
 
@@ -856,7 +856,7 @@ class _WbDataPage(_WbRepresentation):
 
         Must be implemented in the extended class.
 
-        @param repo_site: The Wikibase site
+        :param repo_site: The Wikibase site
         """
         raise NotImplementedError
 
@@ -874,7 +874,7 @@ class _WbDataPage(_WbRepresentation):
         * data_site: APISite, site serving as a repository for
             the given data type.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         raise NotImplementedError
 
@@ -883,14 +883,14 @@ class _WbDataPage(_WbRepresentation):
         """
         Validate the provided page against general and type specific rules.
 
-        @param page: Page containing the data.
-        @type page: pywikibot.Page
-        @param data_site: The site serving as a repository for the given
+        :param page: Page containing the data.
+        :type page: pywikibot.Page
+        :param data_site: The site serving as a repository for the given
             data type.
-        @type data_site: APISite
-        @param ending: Required filetype-like ending in page titles.
+        :type data_site: APISite
+        :param ending: Required filetype-like ending in page titles.
             E.g. '.map'
-        @param label: Label describing the data type in error messages.
+        :param label: Label describing the data type in error messages.
         """
         if not isinstance(page, Page):
             raise ValueError(
@@ -924,9 +924,9 @@ class _WbDataPage(_WbRepresentation):
         """
         Create a new _WbDataPage object.
 
-        @param page: page containing the data
-        @type page: pywikibot.Page
-        @param site: The Wikibase site
+        :param page: page containing the data
+        :type page: pywikibot.Page
+        :param site: The Wikibase site
         """
         site = site or Site().data_repository()
         specifics = type(self)._get_type_specifics(site)
@@ -942,7 +942,7 @@ class _WbDataPage(_WbRepresentation):
         """
         Convert the data to the value required by the Wikibase API.
 
-        @return: title of the data page incl. namespace
+        :return: title of the data page incl. namespace
         """
         return self.page.title()
 
@@ -951,9 +951,9 @@ class _WbDataPage(_WbRepresentation):
         """
         Create a _WbDataPage from the JSON data given by the Wikibase API.
 
-        @param page_name: page name from Wikibase value
-        @param site: The Wikibase site
-        @rtype: pywikibot._WbDataPage
+        :param page_name: page name from Wikibase value
+        :param site: The Wikibase site
+        :rtype: pywikibot._WbDataPage
         """
         data_site = cls._get_data_site(site)
         page = Page(data_site, page_name)
@@ -968,7 +968,7 @@ class WbGeoShape(_WbDataPage):
         """
         Return the site serving as a geo-shape repository.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         return site.geo_shape_repository()
 
@@ -977,7 +977,7 @@ class WbGeoShape(_WbDataPage):
         """
         Return the specifics for WbGeoShape.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         specifics = {
             'ending': '.map',
@@ -995,7 +995,7 @@ class WbTabularData(_WbDataPage):
         """
         Return the site serving as a tabular-data repository.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         return site.tabular_data_repository()
 
@@ -1004,7 +1004,7 @@ class WbTabularData(_WbDataPage):
         """
         Return the specifics for WbTabularData.
 
-        @param site: The Wikibase site
+        :param site: The Wikibase site
         """
         specifics = {
             'ending': '.tab',
@@ -1032,7 +1032,7 @@ class WbUnknown(_WbRepresentation):
         """
         Create a new WbUnknown object.
 
-        @param json: Wikibase JSON
+        :param json: Wikibase JSON
         """
         self.json = json
 
@@ -1040,7 +1040,7 @@ class WbUnknown(_WbRepresentation):
         """
         Return the JSON object for the Wikibase API.
 
-        @return: Wikibase JSON
+        :return: Wikibase JSON
         """
         return self.json
 
@@ -1049,8 +1049,8 @@ class WbUnknown(_WbRepresentation):
         """
         Create a WbUnknown from the JSON data given by the Wikibase API.
 
-        @param json: Wikibase JSON
-        @rtype: pywikibot.WbUnknown
+        :param json: Wikibase JSON
+        :rtype: pywikibot.WbUnknown
         """
         return cls(json)
 
@@ -1063,8 +1063,8 @@ def _code_fam_from_url(url: str, name: Optional[str] = None):
     """Set url to cache and get code and family from cache.
 
     Site helper method.
-    @param url: The site URL to get code and family
-    @param name: A family name used by AutoFamily
+    :param url: The site URL to get code and family
+    :param name: A family name used by AutoFamily
     """
     matched_sites = []
     # Iterate through all families and look, which does apply to
@@ -1130,24 +1130,24 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
     >>> site_1
     APISite("fr", "wikisource")
 
-    C{APISite} is the default interface. Refer L{pywikibot.site} for
+    ``APISite`` is the default interface. Refer :py:obj:`pywikibot.site` for
     other interface types.
 
     **Never create a site object via interface class directly.**
     Always use this factory method.
 
-    @param code: language code (override config.mylang)
+    :param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
-    @param fam: family name or object (override config.family)
-    @type fam: str or pywikibot.family.Family
-    @param user: bot user name to use on this site (override config.usernames)
-    @param interface: site class or name of class in L{pywikibot.site}
+    :param fam: family name or object (override config.family)
+    :type fam: str or pywikibot.family.Family
+    :param user: bot user name to use on this site (override config.usernames)
+    :param interface: site class or name of class in :py:obj:`pywikibot.site`
         (override config.site_interface)
-    @type interface: subclass of L{pywikibot.site.BaseSite} or string
-    @param url: Instead of code and fam, does try to get a Site based on the
+    :type interface: subclass of :py:obj:`pywikibot.site.BaseSite` or string
+    :param url: Instead of code and fam, does try to get a Site based on the
         URL. Still requires that the family supporting that URL exists.
-    @raises ValueError: URL and pair of code and family given
-    @raises ValueError: Invalid interface name
+    :raises ValueError: URL and pair of code and family given
+    :raises ValueError: Invalid interface name
     """
     _logger = 'wiki'
 

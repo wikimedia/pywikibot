@@ -140,22 +140,22 @@ class HarvestRobot(WikidataBot):
         """
         Initializer.
 
-        @param generator: A generator that yields Page objects
-        @type generator: iterator
-        @param template_title: The template to work on
-        @type template_title: str
-        @param fields: A dictionary of fields that are of use to us
-        @type fields: dict
-        @keyword islink: Whether non-linked values should be treated as links
-        @type islink: bool
-        @keyword create: Whether to create a new item if it's missing
-        @type create: bool
-        @keyword exists: pattern for merging existing claims with harvested
+        :param generator: A generator that yields Page objects
+        :type generator: iterator
+        :param template_title: The template to work on
+        :type template_title: str
+        :param fields: A dictionary of fields that are of use to us
+        :type fields: dict
+        :keyword islink: Whether non-linked values should be treated as links
+        :type islink: bool
+        :keyword create: Whether to create a new item if it's missing
+        :type create: bool
+        :keyword exists: pattern for merging existing claims with harvested
             values
-        @type exists: str
-        @keyword multi: Whether multiple values should be extracted from a
+        :type exists: str
+        :keyword multi: Whether multiple values should be extracted from a
             single parameter
-        @type multi: bool
+        :type multi: bool
         """
         self.available_options.update({
             'always': True,
@@ -236,7 +236,7 @@ class HarvestRobot(WikidataBot):
         """
         Compare bot's (global) and provided (local) options.
 
-        @see: L{OptionHandler}
+        :see: :py:obj:`OptionHandler`
         """
         default = self.opt[option]
         local = handler.opt[option]
@@ -355,8 +355,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     template_title = None
 

@@ -23,9 +23,9 @@ and override its `callback` method. Here is a sample:
         def callback(self, item):
             '''Sample callback function for 'private' revert bot.
 
-            @param item: an item from user contributions
-            @type item: dict
-            @rtype: bool
+            :param item: an item from user contributions
+            :type item: dict
+            :rtype: bool
             '''
             if 'top' in item:
                 page = pywikibot.Page(self.site, item['title'])
@@ -153,8 +153,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
 

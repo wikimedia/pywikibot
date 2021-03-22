@@ -36,15 +36,15 @@ def mysql_query(query: str, params=None,
     Supported MediaWiki projects use Unicode (UTF-8) character encoding.
     Cursor charset is utf8.
 
-    @param query: MySQL query to execute
-    @param params: input parameters for the query, if needed
+    :param query: MySQL query to execute
+    :param params: input parameters for the query, if needed
         if list or tuple, %s shall be used as placeholder in the query string.
         if a dict, %(key)s shall be used as placeholder in the query string.
-    @type params: tuple, list or dict of str
-    @param dbname: db name
-    @param verbose: if True, print query to be executed;
+    :type params: tuple, list or dict of str
+    :param dbname: db name
+    :param verbose: if True, print query to be executed;
         if None, config.verbose_output will be used.
-    @return: generator which yield tuples
+    :return: generator which yield tuples
     """
     # These are specified in config.py or user-config.py
     if verbose is None:

@@ -1454,7 +1454,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
 
 class TestGetLanguageLinks(SiteAttributeTestCase):
 
-    """Test L{textlib.getLanguageLinks} function."""
+    """Test :py:obj:`textlib.getLanguageLinks` function."""
 
     sites = {
         'enwp': {

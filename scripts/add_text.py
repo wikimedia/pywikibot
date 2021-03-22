@@ -102,10 +102,10 @@ def get_text(page: pywikibot.page.BasePage, old: Optional[str],
     """
     Get text on page. If old is not None, return old.
 
-    @param page: The page to get text from
-    @param old: If not None, return this rather than the page's text
-    @param create: Declare that the page will be created if it doesn't exist
-    @return: The page's text or the old parameter if not None
+    :param page: The page to get text from
+    :param old: If not None, return this rather than the page's text
+    :param create: Declare that the page will be created if it doesn't exist
+    :return: The page's text or the old parameter if not None
     """
     if old is not None:
         return old
@@ -130,12 +130,12 @@ def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
     """
     Save the new text.
 
-    @param page: The page to change the text of
-    @param new: The new text for the page
-    @param summary: Summary of the page change
-    @param count: Maximum number of attempts to reach the server
-    @param asynchronous: If True, saves the page asynchronously
-    @return: True if successful, False if unsuccessful, and None if
+    :param page: The page to change the text of
+    :param new: The new text for the page
+    :param summary: Summary of the page change
+    :param count: Maximum number of attempts to reach the server
+    :param asynchronous: If True, saves the page asynchronously
+    :return: True if successful, False if unsuccessful, and None if
         awaiting the server
     """
     page.text = new
@@ -175,21 +175,21 @@ def add_text(page: pywikibot.page.BasePage, addText: str,
     """
     Add text to a page.
 
-    @param page: The page to add text to
-    @param addText: Text to add
-    @param summary: Change summary, if None this uses the beginning of addText
-    @param regexSkip: Abort if the text on the page matches this
-    @param regexSkipUrl: Abort if the url matches this
-    @param always: Edit without user confirmation
-    @param up: Append text to the top of the page if True, otherwise the
+    :param page: The page to add text to
+    :param addText: Text to add
+    :param summary: Change summary, if None this uses the beginning of addText
+    :param regexSkip: Abort if the text on the page matches this
+    :param regexSkipUrl: Abort if the url matches this
+    :param always: Edit without user confirmation
+    :param up: Append text to the top of the page if True, otherwise the
         bottom
-    @param putText: Save changes to the page if True, otherwise return
+    :param putText: Save changes to the page if True, otherwise return
         (text, newtext, always)
-    @param oldTextGiven: If None fetch page text, else use this text
-    @param reorderEnabled: If True place text above categories and
+    :param oldTextGiven: If None fetch page text, else use this text
+    :param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
-    @param create: Create the page if it does not exist
-    @return: (success, success, always) if putText is True, otherwise
+    :param create: Create the page if it does not exist
+    :return: (success, success, always) if putText is True, otherwise
         (text, newtext, always)
     """
     site = page.site
@@ -295,7 +295,7 @@ def main(*argv: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param argv: Command line arguments
+    :param argv: Command line arguments
     """
     generator_factory = pagegenerators.GeneratorFactory()
 
@@ -332,10 +332,10 @@ def parse(argv: Tuple[str, ...],
     """
     Parses our arguments and provide a named tuple with their values.
 
-    @param argv: input arguments to be parsed
-    @param generator_factory: factory that will determine the page to edit
+    :param argv: input arguments to be parsed
+    :param generator_factory: factory that will determine the page to edit
 
-    @return: a namedtuple with our parsed arguments
+    :return: a namedtuple with our parsed arguments
 
     @raise: ValueError if we receive invalid arguments
     """

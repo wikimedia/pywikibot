@@ -32,10 +32,10 @@ class IllustrateRobot(WikidataBot):
         """
         Initializer.
 
-        @param generator: A generator that yields Page objects
-        @type generator: generator
-        @param wdproperty: The property to add. Should be of type commonsMedia
-        @type wdproperty: str
+        :param generator: A generator that yields Page objects
+        :type generator: generator
+        :param wdproperty: The property to add. Should be of type commonsMedia
+        :type wdproperty: str
         """
         super().__init__()
         self.generator = generator
@@ -85,8 +85,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

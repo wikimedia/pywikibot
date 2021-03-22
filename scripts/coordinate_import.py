@@ -61,7 +61,7 @@ class CoordImportRobot(WikidataBot):
         """
         Initializer.
 
-        @param generator: A generator that yields Page objects.
+        :param generator: A generator that yields Page objects.
         """
         self.available_options['create'] = False
         super().__init__(**kwargs)
@@ -74,9 +74,9 @@ class CoordImportRobot(WikidataBot):
         """
         Check if self.prop is used as property for a qualifier.
 
-        @param claims: the Wikibase claims to check in
-        @type claims: dict
-        @return: the first property for which self.prop
+        :param claims: the Wikibase claims to check in
+        :type claims: dict
+        :return: the first property for which self.prop
             is used as qualifier, or None if any
         """
         for prop in claims:
@@ -89,7 +89,7 @@ class CoordImportRobot(WikidataBot):
         """
         Check if the item has coordinates.
 
-        @return: whether the item has coordinates
+        :return: whether the item has coordinates
         """
         claims = item.get().get('claims')
         if self.prop in claims:
@@ -123,7 +123,7 @@ class CoordImportRobot(WikidataBot):
         """
         Try import coordinate from the given page to the given item.
 
-        @return: whether any coordinates were found and the import
+        :return: whether any coordinates were found and the import
             was successful
         """
         coordinate = page.coordinates(primary_only=True)
@@ -153,7 +153,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line argument
+    :param args: command line argument
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

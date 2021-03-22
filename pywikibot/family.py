@@ -548,9 +548,9 @@ class Family:
     def load(fam: Optional[str] = None):
         """Import the named family.
 
-        @param fam: family name (if omitted, uses the configured default)
-        @return: a Family instance configured for the named family.
-        @raises pywikibot.exceptions.UnknownFamilyError: family not known
+        :param fam: family name (if omitted, uses the configured default)
+        :return: a Family instance configured for the named family.
+        :raises pywikibot.exceptions.UnknownFamilyError: family not known
         """
         if fam is None:
             fam = config.family
@@ -688,8 +688,8 @@ class Family:
 
         May be overridden to return 'https'. Other protocols are not supported.
 
-        @param code: language code
-        @return: protocol that this family uses
+        :param code: language code
+        :return: protocol that this family uses
         """
         return 'http'
 
@@ -699,8 +699,8 @@ class Family:
 
         *Renamed in version 5.3.*
 
-        @param code: language code
-        @return: flag to verify the SSL certificate;
+        :param code: language code
+        :return: flag to verify the SSL certificate;
                  set it to False to allow access if certificate has an error.
         """
         return True
@@ -724,9 +724,9 @@ class Family:
         but needs to be overridden in the family file for any wiki that
         uses a different value.
 
-        @param code: Site code
-        @raises KeyError: code is not recognised
-        @return: URL path without ending '/'
+        :param code: Site code
+        :raises KeyError: code is not recognised
+        :return: URL path without ending '/'
         """
         return '/w'
 
@@ -749,11 +749,11 @@ class Family:
         """
         Prefix uri with port and hostname.
 
-        @param code: The site code
-        @param uri: The absolute path after the hostname
-        @param protocol: The protocol which is used. If None it'll determine
+        :param code: The site code
+        :param uri: The absolute path after the hostname
+        :param protocol: The protocol which is used. If None it'll determine
             the protocol from the code.
-        @return: The full URL ending with uri
+        :return: The full URL ending with uri
         """
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
@@ -795,7 +795,7 @@ class Family:
         """
         Return interface to use for code.
 
-        @rtype: str or subclass of BaseSite
+        :rtype: str or subclass of BaseSite
         """
         if code in self.interwiki_removals:
             if code in self.codes:
@@ -814,21 +814,22 @@ class Family:
 
         It is first checking if a domain of this family is in the the domain of
         the URL. If that is the case it's checking all codes and verifies that
-        a path generated via L{APISite.article_path} and L{Family.path} matches
-        the path of the URL together with the hostname for that code.
+        a path generated via :py:obj:`APISite.article_path` and
+        :py:obj:`Family.path` matches the path of the URL together with
+        the hostname for that code.
 
-        It is using L{Family.domains} to first check if a domain applies and
-        then iterates over L{Family.codes} to actually determine which code
-        applies.
+        It is using :py:obj:`Family.domains` to first check if a domain
+        applies and then iterates over :py:obj:`Family.codes` to actually
+        determine which code applies.
 
-        @param url: the URL which may contain a C{$1}. If it's missing it is
+        :param url: the URL which may contain a ``$1``. If it's missing it is
             assumed to be at the end and if it's present nothing is allowed
             after it.
-        @return: The language code of the url. None if that url is not from
+        :return: The language code of the url. None if that url is not from
             this family.
-        @raises RuntimeError: When there are multiple languages in this family
+        :raises RuntimeError: When there are multiple languages in this family
             which would work with the given URL.
-        @raises ValueError: When text is present after $1.
+        :raises ValueError: When text is present after $1.
         """
         parsed = urlparse.urlparse(url)
         if not re.match('(https?)?$', parsed.scheme):
@@ -930,7 +931,7 @@ class Family:
         Do a conversion on the retrieved text from the Wiki.
 
         For example a X-conversion in Esperanto
-        U{https://en.wikipedia.org/wiki/Esperanto_orthography#X-system}.
+        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
         """
         return getText
 
@@ -939,7 +940,7 @@ class Family:
         Do a conversion on the text to insert on the Wiki.
 
         For example a X-conversion in Esperanto
-        U{https://en.wikipedia.org/wiki/Esperanto_orthography#X-system}.
+        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
         """
         return putText
 
@@ -950,8 +951,8 @@ class Family:
 
         Interwiki replacements override removals for the same code.
 
-        @return: mapping of old codes to new codes (or None)
-        @rtype: dict
+        :return: mapping of old codes to new codes (or None)
+        :rtype: dict
         """
         data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
@@ -974,7 +975,7 @@ class Family:
 
         These domains may also exist in another family.
 
-        @rtype: set of str
+        :rtype: set of str
         """
         return set(cls.langs.values())
 
@@ -983,7 +984,7 @@ class Family:
         """
         Get list of codes used by this family.
 
-        @rtype: set of str
+        :rtype: set of str
         """
         return set(cls.langs.keys())
 
@@ -1215,7 +1216,7 @@ class WikimediaFamily(Family):
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
-    """Single site family for sites hosted at C{*.wikimedia.org}."""
+    """Single site family for sites hosted at ``*.wikimedia.org``."""
 
     @classproperty
     def domain(cls):
@@ -1228,10 +1229,10 @@ def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.
 
-    @param name: Name for the family
-    @param url: API endpoint URL of the wiki
-    @return: Generated family class
-    @rtype: SingleSiteFamily
+    :param name: Name for the family
+    :param url: API endpoint URL of the wiki
+    :return: Generated family class
+    :rtype: SingleSiteFamily
     """
     url = urlparse.urlparse(url)
     domain = url.netloc

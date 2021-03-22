@@ -52,13 +52,13 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
 
     """Bot to remove links that are being or have been spammed.
 
-    @param generator: page generator with preloaded pages.
-    @type generator: generator
-    @param spam_external_url: an external url
-    @keyword summary: summary message when given. Otherwise the default
+    :param generator: page generator with preloaded pages.
+    :type generator: generator
+    :param spam_external_url: an external url
+    :keyword summary: summary message when given. Otherwise the default
         summary will be used
-    @keyword always: Don't ask for text replacements
-    @type always: bool
+    :keyword always: Don't ask for text replacements
+    :type always: bool
     """
 
     summary_key = 'spamremove-remove'
@@ -123,8 +123,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     spam_external_url = None
     protocol = 'http'

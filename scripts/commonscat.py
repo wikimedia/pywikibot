@@ -372,7 +372,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def findCommonscatLink(self, page) -> str:
         """Find CommonsCat template on interwiki pages.
 
-        @return: name of a valid commons category
+        :return: name of a valid commons category
         """
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
@@ -400,7 +400,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Use Wikibase property to get the category if possible.
         Otherwise check all langlinks to find it.
 
-        @return: name of a valid commons category
+        :return: name of a valid commons category
         """
         data_repo = page.site.data_repository()
         cat_property = wikibase_property.get(data_repo.sitename)
@@ -418,7 +418,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def getCommonscatLink(page):  # noqa N802, N803
         """Find CommonsCat template on page.
 
-        @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
+        :rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
         """
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             page.site.code, commonscatTemplates,
@@ -519,8 +519,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     checkcurrent = False

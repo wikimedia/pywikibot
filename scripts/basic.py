@@ -77,12 +77,12 @@ class BasicBot(
     """
     An incomplete sample bot.
 
-    @ivar summary_key: Edit summary message key. The message that should be
+    :ivar summary_key: Edit summary message key. The message that should be
         used is placed on /i18n subdirectory. The file containing these
         messages should have the same name as the caller script (i.e. basic.py
         in this case). Use summary_key to set a default edit summary message.
 
-    @type summary_key: str
+    :type summary_key: str
     """
 
     summary_key = 'basic-changing'
@@ -91,9 +91,9 @@ class BasicBot(
         """
         Initializer.
 
-        @param generator: the page generator that determines on which pages
+        :param generator: the page generator that determines on which pages
             to work
-        @type generator: generator
+        :type generator: generator
         """
         # Add your own options to the bot and set their defaults
         # -always option is predefined by BaseBot class
@@ -147,7 +147,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
     # Process global arguments to determine desired site

@@ -58,7 +58,7 @@ class UI(ABUIC):
     """Base for terminal user interfaces.
 
     *New in version 6.2:* subclassed from
-    L{pywikibot.userinterfaces._interface_base.ABUIC}.
+    :py:obj:`pywikibot.userinterfaces._interface_base.ABUIC`.
     """
 
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
@@ -256,11 +256,11 @@ class UI(ABUIC):
         after the question if they are not already present. Also recognises
         a trailing question mark.
 
-        @param question: The question, without trailing whitespace.
-        @param password: if True, hides the user's input (for password entry).
-        @param default: The default answer if none was entered. None to require
+        :param question: The question, without trailing whitespace.
+        :param password: if True, hides the user's input (for password entry).
+        :param default: The default answer if none was entered. None to require
             an answer.
-        @param force: Automatically use the default
+        :param force: Automatically use the default
         """
         assert(not password or not default)
 
@@ -323,26 +323,26 @@ class UI(ABUIC):
         sensible when the option supports multiple values as it'll return an
         ambiguous index.
 
-        @param question: The question, without trailing whitespace.
-        @param options: Iterable of all available options. Each entry contains
+        :param question: The question, without trailing whitespace.
+        :param options: Iterable of all available options. Each entry contains
             the full length answer and a shortcut of only one character.
             Alternatively they may be Option (or subclass) instances or
             ChoiceException instances which have a full option and shortcut
             and will be raised if selected.
-        @type options: iterable containing sequences of length 2 or
+        :type options: iterable containing sequences of length 2 or
             iterable containing Option instances or ChoiceException as well.
             Singletons of Option and its subclasses are also accepted.
-        @param default: The default answer if no was entered. None to require
+        :param default: The default answer if no was entered. None to require
             an answer.
-        @param return_shortcut: Whether the shortcut or the index in the option
+        :param return_shortcut: Whether the shortcut or the index in the option
             should be returned.
-        @param automatic_quit: Adds the option 'Quit' ('q') if True and throws
-            a L{QuitKeyboardInterrupt} if selected.
-        @param force: Automatically use the default
-        @return: If return_shortcut the shortcut of options or the value of
+        :param automatic_quit: Adds the option 'Quit' ('q') if True and throws
+            a :py:obj:`QuitKeyboardInterrupt` if selected.
+        :param force: Automatically use the default
+        :return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
-        @rtype: int (if not return_shortcut), lowercased str (otherwise)
+        :rtype: int (if not return_shortcut), lowercased str (otherwise)
         """
         def output_option(option, before_question):
             """Print an OutputOption before or after question."""
@@ -403,12 +403,12 @@ class UI(ABUIC):
                           force: bool = False) -> Any:
         """Ask the user to select one entry from a list of entries.
 
-        @param question: The question, without trailing whitespace.
-        @param answers: A sequence of options to be choosen.
-        @param default: The default answer if no was entered. None to require
+        :param question: The question, without trailing whitespace.
+        :param answers: A sequence of options to be choosen.
+        :param default: The default answer if no was entered. None to require
             an answer.
-        @param force: Automatically use the default.
-        @return: Return a single Sequence entry.
+        :param force: Automatically use the default.
+        :return: Return a single Sequence entry.
         """
         # lock stream output
         # with self.lock: (T282962)
@@ -443,12 +443,12 @@ class UI(ABUIC):
 
         Uses a Tkinter edit box because we don't have a console editor
 
-        @param text: the text to be edited
-        @param jumpIndex: position at which to put the caret
-        @param highlight: each occurrence of this substring will be highlighted
-        @return: the modified text, or None if the user didn't save the text
+        :param text: the text to be edited
+        :param jumpIndex: position at which to put the caret
+        :param highlight: each occurrence of this substring will be highlighted
+        :return: the modified text, or None if the user didn't save the text
             file in his text editor
-        @rtype: str or None
+        :rtype: str or None
         """
         try:
             from pywikibot.userinterfaces import gui

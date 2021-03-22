@@ -1094,7 +1094,7 @@ class transliterator:  # noqa: N801
         """
         Initialize the transliteration mapping.
 
-        @param encoding: the encoding available. Any transliterated character
+        :param encoding: the encoding available. Any transliterated character
             which can't be mapped, will be removed from the mapping.
         """
         trans = _trans.copy()
@@ -1114,11 +1114,11 @@ class transliterator:  # noqa: N801
         """
         Transliterate the character.
 
-        @param char: The character to transliterate.
-        @param default: The character used when there is no transliteration.
-        @param prev: The previous character
-        @param next: The next character
-        @return: The transliterated character which may be an empty string
+        :param char: The character to transliterate.
+        :param default: The character used when there is no transliteration.
+        :param prev: The previous character
+        :param next: The next character
+        :return: The transliterated character which may be an empty string
         """
         if char in self.trans:
             return self.trans[char]

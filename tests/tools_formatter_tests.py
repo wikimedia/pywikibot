@@ -1,4 +1,4 @@
-"""Tests for the C{pywikibot.tools.formatter} module."""
+"""Tests for the ``pywikibot.tools.formatter`` module."""
 #
 # (C) Pywikibot team, 2015-2021
 #

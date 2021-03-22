@@ -57,8 +57,8 @@ class Subject:
     def __init__(self, origin=None):
         """Initializer.
 
-        @param origin: the page on the 'origin' wiki
-        @type origin: pywikibot.page.Page
+        :param origin: the page on the 'origin' wiki
+        :type origin: pywikibot.page.Page
         """
         # Remember the "origin page"
         self._origin = origin
@@ -88,10 +88,10 @@ class GraphDrawer:
     def __init__(self, subject):
         """Initializer.
 
-        @param subject: page data to graph
-        @type subject: pywikibot.interwiki_graph.Subject
+        :param subject: page data to graph
+        :type subject: pywikibot.interwiki_graph.Subject
 
-        @raises ImportError if pydot is not installed
+        :raises ImportError if pydot is not installed
         """
         if isinstance(pydot, ImportError):
             raise ImportError('pydot is not installed: {}.'.format(pydot))
@@ -183,7 +183,7 @@ class GraphDrawer:
         """
         Create graph of the interwiki links.
 
-        For more info see U{https://meta.wikimedia.org/wiki/Interwiki_graphs}
+        For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
         pywikibot.output('Preparing graph for {}'
                          .format(self.subject.origin.title()))
@@ -210,10 +210,10 @@ def getFilename(page, extension: Optional[str] = None) -> str:
     """
     Create a filename that is unique for the page.
 
-    @param page: page used to create the new filename
-    @type page: pywikibot.page.Page
-    @param extension: file extension
-    @return: filename of <family>-<lang>-<page>.<ext>
+    :param page: page used to create the new filename
+    :type page: pywikibot.page.Page
+    :param extension: file extension
+    :return: filename of <family>-<lang>-<page>.<ext>
     """
     filename = '-'.join((page.site.family.name,
                          page.site.code,

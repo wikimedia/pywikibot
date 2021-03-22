@@ -96,8 +96,8 @@ def abspath(path):
 def handle_args(pwb_py, *args):
     """Handle args and get filename.
 
-    @return: filename, script args, local args for pwb.py
-    @rtype: tuple
+    :return: filename, script args, local args for pwb.py
+    :rtype: tuple
     """
     fname = None
     index = 0
@@ -135,11 +135,11 @@ def check_modules(script=None):
 
     This also checks Python version when importing deptendencies from setup.py
 
-    @param script: The script name to be checked for dependencies
-    @type script: str or None
-    @return: True if all dependencies are installed
-    @rtype: bool
-    @raise RuntimeError: wrong Python version found in setup.py
+    :param script: The script name to be checked for dependencies
+    :type script: str or None
+    :return: True if all dependencies are installed
+    :rtype: bool
+    :raise RuntimeError: wrong Python version found in setup.py
     """
     import pkg_resources
     if script:

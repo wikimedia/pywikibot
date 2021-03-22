@@ -381,16 +381,16 @@ class XmlDumpReplacePageGenerator:
 
     These pages will be retrieved from a local XML dump file.
 
-    @param xmlFilename: The dump's path, either absolute or relative
-    @type xmlFilename: str
-    @param xmlStart: Skip all articles in the dump before this one
-    @type xmlStart: str
-    @param replacements: A list of 2-tuples of original text (as a
+    :param xmlFilename: The dump's path, either absolute or relative
+    :type xmlFilename: str
+    :param xmlStart: Skip all articles in the dump before this one
+    :type xmlStart: str
+    :param replacements: A list of 2-tuples of original text (as a
         compiled regular expression) and replacement text (as a string).
-    @type replacements: list of 2-tuples
-    @param exceptions: A dictionary which defines when to ignore an
+    :type replacements: list of 2-tuples
+    :param exceptions: A dictionary which defines when to ignore an
         occurrence. See docu of the ReplaceRobot initializer below.
-    @type exceptions: dict
+    :type exceptions: dict
     """
 
     def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
@@ -447,7 +447,7 @@ class XmlDumpReplacePageGenerator:
         """
         Return True if one of the exceptions applies for the given title.
 
-        @rtype: bool
+        :rtype: bool
         """
         if 'title' in self.exceptions:
             for exc in self.exceptions['title']:
@@ -464,7 +464,7 @@ class XmlDumpReplacePageGenerator:
         """
         Return True if one of the exceptions applies for the given text.
 
-        @rtype: bool
+        :rtype: bool
         """
         if 'text-contains' in self.exceptions:
             for exc in self.exceptions['text-contains']:
@@ -477,13 +477,13 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
     """A bot that can do text replacements.
 
-    @param generator: generator that yields Page objects
-    @type generator: generator
-    @param replacements: a list of Replacement instances or sequences of
+    :param generator: generator that yields Page objects
+    :type generator: generator
+    :param replacements: a list of Replacement instances or sequences of
         length 2 with the original text (as a compiled regular expression)
         and replacement text (as a string).
-    @type replacements: list
-    @param exceptions: a dictionary which defines when not to change an
+    :type replacements: list
+    :param exceptions: a dictionary which defines when not to change an
         occurrence. This dictionary can have these keys:
 
         title
@@ -502,22 +502,22 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             dictionary in textlib._create_default_regexes() or must be
             accepted by textlib._get_regexes().
 
-    @type exceptions: dict
-    @param allowoverlap: when matches overlap, all of them are replaced.
-    @type allowoverlap: bool
-    @param recursive: Recurse replacement as long as possible.
-    @type recursive: bool
-    @warning: Be careful, this might lead to an infinite loop.
-    @param addcat: category to be added to every page touched
-    @type addcat: pywikibot.Category or str or None
-    @param sleep: slow down between processing multiple regexes
-    @type sleep: int
-    @param summary: Set the summary message text bypassing the default
-    @type summary: str
-    @keyword always: the user won't be prompted before changes are made
-    @type keyword: bool
-    @keyword site: Site the bot is working on.
-    @warning: site parameter should be passed to constructor.
+    :type exceptions: dict
+    :param allowoverlap: when matches overlap, all of them are replaced.
+    :type allowoverlap: bool
+    :param recursive: Recurse replacement as long as possible.
+    :type recursive: bool
+    :warning: Be careful, this might lead to an infinite loop.
+    :param addcat: category to be added to every page touched
+    :type addcat: pywikibot.Category or str or None
+    :param sleep: slow down between processing multiple regexes
+    :type sleep: int
+    :param summary: Set the summary message text bypassing the default
+    :type summary: str
+    :keyword always: the user won't be prompted before changes are made
+    :type keyword: bool
+    :keyword site: Site the bot is working on.
+    :warning: site parameter should be passed to constructor.
         Otherwise the bot takes the current site and warns the operator
         about the missing site
     """
@@ -575,7 +575,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         """
         Apply all replacements to the given text.
 
-        @rtype: str, set
+        :rtype: str, set
         """
         if page is None:
             pywikibot.warn(
@@ -777,8 +777,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     gen = None

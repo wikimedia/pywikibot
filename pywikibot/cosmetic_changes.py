@@ -214,7 +214,7 @@ def _format_isbn_match(match, strict=True):
 def _reformat_ISBNs(text, strict=True):
     """Helper function to normalise ISBNs in text.
 
-    @raises Exception: Invalid ISBN encountered when strict enabled
+    :raises Exception: Invalid ISBN encountered when strict enabled
     """
     return textlib.reformat_ISBNs(
         text, lambda match: _format_isbn_match(match, strict=strict))
@@ -232,12 +232,12 @@ class CosmeticChangesToolkit:
                  ignore: IntEnum = CANCEL.ALL):
         """Initializer.
 
-        @param page: the Page object containing the text to be modified
-        @type page: pywikibot.Page
-        @param show_diff: show difference after replacements (default: False)
-        @param namespace: DEPRECATED namespace parameter
-        @param pageTitle: DEPRECATED page title parameter
-        @param ignore: ignores if an error occurred and either skips the page
+        :param page: the Page object containing the text to be modified
+        :type page: pywikibot.Page
+        :param show_diff: show difference after replacements (default: False)
+        :param namespace: DEPRECATED namespace parameter
+        :param pageTitle: DEPRECATED page title parameter
+        :param ignore: ignores if an error occurred and either skips the page
             or only that method. It can be set one of the CANCEL constants
         """
         if isinstance(page, pywikibot.BaseSite):
@@ -544,8 +544,8 @@ class CosmeticChangesToolkit:
 
         * Capitalize the article title of the link, if appropriate
 
-        @param text: string to perform the clean-up on
-        @return: text with tidied wikilinks
+        :param text: string to perform the clean-up on
+        :return: text with tidied wikilinks
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
