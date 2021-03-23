@@ -45,6 +45,7 @@ from pathlib import Path
 from textwrap import fill
 from typing import Optional, Union
 from warnings import warn
+from zipfile import is_zipfile, ZipFile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.backports import Dict, List, removesuffix, Tuple
@@ -397,13 +398,41 @@ def register_family_file(family_name, file_path):
     family_files[family_name] = file_path
 
 
-def register_families_folder(folder_path):
-    """Register all family class files contained in a directory."""
+def register_families_folder(folder_path: str):
+    """Register all family class files contained in a directory.
+
+    @param folder_path: The path of a folder containing family files.
+        The families may also be inside a zip archive structure.
+    @raises NotADirectoryError: folder_path is not a directory
+    """
     suffix = '_family.py'
-    for file_name in os.listdir(folder_path):
+    if os.path.isdir(folder_path):
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith(suffix):
+                family_name = removesuffix(file_name, suffix)
+                family_files[family_name] = os.path.join(folder_path,
+                                                         file_name)
+        return
+
+    # probably there is a zip file chain (T278076)
+    # find the parent zip folder
+    path = Path(folder_path)
+    if not is_zipfile(path):
+        for path in path.parents:
+            if is_zipfile(path):
+                break
+        else:
+            raise NotADirectoryError('20', 'Not a directory', folder_path)
+
+    # read the family files from zip folder
+    # assume that all files ending with suffix reside in family folder
+    zip_file = ZipFile(path)
+    for file_name in zip_file.namelist():
         if file_name.endswith(suffix):
-            family_name = removesuffix(file_name, suffix)
-            family_files[family_name] = os.path.join(folder_path, file_name)
+            file_path = Path(file_name)
+            family_name = removesuffix(file_path.name, suffix)
+            family_files[family_name] = os.path.join(folder_path,
+                                                     file_path.name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
