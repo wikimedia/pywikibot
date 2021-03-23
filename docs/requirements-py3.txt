@@ -2,4 +2,3 @@
 # requirements.txt is also needed
 
 sphinx >= 1.8, != 3.1.0, != 3.5.0
-sphinx-epytext >= 0.0.4
