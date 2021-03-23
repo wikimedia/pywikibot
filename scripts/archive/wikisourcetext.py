@@ -53,7 +53,7 @@ The following parameters are supported:
     -always     don't bother asking to confirm any of the changes.
 """
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -167,7 +167,7 @@ class UploadTextBot(SingleSiteBot):
 
         @param page: page to be treated.
         @type page: ProofreadPage
-        @raises: pywikibot.Error
+        @raises pywikibot.Error: Page must be a ProofreadPage object
         """
         if not isinstance(page, ProofreadPage):
             raise pywikibot.Error('Page {} must be a ProofreadPage object.'

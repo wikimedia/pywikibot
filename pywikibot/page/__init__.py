@@ -2452,7 +2452,7 @@ class FilePage(Page):
             FileInfo: provided revision will be used.
         @type revision: None or FileInfo
         @return: True if download is successful, False otherwise.
-        @raise: IOError if filename cannot be written for any reason.
+        @raise IOError: if filename cannot be written for any reason.
         """
         if filename is None:
             filename = self.title(as_filename=True, with_ns=False)
@@ -3133,7 +3133,7 @@ class User(Page):
     ) -> Iterable[Tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
-        @param: total: Limit results to this number of pages
+        @param total: Limit results to this number of pages
         @keyword start: Iterate contributions starting at this Timestamp
         @keyword end: Iterate contributions ending at this Timestamp
         @keyword reverse: Iterate oldest contributions first (default: newest)

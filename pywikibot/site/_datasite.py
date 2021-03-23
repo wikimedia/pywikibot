@@ -890,7 +890,7 @@ class DataSite(APISite):
         """
         Set aliases for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetaliases', aliases, **kwargs)
 
@@ -898,7 +898,7 @@ class DataSite(APISite):
         """
         Set description for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action()
         """
         return self._wbset_action(itemdef, 'wbsetdescription', description,
                                   **kwargs)
@@ -907,7 +907,7 @@ class DataSite(APISite):
         """
         Set label for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetlabel', label, **kwargs)
 
@@ -915,6 +915,6 @@ class DataSite(APISite):
         """
         Set, remove or modify a sitelink on a Wikibase item.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)

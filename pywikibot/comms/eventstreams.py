@@ -184,7 +184,7 @@ class EventStreams:
         assumed as default.
 
         You may register multiple filters for each type of filter.
-        The behaviour of filter type is as follows::
+        The behaviour of filter type is as follows:
 
         - B{'none'}: Skip if the any filter matches. Otherwise check 'all'.
         - B{'all'}: Skip if not all filter matches. Otherwise check 'any':
