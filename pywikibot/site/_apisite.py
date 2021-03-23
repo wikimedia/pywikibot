@@ -633,19 +633,17 @@ class APISite(
         """Return true if the user has new messages, and false otherwise."""
         return 'messages' in self.userinfo
 
-    def mediawiki_messages(self, keys, lang=None):
+    def mediawiki_messages(self, keys, lang: Optional[str] = None):
         """Fetch the text of a set of MediaWiki messages.
 
         The returned dict uses each key to store the associated message.
 
-        @see: U{https://www.mediawiki.org/wiki/API:Allmessages}
+        @see: https://www.mediawiki.org/wiki/API:Allmessages
 
         @param keys: MediaWiki messages to fetch
         @type keys: iterable of str
         @param lang: a language code, default is self.lang
-        @type lang: str or None
-
-        @rtype OrderedDict
+        @rtype: OrderedDict
         """
         amlang = lang or self.lang
         if not all(amlang in _mw_msg_cache
@@ -2931,7 +2929,7 @@ class APISite(
             or typing.Iterable[str]
         @keyword revids: Get revisions by their ID
 
-        @note either titles or revids must be set but not both
+        @note: either titles or revids must be set but not both
 
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp

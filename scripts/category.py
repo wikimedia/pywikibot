@@ -966,20 +966,15 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     categories it currently is.
 
     @param cat_title: a title of the category to process.
-    @type: str
-
     @param cat_db: a CategoryDatabase object.
-    @type: CategoryDatabase object
-
+    @type cat_db: CategoryDatabase object
     @param namespaces: namespaces to focus on.
-    @type: iterable of pywikibot.Namespace
-
+    @type namespaces: iterable of pywikibot.Namespace
     @param comment: a custom summary for edits.
-    @type: str
     """
 
-    def __init__(self, cat_title, cat_db, namespaces=None, comment=None
-                 ) -> None:
+    def __init__(self, cat_title: str, cat_db, namespaces=None,
+                 comment: Optional[str] = None) -> None:
         """Initializer."""
         self.cat_title = cat_title
         self.cat_db = cat_db
@@ -1004,13 +999,11 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         should always use current_cat = original_cat.
 
         @param member: a page to process.
-        @type: pywikibot.Page
-
+        @type member: pywikibot.Page
         @param original_cat: original category to replace.
-        @type: pywikibot.Category
-
+        @type original_cat: pywikibot.Category
         @param current_cat: a category which is questioned.
-        @type: pywikibot.Category
+        @type current_cat: pywikibot.Category
         """
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
@@ -1032,7 +1025,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""
 
-            def list_categories(self, cat_list, prefix='') -> None:
+            def list_categories(self, cat_list, prefix: str = '') -> None:
                 """
                 Output categories in one or two columns.
 
@@ -1041,10 +1034,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 options.
 
                 @param cat_list: sorted iterable of category titles to output.
-                @type: iterable of str
-
+                @type cat_list: iterable of str
                 @param prefix: a prefix to assigned number index.
-                @type: str
                 """
                 # can we can output in two columns?
                 count = len(cat_list)

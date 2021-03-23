@@ -212,7 +212,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         Return an item without any existing claims of the given property.
 
         @param repo: repository to fetch item from
-        @type: pywikibot.site.DataSite
+        @type repo: pywikibot.site.DataSite
         @param prop: P-value of the property to scrub
         @return: scrubbed item
         @rtype: pywikibot.ItemPage

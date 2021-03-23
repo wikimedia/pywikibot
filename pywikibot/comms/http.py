@@ -223,7 +223,7 @@ def request(site,
     document root '/'.
 
     @param site: The Site to connect to
-    @type: site: pywikibot.site.BaseSite
+    @type site: pywikibot.site.BaseSite
     @param uri: the URI to retrieve
     @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
