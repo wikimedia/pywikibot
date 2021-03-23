@@ -43,7 +43,7 @@ class HttpTestCase(TestCase):
         r = http.fetch('http://www.wikipedia.org/')
         self.assertIsInstance(r, requests.Response)
         self.assertEqual(r.status_code, 200)
-        self.assertIn('<html lang="mul"', r.text)
+        self.assertIn('<html lang="en"', r.text)
         self.assertIsInstance(r.text, str)
         self.assertIsInstance(r.content, bytes)
 
