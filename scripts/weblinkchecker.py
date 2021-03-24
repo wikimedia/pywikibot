@@ -491,7 +491,7 @@ class DeadLinkReportThread(threading.Thread):
     def run(self):
         """Run thread."""
         while not self.killed:
-            if len(self.queue) == 0:
+            if not self.queue:
                 if self.finishing:
                     break
                 time.sleep(0.1)

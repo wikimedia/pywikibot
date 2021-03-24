@@ -1495,7 +1495,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         super().setUpClass()
         site = pywikibot.Site()
         newuser_logevents = list(site.logevents(logtype='newusers', total=1))
-        if len(newuser_logevents) == 0:
+        if not newuser_logevents:
             raise unittest.SkipTest('No newuser logs found to test with.')
 
     login = True

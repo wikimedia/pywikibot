@@ -1357,8 +1357,7 @@ def deprecated(*args, **kwargs):
 
     since = kwargs.pop('since', None)
     future_warning = kwargs.pop('future_warning', False)
-    without_parameters = (len(args) == 1 and len(kwargs) == 0
-                          and callable(args[0]))
+    without_parameters = len(args) == 1 and not kwargs and callable(args[0])
     if 'instead' in kwargs:
         instead = kwargs['instead']
     elif not without_parameters and len(args) == 1:
