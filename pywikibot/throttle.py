@@ -1,6 +1,6 @@
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,6 @@ from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import deprecated
 
 _logger = 'wiki.throttle'
 
@@ -75,12 +74,6 @@ class Throttle:
         if self.multiplydelay:
             self.checkMultiplicity()
         self.setDelays()
-
-    @property
-    @deprecated(since='20180423', future_warning=True)
-    def lastwait(self):
-        """DEPRECATED property."""
-        return 0.0
 
     def _read_file(self, raise_exc=False):
         """Yield process entries from file."""
