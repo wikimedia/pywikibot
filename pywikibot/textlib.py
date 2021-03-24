@@ -24,11 +24,7 @@ import pywikibot
 from pywikibot.backports import List, Tuple
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import (
-    deprecate_arg,
-    deprecated,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecate_arg, issue_deprecation_warning
 
 try:
     import mwparserfromhell
@@ -2019,23 +2015,6 @@ class TimeStripper:
 
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
-
-    @property
-    @deprecated(since='20170212', future_warning=True)
-    def linkP(self):
-        """Deprecated linkP instance variable."""
-        return self._hyperlink_pat
-
-    @property
-    @deprecated(since='20170212', future_warning=True)
-    def comment_pattern(self):
-        """Deprecated comment_pattern instance variable."""
-        return self._comment_pat
-
-    @deprecated('module function', since='20151118', future_warning=True)
-    def findmarker(self, text: str, base: str = '@@', delta: str = '@'):
-        """Find a string which is not part of text."""
-        return findmarker(text, base, delta)
 
     def fix_digits(self, line):
         """Make non-latin digits like Persian to latin to parse."""
