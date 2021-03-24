@@ -8,7 +8,7 @@ retrieves the site settings from wikipedia family and updates the Family
 linktrails dict.
 """
 #
-# (C) Pywikibot team, 2017-2020
+# (C) Pywikibot team, 2017-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -149,7 +149,7 @@ def update_family_file():
         family_file_name = join('pywikibot', 'family.py')
         with codecs.open(family_file_name, 'r', 'utf8') as family_file:
             family_text = family_file.read()
-        family_text = re.sub(r'(?msu)^ {4}linktrails.+?\}',
+        family_text = re.sub(r'(?ms)^ {4}linktrails.+?\}',
                              text, family_text, 1)
         with codecs.open(family_file_name, 'w', 'utf8') as family_file:
             family_file.write(family_text)
