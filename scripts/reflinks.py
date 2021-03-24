@@ -47,6 +47,7 @@ import socket
 import subprocess
 import tempfile
 
+from contextlib import suppress
 from functools import partial
 from textwrap import shorten
 from urllib.error import URLError
@@ -56,6 +57,7 @@ from requests import codes
 import pywikibot
 
 from pywikibot import comms, i18n, pagegenerators, textlib
+from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
@@ -233,7 +235,6 @@ class RefLink:
         self.title = re.sub(r'[\.+\-=]{4,}', ' ', self.title)
         # remove \n and \r and unicode spaces from titles
         self.title = re.sub(r'\s', ' ', self.title)
-        self.title = re.sub(r'[\n\r\t]', ' ', self.title)
         # remove extra whitespaces
         # remove leading and trailing ./;/,/-/_/+/ /
         self.title = re.sub(r' +', ' ', self.title.strip(r'=.;,-+_ '))
@@ -285,10 +286,9 @@ class DuplicateReferences:
         # Match references
         self.REFS = re.compile(
             r'(?i)<ref(?P<params>[^>/]*)>(?P<content>.*?)</ref>')
-        self.NAMES = re.compile(
-            r'(?i).*name\s*=\s*(?P<quote>"?)\s*(?P<name>.+)\s*(?P=quote).*')
-        self.GROUPS = re.compile(
-            r'(?i).*group\s*=\s*(?P<quote>"?)\s*(?P<group>.+)\s*(?P=quote).*')
+        fmt = r'(?i).*{0}\s*=\s*(?P<quote>["\']?)\s*(?P<{0}>.+)\s*(?P=quote).*'
+        self.NAMES = re.compile(fmt.format('name'))
+        self.GROUPS = re.compile(fmt.format('group'))
         self.autogen = i18n.twtranslate(site, 'reflinks-autogen')
 
     def process(self, text):
@@ -320,10 +320,10 @@ class DuplicateReferences:
             else:
                 v = [None, [match.group()], False, False]
 
-            name = self.NAMES.match(params)
-            if name:
-                quoted = name.group('quote') == '"'
-                name = name.group('name')
+            found = self.NAMES.match(params)
+            if found:
+                quoted = found.group('quote') in ['"', "'"]
+                name = found.group('name')
                 if v[0]:
                     if v[0] != name:
                         named_repl[name] = [v[0], v[2]]
@@ -344,14 +344,20 @@ class DuplicateReferences:
                 found_ref_names[name] = 1
             groupdict[content] = v
 
-        id_ = 1
-        while self.autogen + str(id_) in found_ref_names:
-            id_ += 1
+        used_numbers = set()
+        for name in found_ref_names:
+            number = removeprefix(name, self.autogen)
+            with suppress(ValueError):
+                used_numbers.add(int(number))
+
+        # iterator to give the next free number
+        free_number = iter({str(i) for i in range(1, 1000)  # should be enough
+                            if i not in used_numbers})
 
         for (g, d) in found_refs.items():
             group = ''
             if g:
-                group = 'group=\"{}\" '.format(group)
+                group = 'group="{}" '.format(group)
 
             for (k, v) in d.items():
                 if len(v[1]) == 1 and not v[3]:
@@ -359,10 +365,9 @@ class DuplicateReferences:
 
                 name = v[0]
                 if not name:
-                    name = '"{}{}"'.format(self.autogen, id_)
-                    id_ += 1
+                    name = '"{}{}"'.format(self.autogen, next(free_number))
                 elif v[2]:
-                    name = '{!r}'.format(name)
+                    name = '"{}"'.format(name)
 
                 named = '<ref {}name={}>{}</ref>'.format(group, name, k)
                 text = text.replace(v[1][0], named, 1)
@@ -384,10 +389,10 @@ class DuplicateReferences:
             # TODO : Support ref groups
             name = v[0]
             if v[1]:
-                name = '{!r}'.format(name)
+                name = '"{}"'.format(name)
 
             text = re.sub(
-                '<ref name\\s*=\\s*(?P<quote>"?)\\s*{}\\s*(?P=quote)\\s*/>'
+                r'<ref name\s*=\s*(?P<quote>["\']?)\s*{}\s*(?P=quote)\s*/>'
                 .format(k),
                 '<ref name={} />'.format(name), text)
         return text
@@ -518,10 +523,9 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         """Process one page."""
         # Load the page's text from the wiki
         new_text = page.text
-
+        raw_text = textlib.removeDisabledParts(new_text)
         # for each link to change
-        for match in linksInRef.finditer(
-                textlib.removeDisabledParts(page.get())):
+        for match in linksInRef.finditer(raw_text):
 
             link = match.group('url')
             if 'jstor.org' in link:
