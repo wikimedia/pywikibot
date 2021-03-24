@@ -652,26 +652,24 @@ class checkImagesBot:
         emailPageName = i18n.translate(self.site, emailPageWithText)
         emailSubj = i18n.translate(self.site, emailSubject)
         if self.notification2:
-            self.notification2 = self.notification2 % self.image_to_report
+            self.notification2 %= self.image_to_report
         else:
             self.notification2 = self.notification
-        second_text = False
 
+        second_text = False
         # Getting the talk page's history, to check if there is another
         # advise...
         try:
             testoattuale = self.talk_page.get()
-            history = self.talk_page.getLatestEditors(limit=10)
+            history = list(self.talk_page.revisions(total=10))
             latest_user = history[0]['user']
             pywikibot.output(
                 'The latest user that has written something is: '
                 + latest_user)
-            if latest_user in self.bots:
+            # A block to prevent the second message if the bot also
+            # welcomed users...
+            if latest_user in self.bots and len(history) > 1:
                 second_text = True
-                # A block to prevent the second message if the bot also
-                # welcomed users...
-                if history[0]['timestamp'] == history[-1]['timestamp']:
-                    second_text = False
         except pywikibot.IsRedirectPage:
             pywikibot.output(
                 'The user talk is a redirect, trying to get the right talk...')
@@ -679,11 +677,9 @@ class checkImagesBot:
                 self.talk_page = self.talk_page.getRedirectTarget()
                 testoattuale = self.talk_page.get()
             except pywikibot.NoPage:
-                second_text = False
                 testoattuale = i18n.translate(self.site, empty)
         except pywikibot.NoPage:
             pywikibot.output('The user page is blank')
-            second_text = False
             testoattuale = i18n.translate(self.site, empty)
 
         if self.commTalk:
@@ -725,7 +721,6 @@ class checkImagesBot:
                     emailClass.send_email(emailSubj, text_to_send)
                 except NotEmailableError:
                     pywikibot.output('User is not mailable, aborted')
-                    return
 
     def regexGenerator(self, regexp, textrun) -> Generator[pywikibot.FilePage,
                                                            None, None]:
