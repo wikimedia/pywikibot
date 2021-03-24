@@ -706,6 +706,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
+    @deprecated('ImagePage.fromPage()', since='20210325', future_warning=True)
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
         Create a new Wikibase item for a provided page.
