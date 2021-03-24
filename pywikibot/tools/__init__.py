@@ -241,36 +241,6 @@ class DotReadableDict:
         return repr(self.__dict__)
 
 
-class _FrozenDict(dict):
-
-    """
-    Frozen dict, preventing write after initialisation.
-
-    Raises TypeError if write attempted.
-    """
-
-    def __init__(self, data=None, error: Optional[str] = None):
-        """
-        Initializer.
-
-        @param data: mapping to freeze
-        @type data: mapping
-        @param error: error message
-        """
-        if data:
-            args = [data]
-        else:
-            args = []
-        super().__init__(*args)
-        self._error = error or 'FrozenDict: not writable'
-
-    def update(self, *args, **kwargs):
-        """Prevent updates."""
-        raise TypeError(self._error)
-
-    __setitem__ = update
-
-
 class frozenmap(Mapping):  # noqa:  N801
 
     """Frozen mapping, preventing write after initialisation."""
@@ -1816,9 +1786,3 @@ def concat_options(message, line_length, options):
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
     return '{} ({}):'.format(message, option_msg)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
-                             replacement_name='tools.frozenmap',
-                             since='20201109', future_warning=True)
