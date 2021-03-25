@@ -2162,6 +2162,112 @@ class TestSiteSysopWrite(TestCase):
         revs = list(p.revisions())
         self.assertGreater(len(revs), 2)
 
+    def test_revdel_page(self):
+        """Test deleting and undeleting page revisions."""
+        site = self.get_site()
+        # Verify state
+        site.deleterevs('revision', ids=[219993, 219994], hide='',
+                        show='content|comment|user',
+                        reason='pywikibot unit tests')
+
+        # Single revision
+        site.deleterevs('revision', '219994', hide='user',
+                        reason='pywikibot unit tests')
+
+        p1 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p1.revisions())
+        for rev in revs:
+            if rev['revid'] != 219994:
+                continue
+            self.assertTrue(rev['userhidden'])
+
+        # Multiple revisions
+        site.deleterevs('revision', '219993|219994', hide='comment',
+                        reason='pywikibot unit tests')
+
+        p2 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p2.revisions())
+        for rev in revs:
+            if rev['revid'] != 219994:
+                continue
+            self.assertTrue(rev['userhidden'])
+            self.assertTrue(rev['commenthidden'])
+
+        # Concurrently show and hide
+        site.deleterevs('revision', ['219993', '219994'], hide='user|content',
+                        show='comment', reason='pywikibot unit tests')
+
+        p3 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p3.revisions())
+        for rev in revs:
+            if rev['revid'] == 219993:
+                self.assertTrue(rev['userhidden'])
+            elif rev['revid'] == 219994:
+                self.assertFalse(rev['commenthidden'])
+
+        # Cleanup
+        site.deleterevs('revision', [219993, 219994],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests')
+
+    def test_revdel_file(self):
+        """Test deleting and undeleting file revisions."""
+        site = pywikibot.Site('test')
+
+        # Verify state
+        site.deleterevs('oldimage', [20210314184415, 20210314184430],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        # Single revision
+        site.deleterevs('oldimage', '20210314184415', hide='user', show='',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp1 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp1, history=True)
+        for idx, v in fp1._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertTrue(hasattr(v, 'userhidden'))
+
+        # Multiple revisions
+        site.deleterevs('oldimage', '20210314184415|20210314184430',
+                        hide='comment', reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp2 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp2, history=True)
+        for idx, v in fp2._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertTrue(hasattr(v, 'commenthidden'))
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+                self.assertTrue(hasattr(v, 'commenthidden'))
+
+        # Concurrently show and hide
+        site.deleterevs('oldimage', ['20210314184415', '20210314184430'],
+                        hide='user|content', show='comment',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp3 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp3, history=True)
+        for idx, v in fp3._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertFalse(hasattr(v, 'commenthidden'))
+                self.assertFalse(hasattr(v, 'userhidden'))
+                self.assertFalse(hasattr(v, 'filehidden'))
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+                self.assertFalse(hasattr(v, 'commenthidden'))
+                self.assertFalse(hasattr(v, 'userhidden'))
+                self.assertFalse(hasattr(v, 'filehidden'))
+
+        # Cleanup
+        site.deleterevs('oldimage', [20210314184415, 20210314184430],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
     def test_delete_oldimage(self):
         """Test deleting and undeleting specific versions of files."""
         site = self.get_site()
