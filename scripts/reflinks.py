@@ -232,7 +232,7 @@ class RefLink:
         # remove formatting, i.e long useless strings
         self.title = re.sub(r'[\.+\-=]{4,}', ' ', self.title)
         # remove \n and \r and unicode spaces from titles
-        self.title = re.sub(r'(?u)\s', ' ', self.title)
+        self.title = re.sub(r'\s', ' ', self.title)
         self.title = re.sub(r'[\n\r\t]', ' ', self.title)
         # remove extra whitespaces
         # remove leading and trailing ./;/,/-/_/+/ /

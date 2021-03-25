@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Script that updates interwiki sorting order in family.py file."""
 #
-# (C) Pywikibot team, 2020
+# (C) Pywikibot team, 2020-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -60,7 +60,7 @@ def update_family(list_name, page):
     family_file_name = 'pywikibot/family.py'
     with codecs.open(family_file_name, 'r', 'utf8') as family_file:
         family_text = family_file.read()
-    family_text = re.sub(r'(?msu)^ {4}%s.+?\]' % list_name,
+    family_text = re.sub(r'(?ms)^ {4}%s.+?\]' % list_name,
                          text, family_text, 1)
     with codecs.open(family_file_name, 'w', 'utf8') as family_file:
         family_file.write(family_text)

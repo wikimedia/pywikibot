@@ -7,7 +7,7 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,7 +85,7 @@ def update_family(families):
         family_file_name = 'pywikibot/families/%s_family.py' % family
         with codecs.open(family_file_name, 'r', 'utf8') as family_file:
             family_text = family_file.read()
-        family_text = re.sub(r'(?msu)^ {4}languages_by_size.+?\]',
+        family_text = re.sub(r'(?ms)^ {4}languages_by_size.+?\]',
                              text, family_text, 1)
         with codecs.open(family_file_name, 'w', 'utf8') as family_file:
             family_file.write(family_text)
