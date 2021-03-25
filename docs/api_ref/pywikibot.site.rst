@@ -31,6 +31,11 @@ pywikibot.site.\_extensions module
 
 .. automodule:: pywikibot.site._extensions
 
+pywikibot.site.\_generators module
+----------------------------------
+
+.. automodule:: pywikibot.site._generators
+
 pywikibot.site.\_interwikimap module
 ------------------------------------
 

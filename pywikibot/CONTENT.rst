@@ -126,6 +126,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _extensions.py             | API interfaces to MediaWiki extensions               |
     +----------------------------+------------------------------------------------------+
+    | _generators.py             | API generators mixin to MediaWiki site               |
+    +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+
     | _namespace.py              | Objects representing Namespaces of MediaWiki site    |
