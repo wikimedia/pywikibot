@@ -13,7 +13,6 @@ from pywikibot.site import TokenWallet
 
 from tests.aspects import (
     DefaultSiteTestCase,
-    DeprecationTestCase,
     TestCase,
     TestCaseBase,
     unittest,
@@ -169,28 +168,6 @@ class PatrolTestCase(TokenTestBase, TestCase):
             # expected result
             raised = True
         self.assertTrue(raised, msg='pywikibot.Error not raised')
-
-
-class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
-
-    """Test cases for Site patrol token deprecated methods."""
-
-    cached = True
-    login = True
-
-    def test_get_patrol_token(self):
-        """Test site.getPatrolToken."""
-        self.mysite = self.site
-        try:
-            self.assertEqual(self.mysite.getPatrolToken(),
-                             self.mysite.tokens['patrol'])
-            self.assertOneDeprecation()
-        except pywikibot.Error as error_msg:
-            self.assertRegex(
-                str(error_msg),
-                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-            # test __contains__
-            self.assertNotIn('patrol', self.mysite.tokens)
 
 
 if __name__ == '__main__':  # pragma: no cover
