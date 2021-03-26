@@ -342,13 +342,6 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertEqual(it, self.it)
         self.assertNotEqual(it[-1], '…')
 
-    def test_accept_only_keyword_marker(self):
-        """Test that the only kwargs accepted is 'marker'."""
-        with self.assertRaisesRegex(TypeError,
-                                    r'islice_with_ellipsis\(\) got an '
-                                    "unexpected keyword argument 't'"):
-            tools.islice_with_ellipsis(self.it, 1, t='')
-
 
 def passthrough(x):
     """Return x."""
