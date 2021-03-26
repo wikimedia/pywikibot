@@ -1087,63 +1087,61 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
         s2 = removeLanguageLinksAndSeparator(oldtext, site=site, marker=marker,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite=site)
-    if s:
-        if site.code in site.family.interwiki_attop \
-           or '<!-- interwiki at top -->' in oldtext:
-            # do not add separator if interwiki links are on one line
-            newtext = s + ('' if site.code in site.family.interwiki_on_one_line
-                           else separator) + s2.replace(marker, '').strip()
-        else:
-            # calculate what was after the language links on the page
-            firstafter = s2.find(marker)
-            if firstafter < 0:
-                firstafter = len(s2)
-            else:
-                firstafter += len(marker)
-            # Any text in 'after' part that means we should keep it after?
-            if '</noinclude>' in s2[firstafter:]:
-                if separatorstripped:
-                    s = separator + s
-                newtext = (s2[:firstafter].replace(marker, '')
-                           + s + s2[firstafter:])
-            elif site.code in site.family.categories_last:
-                cats = getCategoryLinks(s2, site=site)
-                s2 = removeCategoryLinksAndSeparator(
-                    s2.replace(marker, cseparatorstripped).strip(), site) \
-                    + separator + s
-                newtext = replaceCategoryLinks(s2, cats, site=site,
-                                               addOnly=True)
-            # for Wikitravel's language links position.
-            # (not supported by rewrite - no API)
-            elif site.family.name == 'wikitravel':
-                s = separator + s + separator
-                newtext = (s2[:firstafter].replace(marker, '')
-                           + s + s2[firstafter:])
-            else:
-                if template or template_subpage:
-                    if template_subpage:
-                        includeOn = '<includeonly>'
-                        includeOff = '</includeonly>'
-                    else:
-                        includeOn = '<noinclude>'
-                        includeOff = '</noinclude>'
-                        separator = ''
-                    # Do we have a noinclude at the end of the template?
-                    parts = s2.split(includeOff)
-                    lastpart = parts[-1]
-                    if re.match(r'\s*%s' % marker, lastpart):
-                        # Put the langlinks back into the noinclude's
-                        regexp = re.compile(r'%s\s*%s' % (includeOff, marker))
-                        newtext = regexp.sub(s + includeOff, s2)
-                    else:
-                        # Put the langlinks at the end, inside noinclude's
-                        newtext = (s2.replace(marker, '').strip()
-                                   + separator
-                                   + '%s\n%s%s\n' % (includeOn, s, includeOff))
-                else:
-                    newtext = s2.replace(marker, '').strip() + separator + s
-    else:
+    if not s:
         newtext = s2.replace(marker, '')
+    elif site.code in site.family.interwiki_attop \
+            or '<!-- interwiki at top -->' in oldtext:
+        # do not add separator if interwiki links are on one line
+        newtext = s + ('' if site.code in site.family.interwiki_on_one_line
+                       else separator) + s2.replace(marker, '').strip()
+    else:
+        # calculate what was after the language links on the page
+        firstafter = s2.find(marker)
+        if firstafter < 0:
+            firstafter = len(s2)
+        else:
+            firstafter += len(marker)
+
+        # Any text in 'after' part that means we should keep it after?
+        if '</noinclude>' in s2[firstafter:]:
+            if separatorstripped:
+                s = separator + s
+            newtext = (s2[:firstafter].replace(marker, '')
+                       + s + s2[firstafter:])
+        elif site.code in site.family.categories_last:
+            cats = getCategoryLinks(s2, site=site)
+            s2 = removeCategoryLinksAndSeparator(
+                s2.replace(marker, cseparatorstripped).strip(), site) \
+                + separator + s
+            newtext = replaceCategoryLinks(s2, cats, site=site, addOnly=True)
+        # for Wikitravel's language links position.
+        # (not supported by rewrite - no API)
+        elif site.family.name == 'wikitravel':
+            s = separator + s + separator
+            newtext = (s2[:firstafter].replace(marker, '')
+                       + s + s2[firstafter:])
+        elif template or template_subpage:
+            if template_subpage:
+                includeOn = '<includeonly>'
+                includeOff = '</includeonly>'
+            else:
+                includeOn = '<noinclude>'
+                includeOff = '</noinclude>'
+                separator = ''
+            # Do we have a noinclude at the end of the template?
+            parts = s2.split(includeOff)
+            lastpart = parts[-1]
+            if re.match(r'\s*%s' % marker, lastpart):
+                # Put the langlinks back into the noinclude's
+                regexp = re.compile(r'{}\s*{}'.formar(includeOff, marker))
+                newtext = regexp.sub(s + includeOff, s2)
+            else:
+                # Put the langlinks at the end, inside noinclude's
+                newtext = (s2.replace(marker, '').strip()
+                           + separator
+                           + '{}\n{}{}\n'.format(includeOn, s, includeOff))
+        else:
+            newtext = s2.replace(marker, '').strip() + separator + s
 
     # special parts above interwiki
     above_interwiki = []
