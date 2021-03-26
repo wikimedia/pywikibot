@@ -22,12 +22,6 @@ scripts_path = join_root_path('scripts')
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
-    'flickrripper': ['flickrapi', 'PIL'],
-    'imageharvest': ['bs4'],
-    'isbn': ['stdnum'],
-    'match_images': ['PIL.Image'],
-    'states_redirect': ['pycountry'],
-    'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
 }
 
@@ -67,12 +61,6 @@ runnable_script_list = (
     ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
 
 script_input = {
-    'catall': 'q\n',  # q for quit
-    'editarticle': 'Test page\n',
-    'imageuncat': 'q\n',
-    'imageharvest':
-        'https://upload.wikimedia.org/wikipedia/commons/'
-        '8/80/Wikipedia-logo-v2.svg\n\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -107,14 +95,9 @@ no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
     'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',
-    'editarticle': 'Nothing changed',
-    'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
-    'imageuncat':
-        'WARNING: This script is primarily written for Wikimedia Commons',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
-    'imageharvest': 'From what URL should I get the images',
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
     'parser_function_count': 'Hold on, this will need some time.',
