@@ -867,7 +867,7 @@ class WelcomeBot(SingleSiteBot):
         if hasattr(self, '_BAQueue'):
             self.show_status()
             pywikibot.output('Putting bad name to report page...')
-            self.reportBadAccount(None, final=True)
+            self.report_bad_account()
 
     @staticmethod
     def show_status(message=Msg.DEFAULT):
