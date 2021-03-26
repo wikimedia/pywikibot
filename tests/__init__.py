@@ -5,8 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 __all__ = (
-    'requests', 'unittest', 'TestRequest', 'patch_request', 'unpatch_request',
-    'mock', 'Mock', 'MagicMock', 'patch')
+    'create_path_func', 'join_cache_path', 'join_data_path',
+    'join_html_data_path', 'join_images_path', 'join_pages_path',
+    'join_root_path', 'join_xml_data_path', 'patch_request', 'unittest_print',
+    'unpatch_request',
+)
 
 import functools
 import os
@@ -15,14 +18,14 @@ import warnings
 
 from contextlib import suppress
 from itertools import chain
-from unittest import mock
-from unittest.mock import MagicMock, Mock, patch
+from unittest import mock  # noqa: F401
+from unittest.mock import MagicMock, Mock, patch  # noqa: F401
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - mwparserfromhell is optional, so is only imported in textlib_tests
-import requests
+import requests  # noqa: F401
 
 import pywikibot.data.api
 
