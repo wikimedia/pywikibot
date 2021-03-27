@@ -1637,7 +1637,9 @@ def extract_templates_and_params_mwpfh(text: str, strip=False):
     code = mwparserfromhell.parse(text)
     result = []
 
-    for template in code.filter_templates(recursive=True):
+    for template in code.ifilter_templates(
+            matches=lambda x: not x.name.lstrip().startswith('#'),
+            recursive=True):
         params = OrderedDict()
         for param in template.params:
             if strip:

@@ -34,15 +34,15 @@ python-stdnum >= 1.16
 
 # GUI
 Pillow >= 6.2.2, < 8.0.0 ; python_version < '3.6'
-Pillow >= 6.2.2 ; python_version >= '3.6' and python_version < '3.9' 
+Pillow >= 6.2.2 ; python_version >= '3.6' and python_version < '3.9'
 Pillow >= 8.0.0 ; python_version >= '3.9'
 
 # core pagegenerators
 google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
-# textlib.py and patrol.py
-mwparserfromhell>=0.3.3
+# textlib.py
+mwparserfromhell>=0.5.0
 
 # The mysql generator in pagegenerators depends on PyMySQL
 PyMySQL
