@@ -2058,7 +2058,7 @@ class APISite(
         Page to be deleted can be given either as Page object or as pageid.
 
         @param page: Page to be deleted or its pageid.
-        @type page: Page or, in case of pageid, int or str
+        @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
         @param reason: Deletion reason.
         @raises TypeError, ValueError: page has wrong type/value.
 
@@ -2066,9 +2066,9 @@ class APISite(
         token = self.tokens['delete']
         params = {'action': 'delete', 'token': token, 'reason': reason}
 
-        if isinstance(page, pywikibot.Page):
+        if isinstance(page, pywikibot.page.BasePage):
             params['title'] = page
-            msg = page.title(withSection=False)
+            msg = page.title(with_section=False)
         else:
             pageid = int(page)
             params['pageid'] = pageid
@@ -2116,7 +2116,7 @@ class APISite(
 
         if isinstance(page, pywikibot.Page):
             params['title'] = page
-            msg = page.title(withSection=False)
+            msg = page.title(with_section=False)
         else:
             pageid = int(page)
             params['pageid'] = pageid
