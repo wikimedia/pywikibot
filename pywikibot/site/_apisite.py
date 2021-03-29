@@ -2050,21 +2050,37 @@ class APISite(
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
-    @deprecate_arg('summary', 'reason')
-    def deletepage(self, page, reason: str):
-        """Delete page from the wiki. Requires appropriate privilege level.
+    def delete(self, page, reason: str, *, oldimage: Optional[str] = None):
+        """Delete a page or a specific old version of a file from the wiki.
+
+        Requires appropriate privileges.
 
         @see: U{https://www.mediawiki.org/wiki/API:Delete}
         Page to be deleted can be given either as Page object or as pageid.
+        To delete a specific version of an image the oldimage identifier
+        must be provided.
+
 
         @param page: Page to be deleted or its pageid.
         @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
         @param reason: Deletion reason.
+        @param oldimage: oldimage id of the file version to be deleted.
+            If a BasePage object is given with page parameter, it has to
+            be a FilePage.
         @raises TypeError, ValueError: page has wrong type/value.
-
         """
+        if oldimage and isinstance(page, pywikibot.page.BasePage) \
+           and not isinstance(page, pywikibot.FilePage):
+            raise TypeError("'page' must be a FilePage not a '{}'"
+                            .format(page.__class__.__name__))
+
         token = self.tokens['delete']
-        params = {'action': 'delete', 'token': token, 'reason': reason}
+        params = {
+            'action': 'delete',
+            'token': token,
+            'reason': reason,
+            'oldimage': oldimage,
+        }
 
         if isinstance(page, pywikibot.page.BasePage):
             params['title'] = page
@@ -2086,8 +2102,8 @@ class APISite(
             }
             if err.code in self._dl_errors:
                 raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug("delete: Unexpected error code '%s' received."
-                            % err.code,
+            pywikibot.debug('delete: Unexpected error code {!r} received.'
+                            .format(err.code),
                             _logger)
             raise
         else:
@@ -2095,8 +2111,24 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    @need_right('delete')
-    def deleteoldimage(self, page, oldimage, reason: str):
+    @deprecate_arg('summary', 'reason')
+    @deprecated('delete()', since='20210330', future_warning=True)
+    def deletepage(self, page, reason: str):
+        """Delete page from the wiki. Requires appropriate privilege level.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        Page to be deleted can be given either as Page object or as pageid.
+
+        @param page: Page to be deleted or its pageid.
+        @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
+        @param reason: Deletion reason.
+        @raises TypeError, ValueError: page has wrong type/value.
+        """
+        self.delete(page, reason)
+
+    @deprecated('delete() with oldimage keyword parameter', since='20210330',
+                future_warning=True)
+    def deleteoldimage(self, page, oldimage: str, reason: str):
         """Delete a specific version of a file. Requires appropriate privileges.
 
         @see: U{https://www.mediawiki.org/wiki/API:Delete}
@@ -2104,23 +2136,37 @@ class APISite(
         provided.
 
         @param page: Page to be deleted or its pageid
-        @type page: Page or, in case of pageid, int or str
+        @type page: FilePage or, in case of pageid, int or str
         @param oldimage: oldimageid of the file version to be deleted.
         @param reason: Deletion reason.
         @raises TypeError, ValueError: page has wrong type/value.
+        """
+        self.delete(page, reason, oldimage=oldimage)
 
+    @need_right('undelete')
+    def undelete(self, page, reason: str, *, revisions=None, fileids=None):
+        """Undelete page from the wiki. Requires appropriate privilege level.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+
+        @param page: Page to be deleted.
+        @type page: pywikibot.BasePage
+        @param reason: Undeletion reason.
+        @param revisions: List of timestamps to restore.
+            If None, restores all revisions.
+        @type revisions: list
+        @param fileids: List of fileids to restore.
+        @type fileids: list
         """
         token = self.tokens['delete']
-        params = {'action': 'delete', 'oldimage': oldimage,
-                  'token': token, 'reason': reason}
-
-        if isinstance(page, pywikibot.Page):
-            params['title'] = page
-            msg = page.title(with_section=False)
-        else:
-            pageid = int(page)
-            params['pageid'] = pageid
-            msg = pageid
+        params = {
+            'action': 'undelete',
+            'title': page,
+            'reason': reason,
+            'token': token,
+            'timestamps': revisions,
+            'fileids': fileids,
+        }
 
         req = self._simple_request(**params)
         self.lock_page(page)
@@ -2129,24 +2175,22 @@ class APISite(
         except api.APIError as err:
             errdata = {
                 'site': self,
-                'title': msg,
+                'title': page.title(with_section=False),
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
                 raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug("delete: Unexpected error code '%s' received."
-                            % err.code,
+            pywikibot.debug('undelete: Unexpected error code {!r} received.'
+                            .format(err.code),
                             _logger)
             raise
-        else:
-            page.clear_cache()
         finally:
             self.unlock_page(page)
 
-    @need_right('undelete')
     @deprecate_arg('summary', 'reason')
+    @deprecated('undelete()', since='20210330', future_warning=True)
     def undelete_page(self, page, reason: str, revisions=None):
-        """Undelete page from the wiki. Requires appropriate privilege level.
+        """DEPRECATED. Undelete page from the wiki.
 
         @see: U{https://www.mediawiki.org/wiki/API:Undelete}
 
@@ -2156,36 +2200,13 @@ class APISite(
             If None, restores all revisions.
         @type revisions: list
         @param reason: Undeletion reason.
-
         """
-        token = self.tokens['delete']
-        self.lock_page(page)
+        self.undelete(page, reason, revisions=revisions)
 
-        req = self._simple_request(action='undelete',
-                                   title=page,
-                                   reason=reason,
-                                   token=token,
-                                   timestamps=revisions)
-        try:
-            req.submit()
-        except api.APIError as err:
-            errdata = {
-                'site': self,
-                'title': page.title(with_section=False),
-                'user': self.user(),
-            }
-            if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug("delete: Unexpected error code '%s' received."
-                            % err.code,
-                            _logger)
-            raise
-        finally:
-            self.unlock_page(page)
-
-    @need_right('undelete')
+    @deprecated('undelete() with fileids parameter', since='20210330',
+                future_warning=True)
     def undelete_file_versions(self, page, reason: str, fileids=None):
-        """Undelete page from the wiki. Requires appropriate privilege level.
+        """DEPRECATED. Undelete page from the wiki.
 
         @see: U{https://www.mediawiki.org/wiki/API:Undelete}
 
@@ -2195,30 +2216,7 @@ class APISite(
         @param fileids: List of fileids to restore.
         @type fileids: list
         """
-        token = self.tokens['delete']
-        self.lock_page(page)
-
-        req = self._simple_request(action='undelete',
-                                   title=page,
-                                   reason=reason,
-                                   token=token,
-                                   fileids=fileids)
-        try:
-            req.submit()
-        except api.APIError as err:
-            errdata = {
-                'site': self,
-                'title': page.title(with_section=False),
-                'user': self.user(),
-            }
-            if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug("delete: Unexpected error code '%s' received."
-                            % err.code,
-                            _logger)
-            raise
-        finally:
-            self.unlock_page(page)
+        self.undelete(page, reason, fileids=fileids)
 
     _protect_errors = {
         'noapiwrite': 'API editing not enabled on %(site)s wiki',
