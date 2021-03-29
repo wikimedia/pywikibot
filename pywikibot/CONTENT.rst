@@ -45,6 +45,8 @@ The contents of the package
     | i18n.py                    | Helper functions for both the internal translation   |
     |                            | system and for TranslateWiki-based translations      |
     +----------------------------+------------------------------------------------------+
+    | interwiki_graph.py         | Possible create graph with interwiki.py script       |
+    +----------------------------+------------------------------------------------------+
     | logentries.py              | Objects representing Mediawiki log entries           |
     +----------------------------+------------------------------------------------------+
     | logging.py                 | Logging and output functions                         |
