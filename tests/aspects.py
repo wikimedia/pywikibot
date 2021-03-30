@@ -28,6 +28,7 @@ import pywikibot.config2 as config
 
 from pywikibot import Site
 
+from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import ServerError, NoUsername
@@ -942,7 +943,9 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
             if self._mainpage.site == site:
                 return self._mainpage
 
-        mainpage = pywikibot.Page(site, site.siteinfo['mainpage'])
+        maintitle = site.siteinfo['mainpage']
+        maintitle = removeprefix(maintitle, 'Special:MyLanguage/')  # T278702
+        mainpage = pywikibot.Page(site, maintitle)
         if not isinstance(site, DrySite) and mainpage.isRedirectPage():
             mainpage = mainpage.getRedirectTarget()
 
