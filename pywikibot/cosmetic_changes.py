@@ -79,6 +79,7 @@ except ImportError:
 
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
+# This is also used by interwiki.py
 # TODO: Maybe move it to family file and implement global instances
 moved_links = {
     'ar': (['documentation', 'template documentation', 'شرح', 'توثيق'],
