@@ -62,10 +62,8 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'Tkinter': [  # vulnerability found in Pillow<6.2.2
-        'Pillow>=6.2.2,<8.0.0;python_version<"3.6"',
-        'Pillow>=6.2.2;python_version>="3.6" and python_version<"3.9"',
-        'Pillow>=8.0.0;python_version>="3.9"',
+    'Tkinter': [  # vulnerability found in Pillow<8.1.1
+        'Pillow>=8.1.1;python_version>="3.6"',
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],

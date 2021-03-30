@@ -4,7 +4,7 @@ A window with a textfield where the user can edit.
 Useful for editing the contents of an article.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -560,6 +560,15 @@ class Tkdialog:
 
     def get_image(self, photo, width, height):
         """Take the BytesIO object and build an imageTK thumbnail."""
+        if PYTHON_VERSION < (3, 6):
+            # vulnerability found in Pillow<8.1.1
+            from sys import version
+            raise RuntimeError(
+                'This script requires Python 3.5+ for GUI support.\n'
+                '{version} is not supported. Please update your Python.'
+                .format(version=version.split(maxsplit=1)[0])
+            )
+
         try:
             from PIL import Image, ImageTk
         except ImportError:
