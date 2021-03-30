@@ -91,6 +91,7 @@ class TestGenerateUserFiles(TestCase):
         self.assertIsNotNone(config_text)
         for section in ('LOGFILE SETTINGS',
                         'EXTERNAL SCRIPT PATH SETTINGS',
+                        'INTERWIKI SETTINGS',
                         'FURTHER SETTINGS',
                         'HTTP SETTINGS',
                         'REPLICATION BOT SETTINGS',

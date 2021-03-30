@@ -113,12 +113,10 @@ _deprecated_variables = {
     'copyright_max_query_for_page', 'copyright_msn', 'copyright_show_date',
     'copyright_show_length', 'copyright_skip_query', 'copyright_yahoo',
     'db_hostname', 'deIndentTables', 'fake_user_agent', 'flickr',
-    'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
-    'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
-    'interwiki_shownew', 'line_separator', 'LS', 'msn_appid', 'panoramio',
-    'persistent_http', 'proxy', 'special_page_limit', 'splitLongParagraphs',
-    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
-    'without_interwiki', 'yahoo_appid',
+    'interwiki_contents_on_disk', 'line_separator', 'LS', 'msn_appid',
+    'panoramio', 'persistent_http', 'proxy', 'special_page_limit',
+    'splitLongParagraphs', 'sysopnames', 'use_mwparserfromhell',
+    'use_SSL_onlogin', 'use_SSL_always', 'yahoo_appid',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -606,6 +604,49 @@ user_script_paths = []  # type: List[str]
 # user_families_paths = ['data/families']
 user_families_paths = []  # type: List[str]
 
+# ############# INTERWIKI SETTINGS ##############
+
+# Should interwiki.py report warnings for missing links between foreign
+# languages?
+interwiki_backlink = True
+
+# Should interwiki.py display every new link it discovers?
+interwiki_shownew = True
+
+# Should interwiki.py output a graph PNG file on conflicts?
+# You need pydot for this:
+# https://pypi.org/project/pydot/
+interwiki_graph = False
+
+# Specifies that the robot should process that amount of subjects at a time,
+# only starting to load new pages in the original language when the total
+# falls below that number. Default is to process (at least) 100 subjects at
+# once.
+interwiki_min_subjects = 100
+
+# If interwiki graphs are enabled, which format(s) should be used?
+# Supported formats include png, jpg, ps, and svg. See:
+# http://www.graphviz.org/doc/info/output.html
+# If you want to also dump the dot files, you can use this in your
+# user-config.py:
+# interwiki_graph_formats = ['dot', 'png']
+# If you need a PNG image with an HTML image map, use this:
+# interwiki_graph_formats = ['png', 'cmap']
+# If you only need SVG images, use:
+# interwiki_graph_formats = ['svg']
+interwiki_graph_formats = ['png']
+
+# You can post the contents of your autonomous_problems.dat to the wiki,
+# e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
+# This allows others to assist you in resolving interwiki problems.
+# To help these people, you can upload the interwiki graphs to your
+# webspace somewhere. Set the base URL here, e.g.:
+# 'https://www.example.org/~yourname/interwiki-graphs/'
+interwiki_graph_url = None
+
+# Save file with local articles without interwikis.
+without_interwiki = False
+
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
 # Set disambiguation_comment[FAMILY][LANG] to a non-empty string to override
@@ -707,7 +748,7 @@ socket_timeout = (6.05, 45)
 
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
-# whitespace or positioning category links.
+# whitespace or positioning of category links.
 
 # This is an experimental feature; handle with care and consider re-checking
 # each bot edit if enabling this!
