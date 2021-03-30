@@ -1995,9 +1995,8 @@ class InterwikiBot:
 
             self.add(page, hints=self.conf.hints)
             self.generated += 1
-            if self.generateNumber:
-                if self.generated >= self.generateNumber:
-                    break
+            if self.generateNumber and self.generated >= self.generateNumber:
+                break
         else:
             return
         # for loop was exited by break statement
@@ -2288,12 +2287,11 @@ class InterwikiDumps(OptionHandler):
         with suppress(KeyError):
             self.restored_files.remove(filename)
 
-    def get_files(self, mode='txt'):
+    def get_files(self):
         """Get dump files from directory."""
-        pattern = (r'(?P<file>\A(?P<fam>[a-z]+)-(?P<code>[a-z]+)\.{}\Z)'
-                   .format(mode))
+        pattern = r'(?P<file>(?P<fam>[a-z]+)-(?P<code>[a-z]+)\.txt)'
         for filename in os.listdir(self.path):
-            found = re.match(pattern, filename)
+            found = re.fullmatch(pattern, filename)
             if found:
                 yield (found['file'],
                        pywikibot.Site(found['code'], found['fam']))
@@ -2318,16 +2316,16 @@ class InterwikiDumps(OptionHandler):
 
             if not os.path.exists(filename):
                 pywikibot.output(tail + ' does not exist.')
+                continue
+
+            pywikibot.output('Retrieving pages from dump file ' + tail)
+            for page in pagegenerators.TextfilePageGenerator(filename, site):
+                if site == self.site:
+                    self._next_page = page.title(with_ns=False) + '!'
+                    self._next_namespace = page.namespace()
+                yield page
             else:
-                pywikibot.output('Retrieving pages from dump file ' + tail)
-                for page in pagegenerators.TextfilePageGenerator(
-                        filename, site):
-                    if site == self.site:
-                        self._next_page = page.title(with_ns=False) + '!'
-                        self._next_namespace = page.namespace()
-                    yield page
-                else:
-                    self.restored_files.add(filename)
+                self.restored_files.add(filename)
 
         if self.opt.do_continue:
             yield from self.site.allpages(start=self.next_page,
@@ -2358,29 +2356,15 @@ class InterwikiDumps(OptionHandler):
             tail = os.path.split(filename)[-1]
             try:
                 os.remove(filename)
-                pywikibot.output('Dumpfile {0} deleted'.format(tail))
             except OSError as e:
                 pywikibot.error('Cannot delete {} due to\n{}\nDo it manually.'
                                 .format(tail, e))
-
-    def old_dumps_found(self) -> bool:
-        """Check whether dumps are in old format.
-
-        @return: True if there are dumps in pickle format, False otherwise
-        """
-        try:
-            next(self.get_files(mode='pickle'))
-        except StopIteration:
-            return False
-        pywikibot.warning(fill(
-            'The pickle format is deprecated. Use maintenance script '
-            'interwikidumps.py to convert pickle files into text files.'))
-        return True
+            else:
+                pywikibot.output('Dumpfile {} deleted'.format(tail))
 
 
 def main(*args):
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -2472,16 +2456,15 @@ def main(*args):
                           restore_all=iwconf.restore_all)
 
     if newPages is not None:
-        if len(namespaces) == 0:
+        if not namespaces:
             ns = 0
         elif len(namespaces) == 1:
             ns = namespaces[0]
-            if ns != 'all':
-                if isinstance(ns, str):
-                    index = site.namespaces.lookup_name(ns)
-                    if index is None:
-                        raise ValueError('Unknown namespace: ' + ns)
-                    ns = index.id
+            if isinstance(ns, str) and ns != 'all':
+                index = site.namespaces.lookup_name(ns)
+                if index is None:
+                    raise ValueError('Unknown namespace: ' + ns)
+                ns = index.id
             namespaces = []
         else:
             ns = 'all'
@@ -2489,9 +2472,6 @@ def main(*args):
                                                                namespaces=ns)
 
     elif optRestore or optContinue or iwconf.restore_all:
-        if dump.old_dumps_found():
-            # There are dumps is pickle format; they must be converted first.
-            return
         hintlessPageGen = dump.read_dump()
 
     bot = InterwikiBot(iwconf)
