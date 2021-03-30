@@ -1736,7 +1736,7 @@ class BasePage(ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                self.site.deletepage(self, reason)
+                self.site.delete(self, reason)
                 return
 
         else:  # Otherwise mark it for deletion
@@ -1861,7 +1861,7 @@ class BasePage(ComparableMixin):
             pywikibot.output('Undeleting %s.' % (self.title(as_link=True)))
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete_page(self, reason, undelete_revs)
+        self.site.undelete(self, reason, revision=undelete_revs)
 
     def protect(self,
                 reason: Optional[str] = None,
