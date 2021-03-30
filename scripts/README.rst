@@ -61,6 +61,9 @@ The contents of the package
     |                        | images, and let the user choose among them for          |
     |                        | images to upload.                                       |
     +------------------------+---------------------------------------------------------+
+    | interwiki.py           | A robot to check interwiki links on all pages (or       |
+    |                        | a range of pages) of a wiki.                            |
+    +------------------------+---------------------------------------------------------+
     | interwikidata.py       | Script to handle interwiki links based on Wikibase.     |
     +------------------------+---------------------------------------------------------+
     | listpages.py           | listpages: report number of pages found                 |
@@ -189,9 +192,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | imageuncat.py          | Adds uncat template to images without categories at     |
     |                        | Commons                                                 |
-    +------------------------+---------------------------------------------------------+
-    | interwiki.py           | A robot to check interwiki links on all pages (or       |
-    |                        | a range of pages) of a wiki.                            |
     +------------------------+---------------------------------------------------------+
     | isbn.py                | Bot to convert all ISBN-10 codes to the ISBN-13         |
     |                        | format.                                                 |

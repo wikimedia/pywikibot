@@ -61,8 +61,8 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         })
         super().__init__(**kwargs)
         if not self.site.has_data_repository:
-            raise ValueError('{site} does not have a data repository.'
-                             .format(site=self.site))
+            raise ValueError('{site} does not have a data repository, use '
+                             'interwiki.py instead.'.format(site=self.site))
         self.repo = self.site.data_repository()
         if not self.opt.summary:
             self.opt.summary = pywikibot.i18n.twtranslate(

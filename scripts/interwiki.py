@@ -328,7 +328,7 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -363,19 +363,18 @@ class SaveError(pywikibot.Error):
     """An attempt to save a page with changed interwiki has failed."""
 
 
-class LinkMustBeRemoved(SaveError):  # noqa: D205,D400
+class LinkMustBeRemoved(SaveError):
 
-    """
-    An interwiki link has to be removed, but this can't be done because of user
-    preferences or because the user chose not to change the page.
+    """An interwiki link has to be removed manually.
+
+    An interwiki link has to be removed, but this can't be done because
+    of user preferences or because the user chose not to change the page.
     """
 
 
 class GiveUpOnPage(pywikibot.Error):
 
     """User chose not to work on this page and its linked pages any more."""
-
-    pass
 
 
 # A list of template names in different languages.

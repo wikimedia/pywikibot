@@ -106,6 +106,11 @@ scripts.imagetransfer script
 
 .. automodule:: scripts.imagetransfer
 
+scripts.interwiki script
+------------------------
+
+.. automodule:: scripts.interwiki
+
 scripts.interwikidata script
 ----------------------------
 
