@@ -61,7 +61,7 @@ extra_deps = {
     'isbn': ['python-stdnum>=1.16'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
-    'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
+    'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'Tkinter': [  # vulnerability found in Pillow<6.2.2
         'Pillow>=6.2.2,<8.0.0;python_version<"3.6"',
         'Pillow>=6.2.2;python_version>="3.6" and python_version<"3.9"',
