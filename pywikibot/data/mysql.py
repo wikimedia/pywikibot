@@ -1,10 +1,9 @@
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
-from contextlib import closing
 from typing import Optional
 
 import pywikibot
@@ -16,7 +15,7 @@ except ImportError:
 
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated_args
+from pywikibot.tools import deprecated_args, PYTHON_VERSION
 
 
 @deprecated_args(encoding=None)
@@ -52,16 +51,20 @@ def mysql_query(query: str, params=None,
 
     if config.db_connect_file is None:
         credentials = {'user': config.db_username,
-                       'passwd': config.db_password}
+                       'password': config.db_password}
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    with closing(pymysql.connect(config.db_hostname_format.format(dbname),
-                                 db=config.db_name_format.format(dbname),
+    connection = pymysql.connect(host=config.db_hostname_format.format(dbname),
+                                 database=config.db_name_format.format(dbname),
                                  port=config.db_port,
                                  charset='utf8',
-                                 **credentials)) as conn, \
-         closing(conn.cursor()) as cursor:
+                                 **credentials)
+    if PYTHON_VERSION < (3, 6):
+        from contextlib import closing
+        connection = closing(connection)
+
+    with connection as conn, conn.cursor() as cursor:
 
         if verbose:
             _query = cursor.mogrify(query, params)
