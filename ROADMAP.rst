@@ -1,7 +1,7 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (No changes yet)
+* mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (T106763)
 
 Deprecations
 ^^^^^^^^^^^^
@@ -14,7 +14,6 @@ Deprecations
 * 6.2.0: empty_iterator will be removed in favour of iter()
 * 6.1.0: tools.frozenmap will be removed in favour of types.MappingProxyType
 * 6.1.0: tools.DotReadableDict will be removed
-* 6.1.0: mwparserfromhell or wikitextparser MediaWiki markup parser becomes mandatory (T106763)
 * 6.1.0: textlib.unescape() function will be removed in favour of html.unescape()
 * 6.0.1: Site.undeletepage() and Site.undelete_file_versions() will be removed in favour of Site.undelete() method
 * 6.0.1: Site.deletepage() and Site.deleteoldimage() will be removed in favour of Site.delete() method
