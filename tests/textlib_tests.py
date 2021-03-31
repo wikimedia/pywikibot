@@ -16,8 +16,10 @@ from contextlib import suppress
 import pywikibot
 import pywikibot.textlib as textlib
 
+from pywikibot.backports import nullcontext
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
+from pywikibot.tools import suppress_warnings
 from pywikibot import UnknownSite
 
 from tests.aspects import (
@@ -300,6 +302,10 @@ class TestTemplatesInCategory(TestCase):
                 'Invalid category title extracted: nasty{{{!}}')
 
 
+WARNING_MSG = (r'.*extract_templates_and_params_mwpfh .*'
+               r'is deprecated for .*; use extract_templates_and_params')
+
+
 class TestTemplateParams(TestCase):
 
     """Test to verify that template params extraction works."""
@@ -308,67 +314,61 @@ class TestTemplateParams(TestCase):
 
     def _common_results(self, func):
         """Common cases."""
-        self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{a }}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{ a }}'), [('a', OrderedDict())])
+        with suppress_warnings(WARNING_MSG, category=FutureWarning):
+            self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
 
-        self.assertEqual(func('{{a|b=c}}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b|c=d}}'),
-                         [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
-        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'),
-                         [('a', OrderedDict((('b', 'c'), ('f', 'g'),
-                                             ('d', 'e'), ('1', ''))))])
-        self.assertEqual(func('{{a|1=2|c=d}}'),
-                         [('a', OrderedDict((('1', '2'), ('c', 'd'))))])
-        self.assertEqual(func('{{a|c=d|1=2}}'),
-                         [('a', OrderedDict((('c', 'd'), ('1', '2'))))])
-        self.assertEqual(func('{{a|5=d|a=b}}'),
-                         [('a', OrderedDict((('5', 'd'), ('a', 'b'))))])
-        self.assertEqual(func('{{a|=2}}'),
-                         [('a', OrderedDict((('', '2'), )))])
+        with suppress_warnings(WARNING_MSG, category=FutureWarning):
+            self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
+            self.assertEqual(func('{{a }}'), [('a', OrderedDict())])
+            self.assertEqual(func('{{ a }}'), [('a', OrderedDict())])
+            self.assertEqual(func('{{a|b=c}}'),
+                             [('a', OrderedDict((('b', 'c'), )))])
+            self.assertEqual(func('{{a|b|c=d}}'),
+                             [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
+            self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'),
+                             [('a', OrderedDict((('b', 'c'), ('f', 'g'),
+                                                 ('d', 'e'), ('1', ''))))])
+            self.assertEqual(func('{{a|1=2|c=d}}'),
+                             [('a', OrderedDict((('1', '2'), ('c', 'd'))))])
+            self.assertEqual(func('{{a|c=d|1=2}}'),
+                             [('a', OrderedDict((('c', 'd'), ('1', '2'))))])
+            self.assertEqual(func('{{a|5=d|a=b}}'),
+                             [('a', OrderedDict((('5', 'd'), ('a', 'b'))))])
+            self.assertEqual(func('{{a|=2}}'),
+                             [('a', OrderedDict((('', '2'), )))])
+            self.assertEqual(func('{{a|}}'),
+                             [('a', OrderedDict((('1', ''), )))])
+            self.assertEqual(func('{{a|=|}}'),
+                             [('a', OrderedDict((('', ''), ('1', ''))))])
+            self.assertEqual(func('{{a||}}'),
+                             [('a', OrderedDict((('1', ''), ('2', ''))))])
+            self.assertEqual(func('{{a|b={{{1}}}}}'),
+                             [('a', OrderedDict((('b', '{{{1}}}'), )))])
+            self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
+                             [('a',
+                               OrderedDict((('b',
+                                             '<noinclude>{{{1}}}</noinclude>'),
+                                            )))])
+            self.assertEqual(func('{{Template:a|b=c}}'),
+                             [('Template:a', OrderedDict((('b', 'c'), )))])
+            self.assertEqual(func('{{template:a|b=c}}'),
+                             [('template:a', OrderedDict((('b', 'c'), )))])
+            self.assertEqual(func('{{:a|b=c}}'),
+                             [(':a', OrderedDict((('b', 'c'), )))])
+            self.assertEqual(func('{{a|b={{{1}}}|c={{{2}}}}}'),
+                             [('a', OrderedDict((('b', '{{{1}}}'),
+                                                 ('c', '{{{2}}}'))))])
+            self.assertEqual(func('{{a|b=c}}{{d|e=f}}'),
+                             [('a', OrderedDict((('b', 'c'), ))),
+                              ('d', OrderedDict((('e', 'f'), )))])
 
-        self.assertEqual(func('{{a|}}'), [('a', OrderedDict((('1', ''), )))])
-        self.assertEqual(func('{{a|=|}}'),
-                         [('a', OrderedDict((('', ''), ('1', ''))))])
-        self.assertEqual(func('{{a||}}'),
-                         [('a', OrderedDict((('1', ''), ('2', ''))))])
+            # initial '{' and '}' should be ignored as outer wikitext
+            self.assertEqual(func('{{{a|b}}X}'),
+                             [('a', OrderedDict((('1', 'b'), )))])
 
-        self.assertEqual(func('{{a|b={{{1}}}}}'),
-                         [('a', OrderedDict((('b', '{{{1}}}'), )))])
-        self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
-                         [('a', OrderedDict(
-                             (('b', '<noinclude>{{{1}}}</noinclude>'), )))])
-        self.assertEqual(func('{{subst:a|b=c}}'),
-                         [('subst:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{safesubst:a|b=c}}'),
-                         [('safesubst:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{msgnw:a|b=c}}'),
-                         [('msgnw:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{Template:a|b=c}}'),
-                         [('Template:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{template:a|b=c}}'),
-                         [('template:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{:a|b=c}}'),
-                         [(':a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{subst::a|b=c}}'),
-                         [('subst::a', OrderedDict((('b', 'c'), )))])
-
-        self.assertEqual(func('{{a|b={{{1}}}|c={{{2}}}}}'),
-                         [('a', OrderedDict((('b', '{{{1}}}'),
-                                             ('c', '{{{2}}}'))))])
-        self.assertEqual(func('{{a|b=c}}{{d|e=f}}'),
-                         [('a', OrderedDict((('b', 'c'), ))),
-                          ('d', OrderedDict((('e', 'f'), )))])
-
-        # initial '{' and '}' should be ignored as outer wikitext
-        self.assertEqual(func('{{{a|b}}X}'),
-                         [('a', OrderedDict((('1', 'b'), )))])
-
-        # sf.net bug 1575: unclosed template
-        self.assertEqual(func('{{a'), [])
-        self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
+            # sf.net bug 1575: unclosed template
+            self.assertEqual(func('{{a'), [])
+            self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
 
     def _unstripped(self, func):
         """Common cases of unstripped results."""
@@ -455,14 +455,69 @@ class TestTemplateParams(TestCase):
                                                   ('2', 'd')])),
                                ('b', OrderedDict([('1', 'c')]))])
 
+    def _mwpfh_passes(self, func, failing=False):
+        """Common cases failing with wikitextparser but passes with mwpfh.
+
+        Probably the behaviour of regex or mwpfh is wrong.
+        """
+        patterns = [
+            '{{subst:a|b=c}}',
+            '{{safesubst:a|b=c}}',
+            '{{msgnw:a|b=c}}',
+            '{{subst::a|b=c}}'
+        ]
+        context = self.assertRaises(AssertionError) \
+            if failing else nullcontext()
+
+        for template in patterns:
+            with self.subTest(template=template, failing=failing):
+                name = template.strip('{}').split('|')[0]
+                with context:
+                    self.assertEqual(func(template),
+                                     [(name, OrderedDict((('b', 'c'), )))])
+
     @require_modules('mwparserfromhell')
     def test_extract_templates_params_mwpfh(self):
         """Test using mwparserfromhell."""
         func = textlib.extract_templates_and_params_mwpfh
+        with suppress_warnings(WARNING_MSG, category=FutureWarning):
+            self._common_results(func)
+            self._order_differs(func)
+            self._unstripped(func)
+            self._etp_regex_differs(func)
+            self._mwpfh_passes(func)
+
+            self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
+                                  [('c', OrderedDict((('1', '{{d}}'), ))),
+                                   ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
+                                   ('d', OrderedDict())
+                                   ])
+
+            self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
+                                  [('c', OrderedDict((('1', '{{d|}}'), ))),
+                                   ('a', OrderedDict([('1', '{{c|{{d|}}}}')])),
+                                   ('d', OrderedDict([('1', '')]))
+                                   ])
+
+    @require_modules('mwparserfromhell')
+    def test_extract_templates_params_parser_stripped(self):
+        """Test using mwparserfromhell with stripping."""
+        func = functools.partial(textlib._extract_templates_and_params_parser,
+                                 strip=True)
+
+        self._common_results(func)
+        self._order_differs(func)
+        self._stripped(func)
+
+    @require_modules('wikitextparser')
+    def test_extract_templates_params_parser(self):
+        """Test using wikitextparser."""
+        func = textlib.extract_templates_and_params
         self._common_results(func)
         self._order_differs(func)
         self._unstripped(func)
         self._etp_regex_differs(func)
+        self._mwpfh_passes(func, failing=True)
 
         self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
                               [('c', OrderedDict((('1', '{{d}}'), ))),
@@ -475,16 +530,6 @@ class TestTemplateParams(TestCase):
                                ('a', OrderedDict([('1', '{{c|{{d|}}}}')])),
                                ('d', OrderedDict([('1', '')]))
                                ])
-
-    @require_modules('mwparserfromhell')
-    def test_extract_templates_params_mwpfh_stripped(self):
-        """Test using mwparserfromhell with stripping."""
-        func = functools.partial(textlib.extract_templates_and_params_mwpfh,
-                                 strip=True)
-
-        self._common_results(func)
-        self._order_differs(func)
-        self._stripped(func)
 
     def test_extract_templates_params_regex(self):
         """Test using many complex regexes."""
@@ -660,7 +705,7 @@ class TestGenericTemplateParams(PatchingTestCase):
 
     net = False
 
-    @PatchingTestCase.patched(textlib, 'extract_templates_and_params_mwpfh')
+    @PatchingTestCase.patched(textlib, '_extract_templates_and_params_parser')
     def extract_mwpfh(self, text, *args, **kwargs):
         """Patched call to extract_templates_and_params_mwpfh."""
         self._text = text
@@ -676,7 +721,7 @@ class TestGenericTemplateParams(PatchingTestCase):
 
     def test_removing_disabled_parts_regex(self):
         """Test removing disabled parts when using the regex variant."""
-        self.patch(textlib, 'mwparserfromhell', Exception())
+        self.patch(textlib, 'wikitextparser', ImportError())
         textlib.extract_templates_and_params('{{a<!-- -->}}', True)
         self.assertEqual(self._text, '{{a}}')
         self.assertFalse(self._mwpfh)
@@ -702,7 +747,7 @@ class TestGenericTemplateParams(PatchingTestCase):
 
     def test_strip_regex(self):
         """Test stripping values when using the regex variant."""
-        self.patch(textlib, 'mwparserfromhell', Exception())
+        self.patch(textlib, 'wikitextparser', ImportError())
         textlib.extract_templates_and_params('{{a| foo }}', False, True)
         self.assertEqual(self._args, (False, True))
         self.assertFalse(self._mwpfh)

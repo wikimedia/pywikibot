@@ -14,6 +14,25 @@ else:
     cache = _lru_cache(None)
 
 
+# context
+if PYTHON_VERSION < (3, 7):
+
+    class nullcontext:  # noqa: N801
+
+        """Dummy context manager for Python 3.5/3.6 that does nothing."""
+
+        def __init__(self, result=None):  # noqa: D107
+            self.result = result
+
+        def __enter__(self):
+            return self.result
+
+        def __exit__(self, *args):
+            pass
+else:
+    from contextlib import nullcontext
+
+
 # typing
 if PYTHON_VERSION < (3, 5, 2):
     from typing import Dict as DefaultDict
@@ -21,6 +40,15 @@ elif PYTHON_VERSION < (3, 9):
     from typing import DefaultDict
 else:
     from collections import defaultdict as DefaultDict  # noqa: N812
+
+
+if PYTHON_VERSION < (3, 7, 2):
+    from typing import Dict as OrderedDict
+elif PYTHON_VERSION < (3, 9):
+    from typing import OrderedDict
+else:
+    from collections import OrderedDict
+
 
 if PYTHON_VERSION >= (3, 9):
     from collections.abc import Iterable, Sequence

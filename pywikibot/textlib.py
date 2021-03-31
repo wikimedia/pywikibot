@@ -22,15 +22,22 @@ from typing import NamedTuple, Optional, Union
 import pywikibot
 
 from pywikibot.backports import List, Tuple
+from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import deprecate_arg, issue_deprecation_warning
+from pywikibot.tools import (
+    deprecated, deprecate_arg, issue_deprecation_warning,
+)
 
 try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
+    import wikitextparser
+except ImportError:
+    try:
+        import mwparserfromhell as wikitextparser
+    except ImportError as e:
+        wikitextparser = e
 
+ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}
@@ -1566,8 +1573,9 @@ def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
 # Functions dealing with templates
 # --------------------------------
 
-def extract_templates_and_params(text: str, remove_disabled_parts=None,
-                                 strip: Optional[bool] = None):
+def extract_templates_and_params(text: str,
+                                 remove_disabled_parts: Optional[bool] = None,
+                                 strip: Optional[bool] = None) -> ETPType:
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -1596,16 +1604,15 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
 
     @param text: The wikitext from which templates are extracted
     @param remove_disabled_parts: Remove disabled wikitext such as comments
-        and pre. If None (default), this is enabled when mwparserfromhell
-        is not available and disabled if mwparserfromhell is present.
-    @type remove_disabled_parts: bool or None
+        and pre. If None (default), this is enabled when neither
+        mwparserfromhell not wikitextparser package is available and
+        disabled otherwise.
     @param strip: if enabled, strip arguments and values of templates.
-        If None (default), this is enabled when mwparserfromhell
-        is not available and disabled if mwparserfromhell is present.
+        If None (default), this is enabled when neither mwparserfromhell
+        nor wikitextparser package is available and disabled otherwise.
     @return: list of template name and params
-    @rtype: list of tuple
     """
-    use_regex = isinstance(mwparserfromhell, Exception)
+    use_regex = isinstance(wikitextparser, ImportError)
 
     if remove_disabled_parts is None:
         remove_disabled_parts = use_regex
@@ -1617,41 +1624,58 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
 
     if use_regex:
         return extract_templates_and_params_regex(text, False, strip)
-    return extract_templates_and_params_mwpfh(text, strip)
+    return _extract_templates_and_params_parser(text, strip)
 
 
-def extract_templates_and_params_mwpfh(text: str, strip=False):
+def _extract_templates_and_params_parser(text: str,
+                                         strip: bool = False) -> ETPType:
     """
     Extract templates with params using mwparserfromhell.
 
     This function should not be called directly.
 
-    Use extract_templates_and_params, which will select this
-    mwparserfromhell implementation if based on whether the
-    mwparserfromhell package is installed.
+    Use extract_templates_and_params, which will select this parser
+    implementation if the mwparserfromhell or wikitextparser package is
+    installed.
 
     @param text: The wikitext from which templates are extracted
+    @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
-    @rtype: list of tuple
     """
-    code = mwparserfromhell.parse(text)
-    result = []
+    def explicit(param):
+        try:
+            attr = param.showkey
+        except AttributeError:
+            attr = not param.positional
+        return attr
 
-    for template in code.ifilter_templates(
+    parser_name = wikitextparser.__name__
+    pywikibot.log('Using {!r} wikitext parser'.format(parser_name))
+
+    result = []
+    parsed = wikitextparser.parse(text)
+    if parser_name == 'wikitextparser':
+        templates = parsed.templates
+        arguments = 'arguments'
+    else:
+        templates = parsed.ifilter_templates(
             matches=lambda x: not x.name.lstrip().startswith('#'),
-            recursive=True):
+            recursive=True)
+        arguments = 'params'
+
+    for template in templates:
         params = OrderedDict()
-        for param in template.params:
+        for param in getattr(template, arguments):
+            value = str(param.value)  # mwpfh needs upcast to str
+
             if strip:
-                implicit_parameter = not param.showkey
                 key = param.name.strip()
-                if not implicit_parameter:
+                if explicit(param):
                     value = param.value.strip()
                 else:
                     value = str(param.value)
             else:
                 key = str(param.name)
-                value = str(param.value)
 
             params[key] = value
 
@@ -1659,9 +1683,22 @@ def extract_templates_and_params_mwpfh(text: str, strip=False):
     return result
 
 
+@deprecated('extract_templates_and_params', since='20210329',
+            future_warning=True)
+def extract_templates_and_params_mwpfh(text: str,
+                                       strip: bool = False) -> ETPType:
+    """Extract templates with params using mwparserfromhell."""
+    global wikitextparser
+    saved_parser = wikitextparser
+    import mwparserfromhell as wikitextparser
+    result = _extract_templates_and_params_parser(text, strip)
+    wikitextparser = saved_parser
+    return result
+
+
 def extract_templates_and_params_regex(text: str,
                                        remove_disabled_parts: bool = True,
-                                       strip: bool = True):
+                                       strip: bool = True) -> ETPType:
     """
     Extract templates with params using a regex with additional processing.
 
@@ -1672,8 +1709,8 @@ def extract_templates_and_params_regex(text: str,
     is not used.
 
     @param text: The wikitext from which templates are extracted
+    @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
-    @rtype: list of tuple
     """
     # remove commented-out stuff etc.
     if remove_disabled_parts:
