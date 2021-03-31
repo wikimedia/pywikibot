@@ -23,8 +23,10 @@ from pywikibot.tools import suppress_warnings
 from pywikibot import UnknownSite
 
 from tests.aspects import (
-    require_modules, TestCase, DefaultDrySiteTestCase,
-    PatchingTestCase, SiteAttributeTestCase,
+    DefaultDrySiteTestCase,
+    require_modules,
+    SiteAttributeTestCase,
+    TestCase,
 )
 from tests import mock
 
@@ -302,7 +304,7 @@ class TestTemplatesInCategory(TestCase):
                 'Invalid category title extracted: nasty{{{!}}')
 
 
-WARNING_MSG = (r'.*extract_templates_and_params_mwpfh .*'
+WARNING_MSG = (r'.*extract_templates_and_params_.*'
                r'is deprecated for .*; use extract_templates_and_params')
 
 
@@ -502,7 +504,7 @@ class TestTemplateParams(TestCase):
     @require_modules('mwparserfromhell')
     def test_extract_templates_params_parser_stripped(self):
         """Test using mwparserfromhell with stripping."""
-        func = functools.partial(textlib._extract_templates_and_params_parser,
+        func = functools.partial(textlib.extract_templates_and_params,
                                  strip=True)
 
         self._common_results(func)
@@ -535,37 +537,39 @@ class TestTemplateParams(TestCase):
         """Test using many complex regexes."""
         func = functools.partial(textlib.extract_templates_and_params_regex,
                                  remove_disabled_parts=False, strip=False)
-        self._common_results(func)
-        self._order_differs(func)
-        self._unstripped(func)
-
-        self.assertEqual(func('{{a|b={} }}'), [])  # FIXME: {} is normal text
+        with suppress_warnings(WARNING_MSG, category=FutureWarning):
+            self._common_results(func)
+            self._order_differs(func)
+            self._unstripped(func)
+            # FIXME: {} is normal text
+            self.assertEqual(func('{{a|b={} }}'), [])
 
     def test_extract_templates_params_regex_stripped(self):
         """Test using many complex regexes with stripping."""
         func = textlib.extract_templates_and_params_regex
+        with suppress_warnings(WARNING_MSG, category=FutureWarning):
+            self._common_results(func)
+            self._order_differs(func)
+            self._stripped(func)
 
-        self._common_results(func)
-        self._order_differs(func)
-        self._stripped(func)
+            self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
+                             [('a', OrderedDict((('b', ''), )))])
 
-        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
-                         [('a', OrderedDict((('b', ''), )))])
+            # Identical to mwpfh
+            self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
+                                  [('c', OrderedDict((('1', '{{d}}'), ))),
+                                   ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
+                                   ('d', OrderedDict())
+                                   ])
 
-        # Identical to mwpfh
-        self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d}}'), ))),
-                               ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
-                               ('d', OrderedDict())
-                               ])
+            # However fails to correctly handle three levels of balanced
+            # brackets with empty parameters
+            self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
+                                  [('c', OrderedDict((('1', '{{d|}}}'), ))),
+                                   ('d', OrderedDict([('1', '}')]))
+                                   ])
 
-        # However fails to correctly handle three levels of balanced brackets
-        # with empty parameters
-        self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d|}}}'), ))),
-                               ('d', OrderedDict([('1', '}')]))
-                               ])
-
+    @require_modules('mwparserfromhell')
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
         func = functools.partial(textlib.extract_templates_and_params,
@@ -697,79 +701,6 @@ class TestTemplateParams(TestCase):
             self.assertIsNone(m.group(2))
             self.assertIsNotNone(m.group('unhandled_depth'))
             self.assertTrue(m.group(0).endswith('foo {{bar}}'))
-
-
-class TestGenericTemplateParams(PatchingTestCase):
-
-    """Test whether the generic function forwards the call correctly."""
-
-    net = False
-
-    @PatchingTestCase.patched(textlib, '_extract_templates_and_params_parser')
-    def extract_mwpfh(self, text, *args, **kwargs):
-        """Patched call to extract_templates_and_params_mwpfh."""
-        self._text = text
-        self._args = args
-        self._mwpfh = True
-
-    @PatchingTestCase.patched(textlib, 'extract_templates_and_params_regex')
-    def extract_regex(self, text, *args, **kwargs):
-        """Patched call to extract_templates_and_params_regex."""
-        self._text = text
-        self._args = args
-        self._mwpfh = False
-
-    def test_removing_disabled_parts_regex(self):
-        """Test removing disabled parts when using the regex variant."""
-        self.patch(textlib, 'wikitextparser', ImportError())
-        textlib.extract_templates_and_params('{{a<!-- -->}}', True)
-        self.assertEqual(self._text, '{{a}}')
-        self.assertFalse(self._mwpfh)
-        textlib.extract_templates_and_params('{{a<!-- -->}}', False)
-        self.assertEqual(self._text, '{{a<!-- -->}}')
-        self.assertFalse(self._mwpfh)
-        textlib.extract_templates_and_params('{{a<!-- -->}}')
-        self.assertEqual(self._text, '{{a}}')
-        self.assertFalse(self._mwpfh)
-
-    @require_modules('mwparserfromhell')
-    def test_removing_disabled_parts_mwpfh(self):
-        """Test removing disabled parts when using the mwpfh variant."""
-        textlib.extract_templates_and_params('{{a<!-- -->}}', True)
-        self.assertEqual(self._text, '{{a}}')
-        self.assertTrue(self._mwpfh)
-        textlib.extract_templates_and_params('{{a<!-- -->}}', False)
-        self.assertEqual(self._text, '{{a<!-- -->}}')
-        self.assertTrue(self._mwpfh)
-        textlib.extract_templates_and_params('{{a<!-- -->}}')
-        self.assertEqual(self._text, '{{a<!-- -->}}')
-        self.assertTrue(self._mwpfh)
-
-    def test_strip_regex(self):
-        """Test stripping values when using the regex variant."""
-        self.patch(textlib, 'wikitextparser', ImportError())
-        textlib.extract_templates_and_params('{{a| foo }}', False, True)
-        self.assertEqual(self._args, (False, True))
-        self.assertFalse(self._mwpfh)
-        textlib.extract_templates_and_params('{{a| foo }}', False, False)
-        self.assertEqual(self._args, (False, False))
-        self.assertFalse(self._mwpfh)
-        textlib.extract_templates_and_params('{{a| foo }}', False)
-        self.assertEqual(self._args, (False, True))
-        self.assertFalse(self._mwpfh)
-
-    @require_modules('mwparserfromhell')
-    def test_strip_mwpfh(self):
-        """Test stripping values when using the mwpfh variant."""
-        textlib.extract_templates_and_params('{{a| foo }}', None, True)
-        self.assertEqual(self._args, (True, ))
-        self.assertTrue(self._mwpfh)
-        textlib.extract_templates_and_params('{{a| foo }}', None, False)
-        self.assertEqual(self._args, (False, ))
-        self.assertTrue(self._mwpfh)
-        textlib.extract_templates_and_params('{{a| foo }}')
-        self.assertEqual(self._args, (False, ))
-        self.assertTrue(self._mwpfh)
 
 
 class TestDisabledParts(DefaultDrySiteTestCase):

@@ -62,6 +62,7 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
+    'wikitextparser': ['wikitextparser>=0.47.0'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
@@ -110,7 +111,7 @@ dependencies = [
     'setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < "3.6"',
     'setuptools>=20.2 ; python_version >= "3.6"',
 ]
-
+# in addition either mwparserfromhell or wikitextparser is required
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']
