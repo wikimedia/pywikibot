@@ -2123,7 +2123,7 @@ class InterwikiBot:
 
     def isDone(self):
         """Check whether there is still more work to do."""
-        return self and self.pageGenerator is None
+        return not self and self.pageGenerator is None
 
     def plus(self, site, count=1):
         """Helper routine that the Subject class expects in a counter."""
