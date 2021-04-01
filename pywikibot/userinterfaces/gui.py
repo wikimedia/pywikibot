@@ -564,7 +564,7 @@ class Tkdialog:
             # vulnerability found in Pillow<8.1.1
             from sys import version
             raise RuntimeError(
-                'This script requires Python 3.5+ for GUI support.\n'
+                'This script requires Python 3.6+ for GUI support.\n'
                 '{version} is not supported. Please update your Python.'
                 .format(version=version.split(maxsplit=1)[0])
             )
