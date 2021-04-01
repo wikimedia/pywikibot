@@ -79,7 +79,7 @@ project_copyright = pywikibot.__copyright__  # alias since Python 3.5
 # built documents.
 #
 # The short X.Y version.
-version = pywikibot.__version__
+version = pywikibot.__version__.partition('.dev')[0]
 # The full version, including alpha/beta/rc tags.
 release = pywikibot.__version__
 
