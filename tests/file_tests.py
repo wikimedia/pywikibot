@@ -42,16 +42,6 @@ class TestShareFiles(TestCase):
 
     cached = True
 
-    def test_fileUrl_versus_get_file_url(self):
-        """Test fileUrl() is equivalent to get_file_url()."""
-        title = 'File:Sepp Maier 1.JPG'
-        commons = self.get_site('commons')
-        commons_file = pywikibot.FilePage(commons, title)
-        self.assertEqual(commons_file.fileUrl(), commons_file.get_file_url())
-        itwp = self.get_site('itwiki')
-        itwp_file = pywikibot.FilePage(itwp, title)
-        self.assertEqual(itwp_file.fileUrl(), itwp_file.get_file_url())
-
     def testSharedOnly(self):
         """Test file_is_shared() on file page with shared file only."""
         title = 'File:Sepp Maier 1.JPG'

@@ -2298,11 +2298,6 @@ class FilePage(Page):
             self._imagePageHtml = http.request(self.site, path).text
         return self._imagePageHtml
 
-    @deprecated('get_file_url', since='20160609', future_warning=True)
-    def fileUrl(self):  # pragma: no cover
-        """Return the URL for the file described on this page."""
-        return self.latest_file_info.url
-
     def get_file_url(self, url_width=None, url_height=None,
                      url_param=None) -> str:
         """
