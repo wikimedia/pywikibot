@@ -449,14 +449,18 @@ def _decide_encoding(response, charset) -> Optional[str]:
         """Helper function to try decoding."""
         if encoding is None:
             return None
+
         try:
             content.decode(encoding)
-        except (LookupError, UnicodeDecodeError):
+        except LookupError:
             pywikibot.warning('Unknown or invalid encoding {!r}'
                               .format(encoding))
-            # let chardet do the job
-            return None
-        return encoding
+        except UnicodeDecodeError as e:
+            pywikibot.warning('{} found in {}'.format(e, content))
+        else:
+            return encoding
+
+        return None  # let chardet do the job
 
     header_encoding = _get_encoding_from_response_headers(response)
     if header_encoding is None:
