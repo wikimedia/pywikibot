@@ -58,7 +58,6 @@ from pywikibot.tools import (
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    redirect_func,
 )
 from pywikibot.tools.formatter import color_format
 
@@ -1159,11 +1158,6 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
                  % (_sites[key], code), UserWarning, 2)
 
     return _sites[key]
-
-
-# alias for backwards-compability
-getSite = redirect_func(Site, old_name='getSite', since='20150924',
-                        future_warning=True)
 
 
 # These imports depend on Wb* classes above.
