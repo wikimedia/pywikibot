@@ -410,11 +410,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_categorymembers(self):
         """Test Site.categorymembers."""
         cats = list(self.site.pagecategories(self.mainpage))
-        if len(cats) == 0:
+        if not cats:
             self.skipTest('Main page is not in any categories.')
-        else:
-            for cm in self.site.categorymembers(cats[0]):
-                self.assertIsInstance(cm, pywikibot.Page)
+
+        for cm in self.site.categorymembers(cats[0]):
+            self.assertIsInstance(cm, pywikibot.Page)
 
     def test_pageimages(self):
         """Test Site.pageimages."""

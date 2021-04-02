@@ -901,7 +901,7 @@ def load_word_function(raw) -> List[str]:
     """Load the badword list and the whitelist."""
     page = re.compile(r'(?:\"|\')(.*?)(?:\"|\')(?:, |\))')
     list_loaded = page.findall(raw)
-    if len(list_loaded) == 0:
+    if not list_loaded:
         pywikibot.output('There was no input on the real-time page.')
     return list_loaded
 

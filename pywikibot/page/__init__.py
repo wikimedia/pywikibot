@@ -851,7 +851,7 @@ class BasePage(ComparableMixin):
         disambigs.update(self.site._disambigtemplates)
         # see if any template on this page is in the set of disambigs
         disambig_in_page = disambigs.intersection(templates)
-        return self.namespace() != 10 and len(disambig_in_page) > 0
+        return self.namespace() != 10 and disambig_in_page
 
     @deprecated_args(withTemplateInclusion='with_template_inclusion',
                      onlyTemplateInclusion='only_template_inclusion',
@@ -4560,7 +4560,7 @@ class Claim(Property):
             if hasattr(self, 'hash') and self.hash is not None:
                 data['hash'] = self.hash
         else:
-            if len(self.qualifiers) > 0:
+            if self.qualifiers:
                 data['qualifiers'] = {}
                 data['qualifiers-order'] = list(self.qualifiers.keys())
                 for prop, qualifiers in self.qualifiers.items():
@@ -4568,7 +4568,8 @@ class Claim(Property):
                         assert qualifier.isQualifier is True
                     data['qualifiers'][prop] = [
                         qualifier.toJSON() for qualifier in qualifiers]
-            if len(self.sources) > 0:
+
+            if self.sources:
                 data['references'] = []
                 for collection in self.sources:
                     reference = {

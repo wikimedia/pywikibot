@@ -938,7 +938,7 @@ class checkImagesBot:
                         self.report(text_for_the_report, image_to_tag,
                                     commImage=dupComment_image, unver=True)
 
-                if len(images_to_tag_list) != 0 and not only_report:
+                if images_to_tag_list and not only_report:
                     fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                     already_reported_in_past = fp.revision_count(self.bots)
                     from_regex = (r'\n\*\[\[:%s%s\]\]'
