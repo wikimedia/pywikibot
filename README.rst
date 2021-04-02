@@ -50,6 +50,7 @@ Quick start
     python pwb.py script_name
 
 Or to install using PyPI (excluding scripts)
+
 ::
 
     pip install -U setuptools
