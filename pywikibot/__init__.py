@@ -35,7 +35,7 @@ from pywikibot import config2 as config
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
-    BadTitle, CaptchaError, CascadeLockedPage, CircularRedirect,
+    CaptchaError, CascadeLockedPage, CircularRedirect,
     CoordinateGlobeUnknownException, EditConflict, Error, FatalServerError,
     InterwikiRedirectPage, InvalidTitle, IsNotRedirectPage, IsRedirectPage,
     LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage, NoSuchSite,
@@ -66,7 +66,7 @@ __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
     '__maintainer__', '__maintainer_email__', '__name__',
     '__url__', '__version__',
-    'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
+    'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
