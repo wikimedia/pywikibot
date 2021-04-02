@@ -1,5 +1,62 @@
-"""
-Exception and warning classes used throughout the framework.
+"""**Pywikibot Exceptions** and warning classes.
+
+This module contains all exception and warning classes used throughout
+the framework::
+
+    Exception
+     +-- Error
+          +-- AutoblockUser
+          +-- CaptchaError
+          +-- InvalidTitle
+          +-- NoUsername
+          +-- PageRelatedError
+          |    +-- CircularRedirect
+          |    +-- InterwikiRedirectPage
+          |    +-- IsNotRedirectPage
+          |    +-- IsRedirectPage
+          |    +-- NoMoveTarget
+          |    +-- NoPage
+          |    +-- NotEmailableError
+          |    +-- PageLoadRelatedError
+          |    |    +-- InconsistentTitleReceived
+          |    +-- PageSaveRelatedError
+          |    |    +-- EditConflict
+          |    |    |    +-- ArticleExistsConflict
+          |    |    |    +-- PageCreatedConflict
+          |    |    |    +-- PageDeletedConflict
+          |    |    +-- LockedPage
+          |    |    |    +-- LockedNoPage
+          |    |    |    +-- CascadeLockedPage
+          |    |    +-- NoCreateError
+          |    |    +-- OtherPageSaveError
+          |    |    +-- SpamblacklistError
+          |    |    +-- TitleblacklistError
+          |    +-- UnsupportedPage
+          +-- SectionError
+          +-- ServerError
+          |    +-- FatalServerError
+          |    +-- Server414Error
+          |    +-- Server504Error
+          +-- SiteDefinitionError
+          |    +-- UnknownFamily
+          |    +-- UnknownSite
+          +-- TimeoutError
+          |    +-- MaxlagTimeoutError
+          +-- UserRightsError
+          |    +-- HiddenKeyError (KeyError)
+          +-- UnknownExtension (NotImplementedError)
+          +-- WikiBaseError
+               +-- CoordinateGlobeUnknownException (NotimplementedError)
+               +-- EntityTypeUnknownException
+               +-- NoWikibaseEntity
+
+    UserWarning
+     +-- ArgumentDeprecationWarning (FutureWarning)
+     +-- FamilyMaintenanceWarning
+
+    RuntimeWarning
+     +-- NotImplementedWarning
+
 
 Error: Base class, all exceptions should the subclass of this class.
 
