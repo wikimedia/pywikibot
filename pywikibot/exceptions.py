@@ -6,7 +6,6 @@ Error: Base class, all exceptions should the subclass of this class.
   - NoUsername: Username is not in user-config.py, or it is invalid.
   - AutoblockUser: requested action on a virtual autoblock user not valid
   - UserRightsError: insufficient rights for requested action
-  - BadTitle: Server responded with BadTitle
   - InvalidTitle: Invalid page title
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - Server504Error: Server timed out with HTTP 504 code
@@ -456,13 +455,6 @@ class Server504Error(ServerError):
 class Server414Error(ServerError):
 
     """Server returned with HTTP 414 code."""
-
-    pass
-
-
-class BadTitle(Error):
-
-    """Server responded with BadTitle."""
 
     pass
 
