@@ -44,7 +44,6 @@ needs_sphinx = '1.8'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-              'sphinx_epytext',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
               'sphinx.ext.viewcode',
@@ -88,7 +87,7 @@ release = pywikibot.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-# language = None
+language = None
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -344,6 +343,59 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 
+TOKENS_WITH_PARAM = [
+    # sphinx
+    'param', 'parameter', 'arg', 'argument', 'key', 'keyword',
+    'type',
+    'raises', 'raise', 'except', 'exception',
+    'var', 'ivar', 'cvar',
+    'vartype',
+    'meta',
+    # epytext
+    'todo',
+]
+
+TOKENS = [
+    # sphinx
+    'return', 'returns', 'rtype',
+    # epytext
+    'attention', 'author', 'bug',
+    'change', 'changed',
+    'contact',
+    'copyright', '(c)',
+    'deprecated',
+    'invariant', 'license', 'note',
+    'organization', 'org',
+    'permission',
+    'postcondition', 'postcond',
+    'precondition', 'precond',
+    'requires', 'require', 'requirement',
+    'see', 'seealso',
+    'since', 'status', 'summary', 'todo',
+    'version',
+    'warn', 'warning',
+]
+
+
+def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
+    """Convert epytext tokens to sphinx."""
+    result = []
+    for line in lines:
+        line = re.sub(r'(\A *)@({}) '.format('|'.join(TOKENS_WITH_PARAM)),
+                      r'\1:\2 ', line)  # tokens with parameter
+        line = re.sub(r'(\A *)@({}):'.format('|'.join(TOKENS)),
+                      r'\1:\2:', line)  # short token
+        line = re.sub(r'(\A *)@(?:kwarg|kwparam) ',
+                      r'\1:keyword ', line)  # keyword
+        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
+        line = re.sub(r'(\A| )B\{([^}]*)\}', r'\1**\2**', line)  # Bold
+        line = re.sub(r'(\A| )I\{([^}]*)\}', r'\1*\2*', line)  # Italic
+        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1``\2``', line)  # Code
+        line = re.sub(r'(\A| )U\{([^}]*)\}', r'\1\2', line)  # Url
+        result.append(line)
+    lines[:] = result[:]  # assignment required in this way
+
+
 def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
@@ -433,6 +485,7 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 
 def setup(app):
     """Implicit Sphinx extension hook."""
+    app.connect('autodoc-process-docstring', pywikibot_epytext_to_sphinx)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
     app.connect('autodoc-skip-member', pywikibot_skip_members)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
