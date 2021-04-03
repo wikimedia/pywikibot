@@ -450,9 +450,11 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
 def pywikibot_skip_members(app, what, name, obj, skip, options):
     """Skip certain members from documentation."""
     inclusions = ('__init__', )
-    exclusions = ('__dict__', '__weakref__',)
+    exclusions = ()
     if name in inclusions:
         return False
+    if name.startswith('__') and name.endswith('__'):
+        return True
     if obj.__doc__ is not None \
        and obj.__doc__.startswith(('DEPRECATED', 'Deprecated')):
         return True
