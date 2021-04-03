@@ -102,10 +102,9 @@ class APISite(
     WikibaseClientMixin,
 ):
 
-    """
-    API interface to MediaWiki site.
+    """API interface to MediaWiki site.
 
-    Do not instantiate directly; use pywikibot.Site function.
+    Do not instantiate directly; use L{pywikibot.Site} function.
     """
 
     @remove_last_args(['sysop'])

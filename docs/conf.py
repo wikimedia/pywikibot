@@ -451,7 +451,7 @@ def pywikibot_skip_members(app, what, name, obj, skip, options):
     """Skip certain members from documentation."""
     inclusions = ('__init__', )
     exclusions = ()
-    if name in inclusions:
+    if name in inclusions and len(str.splitlines(obj.__doc__ or '')) >= 3:
         return False
     if name.startswith('__') and name.endswith('__'):
         return True
