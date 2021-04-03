@@ -1377,19 +1377,9 @@ def main(*args: Tuple[str, ...]) -> None:
 
     @param args: command line arguments
     """
-    # the option that's always selected when the bot wonders what to do with
-    # a link. If it's None, the user is prompted (default behaviour).
-    always = None
+    options = {}
     alternatives = []
-    getAlternatives = True
-    dnSkip = False
     generator = None
-    primary = False
-    first_only = False
-    main_only = False
-
-    # For sorting the linked pages, case can be ignored
-    minimum = 0
 
     local_args = pywikibot.handle_args(args)
     site = pywikibot.Site()
@@ -1400,12 +1390,12 @@ def main(*args: Tuple[str, ...]) -> None:
     for argument in local_args:
         arg, _, value = argument.partition(':')
         if arg == '-primary':
-            primary = True
+            options['primary'] = True
             if value:
-                getAlternatives = False
+                options['just'] = False
                 alternatives.append(value)
         elif arg == '-always':
-            always = value
+            options['always'] = value or None
         elif arg == '-pos':
             if not value:
                 continue
@@ -1421,15 +1411,11 @@ def main(*args: Tuple[str, ...]) -> None:
                         automatic_quit=False):
                     alternatives.append(page.title())
         elif arg == '-just':
-            getAlternatives = False
-        elif arg == '-dnskip':
-            dnSkip = True
-        elif arg == '-main':
-            main_only = True
-        elif arg == '-first':
-            first_only = True
+            options['just'] = False
+        elif arg in ('-dnskip', '-main', '-first'):
+            options[arg[1:]] = True
         elif arg == '-min':
-            minimum = int(value)
+            options['min'] = int(value or 0)
         elif arg == '-start':
             try:
                 generator = pagegenerators.CategorizedPageGenerator(
@@ -1447,9 +1433,7 @@ def main(*args: Tuple[str, ...]) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
-                              generator, primary, main_only, first_only,
-                              minimum=minimum)
+    bot = DisambiguationRobot(generator=generator, pos=alternatives, **options)
     bot.run()
 
 
