@@ -144,6 +144,7 @@ globalbadtitles = r"""
             403[ ]forbidden
             |(404|page|file|information|resource).*not([ ]*be)?[ ]*
             (available|found)
+            |are[ ]robot
             |site.*disabled
             |error[ ]404
             |error.+not[ ]found
@@ -170,7 +171,7 @@ badtitles = {
     'fr': '.*(404|page|site).*en +travaux.*',
     'es': '.*sitio.*no +disponible.*',
     'it': '((pagina|sito) (non trovat[ao]|inesistente)|accedi|errore)',
-    'ru': '.*(Страница|страница).*(не[ ]*найдена|отсутствует).*',
+    'ru': '.*([Сс]траница.*(не[ ]*найдена|отсутствует)|Вы.*человек).*',
 }
 
 # Regex that match bare references
