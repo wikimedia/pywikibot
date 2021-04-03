@@ -29,7 +29,7 @@ used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -167,6 +167,9 @@ class ImageTransferBot(SingleSiteBot):
         @return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
+        pywikibot.output(
+            '\n>>> Transfer {source} from {source.site} to {target}\n'
+            .format(source=sourceImagePage, target=self.opt.target))
         url = sourceImagePage.get_file_url()
         pywikibot.output('URL should be: ' + url)
         # localize the text that should be printed on image description page
@@ -207,7 +210,7 @@ class ImageTransferBot(SingleSiteBot):
                               ignore_warning=self.opt.ignore_warning)
 
             # try to upload
-            if bot.self.skip_run():
+            if bot.skip_run():
                 return
             target_filename = bot.upload_file(url)
 
@@ -353,8 +356,8 @@ def main(*args):
     if target_code or target_family:
         site = pywikibot.Site()
         options.setdefault('target',
-                           '{}:{}'.format(target_code or site.lang,
-                                          target_family or site.family))
+                           '{}:{}'.format(target_family or site.family,
+                                          target_code or site.lang))
 
     bot = ImageTransferBot(generator=gen, **options)
     bot.run()
