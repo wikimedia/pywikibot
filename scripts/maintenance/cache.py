@@ -54,7 +54,7 @@ Available filter commands:
     older_than_one_day(entry)
     recent(entry)
 
-  There are helper functions which can be part of a command:
+There are helper functions which can be part of a command:
 
     older_than(entry, interval)
     newer_than(entry, interval)
