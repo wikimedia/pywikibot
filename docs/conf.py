@@ -456,7 +456,7 @@ def pywikibot_skip_members(app, what, name, obj, skip, options):
     if name.startswith('__') and name.endswith('__'):
         return True
     if obj.__doc__ is not None \
-       and obj.__doc__.startswith(('DEPRECATED', 'Deprecated')):
+       and ('DEPRECATED' in obj.__doc__ or 'Deprecated' in obj.__doc__):
         return True
     return skip or name in exclusions
 
