@@ -222,12 +222,16 @@ def checkstr(string: str) -> Tuple[str, str]:
     """
     Return the key and duration extracted from the string.
 
-    @param string: a string defining a time period:
+    @param string: a string defining a time period
+
+    Examples::
+
         300s - 300 seconds
         36h - 36 hours
         7d - 7 days
         2w - 2 weeks (14 days)
         1y - 1 year
+
     @return: key and duration extracted form the string
     """
     if string.isdigit():
@@ -246,12 +250,13 @@ def str2size(string: str) -> Size:
     """
     Return a size for a shorthand size.
 
-    Accepts a string defining a size:
-    1337 - 1337 bytes
-    150K - 150 kilobytes
-    2M - 2 megabytes
-    Returns a tuple (size,unit), where size is an integer and unit is
-    'B' (bytes) or 'T' (threads).
+    Accepts a string defining a size::
+      1337 - 1337 bytes
+      150K - 150 kilobytes
+      2M - 2 megabytes
+
+    @Returns: a tuple ``(size, unit)``, where C{size} is an integer and
+        unit is C{'B'} (bytes) or C{'T'} (threads).
     """
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
     if not match:
@@ -326,7 +331,7 @@ class DiscussionThread:
     """
     An object representing a discussion thread on a page.
 
-    It represents something that is of the form:
+    It represents something that is of the form::
 
         == Title of thread ==
 
@@ -500,17 +505,15 @@ class PageArchiver:
 
     algo = 'none'
 
-    def __init__(self, page, template, salt, force=False) -> None:
+    def __init__(self, page, template, salt: str, force: bool = False) -> None:
         """Initializer.
 
-        param page: a page object to be archived
-        type page: pywikibot.Page
-        param template: a template with configuration settings
-        type template: pywikibot.Page
-        param salt: salt value
-        type salt: str
-        param force: override security value
-        type force: bool
+        @param page: a page object to be archived
+        @type page: L{pywikibot.Page}
+        @param template: a template with configuration settings
+        @type template: L{pywikibot.Page}
+        @param salt: salt value
+        @param force: override security value
         """
         self.attributes = OrderedDict([
             ('archive', ['', False]),
