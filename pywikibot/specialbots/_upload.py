@@ -4,7 +4,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -224,8 +224,8 @@ class UploadRobot(BaseBot):
             filename = self.filename_prefix + filename
         if not self.keep_filename:
             pywikibot.output(
-                'The filename on the target wiki will default to: %s'
-                % filename)
+                '\nThe filename on the target wiki will default to: {}\n'
+                .format(filename))
             assert not self.opt.always
             newfn = pywikibot.input(
                 'Enter a better name, or press enter to accept:')
@@ -271,9 +271,9 @@ class UploadRobot(BaseBot):
                     continue
 
                 if not pywikibot.input_yn(
-                        'File format is not one of [%s], but %s. Continue?'
-                        % (' '.join(allowed_formats), ext),
-                        default=False, automatic_quit=False):
+                        'File format is not one of [{}], but {!r}. Continue?'
+                        .format(' '.join(allowed_formats), ext),
+                        default=False):
                     continue
 
             potential_file_page = pywikibot.FilePage(self.target_site,
