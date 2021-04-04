@@ -1020,6 +1020,10 @@ class TestPageUserAction(DefaultSiteTestCase):
 
     def test_watch(self):
         """Test Page.watch, with and without unwatch enabled."""
+        if not self.site.has_right('editmywatchlist'):
+            self.skipTest('user {} cannot edit its watch list'
+                          .format(self.site.user()))
+
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
         userpage = self.get_userpage()

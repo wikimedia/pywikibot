@@ -1402,6 +1402,10 @@ class TestUserWatchedPages(DefaultSiteTestCase):
 
     def test_watched_pages(self):
         """Test the site.watched_pages() method."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         gen = self.site.watched_pages(total=5, force=False)
         self.assertIsInstance(gen.request, api.CachedRequest)
         for page in gen:
@@ -1414,6 +1418,10 @@ class TestUserWatchedPages(DefaultSiteTestCase):
 
     def test_watched_pages_uncached(self):
         """Test the site.watched_pages() method uncached."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         gen = self.site.watched_pages(total=5, force=True)
         self.assertIsInstance(gen.request, api.Request)
         self.assertFalse(issubclass(gen.request_class, api.CachedRequest))
@@ -1806,6 +1814,10 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
     def test_watchlist_revs(self):
         """Test the site.watchlist_revs() method."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
