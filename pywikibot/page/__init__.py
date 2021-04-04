@@ -851,7 +851,7 @@ class BasePage(ComparableMixin):
         disambigs.update(self.site._disambigtemplates)
         # see if any template on this page is in the set of disambigs
         disambig_in_page = disambigs.intersection(templates)
-        return self.namespace() != 10 and disambig_in_page
+        return self.namespace() != 10 and bool(disambig_in_page)
 
     @deprecated_args(withTemplateInclusion='with_template_inclusion',
                      onlyTemplateInclusion='only_template_inclusion',
