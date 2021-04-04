@@ -409,7 +409,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     length = 0
     for index, line in enumerate(lines):
         if line == 'Initializer.':
-            lines[line] = ''
+            lines[index] = ''
         elif line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pywikibot.pagegenerators` arguments.')
