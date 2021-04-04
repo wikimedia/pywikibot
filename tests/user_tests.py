@@ -25,7 +25,7 @@ class TestUserClass(TestCase):
 
     def _tests_unregistered_user(self, user, prop='invalid'):
         """Proceed user tests."""
-        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
+        with suppress_warnings(r'pywikibot\.page\.User\.name', FutureWarning):
             self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
@@ -56,7 +56,7 @@ class TestUserClass(TestCase):
     def test_registered_user(self):
         """Test registered user."""
         user = User(self.site, 'Xqt')
-        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
+        with suppress_warnings(r'pywikibot\.page\.User\.name', FutureWarning):
             self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertTrue(user.isRegistered())
@@ -124,7 +124,8 @@ class TestUserClass(TestCase):
         p.assert_called_once_with(
             'This is an autoblock ID, you can only use to unblock it.')
         self.assertEqual('#1242976', user.username)
-        with suppress_warnings('pywikibot.page.User.name is deprecated'):
+        with suppress_warnings(r'pywikibot\.page\.User\.name is deprecated',
+                               FutureWarning):
             self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
@@ -148,7 +149,8 @@ class TestUserClass(TestCase):
         with patch.object(pywikibot, 'output'):
             user = User(self.site, 'User:#1242976')
         self.assertEqual('#1242976', user.username)
-        with suppress_warnings('pywikibot.page.User.name is deprecated'):
+        with suppress_warnings(r'pywikibot\.page\.User\.name is deprecated',
+                               FutureWarning):
             self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
