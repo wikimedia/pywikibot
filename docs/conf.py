@@ -449,7 +449,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
 
 def pywikibot_skip_members(app, what, name, obj, skip, options):
     """Skip certain members from documentation."""
-    inclusions = ('__init__', )
+    inclusions = ()
     exclusions = ()
     if name in inclusions and len(str.splitlines(obj.__doc__ or '')) >= 3:
         return False
