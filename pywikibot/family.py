@@ -113,12 +113,12 @@ class Family:
         'ru', 'sah', 'szy', 'se', 'sm', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco',
         'trv', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd',
         'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'su',
-        'fi', 'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara', 'tt', 'te', 'tet',
-        'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk',
-        'tw', 'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep',
-        'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu',
-        'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw',
-        'zh-cn',
+        'fi', 'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara', 'tt', 'tay', 'te',
+        'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb',
+        'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec',
+        'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo',
+        'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
+        'zh-tw', 'zh-cn',
     ]
 
     # The revised sorting order by first word from meta
@@ -151,11 +151,11 @@ class Family:
         'sg', 'sat', 'skr', 'sc', 'sco', 'trv', 'stq', 'st', 'nso', 'tn', 'sq',
         'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
         'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'kbp',
-        'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr',
-        'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk',
-        'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'zh-classical',
-        'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
-        'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+        'roa-tara', 'tt', 'tay', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
+        'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din',
+        'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa',
+        'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue',
+        'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
 
     # Order for fy: alphabetical by code, but y counts as i
