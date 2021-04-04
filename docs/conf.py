@@ -493,6 +493,7 @@ def setup(app):
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
+autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
