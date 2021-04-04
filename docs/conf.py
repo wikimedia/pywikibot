@@ -396,6 +396,15 @@ def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
     lines[:] = result[:]  # assignment required in this way
 
 
+def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
+    """Fixup docstrings."""
+    if what != 'class':
+        return
+
+    if lines and lines[0] == 'Initializer.':
+        lines[:] = lines[2:]
+
+
 def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
@@ -408,9 +417,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
 
     length = 0
     for index, line in enumerate(lines):
-        if line == 'Initializer.':
-            lines[index] = ''
-        elif line == '&params;':
+        if line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pywikibot.pagegenerators` arguments.')
         elif name == 'scripts.replace' and line == '&fixes-help;':
@@ -490,6 +497,7 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_epytext_to_sphinx)
+    app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
     app.connect('autodoc-skip-member', pywikibot_skip_members)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
