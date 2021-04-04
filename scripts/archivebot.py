@@ -328,10 +328,11 @@ class DiscussionThread:
 
     It represents something that is of the form:
 
-    == Title of thread ==
+        == Title of thread ==
 
-    Thread content here. ~~~~
-    :Reply, etc. ~~~~
+        Thread content here. ~~~~
+        :Reply, etc. ~~~~
+
     """
 
     def __init__(self, title: str, timestripper: TimeStripper) -> None:
