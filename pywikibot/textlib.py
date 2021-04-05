@@ -11,6 +11,7 @@ and return a unicode string.
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import html
 import re
 
 from collections.abc import Sequence
@@ -147,15 +148,10 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     return phrase
 
 
+@deprecated('html.unescape', since='20210405', future_warning=True)
 def unescape(s: str) -> str:
     """Replace escaped HTML-special characters by their originals."""
-    if '&' in s:
-        s = s.replace('&lt;', '<')
-        s = s.replace('&gt;', '>')
-        s = s.replace('&apos;', "'")
-        s = s.replace('&quot;', '"')
-        s = s.replace('&amp;', '&')  # Must be last
-    return s
+    return html.unescape(s)
 
 
 class _MultiTemplateMatchBuilder:
