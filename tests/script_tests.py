@@ -22,6 +22,7 @@ scripts_path = join_root_path('scripts')
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
+    'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
 }
 
@@ -82,9 +83,11 @@ auto_run_script_list = [
     'revertbot',
     'noreferences',
     'parser_function_count',
+    'patrol',
     'shell',
     'unusedfiles',
     'upload',
+    'watchlist',
     'welcome',
 ]
 

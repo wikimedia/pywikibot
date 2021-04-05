@@ -63,6 +63,11 @@ commons\_information script
 
 .. automodule:: scripts.commons_information
 
+commonscat script
+-----------------
+
+.. automodule:: scripts.commonscat
+
 coordinate\_import script
 -------------------------
 
@@ -148,6 +153,11 @@ parser\_function\_count script
 
 .. automodule:: scripts.parser_function_count
 
+patrol script
+-------------
+
+.. automodule:: scripts.patrol
+
 protect script
 --------------
 
@@ -227,6 +237,11 @@ version script
 --------------
 
 .. automodule:: scripts.version
+
+watchlist script
+----------------
+
+.. automodule:: scripts.watchlist
 
 weblinkchecker script
 ---------------------

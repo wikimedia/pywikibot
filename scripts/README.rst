@@ -40,6 +40,10 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | clean_sandbox.py       | This bot makes the cleaned of the page of tests.        |
     +------------------------+---------------------------------------------------------+
+    | commonscat.py          | Adds {{commonscat}} to Wikipedia categories (or         |
+    |                        | articles), if other language wikipedia already has such |
+    |                        | a template                                              |
+    +------------------------+---------------------------------------------------------+
     | commons_information.py | Insert a language template into the description field   |
     +------------------------+---------------------------------------------------------+
     | coordinate_import.py   | Coordinate importing script.                            |
@@ -132,6 +136,8 @@ The contents of the package
     | version.py             | Outputs Pywikibot's revision number, Python's version   |
     |                        | and OS used.                                            |
     +------------------------+---------------------------------------------------------+
+    | watchlists.py          | Information retrieved by watchlist.py will be stored    |
+    +------------------------+---------------------------------------------------------+
     | weblinkchecker.py      | Check if external links are still working.              |
     +------------------------+---------------------------------------------------------+
     | welcome.py             | Script to welcome new users.                            |
@@ -155,10 +161,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | commons_link.py        | This robot include commons template to linking Commons  |
     |                        | and your wiki project.                                  |
-    +------------------------+---------------------------------------------------------+
-    | commonscat.py          | Adds {{commonscat}} to Wikipedia categories (or         |
-    |                        | articles), if other language wikipedia already has such |
-    |                        | a template                                              |
     +------------------------+---------------------------------------------------------+
     | create_categories.py   | Program to batch create categories.                     |
     +------------------------+---------------------------------------------------------+
@@ -233,8 +235,6 @@ The contents of the package
     | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables    |
     +------------------------+---------------------------------------------------------+
     | unlink.py              | This bot unlinks a page on every page that links to it. |
-    +------------------------+---------------------------------------------------------+
-    | watchlists.py          | Information retrieved by watchlist.py will be stored    |
     +------------------------+---------------------------------------------------------+
     | wikisourcetext.py      | This bot applies to Wikisource sites to upload text.    |
     +------------------------+---------------------------------------------------------+

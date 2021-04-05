@@ -93,6 +93,8 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
+    'commons_information.py': extra_deps['mwparserfromhell'],
+    'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
 }
 

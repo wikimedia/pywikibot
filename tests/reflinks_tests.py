@@ -54,7 +54,7 @@ class TestXMLPageGenerator(TestCase):
         self.assertPageTitlesEqual(pages, ('Fake page', 'Talk:Fake page'),
                                    site=self.get_site())
 
-    def test_namespace_None(self):
+    def test_namespace_none(self):
         """Test namespaces=None processes all namespaces."""
         gen = XmlDumpPageGenerator(
             filename=join_xml_data_path('dummy-reflinks.xml'),

@@ -408,7 +408,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # fallback to interwiki pages
         return self.findCommonscatLink(page)
 
-    def getCommonscatLink(self, wikipediaPage=None):
+    def getCommonscatLink(self, wikipediaPage=None):  # noqa N802, N803
         """Find CommonsCat template on page.
 
         @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
