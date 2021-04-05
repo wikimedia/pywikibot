@@ -63,7 +63,7 @@ class TestXMLPageGenerator(TestCase):
         start_variants = (
             None,  # None
             'Fake',  # prefix
-            'Fake_page',  # title
+            'Fake_page',  # underscore
         )
 
         filename = join_xml_data_path('dummy-reflinks.xml')
@@ -139,23 +139,22 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
-    def test_xml_start_prefix(self):
-        """Test the generator using a start partial page."""
-        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
-             '-namespace:1', '-xmlstart:Fake')
-        gen = self.constructor_kwargs['generator']
-        pages = list(gen)
-        self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
-                                   site=self.get_site())
+    def test_xml_start_variants(self):
+        """Test the generator using variants of start page."""
+        start_variants = (
+            '-xmlstart:Fake page',  # title
+            '-xmlstart:Fake_page',  # underscore
+            '-xmlstart:Fake',  # prefix
+        )
 
-    def test_xml_start_underscore(self):
-        """Test the generator using a start page with an underscore."""
-        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
-             '-namespace:1', '-xmlstart:Fake_page')
-        gen = self.constructor_kwargs['generator']
-        pages = list(gen)
-        self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
-                                   site=self.get_site())
+        filename = '-xml:' + join_xml_data_path('dummy-reflinks.xml')
+        for start in start_variants:
+            with self.subTest(xmlstart=start):
+                main(filename, '-namespace:1', start)
+                gen = self.constructor_kwargs['generator']
+                pages = list(gen)
+                self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
+                                           site=self.site)
 
     def test_xml_namespace_name(self):
         """Test the generator using a namespace name."""
