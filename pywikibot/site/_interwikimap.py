@@ -6,6 +6,8 @@
 #
 import pywikibot
 
+from pywikibot.backports import Set
+
 
 class _IWEntry:
 
@@ -79,13 +81,11 @@ class _InterwikiMap:
             raise TypeError('_iw_sites[%s] is wrong type: %s'
                             % (prefix, type(self._iw_sites[prefix].site)))
 
-    def get_by_url(self, url):
+    def get_by_url(self, url: str) -> Set[str]:
         """
         Return a set of prefixes applying to the URL.
 
         @param url: URL for the interwiki
-        @type url: str
-        @rtype: set
         """
-        return {prefix for prefix, iw_entry in self._iw_sites
+        return {prefix for prefix, iw_entry in self._iw_sites.items()
                 if iw_entry.url == url}
