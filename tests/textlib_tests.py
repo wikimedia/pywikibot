@@ -1639,6 +1639,10 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         self.assertEqual(set(lang_links), self.sites_set - {self.site})
 
 
+UNESCAPE_WARNING_MSG = (r'.*pywikibot\.textlib\.unescape .*'
+                        r'is deprecated for .*; use html.unescape')
+
+
 class TestUnescape(TestCase):
 
     """Test to verify that unescaping HTML chars are correctly done."""
@@ -1647,8 +1651,9 @@ class TestUnescape(TestCase):
 
     def test_unescape(self):
         """Test unescaping HTML chars."""
-        self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
-                         '!23<>\'"&&')
+        with suppress_warnings(UNESCAPE_WARNING_MSG, category=FutureWarning):
+            self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
+                             '!23<>\'"&&')
 
 
 class TestExtractSections(DefaultDrySiteTestCase):
