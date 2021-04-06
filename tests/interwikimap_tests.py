@@ -8,7 +8,10 @@ import unittest
 
 import pywikibot
 
+from pywikibot.tools import suppress_warnings
+
 from tests.aspects import DefaultSiteTestCase
+from tests import WARN_SITE_CODE
 
 
 class TestInterwikiMap(DefaultSiteTestCase):
@@ -138,9 +141,10 @@ class TestInterwikiMapPrefix(DefaultSiteTestCase):
                           ):
                 continue
 
-            item = self.iw_map[prefix]
-            self.assertEqual(item._site, pywikibot.Site(prefix, family))
-            self.assertTrue(item.local)
+            with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+                item = self.iw_map[prefix]
+                self.assertEqual(item._site, pywikibot.Site(prefix, family))
+                self.assertTrue(item.local)
 
     def test_invalid_prefix(self):
         """Test wrong interwiki prefix."""

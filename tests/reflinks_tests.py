@@ -8,7 +8,9 @@ import unittest
 
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
-from tests import join_xml_data_path
+from pywikibot.tools import suppress_warnings
+
+from tests import WARN_SITE_OBJ, join_xml_data_path
 from tests.aspects import TestCase, ScriptMainTestCase
 from tests.utils import empty_sites
 
@@ -125,11 +127,13 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     def test_xml_multiple_namespace_ids(self):
         """Test the generator using multiple separate namespaces parameters."""
-        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
-             '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
-        gen = self.constructor_kwargs['generator']
-        self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
-                                        site=self.get_site())
+        with suppress_warnings(WARN_SITE_OBJ, category=UserWarning):
+            main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
+                 '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
+            gen = self.constructor_kwargs['generator']
+            self.assertPageTitlesCountEqual(gen, ['Fake page',
+                                            'Talk:Fake page'],
+                                            site=self.get_site())
 
     def test_xml_multiple_namespace_ids_2(self):
         """Test the generator using multiple namespaces in one parameter."""
@@ -150,11 +154,12 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         filename = '-xml:' + join_xml_data_path('dummy-reflinks.xml')
         for start in start_variants:
             with self.subTest(xmlstart=start):
-                main(filename, '-namespace:1', start)
-                gen = self.constructor_kwargs['generator']
-                pages = list(gen)
-                self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
-                                           site=self.site)
+                with suppress_warnings(WARN_SITE_OBJ, category=UserWarning):
+                    main(filename, '-namespace:1', start)
+                    gen = self.constructor_kwargs['generator']
+                    pages = list(gen)
+                    self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
+                                               site=self.site)
 
     def test_xml_namespace_name(self):
         """Test the generator using a namespace name."""

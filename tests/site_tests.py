@@ -21,7 +21,7 @@ from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools import suppress_warnings
 
-from tests import patch, unittest_print
+from tests import WARN_SITE_CODE, patch, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -3163,7 +3163,11 @@ class TestPagePreloading(DefaultSiteTestCase):
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         links = list(mysite.pagelinks(mainpage, total=20))
-        pages = list(mysite.preloadpages(links, groupsize=5, langlinks=True))
+
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+            gen = mysite.preloadpages(links, groupsize=5, langlinks=True)
+            pages = list(gen)
+
         self.assertLength(links, pages)
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
@@ -3299,8 +3303,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
 
     def test_alias_code_site(self):
         """Test Wikimedia site with an alias code."""
-        with suppress_warnings(
-                'Site wikipedia:ja instantiated using different code "jp"'):
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             site = pywikibot.Site('jp', 'wikipedia')
         self.assertIsInstance(site.obsolete, bool)
         self.assertEqual(site.code, 'ja')

@@ -34,8 +34,12 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
+from pywikibot.tools import suppress_warnings
 
-from tests import patch_request, unpatch_request, unittest_print
+from tests import (
+    WARN_SITE_CODE, patch_request, unpatch_request, unittest_print
+)
+
 from tests.utils import (
     execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
@@ -854,8 +858,9 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
                     .format(data['code']))
 
             if 'site' not in data and 'code' in data and 'family' in data:
-                data['site'] = Site(data['code'], data['family'],
-                                    interface=interface)
+                with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+                    data['site'] = Site(data['code'], data['family'],
+                                        interface=interface)
             if 'hostname' not in data and 'site' in data:
                 # Ignore if the family has defined this as
                 # obsolete without a mapping to a hostname.

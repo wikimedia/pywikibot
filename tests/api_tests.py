@@ -694,6 +694,9 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
             self.gen.set_namespace(1)
             self.gen.set_namespace(None)
 
+    @suppress_warnings(
+        r'^set_namespace\(\) will be modified to raise TypeError*',
+        FutureWarning)
     def test_namespace_param_is_not_settable(self):
         """Test ListGenerator support_namespace."""
         self.gen = api.ListGenerator(listaction='querypage', site=self.site)
