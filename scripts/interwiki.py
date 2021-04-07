@@ -338,7 +338,7 @@ import re
 import socket
 import sys
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 from contextlib import suppress
 from itertools import chain
 from textwrap import fill
@@ -1906,10 +1906,11 @@ class InterwikiBot:
         # in a way that saves bandwidth.
         # sites are keys, integers are values.
         # Modify this only via plus() and minus()!
-        self.counts = {}
+        self.counts = Counter()
         self.pageGenerator = None
         self.generated = 0
         self.conf = conf
+        self.site = pywikibot.Site()
 
     def add(self, page, hints=None):
         """Add a single subject to the list."""
@@ -2015,10 +2016,9 @@ class InterwikiBot:
         If there is nothing left, return None.
         Only languages that are TODO for the first Subject are returned.
         """
-        max_ = 0
-        maxlang = None
         if not self.firstSubject():
             return None
+
         oc = dict(self.firstSubject().openSites())
         if not oc:
             # The first subject is done. This might be a recursive call made
@@ -2026,21 +2026,18 @@ class InterwikiBot:
             # go live. Select any language from counts.
             oc = self.counts
 
-        default_site = pywikibot.Site()
-        if default_site in oc:
-            return default_site
+        if self.site in oc:
+            return self.site
 
-        for lang in oc:
-            count = self.counts[lang]
-            if count > max_:
-                max_ = count
-                maxlang = lang
-        return maxlang
+        for site, _ in self.counts.most_common():
+            if site in oc:
+                return site
+        return None
 
     def selectQuerySite(self):
         """Select the site the next query should go out for."""
         # How many home-language queries we still have?
-        mycount = self.counts.get(pywikibot.Site(), 0)
+        mycount = self.counts[self.site]
         # Do we still have enough subjects to work on for which the
         # home language has been retrieved? This is rough, because
         # some subjects may need to retrieve a second home-language page!
@@ -2062,10 +2059,8 @@ class InterwikiBot:
                     else:
                         break
             # If we have a few, getting the home language is a good thing.
-            if not self.conf.restore_all:
-                with suppress(KeyError):
-                    if self.counts[pywikibot.Site()] > 4:
-                        return pywikibot.Site()
+            if not self.conf.restore_all and self.counts[self.site] > 4:
+                return self.site
         # If getting the home language doesn't make sense, see how many
         # foreign page queries we can find.
         return self.maxOpenSite()
@@ -2127,14 +2122,12 @@ class InterwikiBot:
 
     def plus(self, site, count=1):
         """Helper routine that the Subject class expects in a counter."""
-        try:
-            self.counts[site] += count
-        except KeyError:
-            self.counts[site] = count
+        self.counts[site] += count
 
     def minus(self, site, count=1):
         """Helper routine that the Subject class expects in a counter."""
         self.counts[site] -= count
+        self.counts = +self.counts  # remove zero and negative counts
 
     def run(self):
         """Start the process until finished."""
