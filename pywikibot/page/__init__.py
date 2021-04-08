@@ -3026,8 +3026,8 @@ class User(Page):
         except APIError as err:
             if err.code == 'invalidrange':
                 raise ValueError('%s is not a valid IP range.' % self.username)
-            else:
-                raise err
+
+            raise err
 
     def unblock(self, reason: Optional[str] = None):
         """
@@ -4021,10 +4021,11 @@ class ItemPage(WikibasePage):
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
+
         if site not in self.sitelinks:
             raise pywikibot.NoPage(self)
-        else:
-            return self.sitelinks[site].canonical_title()
+
+        return self.sitelinks[site].canonical_title()
 
     def setSitelink(self, sitelink, **kwargs):
         """
@@ -5306,7 +5307,8 @@ class Link(BaseLink):
             if not t:
                 raise pywikibot.InvalidTitle(
                     "'{0}' has no title.".format(self._text))
-            elif ':' in t and self._namespace >= 0:  # < 0 don't have talk
+
+            if ':' in t and self._namespace >= 0:  # < 0 don't have talk
                 other_ns = self._site.namespaces[self._namespace - 1
                                                  if self._namespace % 2 else
                                                  self._namespace + 1]

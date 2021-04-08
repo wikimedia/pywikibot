@@ -427,17 +427,17 @@ class LazyRegex:
 
     def __getattr__(self, attr):
         """Compile the regex and delegate all attribute to the regex."""
-        if self._raw:
-            if not self._compiled:
-                self._compiled = re.compile(self.raw, self.flags)
-
-            if hasattr(self._compiled, attr):
-                return getattr(self._compiled, attr)
-
-            raise AttributeError('%s: attr %s not recognised'
-                                 % (self.__class__.__name__, attr))
-        else:
+        if not self._raw:
             raise AttributeError('%s.raw not set' % self.__class__.__name__)
+
+        if not self._compiled:
+            self._compiled = re.compile(self.raw, self.flags)
+
+        if hasattr(self._compiled, attr):
+            return getattr(self._compiled, attr)
+
+        raise AttributeError('%s: attr %s not recognised'
+                             % (self.__class__.__name__, attr))
 
 
 class DeprecatedRegex(LazyRegex):
