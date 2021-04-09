@@ -107,6 +107,7 @@ library_test_modules = {
     'logentries',
     'login',
     'mediawikiversion',
+    'mysql',
     'namespace',
     'oauth',
     'page',
