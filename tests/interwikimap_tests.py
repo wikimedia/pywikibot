@@ -10,11 +10,11 @@ import pywikibot
 
 from pywikibot.tools import suppress_warnings
 
-from tests.aspects import DefaultSiteTestCase
+from tests.aspects import TestCase
 from tests import WARN_SITE_CODE
 
 
-class TestInterwikiMap(DefaultSiteTestCase):
+class TestInterwikiMap(TestCase):
 
     """Test interwiki map and methods."""
 
@@ -106,9 +106,12 @@ class TestInterwikiMap(DefaultSiteTestCase):
         self.assertTrue(True)
 
 
-class TestInterwikiMapPrefix(DefaultSiteTestCase):
+class TestInterwikiMapPrefix(TestCase):
 
     """Test interwiki map and methods."""
+
+    family = 'wikipedia'
+    code = 'en'
 
     def setUp(self):
         """Setup tests."""
