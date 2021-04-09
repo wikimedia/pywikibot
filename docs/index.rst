@@ -57,7 +57,7 @@ For bot developers:
 -------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation
    library_usage
@@ -76,6 +76,7 @@ For framework developers:
 Miscellaneous
 -------------
 .. toctree::
+   :maxdepth: 1
 
    licenses
    credits
