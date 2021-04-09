@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from distutils.version import LooseVersion
 from typing import Optional
 
 import pywikibot
@@ -15,7 +16,7 @@ except ImportError:
 
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated_args, PYTHON_VERSION
+from pywikibot.tools import deprecated_args
 
 
 @deprecated_args(encoding=None)
@@ -59,13 +60,13 @@ def mysql_query(query: str, params=None,
                                  database=config.db_name_format.format(dbname),
                                  port=config.db_port,
                                  charset='utf8',
+                                 defer_connect=query == 'test',  # for tests
                                  **credentials)
-    if PYTHON_VERSION < (3, 6):
+    if LooseVersion(pymysql.__version__) < LooseVersion('1.0.0'):
         from contextlib import closing
         connection = closing(connection)
 
     with connection as conn, conn.cursor() as cursor:
-
         if verbose:
             _query = cursor.mogrify(query, params)
 
@@ -75,6 +76,9 @@ def mysql_query(query: str, params=None,
             _query = '\n'.join('    {0}'.format(line)
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
+
+        if query == 'test':  # for tests only
+            yield query
 
         cursor.execute(query, params)
         yield from cursor
