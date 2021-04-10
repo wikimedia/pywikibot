@@ -82,17 +82,16 @@ class _ColorFormatter(Formatter):
                     raise ValueError(
                         'Color field "{0}" in "{1}" uses format spec '
                         'information "{2}"'.format(field, format_string, spec))
-                elif conv:
+                if conv:
                     raise ValueError(
                         'Color field "{0}" in "{1}" uses conversion '
                         'information "{2}"'.format(field, format_string, conv))
-                else:
-                    if not literal or literal[-1] != '\03':
-                        literal += '\03'
-                    if '\03' in literal[:-1]:
-                        raise ValueError(r'Literal text in {0} contains '
-                                         r'\03'.format(format_string))
-                    previous_literal += literal + '{' + field + '}'
+                if not literal or literal[-1] != '\03':
+                    literal += '\03'
+                if '\03' in literal[:-1]:
+                    raise ValueError(r'Literal text in {0} contains '
+                                     r'\03'.format(format_string))
+                previous_literal += literal + '{' + field + '}'
             else:
                 if '\03' in literal:
                     raise ValueError(r'Literal text in {0} contains '

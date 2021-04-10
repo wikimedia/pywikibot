@@ -899,7 +899,7 @@ class GeneratorFactory:
             rctag = params.pop(0)
         if len(params) > 2:
             raise ValueError('More than two parameters passed.')
-        elif len(params) == 2:
+        if len(params) == 2:
             offset = float(params[0])
             duration = float(params[1])
             if offset < 0 or duration < 0:

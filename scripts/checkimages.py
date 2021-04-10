@@ -1026,13 +1026,13 @@ class checkImagesBot:
                 raise LogIsFull(
                     'The log page ({}) is full! Please delete the old files '
                     'reported.'.format(another_page.title()))
-            else:
-                pywikibot.output(
-                    'The log page ({}) is full! Please delete the old files '
-                    ' reported. Skip!'.format(another_page.title()))
-                # Don't report, but continue with the check
-                # (we don't know if this is the first time we check this file
-                # or not)
+
+            pywikibot.output(
+                'The log page ({}) is full! Please delete the old files '
+                ' reported. Skip!'.format(another_page.title()))
+            # Don't report, but continue with the check
+            # (we don't know if this is the first time we check this file
+            # or not)
         else:
             # Adding the log
             another_page.put(text_get + rep_text, summary=com, force=True,

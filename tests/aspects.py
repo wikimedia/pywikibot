@@ -195,8 +195,8 @@ class TestCaseBase(unittest.TestCase):
             raise unittest.SkipTest('Pages in namespaces {!r} not found.'
                                     .format(
                                         list(namespaces - page_namespaces)))
-        else:
-            self.assertEqual(page_namespaces, namespaces)
+
+        self.assertEqual(page_namespaces, namespaces)
 
     def assertPageTitlesEqual(self, gen, titles, site=None):
         """
@@ -440,11 +440,10 @@ class CheckHostnameMixin(TestCaseBase):
                         '{}: hostname {} failed (cached): {}'
                         .format(cls.__name__, hostname,
                                 cls._checked_hostnames[hostname]))
-                elif cls._checked_hostnames[hostname] is False:
+                if cls._checked_hostnames[hostname] is False:
                     raise unittest.SkipTest('{}: hostname {} failed (cached)'
                                             .format(cls.__name__, hostname))
-                else:
-                    continue
+                continue
 
             try:
                 if '://' not in hostname:

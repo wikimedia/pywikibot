@@ -1494,9 +1494,9 @@ class BaseBot(OptionHandler):
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
-            else:
-                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                                 self.__class__.__name__)
+
+            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                             self.__class__.__name__)
         finally:
             self.exit()
 

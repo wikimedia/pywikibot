@@ -370,7 +370,8 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
                 '  Directory where user-config.py is searched is determined '
                 'as follows:\n\n    ') + get_base_dir.__doc__
             raise RuntimeError(exc_text)
-        elif __no_user_config != '2':
+
+        if __no_user_config != '2':
             output(exc_text)
 
     return base_dir

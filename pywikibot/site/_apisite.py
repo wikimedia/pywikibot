@@ -1280,11 +1280,11 @@ class APISite(
                 # Check if target is on another site.
                 if target.site != page.site:
                     raise InterwikiRedirectPage(page, target)
-                else:
-                    # Redirect to Special: & Media: pages, which do not work
-                    # like redirects, but are rendered like a redirect.
-                    page._redirtarget = target
-                    return page._redirtarget
+
+                # Redirect to Special: & Media: pages, which do not work
+                # like redirects, but are rendered like a redirect.
+                page._redirtarget = target
+                return page._redirtarget
 
         pagedata = list(result['query']['pages'].values())[0]
         # There should be only one value in 'pages' (the ultimate
@@ -1665,11 +1665,10 @@ class APISite(
                                 'info': err.info
                             }
                             raise Error(exception % errdata)
-                        elif issubclass(exception, SpamblacklistError):
+                        if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
-                        else:
-                            raise exception(page)
+                        raise exception(page)
                     pywikibot.debug(
                         "editpage: Unexpected error code '%s' received."
                         % err.code,
@@ -1833,13 +1832,13 @@ class APISite(
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
                 raise Error(on_error.format_map(errdata))
-            else:
-                pywikibot.debug(
-                    "mergehistory: Unexpected error code '{code}' received"
-                    .format(code=err.code),
-                    _logger
-                )
-                raise
+
+            pywikibot.debug(
+                "mergehistory: Unexpected error code '{code}' received"
+                .format(code=err.code),
+                _logger
+            )
+            raise
         finally:
             self.unlock_page(source)
             self.unlock_page(dest)
@@ -1945,16 +1944,18 @@ class APISite(
                     else:
                         failed_page = newpage if on_error.on_new_page else page
                     raise on_error.exception(failed_page)
-                else:
-                    errdata = {
-                        'site': self,
-                        'oldtitle': oldtitle,
-                        'oldnamespace': self.namespace(page.namespace()),
-                        'newtitle': newtitle,
-                        'newnamespace': self.namespace(newlink.namespace),
-                        'user': self.user(),
-                    }
-                    raise Error(on_error % errdata)
+
+                errdata = {
+                    'site': self,
+                    'oldtitle': oldtitle,
+                    'oldnamespace': self.namespace(page.namespace()),
+                    'newtitle': newtitle,
+                    'newnamespace': self.namespace(newlink.namespace),
+                    'user': self.user(),
+                }
+
+                raise Error(on_error % errdata)
+
             pywikibot.debug("movepage: Unexpected error code '%s' received."
                             % err.code,
                             _logger)
@@ -2932,7 +2933,7 @@ class APISite(
                                     % {'msg': message},
                                     file_key=_file_key,
                                     offset=result.get('offset', False))
-        elif 'result' not in result:
+        if 'result' not in result:
             pywikibot.output('Upload: unrecognized response: %s' % result)
 
         if result['result'] == 'Success':
