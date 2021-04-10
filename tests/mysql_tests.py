@@ -9,7 +9,6 @@ from types import GeneratorType
 
 import unittest
 
-from pywikibot import data
 
 from tests.aspects import TestCase, require_modules
 
@@ -23,7 +22,8 @@ class TestMySQL(TestCase):
 
     def test_mysql(self):
         """Test data.mysql.mysql_query function."""
-        result = data.mysql.mysql_query('test')
+        from pywikibot.data.mysql import mysql_query
+        result = mysql_query('test')
         self.assertIsInstance(result, GeneratorType)
         self.assertEqual(next(result), 'test')
 
