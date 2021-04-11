@@ -12,6 +12,7 @@ import unittest
 
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
+from http import HTTPStatus
 
 import pywikibot
 
@@ -3287,7 +3288,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertEqual(site.hostname(), 'mh.wikipedia.org')
         r = http.fetch('http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertEqual(site.siteinfo['lang'], 'mh')
 
     def test_removed_site(self):

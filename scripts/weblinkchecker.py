@@ -117,6 +117,7 @@ import time
 
 from contextlib import suppress
 from functools import partial
+from http import HTTPStatus
 
 import requests
 
@@ -321,9 +322,8 @@ class LinkCheckThread(threading.Thread):
                              .format(self.url, self.page.title()))
             raise
 
-        if r.status_code != requests.codes.ok \
-           or r.status_code in self.HTTPignore:
-            message = str(r.status_code)
+        if r.status_code != HTTPStatus.OK or r.status_code in self.HTTPignore:
+            message = HTTPStatus(r.status_code).phrase
             pywikibot.output('*{} links to {} - {}.'
                              .format(self.page.title(as_link=True), self.url,
                                      message))

@@ -20,6 +20,7 @@ This script supports the following command line parameters:
 import binascii
 import os.path
 
+from http import HTTPStatus
 from os import remove, replace, symlink, urandom
 
 import pywikibot
@@ -108,13 +109,16 @@ class DownloadDumpBot(Bot):
                     pywikibot.output('Downloading file from ' + url)
                     response = fetch(url, stream=True)
 
-                    if response.status_code != 200:
-                        if response.status_code == 404:
+                    if response.status_code != HTTPStatus.OK:
+                        if response.status_code == HTTPStatus.NOT_FOUND:
                             pywikibot.output(
                                 'File with name {filename!r}, from dumpdate '
                                 '{dumpdate!r}, and wiki {wikiname!r} ({url}) '
                                 "isn't available in the Wikimedia Dumps"
                                 .format(url=url, **self.opt))
+                        else:
+                            pywikibot.output(
+                                HTTPStatus(response.status_code).description)
                         return
 
                     with open(file_current_storepath, 'wb') as result_file:

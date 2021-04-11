@@ -29,6 +29,7 @@ from collections.abc import Iterator
 from collections import namedtuple
 from datetime import timedelta
 from functools import partial
+from http import HTTPStatus
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
 from typing import Optional, Union
@@ -2967,11 +2968,13 @@ class PetScanPageGenerator:
         try:
             req = http.fetch(url, params=self.opts)
         except ReadTimeout:
-            raise ServerError(
-                'received ReadTimeout from {}'.format(url))
-        if 500 <= req.status_code < 600:
+            raise ServerError('received ReadTimeout from {}'.format(url))
+
+        server_err = HTTPStatus.INTERNAL_SERVER_ERROR
+        if server_err <= req.status_code < server_err + 100:
             raise ServerError(
                 'received {} status from {}'.format(req.status_code, req.url))
+
         j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
         yield from raw_pages

@@ -28,8 +28,10 @@ import re
 import time
 
 from functools import partial
-from requests.exceptions import ReadTimeout
+from http import HTTPStatus
 from typing import Optional
+
+from requests.exceptions import ReadTimeout
 
 try:
     from bs4 import BeautifulSoup
@@ -618,7 +620,7 @@ class ProofreadPage(pywikibot.Page):
         else:
             return True, ReadTimeout
 
-        if 400 <= response.status_code < 600:
+        if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
             return True, 'Http response status {}'.format(response.status_code)
 
         data = json.loads(response.text)
