@@ -163,7 +163,7 @@ class ParserFunctionCountBot(SingleSiteBot,
         if self.opt.save:
             # This opens in strict error mode, that means bot will stop
             # on encoding errors with ValueError.
-            # See http://docs.python.org/library/codecs.html#codecs.open
+            # See https://docs.python.org/3/library/codecs.html#codecs.open
             try:
                 with codecs.open(
                         self.opt.save, encoding='utf-8', mode='a') as f:

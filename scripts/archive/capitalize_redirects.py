@@ -25,7 +25,7 @@ Example:
 # Distributed under the terms of the MIT license.
 #
 # Originally derived from:
-#    http://en.wikipedia.org/wiki/User:Drinibot/CapitalizationRedirects
+#    https://en.wikipedia.org/wiki/User:Drinibot/CapitalizationRedirects
 #
 # Automatically converted from compat branch by compat2core.py script
 #

@@ -2,7 +2,7 @@
 """
 Periodically grab list of new articles and analyze to blank or flag them.
 
-Script to follow new articles on a wikipedia and flag them
+Script to follow new articles on the wiki and flag them
 with a template or eventually blank them.
 
 There must be A LOT of bugs! Use with caution and verify what

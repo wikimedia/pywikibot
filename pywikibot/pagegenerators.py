@@ -2,7 +2,7 @@
 This module offers a wide variety of page generators.
 
 A page generator is an
-object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
+object that is iterable (see https://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
 Pagegenerators.py cannot be run as script. For testing purposes listpages.py

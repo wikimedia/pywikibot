@@ -75,7 +75,7 @@ docuReplacements = {
 
 localized_msg = ('fr', 'it', 'pl')  # localized message at MediaWiki
 
-# localized message at specific wikipedia site
+# localized message at specific Wikipedia site
 # should be moved to MediaWiki Pywikibot manual
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-Script to upload images to wikipedia.
+Script to upload images to Wikipedia.
 
 The following parameters are supported:
 

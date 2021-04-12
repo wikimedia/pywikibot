@@ -12,8 +12,8 @@ Command line options:
                some choices for XY don't make sense and will result in a loop,
                e.g. "l" or "m".
 
-   -main       only check pages in the main namespace, not in the talk,
-               wikipedia, user, etc. namespaces.
+   -main       only check pages in the main namespace, not in the Talk,
+               Project, User, etc. namespaces.
 
    -start:XY   goes through all misspellings in the category on your wiki
                that is defined (to the bot) as the category containing

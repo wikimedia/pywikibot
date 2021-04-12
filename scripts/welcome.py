@@ -191,7 +191,7 @@ locale.setlocale(locale.LC_ALL, '')
 #        Add the following strings to customise for a language:
 #        logbook, netext, report_page, bad_pag, report_text, random_sign,
 #        whitelist_pg, final_new_text_additions, logpage_header if
-#        different from wikipedia entry
+#        different from Wikipedia entry
 
 ############################################################################
 
