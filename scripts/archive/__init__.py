@@ -1,6 +1,6 @@
 """THIS DIRECTORY IS TO HOLD BOT SCRIPTS THAT NO LONGER ARE MAINTAINED.
 
-These scripts may be removed at any time withour further warning.
+These scripts may be removed at any time without further warning.
 
 Feel free to reactivate any script at any time by creating a Phabricator
 task:
