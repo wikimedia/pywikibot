@@ -139,11 +139,11 @@ These arguments are useful to provide hints to the bot:
                    Names of families that forward their interlanguage links
                    to the wiki family being worked upon can be used, they are:
 
-                      * commons:   Interlanguage links of Mediawiki Commons
-                      * incubator: Links in pages on the Mediawiki Incubator
+                      * commons:   Interlanguage links of Wikimedia Commons
+                      * incubator: Links in pages on the Wikimedia Incubator
                       * meta:      Interlanguage links of named pages on Meta
-                      * species:   Interlanguage links of the wikispecies wiki
-                      * strategy:  Links in pages on Wikimedias strategy wiki
+                      * species:   Interlanguage links of the Wikispecies wiki
+                      * strategy:  Links in pages on Wikimedia Strategy wiki
                       * test:      Take interwiki links from Test Wikipedia
                       * wikimania: Interwiki links of Wikimania
 

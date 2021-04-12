@@ -507,7 +507,7 @@ def _make_parameter(decoder, param):
 # See dh() for additional information.
 class MonthNames(Mapping):
 
-    """A Mapping with reads month names from mediawiki messages."""
+    """A Mapping which reads month names from MediaWiki messages."""
 
     # Predefined month names which are needed at import time
     months = {
