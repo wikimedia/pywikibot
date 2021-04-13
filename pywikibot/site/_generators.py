@@ -29,7 +29,7 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     filter_unique,
-    is_IP,
+    is_ip_address,
     issue_deprecation_warning,
     itergroup,
     remove_last_args,
@@ -1080,10 +1080,11 @@ class GeneratorsMixin:
         if users:
             if isinstance(users, str):
                 users = users.split('|')
+
             # actual IPv6 addresses (anonymous users) are uppercase, but they
             # have never a :: in the username (so those are registered users)
-            users = [user.upper() if is_IP(user) and '::' not in user else user
-                     for user in users]
+            users = [user.upper() if is_ip_address(user) and '::' not in user
+                     else user for user in users]
             bkgen.request['bkusers'] = users
         elif iprange:
             bkgen.request['bkip'] = iprange

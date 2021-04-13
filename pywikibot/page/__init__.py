@@ -72,7 +72,7 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     first_upper,
-    is_IP,
+    is_ip_address,
     redirect_func,
     remove_last_args,
 )
@@ -2874,7 +2874,7 @@ class User(Page):
 
     def isAnonymous(self) -> bool:
         """Determine if the user is editing as an IP address."""
-        return is_IP(self.username)
+        return is_ip_address(self.username)
 
     def getprops(self, force: bool = False) -> dict:
         """

@@ -15,7 +15,12 @@ from contextlib import suppress
 from importlib import import_module
 
 from pywikibot import tools
-from pywikibot.tools import classproperty, has_module, suppress_warnings
+from pywikibot.tools import (
+    classproperty,
+    has_module,
+    is_ip_address,
+    suppress_warnings,
+)
 from tests import join_xml_data_path, mock
 from tests.aspects import TestCase, require_modules
 
@@ -739,6 +744,74 @@ class TestMergeGenerator(TestCase):
         self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
         result = ''.join(tools.roundrobin_generators('HlWrd', 'e', 'lool'))
         self.assertEqual(result, 'HelloWorld')
+
+
+class TestIsIpAddress(TestCase):
+
+    """Unit test class for is_ip_address."""
+
+    net = False
+
+    def test_valid_ipv4_addresses(self):
+        """Check with valid IPv4 addresses."""
+        valid_addresses = (
+            '0.0.0.0',
+            '0.0.00.0',
+            '1.2.3.4',
+            '1.2.3.4',
+            '192.168.0.1',
+            '255.255.255.255',
+        )
+
+        for address in valid_addresses:
+            with self.subTest(ip_address=address):
+                self.assertTrue(is_ip_address(address))
+
+    def test_invalid_ipv4_addresses(self):
+        """Check with invalid IPv4 addresses."""
+        invalid_addresses = (
+            None,
+            '',
+            '0.0.0',
+            '1.2.3.256',
+            '1.2.3.-1',
+            '0.0.0.a',
+            'a.b.c.d',
+        )
+
+        for address in invalid_addresses:
+            with self.subTest(ip_address=address):
+                self.assertFalse(is_ip_address(address))
+
+    def test_valid_ipv6_addresses(self):
+        """Check with valid IPv6 addresses."""
+        valid_addresses = (
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:8329',
+            'fe80:0:0:0:202:b3ff:fe1e:8329',
+            'fe80::202:b3ff:fe1e:8329',
+            '::ffff:5.9.158.75',
+            '::',
+        )
+
+        for address in valid_addresses:
+            with self.subTest(ip_address=address):
+                self.assertTrue(is_ip_address(address))
+
+    def test_invalid_ipv6_addresses(self):
+        """Check with invalid IPv6 addresses."""
+        invalid_addresses = (
+            None,
+            '',
+            ':',
+            ':::',
+            '2001:db8::aaaa::1',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e: 8329',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:829g',
+        )
+
+        for address in invalid_addresses:
+            with self.subTest(ip_address=address):
+                self.assertFalse(is_ip_address(address))
 
 
 class TestHasModule(TestCase):

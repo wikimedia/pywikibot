@@ -131,7 +131,6 @@ library_test_modules = {
     'tools',
     'tools_chars',
     'tools_formatter',
-    'tools_ip',
     'ui',
     'ui_options',
     'upload',

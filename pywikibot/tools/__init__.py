@@ -8,6 +8,7 @@ import collections
 import gzip
 import hashlib
 import inspect
+import ipaddress
 import itertools
 import os
 import queue
@@ -25,7 +26,6 @@ from datetime import datetime
 from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
-from ipaddress import ip_address
 from itertools import chain, zip_longest
 from typing import Optional
 from warnings import catch_warnings, showwarning, warn
@@ -62,15 +62,13 @@ class _NotImplementedWarning(RuntimeWarning):
     """Feature that is no longer implemented."""
 
 
-def is_IP(IP: str) -> bool:  # noqa N802, N803
-    """Verify the IP address provided is valid.
+def is_ip_address(value: str) -> bool:
+    """Check if a value is a valid IPv4 or IPv6 address.
 
-    No logging is performed. Use ip_address instead to catch errors.
-
-    @param IP: IP address
+    @param value: value to check
     """
     with suppress(ValueError):
-        ip_address(IP)
+        ipaddress.ip_address(value)
         return True
 
     return False
@@ -1945,3 +1943,7 @@ wrapper._add_deprecated_attr('LazyRegex', replacement_name='',
                              since='20210418', future_warning=True)
 wrapper._add_deprecated_attr('DeprecatedRegex', replacement_name='',
                              since='20210418', future_warning=True)
+
+
+is_IP = redirect_func(is_ip_address, old_name='is_IP',  # noqa N816
+                      since='20210418')
