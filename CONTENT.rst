@@ -4,11 +4,11 @@ The contents of the package
     +---------------------------------------------------------------------------------------+
     | README and config files:                                                              |
     +===========================+===========================================================+
-    | CODE_OF_CONDUCT.md        | Code of conduct reference                                 |
+    | CODE_OF_CONDUCT.rst       | Code of conduct reference                                 |
     +---------------------------+-----------------------------------------------------------+
     | CONTENT.rst               | This Content description file                             |
     +---------------------------+-----------------------------------------------------------+
-    | CREDITS                   | List of major contributors to this module                 |
+    | CREDITS.rst               | List of major contributors to this module                 |
     +---------------------------+-----------------------------------------------------------+
     | dev-requirements.txt      | PIP requirements file for development dependencies        |
     +---------------------------+-----------------------------------------------------------+
