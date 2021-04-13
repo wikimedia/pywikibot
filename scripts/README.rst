@@ -57,9 +57,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | fixing_redirects.py    | Correct all redirect links of processed pages.          |
     +------------------------+---------------------------------------------------------+
-    | harvest_template.py    | [IMPROV] Reduce maximum line length to 130              |
+    | harvest_template.py    | Template harvesting script.                             |
     +------------------------+---------------------------------------------------------+
-    | illustrate_wikidata.py | Don't use 'gen' to refer to the generator factory.      |
+    | illustrate_wikidata.py | Bot to add images to Wikidata items.                    |
     +------------------------+---------------------------------------------------------+
     | imagetransfer.py       | Given a wiki page, check the interwiki links for        |
     |                        | images, and let the user choose among them for          |
@@ -118,7 +118,7 @@ The contents of the package
     | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
     |                        | for speedy deletion.                                    |
     +------------------------+---------------------------------------------------------+
-    | template.py            | change one template (that is {{...}}) into another.     |
+    | template.py            | Change one template (that is {{...}}) into another.     |
     +------------------------+---------------------------------------------------------+
     | templatecount.py       | Display the list of pages transcluding a given list     |
     |                        | of templates.                                           |
@@ -175,10 +175,10 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | flickrripper.py        | Upload images from Flickr easily.                       |
     +------------------------+---------------------------------------------------------+
-    | followlive.py          | follow new articles on a Wikipedia and flag them        |
+    | followlive.py          | Follow new articles on a Wikipedia and flag them        |
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
-    | freebasemappingupload.py| Docstring fixes in scripts                             |
+    | freebasemappingupload.py| Script to upload the mappings of Freebase to Wikidata. |
     +------------------------++--------------------------------------------------------+
     | image.py               | This script can be used to change one image to another  |
     |                        | or remove an image entirely.                            |
