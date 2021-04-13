@@ -14,7 +14,7 @@ to set the default site (see T216825):
 
     python pwb.py -lang:de bot_tests -v
 """
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,9 +182,8 @@ def check_modules(script=None):
 try:
     if not check_modules():
         raise RuntimeError('')  # no further output needed
-except RuntimeError as e:
-    print(e)
-    sys.exit()
+except RuntimeError as e:  # setup.py may also raise RuntimeError
+    sys.exit(e)
 
 from pathlib import Path  # noqa: E402
 
@@ -213,6 +212,8 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
+except ImportError as e:  # raised in textlib
+    sys.exit(e)
 
 
 def find_alternates(filename, script_paths):
