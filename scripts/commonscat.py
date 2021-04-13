@@ -51,7 +51,7 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
-# wikibase property containing the wikibase category
+# Wikibase property containing the Wikibase category
 wikibase_property = {
     'wikidata:wikidata': 'P373',
 }
@@ -393,9 +393,9 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         return ''
 
     def find_commons_category(self, page) -> str:
-        """Find CommonsCat template on wikibase repository.
+        """Find CommonsCat template on Wikibase repository.
 
-        Use wikibase property to get the category if possible.
+        Use Wikibase property to get the category if possible.
         Otherwise check all langlinks to find it.
 
         @return: name of a valid commons category

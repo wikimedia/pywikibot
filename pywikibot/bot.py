@@ -25,7 +25,7 @@ conjunction. Each bot should subclass at least one of these four classes:
   identified must be predefined in available_options dictionary.
 
 * L{Bot}: The previous base class which should be avoided. This class is mainly
-  used for bots which work with wikibase or together with an image repository.
+  used for bots which work with Wikibase or together with an image repository.
 
 Additionally there is the L{CurrentPageBot} class which automatically sets the
 current page to the page treated. It is recommended to use this class and to

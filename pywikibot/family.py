@@ -1161,9 +1161,9 @@ class WikimediaFamily(Family):
     # Completely removed
     removed_wikis = []  # type: List[str]
 
-    # WikimediaFamily uses wikibase for the category name containing
+    # WikimediaFamily uses Wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
-    # wikibase code and item number:
+    # Wikibase code and item number:
     disambcatname = {'wikidata': 'Q1982926'}
 
     # UrlShortener extension is only usable on metawiki, and this wiki can
