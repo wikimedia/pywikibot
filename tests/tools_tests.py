@@ -16,7 +16,7 @@ from contextlib import suppress
 from importlib import import_module
 
 from pywikibot import tools
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, has_module, suppress_warnings
 
 from tests import join_xml_data_path, mock
 from tests.aspects import require_modules, TestCase
@@ -740,6 +740,29 @@ class TestMergeGenerator(TestCase):
         self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
         result = ''.join(tools.roundrobin_generators('HlWrd', 'e', 'lool'))
         self.assertEqual(result, 'HelloWorld')
+
+
+class TestHasModule(TestCase):
+
+    """Unit test class for has_module."""
+
+    net = False
+
+    def test_when_present(self):
+        """Test when the module is available."""
+        self.assertTrue(has_module('setuptools'))
+        self.assertTrue(has_module('setuptools', '1.0'))
+
+    def test_when_missing(self):
+        """Test when the module is unavailable."""
+        self.assertFalse(has_module('no-such-module'))
+
+    @suppress_warnings(
+        r'^Module version .* is lower than requested version 99999$',
+        ImportWarning)
+    def test_when_insufficient_version(self):
+        """Test when the module is older than what we need."""
+        self.assertFalse(has_module('setuptools', '99999'))
 
 
 if __name__ == '__main__':  # pragma: no cover

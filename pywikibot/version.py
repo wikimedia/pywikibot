@@ -11,11 +11,11 @@ import pathlib
 import socket
 import subprocess
 import sys
+import sysconfig
 import time
 import xml.dom.minidom
 
 from contextlib import closing, suppress
-from distutils.sysconfig import get_python_lib
 from importlib import import_module
 from io import BytesIO
 from typing import Optional
@@ -415,7 +415,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     if not modules:
         modules = sys.modules.keys()
 
-    std_lib_dir = pathlib.Path(get_python_lib(standard_lib=True))
+    std_lib_dir = pathlib.Path(sysconfig.get_paths()['stdlib'])
 
     root_packages = {key.split('.')[0] for key in modules}
 
