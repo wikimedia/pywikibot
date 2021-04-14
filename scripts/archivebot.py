@@ -238,7 +238,7 @@ def checkstr(string: str) -> Tuple[str, str]:
         key = 's'
         duration = string
         issue_deprecation_warning('Time period without qualifier',
-                                  string + key, 1, UserWarning,
+                                  string + key, 1, FutureWarning,
                                   since='20161009')
     else:
         key = string[-1]
