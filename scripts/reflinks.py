@@ -49,10 +49,9 @@ import tempfile
 
 from contextlib import suppress
 from functools import partial
+from http import HTTPStatus
 from textwrap import shorten
 from urllib.error import URLError
-
-from requests import codes
 
 import pywikibot
 
@@ -584,16 +583,15 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                             'Redirect to root : {0} ', ref.link))
                         continue
 
-                if r.status_code != codes.ok:
+                if r.status_code != HTTPStatus.OK:
                     pywikibot.stdout('HTTP error ({}) for {} on {}'
                                      .format(r.status_code, ref.url,
                                              page.title(as_link=True)))
                     # 410 Gone, indicates that the resource has been
                     # purposely removed
-                    if r.status_code == 410 \
-                       or (r.status_code == 404
-                           and '\t{}\t'.format(
-                               ref.url) in self.dead_links):
+                    if r.status_code == HTTPStatus.GONE \
+                       or (r.status_code == HTTPStatus.NOT_FOUND
+                           and '\t{}\t'.format(ref.url) in self.dead_links):
                         repl = ref.refDead()
                         new_text = new_text.replace(match.group(), repl)
                     continue

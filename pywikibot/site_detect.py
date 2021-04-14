@@ -8,8 +8,10 @@ import json
 
 from contextlib import suppress
 from html.parser import HTMLParser
+from http import HTTPStatus
 from typing import Optional
 from urllib.parse import urljoin, urlparse
+
 from requests.exceptions import RequestException
 
 import pywikibot
@@ -273,11 +275,9 @@ class WikiHTMLPageParser(HTMLParser):
 
 def check_response(response):
     """Raise ServerError if the response indicates a server error."""
-    if response.status_code == 503:
-        raise ServerError('Service Unavailable')
-    if response.status_code == 502:
-        raise ServerError('Bad Gateway')
-    if response.status_code == 500:
-        raise ServerError('Internal Server Error')
-    if response.status_code == 200 and SERVER_DB_ERROR_MSG in response.text:
+    if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+        raise ServerError(HTTPStatus(response.status_code).phrase)
+
+    if response.status_code == HTTPStatus.OK \
+       and SERVER_DB_ERROR_MSG in response.text:
         raise ServerError('Server cannot access the database')

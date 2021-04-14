@@ -23,6 +23,7 @@ import unicodedata
 from collections import Counter, defaultdict, OrderedDict
 from contextlib import suppress
 from html.entities import name2codepoint
+from http import HTTPStatus
 from itertools import chain
 from typing import Any, Optional, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
@@ -2458,7 +2459,7 @@ class FilePage(Page):
             revision = self.latest_file_info
 
         req = http.fetch(revision.url, stream=True)
-        if req.status_code == 200:
+        if req.status_code == HTTPStatus.OK:
             try:
                 with open(filename, 'wb') as f:
                     for chunk in req.iter_content(chunk_size):

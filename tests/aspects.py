@@ -20,6 +20,7 @@ import warnings
 
 from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
@@ -451,8 +452,15 @@ class CheckHostnameMixin(TestCaseBase):
                 r = http.fetch(hostname,
                                method='HEAD',
                                default_error_handling=False)
-                if r.status_code not in {200, 301, 302, 303, 307, 308}:
-                    raise ServerError('HTTP status: {}'.format(r.status_code))
+                if r.status_code not in {HTTPStatus.OK,
+                                         HTTPStatus.MOVED_PERMANENTLY,
+                                         HTTPStatus.FOUND,
+                                         HTTPStatus.SEE_OTHER,
+                                         HTTPStatus.TEMPORARY_REDIRECT,
+                                         HTTPStatus.PERMANENT_REDIRECT}:
+                    raise ServerError(
+                        'HTTP status: {} - {}'.format(
+                            r.status_code, HTTPStatus(r.status_code).phrase))
             except Exception as e:
                 pywikibot.error('{}: accessing {} caused exception:'
                                 .format(cls.__name__, hostname))

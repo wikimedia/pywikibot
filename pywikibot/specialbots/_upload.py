@@ -13,6 +13,7 @@ import requests
 import tempfile
 
 from contextlib import suppress
+from http import HTTPStatus
 from pathlib import Path
 from typing import Optional, Union
 from urllib.parse import urlparse
@@ -158,7 +159,8 @@ class UploadRobot(BaseBot):
                     # exit criteria if size is not available
                     # error on last iteration is OK, we're requesting
                     #    {'Range': 'bytes=file_len-'}
-                    if response.status_code == 416 and path.stat().st_size:
+                    err = HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE
+                    if response.status_code == err and path.stat().st_size:
                         break
                     raise FatalServerError(str(e)) from e
 
