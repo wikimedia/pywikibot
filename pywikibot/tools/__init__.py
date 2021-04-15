@@ -1900,3 +1900,8 @@ def concat_options(message, line_length, options):
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
     return '{} ({}):'.format(message, option_msg)
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
+                             since='20210416', future_warning=True)
