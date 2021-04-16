@@ -21,13 +21,13 @@ from tests.aspects import (
 from tests import mock
 
 
-class FakeFamily(object):
+class FakeFamily:
     """Mock."""
 
     name = '~FakeFamily'
 
 
-class FakeSite(object):
+class FakeSite:
     """Mock."""
 
     code = '~FakeCode'
@@ -37,7 +37,7 @@ class FakeSite(object):
 FakeUsername = '~FakeUsername'
 
 
-class FakeConfig(object):
+class FakeConfig:
     """Mock."""
 
     usernames = defaultdict(dict)

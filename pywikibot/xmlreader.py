@@ -90,7 +90,7 @@ class XmlParserThread(threading.Thread):
         xml.sax.parse(self.filename, self.handler)
 
 
-class XmlDump(object):
+class XmlDump:
 
     """
     Represents an XML dump file.

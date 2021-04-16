@@ -703,7 +703,7 @@ class TestFileShaCalculator(TestCase):
         ))
 
 
-class Foo(object):
+class Foo:
 
     """Test class to verify classproperty decorator."""
 

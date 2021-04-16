@@ -160,7 +160,7 @@ def deprecated_all2(foo):
     return foo
 
 
-class DeprecatedMethodClass(object):
+class DeprecatedMethodClass:
 
     """Class with methods deprecated."""
 
@@ -241,7 +241,7 @@ class DeprecatedMethodClass(object):
 
 
 @deprecated()
-class DeprecatedClassNoInit(object):
+class DeprecatedClassNoInit:
 
     """Deprecated class."""
 
@@ -249,7 +249,7 @@ class DeprecatedClassNoInit(object):
 
 
 @deprecated()
-class DeprecatedClass(object):
+class DeprecatedClass:
 
     """Deprecated class."""
 
