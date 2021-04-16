@@ -98,6 +98,7 @@ import math
 import os
 import re
 import time
+import types
 
 from collections import defaultdict, OrderedDict
 from hashlib import md5
@@ -112,7 +113,7 @@ from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
                                to_local_digits)
-from pywikibot.tools import frozenmap, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 
 
 ShouldArchive = Tuple[str, str]
@@ -120,7 +121,7 @@ Size = Tuple[int, str]
 
 ZERO = datetime.timedelta(0)
 
-MW_KEYS = frozenmap({
+MW_KEYS = types.MappingProxyType({
     's': 'seconds',
     'h': 'hours',
     'd': 'days',
