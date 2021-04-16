@@ -42,7 +42,7 @@ except ImportError as _tk_error:
     Tkdialog = _tk_error
 
 try:
-    import flickrapi  # see: http://stuvel.eu/projects/flickrapi
+    import flickrapi  # see: https://stuvel.eu/software/flickrapi/
 except ImportError as e:
     flickrapi = e
 
@@ -144,7 +144,7 @@ def getTags(photoInfo, raw: bool = False):
 
 def getFlinfoDescription(photo_id):
     """
-    Get the description from http://wikipedia.ramselehof.de/flinfo.php.
+    Get the description from http://wikipedia.ramselehof.de/flinfo.php
 
     TODO: Add exception handling, try a couple of times
     """

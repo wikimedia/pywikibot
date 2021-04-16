@@ -968,7 +968,7 @@ class CosmeticChangesToolkit:
         return text
 
     def fixArabicLetters(self, text):
-        """Fix arabic and persian letters."""
+        """Fix Arabic and Persian letters."""
         if self.site.code not in ['ckb', 'fa']:
             return text
 
