@@ -291,7 +291,7 @@ def error_handling_callback(response):
 
     if isinstance(response, Exception):
         with suppress(Exception):
-            # request.data exception may contain response and request attribute
+            # request exception may contain response and request attribute
             error('An error occurred for uri ' + response.request.url)
         raise response from None
 
