@@ -78,11 +78,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
             self.assertFalse(page.isRedirectPage())
         self.assertOneDeprecation()
 
-    def test_ns_index(self):
-        """Test ns_index."""
-        self.assertEqual(self.site.ns_index('MediaWiki'), 8)
-        self.assertOneDeprecation()
-
     def test_namespace_shortcuts(self):
         """Test namespace shortcuts."""
         self.assertEqual(self.site.image_namespace(), self.site.namespace(6))
