@@ -822,15 +822,6 @@ class APISite(
             return self._magicwords[word]
         return [word]
 
-    @deprecated('expand_text', since='20150831', future_warning=True)
-    def resolvemagicwords(self, wikitext):  # pragma: no cover
-        """
-        Replace the {{ns:xx}} marks in a wikitext with the namespace names.
-
-        DEPRECATED.
-        """
-        return self.expand_text(wikitext)
-
     @remove_last_args(('default', ))
     def redirect(self):
         """Return the localized #REDIRECT keyword."""

@@ -242,25 +242,6 @@ class BaseSite(ComparableMixin):
         yield base_path + '?title='
         yield self.article_path
 
-    @deprecated('APISite.namespaces.lookup_name', since='20150703',
-                future_warning=True)
-    def ns_index(self, namespace):  # pragma: no cover
-        """
-        Return the Namespace for a given namespace name.
-
-        @param namespace: name
-        @type namespace: str
-        @return: The matching Namespace object on this Site
-        @rtype: Namespace, or None if invalid
-        """
-        return self.namespaces.lookup_name(namespace)
-
-    @deprecated('APISite.namespaces.lookup_name', since='20150703',
-                future_warning=True)  # noqa: N802
-    def getNamespaceIndex(self, namespace):
-        """DEPRECATED: Return the Namespace for a given namespace name."""
-        return self.namespaces.lookup_name(namespace)
-
     def _build_namespaces(self):
         """Create default namespaces."""
         return Namespace.builtin_namespaces()
