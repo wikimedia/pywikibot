@@ -1,6 +1,15 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* **mwparserfromhell** or **wikitextparser** are strictly recommended (T106763)
+* Enable different types with BaseBot.treat()
+* Context manager depends on pymysql version, not Python release (T279753)
+* Bugfix for Site.interwiki_prefix() (T188179)
+* Deprecated MoveEntry.new_ns() and new_title() methods were removed
+* Unused NoSuchSite and PageNotSaved exception were removed
+* Unused BadTitle exception was removed (T267768)
+* getSite() function was removed in favour of Site() constructor
+* Page.fileUrl() was removed in favour of Page.get_file_url()
 * Require **Pillow**>=8.1.1 due to vulnerability found (T278743)
 * TkDialog of GUI userinterface requires **Python 3.6+** (T278743)
 * Enable textlib.extract_templates_and_params with **wikitextparser** package
@@ -17,6 +26,9 @@ Current release changes
 Future release notes
 ~~~~~~~~~~~~~~~~~~~~
 
+* 6.1.0: tools.DotReadableDict will be removed
+* 6.1.0: mwparserfromhell or wikitextparser MediaWiki markup parser becomes mandatory (T106763)
+* 6.1.0: textlib.unescape() function will be removed in favour of html.unescape()
 * 6.0.1: Site.undeletepage() and Site.undelete_file_versions() will be removed in favour of Site.undelete() method
 * 6.0.1: Site.deletepage() and Site.deleteoldimage() will be removed in favour of Site.delete() method
 * 6.0.1: DataSite.createNewItemFromPage() method will be removed in favour of ImagePage.fromPage() (T98663)
