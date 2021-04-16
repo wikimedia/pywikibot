@@ -1930,3 +1930,7 @@ def concat_options(message, line_length, options):
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
                              since='20210416', future_warning=True)
+wrapper._add_deprecated_attr('frozenmap',
+                             replacement_name='types.MappingProxyType',
+                             since='20210415',
+                             future_warning=True)
