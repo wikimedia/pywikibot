@@ -24,8 +24,7 @@ from unittest.mock import MagicMock, Mock, patch  # noqa: F401
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
 #   however if unavailable this will fail on use; see pywikibot/tools.py
-# - mwparserfromhell or wikitextparser is mandatory but the dependency
-#   is checked by textlib already
+# - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests  # noqa: F401
 
 import pywikibot.data.api

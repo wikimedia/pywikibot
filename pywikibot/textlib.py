@@ -35,18 +35,8 @@ try:
 except ImportError:
     try:
         import mwparserfromhell as wikitextparser
-    except ImportError:
-        # print required because pywikibot is not imported completely
-        raise ImportError("""
-Pywikibot is missing a MediaWiki markup parser which is necessary.
-Please update the required module with either
-
-    pip install "mwparserfromhell>=0.5.0"
-
-or
-
-    pip install "wikitextparser>=0.47.0"
-""") from None
+    except ImportError as e:
+        wikitextparser = e
 
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
@@ -1580,8 +1570,8 @@ def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
 # --------------------------------
 
 def extract_templates_and_params(text: str,
-                                 remove_disabled_parts: bool = False,
-                                 strip: bool = False) -> ETPType:
+                                 remove_disabled_parts: Optional[bool] = None,
+                                 strip: Optional[bool] = None) -> ETPType:
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -1592,14 +1582,16 @@ def extract_templates_and_params(text: str,
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
 
-    This uses the package L{mwparserfromhell} or L{wikitextparser} as
-    MediaWiki markup parser. It is mandatory that one of them is
-    installed.
+    This uses the package L{mwparserfromhell} (mwpfh) if it is installed.
+    Otherwise it falls back on a regex based implementation.
 
     There are minor differences between the two implementations.
 
-    The parser packages preserves whitespace in parameter names and
-    values.
+    The two implementations return nested templates in a different order.
+    i.e. for {{a|b={{c}}}}, mwpfh returns [a, c], whereas regex returns [c, a].
+
+    mwpfh preserves whitespace in parameter names and values. regex excludes
+    anything between <!-- --> before parsing the text.
 
     If there are multiple numbered parameters in the wikitext for the same
     position, MediaWiki will only use the last parameter value.
@@ -1607,9 +1599,43 @@ def extract_templates_and_params(text: str,
     To replicate that behaviour, enable both remove_disabled_parts and strip.
 
     @param text: The wikitext from which templates are extracted
-    @param remove_disabled_parts: If enabled, remove disabled wikitext
-        such as comments and pre.
-    @param strip: If enabled, strip arguments and values of templates.
+    @param remove_disabled_parts: Remove disabled wikitext such as comments
+        and pre. If None (default), this is enabled when neither
+        mwparserfromhell not wikitextparser package is available and
+        disabled otherwise.
+    @param strip: if enabled, strip arguments and values of templates.
+        If None (default), this is enabled when neither mwparserfromhell
+        nor wikitextparser package is available and disabled otherwise.
+    @return: list of template name and params
+    """
+    use_regex = isinstance(wikitextparser, ImportError)
+
+    if remove_disabled_parts is None:
+        remove_disabled_parts = use_regex
+    if remove_disabled_parts:
+        text = removeDisabledParts(text)
+
+    if strip is None:
+        strip = use_regex
+
+    if use_regex:
+        return extract_templates_and_params_regex(text, False, strip)
+    return _extract_templates_and_params_parser(text, strip)
+
+
+def _extract_templates_and_params_parser(text: str,
+                                         strip: bool = False) -> ETPType:
+    """
+    Extract templates with params using mwparserfromhell.
+
+    This function should not be called directly.
+
+    Use extract_templates_and_params, which will select this parser
+    implementation if the mwparserfromhell or wikitextparser package is
+    installed.
+
+    @param text: The wikitext from which templates are extracted
+    @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
     """
     def explicit(param):
@@ -1618,9 +1644,6 @@ def extract_templates_and_params(text: str,
         except AttributeError:
             attr = not param.positional
         return attr
-
-    if remove_disabled_parts:
-        text = removeDisabledParts(text)
 
     parser_name = wikitextparser.__name__
     pywikibot.log('Using {!r} wikitext parser'.format(parser_name))
@@ -1660,21 +1683,20 @@ def extract_templates_and_params(text: str,
             future_warning=True)
 def extract_templates_and_params_mwpfh(text: str,
                                        strip: bool = False) -> ETPType:
-    """DEPRECATED. Extract templates with params using mwparserfromhell."""
+    """Extract templates with params using mwparserfromhell."""
     global wikitextparser
     saved_parser = wikitextparser
     import mwparserfromhell as wikitextparser
-    result = extract_templates_and_params(text, strip=strip)
+    result = _extract_templates_and_params_parser(text, strip)
     wikitextparser = saved_parser
     return result
 
 
-@deprecated('extract_templates_and_params', since='20210331',
-            future_warning=True)
 def extract_templates_and_params_regex(text: str,
                                        remove_disabled_parts: bool = True,
                                        strip: bool = True) -> ETPType:
-    """DEPRECATED. Extract templates with params using a regex.
+    """
+    Extract templates with params using a regex with additional processing.
 
     This function should not be called directly.
 
