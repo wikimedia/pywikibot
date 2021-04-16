@@ -44,6 +44,7 @@ Quick start
 
 ::
 
+    pip install requests
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
     cd core
     git submodule update --init
@@ -55,6 +56,18 @@ Or to install using PyPI (excluding scripts)
 
     pip install -U setuptools
     pip install pywikibot
+
+In addition a MediaWiki markup parser is required. Please install one of them:
+
+::
+
+    pip install mwparserfromhell
+
+or
+
+::
+
+    pip install wikitextparser
 
 Our `installation
 guide <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
