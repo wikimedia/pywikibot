@@ -12,11 +12,11 @@ This module requires sseclient to be installed::
 #
 # Distributed under the terms of the MIT license.
 #
-from distutils.version import LooseVersion
-from functools import partial
 import json
 import socket
 
+from functools import partial
+from pkg_resources import parse_version
 from typing import Optional
 
 from requests import __version__ as requests_version
@@ -31,7 +31,7 @@ except ImportError as e:
 from pywikibot import config, debug, Timestamp, Site, warning
 from pywikibot.tools import deprecated_args
 
-if LooseVersion(requests_version) < LooseVersion('2.20.1'):
+if parse_version(requests_version) < parse_version('2.20.1'):
     raise ImportError(
         'requests >= 2.20.1 is required for EventStreams;\n'
         "install it with 'pip install \"requests>=2.20.1\"'\n")

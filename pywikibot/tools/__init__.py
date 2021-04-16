@@ -10,6 +10,7 @@ import hashlib
 import inspect
 import itertools
 import os
+import pkg_resources
 import queue
 import re
 import stat
@@ -23,7 +24,6 @@ from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
-from distutils.version import LooseVersion, Version
 from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
@@ -78,24 +78,25 @@ def is_IP(IP: str) -> bool:  # noqa N802, N803
 
 
 def has_module(module, version=None):
-    """Check whether a module can be imported."""
+    """Check if a module can be imported."""
     try:
         m = import_module(module)
     except ImportError:
-        pass
+        return False
     else:
-        if version is None:
-            return True
-        try:
-            module_version = LooseVersion(m.__version__)
-        except AttributeError:
-            pass
-        else:
-            if module_version >= LooseVersion(version):
-                return True
-            warn('Module version {} is lower than requested version {}'
-                 .format(module_version, version), ImportWarning)
-    return False
+        if version:
+            if not hasattr(m, '__version__'):
+                return False
+
+            required_version = pkg_resources.parse_version(version)
+            module_version = pkg_resources.parse_version(m.__version__)
+
+            if module_version < required_version:
+                warn('Module version {} is lower than requested version {}'
+                     .format(module_version, required_version), ImportWarning)
+                return False
+
+        return True
 
 
 def empty_iterator():
@@ -501,7 +502,7 @@ def normalize_username(username) -> Optional[str]:
     return first_upper(username)
 
 
-class MediaWikiVersion(Version):
+class MediaWikiVersion:
 
     """
     Version object to allow comparing 'wmf' versions with normal ones.
@@ -525,6 +526,15 @@ class MediaWikiVersion(Version):
 
     MEDIAWIKI_VERSION = re.compile(
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
+
+    def __init__(self, version_str):
+        """
+        Initializer.
+
+        @param version_str: version to parse
+        @type version: str
+        """
+        self.parse(version_str)
 
     @classmethod
     def from_generator(cls, generator):
@@ -582,6 +592,21 @@ class MediaWikiVersion(Version):
         if self._dev_version < other._dev_version:
             return -1
         return 0
+
+    def __eq__(self, other):
+        return self._cmp(other) == 0
+
+    def __lt__(self, other):
+        return self._cmp(other) < 0
+
+    def __le__(self, other):
+        return self._cmp(other) <= 0
+
+    def __gt__(self, other):
+        return self._cmp(other) > 0
+
+    def __ge__(self, other):
+        return self._cmp(other) >= 0
 
 
 class ThreadedGenerator(threading.Thread):
