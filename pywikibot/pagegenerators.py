@@ -50,7 +50,6 @@ from pywikibot.tools import (
     filter_unique,
     intersect_generators,
     itergroup,
-    ModuleDeprecationWrapper,
     redirect_func,
 )
 
@@ -3001,9 +3000,6 @@ FileGenerator = redirect_func(
 CategoryGenerator = redirect_func(
     PageClassGenerator, old_name='CategoryGenerator', since='20161017',
     future_warning=True)
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
-                             since='20181128')
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '
