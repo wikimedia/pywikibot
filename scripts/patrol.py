@@ -272,7 +272,7 @@ class PatrolBot(BaseBot):
 
         author_ns_prefix = self.site.namespace(author_ns) + ':'
         author_page_name = removeprefix(title, author_ns_prefix)
-        if title != author_ns_prefix:
+        if title != author_page_name:
             verbose_output('Found author ' + author_page_name)
             return True
         return False
