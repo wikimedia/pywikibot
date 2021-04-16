@@ -6,6 +6,7 @@
 # It is organised so that simple requirements
 # are processed first, and more difficult packages
 # are last.
+# All dependencies other than requests are optional.
 #
 # It is good practise to install packages using the system
 # package manager if it has a packaged version.  If you are
@@ -17,17 +18,11 @@
 #     or
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
-# mandatory dependencies, others are optional
+# mandatory
 requests>=2.20.1, < 2.26.0; python_version < '3.6'
 requests>=2.20.1 ; python_version >= '3.6'
 setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < '3.6'
 setuptools>=20.2 ; python_version >= '3.6'
-
-# MediaWiki markup parser
-# mwparserfromhell is default, wikitextparser can be used instead
-# mwparserfromhell is still required for commons_information.py and patrol.py
-# wikitextparser>=0.47.0
-mwparserfromhell>=0.5.0
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
@@ -46,6 +41,9 @@ Pillow >= 8.1.1 ; python_version >= '3.6'
 # core pagegenerators
 google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
+
+# textlib.py, commons_information and patrol.py
+mwparserfromhell>=0.5.0
 
 # The mysql generator in pagegenerators depends on PyMySQL
 PyMySQL >= 0.6.7, < 1.0.0 ; python_version < '3.6'
