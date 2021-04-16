@@ -51,7 +51,6 @@ from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
 from textwrap import shorten
-from urllib.error import URLError
 
 import pywikibot
 
@@ -605,15 +604,16 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     ref.url, page.title(as_link=True)))
                 continue
 
-            except (URLError,
+            except (ValueError,  # urllib3.LocationParseError derives from it
                     socket.error,
                     IOError,
                     httplib.error,
                     pywikibot.FatalServerError,
                     pywikibot.Server414Error,
                     pywikibot.Server504Error) as e:
-                pywikibot.output("Can't retrieve page {} : {}"
-                                 .format(ref.url, e))
+                pywikibot.output(
+                    "{err.__class__.__name__}: Can't retrieve url {url}: {err}"
+                    .format(url=ref.url, err=e))
                 continue
 
             linkedpagetext = r.content
