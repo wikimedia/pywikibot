@@ -9,12 +9,7 @@ from enum import IntEnum
 from typing import Optional, Union
 
 from pywikibot.backports import List
-from pywikibot.tools import (
-    ComparableMixin,
-    deprecated_args,
-    issue_deprecation_warning,
-    SelfCallMixin,
-)
+from pywikibot.tools import ComparableMixin, SelfCallMixin
 
 
 class BuiltinNamespace(IntEnum):
@@ -85,7 +80,6 @@ class Namespace(Iterable, ComparableMixin):
         15: 'Category talk',
     }
 
-    @deprecated_args(use_image_name=True)
     def __init__(self, id,
                  canonical_name: Optional[str] = None,
                  custom_name: Optional[str] = None,
@@ -266,14 +260,8 @@ class Namespace(Iterable, ComparableMixin):
         return default_case
 
     @classmethod
-    @deprecated_args(use_image_name=True)
-    def builtin_namespaces(cls, use_image_name=None, case='first-letter'):
+    def builtin_namespaces(cls, case='first-letter'):
         """Return a dict of the builtin namespaces."""
-        if use_image_name is not None:
-            issue_deprecation_warning(
-                'positional argument of "use_image_name"', None, 3,
-                FutureWarning, since='20181015')
-
         return {i: cls(i, case=cls.default_case(i, case))
                 for i in range(-2, 16)}
 

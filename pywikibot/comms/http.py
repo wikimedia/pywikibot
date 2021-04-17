@@ -311,7 +311,7 @@ def error_handling_callback(response):
         warning('Http response status {}'.format(response.status_code))
 
 
-@deprecated_args(callback=True, body='data')
+@deprecated_args(body='data')
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False, **kwargs):

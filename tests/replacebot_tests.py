@@ -56,7 +56,7 @@ class TestReplacementsMain(TWNBotTestCase):
                 """Nothing to do here."""
                 inner_self.changed_pages = -47  # show that run was called
 
-        def patched_login(sysop=False):
+        def patched_login():
             """Do nothing."""
             pass
 

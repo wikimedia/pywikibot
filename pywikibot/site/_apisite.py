@@ -312,10 +312,7 @@ class APISite(
         auth_token = get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
-    @deprecated_args(sysop=True)
-    def login(self, sysop=None,
-              autocreate: bool = False,
-              user: Optional[str] = None):
+    def login(self, autocreate: bool = False, user: Optional[str] = None):
         """
         Log the user in if not already logged in.
 
@@ -328,11 +325,6 @@ class APISite(
             by the site.
         @see: U{https://www.mediawiki.org/wiki/API:Login}
         """
-        if sysop is not None:
-            issue_deprecation_warning("'sysop' parameter",
-                                      warning_class=FutureWarning,
-                                      since='20201230')
-
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the
         #       login status may be left 'IN_PROGRESS' because
