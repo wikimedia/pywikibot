@@ -1268,7 +1268,7 @@ def _int_none(v):
 
 
 @deprecated('Site.allpages()', since='20180512')
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def AllpagesPageGenerator(start: str = '!', namespace=0,
                           includeredirects=True, site=None,
                           total: Optional[int] = None, content: bool = False
@@ -1298,7 +1298,7 @@ def AllpagesPageGenerator(start: str = '!', namespace=0,
                          filterredir=filterredir, total=total, content=content)
 
 
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def PrefixingPageGenerator(prefix: str, namespace=None,
                            includeredirects: Union[None, bool, str] = True,
                            site=None, total: int = None,
@@ -1337,7 +1337,7 @@ def PrefixingPageGenerator(prefix: str, namespace=None,
                          filterredir=filterredir, total=total, content=content)
 
 
-@deprecated_args(number='total', mode='logtype', repeat=None)
+@deprecated_args(number='total', mode='logtype', repeat=True)
 def LogeventsPageGenerator(logtype: Optional[str] = None,
                            user: Optional[str] = None, site=None,
                            namespace: Optional[int] = None,
@@ -1372,8 +1372,8 @@ def LogeventsPageGenerator(logtype: Optional[str] = None,
             pywikibot.exception(e)
 
 
-@deprecated_args(number='total', step=None, namespace='namespaces',
-                 repeat=None, get_redirect=None)
+@deprecated_args(number='total', step=True, namespace='namespaces',
+                 repeat=True, get_redirect=True)
 def NewpagesPageGenerator(site=None, namespaces=(0, ),
                           total: Optional[int] = None):
     """
@@ -1415,7 +1415,7 @@ def RecentChangesPageGenerator(site=None, _filter_unique=None, **kwargs):
 
 
 @deprecated('site.unconnected_pages()', since='20180512')
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def UnconnectedPageGenerator(site=None, total: Optional[int] = None):
     """
     Iterate Page objects for all unconnected pages to a Wikibase repository.
@@ -1432,7 +1432,7 @@ def UnconnectedPageGenerator(site=None, total: Optional[int] = None):
 
 
 @deprecated('File.usingPages()', since='20200515')
-@deprecated_args(referredImagePage='referredFilePage', step=None)
+@deprecated_args(referredImagePage='referredFilePage', step=True)
 def FileLinksGenerator(referredFilePage, total=None, content=False):
     """DEPRECATED. Yield Pages on which referredFilePage file is displayed."""
     return referredFilePage.usingPages(total=total,
@@ -1440,7 +1440,7 @@ def FileLinksGenerator(referredFilePage, total=None, content=False):
 
 
 @deprecated('Page.imagelinks()', since='20200515')
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def ImagesPageGenerator(pageWithImages, total=None, content=False):
     """DEPRECATED. Yield FilePages displayed on pageWithImages."""
     return pageWithImages.imagelinks(total=total,
@@ -1452,7 +1452,7 @@ def InterwikiPageGenerator(page):
     return (pywikibot.Page(link) for link in page.interwiki())
 
 
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def LanguageLinksPageGenerator(page, total=None):
     """Iterate over all interwiki language links on a page."""
     return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
@@ -1460,7 +1460,7 @@ def LanguageLinksPageGenerator(page, total=None):
 
 @deprecated('Page.getReferences(follow_redirects=False)', since='20200515',
             future_warning=True)
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
                            onlyTemplateInclusion=False,
@@ -1473,7 +1473,7 @@ def ReferringPageGenerator(referredPage, followRedirects=False,
         total=total, content=content)
 
 
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def CategorizedPageGenerator(category, recurse=False, start=None,
                              total=None, content=False,
                              namespaces=None):
@@ -1501,7 +1501,7 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     yield from category.articles(**kwargs)
 
 
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
                                total=None, content=False):
     """Yield all subcategories in a specific category.
@@ -1526,7 +1526,7 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
 
 
 @deprecated('Page.linkedPages()', since='20200515')
-@deprecated_args(step=None)
+@deprecated_args(step=True)
 def LinkedPageGenerator(linkingPage, total: int = None, content: bool = False):
     """DEPRECATED. Yield all pages linked from a specific page.
 
@@ -1618,7 +1618,7 @@ def PagesFromPageidGenerator(pageids, site=None):
     return site.load_pages_from_pageids(pageids)
 
 
-@deprecated_args(number='total', step=None)
+@deprecated_args(number='total', step=True)
 def UserContributionsGenerator(username, namespaces: List[int] = None,
                                site=None, total: Optional[int] = None,
                                _filter_unique=_filter_unique_pages):
@@ -1921,7 +1921,7 @@ def QualityFilterPageGenerator(generator, quality: List[int]):
             yield page
 
 
-@deprecated_args(site=None, since='20201107')
+@deprecated_args(site=True)
 def CategoryFilterPageGenerator(generator, category_list):
     """
     Wrap a generator to filter pages by categories specified.
@@ -2129,7 +2129,7 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
         yield from reversed(list(filtered_generator()))
 
 
-@deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=None)
+@deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=True)
 def PreloadingGenerator(generator, groupsize: int = 50):
     """
     Yield preloaded pages taken from another generator.
@@ -2195,7 +2195,7 @@ def PreloadingEntityGenerator(generator, groupsize: int = 50):
         yield from repo.preload_entities(pages, groupsize)
 
 
-@deprecated_args(number='total', step=None, repeat=None)
+@deprecated_args(number='total', step=True, repeat=True)
 def NewimagesPageGenerator(total: Optional[int] = None, site=None):
     """
     New file generator.
@@ -2262,7 +2262,7 @@ def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
 
 
 @deprecated('Site.unusedfiles()', since='20200515')
-@deprecated_args(extension=None, number='total', repeat=None)
+@deprecated_args(extension=True, number='total', repeat=True)
 def UnusedFilesGenerator(total: Optional[int] = None,
                          site=None):  # pragma: no cover
     """
@@ -2278,7 +2278,7 @@ def UnusedFilesGenerator(total: Optional[int] = None,
 
 
 @deprecated('Site.withoutinterwiki()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def WithoutInterwikiPageGenerator(total=None, site=None):  # pragma: no cover
     """
     DEPRECATED. Page lacking interwikis generator.
@@ -2293,7 +2293,7 @@ def WithoutInterwikiPageGenerator(total=None, site=None):  # pragma: no cover
 
 
 @deprecated('Site.uncategorizedcategories()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
                                    site=None):  # pragma: no cover
     """
@@ -2309,7 +2309,7 @@ def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
 
 
 @deprecated('Site.uncategorizedimages()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def UnCategorizedImageGenerator(total: int = 100,
                                 site=None):  # pragma: no cover
     """
@@ -2325,7 +2325,7 @@ def UnCategorizedImageGenerator(total: int = 100,
 
 
 @deprecated('Site.uncategorizedpages()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def UnCategorizedPageGenerator(total: int = 100,
                                site=None):  # pragma: no cover
     """
@@ -2341,7 +2341,7 @@ def UnCategorizedPageGenerator(total: int = 100,
 
 
 @deprecated('Site.uncategorizedtemplates()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def UnCategorizedTemplateGenerator(total: int = 100,
                                    site=None):  # pragma: no cover
     """
@@ -2357,7 +2357,7 @@ def UnCategorizedTemplateGenerator(total: int = 100,
 
 
 @deprecated('Site.lonelypages()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def LonelyPagesPageGenerator(total: Optional[int] = None,
                              site=None):  # pragma: no cover
     """
@@ -2373,7 +2373,7 @@ def LonelyPagesPageGenerator(total: Optional[int] = None,
 
 
 @deprecated('Site.unwatchedpages()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def UnwatchedPagesPageGenerator(total: Optional[int] = None,
                                 site=None):  # pragma: no cover
     """
@@ -2418,7 +2418,7 @@ def WantedPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     return site.wantedpages(total=total)
 
 
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def AncientPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     Ancient page generator.
@@ -2433,7 +2433,7 @@ def AncientPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
 
 
 @deprecated('Site.deadendpages()', since='20200515')
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def DeadendPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     DEPRECATED. Dead-end page generator.
@@ -2447,7 +2447,7 @@ def DeadendPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     return site.deadendpages(total=total)
 
 
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def LongPagesPageGenerator(total: int = 100, site=None):
     """
     Long page generator.
@@ -2461,7 +2461,7 @@ def LongPagesPageGenerator(total: int = 100, site=None):
     return (page for page, _ in site.longpages(total=total))
 
 
-@deprecated_args(number='total', repeat=None)
+@deprecated_args(number='total', repeat=True)
 def ShortPagesPageGenerator(total: int = 100, site=None):
     """
     Short page generator.
@@ -2509,7 +2509,7 @@ def RandomRedirectPageGenerator(total: Optional[int] = None, site=None,
 
 
 @deprecated('Site.exturlusage()', since='20200515')
-@deprecated_args(link='url', euprotocol='protocol', step=None)
+@deprecated_args(link='url', euprotocol='protocol', step=True)
 def LinksearchPageGenerator(url: str, namespaces: List[int] = None,
                             total: Optional[int] = None, site=None,
                             protocol: Optional[str] = None):
@@ -2532,7 +2532,7 @@ def LinksearchPageGenerator(url: str, namespaces: List[int] = None,
 
 
 @deprecated('Site.search()', since='20200515')
-@deprecated_args(number='total', step=None)
+@deprecated_args(number='total', step=True)
 def SearchPageGenerator(query, total: Optional[int] = None, namespaces=None,
                         site=None):  # pragma: no cover
     """

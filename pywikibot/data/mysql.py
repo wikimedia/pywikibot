@@ -20,7 +20,7 @@ from pywikibot import config2 as config
 from pywikibot.tools import deprecated_args
 
 
-@deprecated_args(encoding=None)
+@deprecated_args(encoding=True)
 def mysql_query(query: str, params=None,
                 dbname: Optional[str] = None,
                 verbose: Optional[bool] = None):

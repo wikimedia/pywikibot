@@ -230,7 +230,7 @@ class WikibaseClientMixin:
 
     """APISite mixin for WikibaseClient extension."""
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     @need_extension('WikibaseClient')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.

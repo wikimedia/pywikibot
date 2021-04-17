@@ -403,7 +403,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
 
     """A robot to mass-add a category to a list of pages."""
 
-    @deprecated_args(editSummary='comment', dry=None)
+    @deprecated_args(editSummary='comment', dry=True)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
                  create=False, comment='', follow_redirects=False) -> None:
         """Initializer."""

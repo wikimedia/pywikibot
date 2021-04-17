@@ -1,6 +1,6 @@
 """Module to daemonize the current process on Unix."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,7 @@ from pywikibot.tools import deprecated_args
 is_daemon = False
 
 
-@deprecated_args(write_pid=None)
+@deprecated_args(write_pid=True)
 def daemonize(close_fd=True, chdir=True, redirect_std=None):
     """
     Daemonize the current process.

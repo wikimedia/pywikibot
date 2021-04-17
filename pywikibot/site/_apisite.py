@@ -212,7 +212,7 @@ class APISite(
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of %s.' % dbname)
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def _generator(self, gen_class, type_arg: Optional[str] = None,
                    namespaces=None, total: Optional[int] = None, **args):
         """Convenience method that returns an API generator.
@@ -654,7 +654,7 @@ class APISite(
 
         return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
-    @deprecated_args(forceReload=None)
+    @deprecated_args(forceReload=True)
     def mediawiki_message(self, key, lang=None) -> str:
         """Fetch the text for a MediaWiki message.
 
