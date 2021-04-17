@@ -64,6 +64,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | illustrate_wikidata.py | Bot to add images to Wikidata items.                    |
     +------------------------+---------------------------------------------------------+
+    | image.py               | Script to replace transclusions of files                |
+    +------------------------+---------------------------------------------------------+
     | imagetransfer.py       | Given a wiki page, check the interwiki links for        |
     |                        | images, and let the user choose among them for          |
     |                        | images to upload.                                       |
@@ -87,6 +89,8 @@ The contents of the package
     | noreferences.py        | Searches for pages where <references /> is missing      |
     |                        | although a <ref> tag is present, and in that case adds  |
     |                        | a new references section.                               |
+    +------------------------+---------------------------------------------------------+
+    | nowcommons.py          | This bot can delete images with NowCommons template.    |
     +------------------------+---------------------------------------------------------+
     | pagefromfile.py        | This bot takes its input from a file that contains a    |
     |                        | number of pages to be put on the wiki.                  |
@@ -179,9 +183,6 @@ The contents of the package
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
     | freebasemappingupload.py| Script to upload the mappings of Freebase to Wikidata. |
-    +------------------------++--------------------------------------------------------+
-    | image.py               | This script can be used to change one image to another  |
-    |                        | or remove an image entirely.                            |
     +------------------------+---------------------------------------------------------+
     | imagecopy.py           | Copies images from a Wikimedia wiki to Commons.         |
     +------------------------+---------------------------------------------------------+
@@ -208,8 +209,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | ndashredir.py          | Creates hyphenated redirects to articles with n dash    |
     |                        | or m dash in their title.                               |
-    +------------------------+---------------------------------------------------------+
-    | nowcommons.py          | This bot can delete images with NowCommons template.    |
     +------------------------+---------------------------------------------------------+
     | piper.py               | Pipes article text through external program(s) on       |
     |                        | STDIN and collects its STDOUT which is used as the      |

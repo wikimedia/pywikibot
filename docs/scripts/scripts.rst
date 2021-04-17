@@ -107,6 +107,11 @@ illustrate\_wikidata script
 
 .. automodule:: scripts.illustrate_wikidata
 
+image script
+------------
+
+.. automodule:: scripts.image
+
 imagetransfer script
 --------------------
 
@@ -146,6 +151,11 @@ noreferences script
 -------------------
 
 .. automodule:: scripts.noreferences
+
+nowcommons script
+-----------------
+
+.. automodule:: scripts.nowcommons
 
 pagefromfile script
 -------------------
