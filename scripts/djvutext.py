@@ -23,15 +23,17 @@ The following parameters are supported:
                    Use quotes if edit summary contains spaces.
     -force         overwrites existing text
                    optional, default False
-    -always        don't bother asking to confirm any of the changes.
+    -always        do not bother asking to confirm any of the changes.
 
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import os.path
+
+from typing import Optional
 
 import pywikibot
 
@@ -51,7 +53,7 @@ class DjVuTextBot(SingleSiteBot):
     Works only on sites with Proofread Page extension installed.
     """
 
-    def __init__(self, djvu, index, pages=None, **kwargs):
+    def __init__(self, djvu, index, pages: Optional[tuple] = None, **kwargs):
         """
         Initializer.
 
@@ -60,7 +62,6 @@ class DjVuTextBot(SingleSiteBot):
         @param index: index page in the Index: namespace
         @type index: Page object
         @param pages: page interval to upload (start, end)
-        @type pages: tuple
         """
         self.available_options.update({
             'force': False,
@@ -77,8 +78,6 @@ class DjVuTextBot(SingleSiteBot):
         else:
             self._pages = pages
 
-        self.generator = self.gen()
-
         # Get edit summary message if it's empty.
         if not self.opt.summary:
             self.opt.summary = i18n.twtranslate(self._index.site,
@@ -92,7 +91,8 @@ class DjVuTextBot(SingleSiteBot):
             last = end + 1
             yield from range(start, last)
 
-    def gen(self):
+    @property
+    def generator(self):
         """Generate pages from specified page interval."""
         for page_number in self.page_number_gen():
             title = '{page_ns}:{prefix}/{number}'.format(
@@ -111,14 +111,13 @@ class DjVuTextBot(SingleSiteBot):
         page.body = self._djvu.get_page(page.page_number)
         new_text = page.text
 
-        summary = self.opt.summary
         if page.exists() and not self.opt.force:
             pywikibot.output(
                 'Page {} already exists, not adding!\n'
                 'Use -force option to overwrite the output page.'
                 .format(page))
         else:
-            self.userPut(page, old_text, new_text, summary=summary)
+            self.userPut(page, old_text, new_text, summary=self.opt.summary)
 
 
 def main(*args: Tuple[str, ...]):
@@ -137,18 +136,17 @@ def main(*args: Tuple[str, ...]):
     # Parse command line arguments.
     local_args = pywikibot.handle_args(args)
     for arg in local_args:
-        if arg.startswith('-index:'):
-            index = arg[7:]
-        elif arg.startswith('-djvu:'):
-            djvu_path = arg[len('-djvu:'):]
-        elif arg.startswith('-pages:'):
-            pages = arg[7:]
-        elif arg.startswith('-summary:'):
-            options['summary'] = arg[len('-summary:'):]
-        elif arg == '-force':
-            options['force'] = True
-        elif arg == '-always':
-            options['always'] = True
+        opt, _, value = arg.partition(':')
+        if opt == '-index':
+            index = value
+        elif opt == '-djvu':
+            djvu_path = value
+        elif opt == '-pages':
+            pages = value
+        elif opt == '-summary':
+            options['summary'] = value
+        elif opt in ('-force', '-always'):
+            options[opt[1:]] = True
         else:
             pywikibot.output('Unknown argument ' + arg)
 
@@ -163,6 +161,7 @@ def main(*args: Tuple[str, ...]):
     if not os.path.exists(djvu_path):
         pywikibot.error('No such file or directory: ' + djvu_path)
         return
+
     if os.path.isdir(djvu_path):
         djvu_path = os.path.join(djvu_path, index)
 
@@ -175,14 +174,14 @@ def main(*args: Tuple[str, ...]):
 
     # Parse pages param.
     pages = pages.split(',')
-    for interval in range(len(pages)):
-        start, sep, end = pages[interval].partition('-')
+    for i, page in enumerate(pages):
+        start, sep, end = page.partition('-')
         start = 1 if not start else int(start)
         if not sep:
             end = start
         else:
             end = int(end) if end else djvu.number_of_images()
-        pages[interval] = (start, end)
+        pages[i] = (start, end)
 
     site = pywikibot.Site()
     if not site.has_extension('ProofreadPage'):
@@ -198,7 +197,7 @@ def main(*args: Tuple[str, ...]):
     pywikibot.output('uploading text from {} to {}'
                      .format(djvu.file, index_page.title(as_link=True)))
 
-    bot = DjVuTextBot(djvu, index_page, pages, **options)
+    bot = DjVuTextBot(djvu, index_page, pages=pages, site=site, **options)
     bot.run()
 
 
