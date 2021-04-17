@@ -546,7 +546,7 @@ class Family:
     _families = {}
 
     @staticmethod
-    @deprecated_args(fatal=None)
+    @deprecated_args(fatal=True)
     def load(fam: Optional[str] = None):
         """Import the named family.
 
@@ -1219,7 +1219,7 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return '{0}.wikimedia.org'.format(cls.name)
 
 
-@deprecated_args(site=None)
+@deprecated_args(site=True)
 def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.

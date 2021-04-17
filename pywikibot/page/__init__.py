@@ -2573,7 +2573,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', startsort=None, endsort=None)
+    @deprecated_args(startFrom='startprefix', startsort=True, endsort=True)
     def articles(self,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,

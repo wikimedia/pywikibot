@@ -1074,7 +1074,7 @@ def _code_fam_from_url(url: str, name: Optional[str] = None):
     return matched_sites[0]
 
 
-@_deprecate_arg('sysop', None)
+@_deprecate_arg('sysop', True)
 def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
          interface=None,
          url: Optional[str] = None) -> Union[APISite, DataSite, ClosedSite]:

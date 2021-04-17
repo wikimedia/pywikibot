@@ -937,7 +937,7 @@ def extract_sections(
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Artículo]]".
 
-@deprecate_arg('pageLink', None)
+@deprecate_arg('pageLink', True)
 def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
     """
     Return a dict of inter-language links found in text.

@@ -1931,7 +1931,7 @@ class WikidataBot(Bot, ExistingPageBot):
     use_from_page = True
     treat_missing_item = False
 
-    @deprecated_args(use_from_page=None)
+    @deprecated_args(use_from_page=True)
     def __init__(self, **kwargs):
         """Initializer of the WikidataBot."""
         self.create_missing_item = False
