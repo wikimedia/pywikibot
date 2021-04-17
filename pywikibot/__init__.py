@@ -35,16 +35,15 @@ from pywikibot import config2 as config
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
-    BadTitle, CaptchaError, CascadeLockedPage, CircularRedirect,
+    CaptchaError, CascadeLockedPage, CircularRedirect,
     CoordinateGlobeUnknownException, EditConflict, Error, FatalServerError,
     InterwikiRedirectPage, InvalidTitle, IsNotRedirectPage, IsRedirectPage,
-    LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage, NoSuchSite,
+    LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage,
     NoUsername, NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
-    PageDeletedConflict, PageNotSaved, PageRelatedError, PageSaveRelatedError,
-    SectionError, Server414Error, Server504Error, ServerError,
-    SiteDefinitionError, SpamblacklistError, TitleblacklistError,
-    UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
-    WikiBaseError,
+    PageDeletedConflict, PageRelatedError, PageSaveRelatedError, SectionError,
+    Server414Error, Server504Error, ServerError, SiteDefinitionError,
+    SpamblacklistError, TitleblacklistError, UnknownExtension, UnknownFamily,
+    UnknownSite, UnsupportedPage, WikiBaseError,
 )
 from pywikibot.family import AutoFamily, Family
 from pywikibot.i18n import translate
@@ -58,7 +57,6 @@ from pywikibot.tools import (
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    redirect_func,
 )
 from pywikibot.tools.formatter import color_format
 
@@ -67,25 +65,24 @@ __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
     '__maintainer__', '__maintainer_email__', '__name__',
     '__url__', '__version__',
-    'BadTitle', 'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
+    'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
     'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
-    'FilePage', 'handle_args', 'html2unicode', 'input',
-    'input_choice', 'input_yn', 'InterwikiRedirectPage', 'InvalidTitle',
-    'IsNotRedirectPage', 'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage',
-    'LockedPage', 'log', 'NoCreateError', 'NoMoveTarget', 'NoPage',
-    'NoSuchSite', 'NoUsername', 'NoWikibaseEntity', 'OtherPageSaveError',
-    'output', 'Page', 'PageCreatedConflict', 'PageDeletedConflict',
-    'PageNotSaved', 'PageRelatedError', 'PageSaveRelatedError', 'PropertyPage',
-    '_QuitKeyboardInterrupt', 'SectionError', 'Server414Error',
-    'Server504Error', 'ServerError', 'showDiff', 'show_help',
-    'Site', 'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
-    'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
-    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'warning', 'WbGeoShape',
-    'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
-    'WikiBaseError', 'WikidataBot',
+    'FilePage', 'handle_args', 'html2unicode', 'input', 'input_choice',
+    'input_yn', 'InterwikiRedirectPage', 'InvalidTitle', 'IsNotRedirectPage',
+    'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage', 'LockedPage', 'log',
+    'NoCreateError', 'NoMoveTarget', 'NoPage', 'NoUsername',
+    'NoWikibaseEntity', 'OtherPageSaveError', 'output', 'Page',
+    'PageCreatedConflict', 'PageDeletedConflict', 'PageRelatedError',
+    'PageSaveRelatedError', 'PropertyPage', '_QuitKeyboardInterrupt',
+    'SectionError', 'Server414Error', 'Server504Error', 'ServerError',
+    'showDiff', 'show_help', 'Site', 'SiteDefinitionError', 'SiteLink',
+    'SpamblacklistError', 'stdout', 'Timestamp', 'TitleblacklistError',
+    'translate', 'ui', 'unicode2html', 'UnknownExtension', 'UnknownFamily',
+    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
+    'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikiBaseError', 'WikidataBot',
 )
 
 
@@ -128,7 +125,7 @@ class Timestamp(datetime.datetime):
         @param sep: one-character separator, placed between the date and time
         @return: ISO8601 format string
         """
-        assert(len(sep) == 1)
+        assert len(sep) == 1
         return '%Y-%m-%d{0}%H:%M:%SZ'.format(sep)
 
     @classmethod
@@ -1159,11 +1156,6 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
                  % (_sites[key], code), UserWarning, 2)
 
     return _sites[key]
-
-
-# alias for backwards-compability
-getSite = redirect_func(Site, old_name='getSite', since='20150924',
-                        future_warning=True)
 
 
 # These imports depend on Wb* classes above.

@@ -174,7 +174,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         return log
 
 
-class AssertAPIErrorContextManager(object):
+class AssertAPIErrorContextManager:
 
     """
     Context manager to assert certain APIError exceptions.
@@ -242,7 +242,7 @@ class DryParamInfo(dict):
             return {'name': name, 'limit': None}
 
 
-class DummySiteinfo(object):
+class DummySiteinfo:
 
     """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
 

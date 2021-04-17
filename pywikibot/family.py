@@ -9,6 +9,7 @@ import logging
 import re
 import string
 import sys
+import types
 import urllib.parse as urlparse
 import warnings
 
@@ -26,7 +27,6 @@ from pywikibot.tools import (
     classproperty,
     deprecated,
     deprecated_args,
-    frozenmap,
     ModuleDeprecationWrapper,
 )
 
@@ -111,13 +111,14 @@ class Family:
         'ps', 'jam', 'koi', 'km', 'pcd', 'pms', 'tpi', 'nds', 'pl', 'pnt',
         'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue',
         'ru', 'sah', 'szy', 'se', 'sm', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco',
-        'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss',
-        'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'su', 'fi',
-        'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara', 'tt', 'te', 'tet', 'th',
-        'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw',
-        'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi',
-        'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts',
-        'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+        'trv', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd',
+        'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'su',
+        'fi', 'sv', 'tl', 'shn', 'ta', 'kab', 'roa-tara', 'tt', 'tay', 'te',
+        'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb',
+        'tk', 'tw', 'tyv', 'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec',
+        'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo',
+        'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
+        'zh-tw', 'zh-cn',
     ]
 
     # The revised sorting order by first word from meta
@@ -147,14 +148,14 @@ class Family:
         'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'km',
         'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty',
         'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah', 'szy', 'se', 'sa',
-        'sg', 'sat', 'skr', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn',
-        'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb',
-        'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'kbp', 'roa-tara',
-        'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr', 'chy', 've',
-        'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk', 'ur', 'ug',
-        'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls',
-        'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
-        'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+        'sg', 'sat', 'skr', 'sc', 'sco', 'trv', 'stq', 'st', 'nso', 'tn', 'sq',
+        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'kbp',
+        'roa-tara', 'tt', 'tay', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
+        'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din',
+        'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa',
+        'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue',
+        'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
 
     # Order for fy: alphabetical by code, but y counts as i
@@ -839,8 +840,8 @@ class Family:
         # Discard $1 and everything after it
         path, _, suffix = path.partition('$1')
         if suffix:
-            raise ValueError('Text after the $1 placeholder is not supported '
-                             '(T111513).')
+            raise ValueError('Url: {}\nText {} after the $1 placeholder is '
+                             'not supported (T111513).'.format(url, suffix))
 
         for domain in self.domains:
             if domain in parsed.netloc:
@@ -953,7 +954,7 @@ class Family:
         """
         data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
-        return frozenmap(data)
+        return types.MappingProxyType(data)
 
     @obsolete.setter
     def obsolete(self, data):
@@ -1160,9 +1161,9 @@ class WikimediaFamily(Family):
     # Completely removed
     removed_wikis = []  # type: List[str]
 
-    # WikimediaFamily uses wikibase for the category name containing
+    # WikimediaFamily uses Wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
-    # wikibase code and item number:
+    # Wikibase code and item number:
     disambcatname = {'wikidata': 'Q1982926'}
 
     # UrlShortener extension is only usable on metawiki, and this wiki can
@@ -1189,7 +1190,7 @@ class WikimediaFamily(Family):
     @classproperty
     def interwiki_replacements(cls):
         """Return an interwiki code replacement mapping."""
-        return frozenmap(cls.code_aliases)
+        return types.MappingProxyType(cls.code_aliases)
 
     def shared_image_repository(self, code):
         """Return Wikimedia Commons as the shared image repository."""

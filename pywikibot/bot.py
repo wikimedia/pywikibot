@@ -25,7 +25,7 @@ conjunction. Each bot should subclass at least one of these four classes:
   identified must be predefined in available_options dictionary.
 
 * L{Bot}: The previous base class which should be avoided. This class is mainly
-  used for bots which work with wikibase or together with an image repository.
+  used for bots which work with Wikibase or together with an image repository.
 
 Additionally there is the L{CurrentPageBot} class which automatically sets the
 current page to the page treated. It is recommended to use this class and to
@@ -1156,6 +1156,11 @@ class BaseBot(OptionHandler):
     Bot will process each page in the generator, invoking the method treat()
     which must then be implemented by subclasses.
 
+    Each item processed by treat() must be a L{pywikibot.page.BasePage}
+    type. Use init_page() to upcast the type. To enable other types, set
+    BaseBot.treat_page_type to an appropriate type; your bot should
+    derive from BaseBot in that case and handle site properties.
+
     If the subclass does not set a generator, or does not override
     treat() or run(), NotImplementedError is raised.
 
@@ -1191,6 +1196,7 @@ class BaseBot(OptionHandler):
         self._save_counter = 0
         self._skip_counter = 0
         self._generator_completed = False
+        self.treat_page_type = pywikibot.page.BasePage  # default type
 
     @property
     def current_page(self):
@@ -1475,9 +1481,11 @@ class BaseBot(OptionHandler):
                 else:
                     page = initialized_page
 
-                assert isinstance(page, pywikibot.page.BasePage), (
-                    '"page" is not a pywikibot.page.BasePage object but {}.'
-                    .format(page.__class__))
+                # validate page type
+                if not isinstance(page, self.treat_page_type):
+                    raise TypeError('"page" is not a {!r} object but {}.'
+                                    .format(self.treat_page_type,
+                                            page.__class__.__name__))
 
                 if self.skip_page(page):
                     self._skip_counter += 1
@@ -1494,9 +1502,9 @@ class BaseBot(OptionHandler):
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
-            else:
-                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                                 self.__class__.__name__)
+
+            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                             self.__class__.__name__)
         finally:
             self.exit()
 

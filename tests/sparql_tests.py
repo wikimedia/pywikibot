@@ -82,7 +82,7 @@ RESPONSE_FALSE = """
 """
 
 
-class Container(object):
+class Container:
     """Simple test container for return values."""
 
     def __init__(self, value):
@@ -171,7 +171,7 @@ class TestSparql(WikidataTestCase):
         self.assertFalse(res)
 
 
-class Shared(object):
+class Shared:
     """Shared test placeholder."""
 
     class SparqlNodeTests(TestCase):

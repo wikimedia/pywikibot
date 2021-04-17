@@ -321,8 +321,7 @@ def main(*args) -> None:
         if _input == 'q':
             failed_filename = True
             break
-        else:
-            filename = _input
+        filename = _input
 
     # show help text from the top of this file if reader failed
     # or User quit.

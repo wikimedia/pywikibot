@@ -2,7 +2,7 @@
 This module offers a wide variety of page generators.
 
 A page generator is an
-object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
+object that is iterable (see https://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
 Pagegenerators.py cannot be run as script. For testing purposes listpages.py
@@ -29,6 +29,7 @@ from collections.abc import Iterator
 from collections import namedtuple
 from datetime import timedelta
 from functools import partial
+from http import HTTPStatus
 from itertools import zip_longest
 from requests.exceptions import ReadTimeout
 from typing import Optional, Union
@@ -49,7 +50,6 @@ from pywikibot.tools import (
     filter_unique,
     intersect_generators,
     itergroup,
-    ModuleDeprecationWrapper,
     redirect_func,
 )
 
@@ -899,7 +899,7 @@ class GeneratorFactory:
             rctag = params.pop(0)
         if len(params) > 2:
             raise ValueError('More than two parameters passed.')
-        elif len(params) == 2:
+        if len(params) == 2:
             offset = float(params[0])
             duration = float(params[1])
             if offset < 0 or duration < 0:
@@ -2967,11 +2967,13 @@ class PetScanPageGenerator:
         try:
             req = http.fetch(url, params=self.opts)
         except ReadTimeout:
-            raise ServerError(
-                'received ReadTimeout from {}'.format(url))
-        if 500 <= req.status_code < 600:
+            raise ServerError('received ReadTimeout from {}'.format(url))
+
+        server_err = HTTPStatus.INTERNAL_SERVER_ERROR
+        if server_err <= req.status_code < server_err + 100:
             raise ServerError(
                 'received {} status from {}'.format(req.status_code, req.url))
+
         j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
         yield from raw_pages
@@ -2998,9 +3000,6 @@ FileGenerator = redirect_func(
 CategoryGenerator = redirect_func(
     PageClassGenerator, old_name='CategoryGenerator', since='20161017',
     future_warning=True)
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
-                             since='20181128')
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '

@@ -1,6 +1,12 @@
 Release history
 ===============
 
+6.0.1
+-----
+*20 March 2021*
+
+* Add support for taywiki, trvwiki and mnwwiktionary (T275838, T276128, T276250)
+
 6.0.0
 -----
 *16 March 2021*

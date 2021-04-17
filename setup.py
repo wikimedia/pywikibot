@@ -59,12 +59,12 @@ extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
     'isbn': ['python-stdnum>=1.16'],
+    'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
-    'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': [  # vulnerability found in Pillow<6.2.2
-        'Pillow>=6.2.2,<8.0.0;python_version<"3.6"',
-        'Pillow>=6.2.2;python_version>="3.6" and python_version<"3.9"',
-        'Pillow>=8.0.0;python_version>="3.9"',
+    'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
+    'wikitextparser': ['wikitextparser>=0.47.0'],
+    'Tkinter': [  # vulnerability found in Pillow<8.1.1
+        'Pillow>=8.1.1;python_version>="3.6"',
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
@@ -73,7 +73,7 @@ extra_deps = {
         'flake8>=3.7.5',
         'pydocstyle>=4.0.0',
         'hacking',
-        'flake8-bugbear',
+        'flake8-bugbear!=21.4.1',
         'flake8-coding',
         'flake8-colors>=0.1.9',
         'flake8-comprehensions>=3.1.4;python_version>="3.8"',
@@ -94,6 +94,8 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
+    'commons_information.py': extra_deps['mwparserfromhell'],
+    'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
 }
 
@@ -109,7 +111,7 @@ dependencies = [
     'setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < "3.6"',
     'setuptools>=20.2 ; python_version >= "3.6"',
 ]
-
+# in addition either mwparserfromhell or wikitextparser is required
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']

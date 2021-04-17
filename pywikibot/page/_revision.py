@@ -7,6 +7,7 @@
 import hashlib
 
 from collections.abc import Mapping
+from contextlib import suppress
 
 from pywikibot import Timestamp, warning
 from pywikibot.tools import deprecated
@@ -23,7 +24,7 @@ class Revision(Mapping):
     >>> r.comment == r['comment']
     True
     >>> r.comment
-    Sample for Revision access
+    'Sample for Revision access'
     """
 
     def __init__(self, **kwargs):
@@ -35,11 +36,13 @@ class Revision(Mapping):
     @staticmethod
     def _upcast_dict(map_):
         """Upcast dictionary values."""
-        map_['timestamp'] = Timestamp.fromISOformat(map_['timestamp'])
+        with suppress(KeyError):  # enable doctest
+            map_['timestamp'] = Timestamp.fromISOformat(map_['timestamp'])
 
         map_.update(anon='anon' in map_)
         map_.update(minor='minor' in map_)
         map_.update(userhidden='userhidden' in map_)
+        map_.update(commenthidden='commenthidden' in map_)
 
         map_.setdefault('comment', '')
         map_.setdefault('user', '')

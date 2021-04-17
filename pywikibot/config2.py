@@ -45,6 +45,7 @@ from pathlib import Path
 from textwrap import fill
 from typing import Optional, Union
 from warnings import warn
+from zipfile import is_zipfile, ZipFile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.backports import Dict, List, removesuffix, Tuple
@@ -112,12 +113,10 @@ _deprecated_variables = {
     'copyright_max_query_for_page', 'copyright_msn', 'copyright_show_date',
     'copyright_show_length', 'copyright_skip_query', 'copyright_yahoo',
     'db_hostname', 'deIndentTables', 'fake_user_agent', 'flickr',
-    'interwiki_contents_on_disk', 'interwiki_backlink', 'interwiki_graph',
-    'interwiki_graph_formats', 'interwiki_graph_url', 'interwiki_min_subjects',
-    'interwiki_shownew', 'line_separator', 'LS', 'msn_appid', 'panoramio',
-    'persistent_http', 'proxy', 'special_page_limit', 'splitLongParagraphs',
-    'sysopnames', 'use_mwparserfromhell', 'use_SSL_onlogin', 'use_SSL_always',
-    'without_interwiki', 'yahoo_appid',
+    'interwiki_contents_on_disk', 'line_separator', 'LS', 'msn_appid',
+    'panoramio', 'persistent_http', 'proxy', 'special_page_limit',
+    'splitLongParagraphs', 'sysopnames', 'use_mwparserfromhell',
+    'use_SSL_onlogin', 'use_SSL_always', 'yahoo_appid',
 }
 _future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
@@ -371,7 +370,8 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
                 '  Directory where user-config.py is searched is determined '
                 'as follows:\n\n    ') + get_base_dir.__doc__
             raise RuntimeError(exc_text)
-        elif __no_user_config != '2':
+
+        if __no_user_config != '2':
             output(exc_text)
 
     return base_dir
@@ -397,13 +397,41 @@ def register_family_file(family_name, file_path):
     family_files[family_name] = file_path
 
 
-def register_families_folder(folder_path):
-    """Register all family class files contained in a directory."""
+def register_families_folder(folder_path: str):
+    """Register all family class files contained in a directory.
+
+    @param folder_path: The path of a folder containing family files.
+        The families may also be inside a zip archive structure.
+    @raises NotADirectoryError: folder_path is not a directory
+    """
     suffix = '_family.py'
-    for file_name in os.listdir(folder_path):
+    if os.path.isdir(folder_path):
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith(suffix):
+                family_name = removesuffix(file_name, suffix)
+                family_files[family_name] = os.path.join(folder_path,
+                                                         file_name)
+        return
+
+    # probably there is a zip file chain (T278076)
+    # find the parent zip folder
+    path = Path(folder_path)
+    if not is_zipfile(path):
+        for path in path.parents:
+            if is_zipfile(path):
+                break
+        else:
+            raise NotADirectoryError('20', 'Not a directory', folder_path)
+
+    # read the family files from zip folder
+    # assume that all files ending with suffix reside in family folder
+    zip_file = ZipFile(path)
+    for file_name in zip_file.namelist():
         if file_name.endswith(suffix):
-            family_name = removesuffix(file_name, suffix)
-            family_files[family_name] = os.path.join(folder_path, file_name)
+            file_path = Path(file_name)
+            family_name = removesuffix(file_path.name, suffix)
+            family_files[family_name] = os.path.join(folder_path,
+                                                     file_path.name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
@@ -577,6 +605,49 @@ user_script_paths = []  # type: List[str]
 # user_families_paths = ['data/families']
 user_families_paths = []  # type: List[str]
 
+# ############# INTERWIKI SETTINGS ##############
+
+# Should interwiki.py report warnings for missing links between foreign
+# languages?
+interwiki_backlink = True
+
+# Should interwiki.py display every new link it discovers?
+interwiki_shownew = True
+
+# Should interwiki.py output a graph PNG file on conflicts?
+# You need pydot for this:
+# https://pypi.org/project/pydot/
+interwiki_graph = False
+
+# Specifies that the robot should process that amount of subjects at a time,
+# only starting to load new pages in the original language when the total
+# falls below that number. Default is to process (at least) 100 subjects at
+# once.
+interwiki_min_subjects = 100
+
+# If interwiki graphs are enabled, which format(s) should be used?
+# Supported formats include png, jpg, ps, and svg. See:
+# http://www.graphviz.org/doc/info/output.html
+# If you want to also dump the dot files, you can use this in your
+# user-config.py:
+# interwiki_graph_formats = ['dot', 'png']
+# If you need a PNG image with an HTML image map, use this:
+# interwiki_graph_formats = ['png', 'cmap']
+# If you only need SVG images, use:
+# interwiki_graph_formats = ['svg']
+interwiki_graph_formats = ['png']
+
+# You can post the contents of your autonomous_problems.dat to the wiki,
+# e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
+# This allows others to assist you in resolving interwiki problems.
+# To help these people, you can upload the interwiki graphs to your
+# webspace somewhere. Set the base URL here, e.g.:
+# 'https://www.example.org/~yourname/interwiki-graphs/'
+interwiki_graph_url = None
+
+# Save file with local articles without interwikis.
+without_interwiki = False
+
 # ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
 # Set disambiguation_comment[FAMILY][LANG] to a non-empty string to override
@@ -678,7 +749,7 @@ socket_timeout = (6.05, 45)
 
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
-# whitespace or positioning category links.
+# whitespace or positioning of category links.
 
 # This is an experimental feature; handle with care and consider re-checking
 # each bot edit if enabling this!

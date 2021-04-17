@@ -410,8 +410,8 @@ class ListOption(IntegerOption):
         """Return a string showing the range."""
         if not self._list:
             raise ValueError('The sequence is empty.')
-        else:
-            return super().format(default=default)
+
+        return super().format(default=default)
 
     @property
     def maximum(self) -> int:

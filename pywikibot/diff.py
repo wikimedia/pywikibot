@@ -78,7 +78,7 @@ class Hunk:
     def create_diff(self):
         """Generator of diff text for this hunk, without formatting."""
         # make sure each line ends with '\n' to prevent
-        # behaviour like http://bugs.python.org/issue2142
+        # behaviour like https://bugs.python.org/issue2142
         def check_line(line):
             return line if line.endswith('\n') else line + '\n'
 

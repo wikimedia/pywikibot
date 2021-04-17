@@ -25,7 +25,7 @@ The contents of the package
     | basic.py               | Is a template from which simple bots can be made.       |
     +------------------------+---------------------------------------------------------+
     | category.py            | Add a category link to all pages mentioned on a page,   |
-    |                        | change or remove category tags                          |
+    |                        | change or remove category tags.                         |
     +------------------------+---------------------------------------------------------+
     | category_redirect.py   | Maintain category redirects and replace links to        |
     |                        | redirected categories.                                  |
@@ -36,11 +36,15 @@ The contents of the package
     |                        | description is present and if there are other problems  |
     |                        | in the image's description.                             |
     +------------------------+---------------------------------------------------------+
-    | claimit.py             | Adds claims to Wikidata items based on categories       |
+    | claimit.py             | Adds claims to Wikidata items based on categories.      |
     +------------------------+---------------------------------------------------------+
-    | clean_sandbox.py       | This bot makes the cleaned of the page of tests.        |
+    | clean_sandbox.py       | This bot resets a sandbox with predefined text.         |
     +------------------------+---------------------------------------------------------+
-    | commons_information.py | Insert a language template into the description field   |
+    | commonscat.py          | Adds {{commonscat}} to Wikipedia categories (or         |
+    |                        | articles), if other language Wikipedia already has such |
+    |                        | a template.                                             |
+    +------------------------+---------------------------------------------------------+
+    | commons_information.py | Insert a language template into the description field.  |
     +------------------------+---------------------------------------------------------+
     | coordinate_import.py   | Coordinate importing script.                            |
     +------------------------+---------------------------------------------------------+
@@ -49,28 +53,34 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | delete.py              | This script can be used to delete pages en masse.       |
     +------------------------+---------------------------------------------------------+
+    | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
+    |                        | pages in the "Page" namespace on Wikisource.            |
+    +------------------------+---------------------------------------------------------+
     | download_dump.py       | Downloads dumps from dumps.wikimedia.org                |
     +------------------------+---------------------------------------------------------+
     | fixing_redirects.py    | Correct all redirect links of processed pages.          |
     +------------------------+---------------------------------------------------------+
-    | harvest_template.py    | [IMPROV] Reduce maximum line length to 130              |
+    | harvest_template.py    | Template harvesting script.                             |
     +------------------------+---------------------------------------------------------+
-    | illustrate_wikidata.py | Don't use 'gen' to refer to the generator factory       |
+    | illustrate_wikidata.py | Bot to add images to Wikidata items.                    |
     +------------------------+---------------------------------------------------------+
     | imagetransfer.py       | Given a wiki page, check the interwiki links for        |
     |                        | images, and let the user choose among them for          |
     |                        | images to upload.                                       |
     +------------------------+---------------------------------------------------------+
+    | interwiki.py           | A robot to check interwiki links on all pages (or       |
+    |                        | a range of pages) of a wiki.                            |
+    +------------------------+---------------------------------------------------------+
     | interwikidata.py       | Script to handle interwiki links based on Wikibase.     |
     +------------------------+---------------------------------------------------------+
-    | listpages.py           | listpages: report number of pages found                 |
+    | listpages.py           | Print a list of pages, defined by a page generator.     |
     +------------------------+---------------------------------------------------------+
     | login.py               | Script to log the bot in to a wiki account.             |
     +------------------------+---------------------------------------------------------+
     | misspelling.py         | Similar to solve_disambiguation.py. It is supposed to   |
     |                        | fix links that contain common spelling mistakes.        |
     +------------------------+---------------------------------------------------------+
-    | movepages.py           | Bot page moves to another title.                        |
+    | movepages.py           | Bot that can move pages to another title.               |
     +------------------------+---------------------------------------------------------+
     | newitem.py             | Script creates new items on Wikidata based on criteria. |
     +------------------------+---------------------------------------------------------+
@@ -80,7 +90,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | pagefromfile.py        | This bot takes its input from a file that contains a    |
     |                        | number of pages to be put on the wiki.                  |
-    +------------------------+---------------------------------------------------------+
+    +------------------------+--+------------------------------------------------------+
     | parser_function_count.py  | Find expensive templates that are subject to be      |
     |                           | converted to Lua.                                    |
     +------------------------+--+------------------------------------------------------+
@@ -100,26 +110,26 @@ The contents of the package
     |                        | text files. The bot can either work on a set of given   |
     |                        | pages or crawl an SQL dump.                             |
     +------------------------+---------------------------------------------------------+
-    | replicate_wiki.py      | Replicates pages in wiki to a second wiki within  family|
+    | replicate_wiki.py      | Replicates pages in wiki to a second wiki within family |
     +------------------------+---------------------------------------------------------+
-    | revertbot.py           | Revert edits.                                           |
+    | revertbot.py           | Script that can be used for reverting certain edits.    |
     +------------------------+---------------------------------------------------------+
-    | shell.py               | Spawns an interactive Python shell                      |
+    | shell.py               | Spawns an interactive Python shell.                     |
     +------------------------+---------------------------------------------------------+
     | solve_disambiguation.py| Interactive robot doing disambiguation.                 |
     +------------------------+---------------------------------------------------------+
     | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
     |                        | for speedy deletion.                                    |
     +------------------------+---------------------------------------------------------+
-    | template.py            | change one template (that is {{...}}) into another.     |
+    | template.py            | Change one template (that is {{...}}) into another.     |
     +------------------------+---------------------------------------------------------+
     | templatecount.py       | Display the list of pages transcluding a given list     |
     |                        | of templates.                                           |
     +------------------------+---------------------------------------------------------+
     | touch.py               | Bot goes over all pages of the home wiki, and edits     |
-    |                        | them without changing.                                  |
+    |                        | them without changes.                                   |
     +------------------------+---------------------------------------------------------+
-    | transferbot.py         | Transfers pages from a source wiki to a target wiki     |
+    | transferbot.py         | Transfers pages from a source wiki to a target wiki.    |
     +------------------------+---------------------------------------------------------+
     | unusedfiles.py         | Bot appends some text to all unused images and other    |
     |                        | text to the respective uploaders.                       |
@@ -128,6 +138,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | version.py             | Outputs Pywikibot's revision number, Python's version   |
     |                        | and OS used.                                            |
+    +------------------------+---------------------------------------------------------+
+    | watchlists.py          | Allows access to the account's watchlist.               |
     +------------------------+---------------------------------------------------------+
     | weblinkchecker.py      | Check if external links are still working.              |
     +------------------------+---------------------------------------------------------+
@@ -144,18 +156,14 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
     +------------------------+---------------------------------------------------------+
-    | casechecker.py         | Script to enumerate all pages in the wikipedia and      |
+    | casechecker.py         | Script to enumerate all pages in Wikipedia and          |
     |                        | find all titles with mixed Latin and Cyrillic           |
     |                        | alphabets.                                              |
     +------------------------+---------------------------------------------------------+
     | catall.py              | Add or change categories on a number of pages.          |
     +------------------------+---------------------------------------------------------+
-    | commons_link.py        | This robot include commons template to linking Commons  |
+    | commons_link.py        | This robot includes commons template to link Commons    |
     |                        | and your wiki project.                                  |
-    +------------------------+---------------------------------------------------------+
-    | commonscat.py          | Adds {{commonscat}} to Wikipedia categories (or         |
-    |                        | articles), if other language wikipedia already has such |
-    |                        | a template                                              |
     +------------------------+---------------------------------------------------------+
     | create_categories.py   | Program to batch create categories.                     |
     +------------------------+---------------------------------------------------------+
@@ -163,22 +171,19 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | disambredir.py         | Changing redirect names in disambiguation pages.        |
     +------------------------+---------------------------------------------------------+
-    | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
-    |                        | pages in the "Page" namespace on Wikisource.            |
-    +------------------------+---------------------------------------------------------+
-    | editarticle.py         | Edit a Wikipedia article with your favourite editor     |
+    | editarticle.py         | Edit a Wikipedia article with your favourite editor.    |
     +------------------------+---------------------------------------------------------+
     | flickrripper.py        | Upload images from Flickr easily.                       |
     +------------------------+---------------------------------------------------------+
-    | followlive.py          | follow new articles on a wikipedia and flag them        |
+    | followlive.py          | Follow new articles on a Wikipedia and flag them        |
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
-    | freebasemappingupload.py| Docstring fixes in scripts                             |
+    | freebasemappingupload.py| Script to upload the mappings of Freebase to Wikidata. |
     +------------------------++--------------------------------------------------------+
     | image.py               | This script can be used to change one image to another  |
     |                        | or remove an image entirely.                            |
     +------------------------+---------------------------------------------------------+
-    | imagecopy.py           | Copies images from a Wikimedia wiki to Commons          |
+    | imagecopy.py           | Copies images from a Wikimedia wiki to Commons.         |
     +------------------------+---------------------------------------------------------+
     | imagecopy_self.py      | Copy self published files from the English Wikipedia to |
     |                        | Commons.                                                |
@@ -188,16 +193,13 @@ The contents of the package
     | iamgerecat.py          | Try to find categories for media on Commons.            |
     +------------------------+---------------------------------------------------------+
     | imageuncat.py          | Adds uncat template to images without categories at     |
-    |                        | Commons                                                 |
-    +------------------------+---------------------------------------------------------+
-    | interwiki.py           | A robot to check interwiki links on all pages (or       |
-    |                        | a range of pages) of a wiki.                            |
+    |                        | Commons.                                                |
     +------------------------+---------------------------------------------------------+
     | isbn.py                | Bot to convert all ISBN-10 codes to the ISBN-13         |
     |                        | format.                                                 |
     +------------------------+---------------------------------------------------------+
     | lonelypages.py         | Place a template on pages which are not linked to by    |
-    |                        | other pages, and are therefore lonely                   |
+    |                        | other pages, and are therefore lonely.                  |
     +------------------------+---------------------------------------------------------+
     | makecat.py             | Given an existing or new category, find pages for that  |
     |                        | category.                                               |
@@ -230,11 +232,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | surnames_redirects.py  | Bot to create redirects based on name order.            |
     +------------------------+---------------------------------------------------------+
-    | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables    |
+    | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables.   |
     +------------------------+---------------------------------------------------------+
     | unlink.py              | This bot unlinks a page on every page that links to it. |
-    +------------------------+---------------------------------------------------------+
-    | watchlists.py          | Information retrieved by watchlist.py will be stored    |
     +------------------------+---------------------------------------------------------+
     | wikisourcetext.py      | This bot applies to Wikisource sites to upload text.    |
     +------------------------+---------------------------------------------------------+

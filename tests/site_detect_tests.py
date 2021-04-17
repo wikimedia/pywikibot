@@ -7,6 +7,7 @@
 import unittest
 
 from contextlib import suppress
+from http import HTTPStatus
 from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError, Timeout
@@ -290,7 +291,7 @@ class PrivateWikiTestCase(PatchingTestCase):
 
         return type(str('Response'),
                     (object,),
-                    {'status_code': 200,
+                    {'status_code': HTTPStatus.OK.value,
                      'text': self._responses[parsed_url.path],
                      'url': url})
 

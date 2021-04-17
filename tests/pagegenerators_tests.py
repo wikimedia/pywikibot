@@ -37,6 +37,15 @@ from tests.aspects import (
 )
 from tests.thread_tests import GeneratorIntersectTestCase
 
+LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
+                  r'is deprecated for .*; use Site\.exturlusage')
+
+PAGES_ID_GEN_MSG = (r'.*pywikibot\.pagegenerators\.PagesFromPageidGenerator .*'
+                    r'is deprecated for .*; use site\.load_pages_from_pageids')
+
+REFERRING_PAGE_MSG = (r'.*pywikibot\.pagegenerators\.ReferringPageGenerator .*'
+                      r'is deprecated for .*; use Page\.getReferences')
+
 
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
@@ -215,8 +224,10 @@ class TestPagesFromPageidGenerator(BasetitleTestCase):
         gen_pages = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                             self.site)
         pageids = [page.pageid for page in gen_pages]
-        gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
-        self.assertPageTitlesEqual(gen, self.titles)
+
+        with suppress_warnings(PAGES_ID_GEN_MSG, category=DeprecationWarning):
+            gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
+            self.assertPageTitlesEqual(gen, self.titles)
 
 
 class TestCategoryFilterPageGenerator(BasetitleTestCase):
@@ -628,13 +639,14 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
 
     def test_non_item_gen(self):
         """Test TestPreloadingEntityGenerator with ReferringPageGenerator."""
-        site = self.get_site()
-        instance_of_page = pywikibot.Page(site, 'Property:P31')
-        ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page,
-                                                        total=5)
-        gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-        self.assertTrue(all(isinstance(item,
-                                       pywikibot.ItemPage) for item in gen))
+        with suppress_warnings(REFERRING_PAGE_MSG, category=FutureWarning):
+            site = self.get_site()
+            instance_of_page = pywikibot.Page(site, 'Property:P31')
+            ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page,
+                                                            total=5)
+            gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
+            is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
+            self.assertTrue(is_all_type)
 
 
 class WikibaseItemFilterPageGeneratorTestCase(TestCase):
@@ -1495,7 +1507,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         super().setUpClass()
         site = pywikibot.Site()
         newuser_logevents = list(site.logevents(logtype='newusers', total=1))
-        if len(newuser_logevents) == 0:
+        if not newuser_logevents:
             raise unittest.SkipTest('No newuser logs found to test with.')
 
     login = True
@@ -1695,20 +1707,22 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_opposite_protocols(self):
         """Test LinksearchPageGenerator with two opposite protocols."""
-        with self.assertRaises(ValueError):
-            pagegenerators.LinksearchPageGenerator(
-                'http://w.wiki',
-                protocol='https',
-                site=self.site)
+        with suppress_warnings(LINKSEARCH_MSG, category=DeprecationWarning):
+            with self.assertRaises(ValueError):
+                pagegenerators.LinksearchPageGenerator(
+                    'http://w.wiki',
+                    protocol='https',
+                    site=self.site)
 
     def test_double_same_protocols(self):
         """Test LinksearchPageGenerator with two same protocols."""
-        gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
-                                                     protocol='https',
-                                                     site=self.site,
-                                                     total=1)
-        self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
-        self.assertLength(list(gen), 1)
+        with suppress_warnings(LINKSEARCH_MSG, category=DeprecationWarning):
+            gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
+                                                         protocol='https',
+                                                         site=self.site,
+                                                         total=1)
+            self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
+            self.assertLength(list(gen), 1)
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -21,9 +21,6 @@ class TestFamily(TestCase):
 
     """Test cases for Family methods."""
 
-    UNKNOWNFAMILY_RE = 'Family unknown does not exist'
-    FROZEN_TYPEERROR_RE = r"'frozen\w+' object does not support item " \
-                          'assignment'
     net = False
 
     def test_family_load_valid(self):
@@ -62,7 +59,7 @@ class TestFamily(TestCase):
         """Test that an invalid family raised UnknownFamily exception."""
         with self.assertRaisesRegex(
                 UnknownFamily,
-                self.UNKNOWNFAMILY_RE):
+                'Family unknown does not exist'):
             Family.load('unknown')
 
     def test_new_same_family_singleton(self):
@@ -99,7 +96,7 @@ class TestFamily(TestCase):
         other = 'unknown'
         with self.assertRaisesRegex(
                 UnknownFamily,
-                self.UNKNOWNFAMILY_RE):
+                'Family unknown does not exist'):
             family.__eq__(other)
 
     def test_get_obsolete_wp(self):
@@ -132,17 +129,21 @@ class TestFamily(TestCase):
         """Test obsolete result not updatable."""
         family = Family.load('wikipedia')
         with self.assertRaisesRegex(
-            AttributeError,
-                "'frozenmap' object has no attribute 'update'"):
+                AttributeError,
+                "'mappingproxy' object has no attribute 'update'"):
             family.obsolete.update({})
 
-        with self.assertRaisesRegex(TypeError, self.FROZEN_TYPEERROR_RE):
+        with self.assertRaisesRegex(
+                TypeError,
+                "'mappingproxy' object does not support item assignment"):
             family.obsolete['a'] = 'b'
 
     def test_WikimediaFamily_obsolete_readonly(self):
         """Test WikimediaFamily obsolete is readonly."""
         family = Family.load('wikipedia')
-        with self.assertRaisesRegex(TypeError, self.FROZEN_TYPEERROR_RE):
+        with self.assertRaisesRegex(
+                TypeError,
+                "'frozenset' object does not support item assignment"):
             family.obsolete = {'a': 'b', 'c': None}
 
 
@@ -197,8 +198,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
         # Text after $1 is not allowed
         with self.assertRaisesRegex(
                 ValueError,
-                r'Text after the \$1 placeholder is not supported'
-                r' \(T111513\)'):
+                'Url: .+\nText /foo after the '
+                r'\$1 placeholder is not supported \(T111513\)\.'):
             f.from_url('//vo.wikipedia.org/wiki/$1/foo')
 
         # the IWM may contain the wrong protocol, but it's only used to

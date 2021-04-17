@@ -13,226 +13,247 @@ Subpackages
     scripts.maintenance
     scripts.userscripts
 
-Submodules
-----------
-
-scripts.add\_text script
-------------------------
+add\_text script
+----------------
 
 .. automodule:: scripts.add_text
 
-scripts.archivebot script
--------------------------
+archivebot script
+-----------------
 
 .. automodule:: scripts.archivebot
 
-scripts.basic script
---------------------
+basic script
+------------
 
 .. automodule:: scripts.basic
 
-scripts.category script
------------------------
+category script
+---------------
 
 .. automodule:: scripts.category
 
-scripts.category\_redirect script
----------------------------------
+category\_redirect script
+-------------------------
 
 .. automodule:: scripts.category_redirect
 
-scripts.change\_pagelang script
--------------------------------
+change\_pagelang script
+-----------------------
 
 .. automodule:: scripts.change_pagelang
 
-scripts.checkimages script
---------------------------
+checkimages script
+------------------
 
 .. automodule:: scripts.checkimages
 
-scripts.claimit script
-----------------------
+claimit script
+--------------
 
 .. automodule:: scripts.claimit
 
-scripts.clean\_sandbox script
------------------------------
+clean\_sandbox script
+---------------------
 
 .. automodule:: scripts.clean_sandbox
 
-scripts.commons\_information script
------------------------------------
+commons\_information script
+---------------------------
 
 .. automodule:: scripts.commons_information
 
-scripts.coordinate\_import script
----------------------------------
+commonscat script
+-----------------
+
+.. automodule:: scripts.commonscat
+
+coordinate\_import script
+-------------------------
 
 .. automodule:: scripts.coordinate_import
 
-scripts.cosmetic\_changes script
---------------------------------
+cosmetic\_changes script
+------------------------
 
 .. automodule:: scripts.cosmetic_changes
 
-scripts.delete script
----------------------
+delete script
+-------------
 
 .. automodule:: scripts.delete
 
-scripts.download\_dump script
------------------------------
+djvutext script
+---------------
+.. automodule:: scripts.djvutext
+
+download\_dump script
+---------------------
 
 .. automodule:: scripts.download_dump
 
-scripts.fixing\_redirects script
---------------------------------
+fixing\_redirects script
+------------------------
 
 .. automodule:: scripts.fixing_redirects
 
-scripts.harvest\_template script
---------------------------------
+harvest\_template script
+------------------------
 
 .. automodule:: scripts.harvest_template
 
-scripts.illustrate\_wikidata script
------------------------------------
+illustrate\_wikidata script
+---------------------------
 
 .. automodule:: scripts.illustrate_wikidata
 
-scripts.imagetransfer script
-----------------------------
+imagetransfer script
+--------------------
 
 .. automodule:: scripts.imagetransfer
 
-scripts.interwikidata script
-----------------------------
+interwiki script
+----------------
+
+.. automodule:: scripts.interwiki
+
+interwikidata script
+--------------------
 
 .. automodule:: scripts.interwikidata
 
-scripts.listpages script
-------------------------
+listpages script
+----------------
 
 .. automodule:: scripts.listpages
 
-scripts.misspelling script
---------------------------
+misspelling script
+------------------
 
 .. automodule:: scripts.misspelling
 
-scripts.movepages script
-------------------------
+movepages script
+----------------
 
 .. automodule:: scripts.movepages
 
-scripts.newitem script
-----------------------
+newitem script
+--------------
 
 .. automodule:: scripts.newitem
 
-scripts.noreferences script
----------------------------
+noreferences script
+-------------------
 
 .. automodule:: scripts.noreferences
 
-scripts.pagefromfile script
----------------------------
+pagefromfile script
+-------------------
 
 .. automodule:: scripts.pagefromfile
 
-scripts.parser\_function\_count script
---------------------------------------
+parser\_function\_count script
+------------------------------
 
 .. automodule:: scripts.parser_function_count
 
-scripts.protect script
-----------------------
+patrol script
+-------------
+
+.. automodule:: scripts.patrol
+
+protect script
+--------------
 
 .. automodule:: scripts.protect
 
-scripts.redirect script
------------------------
+redirect script
+---------------
 
 .. automodule:: scripts.redirect
 
-scripts.reflinks script
------------------------
+reflinks script
+---------------
 
 .. automodule:: scripts.reflinks
 
-scripts.replace script
-----------------------
+replace script
+--------------
 
 .. automodule:: scripts.replace
 
-scripts.replicate\_wiki script
-------------------------------
+replicate\_wiki script
+----------------------
 
 .. automodule:: scripts.replicate_wiki
 
-scripts.revertbot script
-------------------------
+revertbot script
+----------------
 
 .. automodule:: scripts.revertbot
 
-scripts.shell script
---------------------
+shell script
+------------
 
 .. automodule:: scripts.shell
 
-scripts.solve\_disambiguation script
-------------------------------------
+solve\_disambiguation script
+----------------------------
 
 .. automodule:: scripts.solve_disambiguation
 
-scripts.speedy\_delete script
------------------------------
+speedy\_delete script
+---------------------
 
 .. automodule:: scripts.speedy_delete
 
-scripts.template script
------------------------
+template script
+---------------
 
 .. automodule:: scripts.template
 
-scripts.templatecount script
-----------------------------
+templatecount script
+--------------------
 
 .. automodule:: scripts.templatecount
 
-scripts.touch script
---------------------
+touch script
+------------
 
 .. automodule:: scripts.touch
 
-scripts.transferbot script
---------------------------
+transferbot script
+------------------
 
 .. automodule:: scripts.transferbot
 
-scripts.unusedfiles script
---------------------------
+unusedfiles script
+------------------
 
 .. automodule:: scripts.unusedfiles
 
-scripts.upload script
----------------------
+upload script
+-------------
 
 .. automodule:: scripts.upload
 
-scripts.version script
-----------------------
+version script
+--------------
 
 .. automodule:: scripts.version
 
-scripts.weblinkchecker script
------------------------------
+watchlist script
+----------------
+
+.. automodule:: scripts.watchlist
+
+weblinkchecker script
+---------------------
 
 .. automodule:: scripts.weblinkchecker
 
-scripts.welcome script
-----------------------
+welcome script
+--------------
 
 .. automodule:: scripts.welcome
 

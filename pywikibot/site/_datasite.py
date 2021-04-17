@@ -706,6 +706,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
+    @deprecated('ImagePage.fromPage()', since='20210325', future_warning=True)
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
         Create a new Wikibase item for a provided page.
@@ -767,10 +768,10 @@ class DataSite(APISite):
         if 'site' in kwargs:
             if kwargs['site'].sitename != self.sitename:
                 raise ValueError('The site given in the kwargs is different.')
-            else:
-                warn('search_entities should not get a site via kwargs.',
-                     UserWarning, 2)
-                del kwargs['site']
+
+            warn('search_entities should not get a site via kwargs.',
+                 UserWarning, 2)
+            del kwargs['site']
 
         parameters = dict(search=search, language=language, **kwargs)
         gen = self._generator(api.APIGenerator,
@@ -890,7 +891,7 @@ class DataSite(APISite):
         """
         Set aliases for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetaliases', aliases, **kwargs)
 
@@ -898,7 +899,7 @@ class DataSite(APISite):
         """
         Set description for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action()
         """
         return self._wbset_action(itemdef, 'wbsetdescription', description,
                                   **kwargs)
@@ -907,7 +908,7 @@ class DataSite(APISite):
         """
         Set label for a single Wikibase entity.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetlabel', label, **kwargs)
 
@@ -915,6 +916,6 @@ class DataSite(APISite):
         """
         Set, remove or modify a sitelink on a Wikibase item.
 
-        See self._wbset_action(self, itemdef, action, action_data, **kwargs)
+        See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)

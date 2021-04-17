@@ -164,7 +164,7 @@ class Photo(pywikibot.FilePage):
         """
         Find duplicates of the photo.
 
-        Calculates the SHA1 hash and asks the MediaWiki api
+        Calculates the SHA1 hash and asks the MediaWiki API
         for a list of duplicates.
 
         TODO: Add exception handling, fix site thing

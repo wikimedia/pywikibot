@@ -795,37 +795,29 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
         config.mylang = 'en'
         config.family = 'wikipedia'
 
-    def test_fully_qualified_NS0_code(self):
-        """Test 'testwiki:wikidata:Q6' on enwp is namespace 0."""
-        link = Link('testwiki:wikidata:Q6')
-        link.parse()
-        self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 0)
+    def test_fully_qualified_NS0(self):
+        """Test prefixed links with 'Q6' on enwp is namespace 0."""
+        test = [('testwiki:wikidata', 'wikidata:wikidata'),
+                ('wikidata:testwiki', 'wikipedia:test')]
+        for linkprefix, sitetitle in test:
+            with self.subTest(pattern=linkprefix):
+                link = Link(linkprefix + ':Q6')
+                link.parse()
+                self.assertEqual(link.site, pywikibot.Site(sitetitle))
+                self.assertEqual(link.title, 'Q6')
+                self.assertEqual(link.namespace, 0)
 
-    def test_fully_qualified_NS1_code(self):
-        """Test 'testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
-        link = Link('testwiki:wikidata:Talk:Q6')
-        link.parse()
-        self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 1)
-
-    def test_fully_qualified_NS0_family(self):
-        """Test 'wikidata:testwiki:Q6' on enwp is namespace 0."""
-        link = Link('wikidata:testwiki:Q6')
-        link.parse()
-        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 0)
-
-    def test_fully_qualified_NS1_family(self):
-        """Test 'wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
-        link = Link('wikidata:testwiki:Talk:Q6')
-        link.parse()
-        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 1)
+    def test_fully_qualified_NS1(self):
+        """Test prefixed links with 'Talk:Q6' on enwp is namespace 1."""
+        test = [('testwiki:wikidata', 'wikidata:wikidata'),
+                ('wikidata:testwiki', 'wikipedia:test')]
+        for linkprefix, sitetitle in test:
+            with self.subTest(pattern=linkprefix):
+                link = Link(linkprefix + ':Talk:Q6')
+                link.parse()
+                self.assertEqual(link.site, pywikibot.Site(sitetitle))
+                self.assertEqual(link.title, 'Q6')
+                self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):

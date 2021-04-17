@@ -317,11 +317,10 @@ class NowCommonsDeleteBot(Bot):
                         else:
                             pywikibot.output('Please change them manually.')
                         continue
-                    else:
-                        pywikibot.output(color_format(
-                            'No page is using "{lightgreen}{0}{default}" '
-                            'anymore.',
-                            localImagePage.title(with_ns=False)))
+                    pywikibot.output(color_format(
+                        'No page is using "{lightgreen}{0}{default}" '
+                        'anymore.',
+                        localImagePage.title(with_ns=False)))
                 commonsText = commonsImagePage.get()
                 if self.opt.replaceonly is False:
                     if sha1 == commonsImagePage.latest_file_info.sha1:

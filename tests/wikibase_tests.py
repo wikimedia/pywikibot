@@ -16,9 +16,9 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import ItemPage, Page, PropertyPage, WikibasePage
 from pywikibot.site import Namespace, NamespacesDict
-from pywikibot.tools import MediaWikiVersion
+from pywikibot.tools import MediaWikiVersion, suppress_warnings
 
-from tests import join_pages_path, mock
+from tests import WARN_SITE_CODE, join_pages_path, mock
 from tests.aspects import TestCase, WikidataTestCase
 
 from tests.basepage import (
@@ -60,7 +60,8 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
-        self._test_page_text()
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+            self._test_page_text()
 
 
 class TestGeneral(WikidataTestCase):

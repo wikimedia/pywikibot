@@ -4,10 +4,10 @@ The contents of the package
     +-----------------------------------------------------------------------------------+
     |  Library routines                                                                 |
     +============================+======================================================+
-    | __init__.py                | Initialization of the pywikibot framework,           |
+    | __init__.py                | Initialization of the Pywikibot framework,           |
     |                            | basic classes and methods                            |
     +----------------------------+------------------------------------------------------+
-    | __metadata__.py            | pywikibot framework metadata file                    |
+    | __metadata__.py            | Pywikibot framework metadata file                    |
     +----------------------------+------------------------------------------------------+
     | _wbtypes.py                | Wikibase data type classes                           |
     +----------------------------+------------------------------------------------------+
@@ -17,7 +17,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |
     +----------------------------+------------------------------------------------------+
-    | config2.py                 | Module to define and load pywikibot configuration    |
+    | config2.py                 | Module to define and load Pywikibot configuration    |
     +----------------------------+------------------------------------------------------+
     | cosmetic_changes.py        | Slight modifications to a wiki page's source code    |
     +----------------------------+------------------------------------------------------+
@@ -45,6 +45,8 @@ The contents of the package
     | i18n.py                    | Helper functions for both the internal translation   |
     |                            | system and for TranslateWiki-based translations      |
     +----------------------------+------------------------------------------------------+
+    | interwiki_graph.py         | Possible create graph with interwiki.py script       |
+    +----------------------------+------------------------------------------------------+
     | logentries.py              | Objects representing Mediawiki log entries           |
     +----------------------------+------------------------------------------------------+
     | logging.py                 | Logging and output functions                         |
@@ -68,7 +70,7 @@ The contents of the package
     | titletranslate.py          | Rules and tricks to auto-translate wikipage titles   |
     |                            | articles                                             |
     +----------------------------+------------------------------------------------------+
-    | version.py                 | Module to determine the pywikibot version (tag,      |
+    | version.py                 | Module to determine the Pywikibot version (tag,      |
     |                            | revision and date)                                   |
     +----------------------------+------------------------------------------------------+
     | xmlreader.py               | Reading and parsing XML dump files                   |
@@ -125,6 +127,8 @@ The contents of the package
     | _decorators.py             | Decorators used by site models                       |
     +----------------------------+------------------------------------------------------+
     | _extensions.py             | API interfaces to MediaWiki extensions               |
+    +----------------------------+------------------------------------------------------+
+    | _generators.py             | API generators mixin to MediaWiki site               |
     +----------------------------+------------------------------------------------------+
     | _interwikimap.py           | Objects representing interwiki map of MediaWiki site |
     +----------------------------+------------------------------------------------------+

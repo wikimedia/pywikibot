@@ -507,7 +507,7 @@ def _make_parameter(decoder, param):
 # See dh() for additional information.
 class MonthNames(Mapping):
 
-    """A Mapping with reads month names from mediawiki messages."""
+    """A Mapping which reads month names from MediaWiki messages."""
 
     # Predefined month names which are needed at import time
     months = {
@@ -1898,10 +1898,10 @@ def _format_limit_dom(days):
 
 
 for monthId in range(12):
-    if (monthId + 1) in (1, 3, 5, 7, 8, 10, 12):
+    if monthId + 1 in (1, 3, 5, 7, 8, 10, 12):
         # 31 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(31)
-    elif (monthId + 1) == 2:  # February
+    elif monthId + 1 == 2:  # February
         # 29 days a month
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(29)
     else:

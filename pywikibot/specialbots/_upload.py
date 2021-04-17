@@ -4,7 +4,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,6 +13,7 @@ import requests
 import tempfile
 
 from contextlib import suppress
+from http import HTTPStatus
 from pathlib import Path
 from typing import Optional, Union
 from urllib.parse import urlparse
@@ -158,10 +159,10 @@ class UploadRobot(BaseBot):
                     # exit criteria if size is not available
                     # error on last iteration is OK, we're requesting
                     #    {'Range': 'bytes=file_len-'}
-                    if response.status_code == 416 and path.stat().st_size:
+                    err = HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE
+                    if response.status_code == err and path.stat().st_size:
                         break
-                    else:
-                        raise FatalServerError(str(e)) from e
+                    raise FatalServerError(str(e)) from e
 
             if size and size == path.stat().st_size:
                 break
@@ -203,7 +204,7 @@ class UploadRobot(BaseBot):
             if this_answer is False:
                 answer = False
                 break
-            elif this_answer is None:
+            if this_answer is None:
                 answer = None
         if answer is None:
             answer = pywikibot.input_yn('Do you want to ignore?',
@@ -225,8 +226,8 @@ class UploadRobot(BaseBot):
             filename = self.filename_prefix + filename
         if not self.keep_filename:
             pywikibot.output(
-                'The filename on the target wiki will default to: %s'
-                % filename)
+                '\nThe filename on the target wiki will default to: {}\n'
+                .format(filename))
             assert not self.opt.always
             newfn = pywikibot.input(
                 'Enter a better name, or press enter to accept:')
@@ -272,9 +273,9 @@ class UploadRobot(BaseBot):
                     continue
 
                 if not pywikibot.input_yn(
-                        'File format is not one of [%s], but %s. Continue?'
-                        % (' '.join(allowed_formats), ext),
-                        default=False, automatic_quit=False):
+                        'File format is not one of [{}], but {!r}. Continue?'
+                        .format(' '.join(allowed_formats), ext),
+                        default=False):
                     continue
 
             potential_file_page = pywikibot.FilePage(self.target_site,
@@ -296,8 +297,7 @@ class UploadRobot(BaseBot):
                             automatic_quit=False)
                     if not overwrite:
                         continue
-                    else:
-                        break
+                    break
 
                 pywikibot.output('File with name {} already exists and '
                                  'cannot be overwritten.'.format(filename))
@@ -448,8 +448,8 @@ class UploadRobot(BaseBot):
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
-            else:
-                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                                 self.__class__.__name__)
+
+            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                             self.__class__.__name__)
         finally:
             self.exit()

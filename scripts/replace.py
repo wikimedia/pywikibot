@@ -596,7 +596,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue
-            elif page is not None and self.isTitleExcepted(
+            if page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
                 if replacement.container:
                     pywikibot.output(

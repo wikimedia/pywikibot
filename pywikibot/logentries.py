@@ -290,11 +290,6 @@ class MoveEntry(LogEntry):
 
     _expected_type = 'move'
 
-    @deprecated('target_ns.id', since='20150518', future_warning=True)
-    def new_ns(self):
-        """Return namespace id of target page."""
-        return self.target_ns.id
-
     @property
     def target_ns(self):
         """Return namespace object of target page."""
@@ -302,11 +297,6 @@ class MoveEntry(LogEntry):
         return self.site.namespaces[self._params['target_ns']
                                     if 'target_ns' in self._params
                                     else self._params['new_ns']]
-
-    @deprecated('target_page', since='20150518', future_warning=True)
-    def new_title(self):
-        """Return page object of the new title."""
-        return self.target_page
 
     @property
     def target_title(self):

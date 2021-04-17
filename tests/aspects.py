@@ -20,6 +20,7 @@ import warnings
 
 from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
@@ -28,13 +29,18 @@ import pywikibot.config2 as config
 
 from pywikibot import Site
 
+from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
+from pywikibot.tools import suppress_warnings
 
-from tests import patch_request, unpatch_request, unittest_print
+from tests import (
+    WARN_SITE_CODE, patch_request, unpatch_request, unittest_print
+)
+
 from tests.utils import (
     execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
@@ -190,8 +196,8 @@ class TestCaseBase(unittest.TestCase):
             raise unittest.SkipTest('Pages in namespaces {!r} not found.'
                                     .format(
                                         list(namespaces - page_namespaces)))
-        else:
-            self.assertEqual(page_namespaces, namespaces)
+
+        self.assertEqual(page_namespaces, namespaces)
 
     def assertPageTitlesEqual(self, gen, titles, site=None):
         """
@@ -435,11 +441,10 @@ class CheckHostnameMixin(TestCaseBase):
                         '{}: hostname {} failed (cached): {}'
                         .format(cls.__name__, hostname,
                                 cls._checked_hostnames[hostname]))
-                elif cls._checked_hostnames[hostname] is False:
+                if cls._checked_hostnames[hostname] is False:
                     raise unittest.SkipTest('{}: hostname {} failed (cached)'
                                             .format(cls.__name__, hostname))
-                else:
-                    continue
+                continue
 
             try:
                 if '://' not in hostname:
@@ -447,8 +452,15 @@ class CheckHostnameMixin(TestCaseBase):
                 r = http.fetch(hostname,
                                method='HEAD',
                                default_error_handling=False)
-                if r.status_code not in {200, 301, 302, 303, 307, 308}:
-                    raise ServerError('HTTP status: {}'.format(r.status_code))
+                if r.status_code not in {HTTPStatus.OK,
+                                         HTTPStatus.MOVED_PERMANENTLY,
+                                         HTTPStatus.FOUND,
+                                         HTTPStatus.SEE_OTHER,
+                                         HTTPStatus.TEMPORARY_REDIRECT,
+                                         HTTPStatus.PERMANENT_REDIRECT}:
+                    raise ServerError(
+                        'HTTP status: {} - {}'.format(
+                            r.status_code, HTTPStatus(r.status_code).phrase))
             except Exception as e:
                 pywikibot.error('{}: accessing {} caused exception:'
                                 .format(cls.__name__, hostname))
@@ -853,8 +865,9 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
                     .format(data['code']))
 
             if 'site' not in data and 'code' in data and 'family' in data:
-                data['site'] = Site(data['code'], data['family'],
-                                    interface=interface)
+                with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+                    data['site'] = Site(data['code'], data['family'],
+                                        interface=interface)
             if 'hostname' not in data and 'site' in data:
                 # Ignore if the family has defined this as
                 # obsolete without a mapping to a hostname.
@@ -942,7 +955,9 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
             if self._mainpage.site == site:
                 return self._mainpage
 
-        mainpage = pywikibot.Page(site, site.siteinfo['mainpage'])
+        maintitle = site.siteinfo['mainpage']
+        maintitle = removeprefix(maintitle, 'Special:MyLanguage/')  # T278702
+        mainpage = pywikibot.Page(site, maintitle)
         if not isinstance(site, DrySite) and mainpage.isRedirectPage():
             mainpage = mainpage.getRedirectTarget()
 

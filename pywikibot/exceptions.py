@@ -1,17 +1,73 @@
-"""
-Exception and warning classes used throughout the framework.
+"""**Pywikibot Exceptions** and warning classes.
+
+This module contains all exception and warning classes used throughout
+the framework::
+
+    Exception
+     +-- Error
+          +-- AutoblockUser
+          +-- CaptchaError
+          +-- InvalidTitle
+          +-- NoUsername
+          +-- PageRelatedError
+          |    +-- CircularRedirect
+          |    +-- InterwikiRedirectPage
+          |    +-- IsNotRedirectPage
+          |    +-- IsRedirectPage
+          |    +-- NoMoveTarget
+          |    +-- NoPage
+          |    +-- NotEmailableError
+          |    +-- PageLoadRelatedError
+          |    |    +-- InconsistentTitleReceived
+          |    +-- PageSaveRelatedError
+          |    |    +-- EditConflict
+          |    |    |    +-- ArticleExistsConflict
+          |    |    |    +-- PageCreatedConflict
+          |    |    |    +-- PageDeletedConflict
+          |    |    +-- LockedPage
+          |    |    |    +-- LockedNoPage
+          |    |    |    +-- CascadeLockedPage
+          |    |    +-- NoCreateError
+          |    |    +-- OtherPageSaveError
+          |    |    +-- SpamblacklistError
+          |    |    +-- TitleblacklistError
+          |    +-- UnsupportedPage
+          +-- SectionError
+          +-- ServerError
+          |    +-- FatalServerError
+          |    +-- Server414Error
+          |    +-- Server504Error
+          +-- SiteDefinitionError
+          |    +-- UnknownFamily
+          |    +-- UnknownSite
+          +-- TimeoutError
+          |    +-- MaxlagTimeoutError
+          +-- UserRightsError
+          |    +-- HiddenKeyError (KeyError)
+          +-- UnknownExtension (NotImplementedError)
+          +-- WikiBaseError
+               +-- CoordinateGlobeUnknownException (NotimplementedError)
+               +-- EntityTypeUnknownException
+               +-- NoWikibaseEntity
+
+    UserWarning
+     +-- ArgumentDeprecationWarning (FutureWarning)
+     +-- FamilyMaintenanceWarning
+
+    RuntimeWarning
+     +-- NotImplementedWarning
+
 
 Error: Base class, all exceptions should the subclass of this class.
 
   - NoUsername: Username is not in user-config.py, or it is invalid.
   - AutoblockUser: requested action on a virtual autoblock user not valid
   - UserRightsError: insufficient rights for requested action
-  - BadTitle: Server responded with BadTitle
   - InvalidTitle: Invalid page title
   - CaptchaError: Captcha is asked and config.solve_captcha == False
-  - Server504Error: Server timed out with HTTP 504 code
   - i18n.TranslationError: i18n/l10n message not available
   - UnknownExtension: Extension is not defined for this site
+  - SectionError: The section specified by # does not exist
 
 SiteDefinitionError: Site loading problem
 
@@ -26,7 +82,6 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - IsNotRedirectPage: Page is not a redirect page
   - CircularRedirect: Page is a circular redirect
   - InterwikiRedirectPage: Page is a redirect to another site
-  - SectionError: The section specified by # does not exist
   - NotEmailableError: The target user has disabled email
   - NoMoveTarget: An expected move target page does not exist
 
@@ -34,7 +89,6 @@ PageLoadRelatedError: any exception which happens while loading a Page.
   - InconsistentTitleReceived: Page receives a title inconsistent with query
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
-(alias: PageNotSaved).
 
   - SpamblacklistError: MediaWiki spam filter detected a blacklisted URL
   - TitleblacklistError: MediaWiki detected a blacklisted page title
@@ -51,6 +105,8 @@ PageSaveRelatedError: page exceptions within the save operation on a Page
 ServerError: a problem with the server.
 
   - FatalServerError: A fatal/non-recoverable server error
+  - Server414Error: Server timed out with HTTP 414 code
+  - Server504Error: Server timed out with HTTP 504 code
 
 WikiBaseError: any issue specific to Wikibase.
 
@@ -81,7 +137,7 @@ UserWarning: warnings targeted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -169,15 +225,6 @@ class PageSaveRelatedError(PageRelatedError):
 
     message = 'Page %s was not saved.'
 
-    # This property maintains backwards compatibility with
-    # the old PageNotSaved which inherited from Error
-    # (not PageRelatedError) and exposed the normal 'args'
-    # which could be printed
-    @property
-    def args(self):
-        """Expose args."""
-        return str(self)
-
 
 class OtherPageSaveError(PageSaveRelatedError):
 
@@ -211,8 +258,6 @@ class NoPage(PageRelatedError):
     """Page does not exist."""
 
     message = "Page %s doesn't exist."
-
-    pass
 
 
 class UnsupportedPage(PageRelatedError):
@@ -258,12 +303,6 @@ class SiteDefinitionError(Error):
     """Site does not exist."""
 
     pass
-
-
-# The name 'NoSuchSite' was used for all site related issues,
-# and it used message "Site does not exist".
-# These are retain for backwards compatibility with scripts.
-NoSuchSite = SiteDefinitionError
 
 
 class UnknownSite(SiteDefinitionError):
@@ -373,9 +412,6 @@ class SectionError(Error):
     pass
 
 
-PageNotSaved = PageSaveRelatedError
-
-
 class NoCreateError(PageSaveRelatedError):
 
     """Parameter nocreate doesn't allow page creation."""
@@ -460,13 +496,6 @@ class Server414Error(ServerError):
     pass
 
 
-class BadTitle(Error):
-
-    """Server responded with BadTitle."""
-
-    pass
-
-
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
@@ -505,8 +534,6 @@ class NotEmailableError(PageRelatedError):
     """This user is not emailable."""
 
     message = '%s is not emailable.'
-
-    pass
 
 
 class WikiBaseError(Error):

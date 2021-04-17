@@ -49,17 +49,17 @@ Command line options:
                some choices for XY don't make sense and will result in a loop,
                e.g. "l" or "m".
 
-   -main       only check pages in the main namespace, not in the talk,
-               wikipedia, user, etc. namespaces.
+   -main       only check pages in the main namespace, not in the Talk,
+               Project, User, etc. namespaces.
 
    -first      Uses only the first link of every line on the disambiguation
                page that begins with an asterisk. Useful if the page is full
                of irrelevant links that are not subject to disambiguation.
                You won't get all af them as options, just the first on each
                line. For a moderated example see
-               http://en.wikipedia.org/wiki/Szerdahely
+               https://en.wikipedia.org/wiki/Szerdahely
                A really exotic one is
-               http://hu.wikipedia.org/wiki/Brabant_(egyértelműsítő lap)
+               https://hu.wikipedia.org/wiki/Brabant_(egyértelműsítő lap)
 
    -start:XY   goes through all disambiguation pages in the category on your
                wiki that is defined (to the bot) as the category containing
@@ -75,7 +75,7 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -95,7 +95,9 @@ from pywikibot import i18n, pagegenerators
 from pywikibot.backports import List
 from pywikibot.bot import (HighlightContextOption, ListOption,
                            OutputProxyOption, SingleSiteBot, StandardOption)
-from pywikibot.tools import first_lower, first_upper
+from pywikibot.tools import (
+    deprecated, first_lower, first_upper, issue_deprecation_warning,
+)
 from pywikibot.tools.formatter import SequenceOutputter
 
 # Disambiguation Needed template
@@ -598,24 +600,179 @@ class DisambiguationRobot(SingleSiteBot):
         'hu': 'Egyért-redir',
     }
 
-    def __init__(self, always, alternatives, getAlternatives, dnSkip,
-                 generator, primary, main_only, first_only=False, minimum=0,
-                 **kwargs) -> None:
+    # refer -help message for complete options documentation
+    disambig_options = {
+        'always': None,  # always perform the same action
+        'pos': [],  # add possibilities as alternative disambig
+        'just': True,  # just and only use the possibilities given with command
+        'dnskip': False,  # skip  already marked links
+        'primary': False,  # primary topic disambig
+        'main': False,  # only use main namespace
+        'first': False,  # use first link only
+        'min': 0,  # minimum number of pages on a disambig
+    }
+
+    # needed for argument cleanup
+    available_options = disambig_options
+
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
+        self._clean_args(args, kwargs)
         super().__init__(**kwargs)
-        self.always = always
-        self.alternatives = alternatives
-        self.getAlternatives = getAlternatives
-        self.dnSkip = dnSkip
-        if generator:
-            self.generator = generator
-        self.primary = primary
         self.ignores = set()
-        self.main_only = main_only
-        self.first_only = first_only
-        self.minimum = minimum
         self.summary = None
         self.dn_template_str = i18n.translate(self.site, dn_template)
+
+    def _clean_args(self, args, kwargs):
+        """Cleanup positional and keyword arguments.
+
+        Replace positional arguments with keyword arguments.
+        Replace old keywords with new keywords which are given by
+        argument handling.
+
+        This also fixes arguments which aren't currently used by
+        BaseDisambigBot abstract class but was introduced for the old
+        DisambiguationRobot to prevent multiple deprecation warnings.
+        """
+        # New keys of positional arguments
+        keys = ('always', 'pos', 'just', 'dnskip', 'generator', 'primary',
+                'main', 'first', 'min')
+
+        # Keys mapping from old argument name to new keywords.
+        # The ordering of dics is not safe for Python < 3.7. Therefore
+        # we need a dict in addition to key above.
+        keymap = {
+            'alternatives': 'pos',
+            'getAlternatives': 'just',
+            'dnSkip': 'dnskip',
+            'main_only': 'main',
+            'first_only': 'first',
+            'minimum': 'min',
+        }
+
+        # Replace positional arguments with keyword arguments
+        for i, arg in enumerate(args):
+            key = keys[i]
+            issue_deprecation_warning(
+                'Positional argument {} ({})'.format(i + 1, arg),
+                'keyword argument "{}={}"'.format(key, arg),
+                since='20210303')
+            if key in kwargs:
+                pywikibot.warning('{!r} is given as keyword argument {!r} '
+                                  'already; ignoring {!r}'
+                                  .format(key, arg, kwargs[key]))
+            else:
+                kwargs[key] = arg
+
+        # replace old keywords to new
+        for key in list(kwargs):
+            if key in keymap:
+                newkey = keymap[key]
+                issue_deprecation_warning(
+                    '{!r} argument of {}'.format(key, self.__class__.__name__),
+                    repr(newkey), since='20210303')
+                kwargs[newkey] = kwargs.pop(key)
+
+        # Expand available_options
+        # Currently scripts may have its own options set
+        added_keys = []
+        for key in keys:
+            if key != 'generator':
+                if key not in self.available_options:
+                    added_keys.append(key)
+                    self.available_options[key] = self.disambig_options[key]
+        if added_keys:
+            pywikibot.warning("""\
+The following keys were added to available_options:
+{options}.
+Either add them to available_options setting of {classname}
+bot class or use available_options.update() to use default settings from
+DisambiguationRobot""".format(options=added_keys,
+                              classname=self.__class__.__name__))
+
+    # Deprecated properties ---------------------------------------
+
+    @property
+    @deprecated('opt.always', since='20210303', future_warning=True)
+    def always(self):  # noqa: D102
+        return self.opt.always
+
+    @always.setter
+    @deprecated('opt.always', since='20210303', future_warning=True)
+    def always(self, value):
+        self.opt.always = value
+
+    @property
+    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    def dnSkip(self):  # noqa: D102
+        return self.opt.dnskip
+
+    @dnSkip.setter
+    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    def dnSkip(self, value):
+        self.opt.dnskip = value
+
+    @property
+    @deprecated('opt.primary', since='20210303', future_warning=True)
+    def primary(self):  # noqa: D102
+        return self.opt.primary
+
+    @primary.setter
+    @deprecated('opt.primary', since='20210303', future_warning=True)
+    def primary(self, value):
+        self.opt.primary = value
+
+    @property
+    @deprecated('opt.main', since='20210303', future_warning=True)
+    def main_only(self):  # noqa: D102
+        return self.opt.main
+
+    @main_only.setter
+    @deprecated('opt.main', since='20210303', future_warning=True)
+    def main_only(self, value):
+        self.opt.main = value
+
+    @property
+    @deprecated('opt.first', since='20210303', future_warning=True)
+    def first_only(self):  # noqa: D102
+        return self.opt.first
+
+    @first_only.setter
+    @deprecated('opt.first', since='20210303', future_warning=True)
+    def first_only(self, value):
+        self.opt.first = value
+
+    @property
+    @deprecated('opt.min', since='20210303', future_warning=True)
+    def minimum(self):  # noqa: D102
+        return self.opt.min
+
+    @minimum.setter
+    @deprecated('opt.min', since='20210303', future_warning=True)
+    def minimum(self, value):
+        self.opt.min = value
+
+    @property
+    @deprecated('opt.pos', since='20210303', future_warning=True)
+    def alternatives(self):  # noqa: D102
+        return self.opt.pos
+
+    @alternatives.setter
+    @deprecated('opt.pos', since='20210303', future_warning=True)
+    def alternatives(self, value):
+        self.opt.pos = value
+
+    @property
+    @deprecated('opt.just', since='20210303', future_warning=True)
+    def getAlternatives(self):  # noqa: D102
+        return self.opt.just
+
+    @getAlternatives.setter
+    @deprecated('opt.just', since='20210303', future_warning=True)
+    def getAlternatives(self, value):
+        self.opt.just = value
+
+    # -------------------------------------------------------------
 
     def checkContents(self, text: str) -> Optional[str]:  # noqa: N802
         """
@@ -633,13 +790,13 @@ class DisambiguationRobot(SingleSiteBot):
         return None
 
     def makeAlternativesUnique(self) -> None:  # noqa: N802
-        """Remove duplicate items from self.alternatives.
+        """Remove duplicate items from self.opt.pos.
 
         Preserve the order of alternatives.
         """
         seen = set()
-        self.alternatives = [i for i in self.alternatives
-                             if i not in seen and not seen.add(i)]
+        self.opt.pos = [i for i in self.opt.pos
+                        if i not in seen and not seen.add(i)]
 
     def setup(self) -> None:
         """Compile regular expressions."""
@@ -750,7 +907,7 @@ class DisambiguationRobot(SingleSiteBot):
             pywikibot.output('{0} is a redirect to {1}'
                              .format(ref_page.title(), disamb_page.title()))
             if disamb_page.isRedirectPage():
-                target = self.alternatives[0]
+                target = self.opt.pos[0]
                 if pywikibot.input_yn(
                     'Do you want to make redirect {0} point to {1}?'
                     .format(ref_page.title(), target),
@@ -771,7 +928,7 @@ class DisambiguationRobot(SingleSiteBot):
                     automatic_quit=False)
                 if choice == 'y':
                     gen = ReferringPageGeneratorWithIgnore(
-                        ref_page, self.primary, main_only=self.main_only
+                        ref_page, self.opt.primary, main_only=self.opt.main
                     )
                     gen = pagegenerators.PreloadingGenerator(gen)
                     for ref_page2 in gen:
@@ -842,7 +999,7 @@ class DisambiguationRobot(SingleSiteBot):
                 context = 60
 
                 # check if there's a dn-template here already
-                if (self.dnSkip and self.dn_template_str
+                if (self.opt.dnskip and self.dn_template_str
                         and self.dn_template_str[:-2] in text[
                             m.end():m.end() + len(self.dn_template_str) + 8]):
                     continue
@@ -854,8 +1011,8 @@ class DisambiguationRobot(SingleSiteBot):
                     end=m.end())
                 context_option.before_question = True
 
-                options = [ListOption(self.alternatives, ''),
-                           ListOption(self.alternatives, 'r'),
+                options = [ListOption(self.opt.pos, ''),
+                           ListOption(self.opt.pos, 'r'),
                            StandardOption('skip link', 's'),
                            edit,
                            StandardOption('next page', 'n'),
@@ -874,16 +1031,16 @@ class DisambiguationRobot(SingleSiteBot):
 
                 options += [
                     OutputProxyOption('list', 'l',
-                                      SequenceOutputter(self.alternatives)),
+                                      SequenceOutputter(self.opt.pos)),
                     AddAlternativeOption('add new', 'a',
-                                         SequenceOutputter(self.alternatives))]
+                                         SequenceOutputter(self.opt.pos))]
                 if edited:
                     options += [StandardOption('save in this form', 'x')]
 
                 # TODO: Output context on each question
                 answer = pywikibot.input_choice('Option', options,
-                                                default=self.always,
-                                                force=bool(self.always))
+                                                default=self.opt.always,
+                                                force=bool(self.opt.always))
                 if answer == 'x':
                     assert edited, 'invalid option before editing'
                     break
@@ -900,7 +1057,7 @@ class DisambiguationRobot(SingleSiteBot):
 
                 if answer == 'n':
                     # skip this page
-                    if self.primary:
+                    if self.opt.primary:
                         # If run with the -primary argument, skip this
                         # occurrence next time.
                         self.ignores.add(ref_page.title(as_url=True))
@@ -1019,13 +1176,13 @@ class DisambiguationRobot(SingleSiteBot):
         return 'done'
 
     def findAlternatives(self, page) -> bool:  # noqa: N802
-        """Extend self.alternatives using correctcap of disambPage.linkedPages.
+        """Extend self.opt.pos using correctcap of disambPage.linkedPages.
 
         @param page: the disambiguation page
         @type page: pywikibot.Page
         @return: True if everything goes fine, False otherwise
         """
-        if page.isRedirectPage() and not self.primary:
+        if page.isRedirectPage() and not self.opt.primary:
             primary = i18n.translate(page.site,
                                      self.primary_redir_template)
             if primary:
@@ -1042,7 +1199,7 @@ class DisambiguationRobot(SingleSiteBot):
                     page2 = pywikibot.Page(
                         pywikibot.Link(disambTitle, self.site))
                     links = page2.linkedPages()
-                    if self.first_only:
+                    if self.opt.first:
                         links = self.firstize(page2, links)
                     links = [correctcap(link, page2.get())
                              for link in links]
@@ -1053,11 +1210,11 @@ class DisambiguationRobot(SingleSiteBot):
                     links = [correctcap(link,
                                         page.get(get_redirect=True))
                              for link in links]
-                self.alternatives += links
+                self.opt.pos += links
             else:
                 try:
                     target = page.getRedirectTarget().title()
-                    self.alternatives.append(target)
+                    self.opt.pos.append(target)
                 except pywikibot.NoPage:
                     pywikibot.output('The specified page was not found.')
                     user_input = pywikibot.input("""\
@@ -1066,15 +1223,15 @@ or press enter to quit:""")
                     if user_input == '':
                         self.quit()
                     else:
-                        self.alternatives.append(user_input)
+                        self.opt.pos.append(user_input)
                 except pywikibot.IsNotRedirectPage:
                     pywikibot.output(
                         'The specified page is not a redirect. Skipping.')
                     return False
-        elif self.getAlternatives:
-            # not page.isRedirectPage() or self.primary
+        elif self.opt.just:
+            # not page.isRedirectPage() or self.opt.primary
             try:
-                if self.primary:
+                if self.opt.primary:
                     try:
                         page2 = pywikibot.Page(
                             pywikibot.Link(
@@ -1082,7 +1239,7 @@ or press enter to quit:""")
                                 % page.title(),
                                 self.site))
                         links = page2.linkedPages()
-                        if self.first_only:
+                        if self.opt.first:
                             links = self.firstize(page2, links)
                         links = [correctcap(link, page2.get())
                                  for link in links]
@@ -1096,7 +1253,7 @@ or press enter to quit:""")
                 else:
                     try:
                         links = page.linkedPages()
-                        if self.first_only:
+                        if self.opt.first:
                             links = self.firstize(page, links)
                         links = [correctcap(link, page.get())
                                  for link in links]
@@ -1106,7 +1263,7 @@ or press enter to quit:""")
             except pywikibot.IsRedirectPage:
                 pywikibot.output('Page is a redirect, skipping.')
                 return False
-            self.alternatives += links
+            self.opt.pos += links
         return True
 
     def setSummaryMessage(self, page, new_targets=None, unlink_counter=0,
@@ -1182,7 +1339,7 @@ or press enter to quit:""")
     def treat(self, page) -> None:
         """Work on a single disambiguation page."""
         self.primaryIgnoreManager = PrimaryIgnoreManager(
-            page, enabled=self.primary)
+            page, enabled=self.opt.primary)
 
         if not self.findAlternatives(page):
             return
@@ -1191,16 +1348,16 @@ or press enter to quit:""")
         self.makeAlternativesUnique()
         # sort possible choices
         if config.sort_ignore_case:
-            self.alternatives.sort(key=lambda x: x.lower())
+            self.opt.pos.sort(key=lambda x: x.lower())
         else:
-            self.alternatives.sort()
-        SequenceOutputter(self.alternatives).output()
+            self.opt.pos.sort()
+        SequenceOutputter(self.opt.pos).output()
 
         gen = ReferringPageGeneratorWithIgnore(
             page,
-            self.primary,
-            minimum=self.minimum,
-            main_only=self.main_only
+            self.opt.primary,
+            minimum=self.opt.min,
+            main_only=self.opt.main
         )
         gen = pagegenerators.PreloadingGenerator(gen)
         for ref_page in gen:
@@ -1209,7 +1366,7 @@ or press enter to quit:""")
                     break  # next disambig
 
         # clear alternatives before working on next disambiguation page
-        self.alternatives = []
+        self.opt.pos = []
 
 
 def main(*args: Tuple[str, ...]) -> None:
@@ -1220,19 +1377,9 @@ def main(*args: Tuple[str, ...]) -> None:
 
     @param args: command line arguments
     """
-    # the option that's always selected when the bot wonders what to do with
-    # a link. If it's None, the user is prompted (default behaviour).
-    always = None
+    options = {}
     alternatives = []
-    getAlternatives = True
-    dnSkip = False
     generator = None
-    primary = False
-    first_only = False
-    main_only = False
-
-    # For sorting the linked pages, case can be ignored
-    minimum = 0
 
     local_args = pywikibot.handle_args(args)
     site = pywikibot.Site()
@@ -1243,12 +1390,12 @@ def main(*args: Tuple[str, ...]) -> None:
     for argument in local_args:
         arg, _, value = argument.partition(':')
         if arg == '-primary':
-            primary = True
+            options['primary'] = True
             if value:
-                getAlternatives = False
+                options['just'] = False
                 alternatives.append(value)
         elif arg == '-always':
-            always = value
+            options['always'] = value or None
         elif arg == '-pos':
             if not value:
                 continue
@@ -1264,15 +1411,11 @@ def main(*args: Tuple[str, ...]) -> None:
                         automatic_quit=False):
                     alternatives.append(page.title())
         elif arg == '-just':
-            getAlternatives = False
-        elif arg == '-dnskip':
-            dnSkip = True
-        elif arg == '-main':
-            main_only = True
-        elif arg == '-first':
-            first_only = True
+            options['just'] = False
+        elif arg in ('-dnskip', '-main', '-first'):
+            options[arg[1:]] = True
         elif arg == '-min':
-            minimum = int(value)
+            options['min'] = int(value or 0)
         elif arg == '-start':
             try:
                 generator = pagegenerators.CategorizedPageGenerator(
@@ -1290,9 +1433,7 @@ def main(*args: Tuple[str, ...]) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
-                              generator, primary, main_only, first_only,
-                              minimum=minimum)
+    bot = DisambiguationRobot(generator=generator, pos=alternatives, **options)
     bot.run()
 
 

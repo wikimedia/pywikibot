@@ -1,10 +1,11 @@
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 #
-from contextlib import closing
+import pkg_resources
+
 from typing import Optional
 
 import pywikibot
@@ -52,17 +53,24 @@ def mysql_query(query: str, params=None,
 
     if config.db_connect_file is None:
         credentials = {'user': config.db_username,
-                       'passwd': config.db_password}
+                       'password': config.db_password}
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    with closing(pymysql.connect(config.db_hostname_format.format(dbname),
-                                 db=config.db_name_format.format(dbname),
+    connection = pymysql.connect(host=config.db_hostname_format.format(dbname),
+                                 database=config.db_name_format.format(dbname),
                                  port=config.db_port,
                                  charset='utf8',
-                                 **credentials)) as conn, \
-         closing(conn.cursor()) as cursor:
+                                 defer_connect=query == 'test',  # for tests
+                                 **credentials)
 
+    pymysql_version = pkg_resources.parse_version(pymysql.__version__)
+
+    if pymysql_version < pkg_resources.parse_version('1.0.0'):
+        from contextlib import closing
+        connection = closing(connection)
+
+    with connection as conn, conn.cursor() as cursor:
         if verbose:
             _query = cursor.mogrify(query, params)
 
@@ -72,6 +80,9 @@ def mysql_query(query: str, params=None,
             _query = '\n'.join('    {0}'.format(line)
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
+
+        if query == 'test':  # for tests only
+            yield query
 
         cursor.execute(query, params)
         yield from cursor

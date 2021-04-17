@@ -12,6 +12,7 @@ import unittest
 
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
+from http import HTTPStatus
 
 import pywikibot
 
@@ -21,7 +22,7 @@ from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools import suppress_warnings
 
-from tests import patch, unittest_print
+from tests import WARN_SITE_CODE, patch, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -75,11 +76,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         """Test if filterredir's bool is False it's deprecated to False."""
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
-        self.assertOneDeprecation()
-
-    def test_ns_index(self):
-        """Test ns_index."""
-        self.assertEqual(self.site.ns_index('MediaWiki'), 8)
         self.assertOneDeprecation()
 
     def test_namespace_shortcuts(self):
@@ -410,11 +406,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_categorymembers(self):
         """Test Site.categorymembers."""
         cats = list(self.site.pagecategories(self.mainpage))
-        if len(cats) == 0:
+        if not cats:
             self.skipTest('Main page is not in any categories.')
-        else:
-            for cm in self.site.categorymembers(cats[0]):
-                self.assertIsInstance(cm, pywikibot.Page)
+
+        for cm in self.site.categorymembers(cats[0]):
+            self.assertIsInstance(cm, pywikibot.Page)
 
     def test_pageimages(self):
         """Test Site.pageimages."""
@@ -1402,6 +1398,10 @@ class TestUserWatchedPages(DefaultSiteTestCase):
 
     def test_watched_pages(self):
         """Test the site.watched_pages() method."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         gen = self.site.watched_pages(total=5, force=False)
         self.assertIsInstance(gen.request, api.CachedRequest)
         for page in gen:
@@ -1414,6 +1414,10 @@ class TestUserWatchedPages(DefaultSiteTestCase):
 
     def test_watched_pages_uncached(self):
         """Test the site.watched_pages() method uncached."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         gen = self.site.watched_pages(total=5, force=True)
         self.assertIsInstance(gen.request, api.Request)
         self.assertFalse(issubclass(gen.request_class, api.CachedRequest))
@@ -1806,6 +1810,10 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
     def test_watchlist_revs(self):
         """Test the site.watchlist_revs() method."""
+        if not self.site.has_right('viewmywatchlist'):
+            self.skipTest('user {} cannot view its watch list'
+                          .format(self.site.user()))
+
         mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
@@ -2137,30 +2145,136 @@ class TestSiteSysopWrite(TestCase):
                          page=p1, reason='Pywikibot unit test')
 
     def test_delete(self):
-        """Test the site.deletepage() and site.undelete_page() methods."""
+        """Test the site.delete() and site.undelete() methods."""
         site = self.get_site()
         p = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
         # Verify state
         if not p.exists():
-            site.undelete_page(p, 'pywikibot unit tests')
+            site.undelete(p, 'pywikibot unit tests')
 
-        site.deletepage(p, reason='pywikibot unit tests')
+        site.delete(p, reason='pywikibot unit tests')
         with self.assertRaises(pywikibot.NoPage):
             p.get(force=True)
 
-        site.undelete_page(p, 'pywikibot unit tests',
-                           revisions=['2014-12-21T06:07:47Z',
-                                      '2014-12-21T06:07:31Z'])
+        site.undelete(p, 'pywikibot unit tests',
+                      revisions=['2014-12-21T06:07:47Z',
+                                 '2014-12-21T06:07:31Z'])
 
         revs = list(p.revisions())
         self.assertLength(revs, 2)
         self.assertEqual(revs[0].revid, 219995)
         self.assertEqual(revs[1].revid, 219994)
 
-        site.deletepage(p, reason='pywikibot unit tests')
-        site.undelete_page(p, 'pywikibot unit tests')
+        site.delete(p, reason='pywikibot unit tests')
+        site.undelete(p, 'pywikibot unit tests')
         revs = list(p.revisions())
         self.assertGreater(len(revs), 2)
+
+    def test_revdel_page(self):
+        """Test deleting and undeleting page revisions."""
+        site = self.get_site()
+        # Verify state
+        site.deleterevs('revision', ids=[219993, 219994], hide='',
+                        show='content|comment|user',
+                        reason='pywikibot unit tests')
+
+        # Single revision
+        site.deleterevs('revision', '219994', hide='user',
+                        reason='pywikibot unit tests')
+
+        p1 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p1.revisions())
+        for rev in revs:
+            if rev['revid'] != 219994:
+                continue
+            self.assertTrue(rev['userhidden'])
+
+        # Multiple revisions
+        site.deleterevs('revision', '219993|219994', hide='comment',
+                        reason='pywikibot unit tests')
+
+        p2 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p2.revisions())
+        for rev in revs:
+            if rev['revid'] != 219994:
+                continue
+            self.assertTrue(rev['userhidden'])
+            self.assertTrue(rev['commenthidden'])
+
+        # Concurrently show and hide
+        site.deleterevs('revision', ['219993', '219994'], hide='user|content',
+                        show='comment', reason='pywikibot unit tests')
+
+        p3 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
+        revs = list(p3.revisions())
+        for rev in revs:
+            if rev['revid'] == 219993:
+                self.assertTrue(rev['userhidden'])
+            elif rev['revid'] == 219994:
+                self.assertFalse(rev['commenthidden'])
+
+        # Cleanup
+        site.deleterevs('revision', [219993, 219994],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests')
+
+    def test_revdel_file(self):
+        """Test deleting and undeleting file revisions."""
+        site = pywikibot.Site('test')
+
+        # Verify state
+        site.deleterevs('oldimage', [20210314184415, 20210314184430],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        # Single revision
+        site.deleterevs('oldimage', '20210314184415', hide='user', show='',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp1 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp1, history=True)
+        for idx, v in fp1._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertTrue(hasattr(v, 'userhidden'))
+
+        # Multiple revisions
+        site.deleterevs('oldimage', '20210314184415|20210314184430',
+                        hide='comment', reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp2 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp2, history=True)
+        for idx, v in fp2._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertTrue(hasattr(v, 'commenthidden'))
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+                self.assertTrue(hasattr(v, 'commenthidden'))
+
+        # Concurrently show and hide
+        site.deleterevs('oldimage', ['20210314184415', '20210314184430'],
+                        hide='user|content', show='comment',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
+
+        fp3 = pywikibot.FilePage(site, 'File:T276726.png')
+        site.loadimageinfo(fp3, history=True)
+        for idx, v in fp3._file_revisions.items():
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+                self.assertFalse(hasattr(v, 'commenthidden'))
+                self.assertFalse(hasattr(v, 'userhidden'))
+                self.assertFalse(hasattr(v, 'filehidden'))
+            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+                self.assertFalse(hasattr(v, 'commenthidden'))
+                self.assertFalse(hasattr(v, 'userhidden'))
+                self.assertFalse(hasattr(v, 'filehidden'))
+
+        # Cleanup
+        site.deleterevs('oldimage', [20210314184415, 20210314184430],
+                        show='content|comment|user',
+                        reason='pywikibot unit tests',
+                        target='File:T276726.png')
 
     def test_delete_oldimage(self):
         """Test deleting and undeleting specific versions of files."""
@@ -2176,15 +2290,14 @@ class TestSiteSysopWrite(TestCase):
             break
 
         if fileid is not None:
-            site.undelete_file_versions(fp, 'pywikibot unit tests',
-                                        fileids=[fileid])
+            site.undelete(fp, 'pywikibot unit tests', fileids=[fileid])
 
         # Delete the older version of file
         hist = fp.get_file_history()
         ts = pywikibot.Timestamp(2021, 3, 8, 2, 38, 57)
         oldimageid = hist[ts]['archivename']
 
-        site.deleteoldimage(fp, oldimageid, 'pywikibot unit tests')
+        site.delete(fp, 'pywikibot unit tests', oldimage=oldimageid)
 
         # Undelete the older revision of file
         gen = site.filearchive(start='T276725.png', end='T276725.pngg')
@@ -2196,8 +2309,7 @@ class TestSiteSysopWrite(TestCase):
 
         self.assertIsNotNone(fileid)
 
-        site.undelete_file_versions(fp, 'pywikibot unit tests',
-                                    fileids=[fileid])
+        site.undelet(fp, 'pywikibot unit tests', fileids=[fileid])
 
 
 class TestUsernameInUsers(DefaultSiteTestCase):
@@ -3047,7 +3159,11 @@ class TestPagePreloading(DefaultSiteTestCase):
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         links = list(mysite.pagelinks(mainpage, total=20))
-        pages = list(mysite.preloadpages(links, groupsize=5, langlinks=True))
+
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+            gen = mysite.preloadpages(links, groupsize=5, langlinks=True)
+            pages = list(gen)
+
         self.assertLength(links, pages)
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
@@ -3167,7 +3283,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertEqual(site.hostname(), 'mh.wikipedia.org')
         r = http.fetch('http://mh.wikipedia.org/w/api.php',
                        default_error_handling=False)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertEqual(site.siteinfo['lang'], 'mh')
 
     def test_removed_site(self):
@@ -3183,8 +3299,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
 
     def test_alias_code_site(self):
         """Test Wikimedia site with an alias code."""
-        with suppress_warnings(
-                'Site wikipedia:ja instantiated using different code "jp"'):
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             site = pywikibot.Site('jp', 'wikipedia')
         self.assertIsInstance(site.obsolete, bool)
         self.assertEqual(site.code, 'ja')

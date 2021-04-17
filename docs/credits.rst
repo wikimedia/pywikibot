@@ -1,6 +1,5 @@
 Credits
 =======
 
-.. include:: ../CREDITS
-   :literal:
+.. include:: ../CREDITS.rst
 

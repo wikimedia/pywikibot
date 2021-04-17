@@ -112,7 +112,7 @@ class TestPwb(PwbTestCase):
             '',
             'The most similar scripts are:',
             '1 - interwikidata',
-            '2 - illustrate_wikidata',
+            '2 - interwiki',
         ]
         stderr = io.StringIO(
             execute_pwb(['inter_wikidata'], data_in='q')['stderr'])

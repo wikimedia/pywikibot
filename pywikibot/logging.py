@@ -137,7 +137,7 @@ def stdout(text, decoder=None, newline=True, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     """
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
@@ -151,7 +151,7 @@ def warning(text: str, decoder: Optional[str] = None,
         should be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     """
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
@@ -164,7 +164,7 @@ def error(text, decoder=None, newline=True, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     """
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
@@ -177,7 +177,7 @@ def log(text, decoder=None, newline=True, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     """
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
@@ -190,7 +190,7 @@ def critical(text, decoder=None, newline=True, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     """
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
@@ -203,7 +203,7 @@ def debug(text, layer, decoder=None, newline=True, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     @param layer: The name of the logger that text will be sent to.
     """
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
@@ -233,7 +233,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
         be encoded in the given encoding.
     @param newline: If True, a line feed will be added after printing the text.
     @param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html.
+        https://docs.python.org/3/howto/logging-cookbook.html
     @param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):

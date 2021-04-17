@@ -9,6 +9,7 @@ import re
 import warnings
 
 from contextlib import suppress
+from http import HTTPStatus
 
 import requests
 
@@ -42,8 +43,8 @@ class HttpTestCase(TestCase):
         """Test http.fetch using http://www.wikipedia.org/."""
         r = http.fetch('http://www.wikipedia.org/')
         self.assertIsInstance(r, requests.Response)
-        self.assertEqual(r.status_code, 200)
-        self.assertIn('<html lang="mul"', r.text)
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
+        self.assertIn('<html lang="en"', r.text)
         self.assertIsInstance(r.text, str)
         self.assertIsInstance(r.content, bytes)
 
@@ -167,12 +168,12 @@ class TestHttpStatus(HttpbinTestCase):
         """Test follow 301 redirects correctly."""
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch('http://en.wikipedia.org/wiki/Main%20Page')
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertIsNotNone(r.history)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
         r = http.fetch('http://en.wikia.com')
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertEqual(r.url,
                          'https://community.fandom.com/wiki/Community_Central')
 
@@ -555,10 +556,13 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     def test_no_params(self):
         """Test fetch method with no parameters."""
         r = http.fetch(self.url, params={})
-        if r.status_code == 503:  # T203637
-            self.skipTest(
-                '503: Service currently not available for ' + self.url)
-        self.assertEqual(r.status_code, 200)
+
+        fail_status = HTTPStatus.SERVICE_UNAVAILABLE
+        if r.status_code == fail_status:  # T203637
+            self.skipTest('{status.value}: {status.description} for {url}'
+                          .format(status=fail_status, url=self.url))
+
+        self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
         self.assertDictEqual(content['args'], {})
@@ -571,10 +575,13 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         should be the same as what we get out.
         """
         r = http.fetch(self.url, params={'fish&chips': 'delicious'})
-        if r.status_code == 503:  # T203637
-            self.skipTest(
-                '503: Service currently not available for ' + self.url)
-        self.assertEqual(r.status_code, 200)
+
+        fail_status = HTTPStatus.SERVICE_UNAVAILABLE
+        if r.status_code == fail_status:  # T203637
+            self.skipTest('{status.value}: {status.description} for {url}'
+                          .format(status=fail_status, url=self.url))
+
+        self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
         self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
@@ -587,10 +594,13 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         should be the same as what we get out.
         """
         r = http.fetch(self.url, params={'fish%26chips': 'delicious'})
-        if r.status_code == 503:  # T203637
-            self.skipTest(
-                '503: Service currently not available for ' + self.url)
-        self.assertEqual(r.status_code, 200)
+
+        fail_status = HTTPStatus.SERVICE_UNAVAILABLE
+        if r.status_code == fail_status:  # T203637
+            self.skipTest('{status.value}: {status.description} for {url}'
+                          .format(status=fail_status, url=self.url))
+
+        self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
         self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})

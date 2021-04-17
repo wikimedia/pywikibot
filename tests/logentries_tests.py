@@ -292,17 +292,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
     """Test cases for deprecated logentry methods."""
 
-    def test_move_entry(self, key):
-        """Test deprecated MoveEntry methods."""
-        logentry = self._get_logentry('move')
-        self.assertIsInstance(logentry.new_ns(), int)
-        self.assertOneDeprecationParts('pywikibot.logentries.MoveEntry.new_ns',
-                                       'target_ns.id')
-
-        self.assertEqual(logentry.new_title(), logentry.target_page)
-        self.assertOneDeprecationParts(
-            'pywikibot.logentries.MoveEntry.new_title', 'target_page')
-
     def test_logentry_title(self, key):
         """Test title and page return the same instance."""
         # Request multiple log entries in the hope that one might have no

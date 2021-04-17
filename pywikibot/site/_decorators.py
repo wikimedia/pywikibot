@@ -1,14 +1,13 @@
 """Decorators used by site models."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from pywikibot.exceptions import UnknownExtension, UserRightsError
-from pywikibot.tools import deprecated_args, manage_wrapping, MediaWikiVersion
+from pywikibot.tools import manage_wrapping, MediaWikiVersion
 
 
-@deprecated_args(right=True)
 def must_be(group=None):
     """Decorator to require a certain user status when method is called.
 

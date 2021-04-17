@@ -1923,8 +1923,12 @@ The text message is:
             except TypeError:
                 raise RuntimeError(result)
 
-        raise MaxlagTimeoutError(
-            'Maximum retries attempted due to maxlag without success.')
+        msg = 'Maximum retries attempted due to maxlag without success.'
+        if os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1':
+            import unittest
+            raise unittest.SkipTest(msg)
+
+        raise MaxlagTimeoutError(msg)
 
     def wait(self, delay=None):
         """Determine how long to wait after a failed request."""

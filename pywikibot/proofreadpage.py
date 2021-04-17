@@ -28,8 +28,10 @@ import re
 import time
 
 from functools import partial
-from requests.exceptions import ReadTimeout
+from http import HTTPStatus
 from typing import Optional
+
+from requests.exceptions import ReadTimeout
 
 try:
     from bs4 import BeautifulSoup
@@ -618,7 +620,7 @@ class ProofreadPage(pywikibot.Page):
         else:
             return True, ReadTimeout
 
-        if 400 <= response.status_code < 600:
+        if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
             return True, 'Http response status {}'.format(response.status_code)
 
         data = json.loads(response.text)
@@ -887,7 +889,9 @@ class IndexPage(pywikibot.Page):
         # </a>
 
         # Try to purge or raise ValueError.
-        if not self._soup.find_all('a', attrs=attrs):
+        found = self._soup.find_all('a', attrs=attrs)
+        attrs = {'class': re.compile('prp-pagequality|new')}
+        if not found:
             self.purge()
             del self._parsed_text
             self._parsed_text = self._get_parsed_page()
@@ -898,7 +902,6 @@ class IndexPage(pywikibot.Page):
                     'class="new" in: {}.'.format(self))
 
         # Search for attribute "prp-pagequality" or "new" in tags:
-        attrs = {'class': re.compile('prp-pagequality|new')}
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
             label = a_tag.text.lstrip('0')  # Label is not converted to int.
@@ -1094,4 +1097,4 @@ class IndexPage(pywikibot.Page):
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Soup', _bs4_soup, replacement_name='_bs4_soup',
-                             since='20181128')
+                             since='20181128', future_warning=True)

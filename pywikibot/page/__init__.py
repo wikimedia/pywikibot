@@ -23,6 +23,7 @@ import unicodedata
 from collections import Counter, defaultdict, OrderedDict
 from contextlib import suppress
 from html.entities import name2codepoint
+from http import HTTPStatus
 from itertools import chain
 from typing import Any, Optional, Union
 from urllib.parse import quote_from_bytes, unquote_to_bytes
@@ -57,7 +58,6 @@ from pywikibot.tools import (
     deprecated,
     deprecate_arg,
     deprecated_args,
-    DotReadableDict,
     first_upper,
     redirect_func,
     remove_last_args,
@@ -851,7 +851,7 @@ class BasePage(ComparableMixin):
         disambigs.update(self.site._disambigtemplates)
         # see if any template on this page is in the set of disambigs
         disambig_in_page = disambigs.intersection(templates)
-        return self.namespace() != 10 and len(disambig_in_page) > 0
+        return self.namespace() != 10 and bool(disambig_in_page)
 
     @deprecated_args(withTemplateInclusion='with_template_inclusion',
                      onlyTemplateInclusion='only_template_inclusion',
@@ -1736,7 +1736,7 @@ class BasePage(ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                self.site.deletepage(self, reason)
+                self.site.delete(self, reason)
                 return
 
         else:  # Otherwise mark it for deletion
@@ -1861,7 +1861,7 @@ class BasePage(ComparableMixin):
             pywikibot.output('Undeleting %s.' % (self.title(as_link=True)))
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete_page(self, reason, undelete_revs)
+        self.site.undelete(self, reason, revision=undelete_revs)
 
     def protect(self,
                 reason: Optional[str] = None,
@@ -2254,7 +2254,7 @@ class FilePage(Page):
 
         @return: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         latest_ts = max(self._file_revisions)
         return self._file_revisions[latest_ts]
@@ -2269,7 +2269,7 @@ class FilePage(Page):
 
         @return: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         oldest_ts = min(self._file_revisions)
         return self._file_revisions[oldest_ts]
@@ -2282,7 +2282,7 @@ class FilePage(Page):
             key: timestamp of the entry
             value: instance of FileInfo()
         """
-        if not len(self._file_revisions):
+        if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
         return self._file_revisions
 
@@ -2297,11 +2297,6 @@ class FilePage(Page):
                                                   self.title(as_url=True))
             self._imagePageHtml = http.request(self.site, path).text
         return self._imagePageHtml
-
-    @deprecated('get_file_url', since='20160609', future_warning=True)
-    def fileUrl(self):  # pragma: no cover
-        """Return the URL for the file described on this page."""
-        return self.latest_file_info.url
 
     def get_file_url(self, url_width=None, url_height=None,
                      url_param=None) -> str:
@@ -2452,7 +2447,7 @@ class FilePage(Page):
             FileInfo: provided revision will be used.
         @type revision: None or FileInfo
         @return: True if download is successful, False otherwise.
-        @raise: IOError if filename cannot be written for any reason.
+        @raise IOError: if filename cannot be written for any reason.
         """
         if filename is None:
             filename = self.title(as_filename=True, with_ns=False)
@@ -2463,7 +2458,7 @@ class FilePage(Page):
             revision = self.latest_file_info
 
         req = http.fetch(revision.url, stream=True)
-        if req.status_code == 200:
+        if req.status_code == HTTPStatus.OK:
             try:
                 with open(filename, 'wb') as f:
                     for chunk in req.iter_content(chunk_size):
@@ -2914,7 +2909,7 @@ class User(Page):
 
         @param force: if True, forces reloading the data from API
         """
-        return (not self.isAnonymous() and 'emailable' in self.getprops(force))
+        return not self.isAnonymous() and 'emailable' in self.getprops(force)
 
     def groups(self, force: bool = False) -> list:
         """
@@ -3031,8 +3026,8 @@ class User(Page):
         except APIError as err:
             if err.code == 'invalidrange':
                 raise ValueError('%s is not a valid IP range.' % self.username)
-            else:
-                raise err
+
+            raise err
 
     def unblock(self, reason: Optional[str] = None):
         """
@@ -3133,7 +3128,7 @@ class User(Page):
     ) -> Iterable[Tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
-        @param: total: Limit results to this number of pages
+        @param total: Limit results to this number of pages
         @keyword start: Iterate contributions starting at this Timestamp
         @keyword end: Iterate contributions ending at this Timestamp
         @keyword reverse: Iterate oldest contributions first (default: newest)
@@ -4026,10 +4021,11 @@ class ItemPage(WikibasePage):
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
+
         if site not in self.sitelinks:
             raise pywikibot.NoPage(self)
-        else:
-            return self.sitelinks[site].canonical_title()
+
+        return self.sitelinks[site].canonical_title()
 
     def setSitelink(self, sitelink, **kwargs):
         """
@@ -4565,7 +4561,7 @@ class Claim(Property):
             if hasattr(self, 'hash') and self.hash is not None:
                 data['hash'] = self.hash
         else:
-            if len(self.qualifiers) > 0:
+            if self.qualifiers:
                 data['qualifiers'] = {}
                 data['qualifiers-order'] = list(self.qualifiers.keys())
                 for prop, qualifiers in self.qualifiers.items():
@@ -4573,7 +4569,8 @@ class Claim(Property):
                         assert qualifier.isQualifier is True
                     data['qualifiers'][prop] = [
                         qualifier.toJSON() for qualifier in qualifiers]
-            if len(self.sources) > 0:
+
+            if self.sources:
                 data['references'] = []
                 for collection in self.sources:
                     reference = {
@@ -4875,7 +4872,7 @@ class Claim(Property):
         }
 
 
-class FileInfo(DotReadableDict):
+class FileInfo:
 
     """
     A structure holding imageinfo of latest rev. of FilePage.
@@ -4896,6 +4893,14 @@ class FileInfo(DotReadableDict):
         """Initiate the class using the dict from L{APISite.loadimageinfo}."""
         self.__dict__.update(file_revision)
         self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
+
+    def __getitem__(self, key):
+        """Give access to class values by key."""
+        return getattr(self, key)
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        return repr(self.__dict__)
 
     def __eq__(self, other):
         """Test if two File_info objects are equal."""
@@ -5310,7 +5315,8 @@ class Link(BaseLink):
             if not t:
                 raise pywikibot.InvalidTitle(
                     "'{0}' has no title.".format(self._text))
-            elif ':' in t and self._namespace >= 0:  # < 0 don't have talk
+
+            if ':' in t and self._namespace >= 0:  # < 0 don't have talk
                 other_ns = self._site.namespaces[self._namespace - 1
                                                  if self._namespace % 2 else
                                                  self._namespace + 1]

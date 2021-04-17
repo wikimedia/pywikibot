@@ -1,12 +1,12 @@
 """Tests for the patrol script."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
 
-from scripts import patrol
+from scripts.patrol import PatrolBot
 
 from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
 
@@ -27,15 +27,6 @@ This is some text above the entries:
 """
 
 
-class DummyPatrolBot(patrol.PatrolBot):
-
-    """Dummy Patrol Bot for Tests."""
-
-    def load_whitelist(self):
-        """Do not try to load the whitelist."""
-        pass
-
-
 @require_modules('mwparserfromhell')
 class TestPatrolBot(DefaultDrySiteTestCase):
 
@@ -44,7 +35,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
     def setUp(self):
         """Create a bot dummy instance."""
         super().setUp()
-        self.bot = DummyPatrolBot(self.site)
+        self.bot = PatrolBot(self.site)
 
     def test_parse_page_tuples(self):
         """Test parsing the page tuples from a dummy text."""

@@ -164,7 +164,7 @@ def _complain(message):
 
 def register_cp65001():
     """Register codecs cp65001 as utf-8."""
-    # Work around <http://bugs.python.org/issue6058>.
+    # Work around <https://bugs.python.org/issue6058>
     codecs.register(lambda name: name == 'cp65001'
                     and codecs.lookup('utf-8') or None)
 
@@ -229,7 +229,7 @@ def get_unicode_console():
     @rtype: tuple
     """
     # Make Unicode console output work independently of the current code page.
-    # This also fixes http://bugs.python.org/issue1602.
+    # This also fixes https://bugs.python.org/issue1602
     # Credit to Michael Kaplan
     # http://blogs.msdn.com/b/michkap/archive/2010/04/07/9989346.aspx
     # and TZOmegaTZIOY

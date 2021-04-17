@@ -11,6 +11,7 @@ and return a unicode string.
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import html
 import re
 
 from collections.abc import Sequence
@@ -22,19 +23,22 @@ from typing import NamedTuple, Optional, Union
 import pywikibot
 
 from pywikibot.backports import List, Tuple
+from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import (
-    deprecate_arg,
-    deprecated,
-    issue_deprecation_warning,
+    deprecated, deprecate_arg, issue_deprecation_warning,
 )
 
 try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
+    import wikitextparser
+except ImportError:
+    try:
+        import mwparserfromhell as wikitextparser
+    except ImportError as e:
+        wikitextparser = e
 
+ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}
@@ -144,15 +148,10 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     return phrase
 
 
+@deprecated('html.unescape', since='20210405', future_warning=True)
 def unescape(s: str) -> str:
     """Replace escaped HTML-special characters by their originals."""
-    if '&' in s:
-        s = s.replace('&lt;', '<')
-        s = s.replace('&gt;', '>')
-        s = s.replace('&apos;', "'")
-        s = s.replace('&quot;', '"')
-        s = s.replace('&amp;', '&')  # Must be last
-    return s
+    return html.unescape(s)
 
 
 class _MultiTemplateMatchBuilder:
@@ -537,7 +536,7 @@ def isDisabled(text: str, index: int, tags=None) -> bool:
     marker = findmarker(text)
     text = text[:index] + marker + text[index:]
     text = removeDisabledParts(text, tags)
-    return (marker not in text)
+    return marker not in text
 
 
 def findmarker(text: str, startwith: str = '@@',
@@ -1091,63 +1090,61 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
         s2 = removeLanguageLinksAndSeparator(oldtext, site=site, marker=marker,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite=site)
-    if s:
-        if site.code in site.family.interwiki_attop \
-           or '<!-- interwiki at top -->' in oldtext:
-            # do not add separator if interwiki links are on one line
-            newtext = s + ('' if site.code in site.family.interwiki_on_one_line
-                           else separator) + s2.replace(marker, '').strip()
-        else:
-            # calculate what was after the language links on the page
-            firstafter = s2.find(marker)
-            if firstafter < 0:
-                firstafter = len(s2)
-            else:
-                firstafter += len(marker)
-            # Any text in 'after' part that means we should keep it after?
-            if '</noinclude>' in s2[firstafter:]:
-                if separatorstripped:
-                    s = separator + s
-                newtext = (s2[:firstafter].replace(marker, '')
-                           + s + s2[firstafter:])
-            elif site.code in site.family.categories_last:
-                cats = getCategoryLinks(s2, site=site)
-                s2 = removeCategoryLinksAndSeparator(
-                    s2.replace(marker, cseparatorstripped).strip(), site) \
-                    + separator + s
-                newtext = replaceCategoryLinks(s2, cats, site=site,
-                                               addOnly=True)
-            # for Wikitravel's language links position.
-            # (not supported by rewrite - no API)
-            elif site.family.name == 'wikitravel':
-                s = separator + s + separator
-                newtext = (s2[:firstafter].replace(marker, '')
-                           + s + s2[firstafter:])
-            else:
-                if template or template_subpage:
-                    if template_subpage:
-                        includeOn = '<includeonly>'
-                        includeOff = '</includeonly>'
-                    else:
-                        includeOn = '<noinclude>'
-                        includeOff = '</noinclude>'
-                        separator = ''
-                    # Do we have a noinclude at the end of the template?
-                    parts = s2.split(includeOff)
-                    lastpart = parts[-1]
-                    if re.match(r'\s*%s' % marker, lastpart):
-                        # Put the langlinks back into the noinclude's
-                        regexp = re.compile(r'%s\s*%s' % (includeOff, marker))
-                        newtext = regexp.sub(s + includeOff, s2)
-                    else:
-                        # Put the langlinks at the end, inside noinclude's
-                        newtext = (s2.replace(marker, '').strip()
-                                   + separator
-                                   + '%s\n%s%s\n' % (includeOn, s, includeOff))
-                else:
-                    newtext = s2.replace(marker, '').strip() + separator + s
-    else:
+    if not s:
         newtext = s2.replace(marker, '')
+    elif site.code in site.family.interwiki_attop \
+            or '<!-- interwiki at top -->' in oldtext:
+        # do not add separator if interwiki links are on one line
+        newtext = s + ('' if site.code in site.family.interwiki_on_one_line
+                       else separator) + s2.replace(marker, '').strip()
+    else:
+        # calculate what was after the language links on the page
+        firstafter = s2.find(marker)
+        if firstafter < 0:
+            firstafter = len(s2)
+        else:
+            firstafter += len(marker)
+
+        # Any text in 'after' part that means we should keep it after?
+        if '</noinclude>' in s2[firstafter:]:
+            if separatorstripped:
+                s = separator + s
+            newtext = (s2[:firstafter].replace(marker, '')
+                       + s + s2[firstafter:])
+        elif site.code in site.family.categories_last:
+            cats = getCategoryLinks(s2, site=site)
+            s2 = removeCategoryLinksAndSeparator(
+                s2.replace(marker, cseparatorstripped).strip(), site) \
+                + separator + s
+            newtext = replaceCategoryLinks(s2, cats, site=site, addOnly=True)
+        # for Wikitravel's language links position.
+        # (not supported by rewrite - no API)
+        elif site.family.name == 'wikitravel':
+            s = separator + s + separator
+            newtext = (s2[:firstafter].replace(marker, '')
+                       + s + s2[firstafter:])
+        elif template or template_subpage:
+            if template_subpage:
+                includeOn = '<includeonly>'
+                includeOff = '</includeonly>'
+            else:
+                includeOn = '<noinclude>'
+                includeOff = '</noinclude>'
+                separator = ''
+            # Do we have a noinclude at the end of the template?
+            parts = s2.split(includeOff)
+            lastpart = parts[-1]
+            if re.match(r'\s*%s' % marker, lastpart):
+                # Put the langlinks back into the noinclude's
+                regexp = re.compile(r'{}\s*{}'.formar(includeOff, marker))
+                newtext = regexp.sub(s + includeOff, s2)
+            else:
+                # Put the langlinks at the end, inside noinclude's
+                newtext = (s2.replace(marker, '').strip()
+                           + separator
+                           + '{}\n{}{}\n'.format(includeOn, s, includeOff))
+        else:
+            newtext = s2.replace(marker, '').strip() + separator + s
 
     # special parts above interwiki
     above_interwiki = []
@@ -1572,8 +1569,9 @@ def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
 # Functions dealing with templates
 # --------------------------------
 
-def extract_templates_and_params(text: str, remove_disabled_parts=None,
-                                 strip: Optional[bool] = None):
+def extract_templates_and_params(text: str,
+                                 remove_disabled_parts: bool = False,
+                                 strip: bool = False) -> ETPType:
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -1584,16 +1582,19 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
 
-    This uses the package L{mwparserfromhell} (mwpfh) if it is installed.
-    Otherwise it falls back on a regex based implementation.
+    This uses the package L{mwparserfromhell} or L{wikitextparser} as
+    MediaWiki markup parser. Otherwise it falls back on a regex based
+    implementation but it becomes mandatory that one of them is
+    installed.
 
     There are minor differences between the two implementations.
 
-    The two implementations return nested templates in a different order.
-    i.e. for {{a|b={{c}}}}, mwpfh returns [a, c], whereas regex returns [c, a].
+    The two implementations return nested templates in a different
+    order, i.e. for {{a|b={{c}}}}, parsers returns [a, c], whereas regex
+    returns [c, a].
 
-    mwpfh preserves whitespace in parameter names and values. regex excludes
-    anything between <!-- --> before parsing the text.
+    The parser packages preserves whitespace in parameter names and
+    values.
 
     If there are multiple numbered parameters in the wikitext for the same
     position, MediaWiki will only use the last parameter value.
@@ -1601,61 +1602,84 @@ def extract_templates_and_params(text: str, remove_disabled_parts=None,
     To replicate that behaviour, enable both remove_disabled_parts and strip.
 
     @param text: The wikitext from which templates are extracted
-    @param remove_disabled_parts: Remove disabled wikitext such as comments
-        and pre. If None (default), this is enabled when mwparserfromhell
-        is not available and disabled if mwparserfromhell is present.
-    @type remove_disabled_parts: bool or None
-    @param strip: if enabled, strip arguments and values of templates.
-        If None (default), this is enabled when mwparserfromhell
-        is not available and disabled if mwparserfromhell is present.
+    @param remove_disabled_parts: If enabled, remove disabled wikitext
+        such as comments and pre.
+    @param strip: If enabled, strip arguments and values of templates.
     @return: list of template name and params
-    @rtype: list of tuple
     """
-    use_regex = isinstance(mwparserfromhell, Exception)
+    use_regex = isinstance(wikitextparser, ImportError)
 
-    if remove_disabled_parts is None:
-        remove_disabled_parts = use_regex
     if remove_disabled_parts:
         text = removeDisabledParts(text)
 
-    if strip is None:
-        strip = use_regex
-
     if use_regex:
-        return extract_templates_and_params_regex(text, False, strip)
-    return extract_templates_and_params_mwpfh(text, strip)
+        issue_deprecation_warning("""
+Pywikibot needs a MediaWiki markup parser.
+Please install the requested module with either
+
+    pip install "mwparserfromhell>=0.5.0"
+
+or
+
+    pip install "wikitextparser>=0.47.0"
+
+Using pywikibot without MediaWiki markup parser""",
+                                  warning_class=FutureWarning,
+                                  since='20210416')
+
+        return _extract_templates_and_params_regex(text, False, strip)
+    return _extract_templates_and_params_parser(text, strip)
 
 
-def extract_templates_and_params_mwpfh(text: str, strip=False):
+def _extract_templates_and_params_parser(text: str,
+                                         strip: bool = False) -> ETPType:
     """
     Extract templates with params using mwparserfromhell.
 
     This function should not be called directly.
 
-    Use extract_templates_and_params, which will select this
-    mwparserfromhell implementation if based on whether the
-    mwparserfromhell package is installed.
+    Use extract_templates_and_params, which will select this parser
+    implementation if the mwparserfromhell or wikitextparser package is
+    installed.
 
     @param text: The wikitext from which templates are extracted
+    @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
-    @rtype: list of tuple
     """
-    code = mwparserfromhell.parse(text)
-    result = []
+    def explicit(param):
+        try:
+            attr = param.showkey
+        except AttributeError:
+            attr = not param.positional
+        return attr
 
-    for template in code.filter_templates(recursive=True):
+    parser_name = wikitextparser.__name__
+    pywikibot.log('Using {!r} wikitext parser'.format(parser_name))
+
+    result = []
+    parsed = wikitextparser.parse(text)
+    if parser_name == 'wikitextparser':
+        templates = parsed.templates
+        arguments = 'arguments'
+    else:
+        templates = parsed.ifilter_templates(
+            matches=lambda x: not x.name.lstrip().startswith('#'),
+            recursive=True)
+        arguments = 'params'
+
+    for template in templates:
         params = OrderedDict()
-        for param in template.params:
+        for param in getattr(template, arguments):
+            value = str(param.value)  # mwpfh needs upcast to str
+
             if strip:
-                implicit_parameter = not param.showkey
                 key = param.name.strip()
-                if not implicit_parameter:
+                if explicit(param):
                     value = param.value.strip()
                 else:
                     value = str(param.value)
             else:
                 key = str(param.name)
-                value = str(param.value)
 
             params[key] = value
 
@@ -1663,11 +1687,25 @@ def extract_templates_and_params_mwpfh(text: str, strip=False):
     return result
 
 
+@deprecated('extract_templates_and_params', since='20210329',
+            future_warning=True)
+def extract_templates_and_params_mwpfh(text: str,
+                                       strip: bool = False) -> ETPType:
+    """DEPRECATED. Extract templates with params using mwparserfromhell."""
+    global wikitextparser
+    saved_parser = wikitextparser
+    import mwparserfromhell as wikitextparser
+    result = _extract_templates_and_params_parser(text, strip)
+    wikitextparser = saved_parser
+    return result
+
+
+@deprecated('extract_templates_and_params', since='20210331',
+            future_warning=True)
 def extract_templates_and_params_regex(text: str,
                                        remove_disabled_parts: bool = True,
-                                       strip: bool = True):
-    """
-    Extract templates with params using a regex with additional processing.
+                                       strip: bool = True) -> ETPType:
+    """DEPRECATED. Extract templates with params using a regex.
 
     This function should not be called directly.
 
@@ -1676,9 +1714,17 @@ def extract_templates_and_params_regex(text: str,
     is not used.
 
     @param text: The wikitext from which templates are extracted
+    @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
-    @rtype: list of tuple
     """
+    return _extract_templates_and_params_regex(text, remove_disabled_parts,
+                                               strip)
+
+
+def _extract_templates_and_params_regex(text: str,
+                                        remove_disabled_parts: bool = True,
+                                        strip: bool = True) -> ETPType:
+    """DEPRECATED. Extract templates with params using a regex."""
     # remove commented-out stuff etc.
     if remove_disabled_parts:
         thistxt = removeDisabledParts(text)
@@ -2019,23 +2065,6 @@ class TimeStripper:
 
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
-
-    @property
-    @deprecated(since='20170212', future_warning=True)
-    def linkP(self):
-        """Deprecated linkP instance variable."""
-        return self._hyperlink_pat
-
-    @property
-    @deprecated(since='20170212', future_warning=True)
-    def comment_pattern(self):
-        """Deprecated comment_pattern instance variable."""
-        return self._comment_pat
-
-    @deprecated('module function', since='20151118', future_warning=True)
-    def findmarker(self, text: str, base: str = '@@', delta: str = '@'):
-        """Find a string which is not part of text."""
-        return findmarker(text, base, delta)
 
     def fix_digits(self, line):
         """Make non-latin digits like Persian to latin to parse."""

@@ -21,7 +21,7 @@ import re
 import sys
 
 from contextlib import suppress
-from http import cookiejar
+from http import cookiejar, HTTPStatus
 from string import Formatter
 from typing import Optional, Union
 from urllib.parse import quote, urlparse
@@ -223,7 +223,7 @@ def request(site,
     document root '/'.
 
     @param site: The Site to connect to
-    @type: site: pywikibot.site.BaseSite
+    @type site: pywikibot.site.BaseSite
     @param uri: the URI to retrieve
     @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
@@ -291,15 +291,15 @@ def error_handling_callback(response):
 
     if isinstance(response, Exception):
         with suppress(Exception):
-            # request.data exception may contain response and request attribute
+            # request exception may contain response and request attribute
             error('An error occurred for uri ' + response.request.url)
         raise response from None
 
-    if response.status_code == 504:
+    if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
         raise Server504Error('Server {} timed out'
                              .format(urlparse(response.url).netloc))
 
-    if response.status_code == 414:
+    if response.status_code == HTTPStatus.REQUEST_URI_TOO_LONG:
         raise Server414Error('Too long GET request')
 
     # TODO: shall it raise? this might break some code, TBC
@@ -307,11 +307,11 @@ def error_handling_callback(response):
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
-    if response.status_code not in (200, 207):
+    if response.status_code not in (HTTPStatus.OK, HTTPStatus.MULTI_STATUS):
         warning('Http response status {}'.format(response.status_code))
 
 
-@deprecated_args(callback=True, body='data')
+@deprecated_args(body='data')
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False, **kwargs):
@@ -449,14 +449,18 @@ def _decide_encoding(response, charset) -> Optional[str]:
         """Helper function to try decoding."""
         if encoding is None:
             return None
+
         try:
             content.decode(encoding)
-        except (LookupError, UnicodeDecodeError):
+        except LookupError:
             pywikibot.warning('Unknown or invalid encoding {!r}'
                               .format(encoding))
-            # let chardet do the job
-            return None
-        return encoding
+        except UnicodeDecodeError as e:
+            pywikibot.warning('{} found in {}'.format(e, content))
+        else:
+            return encoding
+
+        return None  # let chardet do the job
 
     header_encoding = _get_encoding_from_response_headers(response)
     if header_encoding is None:

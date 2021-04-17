@@ -4,11 +4,11 @@ The contents of the package
     +---------------------------------------------------------------------------------------+
     | README and config files:                                                              |
     +===========================+===========================================================+
-    | CODE_OF_CONDUCT.md        | Code of conduct reference                                 |
+    | CODE_OF_CONDUCT.rst       | Code of conduct reference                                 |
     +---------------------------+-----------------------------------------------------------+
     | CONTENT.rst               | This Content description file                             |
     +---------------------------+-----------------------------------------------------------+
-    | CREDITS                   | List of major contributors to this module                 |
+    | CREDITS.rst               | List of major contributors to this module                 |
     +---------------------------+-----------------------------------------------------------+
     | dev-requirements.txt      | PIP requirements file for development dependencies        |
     +---------------------------+-----------------------------------------------------------+
@@ -20,7 +20,7 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | generate_user_files.py    | Creates user-config.py or user-fixes.py                   |
     +---------------------------+-----------------------------------------------------------+
-    | HISTORY.rst               | pypi version history file                                 |
+    | HISTORY.rst               | PyPI version history file                                 |
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
@@ -32,7 +32,7 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                             |
     +---------------------------+-----------------------------------------------------------+
-    | ROADMAP.rst               | pypi version roadmap file                                 |
+    | ROADMAP.rst               | PyPI version roadmap file                                 |
     +---------------------------+-----------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot framework                  |
     +---------------------------+-----------------------------------------------------------+

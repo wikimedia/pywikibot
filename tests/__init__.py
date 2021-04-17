@@ -5,8 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 __all__ = (
-    'requests', 'unittest', 'TestRequest', 'patch_request', 'unpatch_request',
-    'mock', 'Mock', 'MagicMock', 'patch')
+    'create_path_func', 'join_cache_path', 'join_data_path',
+    'join_html_data_path', 'join_images_path', 'join_pages_path',
+    'join_root_path', 'join_xml_data_path', 'patch_request', 'unittest_print',
+    'unpatch_request',
+)
 
 import functools
 import os
@@ -15,14 +18,15 @@ import warnings
 
 from contextlib import suppress
 from itertools import chain
-from unittest import mock
-from unittest.mock import MagicMock, Mock, patch
+from unittest import mock  # noqa: F401
+from unittest.mock import MagicMock, Mock, patch  # noqa: F401
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
 #   however if unavailable this will fail on use; see pywikibot/tools.py
-# - mwparserfromhell is optional, so is only imported in textlib_tests
-import requests
+# - mwparserfromhell or wikitextparser should be used but the dependency
+#   is checked by textlib already
+import requests  # noqa: F401
 
 import pywikibot.data.api
 
@@ -32,6 +36,14 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
+
+# common warn() clauses...
+#
+#   WARN_SITE_CODE is from T234147
+#   WARN_SITE_OBJ is from T225594
+
+WARN_SITE_CODE = r'^Site .*:.* instantiated using different code *'
+WARN_SITE_OBJ = 'Site objects have been created before arguments were handled'
 
 
 def join_root_path(*names):
@@ -88,12 +100,15 @@ library_test_modules = {
     'flow_thanks',
     'http',
     'i18n',
+    'interwiki_graph',
     'interwiki_link',
+    'interwikimap',
     'link',
     'linter',
     'logentries',
     'login',
     'mediawikiversion',
+    'mysql',
     'namespace',
     'oauth',
     'page',
@@ -135,16 +150,17 @@ script_test_modules = {
     'cache',
     'category_bot',
     'checkimages',
-    'compat2core',
     'deletionbot',
     'fixing_redirects',
     'generate_family_file',
     'generate_user_files',
     'interwikidata',
     'l10n',
+    'patrolbot',
     'protectbot',
     'pwb',
     'redirect_bot',
+    'reflinks',
     'replacebot',
     'script',
     'template_bot',

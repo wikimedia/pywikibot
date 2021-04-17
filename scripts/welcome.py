@@ -191,7 +191,7 @@ locale.setlocale(locale.LC_ALL, '')
 #        Add the following strings to customise for a language:
 #        logbook, netext, report_page, bad_pag, report_text, random_sign,
 #        whitelist_pg, final_new_text_additions, logpage_header if
-#        different from wikipedia entry
+#        different from Wikipedia entry
 
 ############################################################################
 
@@ -584,7 +584,7 @@ class WelcomeBot(SingleSiteBot):
                     return True
         return False
 
-    def reportBadAccount(self, name: str) -> None:  # should be renamed
+    def collect_bad_accounts(self, name: str) -> None:
         """Add bad account to queue."""
         if globalvar.confirm:
             answer = pywikibot.input_choice(
@@ -811,7 +811,7 @@ class WelcomeBot(SingleSiteBot):
             return
 
         if self.badNameFilter(user.username):
-            self.reportBadAccount(user.username)
+            self.collect_bad_accounts(user.username)
             return
 
         welcome_text = self.welcome_text
@@ -867,7 +867,7 @@ class WelcomeBot(SingleSiteBot):
         if hasattr(self, '_BAQueue'):
             self.show_status()
             pywikibot.output('Putting bad name to report page...')
-            self.reportBadAccount(None, final=True)
+            self.report_bad_account()
 
     @staticmethod
     def show_status(message=Msg.DEFAULT):
@@ -901,7 +901,7 @@ def load_word_function(raw) -> List[str]:
     """Load the badword list and the whitelist."""
     page = re.compile(r'(?:\"|\')(.*?)(?:\"|\')(?:, |\))')
     list_loaded = page.findall(raw)
-    if len(list_loaded) == 0:
+    if not list_loaded:
         pywikibot.output('There was no input on the real-time page.')
     return list_loaded
 

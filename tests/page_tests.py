@@ -13,6 +13,9 @@ import pywikibot
 import pywikibot.page
 
 from pywikibot import config, InvalidTitle
+from pywikibot.tools import suppress_warnings
+
+from tests import WARN_SITE_CODE
 
 from tests.aspects import (
     DefaultDrySiteTestCase, DefaultSiteTestCase, SiteAttributeTestCase,
@@ -528,8 +531,9 @@ class TestPageObject(DefaultSiteTestCase):
         for p2 in mainpage.interwiki(expand=False):
             self.assertIsInstance(p2, pywikibot.Link)
             self.assertIn(p2, iw)
-        for p in mainpage.langlinks():
-            self.assertIsInstance(p, pywikibot.Link)
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+            for p in mainpage.langlinks():
+                self.assertIsInstance(p, pywikibot.Link)
         for p in mainpage.imagelinks():
             self.assertIsInstance(p, pywikibot.FilePage)
         for p in mainpage.templates():
@@ -1020,6 +1024,10 @@ class TestPageUserAction(DefaultSiteTestCase):
 
     def test_watch(self):
         """Test Page.watch, with and without unwatch enabled."""
+        if not self.site.has_right('editmywatchlist'):
+            self.skipTest('user {} cannot edit its watch list'
+                          .format(self.site.user()))
+
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
         userpage = self.get_userpage()

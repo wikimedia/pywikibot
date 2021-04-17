@@ -51,7 +51,7 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
-# wikibase property containing the wikibase category
+# Wikibase property containing the Wikibase category
 wikibase_property = {
     'wikidata:wikidata': 'P373',
 }
@@ -246,21 +246,24 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             return True
         return super().skip_page(page)
 
-    def skipPage(self, page):
+    @staticmethod
+    def skipPage(page):
         """Determine if the page should be skipped."""
-        if page.site.code in ignoreTemplates:
-            templatesInThePage = page.templates()
-            templatesWithParams = page.templatesWithParams()
-            for template in ignoreTemplates[page.site.code]:
-                if not isinstance(template, tuple):
-                    for pageTemplate in templatesInThePage:
-                        if pageTemplate.title(with_ns=False) == template:
-                            return True
-                else:
-                    for (inPageTemplate, param) in templatesWithParams:
-                        if inPageTemplate.title(with_ns=False) == template[0] \
-                           and template[1] in param[0].replace(' ', ''):
-                            return True
+        try:
+            templates_to_ignore = ignoreTemplates[page.site.code]
+        except KeyError:
+            return False
+
+        for template in templates_to_ignore:
+            if not isinstance(template, tuple):
+                for pageTemplate in page.templates():
+                    if pageTemplate.title(with_ns=False) == template:
+                        return True
+            else:
+                for (inPageTemplate, param) in page.templatesWithParams():
+                    if inPageTemplate.title(with_ns=False) == template[0] \
+                       and template[1] in param[0].replace(' ', ''):
+                        return True
         return False
 
     def treat_page(self):
@@ -276,6 +279,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             page.site.code, commonscatTemplates,
             fallback=i18n.DEFAULT_FALLBACK)
+
         commonscatLink = self.getCommonscatLink(page)
         if commonscatLink:
             pywikibot.output('Commonscat template is already on '
@@ -285,7 +289,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             checkedCommonscatTarget = self.checkCommonscatLink(
                 currentCommonscatTarget)
 
-            if (currentCommonscatTarget == checkedCommonscatTarget):
+            if currentCommonscatTarget == checkedCommonscatTarget:
                 # The current commonscat link is good
                 pywikibot.output('Commonscat link at {} to Category:{} is ok'
                                  .format(page.title(),
@@ -333,9 +337,11 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         """Change the current commonscat template and target."""
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki
+
         if not linktitle and (page.title().lower() in oldcat.lower()
                               or oldcat.lower() in page.title().lower()):
             linktitle = oldcat
+
         if linktitle and newcat != page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
@@ -353,12 +359,10 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                              page.get())
         else:  # nothing left to do
             return
-        if self.opt.summary:
-            comment = self.opt.summary
-        else:
-            comment = i18n.twtranslate(page.site,
-                                       'commonscat-msg_change',
-                                       {'oldcat': oldcat, 'newcat': newcat})
+
+        comment = self.opt.summary or i18n.twtranslate(
+            page.site, 'commonscat-msg_change', {'oldcat': oldcat,
+                                                 'newcat': newcat})
 
         self.userPut(page, page.text, newtext, summary=comment,
                      ignore_save_related_errors=True)
@@ -389,9 +393,9 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         return ''
 
     def find_commons_category(self, page) -> str:
-        """Find CommonsCat template on wikibase repository.
+        """Find CommonsCat template on Wikibase repository.
 
-        Use wikibase property to get the category if possible.
+        Use Wikibase property to get the category if possible.
         Otherwise check all langlinks to find it.
 
         @return: name of a valid commons category
@@ -408,30 +412,31 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # fallback to interwiki pages
         return self.findCommonscatLink(page)
 
-    def getCommonscatLink(self, wikipediaPage=None):
+    @staticmethod
+    def getCommonscatLink(page):  # noqa N802, N803
         """Find CommonsCat template on page.
 
         @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
         """
         primaryCommonscat, commonscatAlternatives = i18n.translate(
-            wikipediaPage.site.code, commonscatTemplates,
+            page.site.code, commonscatTemplates,
             fallback=i18n.DEFAULT_FALLBACK)
         commonscatLinktext = ''
         commonscatNote = ''
         # See if commonscat is present
-        for template in wikipediaPage.templatesWithParams():
-            templateTitle = template[0].title(with_ns=False)
+        for template, params in page.templatesWithParams():
+            templateTitle = template.title(with_ns=False)
             if templateTitle == primaryCommonscat \
                or templateTitle in commonscatAlternatives:
                 commonscatTemplate = templateTitle
-                if (len(template[1]) > 0):
-                    commonscatTarget = template[1][0]
-                    if len(template[1]) > 1:
-                        commonscatLinktext = template[1][1]
-                    if len(template[1]) > 2:
-                        commonscatNote = template[1][2]
+                if params:
+                    commonscatTarget = params[0]
+                    if len(params) > 1:
+                        commonscatLinktext = params[1]
+                    if len(params) > 2:
+                        commonscatNote = params[2]
                 else:
-                    commonscatTarget = wikipediaPage.title(with_ns=False)
+                    commonscatTarget = page.title(with_ns=False)
                 return (commonscatTemplate, commonscatTarget,
                         commonscatLinktext, commonscatNote)
         return None
@@ -472,7 +477,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         "getCommonscat: {} deleted by {}. Couldn't find "
                         'move target in "{}"'
                         .format(commonsPage, loguser, logcomment))
-                    return ''
+                    break
             return ''
 
         if commonsPage.isRedirectPage():
@@ -484,10 +489,11 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 in commonsPage.templates()):
             pywikibot.log(
                 'getCommonscat: The category is a category redirect')
-            for template in commonsPage.templatesWithParams():
-                if (template[0].title(with_ns=False) == 'Category redirect'
-                        and len(template[1]) > 0):
-                    return self.checkCommonscatLink(template[1][0])
+            for template, param in commonsPage.templatesWithParams():
+                if (template.title(with_ns=False) == 'Category redirect'
+                        and param):
+                    return self.checkCommonscatLink(param[0])
+
         elif commonsPage.isDisambig():
             pywikibot.log('getCommonscat: The category is disambiguation')
             return ''

@@ -10,6 +10,7 @@ import hashlib
 import inspect
 import itertools
 import os
+import pkg_resources
 import queue
 import re
 import stat
@@ -19,15 +20,15 @@ import threading
 import time
 import types
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Container, Iterable, Iterator, Mapping, Sized
+from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
-from distutils.version import LooseVersion, Version
 from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
 from ipaddress import ip_address
-from itertools import zip_longest
+from itertools import chain, zip_longest
 from typing import Optional
 from warnings import catch_warnings, showwarning, warn
 
@@ -77,24 +78,25 @@ def is_IP(IP: str) -> bool:  # noqa N802, N803
 
 
 def has_module(module, version=None):
-    """Check whether a module can be imported."""
+    """Check if a module can be imported."""
     try:
         m = import_module(module)
     except ImportError:
-        pass
+        return False
     else:
-        if version is None:
-            return True
-        try:
-            module_version = LooseVersion(m.__version__)
-        except AttributeError:
-            pass
-        else:
-            if module_version >= LooseVersion(version):
-                return True
-            warn('Module version {} is lower than requested version {}'
-                 .format(module_version, version), ImportWarning)
-    return False
+        if version:
+            if not hasattr(m, '__version__'):
+                return False
+
+            required_version = pkg_resources.parse_version(version)
+            module_version = pkg_resources.parse_version(m.__version__)
+
+            if module_version < required_version:
+                warn('Module version {} is lower than requested version {}'
+                     .format(module_version, required_version), ImportWarning)
+                return False
+
+        return True
 
 
 def empty_iterator():
@@ -241,36 +243,6 @@ class DotReadableDict:
         return repr(self.__dict__)
 
 
-class _FrozenDict(dict):
-
-    """
-    Frozen dict, preventing write after initialisation.
-
-    Raises TypeError if write attempted.
-    """
-
-    def __init__(self, data=None, error: Optional[str] = None):
-        """
-        Initializer.
-
-        @param data: mapping to freeze
-        @type data: mapping
-        @param error: error message
-        """
-        if data:
-            args = [data]
-        else:
-            args = []
-        super().__init__(*args)
-        self._error = error or 'FrozenDict: not writable'
-
-    def update(self, *args, **kwargs):
-        """Prevent updates."""
-        raise TypeError(self._error)
-
-    __setitem__ = update
-
-
 class frozenmap(Mapping):  # noqa:  N801
 
     """Frozen mapping, preventing write after initialisation."""
@@ -301,6 +273,113 @@ class frozenmap(Mapping):  # noqa:  N801
 
     def __repr__(self):
         return '{}({!r})'.format(self.__class__.__name__, self.__data)
+
+
+# Collection is not provided with Python 3.5; use Container, Iterable, Sized
+class SizedKeyCollection(Container, Iterable, Sized):
+
+    """Structure to hold values where the key is given by the value itself.
+
+    A stucture like a defaultdict but the key is given by the value
+    itselfvand cannot be assigned directly. It returns the number of all
+    items with len() but not the number of keys.
+
+    Samples:
+
+        >>> from pywikibot.tools import SizedKeyCollection
+        >>> data = SizedKeyCollection('title')
+        >>> data.append('foo')
+        >>> data.append('bar')
+        >>> data.append('Foo')
+        >>> list(data)
+        ['foo', 'Foo', 'bar']
+        >>> len(data)
+        3
+        >>> 'Foo' in data
+        True
+        >>> 'foo' in data
+        False
+        >>> data['Foo']
+        ['foo', 'Foo']
+        >>> list(data.keys())
+        ['Foo', 'Bar']
+        >>> data.remove_key('Foo')
+        >>> list(data)
+        ['bar']
+        >>> data.clear()
+        >>> list(data)
+        []
+    """
+
+    def __init__(self, keyattr: str):
+        """Initializer.
+
+        @param keyattr: an attribute or method of the values to be hold
+            with this collection which will be used as key.
+        """
+        self.keyattr = keyattr
+        self.clear()
+
+    def __contains__(self, key) -> bool:
+        return key in self.data
+
+    def __getattr__(self, key):
+        """Delegate Mapping methods to self.data."""
+        if key in ('keys', 'values', 'items'):
+            return getattr(self.data, key)
+        return super().__getattr__(key)
+
+    def __getitem__(self, key) -> list:
+        return self.data[key]
+
+    def __iter__(self):
+        """Iterate through all items of the tree."""
+        yield from chain.from_iterable(self.data.values())
+
+    def __len__(self) -> int:
+        """Return the number of all values."""
+        return self.size
+
+    def __repr__(self) -> str:
+        return str(self.data).replace('defaultdict', self.__class__.__name__)
+
+    def append(self, value):
+        """Add a value to the collection."""
+        key = getattr(value, self.keyattr)
+        if callable(key):
+            key = key()
+        self.data[key].append(value)
+        self.size += 1
+
+    def remove(self, value):
+        """Remove a value from the container."""
+        key = getattr(value, self.keyattr)
+        if callable(key):
+            key = key()
+        with suppress(ValueError):
+            self.data[key].remove(value)
+            self.size -= 1
+
+    def remove_key(self, key):
+        """Remove all values for a given key."""
+        with suppress(KeyError):
+            self.size -= len(self.data[key])
+            del self.data[key]
+
+    def clear(self):
+        """Remove all elements from SizedKeyCollection."""
+        self.data = defaultdict(list)
+        self.size = 0
+
+    def filter(self, key):
+        """Iterate over items for a given key."""
+        with suppress(KeyError):
+            yield from self.data[key]
+
+    def iter_values_len(self):
+        """Yield key, len(values) pairs."""
+        for key, values in self.data.items():
+            yield key, len(values)
 
 
 class LazyRegex:
@@ -349,17 +428,17 @@ class LazyRegex:
 
     def __getattr__(self, attr):
         """Compile the regex and delegate all attribute to the regex."""
-        if self._raw:
-            if not self._compiled:
-                self._compiled = re.compile(self.raw, self.flags)
-
-            if hasattr(self._compiled, attr):
-                return getattr(self._compiled, attr)
-
-            raise AttributeError('%s: attr %s not recognised'
-                                 % (self.__class__.__name__, attr))
-        else:
+        if not self._raw:
             raise AttributeError('%s.raw not set' % self.__class__.__name__)
+
+        if not self._compiled:
+            self._compiled = re.compile(self.raw, self.flags)
+
+        if hasattr(self._compiled, attr):
+            return getattr(self._compiled, attr)
+
+        raise AttributeError('%s: attr %s not recognised'
+                             % (self.__class__.__name__, attr))
 
 
 class DeprecatedRegex(LazyRegex):
@@ -423,7 +502,7 @@ def normalize_username(username) -> Optional[str]:
     return first_upper(username)
 
 
-class MediaWikiVersion(Version):
+class MediaWikiVersion:
 
     """
     Version object to allow comparing 'wmf' versions with normal ones.
@@ -447,6 +526,15 @@ class MediaWikiVersion(Version):
 
     MEDIAWIKI_VERSION = re.compile(
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
+
+    def __init__(self, version_str):
+        """
+        Initializer.
+
+        @param version_str: version to parse
+        @type version: str
+        """
+        self.parse(version_str)
 
     @classmethod
     def from_generator(cls, generator):
@@ -504,6 +592,21 @@ class MediaWikiVersion(Version):
         if self._dev_version < other._dev_version:
             return -1
         return 0
+
+    def __eq__(self, other):
+        return self._cmp(other) == 0
+
+    def __lt__(self, other):
+        return self._cmp(other) < 0
+
+    def __le__(self, other):
+        return self._cmp(other) <= 0
+
+    def __gt__(self, other):
+        return self._cmp(other) > 0
+
+    def __ge__(self, other):
+        return self._cmp(other) >= 0
 
 
 class ThreadedGenerator(threading.Thread):
@@ -960,9 +1063,16 @@ class DequeGenerator(Iterator, collections.deque):
 
     def __next__(self):
         """Iterator method."""
-        if len(self):
+        if self:
             return self.popleft()
         raise StopIteration
+
+    def __repr__(self):
+        """Provide an object representation without clearing the content."""
+        items = list(self)
+        result = '{}({})'.format(self.__class__.__name__, items)
+        self.extend(items)
+        return result
 
 
 def open_archive(filename, mode='rb', use_extension=True):
@@ -1357,8 +1467,7 @@ def deprecated(*args, **kwargs):
 
     since = kwargs.pop('since', None)
     future_warning = kwargs.pop('future_warning', False)
-    without_parameters = (len(args) == 1 and len(kwargs) == 0
-                          and callable(args[0]))
+    without_parameters = len(args) == 1 and not kwargs and callable(args[0])
     if 'instead' in kwargs:
         instead = kwargs['instead']
     elif not without_parameters and len(args) == 1:
@@ -1819,6 +1928,9 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('FrozenDict', _FrozenDict,
-                             replacement_name='tools.frozenmap',
-                             since='20201109', future_warning=True)
+wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
+                             since='20210416', future_warning=True)
+wrapper._add_deprecated_attr('frozenmap',
+                             replacement_name='types.MappingProxyType',
+                             since='20210415',
+                             future_warning=True)

@@ -15,6 +15,7 @@ To get started on proper usage of the bot framework, please refer to:
 .. include:: CONTENT.rst
 
 **External software can be used with Pywikibot:**
+  * Pydot, Pyparsing and Graphviz for use with interwiki_graph.py
   * PyMySQL to access MySQL database for use with pagegenerators.py
   * google to access Google Web API for use with pagegenerators.py
 

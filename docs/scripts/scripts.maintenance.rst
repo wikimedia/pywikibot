@@ -17,11 +17,6 @@ scripts.maintenance.colors script
 
 .. automodule:: scripts.maintenance.colors
 
-scripts.maintenance.compat2core script
---------------------------------------
-
-.. automodule:: scripts.maintenance.compat2core
-
 scripts.maintenance.make\_i18n\_dict script
 -------------------------------------------
 
