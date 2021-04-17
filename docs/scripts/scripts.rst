@@ -83,6 +83,10 @@ delete script
 
 .. automodule:: scripts.delete
 
+djvutext script
+---------------
+.. automodule:: scripts.djvutext
+
 download\_dump script
 ---------------------
 

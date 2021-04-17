@@ -53,6 +53,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | delete.py              | This script can be used to delete pages en masse.       |
     +------------------------+---------------------------------------------------------+
+    | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
+    |                        | pages in the "Page" namespace on Wikisource.            |
+    +------------------------+---------------------------------------------------------+
     | download_dump.py       | Downloads dumps from dumps.wikimedia.org                |
     +------------------------+---------------------------------------------------------+
     | fixing_redirects.py    | Correct all redirect links of processed pages.          |
@@ -167,9 +170,6 @@ The contents of the package
     | data_ingestion.py      | A generic bot to do batch uploading to Commons.         |
     +------------------------+---------------------------------------------------------+
     | disambredir.py         | Changing redirect names in disambiguation pages.        |
-    +------------------------+---------------------------------------------------------+
-    | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
-    |                        | pages in the "Page" namespace on Wikisource.            |
     +------------------------+---------------------------------------------------------+
     | editarticle.py         | Edit a Wikipedia article with your favourite editor.    |
     +------------------------+---------------------------------------------------------+
