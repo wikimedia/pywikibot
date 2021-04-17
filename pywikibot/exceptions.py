@@ -35,6 +35,7 @@ the framework::
           |    |    +-- OtherPageSaveError
           |    |    +-- SpamblacklistError
           |    |    +-- TitleblacklistError
+          |    |    +-- AbuseFilterDisallowedError
           |    +-- UnsupportedPageError
           +-- SectionError
           +-- ServerError
@@ -106,6 +107,7 @@ PageLoadRelatedError: any exception which happens while loading a Page.
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 
+  - AbuseFilterDisallowedError: AbuseFilter disallowed
   - SpamblacklistError: MediaWiki spam filter detected a blacklisted URL
   - TitleblacklistError: MediaWiki detected a blacklisted page title
   - OtherPageSaveError: misc. other save related exception.
@@ -532,6 +534,20 @@ class ArticleExistsConflictError(EditConflictError):
 
     message = ('Destination article %s already exists and is not a redirect '
                'to the source article')
+
+
+class AbuseFilterDisallowedError(PageSaveRelatedError):
+
+    """Page save failed because the AbuseFilter disallowed it."""
+
+    message = ('Edit to page %(title)s disallowed by the AbuseFilter.\n'
+               '%(info)s\n%(warning)s')
+
+    def __init__(self, page, info, warning):
+        """Initializer."""
+        self.info = info
+        self.warning = warning
+        super().__init__(page)
 
 
 class SpamblacklistError(PageSaveRelatedError):
