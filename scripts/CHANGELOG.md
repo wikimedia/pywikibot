@@ -1,5 +1,38 @@
 # Schripts Changelog
 
+## 6.1.0
+*17 April 2021*
+
+### general
+* commonscat.py was restored
+* compat2core.py script was archived
+* djvutext.py was restored
+* interwiki.py was restored
+* patrol.py was restored
+* watchlist.py was restored
+
+### archivebot
+* PageArchiver.maxsize must be defined before load_config() (T277547)
+* Time period must have a qualifier
+
+### imagetransfer
+* Fix usage of -tofamily -tolang options (T279232)
+
+### misspelling
+* Use the new DisambiguationRobot interface and options
+
+### reflinks
+* Catch urllib3.LocationParseError and skip link (T280356)
+* L10N updates
+* Avoid dupliate reference names (T278040)
+
+### solve_disambiguation
+* Keyword arguments are recommended if deriving the bot; opt option handler is used.
+
+### welcome
+* Fix reporting bad account names
+
+
 ## 6.0.0
 *15 March 2021*
 
