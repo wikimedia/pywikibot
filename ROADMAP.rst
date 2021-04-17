@@ -1,40 +1,7 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Improvements and Bugfixes
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* proofreadpage: search for "new" class after purge (T280357)
-* Enable different types with BaseBot.treat()
-* Context manager depends on pymysql version, not Python release (T279753)
-* Bugfix for Site.interwiki_prefix() (T188179)
-* Exclude expressions from parsed template in mwparserfromhell (T71384)
-* Provide an object representation for DequeGenerator
-* Allow deleting any subclass of BasePage by title (T278659)
-* Add support for API:Revisiondelete with Site.deleterevs() method (T276726)
-* L10N updates
-* Family files can be collected from a zip folder (T278076)
-
-Dependencies
-^^^^^^^^^^^^
-
-* **mwparserfromhell** or **wikitextparser** are strictly recommended (T106763)
-* Require **Pillow**>=8.1.1 due to vulnerability found (T278743)
-* TkDialog of GUI userinterface requires **Python 3.6+** (T278743)
-* Enable textlib.extract_templates_and_params with **wikitextparser** package
-* Add support for **PyMySQL** 1.0.0+
-
-Code cleanups
-^^^^^^^^^^^^^
-
-* APISite.resolvemagicwords(), BaseSite.ns_index() and  remove BaseSite.getNamespaceIndex() were removed
-* Deprecated MoveEntry.new_ns() and new_title() methods were removed
-* Unused NoSuchSite and PageNotSaved exception were removed
-* Unused BadTitle exception was removed (T267768)
-* getSite() function was removed in favour of Site() constructor
-* Page.fileUrl() was removed in favour of Page.get_file_url()
-* Deprecated getuserinfo and getglobaluserinfo Site methods were removed
-* compat2core.py script was archived
+* (no changes yet)
 
 Deprecations
 ~~~~~~~~~~~~
