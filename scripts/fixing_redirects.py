@@ -141,7 +141,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             try:
                 target = page.getRedirectTarget()
             except (pywikibot.CircularRedirect,
-                    pywikibot.InvalidTitle):
+                    pywikibot.InvalidTitle,
+                    pywikibot.InterwikiRedirectPage):
                 pass
             except RuntimeError:
                 pywikibot.exception()
