@@ -22,11 +22,11 @@ import types
 from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from contextlib import suppress
 from datetime import datetime
-from functools import wraps
+from functools import total_ordering, wraps
 from importlib import import_module
 from inspect import getfullargspec
 from itertools import chain, zip_longest
-from typing import Optional
+from typing import Any, Optional
 from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
@@ -507,6 +507,7 @@ def normalize_username(username) -> Optional[str]:
     return first_upper(username)
 
 
+@total_ordering
 class MediaWikiVersion:
 
     """
@@ -532,32 +533,26 @@ class MediaWikiVersion:
     MEDIAWIKI_VERSION = re.compile(
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
-    def __init__(self, version_str):
+    def __init__(self, version_str: str) -> None:
         """
         Initializer.
 
         @param version_str: version to parse
-        @type version: str
         """
-        self.parse(version_str)
+        self._parse(version_str)
 
-    @classmethod
-    def from_generator(cls, generator):
-        """Create instance using the generator string."""
-        if not generator.startswith('MediaWiki '):
-            raise ValueError('Generator string ({!r}) must start with '
-                             '"MediaWiki "'.format(generator))
-        return cls(generator[len('MediaWiki '):])
+    def _parse(self, version_str: str) -> None:
+        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(version_str)
 
-    def parse(self, vstring):
-        """Parse version string."""
-        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
         if not version_match:
-            raise ValueError('Invalid version number "{}"'.format(vstring))
+            raise ValueError('Invalid version number "{}"'.format(version_str))
+
         components = [int(n) for n in version_match.group(1).split('.')]
+
         # The _dev_version numbering scheme might change. E.g. if a stage
         # between 'alpha' and 'beta' is added, 'beta', 'rc' and stable releases
         # are reassigned (beta=3, rc=4, stable=5).
+
         if version_match.group(3):  # wmf version
             self._dev_version = (0, int(version_match.group(3)))
         elif version_match.group(4):
@@ -577,41 +572,45 @@ class MediaWikiVersion:
                       '"{}"'.format(version_match.group(2)),
                       _logger)
             self._dev_version = (4, )
+
         self.suffix = version_match.group(2) or ''
         self.version = tuple(components)
 
-    def __str__(self):
+    @staticmethod
+    def from_generator(generator: str) -> 'MediaWikiVersion':
+        """Create instance from a site's generator attribute."""
+        prefix = 'MediaWiki '
+
+        if not generator.startswith(prefix):
+            raise ValueError('Generator string ({!r}) must start with '
+                             '"{}"'.format(generator, prefix))
+
+        return MediaWikiVersion(generator[len(prefix):])
+
+    def __str__(self) -> str:
         """Return version number with optional suffix."""
         return '.'.join(str(v) for v in self.version) + self.suffix
 
-    def _cmp(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, str):
             other = MediaWikiVersion(other)
+        elif not isinstance(other, MediaWikiVersion):
+            return False
 
-        if self.version > other.version:
-            return 1
-        if self.version < other.version:
-            return -1
-        if self._dev_version > other._dev_version:
-            return 1
-        if self._dev_version < other._dev_version:
-            return -1
-        return 0
+        return self.version == other.version and \
+            self._dev_version == other._dev_version
 
-    def __eq__(self, other):
-        return self._cmp(other) == 0
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, str):
+            other = MediaWikiVersion(other)
+        elif not isinstance(other, MediaWikiVersion):
+            raise TypeError("Comparison between 'MediaWikiVersion' and '{}' "
+                            'unsupported'.format(type(other).__name__))
 
-    def __lt__(self, other):
-        return self._cmp(other) < 0
-
-    def __le__(self, other):
-        return self._cmp(other) <= 0
-
-    def __gt__(self, other):
-        return self._cmp(other) > 0
-
-    def __ge__(self, other):
-        return self._cmp(other) >= 0
+        if self.version != other.version:
+            return self.version < other.version
+        else:
+            return self._dev_version < other._dev_version
 
 
 class RLock:
