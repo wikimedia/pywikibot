@@ -51,7 +51,7 @@ Options for "move" action:
  -hist        - Creates a nice wikitable on the talk page of target category
                 that contains detailed page history of the source category.
  -nodelete    - Don't delete the old category after move.
- -nowb        - Don't update the wikibase repository.
+ -nowb        - Don't update the Wikibase repository.
  -allowsplit  - If that option is not set, it only moves the talk and main
                 page together.
  -mvtogether  - Only move the pages/subcategories of a category, if the
@@ -592,7 +592,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
-        # if that page doesn't has a wikibase
+        # if that page doesn't has a Wikibase
         self.wikibase = wikibase and self.site.has_data_repository
         self.allow_split = allow_split
         self.move_together = move_together

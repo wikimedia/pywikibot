@@ -2234,7 +2234,7 @@ def WikibaseItemGenerator(gen):
 def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
                                     show_filtered: bool = False):
     """
-    A wrapper generator used to exclude if page has a wikibase item or not.
+    A wrapper generator used to exclude if page has a Wikibase item or not.
 
     @param generator: Generator to wrap.
     @type generator: generator

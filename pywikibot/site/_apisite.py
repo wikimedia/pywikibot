@@ -1015,17 +1015,17 @@ class APISite(
 
     def page_from_repository(self, item):
         """
-        Return a Page for this site object specified by wikibase item.
+        Return a Page for this site object specified by Wikibase item.
 
         @param item: id number of item, "Q###",
         @type item: str
-        @return: Page, or Category object given by wikibase item number
+        @return: Page, or Category object given by Wikibase item number
             for this site object.
         @rtype: pywikibot.Page or None
 
-        @raises pywikibot.exceptions.UnknownExtension: site has no wikibase
+        @raises pywikibot.exceptions.UnknownExtension: site has no Wikibase
             extension
-        @raises NotimplementedError: method not implemented for a wikibase site
+        @raises NotimplementedError: method not implemented for a Wikibase site
         """
         if not self.has_data_repository:
             raise UnknownExtension(

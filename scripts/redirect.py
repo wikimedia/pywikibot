@@ -57,7 +57,7 @@ and arguments can be:
 
 -sdtemplate:x  Add the speedy deletion template string including brackets.
                This enables overriding the default template via i18n or
-               to enable speedy deletion for projects other than wikipedias.
+               to enable speedy deletion for projects other than Wikipedias.
 
 -always        Don't prompt you for each replacement.
 

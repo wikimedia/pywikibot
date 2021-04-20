@@ -96,7 +96,7 @@ A sample pywikibot script for getting data from Wikibase:
 
     import pywikibot
     site = pywikibot.Site('wikipedia:en')
-    repo = site.data_repository()  # the wikibase repository for given site
+    repo = site.data_repository()  # the Wikibase repository for given site
     page = repo.page_from_repository('Q91')  # create a local page for the given item
     item = pywikibot.ItemPage(repo, 'Q91')  # a repository item
     data = item.get()  # get all item data from repository for this item

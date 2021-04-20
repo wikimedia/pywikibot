@@ -14,7 +14,7 @@ This script understands various command-line arguments:
 -pageage          The minimum number of days that has passed since the page was
                   created.
 
--touch            Do a null edit on every page which has a wikibase item.
+-touch            Do a null edit on every page which has a Wikibase item.
                   Be careful, this option can trigger edit rates or captchas
                   if your account is not autoconfirmed.
 

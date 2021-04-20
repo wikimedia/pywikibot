@@ -2175,15 +2175,15 @@ class Page(BasePage):
         """
         Return the first best Claim for this page.
 
-        Return the first 'preferred' ranked Claim specified by wikibase
+        Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
 
         @param prop: property id, "P###"
-        @return: Claim object given by wikibase property number
+        @return: Claim object given by Wikibase property number
             for this page object.
         @rtype: pywikibot.Claim or None
 
-        @raises UnknownExtension: site has no wikibase extension
+        @raises UnknownExtension: site has no Wikibase extension
         """
         def find_best_claim(claims):
             """Find the first best ranked claim."""
@@ -3841,9 +3841,9 @@ class ItemPage(WikibasePage):
         Return ID as title of the ItemPage.
 
         If the ItemPage was lazy-loaded via ItemPage.fromPage, this method
-        will fetch the wikibase item ID for the page, potentially raising
+        will fetch the Wikibase item ID for the page, potentially raising
         NoPage with the page on the linked wiki if it does not exist, or
-        does not have a corresponding wikibase item ID.
+        does not have a corresponding Wikibase item ID.
 
         This method also refreshes the title if the id property was set.
         i.e. item.id = 'Q60'
