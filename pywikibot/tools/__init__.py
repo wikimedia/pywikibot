@@ -1035,11 +1035,11 @@ class SelfCallMixin:
 
     def __call__(self):
         """Do nothing and just return itself."""
-        if hasattr(self, '_own_desc'):
-            issue_deprecation_warning('Calling {}'.format(self._own_desc),
-                                      'it directly',
-                                      warning_class=FutureWarning,
-                                      since='20150515')
+        issue_deprecation_warning('Referencing this attribute like a function',
+                                  'it directly',
+                                  warning_class=FutureWarning,
+                                  since='20210420')
+
         return self
 
 

@@ -100,8 +100,9 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
         """Test that namespaces is callable and returns itself."""
         site = self.get_site()
         self.assertIs(site.namespaces(), site.namespaces)
-        self.assertOneDeprecationParts('Calling the namespaces property',
-                                       'it directly')
+        self.assertOneDeprecationParts(
+            'Referencing this attribute like a function',
+            'it directly')
 
 
 class TestSiteObject(DefaultSiteTestCase):

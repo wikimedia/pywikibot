@@ -305,8 +305,6 @@ class NamespacesDict(Mapping, SelfCallMixin):
     APISite was callable.
     """
 
-    _own_desc = 'the namespaces property'
-
     def __init__(self, namespaces):
         """Create new dict using the given namespaces."""
         super().__init__()
