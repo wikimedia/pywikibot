@@ -592,7 +592,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
-        # if that page doesn't has a Wikibase
+        # if that page doesn't have a Wikibase
         self.wikibase = wikibase and self.site.has_data_repository
         self.allow_split = allow_split
         self.move_together = move_together
