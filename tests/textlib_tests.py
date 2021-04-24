@@ -14,13 +14,15 @@ from collections import OrderedDict
 from contextlib import suppress
 
 import pywikibot
-import pywikibot.textlib as textlib
 
 from pywikibot.backports import nullcontext
+from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
+from pywikibot import textlib
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import suppress_warnings
-from pywikibot import UnknownSite
+
+from tests import mock
 
 from tests.aspects import (
     DefaultDrySiteTestCase,
@@ -28,7 +30,6 @@ from tests.aspects import (
     SiteAttributeTestCase,
     TestCase,
 )
-from tests import mock
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), 'pages')
@@ -753,7 +754,7 @@ class TestReplaceLinks(TestCase):
                 mapping[iw['family']] = _IWEntry(True, 'invalid')
                 mapping[iw['family']]._site = iw['site']
             mapping['bug'] = _IWEntry(False, 'invalid')
-            mapping['bug']._site = UnknownSite('Not a wiki')
+            mapping['bug']._site = UnknownSiteError('Not a wiki')
             mapping['en'] = _IWEntry(True, 'invalid')
             mapping['en']._site = site['site']
             site['site']._interwikimap._map = mapping

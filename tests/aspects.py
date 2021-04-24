@@ -27,23 +27,28 @@ import pywikibot
 
 import pywikibot.config2 as config
 
-from pywikibot import Site
-
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.exceptions import ServerError, NoUsername
+from pywikibot.exceptions import ServerError, NoUsernameError
 from pywikibot.family import WikimediaFamily
+from pywikibot import Site
 from pywikibot.site import BaseSite
 from pywikibot.tools import suppress_warnings
 
 from tests import (
-    WARN_SITE_CODE, patch_request, unpatch_request, unittest_print
+    patch_request,
+    unpatch_request,
+    unittest_print,
+    WARN_SITE_CODE,
 )
 
 from tests.utils import (
-    execute_pwb, DrySite, DryRequest,
-    WarningSourceSkipContextManager, AssertAPIErrorContextManager,
+    AssertAPIErrorContextManager,
+    DryRequest,
+    DrySite,
+    execute_pwb,
+    WarningSourceSkipContextManager,
 )
 
 try:
@@ -567,7 +572,7 @@ class RequireLoginMixin(TestCaseBase):
                     'Site {} has readonly state: {}'.format(
                         site, site.siteinfo.get('readonlyreason', '')))
 
-            with suppress(NoUsername):
+            with suppress(NoUsernameError):
                 site.login()
 
             if not site.user():

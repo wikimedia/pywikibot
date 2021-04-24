@@ -8,7 +8,7 @@ import unittest
 
 from contextlib import contextmanager, suppress
 
-from pywikibot.exceptions import LockedPage
+from pywikibot.exceptions import LockedPageError
 from pywikibot.flow import Board, Topic, Post
 
 from tests.aspects import TestCase
@@ -197,14 +197,14 @@ class TestFlowEditFailure(TestCase):
         # Setup
         content = 'I am a reply to a locked topic. This is not good!'
         topic = Topic(self.site, 'Topic:Smxnipjfs8umm1wt')
-        # Reply (should raise a LockedPage exception)
-        with self.assertRaises(LockedPage):
+        # Reply (should raise a LockedPageError exception)
+        with self.assertRaises(LockedPageError):
             topic.reply(content, 'wikitext')
         topic_root = topic.root
-        with self.assertRaises(LockedPage):
+        with self.assertRaises(LockedPageError):
             topic_root.reply(content, 'wikitext')
         topic_reply = topic.root.replies(force=True)[0]
-        with self.assertRaises(LockedPage):
+        with self.assertRaises(LockedPageError):
             topic_reply.reply(content, 'wikitext')
 
 

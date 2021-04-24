@@ -178,7 +178,7 @@ import pywikibot
 from pywikibot import config, i18n
 from pywikibot.backports import List
 from pywikibot.bot import SingleSiteBot
-from pywikibot.exceptions import HiddenKeyError
+from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 from pywikibot.tools.formatter import color_format
 
 
@@ -435,7 +435,7 @@ class Msg(Enum):
     DEFAULT = 'MSG', 'lightpurple'
 
 
-class FilenameNotSet(pywikibot.Error):
+class FilenameNotSet(Error):
 
     """An exception indicating that a signature filename was not specified."""
 
@@ -687,7 +687,7 @@ class WelcomeBot(SingleSiteBot):
             try:
                 log_page.put(text, i18n.twtranslate(self.site,
                                                     'welcome-updating'))
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output('An edit conflict has occurred. Pausing for '
                                  '10 seconds before continuing.')
                 time.sleep(10)
@@ -830,7 +830,7 @@ class WelcomeBot(SingleSiteBot):
         try:
             # append welcomed, welcome_count++
             ustp.put(welcome_text, welcome_comment, minor=False)
-        except pywikibot.EditConflict:
+        except EditConflictError:
             self.show_status(Msg.WARN)
             pywikibot.output(
                 'An edit conflict has occurred, skipping this user.')

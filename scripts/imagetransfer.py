@@ -38,8 +38,9 @@ import sys
 
 import pywikibot
 
-from pywikibot.bot import SingleSiteBot
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.bot import SingleSiteBot
+from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools.formatter import color_format
 
@@ -196,10 +197,10 @@ class ImageTransferBot(SingleSiteBot):
             # add interwiki link
             if sourceSite.family == self.opt.target.family:
                 description += '\n\n{0}'.format(sourceImagePage)
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output(
                 'Image does not exist or description page is empty.')
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('Image description page is redirect.')
         else:
             bot = UploadRobot(url=url, description=description,
@@ -244,7 +245,7 @@ class ImageTransferBot(SingleSiteBot):
             try:
                 # Show the image description page's contents
                 pywikibot.output(image.get())
-            except pywikibot.NoPage:
+            except NoPageError:
                 pass
             else:
                 # look if page already exists with this name.
@@ -261,10 +262,10 @@ class ImageTransferBot(SingleSiteBot):
                     pywikibot.output('-' * 60)
                     pywikibot.output(targetImage.get())
                     sys.exit()
-                except pywikibot.NoPage:
+                except NoPageError:
                     # That's the normal case
                     pass
-                except pywikibot.IsRedirectPage:
+                except IsRedirectPageError:
                     pywikibot.output(
                         'Description page on target wiki is redirect?!')
 

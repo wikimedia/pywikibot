@@ -61,13 +61,21 @@ from typing import Optional
 
 import pywikibot
 
+from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import url2unicode
 from pywikibot import textlib
+
 from pywikibot.textlib import (
-    _get_regexes, _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+    FILE_LINK_REGEX,
+    _get_regexes,
+    _MultiTemplateMatchBuilder,
 )
+
 from pywikibot.tools import (
-    deprecated, deprecated_args, first_lower, first_upper,
+    deprecated,
+    deprecated_args,
+    first_lower,
+    first_upper,
     issue_deprecation_warning,
 )
 
@@ -551,7 +559,7 @@ class CosmeticChangesToolkit:
             page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
             try:
                 in_main_namespace = page.namespace() == 0
-            except pywikibot.InvalidTitle:
+            except InvalidTitleError:
                 in_main_namespace = False
             if not in_main_namespace:
                 return match.group()

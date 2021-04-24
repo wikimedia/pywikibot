@@ -44,8 +44,18 @@ from contextlib import suppress
 from functools import partial
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, textlib, Bot, WikidataBot
 from pywikibot.tools import has_module
+
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    IsRedirectPageError,
+    LockedPageError,
+    NoPageError,
+    SpamblacklistError,
+)
 
 try:
     import stdnum.isbn
@@ -58,7 +68,7 @@ docuReplacements = {
 }
 
 
-class InvalidIsbnException(pywikibot.Error):
+class InvalidIsbnException(Error):
 
     """Invalid ISBN."""
 
@@ -188,20 +198,20 @@ class IsbnBot(Bot):
                 new_text = self.isbnR.sub(_hyphenateIsbnNumber, new_text)
             try:
                 self.userPut(page, page.text, new_text, summary=self.comment)
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output('Skipping {0} because of edit conflict'
                                  .format(page.title()))
-            except pywikibot.SpamblacklistError as e:
+            except SpamblacklistError as e:
                 pywikibot.output(
                     'Cannot change {0} because of blacklist entry {1}'
                     .format(page.title(), e.url))
-            except pywikibot.LockedPage:
+            except LockedPageError:
                 pywikibot.output('Skipping {0} (locked page)'
                                  .format(page.title()))
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Page {0} does not exist'
                              .format(page.title(as_link=True)))
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('Page {0} is a redirect; skipping.'
                              .format(page.title(as_link=True)))
 

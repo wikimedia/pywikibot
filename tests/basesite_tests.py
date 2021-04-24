@@ -8,6 +8,7 @@ from contextlib import suppress
 
 import pywikibot
 
+from pywikibot.exceptions import Error
 from pywikibot.tools import suppress_warnings
 
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
@@ -97,7 +98,7 @@ class TestSiteObject(DefaultSiteTestCase):
 
         try:
             dabcat = mysite.disambcategory()
-        except pywikibot.Error as e:
+        except Error as e:
             try:
                 self.assertIn('No disambiguation category name found', str(e))
             except AssertionError:

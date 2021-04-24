@@ -18,6 +18,7 @@ import pywikibot
 from pywikibot import i18n
 
 from pywikibot.data import api
+from pywikibot.exceptions import LockedPageError, PageSaveRelatedError
 from pywikibot.tools import first_lower, first_upper, formatter
 
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
@@ -733,7 +734,7 @@ class CaseChecker:
                         self.site.mediawiki_message(
                             'comma-separator').join(msg)))
                 return True
-            except (pywikibot.LockedPage, pywikibot.PageSaveRelatedError):
+            except (LockedPageError, PageSaveRelatedError):
                 self.WikiLog('* Error: Could not save updated page {} ({})'
                              .format(self.MakeLink(title, False), coloredMsg))
         return False

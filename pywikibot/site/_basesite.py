@@ -12,22 +12,26 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot.exceptions import Error, FamilyMaintenanceWarning, UnknownSite
 from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
+
+from pywikibot.exceptions import (
+    Error,
+    FamilyMaintenanceWarning,
+    NoPageError,
+    PageInUseError,
+    UnknownSiteError,
+)
+
 from pywikibot.tools import (
     ComparableMixin,
     deprecated,
     first_upper,
+    ModuleDeprecationWrapper,
     normalize_username,
     remove_last_args,
     SelfCallString,
 )
-
-
-class PageInUse(Error):
-
-    """Page cannot be reserved for writing due to existing lock."""
 
 
 class BaseSite(ComparableMixin):
@@ -86,8 +90,9 @@ class BaseSite(ComparableMixin):
                          '"%s" while instantiating site %s'
                          % (self.__code, self), UserWarning)
             else:
-                raise UnknownSite("Language '%s' does not exist in family %s"
-                                  % (self.__code, self.__family.name))
+                error_msg = ("Language '{}' does not exist in family {}"
+                             .format(self.__code, self.__family.name))
+                raise UnknownSiteError(error_msg)
 
         self._username = normalize_username(user)
 
@@ -296,7 +301,7 @@ class BaseSite(ComparableMixin):
         with self._pagemutex:
             while title in self._locked_pages:
                 if not block:
-                    raise PageInUse(title)
+                    raise PageInUseError(title)
                 self._pagemutex.wait()
             self._locked_pages.add(title)
 
@@ -328,7 +333,7 @@ class BaseSite(ComparableMixin):
             dp = pywikibot.ItemPage(repo, item)
             try:
                 name = dp.getSitelink(self)
-            except pywikibot.NoPage:
+            except NoPageError:
                 raise Error(
                     'No disambiguation category name found in {repo} '
                     'for {site}'.format(repo=repo_name, site=self))
@@ -455,3 +460,13 @@ class BaseSite(ComparableMixin):
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
+
+
+PageInUse = PageInUseError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'PageInUse',
+    replacement_name='pywikibot.exceptions.PageInUseError',
+    since='20210423',
+    future_warning=True)

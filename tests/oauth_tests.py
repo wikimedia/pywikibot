@@ -11,10 +11,10 @@ from contextlib import suppress
 from pywikibot.login import OauthLoginManager
 
 from tests.aspects import (
-    unittest,
+    DefaultSiteTestCase,
     require_modules,
     TestCase,
-    DefaultSiteTestCase,
+    unittest,
 )
 
 

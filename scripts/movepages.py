@@ -41,6 +41,7 @@ import pywikibot
 
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import CurrentPageBot, MultipleSitesBot
+from pywikibot.exceptions import PageRelatedError
 
 
 # This is required for the text that is shown when you run this script
@@ -79,7 +80,7 @@ class MovePagesBot(MultipleSitesBot, CurrentPageBot):
                 newPageTitle, reason=msg,
                 movetalk=self.opt.movetalkpage,
                 noredirect=self.opt.noredirect)
-        except pywikibot.PageRelatedError as error:
+        except PageRelatedError as error:
             pywikibot.output(error)
 
     def skip_page(self, page):

@@ -17,8 +17,13 @@ If no starting name is provided, the bot starts at '!'.
 import pywikibot
 
 from pywikibot import textlib, pagegenerators
-from pywikibot.bot import (MultipleSitesBot, InteractiveReplace,
-                           AutomaticTWSummaryBot)
+from pywikibot.exceptions import Error, SectionError
+
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    InteractiveReplace,
+    MultipleSitesBot,
+)
 
 
 class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
@@ -42,7 +47,7 @@ class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
         for linked_page in self.current_page.linkedPages():
             try:
                 target = linked_page.getRedirectTarget()
-            except (pywikibot.Error, pywikibot.SectionError):
+            except (Error, SectionError):
                 continue
             # TODO: Work on all links at the same time (would mean that the
             # user doesn't get them ordered like in links but how they appear
@@ -71,7 +76,7 @@ def main(*args):
     mysite = pywikibot.Site()
     try:
         mysite.disambcategory()
-    except pywikibot.Error as e:
+    except Error as e:
         pywikibot.bot.suggest_help(exception=e)
         return
 

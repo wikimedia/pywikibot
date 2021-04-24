@@ -18,9 +18,11 @@ import pywikibot
 from pywikibot import config2 as config
 
 from pywikibot.comms import http
+from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 
 from tests import join_images_path, patch
+
 from tests.aspects import (
     unittest,
     TestCase,
@@ -99,7 +101,7 @@ class HttpsCertificateTestCase(TestCase):
     def test_https_cert_error(self):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
         with self.assertRaisesRegex(
-                pywikibot.FatalServerError,
+                FatalServerError,
                 self.CERT_VERIFY_FAILED_RE):
             http.fetch('https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
@@ -114,7 +116,7 @@ class HttpsCertificateTestCase(TestCase):
 
         # Verify that it now fails again
         with self.assertRaisesRegex(
-                pywikibot.FatalServerError,
+                FatalServerError,
                 self.CERT_VERIFY_FAILED_RE):
             http.fetch('https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
@@ -143,7 +145,7 @@ class TestHttpStatus(HttpbinTestCase):
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
         with self.assertRaisesRegex(
-                pywikibot.Server504Error,
+                Server504Error,
                 r'Server ([^\:]+|[^\:]+:[0-9]+)'
                 r' timed out'):
             http.fetch(self.get_httpbin_url('/status/504'))

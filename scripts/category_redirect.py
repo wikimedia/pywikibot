@@ -41,6 +41,13 @@ from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
 
+from pywikibot.exceptions import (
+    CircularRedirectError,
+    Error,
+    NoPageError,
+    ServerError,
+)
+
 
 class CategoryRedirectBot(SingleSiteBot):
 
@@ -153,7 +160,7 @@ class CategoryRedirectBot(SingleSiteBot):
                                                         + '/doc', self.site))
                     try:
                         doc.get()
-                    except pywikibot.Error:
+                    except Error:
                         continue
                     changed = doc.change_category(oldCat, newCat,
                                                   summary=summary)
@@ -164,7 +171,7 @@ class CategoryRedirectBot(SingleSiteBot):
                     pywikibot.output('{}: {} found, {} moved'
                                      .format(oldCat.title(), found, moved))
                 return (found, moved)
-            except pywikibot.ServerError:
+            except ServerError:
                 pywikibot.output('Server error: retrying in 5 seconds...')
                 time.sleep(5)
                 continue
@@ -184,7 +191,7 @@ class CategoryRedirectBot(SingleSiteBot):
         LOG_SIZE = 7  # Number of items to keep in active log
         try:
             log_text = self.log_page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             log_text = ''
         log_items = {}
         header = None
@@ -230,7 +237,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 continue
             try:
                 target = page.getRedirectTarget()
-            except pywikibot.CircularRedirect:
+            except CircularRedirectError:
                 target = page
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-problem-self-linked',
@@ -265,7 +272,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-added', params)
                 self.log_text.append(message)
-            except pywikibot.Error:
+            except Error:
                 pywikibot.exception()
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-add-failed', params)
@@ -343,7 +350,7 @@ class CategoryRedirectBot(SingleSiteBot):
             if cat_title not in self.record:
                 # make sure every redirect has a self.record entry
                 self.record[cat_title] = {today: None}
-                with suppress(pywikibot.Error):
+                with suppress(Error):
                     self.newredirs.append('*# {} → {}'.format(
                         cat.title(as_link=True, textlink=True),
                         cat.getCategoryRedirectTarget().title(
@@ -369,7 +376,7 @@ class CategoryRedirectBot(SingleSiteBot):
                         {'oldcat': cat.title(as_link=True, textlink=True)})
                     self.log_text.append(message)
                     continue
-            except pywikibot.Error:
+            except Error:
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-not-loaded',
                     {'oldcat': cat.title(as_link=True, textlink=True)})
@@ -427,7 +434,7 @@ class CategoryRedirectBot(SingleSiteBot):
                         cat.text = newtext
                         cat.save(i18n.twtranslate(self.site,
                                                   self.dbl_redir_comment))
-                    except pywikibot.Error as e:
+                    except Error as e:
                         message = i18n.twtranslate(
                             self.site, 'category_redirect-log-failed',
                             {'error': e})

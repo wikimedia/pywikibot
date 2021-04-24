@@ -14,14 +14,14 @@ from pywikibot import config2 as config
 from pywikibot import Site
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
+from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 
 from tests.aspects import (
-    unittest,
     AlteredDefaultSiteTestCase as LinkTestCase,
     DefaultDrySiteTestCase,
-    WikimediaDefaultSiteTestCase,
     TestCase,
+    unittest,
+    WikimediaDefaultSiteTestCase,
 )
 
 
@@ -108,7 +108,7 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(section_link.section, 'B')
 
     def test_invalid(self):
-        """Test that invalid titles raise InvalidTitle exception."""
+        """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
             exc_regex = (
@@ -178,7 +178,7 @@ class TestLink(DefaultDrySiteTestCase):
                         regex = exception_regex(text)
                     else:
                         regex = exception_regex
-                    with self.assertRaisesRegex(InvalidTitle, regex):
+                    with self.assertRaisesRegex(InvalidTitleError, regex):
                         Link(text, self.get_site()).parse()
 
     def test_relative(self):
@@ -886,7 +886,7 @@ class TestEmptyTitle(TestCase):
         """Test that Link doesn't allow links without a title."""
         link = Link('en:Help:', self.get_site())
         with self.assertRaisesRegex(
-                InvalidTitle,
+                InvalidTitleError,
                 "'en:Help:' has no title."):
             link.parse()
 
@@ -894,7 +894,7 @@ class TestEmptyTitle(TestCase):
         """Test that Link doesn't allow empty."""
         link = Link('', self.get_site())
         with self.assertRaisesRegex(
-                InvalidTitle,
+                InvalidTitleError,
                 'The link does not contain a page title'):
             link.parse()
 

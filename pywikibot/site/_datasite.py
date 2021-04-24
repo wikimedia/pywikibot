@@ -16,13 +16,17 @@ import pywikibot
 import pywikibot.family
 
 from pywikibot.data import api
-from pywikibot.exceptions import (
-    EntityTypeUnknownException,
-    NoPage,
-    NoWikibaseEntity,
-)
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_right, need_version
+
+from pywikibot.exceptions import (
+    APIError,
+    EntityTypeUnknownError,
+    IsRedirectPageError,
+    NoPageError,
+    NoWikibaseEntityError,
+)
+
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
@@ -74,7 +78,7 @@ class DataSite(APISite):
             self._cache_entity_namespaces()
         if entity_type in self._entity_namespaces:
             return self._entity_namespaces[entity_type]
-        raise EntityTypeUnknownException(
+        raise EntityTypeUnknownError(
             '{0!r} does not support entity type "{1}"'
             .format(self, entity_type))
 
@@ -107,7 +111,7 @@ class DataSite(APISite):
         """
         Return a new instance for given entity id.
 
-        @raises pywikibot.exceptions.NoWikibaseEntity: there is no entity
+        @raises pywikibot.exceptions.NoWikibaseEntityError: there is no entity
             with the id
         @return: a WikibaseEntity subclass
         @rtype: WikibaseEntity
@@ -116,7 +120,8 @@ class DataSite(APISite):
             if cls.is_valid_id(entity_id):
                 return cls(self, entity_id)
 
-        raise NoWikibaseEntity(pywikibot.page.WikibaseEntity(self, entity_id))
+        entity = pywikibot.page.WikibaseEntity(self, entity_id)
+        raise NoWikibaseEntityError(entity)
 
     @property
     @need_version('1.28-wmf.3')
@@ -214,7 +219,7 @@ class DataSite(APISite):
         req = self._simple_request(**params)
         data = req.submit()
         if 'success' not in data:
-            raise api.APIError(data['errors'], '')
+            raise APIError(data['errors'], '')
         return data['entities']
 
     def preload_entities(self, pagelist, groupsize=50):
@@ -257,7 +262,7 @@ class DataSite(APISite):
                 page = cls(self, entity)
                 # No api call is made because item._content is given
                 page._content = data['entities'][entity]
-                with suppress(pywikibot.IsRedirectPage):
+                with suppress(IsRedirectPageError):
                     page.get()  # cannot provide get_redirect=True (T145971)
                 yield page
 
@@ -393,7 +398,7 @@ class DataSite(APISite):
             raise NotImplementedError
         if not claim.snak:
             # We need to already have the snak value
-            raise NoPage(claim)
+            raise NoPageError(claim)
         params = {'action': 'wbsetclaimvalue', 'claim': claim.snak,
                   'snaktype': snaktype, 'summary': summary, 'bot': bot,
                   'token': self.tokens['edit']}
@@ -421,7 +426,7 @@ class DataSite(APISite):
             raise NotImplementedError
         if not claim.snak:
             # We need to already have the snak value
-            raise NoPage(claim)
+            raise NoPageError(claim)
         params = {'action': 'wbsetclaim',
                   'claim': json.dumps(claim.toJSON()),
                   'token': self.tokens['edit'],
@@ -859,7 +864,7 @@ class DataSite(APISite):
         elif isinstance(itemdef, pywikibot.Page):
             try:
                 itemdef = itemdef.data_item()
-            except pywikibot.NoPage:
+            except NoPageError:
                 itemdef = pywikibot.ItemPage(self)
         if not isinstance(itemdef, pywikibot.page.WikibasePage):
             raise TypeError('itemdef shall be str, WikibasePage or Page')

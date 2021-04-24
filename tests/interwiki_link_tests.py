@@ -8,13 +8,13 @@ from contextlib import suppress
 
 from pywikibot import config2 as config
 
-from pywikibot.exceptions import InvalidTitle
+from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import Link
 
 from tests.aspects import (
-    unittest,
     AlteredDefaultSiteTestCase as LinkTestCase,
     TestCase,
+    unittest,
 )
 
 
@@ -82,7 +82,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         """Test de:translatewiki:Main Page on English Wikipedia."""
         link = Link('de:translatewiki:Main Page', self.get_site('wp'))
         with self.assertRaisesRegex(
-                InvalidTitle,
+                InvalidTitleError,
                 'de:translatewiki:Main Page links to a non local '
                 'site i18n:i18n '
                 'via an interwiki link to wikipedia:de'):

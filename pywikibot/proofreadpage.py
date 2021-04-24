@@ -54,7 +54,7 @@ import pywikibot
 
 from pywikibot.comms import http
 from pywikibot.data.api import Request
-from pywikibot.exceptions import OtherPageSaveError
+from pywikibot.exceptions import Error, OtherPageSaveError
 from pywikibot import textlib
 from pywikibot.tools import ModuleDeprecationWrapper
 
@@ -174,7 +174,8 @@ class ProofreadPage(pywikibot.Page):
     def __init__(self, source, title=''):
         """Instantiate a ProofreadPage object.
 
-        @raise UnknownExtension: source Site has no ProofreadPage Extension.
+        @raise UnknownExtensionError: source Site has no ProofreadPage
+            Extension.
         """
         if not isinstance(source, pywikibot.site.BaseSite):
             site = source.site
@@ -467,8 +468,7 @@ class ProofreadPage(pywikibot.Page):
         """
         def _assert_len(len_oq, len_cq, title):
             if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
-                raise pywikibot.Error('ProofreadPage {}: invalid format'
-                                      .format(title))
+                raise Error('ProofreadPage {}: invalid format'.format(title))
 
         # Property force page text loading.
         text = self.text
@@ -781,7 +781,8 @@ class IndexPage(pywikibot.Page):
         possibility to define range, filter by quality levels and page
         existence.
 
-        @raise UnknownExtension: source Site has no ProofreadPage Extension.
+        @raise UnknownExtensionError: source Site has no ProofreadPage
+            Extension.
         @raise ImportError: bs4 is not installed.
         """
         # Check if BeautifulSoup is imported.
@@ -923,7 +924,7 @@ class IndexPage(pywikibot.Page):
                 continue
 
             if page not in self._all_page_links:
-                raise pywikibot.Error('Page {} not recognised.'.format(page))
+                raise Error('Page {} not recognised.'.format(page))
 
             # In order to avoid to fetch other Page:title links outside
             # the Pages section of the Index page; these should hopefully be

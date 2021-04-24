@@ -13,6 +13,7 @@ from contextlib import suppress
 import pywikibot
 
 from pywikibot.data import api
+from pywikibot.exceptions import UnknownExtensionError
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
 from pywikibot.tools import has_module
 
@@ -35,7 +36,7 @@ class TestProofreadPageInvalidSite(TestCase):
 
     def test_invalid_site_source(self):
         """Test ProofreadPage from invalid Site as source."""
-        with self.assertRaises(pywikibot.UnknownExtension):
+        with self.assertRaises(UnknownExtensionError):
             ProofreadPage(self.site, 'title')
 
 
@@ -503,7 +504,7 @@ class TestIndexPageInvalidSite(BS4TestCase):
 
     def test_invalid_site_source(self):
         """Test IndexPage from invalid Site as source."""
-        with self.assertRaises(pywikibot.UnknownExtension):
+        with self.assertRaises(UnknownExtensionError):
             IndexPage(self.site, 'title')
 
 

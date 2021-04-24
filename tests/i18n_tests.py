@@ -9,6 +9,7 @@ from contextlib import suppress
 import pywikibot
 
 from pywikibot import bot, config, i18n, plural
+from pywikibot.exceptions import TranslationError
 
 from tests.aspects import (
     AutoDeprecationTestCase,
@@ -295,7 +296,7 @@ class TestTWTranslate(TWNTestCaseBase):
 
     def testNoEnglish(self):
         """Test translating into English with missing entry."""
-        with self.assertRaises(i18n.TranslationError):
+        with self.assertRaises(TranslationError):
             i18n.twtranslate('en', 'test-no-english')
 
 
@@ -466,7 +467,7 @@ class ScriptMessagesTestCase(TWNTestCaseBase, AutoDeprecationTestCase):
 
     def test_missing(self):
         """Test a missing message from a real message bundle."""
-        with self.assertRaises(i18n.TranslationError):
+        with self.assertRaises(TranslationError):
             i18n.twntranslate('en', 'pywikibot-missing-key')
 
 

@@ -97,6 +97,7 @@ import re
 import pywikibot
 
 from pywikibot import config2 as config, i18n
+from pywikibot.exceptions import Error
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
@@ -148,7 +149,7 @@ class Formatter:
             try:
                 self.trs_title = page._link.ns_title(onsite=self.onsite)
             # Fallback if no corresponding namespace is found in onsite.
-            except pywikibot.Error:
+            except Error:
                 self.trs_title = '{0}:{1}'.format(default, page._link.title)
 
     def output(self, num=None, fmt='1') -> str:
@@ -260,7 +261,7 @@ def main(*args) -> None:
                     pywikibot.stdout(output_list.pop(-1))
                 try:
                     pywikibot.stdout(page.text)
-                except pywikibot.Error as err:
+                except Error as err:
                     pywikibot.output(err)
             if base_dir:
                 filename = os.path.join(base_dir, page.title(as_filename=True))

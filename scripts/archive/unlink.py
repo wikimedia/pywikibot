@@ -28,6 +28,7 @@ descriptions:
 #
 
 import pywikibot
+
 from pywikibot.bot import SingleSiteBot
 from pywikibot.specialbots import BaseUnlinkBot
 

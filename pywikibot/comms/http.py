@@ -33,10 +33,14 @@ import pywikibot
 
 from pywikibot.backports import Tuple
 from pywikibot import config2 as config
-from pywikibot.exceptions import (
-    FatalServerError, Server504Error, Server414Error
-)
 from pywikibot.logging import critical, debug, error, log, warning
+
+from pywikibot.exceptions import (
+    FatalServerError,
+    Server504Error,
+    Server414Error,
+)
+
 from pywikibot.tools import (
     deprecated,
     deprecated_args,

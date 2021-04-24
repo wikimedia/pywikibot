@@ -29,10 +29,14 @@ Furthermore, the following command line parameters are supported:
 from typing import Union
 
 import pywikibot
+import pywikibot.data.api
+import pywikibot.i18n
+import pywikibot.textlib
 
 from pywikibot import pagegenerators, output, warning
 from pywikibot.backports import Set
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
+from pywikibot.exceptions import APIError, NoPageError
 
 
 # This is required for the text that is shown when you run this script
@@ -84,7 +88,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return
         try:
             item = pywikibot.ItemPage.fromPage(self.current_page)
-        except pywikibot.NoPage:
+        except NoPageError:
             item = None
 
         if item is None:
@@ -163,7 +167,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                 continue
             try:
                 wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
-            except pywikibot.NoPage:
+            except NoPageError:
                 output('Interwiki {} does not have an item'
                        .format(iw_page.title(as_link=True)))
         return wd_data
@@ -201,7 +205,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         target_item = list(wd_data).pop()
         try:
             item.mergeInto(target_item)
-        except pywikibot.data.api.APIError:
+        except APIError:
             # warning already printed by the API
             return False
         else:

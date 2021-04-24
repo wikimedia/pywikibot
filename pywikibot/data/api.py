@@ -25,29 +25,30 @@ from warnings import warn
 from urllib.parse import urlencode, unquote
 
 import pywikibot
+import pywikibot.exceptions
 
 from pywikibot import config, login
-
 from pywikibot.backports import removeprefix, Tuple
 from pywikibot.comms import http
+from pywikibot.family import SubdomainFamily
+from pywikibot.login import LoginStatus
+from pywikibot.textlib import removeHTMLParts
+from pywikibot.tools import itergroup, ModuleDeprecationWrapper, PYTHON_VERSION
+from pywikibot.tools.formatter import color_format
+
 from pywikibot.exceptions import (
     CaptchaError,
     Error,
     FatalServerError,
-    InvalidTitle,
+    InvalidTitleError,
     MaxlagTimeoutError,
-    NoUsername,
+    NoUsernameError,
     Server414Error,
     Server504Error,
     SiteDefinitionError,
     TimeoutError,
-    UnsupportedPage,
+    UnsupportedPageError,
 )
-from pywikibot.family import SubdomainFamily
-from pywikibot.login import LoginStatus
-from pywikibot.textlib import removeHTMLParts
-from pywikibot.tools import itergroup, PYTHON_VERSION
-from pywikibot.tools.formatter import color_format
 
 
 _logger = 'data.api'
@@ -108,71 +109,6 @@ class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
 
 
 MIMEMultipart = CTEBinaryMIMEMultipart
-
-
-class APIError(Error):
-
-    """The wiki site returned an error message."""
-
-    def __init__(self, code, info, **kwargs):
-        """Save error dict returned by MW API."""
-        self.code = code
-        self.info = info
-        self.other = kwargs
-        self.unicode = self.__str__()
-
-    def __repr__(self):
-        """Return internal representation."""
-        return '{name}("{code}", "{info}", {other})'.format(
-            name=self.__class__.__name__, **self.__dict__)
-
-    def __str__(self):
-        """Return a string representation."""
-        if self.other:
-            return '{0}: {1}\n[{2}]'.format(
-                self.code,
-                self.info,
-                ';\n '.join(
-                    '{0}: {1}'.format(key, val)
-                    for key, val in self.other.items()))
-
-        return '{0}: {1}'.format(self.code, self.info)
-
-
-class UploadWarning(APIError):
-
-    """Upload failed with a warning message (passed as the argument)."""
-
-    def __init__(self, code, message,
-                 file_key: Optional[str] = None,
-                 offset: Union[int, bool] = 0):
-        """
-        Create a new UploadWarning instance.
-
-        @param file_key: The file_key of the uploaded file to reuse it later.
-            If no key is known or it is an incomplete file it may be None.
-        @param offset: The starting offset for a chunked upload. Is False when
-            there is no offset.
-        """
-        super().__init__(code, message)
-        self.file_key = file_key
-        self.offset = offset
-
-    @property
-    def message(self):
-        """Return warning message."""
-        return self.info
-
-
-class APIMWException(APIError):
-
-    """The API site returned an error about a MediaWiki internal exception."""
-
-    def __init__(self, mediawiki_exception_class_name, info, **kwargs):
-        """Save error dict returned by MW API."""
-        self.mediawiki_exception_class_name = mediawiki_exception_class_name
-        code = 'internal_api_error_' + mediawiki_exception_class_name
-        super().__init__(code, info, **kwargs)
 
 
 class ParamInfo(Sized, Container):
@@ -1570,8 +1506,8 @@ class Request(MutableMapping):
         @param response: a requests.Response object
         @type response: requests.Response
         @return: a data dict
-        @raises APIError: unknown action found
-        @raises APIError: unknown query result type
+        @raises pywikibot.exceptions.APIError: unknown action found
+        @raises pywikibot.exceptions.APIError: unknown query result type
         """
         try:
             result = response.json()
@@ -1686,7 +1622,7 @@ The text message is:
     def _internal_api_error(self, code, error, result):
         """Check for internal_api_error_ or readonly and retry.
 
-        @raises APIMWException: internal_api_error or readonly
+        @raises pywikibot.exceptions.APIMWError: internal_api_error or readonly
         """
         iae = 'internal_api_error_'
         if not (code.startswith(iae) or code == 'readonly'):
@@ -1696,7 +1632,7 @@ The text message is:
         class_name = code if code == 'readonly' else removeprefix(code, iae)
 
         del error['code']  # is added via class_name
-        e = APIMWException(class_name, **error)
+        e = pywikibot.exceptions.APIMWError(class_name, **error)
 
         # If the error key is in this table, it is probably a temporary
         # problem, so we will retry the edit.
@@ -1897,8 +1833,8 @@ The text message is:
                         'Retrying failed OAuth authentication for {0}: {1}'
                         .format(self.site, info))
                     continue
-                raise NoUsername('Failed OAuth authentication for %s: %s'
-                                 % (self.site, info))
+                raise NoUsernameError('Failed OAuth authentication for {}: {}'
+                                      .format(self.site, info))
             if code == 'cirrussearch-too-busy-error':  # T170647
                 self.wait()
                 continue
@@ -1919,7 +1855,7 @@ The text message is:
                               % pprint.pformat(param_repr))
                 pywikibot.log('           response=\n{}'.format(result))
 
-                raise APIError(**result['error'])
+                raise pywikibot.exceptions.APIError(**result['error'])
             except TypeError:
                 raise RuntimeError(result)
 
@@ -2952,7 +2888,7 @@ class LoginManager(login.LoginManager):
             # try to login
             try:
                 login_result = login_request.submit()
-            except APIError as e:
+            except pywikibot.exceptions.APIError as e:
                 login_result = {'error': e.__dict__}
 
             # clientlogin response can be clientlogin or error
@@ -3018,9 +2954,9 @@ class LoginManager(login.LoginManager):
             break
 
         if 'error' in login_result:
-            raise APIError(**response)
+            raise pywikibot.exceptions.APIError(**response)
 
-        raise APIError(code=status, info=fail_reason)
+        raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
 
     def get_login_token(self) -> str:
         """Fetch login token from action=query&meta=tokens.
@@ -3073,10 +3009,11 @@ def _update_pageid(page, pagedict: dict):
         # Something is wrong.
         if page.site.sametitle(page.title(), pagedict['title']):
             if 'invalid' in pagedict:
-                raise InvalidTitle('{}: {}'.format(page,
-                                                   pagedict['invalidreason']))
+                raise InvalidTitleError('{}: {}'
+                                        .format(page,
+                                                pagedict['invalidreason']))
         if int(pagedict['ns']) < 0:
-            raise UnsupportedPage(page)
+            raise UnsupportedPageError(page)
         raise RuntimeError(
             "Page {} has neither 'pageid' nor 'missing' attribute"
             .format(pagedict['title']))
@@ -3157,8 +3094,8 @@ def update_page(page, pagedict: dict, props=None):
         property which would make the value present must be in the props
         parameter.
     @type props: iterable of string
-    @raises pywikibot.exceptions.InvalidTitle: Page title is invalid
-    @raises pywikibot.exceptions.UnsupportedPage: Page with namespace < 0
+    @raises pywikibot.exceptions.InvalidTitleError: Page title is invalid
+    @raises pywikibot.exceptions.UnsupportedPageError: Page with namespace < 0
         is not supported yet
     """
     _update_pageid(page, pagedict)
@@ -3219,3 +3156,25 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('pageid')
         page._lintinfo.pop('title')
         page._lintinfo.pop('ns')
+
+
+APIError = pywikibot.exceptions.APIError
+UploadWarning = pywikibot.exceptions.UploadError
+APIMWException = pywikibot.exceptions.APIMWError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'APIError',
+    replacement_name='pywikibot.exceptions.APIError',
+    since='20210423',
+    future_warning=True)
+wrapper._add_deprecated_attr(
+    'UploadWarning',
+    replacement_name='pywikibot.exceptions.UploadError',
+    since='20210423',
+    future_warning=True)
+wrapper._add_deprecated_attr(
+    'APIMWException',
+    replacement_name='pywikibot.exceptions.APIMWError',
+    since='20210423',
+    future_warning=True)

@@ -14,28 +14,28 @@ from contextlib import suppress
 from typing import Optional
 
 import pywikibot
+
 from pywikibot import pagegenerators, date
-
-from pywikibot.exceptions import ServerError, UnknownExtension
-
-from pywikibot.pagegenerators import (
-    PagesFromTitlesGenerator,
-    PreloadingGenerator,
-    CategorizedPageGenerator,
-    WikibaseItemFilterPageGenerator,
-)
-
+from pywikibot.exceptions import ServerError, UnknownExtensionError
 from pywikibot.tools import has_module, suppress_warnings
 
 from tests import join_data_path, mock
-from tests.aspects import (
-    TestCase,
-    DeprecationTestCase,
-    WikidataTestCase,
-    DefaultSiteTestCase,
-    RecentChangesTestCase,
-)
 from tests.thread_tests import GeneratorIntersectTestCase
+
+from pywikibot.pagegenerators import (
+    CategorizedPageGenerator,
+    PagesFromTitlesGenerator,
+    PreloadingGenerator,
+    WikibaseItemFilterPageGenerator,
+)
+
+from tests.aspects import (
+    DefaultSiteTestCase,
+    DeprecationTestCase,
+    RecentChangesTestCase,
+    TestCase,
+    WikidataTestCase,
+)
 
 LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
                   r'is deprecated for .*; use Site\.exturlusage')
@@ -726,7 +726,7 @@ class DryFactoryGeneratorTest(TestCase):
     def test_unsupported_quality_level_filter(self):
         """Test unsupported option."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        with self.assertRaises(UnknownExtension):
+        with self.assertRaises(UnknownExtensionError):
             gf.handle_arg('-ql:2')
 
     def test_one_excluded_namespaces(self):
@@ -1274,7 +1274,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 gf.handle_arg('-linter:show')
             self.assertEqual(cm.exception.code, 0)
         else:
-            with self.assertRaises(UnknownExtension):
+            with self.assertRaises(UnknownExtensionError):
                 gf.handle_arg('-linter:show')
 
     def test_querypage_generator_with_valid_page(self):

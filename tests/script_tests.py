@@ -13,9 +13,13 @@ from contextlib import suppress
 from pywikibot.tools import has_module
 
 from tests import join_root_path, unittest_print
-from tests.aspects import (DefaultSiteTestCase, MetaTestCaseClass,
-                           PwbTestCase)
 from tests.utils import execute_pwb
+
+from tests.aspects import (
+    DefaultSiteTestCase,
+    MetaTestCaseClass,
+    PwbTestCase,
+)
 
 scripts_path = join_root_path('scripts')
 

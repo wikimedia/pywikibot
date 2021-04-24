@@ -24,10 +24,13 @@ import pywikibot
 
 from pywikibot.backports import List, Tuple
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
+from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
+
 from pywikibot.tools import (
-    deprecated, deprecate_arg, issue_deprecation_warning,
+    deprecated,
+    deprecate_arg,
+    issue_deprecation_warning,
 )
 
 try:
@@ -721,7 +724,7 @@ def replace_links(text: str, replace, site=None) -> str:
             link = pywikibot.Link.create_separated(
                 groups['title'], site, section=groups['section'],
                 label=groups['label'])
-        except (SiteDefinitionError, InvalidTitle):
+        except (SiteDefinitionError, InvalidTitleError):
             # unrecognized iw prefix or invalid title
             curpos = end
             continue
@@ -798,7 +801,7 @@ def replace_links(text: str, replace, site=None) -> str:
         parsed_new_label = pywikibot.Link(new_label, new_link.site)
         try:
             parsed_new_label.parse()
-        except InvalidTitle:
+        except InvalidTitleError:
             pass
         else:
             parsed_link_title = title_section(parsed_new_label)
@@ -991,7 +994,7 @@ def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
             page = pywikibot.Page(site, pagetitle)
             try:
                 result[page.site] = page  # need to trigger page._link.parse()
-            except InvalidTitle:
+            except InvalidTitleError:
                 pywikibot.output('[getLanguageLinks] Text contains invalid '
                                  'interwiki link [[%s:%s]].'
                                  % (lang, pagetitle))
@@ -1273,7 +1276,7 @@ def getCategoryLinks(text: str, site=None,
                                      (match.group('namespace'), title),
                                      site),
                                      sort_key=sortKey)
-        except InvalidTitle:
+        except InvalidTitleError:
             # Category title extracted contains invalid characters
             # Likely due to on-the-fly category name creation, see T154309
             pywikibot.warning('Invalid category title extracted: %s' % title)

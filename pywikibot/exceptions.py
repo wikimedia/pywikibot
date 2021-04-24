@@ -5,50 +5,57 @@ the framework::
 
     Exception
      +-- Error
-          +-- AutoblockUser
+          +-- APIError
+          |    +-- APIMWError
+          |    +-- UploadError
+          +-- AutoblockUserError
           +-- CaptchaError
-          +-- InvalidTitle
-          +-- NoUsername
+          +-- InvalidTitleError
+          +-- NoUsernameError
+          +-- PageInUseError
           +-- PageRelatedError
-          |    +-- CircularRedirect
-          |    +-- InterwikiRedirectPage
-          |    +-- IsNotRedirectPage
-          |    +-- IsRedirectPage
-          |    +-- NoMoveTarget
-          |    +-- NoPage
+          |    +-- CircularRedirectError
+          |    +-- InterwikiRedirectPageError
+          |    +-- IsNotRedirectPageError
+          |    +-- IsRedirectPageError
+          |    +-- NoMoveTargetError
+          |    +-- NoPageError
           |    +-- NotEmailableError
           |    +-- PageLoadRelatedError
-          |    |    +-- InconsistentTitleReceived
+          |    |    +-- InconsistentTitleError
           |    +-- PageSaveRelatedError
-          |    |    +-- EditConflict
-          |    |    |    +-- ArticleExistsConflict
-          |    |    |    +-- PageCreatedConflict
-          |    |    |    +-- PageDeletedConflict
-          |    |    +-- LockedPage
-          |    |    |    +-- LockedNoPage
-          |    |    |    +-- CascadeLockedPage
+          |    |    +-- EditConflictError
+          |    |    |    +-- ArticleExistsConflictError
+          |    |    |    +-- PageCreatedConflictError
+          |    |    |    +-- PageDeletedConflictError
+          |    |    +-- LockedPageError
+          |    |    |    +-- LockedNoPageError
+          |    |    |    +-- CascadeLockedPageError
           |    |    +-- NoCreateError
           |    |    +-- OtherPageSaveError
           |    |    +-- SpamblacklistError
           |    |    +-- TitleblacklistError
-          |    +-- UnsupportedPage
+          |    +-- UnsupportedPageError
           +-- SectionError
           +-- ServerError
           |    +-- FatalServerError
           |    +-- Server414Error
           |    +-- Server504Error
           +-- SiteDefinitionError
-          |    +-- UnknownFamily
-          |    +-- UnknownSite
+          |    +-- UnknownFamilyError
+          |    +-- UnknownSiteError
           +-- TimeoutError
           |    +-- MaxlagTimeoutError
+          +-- TranslationError
           +-- UserRightsError
           |    +-- HiddenKeyError (KeyError)
-          +-- UnknownExtension (NotImplementedError)
+          +-- UnhandledAnswerError
+          +-- UnknownExtensionError (NotImplementedError)
+          +-- VersionParseError
           +-- WikiBaseError
-               +-- CoordinateGlobeUnknownException (NotimplementedError)
-               +-- EntityTypeUnknownException
-               +-- NoWikibaseEntity
+               +-- CoordinateGlobeUnknownError (NotimplementedError)
+               +-- EntityTypeUnknownError
+               +-- NoWikibaseEntityError
 
     UserWarning
      +-- ArgumentDeprecationWarning (FutureWarning)
@@ -60,46 +67,55 @@ the framework::
 
 Error: Base class, all exceptions should the subclass of this class.
 
-  - NoUsername: Username is not in user-config.py, or it is invalid.
-  - AutoblockUser: requested action on a virtual autoblock user not valid
+  - NoUsernameError: Username is not in user-config.py, or it is invalid.
+  - AutoblockUserError: requested action on a virtual autoblock user not valid
+  - TranslationError: no language translation found
   - UserRightsError: insufficient rights for requested action
-  - InvalidTitle: Invalid page title
+  - InvalidTitleError: Invalid page title
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - i18n.TranslationError: i18n/l10n message not available
-  - UnknownExtension: Extension is not defined for this site
+  - PageInUseError: Page cannot be reserved due to a lock
+  - UnhandledAnswerError: bot choice caused a problem to arise
+  - UnknownExtensionError: Extension is not defined for this site
+  - VersionParseError: failed to parse version information
   - SectionError: The section specified by # does not exist
+
+APIError: wiki API returned an error
+
+  - APIMWError: MediaWiki internal exception
+  - UploadError: upload failed
 
 SiteDefinitionError: Site loading problem
 
-  - UnknownSite: Site does not exist in Family
-  - UnknownFamily: Family is not registered
+  - UnknownSiteError: Site does not exist in Family
+  - UnknownFamilyError: Family is not registered
 
 PageRelatedError: any exception which is caused by an operation on a Page.
 
-  - NoPage: Page does not exist
-  - UnsupportedPage: Page is not supported due to a namespace restriction
-  - IsRedirectPage: Page is a redirect page
-  - IsNotRedirectPage: Page is not a redirect page
-  - CircularRedirect: Page is a circular redirect
-  - InterwikiRedirectPage: Page is a redirect to another site
+  - NoPageError: Page does not exist
+  - UnsupportedPageError: Page is not supported due to a namespace restriction
+  - IsRedirectPageError: Page is a redirect page
+  - IsNotRedirectPageError: Page is not a redirect page
+  - CircularRedirectError: Page is a circular redirect
+  - InterwikiRedirectPageError: Page is a redirect to another site
   - NotEmailableError: The target user has disabled email
-  - NoMoveTarget: An expected move target page does not exist
+  - NoMoveTargetError: An expected move target page does not exist
 
 PageLoadRelatedError: any exception which happens while loading a Page.
-  - InconsistentTitleReceived: Page receives a title inconsistent with query
+  - InconsistentTitleError: Page receives a title inconsistent with query
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 
   - SpamblacklistError: MediaWiki spam filter detected a blacklisted URL
   - TitleblacklistError: MediaWiki detected a blacklisted page title
   - OtherPageSaveError: misc. other save related exception.
-  - LockedPage: Page is locked
-      - LockedNoPage: Title is locked against creation
-      - CascadeLockedPage: Page is locked due to cascading protection
-  - EditConflict: Edit conflict while uploading the page
-      - PageDeletedConflict: Page was deleted since being retrieved
-      - PageCreatedConflict: Page was created by another user
-      - ArticleExistsConflict: Page article already exists
+  - LockedPageError: Page is locked
+      - LockedNoPageError: Title is locked against creation
+      - CascadeLockedPageError: Page is locked due to cascading protection
+  - EditConflictError: Edit conflict while uploading the page
+      - PageDeletedConflictError: Page was deleted since being retrieved
+      - PageCreatedConflictError: Page was created by another user
+      - ArticleExistsConflictError: Page article already exists
   - NoCreateError: parameter nocreate not allow page creation
 
 ServerError: a problem with the server.
@@ -110,9 +126,9 @@ ServerError: a problem with the server.
 
 WikiBaseError: any issue specific to Wikibase.
 
-  - NoWikibaseEntity: entity doesn't exist
-  - CoordinateGlobeUnknownException: globe is not implemented yet.
-  - EntityTypeUnknownException: entity type is not available on the site.
+  - NoWikibaseEntityError: entity doesn't exist
+  - CoordinateGlobeUnknownError: globe is not implemented yet.
+  - EntityTypeUnknownError: entity type is not available on the site.
 
 TimeoutError: request failed with a timeout
 
@@ -142,10 +158,11 @@ UserWarning: warnings targeted at users
 # Distributed under the terms of the MIT license.
 #
 import re
+import sys
 
 from typing import Optional, Union
 
-from pywikibot.tools import _NotImplementedWarning
+from pywikibot.tools import ModuleDeprecationWrapper, _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -180,6 +197,71 @@ class Error(Exception):
     def __str__(self) -> str:
         """Return a string representation."""
         return self.unicode
+
+
+class APIError(Error):
+
+    """The wiki site returned an error message."""
+
+    def __init__(self, code, info, **kwargs):
+        """Save error dict returned by MW API."""
+        self.code = code
+        self.info = info
+        self.other = kwargs
+        self.unicode = self.__str__()
+
+    def __repr__(self):
+        """Return internal representation."""
+        return '{name}("{code}", "{info}", {other})'.format(
+            name=self.__class__.__name__, **self.__dict__)
+
+    def __str__(self):
+        """Return a string representation."""
+        if self.other:
+            return '{0}: {1}\n[{2}]'.format(
+                self.code,
+                self.info,
+                ';\n '.join(
+                    '{0}: {1}'.format(key, val)
+                    for key, val in self.other.items()))
+
+        return '{0}: {1}'.format(self.code, self.info)
+
+
+class APIMWError(APIError):
+
+    """The API site returned an error about a MediaWiki internal exception."""
+
+    def __init__(self, mediawiki_exception_class_name, info, **kwargs):
+        """Save error dict returned by MW API."""
+        self.mediawiki_exception_class_name = mediawiki_exception_class_name
+        code = 'internal_api_error_' + mediawiki_exception_class_name
+        super().__init__(code, info, **kwargs)
+
+
+class UploadError(APIError):
+
+    """Upload failed with a warning message (passed as the argument)."""
+
+    def __init__(self, code, message,
+                 file_key: Optional[str] = None,
+                 offset: Union[int, bool] = 0):
+        """
+        Create a new UploadError instance.
+
+        @param file_key: The file_key of the uploaded file to reuse it later.
+            If no key is known or it is an incomplete file it may be None.
+        @param offset: The starting offset for a chunked upload. Is False when
+            there is no offset.
+        """
+        super().__init__(code, message)
+        self.file_key = file_key
+        self.offset = offset
+
+    @property
+    def message(self):
+        """Return warning message."""
+        return self.info
 
 
 class PageRelatedError(Error):
@@ -246,21 +328,21 @@ class OtherPageSaveError(PageSaveRelatedError):
         return str(self.reason)
 
 
-class NoUsername(Error):
+class NoUsernameError(Error):
 
     """Username is not in user-config.py."""
 
     pass
 
 
-class NoPage(PageRelatedError):
+class NoPageError(PageRelatedError):
 
     """Page does not exist."""
 
     message = "Page %s doesn't exist."
 
 
-class UnsupportedPage(PageRelatedError):
+class UnsupportedPageError(PageRelatedError):
 
     """Unsupported page due to namespace restriction."""
 
@@ -268,7 +350,7 @@ class UnsupportedPage(PageRelatedError):
     message = 'Page %s is not supported due to namespace restriction.'
 
 
-class NoMoveTarget(PageRelatedError):
+class NoMoveTargetError(PageRelatedError):
 
     """Expected move target page not found."""
 
@@ -282,7 +364,7 @@ class PageLoadRelatedError(PageRelatedError):
     message = 'Page %s was not loaded.'
 
 
-class InconsistentTitleReceived(PageLoadRelatedError):
+class InconsistentTitleError(PageLoadRelatedError):
 
     """Page receives a title inconsistent with query."""
 
@@ -305,42 +387,47 @@ class SiteDefinitionError(Error):
     pass
 
 
-class UnknownSite(SiteDefinitionError):
+class UnknownSiteError(SiteDefinitionError):
 
     """Site does not exist in Family."""
 
     pass
 
 
-class UnknownFamily(SiteDefinitionError):
+class UnknownFamilyError(SiteDefinitionError):
 
     """Family is not registered."""
 
     pass
 
 
-class UnknownExtension(Error, NotImplementedError):
+class UnknownExtensionError(Error, NotImplementedError):
 
     """Extension is not defined."""
 
     pass
 
 
-class IsRedirectPage(PageRelatedError):
+class VersionParseError(Error):
+
+    """Failed to parse version information."""
+
+
+class IsRedirectPageError(PageRelatedError):
 
     """Page is a redirect page."""
 
     message = 'Page %s is a redirect page.'
 
 
-class IsNotRedirectPage(PageRelatedError):
+class IsNotRedirectPageError(PageRelatedError):
 
     """Page is not a redirect page."""
 
     message = 'Page %s is not a redirect page.'
 
 
-class CircularRedirect(PageRelatedError):
+class CircularRedirectError(PageRelatedError):
 
     """Page is a circular redirect.
 
@@ -353,7 +440,7 @@ class CircularRedirect(PageRelatedError):
     message = 'Page %s is a circular redirect.'
 
 
-class InterwikiRedirectPage(PageRelatedError):
+class InterwikiRedirectPageError(PageRelatedError):
 
     """
     Page is a redirect to another site.
@@ -377,28 +464,28 @@ class InterwikiRedirectPage(PageRelatedError):
         super().__init__(page)
 
 
-class InvalidTitle(Error):
+class InvalidTitleError(Error):
 
     """Invalid page title."""
 
     pass
 
 
-class LockedPage(PageSaveRelatedError):
+class LockedPageError(PageSaveRelatedError):
 
     """Page is locked."""
 
     message = 'Page %s is locked.'
 
 
-class LockedNoPage(LockedPage):
+class LockedNoPageError(LockedPageError):
 
     """Title is locked against creation."""
 
     message = 'Page %s does not exist and is locked preventing creation.'
 
 
-class CascadeLockedPage(LockedPage):
+class CascadeLockedPageError(LockedPageError):
 
     """Page is locked due to cascading protection."""
 
@@ -419,28 +506,28 @@ class NoCreateError(PageSaveRelatedError):
     message = 'Page %s could not be created due to parameter nocreate'
 
 
-class EditConflict(PageSaveRelatedError):
+class EditConflictError(PageSaveRelatedError):
 
     """There has been an edit conflict while uploading the page."""
 
     message = 'Page %s could not be saved due to an edit conflict'
 
 
-class PageDeletedConflict(EditConflict):
+class PageDeletedConflictError(EditConflictError):
 
     """Page was deleted since being retrieved."""
 
     message = 'Page %s has been deleted since last retrieved.'
 
 
-class PageCreatedConflict(EditConflict):
+class PageCreatedConflictError(EditConflictError):
 
     """Page was created by another user."""
 
     message = 'Page %s has been created since last retrieved.'
 
 
-class ArticleExistsConflict(EditConflict):
+class ArticleExistsConflictError(EditConflictError):
 
     """Page already exists."""
 
@@ -503,7 +590,7 @@ class CaptchaError(Error):
     pass
 
 
-class AutoblockUser(Error):
+class AutoblockUserError(Error):
 
     """Requested action on a virtual autoblock user not valid.
 
@@ -511,6 +598,26 @@ class AutoblockUser(Error):
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
+
+    pass
+
+
+class UnhandledAnswerError(Error):
+
+    """The given answer didn't suffice."""
+
+    def __init__(self, stop=False):
+        """Initializer."""
+        self.stop = stop
+
+
+class TranslationError(Error, ImportError):
+
+    """Raised when no correct translation could be found."""
+
+    # Inherits from ImportError, as this exception is now used
+    # where previously an ImportError would have been raised,
+    # and may have been caught by scripts as such.
 
     pass
 
@@ -536,6 +643,11 @@ class NotEmailableError(PageRelatedError):
     message = '%s is not emailable.'
 
 
+class PageInUseError(Error):
+
+    """Page cannot be reserved for writing due to existing lock."""
+
+
 class WikiBaseError(Error):
 
     """Wikibase related error."""
@@ -543,7 +655,7 @@ class WikiBaseError(Error):
     pass
 
 
-class NoWikibaseEntity(WikiBaseError):
+class NoWikibaseEntityError(WikiBaseError):
 
     """This entity doesn't exist."""
 
@@ -559,14 +671,14 @@ class NoWikibaseEntity(WikiBaseError):
         self.entity = entity
 
 
-class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
+class CoordinateGlobeUnknownError(WikiBaseError, NotImplementedError):
 
     """This globe is not implemented yet in either WikiBase or pywikibot."""
 
     pass
 
 
-class EntityTypeUnknownException(WikiBaseError):
+class EntityTypeUnknownError(WikiBaseError):
 
     """The requested entity type is not recognised on this site."""
 
@@ -585,3 +697,39 @@ class MaxlagTimeoutError(TimeoutError):
     """Request failed with a maxlag timeout error."""
 
     pass
+
+
+DEPRECATED_EXCEPTIONS = {
+    'NoUsername': 'NoUsernameError',
+    'NoPage': 'NoPageError',
+    'UnsupportedPage': 'UnsupportedPageError',
+    'NoMoveTarget': 'NoMoveTargetError',
+    'InconsistentTitleReceived': 'InconsistentTitleError',
+    'UnknownSite': 'UnknownSiteError',
+    'UnknownFamily': 'UnknownFamilyError',
+    'UnknownExtension': 'UnknownExtensionError',
+    'IsRedirectPage': 'IsRedirectPageError',
+    'IsNotRedirectPage': 'IsNotRedirectPageError',
+    'CircularRedirect': 'CircularRedirectError',
+    'InterwikiRedirectPage': 'InterwikiRedirectPageError',
+    'InvalidTitle': 'InvalidTitleError',
+    'LockedPage': 'LockedPageError',
+    'LockedNoPage': 'LockedNoPageError',
+    'CascadeLockedPage': 'CascadeLockedPageError',
+    'EditConflict': 'EditConflictError',
+    'PageDeletedConflict': 'PageDeletedConflictError',
+    'PageCreatedConflict': 'PageCreatedConflictError',
+    'ArticleExistsConflict': 'ArticleExistsConflictError',
+    'AutoblockUser': 'AutoblockUserError',
+    'NoWikibaseEntity': 'NoWikibaseEntityError',
+    'CoordinateGlobeUnknownException': 'CoordinateGlobeUnknownError',
+    'EntityTypeUnknownException': 'EntityTypeUnknownError',
+}
+
+wrapper = ModuleDeprecationWrapper(__name__)
+module = sys.modules[__name__]
+
+for old_name, new_name in DEPRECATED_EXCEPTIONS.items():
+    setattr(module, old_name, getattr(module, new_name))
+    wrapper._add_deprecated_attr(old_name, replacement_name=new_name,
+                                 since='20210423', future_warning=True)

@@ -27,8 +27,10 @@ Command line options:
 import os
 
 import pywikibot
+
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
+from pywikibot.exceptions import InvalidTitleError
 from scripts.maintenance.cache import CacheEntry
 
 
@@ -135,7 +137,7 @@ def main(*args):
         for page in watchlist:
             try:
                 pywikibot.stdout(page.title())
-            except pywikibot.InvalidTitle:
+            except InvalidTitleError:
                 pywikibot.exception()
 
 

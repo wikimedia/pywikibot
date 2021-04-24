@@ -14,6 +14,7 @@ Parameters:
 import pywikibot
 
 from pywikibot import i18n, textlib
+from pywikibot.exceptions import IsRedirectPageError, LockedPageError
 
 
 def main(*args):
@@ -34,7 +35,7 @@ def main(*args):
         pywikibot.output('\nLoading {0}...'.format(plname))
         try:
             oldtext = pl.get()
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('{0} is a redirect!'.format(plname))
             continue
         old = pl.interwiki()
@@ -48,7 +49,7 @@ def main(*args):
                 # Submit changes
                 try:
                     pl.put(newtext, comment=comm)
-                except pywikibot.LockedPage:
+                except LockedPageError:
                     pywikibot.output('{0} is locked'.format(plname))
                     continue
             else:

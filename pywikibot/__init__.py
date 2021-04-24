@@ -6,10 +6,13 @@
 #
 import atexit
 import datetime
+import inspect
 import math
 import re
 import threading
 import time
+
+import pywikibot.exceptions
 
 from contextlib import suppress
 from decimal import Decimal
@@ -24,41 +27,51 @@ from pywikibot.__metadata__ import (
 
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.backports import cache, removesuffix
+from pywikibot import config2 as config
+from pywikibot.diff import PatchManager
+from pywikibot.family import AutoFamily, Family
+from pywikibot.i18n import translate
+from pywikibot.site import BaseSite, DataSite, APISite, ClosedSite
+from pywikibot.tools.formatter import color_format
+
 from pywikibot.bot import (
     input, input_choice, input_yn, handle_args, show_help, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
 )
+
 from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
 )
-from pywikibot import config2 as config
-from pywikibot.data.api import UploadWarning
-from pywikibot.diff import PatchManager
-from pywikibot.exceptions import (
-    CaptchaError, CascadeLockedPage, CircularRedirect,
-    CoordinateGlobeUnknownException, EditConflict, Error, FatalServerError,
-    InterwikiRedirectPage, InvalidTitle, IsNotRedirectPage, IsRedirectPage,
-    LockedNoPage, LockedPage, NoCreateError, NoMoveTarget, NoPage,
-    NoUsername, NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
-    PageDeletedConflict, PageRelatedError, PageSaveRelatedError, SectionError,
-    Server414Error, Server504Error, ServerError, SiteDefinitionError,
-    SpamblacklistError, TitleblacklistError, UnknownExtension, UnknownFamily,
-    UnknownSite, UnsupportedPage, WikiBaseError,
-)
-from pywikibot.family import AutoFamily, Family
-from pywikibot.i18n import translate
+
 from pywikibot.logging import (
     critical, debug, error, exception, log, output, stdout, warning
 )
-from pywikibot.site import BaseSite, DataSite, APISite, ClosedSite
+
 from pywikibot.tools import (
     classproperty,
     deprecate_arg as _deprecate_arg,
     normalize_username,
     MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
+    suppress_warnings,
 )
-from pywikibot.tools.formatter import color_format
+
+with suppress_warnings(category=FutureWarning):
+    from pywikibot.data.api import UploadWarning
+
+    from pywikibot.exceptions import (
+        CaptchaError, CascadeLockedPage, CircularRedirect,
+        CoordinateGlobeUnknownError, CoordinateGlobeUnknownException,
+        EditConflict, Error, FatalServerError, InterwikiRedirectPage,
+        InvalidTitle, IsNotRedirectPage, IsRedirectPage, LockedNoPage,
+        LockedPage, NoCreateError, NoMoveTarget, NoPage, NoUsername,
+        NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
+        PageDeletedConflict, PageRelatedError, PageSaveRelatedError,
+        SectionError, Server414Error, Server504Error, ServerError,
+        SiteDefinitionError, SpamblacklistError, TitleblacklistError,
+        UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
+        WikiBaseError, DEPRECATED_EXCEPTIONS,
+    )
 
 
 __all__ = (
@@ -245,7 +258,7 @@ class Coordinate(_WbRepresentation):
         """Return the entity uri of the globe."""
         if not self._entity:
             if self.globe not in self.site.globes():
-                raise CoordinateGlobeUnknownException(
+                raise CoordinateGlobeUnknownError(
                     '%s is not supported in Wikibase yet.'
                     % self.globe)
             return self.site.globes()[self.globe]
@@ -1317,3 +1330,29 @@ wrapper._add_deprecated_attr('__release__', __version__,
                              since='20200707')
 wrapper._add_deprecated_attr('showHelp', show_help,
                              since='20200705', future_warning=True)
+
+# This module aliases many (but not all) pywikibot.exception classes and one
+# from pywikibot.data.api. Use of these aliases is deprecated. When removed
+# we can drop them from both our import and __all__ listing.
+
+EXCEPTION_CLASSES = {
+    n for n, _ in inspect.getmembers(pywikibot.exceptions, inspect.isclass)
+}
+
+EXCEPTION_CLASSES.add('UploadWarning')
+EXCEPTION_CLASSES.update(DEPRECATED_EXCEPTIONS.keys())
+
+for name in __all__:
+    if name in EXCEPTION_CLASSES:
+        if name in DEPRECATED_EXCEPTIONS:
+            replacement = DEPRECATED_EXCEPTIONS[name]
+        elif name == 'UploadWarning':
+            replacement = 'UploadError'
+        else:
+            replacement = name
+
+        wrapper._add_deprecated_attr(
+            name,
+            replacement_name='pywikibot.exceptions.{}'.format(replacement),
+            since='20210424',
+        )

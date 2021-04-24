@@ -32,15 +32,19 @@ from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
+import pywikibot.exceptions
 
 from pywikibot import __url__
-from pywikibot.backports import cache, List
 from pywikibot import config2 as config
-from pywikibot.exceptions import Error
+from pywikibot.backports import cache, List
 from pywikibot.plural import plural_rule
-from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning)
 
+from pywikibot.tools import (
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+    ModuleDeprecationWrapper,
+)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -406,17 +410,6 @@ def _altlang(lang: str) -> List[str]:
     return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
 
 
-class TranslationError(Error, ImportError):
-
-    """Raised when no correct translation could be found."""
-
-    # Inherits from ImportError, as this exception is now used
-    # where previously an ImportError would have been raised,
-    # and may have been caught by scripts as such.
-
-    pass
-
-
 @cache
 def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     """
@@ -719,7 +712,7 @@ def twtranslate(source,
                 return fallback_prompt % parameters
             return fallback_prompt
 
-        raise TranslationError(
+        raise pywikibot.exceptions.TranslationError(
             'Unable to load messages package %s for bundle %s'
             '\nIt can happen due to lack of i18n submodule or files. '
             'See %s/i18n'
@@ -752,7 +745,7 @@ def twtranslate(source,
         if trans:
             break
     else:
-        raise TranslationError(fill(
+        raise pywikibot.exceptions.TranslationError(fill(
             'No {} translation has been defined for TranslateWiki key "{}". '
             'It can happen due to lack of i18n submodule or files or an '
             'outdated submodule. See {}/i18n'
@@ -865,7 +858,17 @@ def input(twtitle: str,
     elif fallback_prompt:
         prompt = fallback_prompt
     else:
-        raise TranslationError(
+        raise pywikibot.exceptions.TranslationError(
             'Unable to load messages package {} for bundle {}'
             .format(_messages_package_name, twtitle))
     return pywikibot.input(prompt, password)
+
+
+TranslationError = pywikibot.exceptions.TranslationError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'TranslationError',
+    replacement_name='pywikibot.exceptions.TranslationError',
+    since='20210423',
+    future_warning=True)

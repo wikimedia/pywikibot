@@ -29,8 +29,10 @@ import time
 from textwrap import fill, wrap
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.exceptions import Error
 from pywikibot.tools.formatter import color_format
 
 
@@ -324,7 +326,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         if csd_cat is None:
             self.csd_cat = self.site.page_from_repository(self.csd_cat_item)
             if self.csd_cat is None:
-                raise pywikibot.Error(
+                raise Error(
                     'No category for speedy deletion found for {}'
                     .format(self.site))
         else:

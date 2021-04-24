@@ -33,8 +33,13 @@ from pywikibot import pagegenerators
 
 from pywikibot.backports import Set
 from pywikibot.bot import NoRedirectPageBot, WikidataBot
-from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
-                                  PageSaveRelatedError)
+
+from pywikibot.exceptions import (
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    PageSaveRelatedError,
+)
 
 
 DELETION_TEMPLATES = ('Q4847311', 'Q6687153', 'Q21528265')
@@ -82,10 +87,10 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         try:
             pywikibot.output('Doing a null edit on the page.')
             page.touch()
-        except (NoCreateError, NoPage):
+        except (NoCreateError, NoPageError):
             pywikibot.error('Page {0} does not exist.'.format(
                 page.title(as_link=True)))
-        except LockedPage:
+        except LockedPageError:
             pywikibot.error('Page {0} is locked.'.format(
                 page.title(as_link=True)))
         except PageSaveRelatedError:

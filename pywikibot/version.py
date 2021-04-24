@@ -26,15 +26,11 @@ import pywikibot
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated
+from pywikibot.exceptions import VersionParseError
+from pywikibot.tools import deprecated, ModuleDeprecationWrapper
 
 
 _logger = 'version'
-
-
-class ParseError(Exception):
-
-    """Parsing went wrong."""
 
 
 def _get_program_dir():
@@ -228,7 +224,7 @@ def getversion_svn(path=None):  # pragma: no cover
 
     rev = 's%s' % rev
     if (not date or not tag or not rev) and not path:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -283,7 +279,7 @@ def getversion_git(path=None):
     rev = 'g%s' % len(rev.splitlines())
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -307,7 +303,7 @@ def getversion_nightly(path=None):  # pragma: no cover
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
 
     if not date or not tag or not rev:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -343,7 +339,7 @@ def getversion_onlinerepo(path='branches/master'):
         hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
-        raise ParseError(repr(e) + ' while parsing ' + repr(buf))
+        raise VersionParseError(repr(e) + ' while parsing ' + repr(buf))
 
 
 @deprecated('pywikibot.__version__', since='20201003')
@@ -503,3 +499,13 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             del data[name]
 
     return data
+
+
+ParseError = VersionParseError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'ParseError',
+    replacement_name='pywikibot.exceptions.VersionParseError',
+    since='20210423',
+    future_warning=True)

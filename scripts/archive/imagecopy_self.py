@@ -46,7 +46,6 @@ from textwrap import fill
 import pywikibot
 
 from pywikibot import pagegenerators, i18n
-
 from pywikibot.specialbots import UploadRobot
 from pywikibot.textlib import removeCategoryLinks
 

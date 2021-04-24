@@ -110,9 +110,10 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot import pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
-from pywikibot import pagegenerators
+from pywikibot.exceptions import NoPageError
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import deprecated_args
 
@@ -337,7 +338,7 @@ def main(*args: Tuple[str, ...]):
     for config_page in config_generator:
         try:
             config_page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.error('{} does not exist'.format(config_page))
             continue
 

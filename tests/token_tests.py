@@ -6,9 +6,7 @@
 #
 from contextlib import suppress
 
-import pywikibot
-
-from pywikibot.data import api
+from pywikibot.exceptions import APIError, Error
 from pywikibot.site import TokenWallet
 
 from tests.aspects import (
@@ -58,7 +56,7 @@ class TestSiteTokens(DefaultSiteTestCase):
             tokentype = self.mysite.validate_tokens([ttype])
             try:
                 token = self.mysite.tokens[ttype]
-            except pywikibot.Error as error_msg:
+            except Error as error_msg:
                 if tokentype:
                     self.assertRegex(
                         str(error_msg),
@@ -86,7 +84,7 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_invalid_token(self):
         """Test invalid token."""
-        with self.assertRaises(pywikibot.Error):
+        with self.assertRaises(Error):
             self.mysite.tokens['invalidtype']
 
 
@@ -101,7 +99,7 @@ class TokenTestBase(TestCaseBase):
         ttype = self.token_type
         try:
             token = mysite.tokens[ttype]
-        except pywikibot.Error as error_msg:
+        except Error as error_msg:
             self.assertRegex(
                 str(error_msg),
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
@@ -140,11 +138,11 @@ class PatrolTestCase(TokenTestBase, TestCase):
         rc = rc[0]
 
         # site.patrol() needs params
-        with self.assertRaises(pywikibot.Error):
+        with self.assertRaises(Error):
             list(mysite.patrol())
         try:
             result = list(mysite.patrol(rcid=rc['rcid']))
-        except api.APIError as error:
+        except APIError as error:
             if error.code == 'permissiondenied':
                 self.skipTest(error)
             raise
@@ -161,13 +159,13 @@ class PatrolTestCase(TokenTestBase, TestCase):
         try:
             # no such rcid, revid or too old revid
             list(mysite.patrol(**params))
-        except api.APIError as error:
+        except APIError as error:
             if error.code == 'badtoken':
                 self.skipTest(error)
-        except pywikibot.Error:
+        except Error:
             # expected result
             raised = True
-        self.assertTrue(raised, msg='pywikibot.Error not raised')
+        self.assertTrue(raised, msg='pywikibot.exceptions.Error not raised')
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -15,6 +15,7 @@ from urllib.parse import urljoin, urlparse
 from requests.exceptions import RequestException
 
 import pywikibot
+
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion

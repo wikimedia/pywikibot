@@ -150,11 +150,10 @@ from contextlib import suppress
 from queue import Queue
 
 import pywikibot
-from pywikibot import editor
-# Imports predefined replacements tasks from fixes.py
-from pywikibot import fixes
-from pywikibot import i18n, textlib, pagegenerators
+
+from pywikibot import fixes, editor, i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.exceptions import NoPageError
 from pywikibot.tools import chars, deprecated_args
 
 
@@ -739,7 +738,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 pywikibot.bot.open_webbrowser(page)
                 try:
                     original_text = page.get(get_redirect=True, force=True)
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.output('Page {0} has been deleted.'
                                      .format(page.title()))
                     break

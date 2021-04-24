@@ -50,10 +50,19 @@ import webbrowser
 
 import pywikibot
 
-from pywikibot import config
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import config, i18n, pagegenerators
 from pywikibot.tools.formatter import color_format
+
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    IsRedirectPageError,
+    LockedPageError,
+    NoPageError,
+    PageSaveRelatedError,
+    ServerError,
+    SpamblacklistError,
+)
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -283,10 +292,10 @@ def main(*args):
         pywikibot.output('Loading %s...' % pagename)
         try:
             text = page.text
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output("%s doesn't exist! Skipping..." % pagename)
             continue
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('{} is a redirect! Skipping...'.format(pagename))
             if show:
                 showQuest(page)
@@ -322,7 +331,7 @@ def main(*args):
             # page is not edit-protected
             # Deleting the template because the page doesn't need it.
             if not (TTP or TSP):
-                raise pywikibot.Error(
+                raise Error(
                     'This script is not localized to use it on \n{0}. '
                     'Missing "templateSemiProtection" or'
                     '"templateTotalProtection"'.format(site.sitename))
@@ -350,7 +359,7 @@ def main(*args):
                 pywikibot.output(msg)
             else:
                 if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
-                    raise pywikibot.Error(
+                    raise Error(
                         'This script is not localized to use it on \n{0}. '
                         'Missing "templateNoRegex"'.format(
                             site.sitename))
@@ -372,7 +381,7 @@ def main(*args):
                 pywikibot.output(msg)
             else:
                 if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
-                    raise pywikibot.Error(
+                    raise Error(
                         'This script is not localized to use it on \n{0}. '
                         'Missing "templateNoRegex"'.format(
                             site.sitename))
@@ -477,9 +486,9 @@ def save_page(page, text, comment):
     while True:
         try:
             page.put(text, comment, force=True)
-        except pywikibot.EditConflict:
+        except EditConflictError:
             pywikibot.output('Edit conflict! skip!')
-        except pywikibot.ServerError:
+        except ServerError:
             # Sometimes there is this error that's quite annoying
             # because can block the whole process for nothing.
             error_count += 1
@@ -488,15 +497,15 @@ def save_page(page, text, comment):
                 time.sleep(3)
                 continue
             # Prevent Infinite Loops
-            raise pywikibot.ServerError('Fifth Server Error!')
-        except pywikibot.SpamblacklistError as e:
+            raise ServerError('Fifth Server Error!')
+        except SpamblacklistError as e:
             pywikibot.output('Cannot change %s because of '
                              'blacklist entry %s'
                              % (page.title(), e.url))
-        except pywikibot.LockedPage:
+        except LockedPageError:
             pywikibot.output('The page is still protected. '
                              'Skipping...')
-        except pywikibot.PageSaveRelatedError as error:
+        except PageSaveRelatedError as error:
             pywikibot.output('Error putting page: %s'
                              % (error.args,))
         break

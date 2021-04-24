@@ -66,7 +66,7 @@ __all__ = (
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
-    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
+    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswerError',
     'Choice', 'StaticChoice', 'LinkChoice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
@@ -103,11 +103,13 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Dict, Iterable, List, Sequence
+
 from pywikibot import config2 as config
-from pywikibot import daemonize
-from pywikibot import i18n
-from pywikibot import version
+from pywikibot import daemonize, i18n, version
+from pywikibot.backports import Dict, Iterable, List, Sequence
+from pywikibot.tools.formatter import color_format
+from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
+
 from pywikibot.bot_choice import (
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
     ListOption, ShowingListOption, MultipleChoiceList,
@@ -115,19 +117,24 @@ from pywikibot.bot_choice import (
     ChoiceException, QuitKeyboardInterrupt,
     Choice, StaticChoice, LinkChoice, AlwaysChoice
 )
-from pywikibot.exceptions import UnknownFamily, UnknownSite
-from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING
-from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
+
+from pywikibot.exceptions import (
+    EditConflictError, Error, LockedPageError, NoPageError,
+    PageSaveRelatedError, ServerError, SpamblacklistError,
+    UnhandledAnswerError, UnknownFamilyError,
+    UnknownSiteError, VersionParseError, WikiBaseError,
+)
+
 from pywikibot.logging import (
     add_init_routine,
+    CRITICAL, DEBUG, ERROR, INFO, INPUT, STDOUT, VERBOSE, WARNING,
     critical, debug, error, exception, log, output, stdout, warning,
 )
+
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    PYTHON_VERSION, suppress_warnings
+    PYTHON_VERSION, ModuleDeprecationWrapper, suppress_warnings,
 )
-from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
-from pywikibot.tools.formatter import color_format
 
 
 # Note: all output goes through python std library "logging" module
@@ -213,15 +220,6 @@ GLOBAL OPTIONS
 For global options use -help:global or run pwb.py -help
 
 """
-
-
-class UnhandledAnswer(Exception):
-
-    """The given answer didn't suffice."""
-
-    def __init__(self, stop=False):
-        """Initializer."""
-        self.stop = stop
 
 
 # Initialize the handlers and formatters for the logging system.
@@ -370,7 +368,7 @@ def writelogheader():
     try:
         log('VERSION: {}'.format(
             version.getversion(online=config.log_pywiki_repo_version).strip()))
-    except version.ParseError:
+    except VersionParseError:
         exception()
 
     # system
@@ -626,7 +624,7 @@ class InteractiveReplace:
             while True:
                 try:
                     answer = self.handle_link()
-                except UnhandledAnswer as e:
+                except UnhandledAnswerError as e:
                     if e.stop:
                         raise
                 else:
@@ -836,7 +834,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
     if calledModuleName() != 'generate_user_files':  # T261771
         try:
             pywikibot.Site()
-        except (UnknownFamily, UnknownSite):
+        except (UnknownFamilyError, UnknownSiteError):
             pywikibot.exception()
             sys.exit(1)
 
@@ -987,8 +985,8 @@ class _OptionDict(dict):
         super().__init__(options)
 
     def __missing__(self, key):
-        raise pywikibot.Error("'{}' is not a valid option for {}."
-                              .format(key, self._classname))
+        raise Error("'{}' is not a valid option for {}."
+                    .format(key, self._classname))
 
     def __getattr__(self, name):
         """Get item from dict."""
@@ -1323,24 +1321,24 @@ class BaseBot(OptionHandler):
         try:
             func(*args, **kwargs)
             self._save_counter += 1
-        except pywikibot.PageSaveRelatedError as e:
+        except PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
-            if isinstance(e, pywikibot.EditConflict):
+            if isinstance(e, EditConflictError):
                 pywikibot.output('Skipping %s because of edit conflict'
                                  % page.title())
-            elif isinstance(e, pywikibot.SpamblacklistError):
+            elif isinstance(e, SpamblacklistError):
                 pywikibot.output(
                     'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
-            elif isinstance(e, pywikibot.LockedPage):
+            elif isinstance(e, LockedPageError):
                 pywikibot.output('Skipping %s (locked page)'
                                  % page.title())
             else:
                 pywikibot.error(
                     'Skipping %s because of a save related error: %s'
                     % (page.title(), e))
-        except pywikibot.ServerError as e:
+        except ServerError as e:
             if not ignore_server_errors:
                 raise
             pywikibot.error('Server Error while processing %s: %s'
@@ -1839,7 +1837,7 @@ class ExistingPageBot(CurrentPageBot):
     """A CurrentPageBot class which only treats existing pages."""
 
     def skip_page(self, page):
-        """Treat page if it exists and handle NoPage from it."""
+        """Treat page if it exists and handle NoPageError."""
         if not page.exists():
             pywikibot.warning(
                 'Page {page} does not exist on {page.site}.'
@@ -1878,7 +1876,7 @@ class RedirectPageBot(CurrentPageBot):
     """A RedirectPageBot class which only treats redirects."""
 
     def skip_page(self, page):
-        """Treat only redirect pages and handle IsNotRedirectPage from it."""
+        """Treat only redirect pages and handle IsNotRedirectPageError."""
         if not page.isRedirectPage():
             pywikibot.warning(
                 'Page {page} on {page.site} is skipped because it is '
@@ -1892,7 +1890,7 @@ class NoRedirectPageBot(CurrentPageBot):
     """A NoRedirectPageBot class which only treats non-redirects."""
 
     def skip_page(self, page):
-        """Treat only non-redirect pages and handle IsRedirectPage from it."""
+        """Treat only non-redirect pages and handle IsRedirectPageError."""
         if page.isRedirectPage():
             pywikibot.warning(
                 'Page {page} on {page.site} is skipped because it is '
@@ -1939,7 +1937,7 @@ class WikidataBot(Bot, ExistingPageBot):
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
         if self.repo is None:
-            raise pywikibot.exceptions.WikiBaseError(
+            raise WikiBaseError(
                 '%s is not connected to a data repository' % self.site)
 
     def cacheSources(self):
@@ -2188,7 +2186,7 @@ class WikidataBot(Bot, ExistingPageBot):
         if self.use_from_page is True:
             try:
                 item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
+            except NoPageError:
                 item = None
         else:
             if isinstance(page, pywikibot.ItemPage):
@@ -2209,7 +2207,7 @@ class WikidataBot(Bot, ExistingPageBot):
                 else:
                     try:
                         item = pywikibot.ItemPage.fromPage(page)
-                    except pywikibot.NoPage:
+                    except NoPageError:
                         item = None
                     if self.use_from_page is False:
                         pywikibot.error('{0} is not in the item namespace but '
@@ -2233,3 +2231,13 @@ class WikidataBot(Bot, ExistingPageBot):
         """
         raise NotImplementedError('Method %s.treat_page_and_item() not '
                                   'implemented.' % self.__class__.__name__)
+
+
+UnhandledAnswer = UnhandledAnswerError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'UnhandledAnswer',
+    replacement_name='pywikibot.exceptions.UnhandledAnswerError',
+    since='20210423',
+    future_warning=True)

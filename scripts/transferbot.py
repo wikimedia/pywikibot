@@ -50,6 +50,7 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+
 from pywikibot.bot import suggest_help
 from pywikibot.i18n import twtranslate
 from pywikibot import pagegenerators

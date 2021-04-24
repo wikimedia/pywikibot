@@ -11,8 +11,8 @@ from contextlib import suppress
 
 from tests import mock
 
-from pywikibot.comms.eventstreams import EventStreams, EventSource
 from pywikibot import config
+from pywikibot.comms.eventstreams import EventStreams, EventSource
 from pywikibot.family import WikimediaFamily
 
 from tests.aspects import TestCase, DefaultSiteTestCase, require_modules

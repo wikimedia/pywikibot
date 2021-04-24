@@ -18,9 +18,15 @@ from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
-from pywikibot.exceptions import ArgumentDeprecationWarning
+
 from pywikibot import pagegenerators
 from pywikibot.tools import issue_deprecation_warning
+
+from pywikibot.exceptions import (
+    ArgumentDeprecationWarning,
+    EditConflictError,
+    LockedPageError,
+)
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1297,7 +1303,7 @@ def addUncat(page):
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
-    with suppress(pywikibot.EditConflict, pywikibot.LockedPage):
+    with suppress(EditConflictError, LockedPageError):
         page.put(newtext, putcomment)
 
 

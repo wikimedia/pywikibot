@@ -44,6 +44,7 @@ subdirectory.
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+import pywikibot.bot
 
 from pywikibot.backports import Tuple
 from pywikibot import config

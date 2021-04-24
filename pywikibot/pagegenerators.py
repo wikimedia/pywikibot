@@ -41,8 +41,14 @@ from pywikibot.backports import Iterable, List
 from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
 from pywikibot.data import api
-from pywikibot.exceptions import ServerError, UnknownExtension
 from pywikibot.proofreadpage import ProofreadPage
+
+from pywikibot.exceptions import (
+    NoPageError,
+    ServerError,
+    UnknownExtensionError,
+)
+
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
@@ -753,7 +759,7 @@ class GeneratorFactory:
     def _handle_linter(self, value):
         """Handle `-linter` argument."""
         if not self.site.has_extension('Linter'):
-            raise UnknownExtension(
+            raise UnknownExtensionError(
                 '-linter needs a site with Linter extension.')
         cats = self.site.siteinfo.get('linter')  # Get linter categories.
         valid_cats = [c for _list in cats.values() for c in _list]
@@ -1138,7 +1144,7 @@ class GeneratorFactory:
     def _handle_ql(self, value):
         """Handle `-ql` argument."""
         if not self.site.has_extension('ProofreadPage'):
-            raise UnknownExtension(
+            raise UnknownExtensionError(
                 'Ql filtering needs a site with ProofreadPage extension.')
         value = [int(_) for _ in value.split(',')]
         if min(value) < 0 or max(value) > 4:  # Invalid input ql.
@@ -1757,7 +1763,7 @@ class ItemClaimFilter:
             except (AttributeError, AssertionError):
                 try:
                     page = pywikibot.ItemPage.fromPage(page)
-                except pywikibot.NoPage:
+                except NoPageError:
                     return False
 
         def match_qualifiers(page_claim, qualifiers):
@@ -2250,7 +2256,7 @@ def WikibaseItemFilterPageGenerator(generator, has_item: bool = True,
     for page in generator or []:
         try:
             page_item = pywikibot.ItemPage.fromPage(page, lazy_load=False)
-        except pywikibot.NoPage:
+        except NoPageError:
             page_item = None
 
         to_be_skipped = bool(page_item) != has_item

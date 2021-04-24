@@ -11,14 +11,15 @@ e.g. used to test password-file based login.
 from collections import defaultdict
 from io import StringIO
 
-from pywikibot.exceptions import NoUsername
+from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
 
-from tests.aspects import (
-    unittest,
-    DefaultDrySiteTestCase,
-)
 from tests import mock
+
+from tests.aspects import (
+    DefaultDrySiteTestCase,
+    unittest,
+)
 
 
 class FakeFamily:
@@ -73,7 +74,7 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
         FakeConfig.usernames['*']['en'] = FakeUsername
         error_undefined_username = 'ERROR: username for.*is undefined.\nIf'
         with self.assertRaisesRegex(
-                NoUsername,
+                NoUsernameError,
                 error_undefined_username):
             LoginManager()
         FakeConfig.usernames['*']['*'] = FakeUsername

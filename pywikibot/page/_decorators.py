@@ -10,6 +10,12 @@ import pywikibot
 
 from pywikibot.tools import add_full_name, manage_wrapping
 
+from pywikibot.exceptions import (
+    Error,
+    OtherPageSaveError,
+    PageSaveRelatedError,
+)
+
 
 @add_full_name
 def allow_asynchronous(func):
@@ -28,7 +34,7 @@ def allow_asynchronous(func):
         try:
             func(self, *args, **kwargs)
         # TODO: other "expected" error types to catch?
-        except pywikibot.Error as edit_err:
+        except Error as edit_err:
             err = edit_err  # edit_err will be deleted in the end of the scope
             link = self.title(as_link=True)
             if do_async:
@@ -37,9 +43,9 @@ def allow_asynchronous(func):
             pywikibot.log('Error saving page %s (%s)\n' % (link, err),
                           exc_info=True)
             if not callback and not do_async:
-                if isinstance(err, pywikibot.PageSaveRelatedError):
+                if isinstance(err, PageSaveRelatedError):
                     raise err
-                raise pywikibot.OtherPageSaveError(self, err)
+                raise OtherPageSaveError(self, err)
         if callback:
             callback(self, err)
 

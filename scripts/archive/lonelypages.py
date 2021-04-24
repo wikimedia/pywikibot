@@ -29,8 +29,10 @@ import re
 import sys
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import suggest_help, SingleSiteBot
+from pywikibot.exceptions import IsRedirectPageError, NoPageError
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -130,11 +132,11 @@ class LonelyPagesBot(SingleSiteBot):
                 self.site, self.opt.disambigPage)
             try:
                 self.disambigtext = self.disambigpage.get()
-            except pywikibot.NoPage:
+            except NoPageError:
                 pywikibot.output("{0} doesn't exist, skip!"
                                  .format(self.disambigpage.title()))
                 self.disambigtext = ''
-            except pywikibot.IsRedirectPage:
+            except IsRedirectPageError:
                 pywikibot.output("{0} is a redirect, don't use it!"
                                  .format(self.disambigpage.title()))
                 self.opt.disambigPage = None
@@ -150,12 +152,12 @@ class LonelyPagesBot(SingleSiteBot):
         if enable is not None:
             try:
                 getenable = enable.get()
-            except pywikibot.NoPage:
+            except NoPageError:
                 pywikibot.output(
                     "{0} doesn't exist, I use the page as if it was blank!"
                     .format(enable.title()))
                 getenable = ''
-            except pywikibot.IsRedirectPage:
+            except IsRedirectPageError:
                 pywikibot.output('{0} is a redirect, skip!'
                                  .format(enable.title()))
                 getenable = ''
@@ -187,11 +189,11 @@ class LonelyPagesBot(SingleSiteBot):
         # no refs, no redirect; check if there's already the template
         try:
             oldtxt = page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output("{0} doesn't exist! Skip..."
                              .format(page.title()))
             return
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('{0} is a redirect! Skip...'
                              .format(page.title()))
             return

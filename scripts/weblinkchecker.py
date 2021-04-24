@@ -133,6 +133,12 @@ from pywikibot.pagegenerators import (
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import ThreadList
 
+from pywikibot.exceptions import (
+    IsRedirectPageError,
+    NoPageError,
+    SpamblacklistError,
+)
+
 try:
     import memento_client
     from memento_client.memento_client import MementoClientException
@@ -512,7 +518,7 @@ class DeadLinkReportThread(threading.Thread):
                             'already been reported on {}{default}',
                             talkPage))
                         continue
-                except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+                except (NoPageError, IsRedirectPageError):
                     content = ''
 
                 if archiveURL:
@@ -546,7 +552,7 @@ class DeadLinkReportThread(threading.Thread):
                                      'weblinkchecker-summary'))
                 try:
                     talkPage.put(content, comment)
-                except pywikibot.SpamblacklistError as error:
+                except SpamblacklistError as error:
                     pywikibot.output(color_format(
                         '{lightaqua}** SpamblacklistError while trying to '
                         'change {0}: {1}{default}',

@@ -33,14 +33,27 @@ import time
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.bot import (
-    ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
-)
-from pywikibot.userinterfaces import (
-    terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
-)
+
 from tests.aspects import TestCase, TestCaseBase
 from tests.utils import unittest, FakeModule
+
+from pywikibot.bot import (
+    CRITICAL,
+    DEBUG,
+    ERROR,
+    INFO,
+    INPUT,
+    STDOUT,
+    ui,
+    VERBOSE,
+    WARNING,
+)
+
+from pywikibot.userinterfaces import (
+    terminal_interface_base,
+    terminal_interface_unix,
+    terminal_interface_win32,
+)
 
 if os.name == 'nt':
     from multiprocessing.managers import BaseManager

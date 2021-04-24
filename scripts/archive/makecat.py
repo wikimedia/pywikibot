@@ -54,9 +54,9 @@ from textwrap import fill
 
 import pywikibot
 
-from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
 from pywikibot import pagegenerators, i18n, textlib
-
+from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
+from pywikibot.exceptions import Error
 from pywikibot.tools import DequeGenerator
 from pywikibot.tools.formatter import color_format
 
@@ -335,7 +335,7 @@ def main(*args):
     # Get parent categories in order to `removeparent`
     try:
         parentcats = workingcat.categories()
-    except pywikibot.Error:
+    except Error:
         parentcats = []
 
     # Do not include articles already in subcats; only checking direct subcats

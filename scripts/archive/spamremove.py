@@ -35,10 +35,15 @@ In addition, these arguments can be used to restrict changes to some pages:
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.bot import (
-    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot)
 from pywikibot.editor import TextEditor
 from pywikibot.tools.formatter import color_format
+
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+    SingleSiteBot,
+)
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

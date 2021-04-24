@@ -108,13 +108,18 @@ from warnings import warn
 
 import pywikibot
 
+from pywikibot import i18n
 from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
-from pywikibot import i18n
-from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
-                               to_local_digits)
+from pywikibot.exceptions import Error, NoPageError
 from pywikibot.tools import issue_deprecation_warning
 
+from pywikibot.textlib import (
+    extract_sections,
+    findmarker,
+    TimeStripper,
+    to_local_digits,
+)
 
 ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]
@@ -131,7 +136,7 @@ MW_KEYS = types.MappingProxyType({
 })
 
 
-class ArchiveBotSiteConfigError(pywikibot.Error):
+class ArchiveBotSiteConfigError(Error):
 
     """There is an error originated by archivebot's on-site configuration."""
 
@@ -411,7 +416,7 @@ class DiscussionPage(pywikibot.Page):
         self.params = params
         try:
             self.load_page()
-        except pywikibot.NoPage:
+        except NoPageError:
             self.header = archiver.get_attr('archiveheader',
                                             i18n.twtranslate(
                                                 self.site.code,
@@ -590,7 +595,7 @@ class PageArchiver:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
                 tpl_page.title()
-            except pywikibot.Error:
+            except Error:
                 continue
             if tpl_page == self.tpl:
                 for item, value in params.items():

@@ -76,13 +76,32 @@ from contextlib import suppress
 from typing import Any, Generator, Optional, Union
 
 import pywikibot
+import pywikibot.data
 
-from pywikibot import i18n, xmlreader
+from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.bot import (ExistingPageBot, MultipleSitesBot, OptionHandler,
-                           RedirectPageBot)
-from pywikibot import pagegenerators
 from pywikibot.textlib import extract_templates_and_params_regex_simple
+
+from pywikibot.bot import (
+    ExistingPageBot,
+    MultipleSitesBot,
+    OptionHandler,
+    RedirectPageBot,
+)
+
+from pywikibot.exceptions import (
+    CircularRedirectError,
+    InterwikiRedirectPageError,
+    InvalidTitleError,
+    IsNotRedirectPageError,
+    IsRedirectPageError,
+    NoMoveTargetError,
+    NoPageError,
+    SectionError,
+    ServerError,
+    SiteDefinitionError,
+    UnsupportedPageError,
+)
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -159,7 +178,7 @@ class RedirectGenerator(OptionHandler):
                 target_link = pywikibot.Link(target, self.site)
                 try:
                     target_link.parse()
-                except pywikibot.SiteDefinitionError as e:
+                except SiteDefinitionError as e:
                     pywikibot.log(e)
                     pywikibot.output(
                         'NOTE: Ignoring {0} which is a redirect ({1}) to an '
@@ -348,16 +367,16 @@ class RedirectGenerator(OptionHandler):
             try:
                 if not moved_page.isRedirectPage():
                     continue
-            except pywikibot.ServerError:
+            except ServerError:
                 continue
             # moved_page is now a redirect, so any redirects pointing
             # to it need to be changed
             try:
                 yield from moved_page.getReferences(follow_redirects=True,
                                                     filter_redirects=True)
-            except (pywikibot.CircularRedirect,
-                    pywikibot.InterwikiRedirectPage,
-                    pywikibot.NoPage,
+            except (CircularRedirectError,
+                    InterwikiRedirectPageError,
+                    NoPageError,
                     ):
                 continue
 
@@ -446,7 +465,7 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                              'put page to speedy deletion.')
             try:
                 content = page.get(get_redirect=True)
-            except pywikibot.SectionError:
+            except SectionError:
                 content_page = pywikibot.Page(page.site,
                                               page.title(with_section=False))
                 content = content_page.get(get_redirect=True)
@@ -461,21 +480,21 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
         done = not self.opt.delete
         try:
             targetPage = redir_page.getRedirectTarget()
-        except (pywikibot.CircularRedirect,
-                pywikibot.InvalidTitle,
+        except (CircularRedirectError,
+                InvalidTitleError,
                 RuntimeError):
             pywikibot.exception()
-        except pywikibot.InterwikiRedirectPage:
+        except InterwikiRedirectPageError:
             pywikibot.output('{0} is on another site.'
                              .format(redir_page.title()))
         else:
             try:
                 targetPage.get()
-            except pywikibot.InvalidTitle:
+            except InvalidTitleError:
                 pywikibot.exception()
-            except pywikibot.NoPage:
+            except NoPageError:
                 movedTarget = None
-                with suppress(pywikibot.NoMoveTarget):
+                with suppress(NoMoveTargetError):
                     movedTarget = targetPage.moved_target()
                 if movedTarget:
                     if not movedTarget.exists():
@@ -509,7 +528,7 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                 elif not (self.opt.delete or movedTarget):
                     pywikibot.output(
                         'Cannot fix or delete the broken redirect')
-            except pywikibot.IsRedirectPage:
+            except IsRedirectPageError:
                 pywikibot.output(
                     'Redirect target {0} is also a redirect! {1}'.format(
                         targetPage.title(as_link=True),
@@ -534,24 +553,24 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                                      newRedir.title(with_section=False)))
             try:
                 targetPage = newRedir.getRedirectTarget()
-            except pywikibot.IsNotRedirectPage:
+            except IsNotRedirectPageError:
                 if len(redirList) == 2:
                     pywikibot.output(
                         'Skipping: Redirect target {0} is not a redirect.'
                         .format(newRedir.title(as_link=True)))
                     break  # do nothing
-            except pywikibot.SectionError:
+            except SectionError:
                 pywikibot.warning(
                     "Redirect target section {0} doesn't exist."
                     .format(newRedir.title(as_link=True)))
-            except (pywikibot.CircularRedirect,
-                    pywikibot.InterwikiRedirectPage,
-                    pywikibot.UnsupportedPage,
+            except (CircularRedirectError,
+                    InterwikiRedirectPageError,
+                    UnsupportedPageError,
                     RuntimeError):
                 pywikibot.exception()
                 pywikibot.output('Skipping {0}.'.format(newRedir))
                 break
-            except pywikibot.NoPage:
+            except NoPageError:
                 if self.opt.always:
                     pywikibot.output(
                         "Skipping: Redirect target {} doesn't exist."
@@ -561,7 +580,7 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                     pywikibot.warning(
                         "Redirect target {} doesn't exist."
                         .format(newRedir.title(as_link=True)))
-            except pywikibot.ServerError:
+            except ServerError:
                 pywikibot.output('Skipping due to server error: '
                                  'No textarea found')
                 break

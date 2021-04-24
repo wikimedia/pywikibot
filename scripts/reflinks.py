@@ -54,9 +54,9 @@ from textwrap import shorten
 
 import pywikibot
 
-from pywikibot import comms, i18n, pagegenerators, textlib
 from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot import comms, i18n, pagegenerators, textlib
 from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
@@ -66,6 +66,11 @@ from pywikibot.tools.formatter import color_format
 
 from scripts import noreferences
 
+from pywikibot.exceptions import (
+    FatalServerError,
+    Server414Error,
+    Server504Error,
+)
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -608,9 +613,9 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     socket.error,
                     IOError,
                     httplib.error,
-                    pywikibot.FatalServerError,
-                    pywikibot.Server414Error,
-                    pywikibot.Server504Error) as e:
+                    FatalServerError,
+                    Server414Error,
+                    Server504Error) as e:
                 pywikibot.output(
                     "{err.__class__.__name__}: Can't retrieve url {url}: {err}"
                     .format(url=ref.url, err=e))

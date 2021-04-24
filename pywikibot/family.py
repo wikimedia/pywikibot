@@ -20,9 +20,10 @@ from typing import Optional
 
 import pywikibot
 
-from pywikibot.backports import Dict, List, Tuple
 from pywikibot import config
-from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
+from pywikibot.backports import Dict, List, Tuple
+from pywikibot.exceptions import UnknownFamilyError, FamilyMaintenanceWarning
+
 from pywikibot.tools import (
     classproperty,
     deprecated,
@@ -552,7 +553,7 @@ class Family:
 
         @param fam: family name (if omitted, uses the configured default)
         @return: a Family instance configured for the named family.
-        @raises pywikibot.exceptions.UnknownFamily: family not known
+        @raises pywikibot.exceptions.UnknownFamilyError: family not known
         """
         if fam is None:
             fam = config.family
@@ -572,7 +573,7 @@ class Family:
                 Family._families[fam] = myfamily
                 return Family._families[fam]
         else:
-            raise UnknownFamily('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family %s does not exist' % fam)
 
         try:
             # Ignore warnings due to dots in family names.
@@ -583,7 +584,7 @@ class Family:
                 sys.path.append(dirname(family_file))
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
-            raise UnknownFamily('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family %s does not exist' % fam)
         cls = mod.Family.instance
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
@@ -904,7 +905,7 @@ class Family:
     def __ne__(self, other):
         try:
             return not self.__eq__(other)
-        except UnknownFamily:
+        except UnknownFamilyError:
             return False
 
     def __hash__(self):

@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import pywikibot
 import pywikibot.page
 
+from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper
 from pywikibot.tools import suppress_warnings
 
@@ -339,12 +340,12 @@ class TestPageArchiverObject(TestCase):
 
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
-        except pywikibot.Error as e:
+        except Error as e:
             self.fail('PageArchiver() raised {}!'.format(e))
 
         try:
             archivebot.PageArchiver(page, tmpl_without_ns, '')
-        except pywikibot.Error as e:
+        except Error as e:
             self.fail('PageArchiver() raised {}!'.format(e))
 
     def testLoadConfigInOtherNamespace(self):
@@ -366,7 +367,7 @@ class TestPageArchiverObject(TestCase):
         # TEMPLATE_PAGE assumed in ns=10 if ns is not explicit.
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
-        except pywikibot.Error as e:
+        except Error as e:
             self.fail('PageArchiver() raised {}!'.format(e))
 
         with self.assertRaises(archivebot.MissingConfigError):

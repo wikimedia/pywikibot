@@ -8,15 +8,22 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot.bot import (
-    AlwaysChoice, AutomaticTWSummaryBot, ChoiceException, ExistingPageBot,
-    InteractiveReplace, NoRedirectPageBot, UnhandledAnswer,
-)
 from pywikibot.editor import TextEditor
+from pywikibot.exceptions import UnhandledAnswerError
 from pywikibot.textlib import replace_links
+from pywikibot.tools import ModuleDeprecationWrapper
+
+from pywikibot.bot import (
+    AlwaysChoice,
+    AutomaticTWSummaryBot,
+    ChoiceException,
+    ExistingPageBot,
+    InteractiveReplace,
+    NoRedirectPageBot,
+)
 
 
-class EditReplacement(ChoiceException, UnhandledAnswer):
+class EditReplacementError(ChoiceException, UnhandledAnswerError):
 
     """The text should be edited and replacement should be restarted."""
 
@@ -38,7 +45,7 @@ class InteractiveUnlink(InteractiveReplace):
         self._always.always = bot.opt.always
         self.additional_choices = [
             AlwaysChoice(self, 'unlink all on page', 'p'),
-            self._always, EditReplacement()]
+            self._always, EditReplacementError()]
         self._bot = bot
         self.context = 100
         self.context_change = 100
@@ -74,7 +81,7 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
             unlink_callback = self._create_callback()
             try:
                 text = replace_links(text, unlink_callback, target_page.site)
-            except EditReplacement:
+            except EditReplacementError:
                 new_text = TextEditor().edit(
                     unlink_callback.current_text,
                     jumpIndex=unlink_callback.current_range[0])
@@ -87,3 +94,13 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
                 break
 
         self.put_current(text)
+
+
+EditReplacement = EditReplacementError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'EditReplacement',
+    replacement_name='EditReplacementError',
+    since='20210423',
+    future_warning=True)

@@ -20,8 +20,10 @@ Parameters:
 import re
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
+from pywikibot.exceptions import Error, NoPageError, TranslationError
 from pywikibot.flow import Board
 
 template_to_the_image = {
@@ -70,7 +72,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         if not (self.opt.filetemplate
                 and (self.opt.usertemplate or self.opt.nouserwarning)):
             # if no templates are given
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'This script is not localized for {} site;\n'
                 'try using -filetemplate:<template name>.'.format(self.site))
 
@@ -109,7 +111,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
             if page.isTalkPage():
                 text = ''
             else:
-                raise pywikibot.NoPage(page)
+                raise NoPageError(page)
 
         text += apptext
         self.current_page = page
@@ -156,7 +158,7 @@ def main(*args):
     bot = UnusedFilesBot(site=site, generator=gen, **options)
     try:
         bot.run()
-    except pywikibot.Error as e:
+    except Error as e:
         pywikibot.bot.suggest_help(exception=e)
 
 

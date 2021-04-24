@@ -51,11 +51,17 @@ Please check every article you change.
 import re
 
 import pywikibot
-from pywikibot import config, i18n, pagegenerators, xmlreader
 
-from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
-                           suggest_help, input_yn)
+from pywikibot import config, i18n, pagegenerators, xmlreader
 from pywikibot.textlib import replaceExcept
+
+from pywikibot.bot import (
+    ExistingPageBot,
+    input_yn,
+    NoRedirectPageBot,
+    SingleSiteBot,
+    suggest_help,
+)
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

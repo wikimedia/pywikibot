@@ -66,8 +66,8 @@ import time
 import pywikibot
 
 from pywikibot import i18n
-
 from pywikibot.bot import SingleSiteBot
+from pywikibot.exceptions import Error
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
 
 
@@ -167,11 +167,11 @@ class UploadTextBot(SingleSiteBot):
 
         @param page: page to be treated.
         @type page: ProofreadPage
-        @raises pywikibot.Error: Page must be a ProofreadPage object
+        @raises pywikibot.exceptions.Error: Page must be a ProofreadPage object
         """
         if not isinstance(page, ProofreadPage):
-            raise pywikibot.Error('Page {} must be a ProofreadPage object.'
-                                  .format(page))
+            raise Error('Page {} must be a ProofreadPage object.'
+                        .format(page))
 
         old_text = page.text if page.exists() else ''
         if self.opt.ocr:

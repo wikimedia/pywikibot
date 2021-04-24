@@ -352,12 +352,27 @@ from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import first_upper, SizedKeyCollection
 from pywikibot.tools.formatter import color_format
 
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    InvalidTitleError,
+    NoCreateError,
+    NoPageError,
+    NoUsernameError,
+    LockedPageError,
+    PageSaveRelatedError,
+    ServerError,
+    SiteDefinitionError,
+    SpamblacklistError,
+    UnknownSiteError,
+)
+
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
 
-class SaveError(pywikibot.Error):
+class SaveError(Error):
 
     """An attempt to save a page with changed interwiki has failed."""
 
@@ -371,7 +386,7 @@ class LinkMustBeRemoved(SaveError):
     """
 
 
-class GiveUpOnPage(pywikibot.Error):
+class GiveUpOnPage(Error):
 
     """User chose not to work on this page and its linked pages any more."""
 
@@ -1201,7 +1216,7 @@ class Subject(interwiki_graph.Subject):
 
             try:
                 iw = page.langlinks()
-            except pywikibot.UnknownSite:
+            except UnknownSiteError:
                 self.conf.note('site {} does not exist.'.format(page.site))
                 continue
 
@@ -1515,7 +1530,7 @@ class Subject(interwiki_graph.Subject):
                         for link in new[site].iterlanglinks():
                             page = pywikibot.Page(link)
                             old[page.site] = page
-                    except pywikibot.NoPage:
+                    except NoPageError:
                         pywikibot.output('BUG>>> {} no longer exists?'
                                          .format(new[site]))
                         continue
@@ -1533,7 +1548,7 @@ class Subject(interwiki_graph.Subject):
                                 updatedSites.append(site)
                         except SaveError:
                             notUpdatedSites.append(site)
-                        except pywikibot.NoUsername:
+                        except NoUsernameError:
                             pass
                         except GiveUpOnPage:
                             break
@@ -1576,7 +1591,7 @@ class Subject(interwiki_graph.Subject):
 
         try:
             pagetext = page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Not editing {}: page does not exist'
                              .format(page))
             raise SaveError("Page doesn't exist")
@@ -1593,8 +1608,8 @@ class Subject(interwiki_graph.Subject):
         # remove interwiki links to ignore
         for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
             with suppress(KeyError,
-                          pywikibot.SiteDefinitionError,
-                          pywikibot.InvalidTitle):
+                          SiteDefinitionError,
+                          InvalidTitleError):
                 ignorepage = pywikibot.Page(page.site, iw.groups()[0])
                 if new[ignorepage.site] == ignorepage \
                    and ignorepage.site != page.site:
@@ -1749,24 +1764,24 @@ class Subject(interwiki_graph.Subject):
                 page.save(summary=mcomment,
                           asynchronous=self.conf.asynchronous,
                           nocreate=True)
-            except pywikibot.NoCreateError:
+            except NoCreateError:
                 pywikibot.exception()
                 return False
-            except pywikibot.LockedPage:
+            except LockedPageError:
                 pywikibot.output('Page {} is locked. Skipping.'
                                  .format(page))
                 raise SaveError('Locked')
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output(
                     'ERROR putting page: An edit conflict occurred. '
                     'Giving up.')
                 raise SaveError('Edit conflict')
-            except pywikibot.SpamblacklistError as error:
+            except SpamblacklistError as error:
                 pywikibot.output(
                     'ERROR putting page: {0} blacklisted by spamfilter. '
                     'Giving up.'.format(error.url))
                 raise SaveError('Spam filter')
-            except pywikibot.PageSaveRelatedError as error:
+            except PageSaveRelatedError as error:
                 pywikibot.output('ERROR putting page: {}'
                                  .format(error.args,))
                 raise SaveError('PageSaveRelatedError')
@@ -1779,7 +1794,7 @@ class Subject(interwiki_graph.Subject):
                                  .format(timeout,))
                 timeout *= 2
                 pywikibot.sleep(timeout)
-            except pywikibot.ServerError:
+            except ServerError:
                 if timeout > 3600:
                     raise
                 pywikibot.output('ERROR putting page: ServerError.')
@@ -1811,7 +1826,7 @@ class Subject(interwiki_graph.Subject):
                 try:
                     linkedPages = {pywikibot.Page(link)
                                    for link in page.iterlanglinks()}
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.warning(
                         'Page {} does no longer exist?!'.format(page))
                     break
@@ -2010,7 +2025,7 @@ class InterwikiBot:
                 while timeout < 3600:
                     try:
                         self.generateMore(self.conf.maxquerysize - mycount)
-                    except pywikibot.ServerError:
+                    except ServerError:
                         # Could not extract allpages special page?
                         pywikibot.output(
                             'ERROR: could not retrieve more pages. '

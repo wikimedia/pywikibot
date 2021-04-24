@@ -16,10 +16,16 @@ import pywikibot
 from pywikibot import config2 as config
 
 from pywikibot.backports import Sequence
-from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
-from pywikibot.bot_choice import (ChoiceException, Option, OutputOption,
-                                  QuitKeyboardInterrupt, StandardOption)
+from pywikibot.logging import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.userinterfaces import transliteration
+
+from pywikibot.bot_choice import (
+    ChoiceException,
+    Option,
+    OutputOption,
+    QuitKeyboardInterrupt,
+    StandardOption,
+)
 
 
 transliterator = transliteration.transliterator(config.console_encoding)

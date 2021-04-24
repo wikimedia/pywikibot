@@ -36,9 +36,9 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 #
 import pywikibot
 
+from pywikibot import pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot
-from pywikibot import pagegenerators
 from pywikibot.site import Namespace
 
 

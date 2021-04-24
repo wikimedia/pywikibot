@@ -14,7 +14,7 @@ from typing import Optional
 
 import pywikibot
 
-from pywikibot.data import api
+from pywikibot.exceptions import APIError
 from pywikibot.tools import EMPTY_DEFAULT, issue_deprecation_warning
 
 
@@ -162,7 +162,7 @@ class Siteinfo(Container):
         request._warning_handler = warn_handler
         try:
             data = request.submit()
-        except api.APIError as e:
+        except APIError as e:
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
                     pywikibot.log(

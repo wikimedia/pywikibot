@@ -36,6 +36,13 @@ import pywikibot
 from pywikibot import textlib, pagegenerators, i18n, Bot
 from pywikibot.backports import Tuple
 
+from pywikibot.exceptions import (
+    EditConflictError,
+    IsRedirectPageError,
+    LockedPageError,
+    NoPageError,
+)
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -94,22 +101,22 @@ class CommonsLinkBot(Bot):
                             try:
                                 self.userPut(page, old_text, text,
                                              summary=comment)
-                            except pywikibot.EditConflict:
+                            except EditConflictError:
                                 pywikibot.output(
                                     'Skipping {} because of edit conflict'
                                     .format(page.title()))
 
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.output('{} does not exist in Commons'
                                      .format(page.__class__.__name__))
 
-            except pywikibot.NoPage:
+            except NoPageError:
                 pywikibot.output('Page {} does not exist'
                                  .format(page.title()))
-            except pywikibot.IsRedirectPage:
+            except IsRedirectPageError:
                 pywikibot.output('Page {} is a redirect; skipping.'
                                  .format(page.title()))
-            except pywikibot.LockedPage:
+            except LockedPageError:
                 pywikibot.output('Page {} is locked'.format(page.title()))
 
 

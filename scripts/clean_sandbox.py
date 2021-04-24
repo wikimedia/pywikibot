@@ -50,6 +50,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import Bot, ConfigParserBot
+from pywikibot.exceptions import EditConflictError, NoPageError
 
 
 content = {
@@ -236,10 +237,10 @@ class SandboxBot(Bot, ConfigParserBot):
                                              .format(delta.seconds // 60))
                             pywikibot.sleep(delta.seconds)
                             wait = True
-                except pywikibot.EditConflict:
+                except EditConflictError:
                     pywikibot.output(
                         '*** Loading again because of edit conflict.\n')
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.output(
                         '*** The sandbox is not existent, skipping.')
                     continue

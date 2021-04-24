@@ -41,6 +41,7 @@ import pywikibot
 
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.exceptions import LockedPageError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import remove_last_args
 
@@ -726,7 +727,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         page = self.current_page
         try:
             text = page.text
-        except pywikibot.LockedPage:
+        except LockedPageError:
             pywikibot.warning('Page {} is locked?!'
                               .format(page.title(as_link=True)))
             return

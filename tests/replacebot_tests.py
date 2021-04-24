@@ -16,7 +16,6 @@ from pywikibot.tools import suppress_warnings
 from scripts import replace
 
 from tests import WARN_SITE_OBJ, join_data_path
-
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
 

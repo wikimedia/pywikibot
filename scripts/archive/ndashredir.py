@@ -30,12 +30,15 @@ The following generators and filters are supported:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
-
-from pywikibot.bot import (MultipleSitesBot, ExistingPageBot,
-                           NoRedirectPageBot)
-
 from pywikibot.tools.formatter import color_format
+
+from pywikibot.bot import (
+    ExistingPageBot,
+    MultipleSitesBot,
+    NoRedirectPageBot,
+)
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

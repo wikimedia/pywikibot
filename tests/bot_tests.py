@@ -15,7 +15,10 @@ from pywikibot import i18n
 from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
-    unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
+    DefaultSiteTestCase,
+    SiteAttributeTestCase,
+    TestCase,
+    unittest,
 )
 
 

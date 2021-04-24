@@ -23,12 +23,16 @@ import pywikibot.comms.http as http
 import pywikibot.data.api
 
 from pywikibot.backports import List
-from pywikibot import config
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot.data.api import APIError
-from pywikibot.exceptions import FatalServerError
+from pywikibot import config
+from pywikibot.exceptions import APIError
 from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
+
+from pywikibot.exceptions import (
+    FatalServerError,
+    NoPageError,
+)
 
 
 class UploadRobot(BaseBot):
@@ -303,7 +307,7 @@ class UploadRobot(BaseBot):
                                  'cannot be overwritten.'.format(filename))
                 continue
 
-            with suppress(pywikibot.NoPage):
+            with suppress(NoPageError):
                 if potential_file_page.file_is_shared():
                     pywikibot.output(
                         'File with name {} already exists in shared '

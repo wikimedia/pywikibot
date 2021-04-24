@@ -8,11 +8,15 @@ import unittest
 
 from contextlib import suppress
 
-from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
-)
-
 from tests.aspects import DeprecationTestCase
+
+from pywikibot.tools import (
+    add_full_name,
+    deprecated,
+    deprecate_arg,
+    deprecated_args,
+    remove_last_args,
+)
 
 
 @add_full_name

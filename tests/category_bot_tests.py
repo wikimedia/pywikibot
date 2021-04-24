@@ -20,7 +20,7 @@ from tests.aspects import DefaultSiteTestCase, TestCase
 MOCKED_USERNAME = Mock(return_value='FakeUsername')
 
 
-# Temporarily set a username to circumvent NoUsername error; T161692
+# Temporarily set a username to circumvent NoUsernameError; T161692
 @patch.object(BaseSite, 'username', new=MOCKED_USERNAME)
 class CfdActions(DefaultSiteTestCase):
 

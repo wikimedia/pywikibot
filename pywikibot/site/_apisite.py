@@ -23,33 +23,42 @@ import pywikibot.family
 
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
+from pywikibot.exceptions import APIError
+from pywikibot.login import LoginStatus as _LoginStatus
+from pywikibot.site._basesite import BaseSite
+from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._generators import GeneratorsMixin
+from pywikibot.site._interwikimap import _InterwikiMap
+from pywikibot.site._namespace import Namespace
+from pywikibot.site._siteinfo import Siteinfo
+from pywikibot.site._tokenwallet import TokenWallet
+
 from pywikibot.exceptions import (
-    ArticleExistsConflict,
+    ArticleExistsConflictError,
     CaptchaError,
-    CascadeLockedPage,
-    CircularRedirect,
-    EditConflict,
+    CascadeLockedPageError,
+    CircularRedirectError,
+    EditConflictError,
     Error,
-    InconsistentTitleReceived,
-    InterwikiRedirectPage,
-    IsNotRedirectPage,
-    LockedNoPage,
-    LockedPage,
+    InconsistentTitleError,
+    InterwikiRedirectPageError,
+    IsNotRedirectPageError,
+    LockedNoPageError,
+    LockedPageError,
     NoCreateError,
-    NoPage,
-    NoUsername,
-    PageCreatedConflict,
-    PageDeletedConflict,
+    NoPageError,
+    NoUsernameError,
+    PageCreatedConflictError,
+    PageDeletedConflictError,
     PageRelatedError,
     PageSaveRelatedError,
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
-    UnknownExtension,
+    UploadError,
+    UnknownExtensionError,
 )
-from pywikibot.login import LoginStatus as _LoginStatus
-from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right, need_version
+
 from pywikibot.site._extensions import (
     EchoMixin,
     FlowMixin,
@@ -63,11 +72,7 @@ from pywikibot.site._extensions import (
     UrlShortenerMixin,
     WikibaseClientMixin,
 )
-from pywikibot.site._generators import GeneratorsMixin
-from pywikibot.site._interwikimap import _InterwikiMap
-from pywikibot.site._namespace import Namespace
-from pywikibot.site._siteinfo import Siteinfo
-from pywikibot.site._tokenwallet import TokenWallet
+
 from pywikibot.tools import (
     compute_file_hash,
     deprecated,
@@ -321,8 +326,8 @@ class APISite(
         @param user: bot user name. Overrides the username set by
             BaseSite initializer parameter or user-config.py setting
 
-        @raises pywikibot.exceptions.NoUsername: Username is not recognised
-            by the site.
+        @raises pywikibot.exceptions.NoUsernameError: Username is not
+            recognised by the site.
         @see: U{https://www.mediawiki.org/wiki/API:Login}
         """
         # TODO: this should include an assert that loginstatus
@@ -356,31 +361,32 @@ class APISite(
                 return
 
         # May occur if you are not logged in (no API read permissions).
-        except api.APIError:
+        except APIError:
             pass
-        except NoUsername as e:
+        except NoUsernameError as e:
             if not autocreate:
                 raise e
 
         if self.is_oauth_token_available():
             if self.userinfo['name'] == self.username():
-                raise NoUsername('Logging in on %s via OAuth failed' % self)
-
-            if self.username() is None:
-                raise NoUsername('No username has been defined in your '
-                                 'user-config.py: you have to add in this '
-                                 'file the following line:\n'
-                                 'usernames[{family!r}][{lang!r}]'
-                                 '= {username!r}'
-                                 .format(family=self.family,
-                                         lang=self.lang,
-                                         username=self.userinfo['name']))
-
-            raise NoUsername('Logged in on {site} via OAuth as '
-                             '{wrong}, but expect as {right}'
+                error_msg = ('Logging in on {} via OAuth failed'
+                             .format(self))
+            elif self.username() is None:
+                error_msg = ('No username has been defined in your '
+                             'user-config.py: you have to add in this '
+                             'file the following line:\n'
+                             'usernames[{family!r}][{lang!r}]= {username!r}'
+                             .format(family=self.family,
+                                     lang=self.lang,
+                                     username=self.userinfo['name']))
+            else:
+                error_msg = ('Logged in on {site} via OAuth as {wrong}, but '
+                             'expect as {right}'
                              .format(site=self,
                                      wrong=self.userinfo['name'],
                                      right=self.username()))
+
+            raise NoUsernameError(error_msg)
 
         login_manager = api.LoginManager(site=self, user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
@@ -923,7 +929,7 @@ class APISite(
         """
         try:
             version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
-        except pywikibot.data.api.APIError:
+        except APIError:
             msg = 'You have no API read permissions.'
             if not self.logged_in():
                 msg += ' Seems you are not logged in.'
@@ -1023,12 +1029,12 @@ class APISite(
             for this site object.
         @rtype: pywikibot.Page or None
 
-        @raises pywikibot.exceptions.UnknownExtension: site has no Wikibase
-            extension
+        @raises pywikibot.exceptions.UnknownExtensionError: site has no
+            Wikibase extension
         @raises NotimplementedError: method not implemented for a Wikibase site
         """
         if not self.has_data_repository:
-            raise UnknownExtension(
+            raise UnknownExtensionError(
                 'Wikibase is not implemented for {0}.'.format(self))
         if self.is_data_repository():
             raise NotImplementedError(
@@ -1038,7 +1044,7 @@ class APISite(
         dp = pywikibot.ItemPage(repo, item)
         try:
             page_title = dp.getSitelink(self)
-        except pywikibot.NoPage:
+        except NoPageError:
             return None
         page = pywikibot.Page(self, page_title)
         if page.namespace() == Namespace.CATEGORY:
@@ -1076,18 +1082,18 @@ class APISite(
             whether 'imageinfo' is missing. In that case an exception
             is raised.
 
-        @raises NoPage: 'missing' key is found in pageitem
+        @raises NoPageError: 'missing' key is found in pageitem
         @raises PageRelatedError: 'imageinfo' is missing in pageitem
         """
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(with_section=False)):
-                raise InconsistentTitleReceived(page, pageitem['title'])
+                raise InconsistentTitleError(page, pageitem['title'])
             api.update_page(page, pageitem, query.props)
 
             if verify_imageinfo and 'imageinfo' not in pageitem:
                 if 'missing' in pageitem:
-                    raise NoPage(page)
+                    raise NoPageError(page)
                 raise PageRelatedError(
                     page, 'loadimageinfo: Query on %s returned no imageinfo')
 
@@ -1204,15 +1210,16 @@ class APISite(
         @return: redirect target of page
         @rtype: pywikibot.Page
 
-        @raises pywikibot.exceptions.IsNotRedirectPage: page is not a redirect
-        @raises RuntimeError: no redirects found
-        @raises pywikibot.exceptions.CircularRedirect: page is a circular
+        @raises pywikibot.exceptions.IsNotRedirectPageError: page is not a
             redirect
-        @raises pywikibot.exceptions.InterwikiRedirectPage: the redirect
+        @raises RuntimeError: no redirects found
+        @raises pywikibot.exceptions.CircularRedirectError: page is a circular
+            redirect
+        @raises pywikibot.exceptions.InterwikiRedirectPageError: the redirect
             target is on another site
         """
         if not self.page_isredirect(page):
-            raise IsNotRedirectPage(page)
+            raise IsNotRedirectPageError(page)
         if hasattr(page, '_redirtarget'):
             return page._redirtarget
 
@@ -1249,20 +1256,20 @@ class APISite(
         target_title = '%(title)s%(section)s' % redirmap[title]
 
         if self.sametitle(title, target_title):
-            raise CircularRedirect(page)
+            raise CircularRedirectError(page)
 
         if 'pages' not in result['query']:
             # No "pages" element might indicate a circular redirect
             # Check that a "to" link is also a "from" link in redirmap
             for _from, _to in redirmap.items():
                 if _to['title'] in redirmap:
-                    raise CircularRedirect(page)
+                    raise CircularRedirectError(page)
             else:
                 target = pywikibot.Page(source=page.site, title=target_title)
 
                 # Check if target is on another site.
                 if target.site != page.site:
-                    raise InterwikiRedirectPage(page, target)
+                    raise InterwikiRedirectPageError(page, target)
 
                 # Redirect to Special: & Media: pages, which do not work
                 # like redirects, but are rendered like a redirect.
@@ -1472,7 +1479,7 @@ class APISite(
 
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': target,
@@ -1515,12 +1522,12 @@ class APISite(
         'noedit':
             'User %(user)s not authorized to edit pages on %(site)s wiki',
         'missingtitle': NoCreateError,
-        'editconflict': EditConflict,
-        'articleexists': PageCreatedConflict,
-        'pagedeleted': PageDeletedConflict,
-        'protectedpage': LockedPage,
-        'protectedtitle': LockedNoPage,
-        'cascadeprotected': CascadeLockedPage,
+        'editconflict': EditConflictError,
+        'articleexists': PageCreatedConflictError,
+        'pagedeleted': PageDeletedConflictError,
+        'protectedpage': LockedPageError,
+        'protectedtitle': LockedNoPageError,
+        'cascadeprotected': CascadeLockedPageError,
         'titleblacklist-forbidden': TitleblacklistError,
         'spamblacklist': SpamblacklistError,
     }
@@ -1566,8 +1573,8 @@ class APISite(
         @type undo: int
         @return: True if edit succeeded, False if it failed
         @raises pywikibot.exceptions.Error: No text to be saved
-        @raises pywikibot.exceptions.NoPage: recreate is disabled and page does
-            not exist
+        @raises pywikibot.exceptions.NoPageError: recreate is disabled and page
+            does not exist
         @raises pywikibot.exceptions.CaptchaError: config.solve_captcha is
             False and saving the page requires solving a captcha
         """
@@ -1598,7 +1605,7 @@ class APISite(
             try:
                 lastrev = page.latest_revision
                 basetimestamp = lastrev.timestamp
-            except NoPage:
+            except NoPageError:
                 basetimestamp = False
                 if not recreate:
                     raise
@@ -1632,7 +1639,7 @@ class APISite(
                     result = req.submit()
                     pywikibot.debug('editpage response: %s' % result,
                                     _logger)
-                except api.APIError as err:
+                except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
                         pywikibot.debug(
                             "editpage: received '%s' even though bot is "
@@ -1778,15 +1785,15 @@ class APISite(
 
         # Check if pages exist before continuing
         if not source.exists():
-            raise NoPage(source,
-                         'Cannot merge revisions from source {source} because '
-                         'it does not exist on {site}'
-                         .format_map(errdata))
+            raise NoPageError(source,
+                              'Cannot merge revisions from source {source} '
+                              'because it does not exist on {site}'
+                              .format_map(errdata))
         if not dest.exists():
-            raise NoPage(dest,
-                         'Cannot merge revisions to destination {dest} '
-                         'because it does not exist on {site}'
-                         .format_map(errdata))
+            raise NoPageError(dest,
+                              'Cannot merge revisions to destination {dest} '
+                              'because it does not exist on {site}'
+                              .format_map(errdata))
 
         if source == dest:  # Same pages
             raise PageSaveRelatedError(
@@ -1811,7 +1818,7 @@ class APISite(
             pywikibot.debug('mergehistory response: {result}'
                             .format(result=result),
                             _logger)
-        except api.APIError as err:
+        except APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
                 raise Error(on_error.format_map(errdata))
@@ -1846,11 +1853,13 @@ class APISite(
         'immobilenamespace':
             'Pages in %(oldnamespace)s namespace cannot be moved on %(site)s '
             'wiki',
-        'articleexists': OnErrorExc(exception=ArticleExistsConflict,
+        'articleexists': OnErrorExc(exception=ArticleExistsConflictError,
                                     on_new_page=True),
         # "protectedpage" can happen in both directions.
-        'protectedpage': OnErrorExc(exception=LockedPage, on_new_page=None),
-        'protectedtitle': OnErrorExc(exception=LockedNoPage, on_new_page=True),
+        'protectedpage': OnErrorExc(exception=LockedPageError,
+                                    on_new_page=None),
+        'protectedtitle': OnErrorExc(exception=LockedNoPageError,
+                                     on_new_page=True),
         'nonfilenamespace':
             'Cannot move a file to %(newnamespace)s namespace on %(site)s '
             'wiki',
@@ -1886,9 +1895,9 @@ class APISite(
             raise Error('Cannot move page %s to its own title.'
                         % oldtitle)
         if not page.exists():
-            raise NoPage(page,
-                         'Cannot move page %(page)s because it '
-                         'does not exist on %(site)s.')
+            raise NoPageError(page,
+                              'Cannot move page %(page)s because it '
+                              'does not exist on %(site)s.')
         token = self.tokens['move']
         self.lock_page(page)
         req = self._simple_request(action='move',
@@ -1902,7 +1911,7 @@ class APISite(
             result = req.submit()
             pywikibot.debug('movepage response: %s' % result,
                             _logger)
-        except api.APIError as err:
+        except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
                 pywikibot.debug(
                     "movepage: received '%s' even though bot is logged in"
@@ -1911,11 +1920,11 @@ class APISite(
             if err.code in self._mv_errors:
                 on_error = self._mv_errors[err.code]
                 if hasattr(on_error, 'exception'):
-                    # LockedPage can be raised both if "from" or "to" page
+                    # LockedPageError can be raised both if "from" or "to" page
                     # are locked for the user.
                     # Both pages locked is not considered
                     # (a double failure has low probability)
-                    if issubclass(on_error.exception, LockedPage):
+                    if issubclass(on_error.exception, LockedPageError):
                         # we assume "from" is locked unless proven otherwise
                         failed_page = page
                         if newpage.exists():
@@ -2004,7 +2013,7 @@ class APISite(
         req = self._simple_request(**parameters)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(with_section=False),
@@ -2077,7 +2086,7 @@ class APISite(
         self.lock_page(page)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': msg,
@@ -2155,7 +2164,7 @@ class APISite(
         self.lock_page(page)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(with_section=False),
@@ -2267,7 +2276,7 @@ class APISite(
         req = self._simple_request(**parameters)
         try:
             result = req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'user': self.user(),
@@ -2479,7 +2488,7 @@ class APISite(
                                 parameters={'action': 'upload',
                                             'token': self.tokens['edit']})
             req.submit()
-        except api.APIError as error:
+        except APIError as error:
             if error.code == 'uploaddisabled':
                 self._uploaddisabled = True
             elif error.code == 'missingparam':
@@ -2538,12 +2547,12 @@ class APISite(
         @param watch: If true, add filepage to the bot user's watchlist
         @param ignore_warnings: It may be a static boolean, a callable
             returning a boolean or an iterable. The callable gets a list of
-            UploadWarning instances and the iterable should contain the warning
+            UploadError instances and the iterable should contain the warning
             codes for which an equivalent callable would return True if all
-            UploadWarning codes are in thet list. If the result is False it'll
+            UploadError codes are in thet list. If the result is False it'll
             not continue uploading the file and otherwise disable any warning
             and reattempt to upload the file. NOTE: If report_success is True
-            or None it'll raise an UploadWarning exception if the static
+            or None it'll raise an UploadError exception if the static
             boolean is False.
         @type ignore_warnings: bool or callable or iterable of str
         @param chunk_size: The chunk size in bytes for chunked uploading (see
@@ -2563,7 +2572,7 @@ class APISite(
             None it'll verifies the stash when a file key and offset is given.
         @param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
-            raise an UploadWarning if a warning occurred. If it's None
+            raise an UploadError if a warning occurred. If it's None
             (default) it'll be True if ignore_warnings is a bool and False
             otherwise. If it's True or None ignore_warnings must be a bool.
         @return: It returns True if the upload was successful and False
@@ -2571,7 +2580,7 @@ class APISite(
         """
         def create_warnings_list(response):
             return [
-                api.UploadWarning(
+                UploadError(
                     warning,
                     upload_warnings.get(warning, '%(msg)s') % {'msg': data},
                     _file_key, response['offset'])
@@ -2757,7 +2766,7 @@ class APISite(
                         try:
                             data = req.submit()['upload']
                             self._uploaddisabled = False
-                        except api.APIError as error:
+                        except APIError as error:
                             # TODO: catch and process foreseeable errors
                             if error.code == 'uploaddisabled':
                                 self._uploaddisabled = True
@@ -2871,7 +2880,7 @@ class APISite(
             try:
                 result = final_request.submit()
                 self._uploaddisabled = False
-            except api.APIError as error:
+            except APIError as error:
                 # TODO: catch and process foreseeable errors
                 if error.code == 'uploaddisabled':
                     self._uploaddisabled = True
@@ -2903,7 +2912,7 @@ class APISite(
                 return False
 
             warn('When ignore_warnings=False in APISite.upload will change '
-                 'from raising an UploadWarning into behaving like being a '
+                 'from raising an UploadError into behaving like being a '
                  'callable returning False.', DeprecationWarning, 3)
             if len(result['warnings']) > 1:
                 warn('The upload returned {0} warnings: '
@@ -2912,10 +2921,10 @@ class APISite(
                      UserWarning, 3)
             warning = list(result['warnings'].keys())[0]
             message = result['warnings'][warning]
-            raise api.UploadWarning(warning, upload_warnings[warning]
-                                    % {'msg': message},
-                                    file_key=_file_key,
-                                    offset=result.get('offset', False))
+            raise UploadError(warning, upload_warnings[warning]
+                              % {'msg': message},
+                              file_key=_file_key,
+                              offset=result.get('offset', False))
         if 'result' not in result:
             pywikibot.output('Upload: unrecognized response: %s' % result)
 

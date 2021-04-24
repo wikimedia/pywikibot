@@ -8,10 +8,14 @@ import unittest
 
 from contextlib import suppress
 
-from pywikibot.page import (
-    LanguageDict, AliasesDict, ClaimCollection, SiteLinkCollection,
-)
 from tests.aspects import WikidataTestCase
+
+from pywikibot.page import (
+    AliasesDict,
+    ClaimCollection,
+    LanguageDict,
+    SiteLinkCollection,
+)
 
 
 class DataCollectionTestCase(WikidataTestCase):

@@ -31,10 +31,11 @@ from contextlib import suppress
 from urllib.parse import urlencode
 
 import pywikibot
-from pywikibot.comms.http import fetch
-from pywikibot import config2 as config
-from pywikibot.specialbots import UploadRobot
+
 from pywikibot import textlib
+from pywikibot import config2 as config
+from pywikibot.comms.http import fetch
+from pywikibot.specialbots import UploadRobot
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog

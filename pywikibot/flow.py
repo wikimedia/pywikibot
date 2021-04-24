@@ -9,10 +9,14 @@ import logging
 
 from urllib.parse import urlparse, parse_qs
 
-from pywikibot.exceptions import NoPage, UnknownExtension, LockedPage
 from pywikibot.page import BasePage, User
 from pywikibot.tools import deprecate_arg
 
+from pywikibot.exceptions import (
+    LockedPageError,
+    NoPageError,
+    UnknownExtensionError,
+)
 
 logger = logging.getLogger('pywiki.wiki.flow')
 
@@ -38,7 +42,7 @@ class FlowPage(BasePage, abc.ABC):
         super().__init__(source, title)
 
         if not self.site.has_extension('Flow'):
-            raise UnknownExtension('site is not Flow-enabled')
+            raise UnknownExtensionError('site is not Flow-enabled')
 
     @abc.abstractmethod
     def _load(self, force: bool = False):
@@ -315,7 +319,7 @@ class Post:
         if not isinstance(page, Topic):
             raise TypeError('Page must be a Topic object')
         if not page.exists():
-            raise NoPage(page, 'Topic must exist: %s')
+            raise NoPageError(page, 'Topic must exist: %s')
         if not isinstance(uuid, str):
             raise TypeError('Post UUID must be a string')
 
@@ -477,7 +481,7 @@ class Post:
         """
         self._load()
         if self.page.is_locked:
-            raise LockedPage(self.page, 'Topic %s is locked.')
+            raise LockedPageError(self.page, 'Topic %s is locked.')
 
         reply_url = self._current_revision['actions']['reply']['url']
         parsed_url = urlparse(reply_url)

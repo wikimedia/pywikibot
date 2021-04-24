@@ -33,6 +33,13 @@ from pywikibot import pagegenerators
 
 from pywikibot.bot import MultipleSitesBot
 
+from pywikibot.exceptions import (
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    PageSaveRelatedError,
+)
+
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
@@ -51,13 +58,13 @@ class TouchBot(MultipleSitesBot):
         """Touch the given page."""
         try:
             page.touch(botflag=self.opt.botflag)
-        except (pywikibot.NoCreateError, pywikibot.NoPage):
+        except (NoCreateError, NoPageError):
             pywikibot.error('Page {0} does not exist.'
                             .format(page.title(as_link=True)))
-        except pywikibot.LockedPage:
+        except LockedPageError:
             pywikibot.error('Page {0} is locked.'
                             .format(page.title(as_link=True)))
-        except pywikibot.PageSaveRelatedError:
+        except PageSaveRelatedError:
             pywikibot.error('Page {0} not saved.'
                             .format(page.title(as_link=True)))
 

@@ -24,6 +24,12 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, editor
 from pywikibot.bot import SingleSiteBot, CurrentPageBot, QuitKeyboardInterrupt
 
+from pywikibot.exceptions import (
+    EditConflictError,
+    IsRedirectPageError,
+    NoPageError,
+)
+
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -450,10 +456,10 @@ What is it? """
         """Process one bad page."""
         try:
             self.content = self.page.get()
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('Already redirected, skipping.')
             return
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Already deleted')
             return
 
@@ -493,7 +499,7 @@ What is it? """
                                       self.site.lang,
                                       'followlive-blanking',
                                       {'content': self.content}))
-                except pywikibot.EditConflict:
+                except EditConflictError:
                     pywikibot.output(
                         'An edit conflict occurred! Automatically retrying')
                     self.handle_bad_page(self)

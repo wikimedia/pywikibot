@@ -23,8 +23,9 @@ import re
 
 import pywikibot
 
-from pywikibot.bot import SingleSiteBot, suggest_help
 from pywikibot import i18n
+from pywikibot.bot import SingleSiteBot, suggest_help
+from pywikibot.exceptions import IsNotRedirectPageError, NoPageError
 
 try:
     import pycountry
@@ -70,7 +71,7 @@ class StatesRedirectBot(SingleSiteBot):
                 pl = pywikibot.Page(self.site, page.title().replace(sn,
                                     self.abbrev[sn]))
                 # A bit hacking here - the real work is done in the
-                # 'except pywikibot.NoPage' part rather than the 'try'.
+                # 'except NoPageError' part rather than the 'try'.
 
                 try:
                     pl.get(get_redirect=True)
@@ -83,12 +84,12 @@ class StatesRedirectBot(SingleSiteBot):
                         pywikibot.warning(
                             '{0} already exists but redirects elsewhere!'
                             .format(goal))
-                except pywikibot.IsNotRedirectPage:
+                except IsNotRedirectPageError:
                     pywikibot.warning(
                         'Page {0} already exists and is not a redirect '
                         'Please check page!'
                         .format(pl.title()))
-                except pywikibot.NoPage:
+                except NoPageError:
                     if page.isRedirectPage():
                         p2 = page.getRedirectTarget()
                         pywikibot.output(
