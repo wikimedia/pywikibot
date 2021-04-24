@@ -3,7 +3,7 @@
 # (C) Pywikibot team, 2012-2018
 #
 ##############################################
-# Support for unicode in windows cmd.exe
+# Support for unicode in Windows cmd.exe
 # Posted on Stack Overflow [1], available under CC-BY-SA 3.0 [2]
 #
 # Question: "Windows cmd encoding change causes Python crash" [3] by Alex [4],

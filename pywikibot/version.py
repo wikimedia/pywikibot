@@ -248,7 +248,7 @@ def getversion_git(path=None):
     try:
         subprocess.Popen([cmd], stdout=subprocess.PIPE).communicate()
     except OSError:
-        # some windows git versions provide git.cmd instead of git.exe
+        # some Windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
     with open(os.path.join(_program_dir, '.git/config'), 'r') as f:

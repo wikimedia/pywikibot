@@ -643,7 +643,7 @@ class TestFileShaCalculator(TestCase):
     r"""Test calculator of sha of a file.
 
     There are two possible hash values for each test. The second one is for
-    files with windows line endings (\r\n).
+    files with Windows line endings (\r\n).
 
     """
 

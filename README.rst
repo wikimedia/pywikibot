@@ -103,7 +103,7 @@ A sample pywikibot script for getting data from Wikibase:
 
 -------------------------------------------------------------------------------------------
 
-For more documentation on pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
+For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
 .. include:: pywikibot/DIRECTORIES.rst
 

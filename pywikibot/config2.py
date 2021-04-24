@@ -1040,7 +1040,7 @@ for _key in _modified:
              _ConfigurationDeprecationWarning)
 
 # If we cannot auto-detect the console encoding (e.g. when piping data)
-# assume utf-8. On Linux, this will typically be correct; on windows,
+# assume utf-8. On Linux, this will typically be correct; on Windows,
 # this can be an issue when piping through more. However, the behavior
 # when redirecting to a file utf-8 is more reasonable.
 
