@@ -13,7 +13,7 @@ from http import HTTPStatus
 import requests
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.tools import PYTHON_VERSION, suppress_warnings

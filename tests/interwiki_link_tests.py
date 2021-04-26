@@ -6,7 +6,7 @@
 #
 from contextlib import suppress
 
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import Link
 from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase

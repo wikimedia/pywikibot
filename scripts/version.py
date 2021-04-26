@@ -68,8 +68,8 @@ def main(*args) -> None:
                                            os.environ.get(environ_name,
                                                           'Not set')))
 
-    pywikibot.output('Config base dir: ' + pywikibot.config2.base_dir)
-    for family, usernames in pywikibot.config2.usernames.items():
+    pywikibot.output('Config base dir: ' + pywikibot.config.base_dir)
+    for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
         pywikibot.output('Usernames for family "{0}":'.format(family))

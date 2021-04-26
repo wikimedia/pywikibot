@@ -8,8 +8,7 @@ import re
 from contextlib import suppress
 
 import pywikibot
-from pywikibot import Site
-from pywikibot import config2 as config
+from pywikibot import Site, config
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace

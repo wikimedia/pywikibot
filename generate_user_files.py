@@ -33,8 +33,8 @@ OBSOLETE_SECTIONS = {
 
 # Disable user-config usage as we are creating it here
 pywikibot = _import_with_no_user_config('pywikibot')
-config, __url__ = pywikibot.config2, pywikibot.__url__
-base_dir = pywikibot.config2.base_dir
+config, __url__ = pywikibot.config, pywikibot.__url__
+base_dir = pywikibot.config.base_dir
 
 try:
     console_encoding = sys.stdout.encoding
@@ -68,14 +68,14 @@ def change_base_dir():
             pywikibot.output('Using existing directory')
         else:
             try:
-                os.mkdir(new_base, pywikibot.config2.private_files_permission)
+                os.mkdir(new_base, pywikibot.config.private_files_permission)
             except Exception as e:
                 pywikibot.error('directory creation failed: {0}'.format(e))
                 continue
             pywikibot.output('Created new directory.')
         break
 
-    if new_base == pywikibot.config2.get_base_dir(new_base):
+    if new_base == pywikibot.config.get_base_dir(new_base):
         # config would find that file
         return new_base
 
@@ -114,7 +114,7 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
     @return: The family, language and username
     @rtype: tuple of three str
     """
-    known_families = sorted(pywikibot.config2.family_files.keys())
+    known_families = sorted(pywikibot.config.family_files.keys())
     if default_family not in known_families:
         default_family = None
     fam = pywikibot.bot.input_list_choice(
@@ -216,9 +216,9 @@ PASSFILE_CONFIG = """\
 
 
 def parse_sections():
-    """Parse sections from config2.py file.
+    """Parse sections from config.py file.
 
-    config2.py will be in the pywikibot/ directory relative to this
+    config.py will be in the pywikibot/ directory relative to this
     generate_user_files script.
 
     @return: a list of ConfigSection named tuples.
@@ -228,7 +228,7 @@ def parse_sections():
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
     install = os.path.dirname(os.path.abspath(__file__))
-    with codecs.open(os.path.join(install, 'pywikibot', 'config2.py'),
+    with codecs.open(os.path.join(install, 'pywikibot', 'config.py'),
                      'r', 'utf-8') as config_f:
         config_file = config_f.read()
 

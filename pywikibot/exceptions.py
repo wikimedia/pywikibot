@@ -149,7 +149,7 @@ be aware of its status.
 
 UserWarning: warnings targeted at users
 
-  - config2._ConfigurationDeprecationWarning: user configuration file problems
+  - config._ConfigurationDeprecationWarning: user configuration file problems
   - login._PasswordFileWarning: password file problems
   - ArgumentDeprecationWarning: command line argument problems
   - FamilyMaintenanceWarning: missing information in family definition

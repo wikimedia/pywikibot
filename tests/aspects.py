@@ -23,8 +23,7 @@ from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
-import pywikibot.config2 as config
-from pywikibot import Site
+from pywikibot import Site, config
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request

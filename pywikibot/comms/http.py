@@ -29,7 +29,7 @@ from warnings import warn
 import requests
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     FatalServerError,

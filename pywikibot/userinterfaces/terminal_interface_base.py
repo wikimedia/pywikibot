@@ -12,7 +12,7 @@ import threading
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.backports import Sequence
 from pywikibot.bot_choice import (
     ChoiceException,

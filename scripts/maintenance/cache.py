@@ -227,7 +227,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
          - True  = always use
     """
     if not cache_path:
-        cache_path = os.path.join(pywikibot.config2.base_dir,
+        cache_path = os.path.join(pywikibot.config.base_dir,
                                   'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
 
     if not os.path.exists(cache_path):
@@ -436,13 +436,13 @@ def main():
         cache_paths += [os.path.join('tests', f) for f in folders]
 
         # Also process the base directory, if it isn't the current directory
-        if os.path.abspath(os.getcwd()) != pywikibot.config2.base_dir:
+        if os.path.abspath(os.getcwd()) != pywikibot.config.base_dir:
             cache_paths += [
-                os.path.join(pywikibot.config2.base_dir, f) for f in folders]
+                os.path.join(pywikibot.config.base_dir, f) for f in folders]
 
         # Also process the user home cache, if it isn't the config directory
         userpath = os.path.expanduser(os.path.join('~', '.pywikibot'))
-        if userpath != pywikibot.config2.base_dir:
+        if userpath != pywikibot.config.base_dir:
             cache_paths += [
                 os.path.join(userpath, f) for f in folders]
 
