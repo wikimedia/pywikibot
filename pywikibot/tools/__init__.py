@@ -1014,7 +1014,7 @@ class EmptyDefault(str, Mapping):
 
     def __iter__(self):
         """An iterator which does nothing and drops the argument."""
-        return empty_iterator()
+        return iter(())
 
     def __getitem__(self, key):
         """Raise always a L{CombinedError}."""
@@ -1928,6 +1928,8 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('empty_iterator', replacement_name='iter(())',
+                             since='20220422', future_warning=True)
 wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
                              since='20210416', future_warning=True)
 wrapper._add_deprecated_attr('frozenmap',
