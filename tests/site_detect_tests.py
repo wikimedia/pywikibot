@@ -10,7 +10,7 @@ from contextlib import suppress
 from http import HTTPStatus
 from urllib.parse import urlparse
 
-from requests.exceptions import ConnectionError, Timeout
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 import pywikibot
 
@@ -48,7 +48,7 @@ class SiteDetectionTestCase(TestCase):
         @raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError, ConnectionError, RuntimeError,
-                                ServerError, Timeout)) as e:
+                                ServerError, Timeout, TooManyRedirects)) as e:
             MWSite(url)
         unittest_print('\nassertNoSite expected exception:\n{e!r}'
                        .format(e=e.exception))
