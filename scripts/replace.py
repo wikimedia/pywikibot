@@ -209,7 +209,7 @@ class ReplacementBase:
         changes to the MediaWiki server, the edit summary includes the
         descriptions of each replacement that you applied to the page.
         """
-        return '-{0} +{1}'.format(self.old, self.new)
+        return '-{} +{}'.format(self.old, self.new)
 
     @property
     def container(self):
@@ -441,7 +441,7 @@ class XmlDumpReplacePageGenerator:
             with suppress(NameError):
                 if not self.skipping:
                     pywikibot.output(
-                        'To resume, use "-xmlstart:{0}" on the command line.'
+                        'To resume, use "-xmlstart:{}" on the command line.'
                         .format(entry.title))
 
     def isTitleExcepted(self, title):
@@ -538,8 +538,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         for i, replacement in enumerate(replacements):
             if isinstance(replacement, Sequence):
                 if len(replacement) != 2:
-                    raise ValueError('Replacement number {0} does not have '
-                                     'exactly two elements: {1}'.format(
+                    raise ValueError('Replacement number {} does not have '
+                                     'exactly two elements: {}'.format(
                                          i, replacement))
                 # Replacement assumes it gets strings but it's already compiled
                 replacements[i] = Replacement.from_compiled(replacement[0],
@@ -597,14 +597,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     page.title(), replacement.exceptions):
                 if replacement.container:
                     pywikibot.output(
-                        'Skipping fix "{0}" on {1} because the title is on '
+                        'Skipping fix "{}" on {} because the title is on '
                         'the exceptions list.'.format(
                             replacement.container.name,
                             page.title(as_link=True)))
                     skipped_containers.add(replacement.container.name)
                 else:
                     pywikibot.output(
-                        'Skipping unnamed replacement ({0}) on {1} because '
+                        'Skipping unnamed replacement ({}) on {} because '
                         'the title is on the exceptions list.'.format(
                             replacement.description, page.title(as_link=True)))
                 continue
@@ -741,7 +741,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 try:
                     original_text = page.get(get_redirect=True, force=True)
                 except NoPageError:
-                    pywikibot.output('Page {0} has been deleted.'
+                    pywikibot.output('Page {} has been deleted.'
                                      .format(page.title()))
                     break
                 new_text = original_text
@@ -756,7 +756,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                           asynchronous=True)
             while not self._pending_processed_titles.empty():
                 proc_title, res = self._pending_processed_titles.get()
-                pywikibot.output('Page {0}{1} saved'
+                pywikibot.output('Page {}{} saved'
                                  .format(proc_title,
                                          '' if res else ' not'))
             # choice must be 'N'
@@ -916,13 +916,13 @@ def main(*args):
                 # strip newlines, but not other characters
                 file_replacements = f.read().splitlines()
         except OSError as e:
-            pywikibot.error('Error loading {0}: {1}'.format(
+            pywikibot.error('Error loading {}: {}'.format(
                 replacement_file, e))
             return
 
         if len(file_replacements) % 2:
             pywikibot.error(
-                '{0} contains an incomplete pattern replacement pair.'.format(
+                '{} contains an incomplete pattern replacement pair.'.format(
                     replacement_file))
             return
 
@@ -948,7 +948,7 @@ def main(*args):
             single_summary = i18n.twtranslate(
                 site, 'replace-replacing',
                 {'description':
-                 ' (-{0} +{1})'.format(replacement.old, replacement.new)}
+                 ' (-{} +{})'.format(replacement.old, replacement.new)}
             )
         replacements.append(replacement)
 
@@ -959,15 +959,15 @@ def main(*args):
         try:
             fix = fixes.fixes[fix_name]
         except KeyError:
-            pywikibot.output('Available predefined fixes are: {0}'
+            pywikibot.output('Available predefined fixes are: {}'
                              .format(', '.join(fixes.fixes.keys())))
             if not fixes.user_fixes_loaded:
-                pywikibot.output('The user fixes file could not be found: '
-                                 '{0}'.format(fixes.filename))
+                pywikibot.output('The user fixes file could not be found: {}'
+                                 .format(fixes.filename))
             return
         if not fix['replacements']:
-            pywikibot.warning('No replacements defined for fix '
-                              '"{0}"'.format(fix_name))
+            pywikibot.warning('No replacements defined for fix "{}"'
+                              .format(fix_name))
             continue
         if 'msg' in fix:
             if isinstance(fix['msg'], str):
@@ -994,14 +994,14 @@ def main(*args):
             summary = None if len(replacement) < 3 else replacement[2]
             if not set_summary and not summary:
                 missing_fix_summaries.append(
-                    '"{0}" (replacement #{1})'.format(fix_name, index))
+                    '"{}" (replacement #{})'.format(fix_name, index))
             if chars.contains_invisible(replacement[0]):
-                pywikibot.warning('The old string "{0}" contains formatting '
+                pywikibot.warning('The old string "{}" contains formatting '
                                   'characters like U+200E'.format(
                                       chars.replace_invisible(replacement[0])))
             if (not callable(replacement[1])
                     and chars.contains_invisible(replacement[1])):
-                pywikibot.warning('The new string "{0}" contains formatting '
+                pywikibot.warning('The new string "{}" contains formatting '
                                   'characters like U+200E'.format(
                                       chars.replace_invisible(replacement[1])))
             replacement_set.append(ReplacementListEntry(
@@ -1023,7 +1023,7 @@ def main(*args):
 
         if len(fix['replacements']) == len(missing_fix_summaries):
             missing_fixes_summaries.append(
-                '"{0}" (all replacements)'.format(fix_name))
+                '"{}" (all replacements)'.format(fix_name))
         else:
             missing_fixes_summaries += missing_fix_summaries
 
@@ -1036,8 +1036,8 @@ def main(*args):
         if missing_fixes_summaries:
             pywikibot.output('The summary will not be used when the fix has '
                              'one defined but the following fix(es) do(es) '
-                             'not have a summary defined: '
-                             '{0}'.format(', '.join(missing_fixes_summaries)))
+                             'not have a summary defined: {}'
+                             .format(', '.join(missing_fixes_summaries)))
         if edit_summary is not True:
             edit_summary = pywikibot.input(
                 'Press Enter to use this automatic message, or enter a '
@@ -1060,23 +1060,24 @@ def main(*args):
                                           replacements, exceptions, site)
     elif useSql:
         if not sql_query:
-            whereClause = 'WHERE (%s)' % ' OR '.join(
-                "old_text RLIKE '%s'"
-                % prepareRegexForMySQL(old_regexp.pattern)
-                for (old_regexp, new_text) in replacements)
+            whereClause = 'WHERE ({})'.format(' OR '.join(
+                "old_text RLIKE '{}'"
+                .format(prepareRegexForMySQL(old_regexp.pattern))
+                for (old_regexp, new_text) in replacements))
             if exceptions:
-                exceptClause = 'AND NOT (%s)' % ' OR '.join(
-                    "old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)
-                    for exc in exceptions)
+                exceptClause = 'AND NOT ({})'.format(' OR '.join(
+                    "old_text RLIKE '{}'"
+                    .format(prepareRegexForMySQL(exc.pattern))
+                    for exc in exceptions))
             else:
                 exceptClause = ''
         query = sql_query or """
 SELECT page_namespace, page_title
 FROM page
 JOIN text ON (page_id = old_id)
-%s
-%s
-LIMIT 200""" % (whereClause, exceptClause)
+{}
+{}
+LIMIT 200""".format(whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
 
     gen = genFactory.getCombinedGenerator(gen, preload=True)

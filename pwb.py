@@ -285,7 +285,7 @@ def find_filename(filename):
             script_paths = config.user_script_paths + script_paths
         else:
             warn("'user_script_paths' must be a list,\n"
-                 'found: {0}. Ignoring this setting.'
+                 'found: {}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
     path_list = []
@@ -348,8 +348,8 @@ def main():
         try:
             import_module(file_package)
         except ImportError as e:
-            warn('Parent module %s not found: %s'
-                 % (file_package, e), ImportWarning)
+            warn('Parent module {} not found: {}'
+                 .format(file_package, e), ImportWarning)
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)

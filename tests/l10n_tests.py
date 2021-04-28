@@ -77,7 +77,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                              .format(package, code)).replace('-', '_')
                 cls.add_method(
                     dct, test_name, test_method(current_site, package),
-                    doc_suffix='{0} and language {1}'.format(
+                    doc_suffix='{} and language {}'.format(
                         package, code))
 
         return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)

@@ -256,7 +256,8 @@ def _create_default_regexes():
         # images.
         'link': re.compile(r'\[\[[^\]|]*(\|[^\]]*)?\]\]'),
         # pagelist tag (used in Proofread extension).
-        'pagelist': re.compile(r'<%s[\s\S]*?/>' % _ignore_case('pagelist')),
+        'pagelist': re.compile(r'<{}[\s\S]*?/>'
+                               .format(_ignore_case('pagelist'))),
         # Wikibase property inclusions
         'property': (
             r'\{\{\s*\#(?:%s):\s*[Pp]\d+.*?\}\}',
@@ -645,7 +646,7 @@ def replace_links(text: str, replace, site=None) -> str:
         if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
             raise ValueError('The replacement must be None, False, '
                              'a sequence, a Link or a str but '
-                             'is "{0}"'.format(type(replacement)))
+                             'is "{}"'.format(type(replacement)))
 
     def title_section(link) -> str:
         title = link.title
@@ -661,7 +662,7 @@ def replace_links(text: str, replace, site=None) -> str:
         if not isinstance(replace_list[0], pywikibot.Link):
             raise ValueError(
                 'The original value must be either str, Link or Page '
-                'but is "{0}"'.format(type(replace_list[0])))
+                'but is "{}"'.format(type(replace_list[0])))
         if replace_list[1] is not False and replace_list[1] is not None:
             if isinstance(replace_list[1], str):
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
@@ -678,8 +679,8 @@ def replace_links(text: str, replace, site=None) -> str:
     linktrail = site.linktrail()
     link_pattern = re.compile(
         r'\[\[(?P<title>.*?)(#(?P<section>.*?))?(\|(?P<label>.*?))?\]\]'
-        r'(?P<linktrail>%s)' % linktrail)
-    extended_label_pattern = re.compile(r'(.*?\]\])({0})'.format(linktrail))
+        r'(?P<linktrail>{})'.format(linktrail))
+    extended_label_pattern = re.compile(r'(.*?\]\])({})'.format(linktrail))
     linktrail = re.compile(linktrail)
     curpos = 0
     # This loop will run until we have finished the current page
@@ -815,10 +816,10 @@ def replace_links(text: str, replace, site=None) -> str:
                     or parsed_new_label.namespace != new_link.namespace)
 
         if must_piped:
-            new_text = '[[{0}|{1}]]'.format(new_title, new_label)
+            new_text = '[[{}|{}]]'.format(new_title, new_label)
         else:
-            new_text = '[[{0}]]{1}'.format(new_label[:len(new_title)],
-                                           new_label[len(new_title):])
+            new_text = '[[{}]]{}'.format(new_label[:len(new_title)],
+                                         new_label[len(new_title):])
 
         text = text[:start] + new_text + text[end:]
         # Make sure that next time around we will not find this same hit.
@@ -995,12 +996,12 @@ def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
                 result[page.site] = page  # need to trigger page._link.parse()
             except InvalidTitleError:
                 pywikibot.output('[getLanguageLinks] Text contains invalid '
-                                 'interwiki link [[%s:%s]].'
-                                 % (lang, pagetitle))
+                                 'interwiki link [[{}:{}]].'
+                                 .format(lang, pagetitle))
                 continue
             if previous_key_count == len(result):
                 pywikibot.warning('[getLanguageLinks] 2 or more interwiki '
-                                  'links point to site %s.' % site)
+                                  'links point to site {}.'.format(site))
     return result
 
 
@@ -1025,8 +1026,8 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
                          + list(site.family.obsolete.keys()))
     if not languages:
         return text
-    interwikiR = re.compile(r'\[\[(%s)\s?:[^\[\]\n]*\]\][\s]*'
-                            % languages, re.IGNORECASE)
+    interwikiR = re.compile(r'\[\[({})\s?:[^\[\]\n]*\]\][\s]*'
+                            .format(languages), re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
                          ['comment', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1136,7 +1137,7 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             # Do we have a noinclude at the end of the template?
             parts = s2.split(includeOff)
             lastpart = parts[-1]
-            if re.match(r'\s*%s' % marker, lastpart):
+            if re.match(r'\s*{}'.format(marker), lastpart):
                 # Put the langlinks back into the noinclude's
                 regexp = re.compile(r'{}\s*{}'.formar(includeOff, marker))
                 newtext = regexp.sub(s + includeOff, s2)
@@ -1258,8 +1259,8 @@ def getCategoryLinks(text: str, site=None,
     # and HTML comments
     text = removeDisabledParts(text, include=include or [])
     catNamespace = '|'.join(site.namespaces.CATEGORY)
-    R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
-                   % catNamespace, re.I)
+    R = re.compile(r'\[\[\s*(?P<namespace>{})\s*:\s*(?P<rest>.+?)\]\]'
+                   .format(catNamespace), re.I)
     for match in R.finditer(text):
         if expand_text and '{{' in match.group('rest'):
             rest = site.expand_text(match.group('rest'))
@@ -1278,7 +1279,8 @@ def getCategoryLinks(text: str, site=None,
         except InvalidTitleError:
             # Category title extracted contains invalid characters
             # Likely due to on-the-fly category name creation, see T154309
-            pywikibot.warning('Invalid category title extracted: %s' % title)
+            pywikibot.warning('Invalid category title extracted: {}'
+                              .format(title))
         else:
             result.append(cat)
 
@@ -1302,7 +1304,8 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
     if site is None:
         site = pywikibot.Site()
     catNamespace = '|'.join(site.namespaces.CATEGORY)
-    categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
+    categoryR = re.compile(r'\[\[\s*({})\s*:.*?\]\]\s*'
+                           .format(catNamespace), re.I)
     text = replaceExcept(text, categoryR, '',
                          ['comment', 'includeonly', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1310,7 +1313,7 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
                          site=site)
     if marker:
         # avoid having multiple linefeeds at the end of the text
-        text = re.sub(r'\s*%s' % re.escape(marker), '\n' + marker,
+        text = re.sub(r'\s*{}'.format(re.escape(marker)), '\n' + marker,
                       text.strip())
     return text.strip()
 
@@ -1362,16 +1365,16 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     title = re.escape(title)
     # title might not be capitalized correctly on the wiki
     if title[0].isalpha() and site.namespaces[14].case == 'first-letter':
-        title = '[%s%s]' % (title[0].upper(), title[0].lower()) + title[1:]
+        title = '[{}{}]'.format(title[0].upper(), title[0].lower()) + title[1:]
     # spaces and underscores in page titles are interchangeable and collapsible
     title = title.replace(r'\ ', '[ _]+').replace(r'\_', '[ _]+')
-    categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s[\s\u200e\u200f]*'
+    categoryR = re.compile(r'\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'
                            r'((?:\|[^]]+)?\]\])'
-                           % (catNamespace, title), re.I)
+                           .format(catNamespace, title), re.I)
     categoryRN = re.compile(
-        r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s[\s\u200e\u200f]*'
+        r'^[^\S\n]*\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'
         r'((?:\|[^]]+)?\]\])[^\S\n]*\n'
-        % (catNamespace, title), re.I | re.M)
+        .format(catNamespace, title), re.I | re.M)
     exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
     if newcat is None:
         # First go through and try the more restrictive regex that removes
@@ -1384,13 +1387,13 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     elif add_only:
         text = replaceExcept(
             oldtext, categoryR,
-            '{0}\n{1}'.format(
+            '{}\n{}'.format(
                 oldcat.title(as_link=True, allow_interwiki=False),
                 newcat.title(as_link=True, allow_interwiki=False)),
             exceptions, site=site)
     else:
         text = replaceExcept(oldtext, categoryR,
-                             '[[{0}:{1}\\2'
+                             '[[{}:{}\\2'
                              .format(site.namespace(14),
                                      newcat.title(with_ns=False)),
                              exceptions, site=site)
@@ -1515,7 +1518,7 @@ def categoryFormat(categories, insite=None) -> str:
             # whole word if no ":" is present
             prefix = category.split(':', 1)[0]
             if prefix not in insite.namespaces[14]:
-                category = '{0}:{1}'.format(insite.namespace(14), category)
+                category = '{}:{}'.format(insite.namespace(14), category)
             category = pywikibot.Category(pywikibot.Link(category,
                                                          insite,
                                                          default_namespace=14),
@@ -1554,10 +1557,10 @@ def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
     # not allowed inside links. For example, in this wiki text:
     #       ''Please see https://www.example.org.''
     # .'' shouldn't be considered as part of the link.
-    regex = r'(?P<url>http[s]?://[^%(notInside)s]*?[^%(notAtEnd)s]' \
-            r'(?=[%(notAtEnd)s]*\'\')|http[s]?://[^%(notInside)s]*' \
-            r'[^%(notAtEnd)s])' % {'notInside': notInside,
-                                   'notAtEnd': notAtEnd}
+    regex = r'(?P<url>http[s]?://[^{notInside}]*?[^{notAtEnd}]' \
+            r'(?=[{notAtEnd}]*\'\')|http[s]?://[^{notInside}]*' \
+            r'[^{notAtEnd}])'.format(notInside=notInside,
+                                     notAtEnd=notAtEnd)
 
     if withoutBracketed:
         regex = r'(?<!\[)' + regex
@@ -1748,10 +1751,10 @@ def _extract_templates_and_params_regex(text: str,
     result = []
     Rmath = re.compile(r'<math>[^<]+</math>')
     Rvalue = re.compile(r'{{{.+?}}}')
-    Rmarker1 = re.compile(r'%s(\d+)%s' % (marker1, marker1))
-    Rmarker2 = re.compile(r'%s(\d+)%s' % (marker2, marker2))
-    Rmarker3 = re.compile(r'%s(\d+)%s' % (marker3, marker3))
-    Rmarker4 = re.compile(r'%s(\d+)%s' % (marker4, marker4))
+    Rmarker1 = re.compile(r'{m}(\d+){m}'.format(m=marker1))
+    Rmarker2 = re.compile(r'{m}(\d+){m}'.format(m=marker2))
+    Rmarker3 = re.compile(r'{m}(\d+){m}'.format(m=marker3))
+    Rmarker4 = re.compile(r'{m}(\d+){m}'.format(m=marker4))
 
     # Replace math with markers
     maths = {}
@@ -1759,7 +1762,8 @@ def _extract_templates_and_params_regex(text: str,
     for m in Rmath.finditer(thistxt):
         count += 1
         item = m.group()
-        thistxt = thistxt.replace(item, '%s%d%s' % (marker3, count, marker3))
+        thistxt = thistxt.replace(item, '{m}{c}{m}'
+                                        .format(m=marker3, c=count))
         maths[count] = item
 
     values = {}
@@ -1771,7 +1775,8 @@ def _extract_templates_and_params_regex(text: str,
         while '}}}%d{{{' % count in text:
             count += 1
         item = m.group()
-        thistxt = thistxt.replace(item, '%s%d%s' % (marker4, count, marker4))
+        thistxt = thistxt.replace(item, '{m}{c}{m}'
+                                        .format(m=marker4, c=count))
         values[count] = item
 
     inside = {}
@@ -1787,8 +1792,8 @@ def _extract_templates_and_params_regex(text: str,
             count += 1
             while '}}%d{{' % count in text:
                 count += 1
-            thistxt = thistxt.replace(item,
-                                      '%s%d%s' % (marker1, count, marker1))
+            thistxt = thistxt.replace(item, '{m}{c}{m}'
+                                            .format(m=marker1, c=count))
 
             # Make sure stored templates don't contain markers
             for m2 in Rmarker1.finditer(item):
@@ -1823,7 +1828,7 @@ def _extract_templates_and_params_regex(text: str,
                     count2 += 1
                     item = m2.group(0)
                     paramString = paramString.replace(
-                        item, '%s%d%s' % (marker2, count2, marker2))
+                        item, '{m}{c}{m}'.format(m=marker2, c=count2))
                     links[count2] = item
                 # Parse string
                 markedParams = paramString.split('|')
@@ -1943,7 +1948,7 @@ def does_text_contain_section(pagetext: str, section: str) -> bool:
     section = re.sub(r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
     section = re.sub(r'\\?[ _]', '[ _]', section)
-    m = re.search("=+[ ']*%s[ ']*=+" % section, pagetext)
+    m = re.search("=+[ ']*{}[ ']*=+".format(section), pagetext)
     return bool(m)
 
 
@@ -2022,7 +2027,7 @@ class TimeStripper:
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
-        yearR = r'(?P<year>(19|20)\d\d)(?:%s)?' % '\ub144'
+        yearR = r'(?P<year>(19|20)\d\d)(?:{})?'.format('\ub144')
         # if months have 'digits' as names, they need to be
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
         escaped_months = [_ for _ in self.origNames2monthNum if
@@ -2035,14 +2040,13 @@ class TimeStripper:
         # the last one is workaround for Korean
         if any(_.isdigit() for _ in self.origNames2monthNum):
             self.is_digit_month = True
-            monthR = r'(?P<month>(%s)|(?:1[012]|0?[1-9])\.)' \
-                % '|'.join(escaped_months)
-            dayR = (
-                r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:{0})?\.?\s*(?:[01]?\d\.)?'
-                .format('\uc77c'))
+            monthR = r'(?P<month>({})|(?:1[012]|0?[1-9])\.)' \
+                     .format('|'.join(escaped_months))
+            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:{})' \
+                   r'?\.?\s*(?:[01]?\d\.)?'.format('\uc77c')
         else:
             self.is_digit_month = False
-            monthR = r'(?P<month>(%s))' % '|'.join(escaped_months)
+            monthR = r'(?P<month>({}))'.format('|'.join(escaped_months))
             dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
         self.ptimeR = re.compile(timeR)
@@ -2208,8 +2212,9 @@ class TimeStripper:
             try:
                 value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
-                pywikibot.output('incorrect month name "%s" in page in site %s'
-                                 % (dateDict['month']['value'], self.site))
+                pywikibot.output('incorrect month name "{}" in page in site {}'
+                                 .format(dateDict['month']['value'],
+                                         self.site))
                 raise KeyError
             else:
                 dateDict['month']['value'] = value
@@ -2222,7 +2227,7 @@ class TimeStripper:
                     dateDict[k] = int(v['value'])
                 except ValueError:
                     raise ValueError(
-                        'Value: {0} could not be converted for key: {1}.'
+                        'Value: {} could not be converted for key: {}.'
                         .format(v['value'], k))
 
             # find timezone

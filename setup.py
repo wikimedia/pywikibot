@@ -224,7 +224,7 @@ def read_desc(filename):  # pragma: no cover
                     with open(include) as g:
                         desc.append(g.read())
                 else:
-                    print('Cannot include {0}; file not found'.format(include))
+                    print('Cannot include {}; file not found'.format(include))
             else:
                 desc.append(line)
     return ''.join(desc)

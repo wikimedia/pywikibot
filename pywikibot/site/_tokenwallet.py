@@ -58,7 +58,7 @@ class TokenWallet:
             key = self.site.validate_tokens([key])[0]
         except IndexError:
             raise Error(
-                "Requested token '{0}' is invalid on {1} wiki."
+                "Requested token '{}' is invalid on {} wiki."
                 .format(key, self.site))
 
         if (key not in user_tokens
@@ -71,7 +71,7 @@ class TokenWallet:
         self.failed_cache.add(failed_cache_key)
         # to be changed back to a plain KeyError?
         raise Error(
-            "Action '{0}' is not allowed for user {1} on {2} wiki."
+            "Action '{}' is not allowed for user {} on {} wiki."
             .format(key, self.site.user(), self.site))
 
     def __contains__(self, key):

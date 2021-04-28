@@ -58,8 +58,9 @@ class Hunk:
         self.b_rng = (first[3], last[4])
 
         self.header = self.get_header()
-        self.diff_plain_text = '%s\n%s' % (self.header, self.diff_plain_text)
-        self.diff_text = '%s' % self.diff_text
+        self.diff_plain_text = '{hunk.header}\n{hunk.diff_plain_text}' \
+                               .format(hunk=self)
+        self.diff_text = str(self.diff_text)
 
         self.reviewed = self.PENDING
 
@@ -196,8 +197,7 @@ class Hunk:
     def __repr__(self):
         """Return a reconstructable representation."""
         # TODO
-        return '%s(a, b, %s)' \
-               % (self.__class__.__name__, self.group)
+        return '{}(a, b, {})'.format(self.__class__.__name__, self.group)
 
 
 class _SuperHunk(Sequence):
@@ -358,7 +358,7 @@ class PatchManager:
         """Generate a diff text for the given hunks."""
         def extend_context(start, end):
             """Add context lines."""
-            return ''.join('  {0}\n'.format(line.rstrip())
+            return ''.join('  {}\n'.format(line.rstrip())
                            for line in self.a[start:end])
 
         context_range = self._get_context_range(hunks)
@@ -430,7 +430,7 @@ class PatchManager:
             answers += ['?']
 
             pywikibot.output(self._generate_diff(super_hunk))
-            choice = pywikibot.input('Accept this hunk [{0}]?'.format(
+            choice = pywikibot.input('Accept this hunk [{}]?'.format(
                 ','.join(answers)))
             if choice not in answers:
                 choice = '?'
@@ -498,7 +498,7 @@ class PatchManager:
                     position = next_hunk_position
                 elif next_hunk:  # nothing entered is silently ignored
                     pywikibot.error(
-                        'Invalid hunk number "{0}"'.format(next_hunk))
+                        'Invalid hunk number "{}"'.format(next_hunk))
             elif choice == 'j':
                 position = next_pending
             elif choice == 'J':
@@ -512,7 +512,7 @@ class PatchManager:
                                + super_hunks[position].split()
                                + super_hunks[position + 1:])
                 pywikibot.output(
-                    'Split into {0} hunks'.format(len(super_hunk._hunks)))
+                    'Split into {} hunks'.format(len(super_hunk._hunks)))
             else:  # choice == '?':
                 pywikibot.output(color_format(
                     '{purple}{0}{default}', '\n'.join(

@@ -171,7 +171,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
             n_pages_in_ns = len(refs[ns])
             plural = '' if n_pages_in_ns == 1 else 's'
             ns_name = ns.canonical_prefix() if ns != ns.MAIN else 'Main:'
-            ns_id = '[{0}]'.format(ns.id)
+            ns_id = '[{}]'.format(ns.id)
             pywikibot.output(
                 '    {0!s:<{width}} {1:>6} {2:>10} page{pl}'.format(
                     ns_name, ns_id, n_pages_in_ns, width=width, pl=plural))
@@ -182,10 +182,10 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
         if self.opt.undelete and page.exists():
-            pywikibot.output('Skipping: {0} already exists.'.format(page))
+            pywikibot.output('Skipping: {} already exists.'.format(page))
             return True
         if not self.opt.undelete and not page.exists():
-            pywikibot.output('Skipping: {0} does not exist.'.format(page))
+            pywikibot.output('Skipping: {} does not exist.'.format(page))
             return True
         return super().skip_page(page)
 
@@ -206,7 +206,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                 if ns_with_ref:
                     ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
                     pywikibot.output(
-                        'Skipping: {0} is not orphan in ns: {1}.'.format(
+                        'Skipping: {} is not orphan in ns: {}.'.format(
                             self.current_page, ns_names))
                     return  # Not an orphan, do not delete.
 

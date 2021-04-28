@@ -238,7 +238,7 @@ class TextEditor(ScrolledText):
                     if not idx:
                         break
                     # index right after the end of the occurrence
-                    lastidx = '%s+%dc' % (idx, len(s))
+                    lastidx = '{}+{}c'.format(idx, len(s))
                     # tag the whole occurrence (start included, stop excluded)
                     self.tag_add('found', idx, lastidx)
                     # prepare to search for next occurrence
@@ -266,7 +266,7 @@ class TextEditor(ScrolledText):
         if lineno <= 0:
             self.bell()
             return 'break'
-        self.mark_set('insert', '%d.0' % lineno)
+        self.mark_set('insert', '{}.0'.format(lineno))
         self.see('insert')
         return None
 
@@ -397,7 +397,7 @@ class EditBoxWindow(tkinter.Frame):
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
             # don't know how to place the caret, but scrolling to the right
             # line should already be helpful.
-            self.editbox.see('%d.%d' % (line, column))
+            self.editbox.see('{}.{}'.format(line, column))
         # wait for user to push a button which will destroy (close) the window
         self.parent.mainloop()
         return self.text
@@ -496,8 +496,9 @@ class Tkdialog:
         """Initializer."""
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
-        self.root.geometry('%ix%i+10-10' % (pywikibot.config.tkhorsize,
-                                            pywikibot.config.tkvertsize))
+        self.root.geometry('{}x{}+10-10'
+                           .format(int(pywikibot.config.tkhorsize),
+                                   int(pywikibot.config.tkvertsize)))
 
         self.root.title(filename)
         self.photo_description = photo_description
@@ -571,7 +572,7 @@ class Tkdialog:
         except ImportError:
             pywikibot.warning('This script requires ImageTk from the'
                               'Python Imaging Library (PIL).\n'
-                              'See: {0}/flickrripper.py'.format(__url__))
+                              'See: {}/flickrripper.py'.format(__url__))
             raise
 
         image = Image.open(photo)

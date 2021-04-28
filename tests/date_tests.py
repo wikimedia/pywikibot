@@ -47,7 +47,7 @@ class TestDateMeta(MetaTestCaseClass):
 
         for formatname in date.formats:
             cls.add_method(dct, 'test_' + formatname, test_method(formatname),
-                           doc_suffix='using {0} format'.format(formatname))
+                           doc_suffix='using {} format'.format(formatname))
 
         return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
 

@@ -218,7 +218,7 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
         duration *= 12
     else:
         raise MalformedConfigError(
-            'Unrecognized parameter in template: {0}'.format(string))
+            'Unrecognized parameter in template: {}'.format(string))
 
     if timestamp:
         return apply_month_delta(
@@ -777,7 +777,7 @@ class PageArchiver:
                     "Couldn't find the template in the header"
                 )
 
-            pywikibot.output('Archiving {0} thread(s).'
+            pywikibot.output('Archiving {} thread(s).'
                              .format(self.archived_threads))
             # Save the archives first (so that bugs don't cause a loss of data)
             for title, archive in sorted(self.archives.items()):
@@ -872,7 +872,7 @@ def main(*args) -> None:
             calc = page.title()
         else:
             pywikibot.output(
-                'NOTE: the specified page "{0}" does not (yet) exist.'
+                'NOTE: the specified page "{}" does not (yet) exist.'
                 .format(calc))
         pywikibot.output('key = {}'.format(calc_md5_hexdigest(calc, salt)))
         return

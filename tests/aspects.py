@@ -73,7 +73,8 @@ class TestCaseBase(unittest.TestCase):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if seq:
-            msg = self._formatMessage(msg, '%s is not empty' % safe_repr(seq))
+            msg = self._formatMessage(msg, '{} is not empty'
+                                           .format(safe_repr(seq)))
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None):
@@ -81,7 +82,8 @@ class TestCaseBase(unittest.TestCase):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if not seq:
-            msg = self._formatMessage(msg, '%s is empty' % safe_repr(seq))
+            msg = self._formatMessage(msg, '{} is empty'
+                                           .format(safe_repr(seq)))
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
@@ -97,7 +99,7 @@ class TestCaseBase(unittest.TestCase):
 
         if first_len != second_len:
             msg = self._formatMessage(
-                msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
+                msg, 'len({}) != {}'.format(safe_repr(seq), second_len))
             self.fail(msg)
 
     def assertPageInNamespaces(self, page, namespaces):
@@ -302,7 +304,7 @@ def require_modules(*required_modules):
                 missing += [required_module]
         if not missing:
             return obj
-        skip_decorator = unittest.skip('{0} not installed'.format(
+        skip_decorator = unittest.skip('{} not installed'.format(
             ', '.join(missing)))
         return skip_decorator(obj)
 
@@ -1445,9 +1447,9 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     @classmethod
     def _build_message(cls, deprecated, instead):
         if deprecated is not None:
-            msg = '{0} is deprecated'.format(deprecated)
+            msg = '{} is deprecated'.format(deprecated)
             if instead:
-                msg += '; use {0} instead.'.format(instead)
+                msg += '; use {} instead.'.format(instead)
         elif instead is None:
             msg = None
         elif instead is True:
@@ -1493,8 +1495,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
                         or msg is None):
                     break
             else:
-                self.fail('No generic deprecation message match found in '
-                          '{0}'.format(deprecation_messages))
+                self.fail('No generic deprecation message match found in {}'
+                          .format(deprecation_messages))
         else:
             head, _, tail = msg.partition('; ')
             for message in self.deprecation_messages:
@@ -1622,5 +1624,5 @@ class HttpbinTestCase(TestCase):
         Otherwise, returns: httpbin.org
         """
         if hasattr(self, 'httpbin'):
-            return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
+            return '{}:{}'.format(self.httpbin.host, self.httpbin.port)
         return 'httpbin.org'

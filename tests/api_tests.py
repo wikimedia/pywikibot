@@ -1001,7 +1001,7 @@ class TestLagpattern(DefaultSiteTestCase):
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
             self.skipTest(
-                '{0} is not running on a replicated database cluster.'
+                '{} is not running on a replicated database cluster.'
                 .format(mysite)
             )
         mythrottle = DummyThrottle(mysite)

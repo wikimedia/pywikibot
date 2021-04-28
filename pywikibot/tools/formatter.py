@@ -64,12 +64,12 @@ class _ColorFormatter(Formatter):
     colors = set(colors)
     # Dot.product of colors to create all possible combinations of foreground
     # and background colors.
-    colors |= {'{0};{1}'.format(c1, c2) for c1 in colors for c2 in colors}
+    colors |= {'{};{}'.format(c1, c2) for c1 in colors for c2 in colors}
 
     def get_value(self, key, args, kwargs):
         """Get value, filling in 'color' when it is a valid color."""
         if key == 'color' and kwargs.get('color') in self.colors:
-            return '\03{{{0}}}'.format(kwargs[key])
+            return '\03{{{}}}'.format(kwargs[key])
         return super().get_value(key, args, kwargs)
 
     def parse(self, format_string: str):
@@ -79,21 +79,21 @@ class _ColorFormatter(Formatter):
             if field in self.colors:
                 if spec:
                     raise ValueError(
-                        'Color field "{0}" in "{1}" uses format spec '
-                        'information "{2}"'.format(field, format_string, spec))
+                        'Color field "{}" in "{}" uses format spec '
+                        'information "{}"'.format(field, format_string, spec))
                 if conv:
                     raise ValueError(
-                        'Color field "{0}" in "{1}" uses conversion '
-                        'information "{2}"'.format(field, format_string, conv))
+                        'Color field "{}" in "{}" uses conversion '
+                        'information "{}"'.format(field, format_string, conv))
                 if not literal or literal[-1] != '\03':
                     literal += '\03'
                 if '\03' in literal[:-1]:
-                    raise ValueError(r'Literal text in {0} contains '
+                    raise ValueError(r'Literal text in {} contains '
                                      r'\03'.format(format_string))
                 previous_literal += literal + '{' + field + '}'
             else:
                 if '\03' in literal:
-                    raise ValueError(r'Literal text in {0} contains '
+                    raise ValueError(r'Literal text in {} contains '
                                      r'\03'.format(format_string))
                 yield previous_literal + literal, field, spec, conv
                 previous_literal = ''

@@ -113,7 +113,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 options['ignore'] = CANCEL_MATCH
             else:
                 raise ValueError(
-                    'Unknown ignore mode "{0}"!'.format(ignore_mode))
+                    'Unknown ignore mode "{}"!'.format(ignore_mode))
         else:
             gen_factory.handle_arg(arg)
 

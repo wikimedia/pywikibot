@@ -62,7 +62,8 @@ class TestShareFiles(TestCase):
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
         with self.assertRaisesRegex(
                 NoPageError,
-                (r'Page \[\[(wikipedia:|)it:%s\]\] doesn\'t exist.' % title)):
+                r'Page \[\[(wikipedia:|)it:{}\]\] doesn\'t exist.'
+                .format(title)):
             itwp_file.get()
 
     def testLocalOnly(self):

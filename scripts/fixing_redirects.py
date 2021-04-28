@@ -102,7 +102,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 section = m.group('section')
             if section and targetPage.section():
                 pywikibot.warning(
-                    'Source section {0} and target section {1} found. '
+                    'Source section {} and target section {} found. '
                     'Skipping.'.format(section, targetPage))
                 continue
             trailing_chars = m.group('linktrail')

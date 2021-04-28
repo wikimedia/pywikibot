@@ -597,26 +597,26 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # Set the edit summary for this case
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
         for section in i18n.translate(self.site, referencesSections):
-            sectionR = re.compile(r'\r?\n=+ *%s *=+ *\r?\n' % section)
+            sectionR = re.compile(r'\r?\n=+ *{} *=+ *\r?\n'.format(section))
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
                 if match:
                     if textlib.isDisabled(oldText, match.start()):
                         pywikibot.output(
-                            'Existing {0} section is commented out, skipping.'
+                            'Existing {} section is commented out, skipping.'
                             .format(section))
                         index = match.end()
                     else:
                         pywikibot.output('Adding references tag to existing'
-                                         '{0} section...\n'.format(section))
+                                         '{} section...\n'.format(section))
                         templates_or_comments = re.compile(
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
                             flags=re.DOTALL)
                         new_text = (
                             oldText[:match.end() - 1]
                             + templates_or_comments.sub(
-                                r'\1\n{0}\n'.format(self.referencesText),
+                                r'\1\n{}\n'.format(self.referencesText),
                                 oldText[match.end() - 1:]))
                         return new_text
                 else:
@@ -625,21 +625,21 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # Create a new section for the references tag
         for section in i18n.translate(self.site, placeBeforeSections):
             # Find out where to place the new section
-            sectionR = re.compile(r'\r?\n(?P<ident>=+) *%s *(?P=ident) *\r?\n'
-                                  % section)
+            sectionR = re.compile(r'\r?\n(?P<ident>=+) *{} *(?P=ident) *\r?\n'
+                                  .format(section))
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
                 if match:
                     if textlib.isDisabled(oldText, match.start()):
                         pywikibot.output(
-                            'Existing {0} section is commented out, '
+                            'Existing {} section is commented out, '
                             "won't add the references in front of it."
                             .format(section))
                         index = match.end()
                     else:
                         pywikibot.output(
-                            'Adding references section before {0} section...\n'
+                            'Adding references section before {} section...\n'
                             .format(section))
                         index = match.start()
                         ident = match.group('ident')
@@ -657,7 +657,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # At the end, look at the length of the temp text. That's the position
         # where we'll insert the references section.
         catNamespaces = '|'.join(self.site.namespaces.CATEGORY)
-        categoryPattern = r'\[\[\s*(%s)\s*:[^\n]*\]\]\s*' % catNamespaces
+        categoryPattern = r'\[\[\s*({})\s*:[^\n]*\]\]\s*'.format(catNamespaces)
         interwikiPattern = r'\[\[([a-zA-Z\-]+)\s?:([^\[\]\n]*)\]\]\s*'
         # won't work with nested templates
         # the negative lookahead assures that we'll match the last template
@@ -668,9 +668,10 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # so templatePattern must be fixed
         templatePattern = r'\r?\n{{((?!}}).)+?}}\s*'
         commentPattern = r'<!--((?!-->).)*?-->\s*'
-        metadataR = re.compile(r'(\r?\n)?(%s|%s|%s|%s)$'
-                               % (categoryPattern, interwikiPattern,
-                                  templatePattern, commentPattern), re.DOTALL)
+        metadataR = re.compile(r'(\r?\n)?({}|{}|{}|{})$'
+                               .format(categoryPattern, interwikiPattern,
+                                       templatePattern, commentPattern),
+                               re.DOTALL)
         tmpText = oldText
         while True:
             match = metadataR.search(tmpText)
@@ -699,7 +700,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         @return: the amended page text with reference section added
         """
         if self.site.code in noTitleRequired:
-            ref_section = '\n\n%s\n' % self.referencesText
+            ref_section = '\n\n{}\n'.format(self.referencesText)
         else:
             ref_section = '\n\n{ident} {title} {ident}\n{text}\n'.format(
                 title=i18n.translate(self.site, referencesSections)[0],

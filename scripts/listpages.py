@@ -150,7 +150,7 @@ class Formatter:
                 self.trs_title = page._link.ns_title(onsite=self.onsite)
             # Fallback if no corresponding namespace is found in onsite.
             except Error:
-                self.trs_title = '{0}:{1}'.format(default, page._link.title)
+                self.trs_title = '{}:{}'.format(default, page._link.title)
 
     def output(self, num=None, fmt='1') -> str:
         """Output formatted string."""
@@ -220,7 +220,7 @@ def main(*args) -> None:
             base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
 
         if not os.path.exists(base_dir):
-            pywikibot.output('Directory "{0}" does not exist.'
+            pywikibot.output('Directory "{}" does not exist.'
                              .format(base_dir))
             choice = pywikibot.input_yn(
                 'Do you want to create it ("No" to continue without saving)?')
@@ -230,7 +230,7 @@ def main(*args) -> None:
                 base_dir = None
         elif not os.path.isdir(base_dir):
             # base_dir is a file.
-            pywikibot.warning('Not a directory: "{0}"\n'
+            pywikibot.warning('Not a directory: "{}"\n'
                               'Skipping saving ...'
                               .format(base_dir))
             base_dir = None
@@ -240,7 +240,7 @@ def main(*args) -> None:
         page_target = pywikibot.Page(site, page_target)
         if not overwrite and page_target.exists():
             pywikibot.bot.suggest_help(
-                additional_text='Page {0} already exists.\n'
+                additional_text='Page {} already exists.\n'
                                 'You can use the -overwrite argument to '
                                 'replace the content of this page.'
                                 .format(page_target.title(as_link=True)))
@@ -265,7 +265,7 @@ def main(*args) -> None:
                     pywikibot.output(err)
             if base_dir:
                 filename = os.path.join(base_dir, page.title(as_filename=True))
-                pywikibot.output('Saving {0} to {1}'
+                pywikibot.output('Saving {} to {}'
                                  .format(page.title(), filename))
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
@@ -274,7 +274,7 @@ def main(*args) -> None:
             page_target.text = text
             page_target.save(summary=summary)
         pywikibot.stdout(text)
-        pywikibot.output('{0} page(s) found'.format(i))
+        pywikibot.output('{} page(s) found'.format(i))
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
 

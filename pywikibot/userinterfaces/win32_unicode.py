@@ -109,8 +109,8 @@ class UnicodeOutput(IOBase):
             try:
                 self._stream.flush()
             except Exception as e:
-                _complain('%s.flush: %r from %r'
-                          % (self.name, e, self._stream))
+                _complain('{}.flush: {!r} from {!r}'
+                          .format(self.name, e, self._stream))
                 raise
 
     def write(self, text):
@@ -131,14 +131,15 @@ class UnicodeOutput(IOBase):
                                            min(remaining, 10000),
                                            byref(n), None)
                     if retval == 0 or n.value == 0:
-                        raise IOError('WriteConsoleW returned %r, n.value = %r'
-                                      % (retval, n.value))
+                        msg = 'WriteConsoleW returned {!r}, n.value = {!r}' \
+                              .format(retval, n.value)
+                        raise IOError(msg)
                     remaining -= n.value
                     if remaining == 0:
                         break
                     text = text[n.value:]
         except Exception as e:
-            _complain('%s.write: %r' % (self.name, e))
+            _complain('{}.write: {!r}'.format(self.name, e))
             raise
 
     def writelines(self, lines):
@@ -147,7 +148,7 @@ class UnicodeOutput(IOBase):
             for line in lines:
                 self.write(line)
         except Exception as e:
-            _complain('%s.writelines: %r' % (self.name, e))
+            _complain('{}.writelines: {!r}'.format(self.name, e))
             raise
 
 
@@ -155,7 +156,7 @@ def old_fileno(std_name):
     """Return the fileno or None if that doesn't work."""
     # some environments like IDLE don't support the fileno operation
     # handle those like std streams which don't have fileno at all
-    std = getattr(sys, 'std{0}'.format(std_name))
+    std = getattr(sys, 'std{}'.format(std_name))
     if hasattr(std, 'fileno'):
         with suppress(UnsupportedOperation):
             return std.fileno()

@@ -165,7 +165,11 @@ import re
 import sys
 from typing import Optional, Union
 
-from pywikibot.tools import ModuleDeprecationWrapper, _NotImplementedWarning
+from pywikibot.tools import (
+    ModuleDeprecationWrapper,
+    _NotImplementedWarning,
+    issue_deprecation_warning,
+)
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -221,14 +225,14 @@ class APIError(Error):
     def __str__(self):
         """Return a string representation."""
         if self.other:
-            return '{0}: {1}\n[{2}]'.format(
+            return '{}: {}\n[{}]'.format(
                 self.code,
                 self.info,
                 ';\n '.join(
-                    '{0}: {1}'.format(key, val)
+                    '{}: {}'.format(key, val)
                     for key, val in self.other.items()))
 
-        return '{0}: {1}'.format(self.code, self.info)
+        return '{}: {}'.format(self.code, self.info)
 
 
 class APIMWError(APIError):
@@ -297,25 +301,34 @@ class PageRelatedError(Error):
         self.title = page.title(as_link=True)
         self.site = page.site
 
-        if re.search(r'%\(\w+\)s', self.message):
-            values = self.__dict__
+        if re.search(r'\{\w+\}', self.message):
+            msg = self.message.format_map(self.__dict__)
+        elif re.search(r'%\(\w+\)s', self.message):
+            issue_deprecation_warning("'%' style messages are deprecated, "
+                                      'please use str.format() style instead',
+                                      since='20210504',
+                                      warning_class=FutureWarning)
+            msg = self.message % self.__dict__
+        elif '%s' in self.message:
+            msg = self.message % page
         else:
-            values = page
-        super().__init__(self.message % values)
+            msg = self.message.format(page)
+
+        super().__init__(msg)
 
 
 class PageSaveRelatedError(PageRelatedError):
 
     """Saving the page has failed."""
 
-    message = 'Page %s was not saved.'
+    message = 'Page {} was not saved.'
 
 
 class OtherPageSaveError(PageSaveRelatedError):
 
     """Saving the page has failed due to uncatchable error."""
 
-    message = 'Edit to page %(title)s failed:\n%(reason)s'
+    message = 'Edit to page {title} failed:\n{reason}'
 
     def __init__(self, page, reason: Union[str, Exception]):
         """Initializer.
@@ -342,7 +355,7 @@ class NoPageError(PageRelatedError):
 
     """Page does not exist."""
 
-    message = "Page %s doesn't exist."
+    message = "Page {} doesn't exist."
 
 
 class UnsupportedPageError(PageRelatedError):
@@ -350,21 +363,21 @@ class UnsupportedPageError(PageRelatedError):
     """Unsupported page due to namespace restriction."""
 
     # namespaces < 0 aren't supported (T169213)
-    message = 'Page %s is not supported due to namespace restriction.'
+    message = 'Page {} is not supported due to namespace restriction.'
 
 
 class NoMoveTargetError(PageRelatedError):
 
     """Expected move target page not found."""
 
-    message = 'Move target page of %s not found.'
+    message = 'Move target page of {} not found.'
 
 
 class PageLoadRelatedError(PageRelatedError):
 
     """Loading the contents of a Page object has failed."""
 
-    message = 'Page %s was not loaded.'
+    message = 'Page {} was not loaded.'
 
 
 class InconsistentTitleError(PageLoadRelatedError):
@@ -379,7 +392,7 @@ class InconsistentTitleError(PageLoadRelatedError):
         @param actual: title obtained by query
 
         """
-        self.message = "Query on %s returned data on '{0}'".format(actual)
+        self.message = "Query on {{}} returned data on '{}'".format(actual)
         super().__init__(page)
 
 
@@ -420,14 +433,14 @@ class IsRedirectPageError(PageRelatedError):
 
     """Page is a redirect page."""
 
-    message = 'Page %s is a redirect page.'
+    message = 'Page {} is a redirect page.'
 
 
 class IsNotRedirectPageError(PageRelatedError):
 
     """Page is not a redirect page."""
 
-    message = 'Page %s is not a redirect page.'
+    message = 'Page {} is not a redirect page.'
 
 
 class CircularRedirectError(PageRelatedError):
@@ -440,7 +453,7 @@ class CircularRedirectError(PageRelatedError):
 
     """
 
-    message = 'Page %s is a circular redirect.'
+    message = 'Page {} is a circular redirect.'
 
 
 class InterwikiRedirectPageError(PageRelatedError):
@@ -453,8 +466,8 @@ class InterwikiRedirectPageError(PageRelatedError):
     """
 
     message = ('Page redirects to a page on another Site.\n'
-               'Page: %(page)s\n'
-               'Target page: %(target_page)s on %(target_site)s.')
+               'Page: {page}\n'
+               'Target page: {target_page} on {target_site}.')
 
     def __init__(self, page, target_page):
         """Initializer.
@@ -485,21 +498,21 @@ class LockedPageError(PageSaveRelatedError):
 
     """Page is locked."""
 
-    message = 'Page %s is locked.'
+    message = 'Page {} is locked.'
 
 
 class LockedNoPageError(LockedPageError):
 
     """Title is locked against creation."""
 
-    message = 'Page %s does not exist and is locked preventing creation.'
+    message = 'Page {} does not exist and is locked preventing creation.'
 
 
 class CascadeLockedPageError(LockedPageError):
 
     """Page is locked due to cascading protection."""
 
-    message = 'Page %s is locked due to cascading protection.'
+    message = 'Page {} is locked due to cascading protection.'
 
 
 class SectionError(Error):
@@ -513,35 +526,35 @@ class NoCreateError(PageSaveRelatedError):
 
     """Parameter nocreate doesn't allow page creation."""
 
-    message = 'Page %s could not be created due to parameter nocreate'
+    message = 'Page {} could not be created due to parameter nocreate'
 
 
 class EditConflictError(PageSaveRelatedError):
 
     """There has been an edit conflict while uploading the page."""
 
-    message = 'Page %s could not be saved due to an edit conflict'
+    message = 'Page {} could not be saved due to an edit conflict'
 
 
 class PageDeletedConflictError(EditConflictError):
 
     """Page was deleted since being retrieved."""
 
-    message = 'Page %s has been deleted since last retrieved.'
+    message = 'Page {} has been deleted since last retrieved.'
 
 
 class PageCreatedConflictError(EditConflictError):
 
     """Page was created by another user."""
 
-    message = 'Page %s has been created since last retrieved.'
+    message = 'Page {} has been created since last retrieved.'
 
 
 class ArticleExistsConflictError(EditConflictError):
 
     """Page already exists."""
 
-    message = ('Destination article %s already exists and is not a redirect '
+    message = ('Destination article {} already exists and is not a redirect '
                'to the source article')
 
 
@@ -563,8 +576,8 @@ class SpamblacklistError(PageSaveRelatedError):
 
     """Page save failed because MediaWiki detected a blacklisted spam URL."""
 
-    message = ('Edit to page %(title)s rejected by spam filter due to '
-               'content:\n%(url)s')
+    message = ('Edit to page {title} rejected by spam filter due to '
+               'content:\n{url}')
 
     def __init__(self, page, url):
         """Initializer."""
@@ -576,7 +589,7 @@ class TitleblacklistError(PageSaveRelatedError):
 
     """Page save failed because MediaWiki detected a blacklisted page title."""
 
-    message = 'Page %s is title-blacklisted.'
+    message = 'Page {} is title-blacklisted.'
 
 
 class ServerError(Error):
@@ -664,7 +677,7 @@ class NotEmailableError(PageRelatedError):
 
     """This user is not emailable."""
 
-    message = '%s is not emailable.'
+    message = '{} is not emailable.'
 
 
 class PageInUseError(Error):
@@ -690,8 +703,8 @@ class NoWikibaseEntityError(WikiBaseError):
         @param entity: Wikibase entity
         @type entity: WikibaseEntity
         """
-        super().__init__("Entity '%s' doesn't exist on %s"
-                         % (entity.id, entity.repo))
+        super().__init__("Entity '{}' doesn't exist on {}"
+                         .format(entity.id, entity.repo))
         self.entity = entity
 
 

@@ -297,7 +297,7 @@ _romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
 def intToRomanNum(i):
     """Convert integer to roman numeral."""
     if i >= len(_romanNumbers):
-        raise IndexError('Roman value %i is not defined' % i)
+        raise IndexError('Roman value {} is not defined'.format(i))
     return _romanNumbers[i]
 
 
@@ -343,7 +343,7 @@ _digitDecoders = {
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
 # the size of zero-padding for numbers
-_reParameters = re.compile('|'.join('(%%[1-9]?%s)' % s
+_reParameters = re.compile('|'.join('(%[1-9]?{})'.format(s)
                                     for s in _digitDecoders))
 
 # A map of sitecode+pattern to (re matching object and corresponding decoders)
@@ -449,14 +449,14 @@ def dh(value: int, pattern, encf, decf, filter=None):
 
     if isinstance(params, (tuple, list)):
         assert len(params) == len(decoders), (
-            'parameter count ({0}) does not match decoder count ({1})'
+            'parameter count ({}) does not match decoder count ({})'
             .format(len(params), len(decoders)))
         # convert integer parameters into their textual representation
         params = tuple(_make_parameter(decoders[i], param)
                        for i, param in enumerate(params))
         return strPattern % params
     assert len(decoders) == 1, (
-        'A single parameter does not match {0} decoders.'
+        'A single parameter does not match {} decoders.'
         .format(len(decoders)))
     # convert integer parameter into its textual representation
     return strPattern % _make_parameter(decoders[0], params)

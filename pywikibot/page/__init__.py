@@ -317,14 +317,14 @@ class BasePage(ComparableMixin):
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
-                    title = '%s:%s' % (self.site.code, title)
+                    title = '{}:{}'.format(self.site.code, title)
             elif textlink and (self.is_filepage() or self.is_categorypage()):
-                title = ':%s' % title
+                title = ':{}'.format(title)
             elif self.namespace() == 0 and not section:
                 with_ns = True
             if with_ns:
-                return '[[%s%s]]' % (title, section)
-            return '[[%s%s|%s]]' % (title, section, label)
+                return '[[{}{}]]'.format(title, section)
+            return '[[{}{}|{}]]'.format(title, section, label)
         if not with_ns and self.namespace() != 0:
             title = label + section
         else:
@@ -508,7 +508,7 @@ class BasePage(ComparableMixin):
             title = self.title(as_url=True)
         else:
             title = self.title(as_url=False).replace(' ', '_')
-        return '{0}//{1}{2}/index.php?title={3}&oldid={4}'.format(
+        return '{}//{}{}/index.php?title={}&oldid={}'.format(
             self.site.protocol() + ':' if with_protocol else '',
             self.site.hostname(),
             self.site.scriptpath(),
@@ -757,7 +757,7 @@ class BasePage(ComparableMixin):
                             self._catredirect = p.title()
                         else:
                             pywikibot.warning(
-                                'Category redirect target {0} on {1} is not a '
+                                'Category redirect target {} on {} is not a '
                                 'category'.format(p.title(as_link=True),
                                                   self.title(as_link=True)))
                     else:
@@ -1198,10 +1198,10 @@ class BasePage(ComparableMixin):
                                   watch=watch, bot=botflag, **kwargs)
         if not done:
             if not quiet:
-                pywikibot.warning('Page %s not saved' % link)
+                pywikibot.warning('Page {} not saved'.format(link))
             raise PageSaveRelatedError(self)
         if not quiet:
-            pywikibot.output('Page %s saved' % link)
+            pywikibot.output('Page {} saved'.format(link))
 
     def _cosmetic_changes_hook(self, summary: str) -> str:
         """The cosmetic changes hook.
@@ -1226,8 +1226,8 @@ class BasePage(ComparableMixin):
             return summary
 
         old = self.text
-        pywikibot.log('Cosmetic changes for %s-%s enabled.'
-                      % (family, self.site.lang))
+        pywikibot.log('Cosmetic changes for {}-{} enabled.'
+                      .format(family, self.site.lang))
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
             CANCEL_MATCH,
@@ -1712,8 +1712,8 @@ class BasePage(ComparableMixin):
             (usually requires sysop privileges, depending on wiki settings)
         """
         if reason is None:
-            pywikibot.output('Moving %s to [[%s]].'
-                             % (self.title(as_link=True), newtitle))
+            pywikibot.output('Moving {} to [[{}]].'
+                             .format(self.title(as_link=True), newtitle))
             reason = pywikibot.input('Please enter a reason for the move:')
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,
@@ -1736,7 +1736,7 @@ class BasePage(ComparableMixin):
         @param quit: show also the quit option, when asking for confirmation.
         """
         if reason is None:
-            pywikibot.output('Deleting %s.' % (self.title(as_link=True)))
+            pywikibot.output('Deleting {}.'.format(self.title(as_link=True)))
             reason = pywikibot.input('Please enter a reason for the deletion:')
 
         # If user has 'delete' right, delete the page
@@ -1744,8 +1744,8 @@ class BasePage(ComparableMixin):
             answer = 'y'
             if prompt and not hasattr(self.site, '_noDeletePrompt'):
                 answer = pywikibot.input_choice(
-                    'Do you want to delete %s?' % self.title(
-                        as_link=True, force_interwiki=True),
+                    'Do you want to delete {}?'.format(self.title(
+                        as_link=True, force_interwiki=True)),
                     [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                     'n', automatic_quit=quit)
                 if answer == 'a':
@@ -1760,9 +1760,9 @@ class BasePage(ComparableMixin):
                 answer = 'y'
             else:
                 answer = pywikibot.input_choice(
-                    "Can't delete %s; do you want to mark it "
-                    'for deletion instead?' % self.title(as_link=True,
-                                                         force_interwiki=True),
+                    "Can't delete {}; do you want to mark it "
+                    'for deletion instead?'
+                    .format(self.title(as_link=True, force_interwiki=True)),
                     [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                     'n', automatic_quit=False)
                 if answer == 'a':
@@ -1840,7 +1840,8 @@ class BasePage(ComparableMixin):
             self.loadDeletedRevisions()
         if timestamp not in self._deletedRevs:
             raise ValueError(
-                'Timestamp %d is not a deleted revision' % timestamp)
+                'Timestamp {} is not a deleted revision'
+                .format(timestamp))
         self._deletedRevs[timestamp]['marked'] = undelete
 
     @deprecated_args(comment='reason')
@@ -1874,7 +1875,7 @@ class BasePage(ComparableMixin):
         if reason is None:
             warn('Not passing a reason for undelete() is deprecated.',
                  DeprecationWarning)
-            pywikibot.output('Undeleting %s.' % (self.title(as_link=True)))
+            pywikibot.output('Undeleting {}.'.format(self.title(as_link=True)))
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
         self.site.undelete(self, reason, revision=undelete_revs)
@@ -1950,17 +1951,19 @@ class BasePage(ComparableMixin):
                 cats.append(cat)
 
         if not self.has_permission():
-            pywikibot.output("Can't edit %s, skipping it..."
-                             % self.title(as_link=True))
+            pywikibot.output("Can't edit {}, skipping it..."
+                             .format(self.title(as_link=True)))
             return False
 
         if old_cat not in cats:
             if self.namespace() != 10:
-                pywikibot.error('%s is not in category %s!'
-                                % (self.title(as_link=True), old_cat.title()))
+                pywikibot.error('{} is not in category {}!'
+                                .format(self.title(as_link=True),
+                                        old_cat.title()))
             else:
-                pywikibot.output('%s is not in category %s, skipping...'
-                                 % (self.title(as_link=True), old_cat.title()))
+                pywikibot.output('{} is not in category {}, skipping...'
+                                 .format(self.title(as_link=True),
+                                         old_cat.title()))
             return False
 
         # This prevents the bot from adding new_cat if it is already present.
@@ -1987,8 +1990,8 @@ class BasePage(ComparableMixin):
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.
-                pywikibot.output('Skipping %s because of interwiki link to '
-                                 'self' % self.title())
+                pywikibot.output('Skipping {} because of interwiki link to '
+                                 'self'.format(self.title()))
                 return False
 
         if oldtext != newtext:
@@ -1996,12 +1999,11 @@ class BasePage(ComparableMixin):
                 self.put(newtext, summary)
                 return True
             except PageSaveRelatedError as error:
-                pywikibot.output('Page %s not saved: %s'
-                                 % (self.title(as_link=True),
-                                    error))
+                pywikibot.output('Page {} not saved: {}'
+                                 .format(self.title(as_link=True), error))
             except NoUsernameError:
-                pywikibot.output('Page %s not saved; sysop privileges '
-                                 'required.' % self.title(as_link=True))
+                pywikibot.output('Page {} not saved; sysop privileges '
+                                 'required.'.format(self.title(as_link=True)))
         return False
 
     def is_flow_page(self) -> bool:
@@ -2182,7 +2184,7 @@ class Page(BasePage):
 
         target_link = target_page.title(as_link=True, textlink=True,
                                         allow_interwiki=False)
-        target_link = '#{0} {1}'.format(self.site.redirect(), target_link)
+        target_link = '#{} {}'.format(self.site.redirect(), target_link)
         self.text = prefix + target_link + suffix
         if save:
             self.save(**kwargs)
@@ -2254,8 +2256,8 @@ class FilePage(Page):
             # filemissing in API response indicates most fields are missing
             # see https://gerrit.wikimedia.org/r/#/c/mediawiki/core/+/533482/
             if 'filemissing' in file_rev:
-                pywikibot.warning("File '%s' contains missing revisions"
-                                  % self.title())
+                pywikibot.warning("File '{}' contains missing revisions"
+                                  .format(self.title()))
                 continue
             file_revision = FileInfo(file_rev)
             self._file_revisions[file_revision.timestamp] = file_revision
@@ -2534,7 +2536,7 @@ class Category(Page):
             title_with_sort_key = self.title(with_section=False) + '|' + key
         else:
             title_with_sort_key = self.title(with_section=False)
-        return '[[%s]]' % title_with_sort_key
+        return '[[{}]]'.format(title_with_sort_key)
 
     def subcategories(self,
                       recurse: Union[int, bool] = False,
@@ -3041,7 +3043,8 @@ class User(Page):
             self.site.blockuser(self, *args, **kwargs)
         except APIError as err:
             if err.code == 'invalidrange':
-                raise ValueError('%s is not a valid IP range.' % self.username)
+                raise ValueError('{} is not a valid IP range.'
+                                 .format(self.username))
 
             raise err
 
@@ -3224,14 +3227,14 @@ class WikibaseEntity:
         self.id = id_ if id_ is not None else '-1'
         if self.id != '-1' and not self.is_valid_id(self.id):
             raise InvalidTitleError(
-                "'%s' is not a valid %s page title"
-                % (self.id, self.entity_type))
+                "'{}' is not a valid {} page title"
+                .format(self.id, self.entity_type))
 
     def __repr__(self):
         if self.id != '-1':
-            return 'pywikibot.page.{0}({1!r}, {2!r})'.format(
+            return 'pywikibot.page.{}({!r}, {!r})'.format(
                 self.__class__.__name__, self.repo, self.id)
-        return 'pywikibot.page.{0}({1!r})'.format(
+        return 'pywikibot.page.{}({!r})'.format(
             self.__class__.__name__, self.repo)
 
     @classmethod
@@ -3438,7 +3441,7 @@ class WikibaseEntity:
         entity_id = self.getID()
         if entity_id == '-1':
             raise NoWikibaseEntityError(self)
-        return '{0}{1}'.format(self.repo.concept_base_uri, entity_id)
+        return '{}{}'.format(self.repo.concept_base_uri, entity_id)
 
 
 class WikibasePage(BasePage, WikibaseEntity):
@@ -3476,9 +3479,10 @@ class WikibasePage(BasePage, WikibaseEntity):
         if not isinstance(site, pywikibot.site.DataSite):
             raise TypeError('site must be a pywikibot.site.DataSite object')
         if title and ('ns' not in kwargs and 'entity_type' not in kwargs):
-            pywikibot.debug('%s.__init__: %s title %r specified without '
+            pywikibot.debug('{}.__init__: {} title {!r} specified without '
                             'ns or entity_type'
-                            % (self.__class__.__name__, site, title),
+                            .format(self.__class__.__name__, site,
+                                    title),
                             layer='wikibase')
 
         self._namespace = None
@@ -3495,8 +3499,8 @@ class WikibasePage(BasePage, WikibaseEntity):
                 elif site.property_namespace.id == ns:
                     self._namespace = site.property_namespace
                 else:
-                    raise ValueError('%r: Namespace "%d" is not valid'
-                                     % (site, ns))
+                    raise ValueError('{!r}: Namespace "{}" is not valid'
+                                     .format(site, int(ns)))
 
         if 'entity_type' in kwargs:
             entity_type = kwargs.pop('entity_type')
@@ -3504,14 +3508,14 @@ class WikibasePage(BasePage, WikibaseEntity):
                 entity_type_ns = site.get_namespace_for_entity_type(
                     entity_type)
             except EntityTypeUnknownError:
-                raise ValueError('Wikibase entity type "%s" unknown'
-                                 % entity_type)
+                raise ValueError('Wikibase entity type "{}" unknown'
+                                 .format(entity_type))
 
             if self._namespace:
                 if self._namespace != entity_type_ns:
-                    raise ValueError('Namespace "%d" is not valid for Wikibase'
-                                     ' entity type "%s"'
-                                     % (kwargs['ns'], entity_type))
+                    raise ValueError('Namespace "{}" is not valid for Wikibase'
+                                     ' entity type "{}"'
+                                     .format(int(kwargs['ns']), entity_type))
             else:
                 self._namespace = entity_type_ns
                 kwargs['ns'] = self._namespace.id
@@ -3526,8 +3530,8 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if self._namespace:
             if self._link.namespace != self._namespace.id:
-                raise ValueError("'%s' is not in the namespace %d"
-                                 % (title, self._namespace.id))
+                raise ValueError("'{}' is not in the namespace {}"
+                                 .format(title, self._namespace.id))
         else:
             # Neither ns or entity_type was provided.
             # Use the _link to determine entity type.
@@ -3537,8 +3541,8 @@ class WikibasePage(BasePage, WikibaseEntity):
             elif self.site.property_namespace.id == ns:
                 self._namespace = self.site.property_namespace
             else:
-                raise ValueError('%r: Namespace "%r" is not valid'
-                                 % (self.site, ns))
+                raise ValueError('{!r}: Namespace "{!r}" is not valid'
+                                 .format(self.site, ns))
 
         WikibaseEntity.__init__(
             self,
@@ -3593,7 +3597,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         """
         if args or kwargs:
             raise NotImplementedError(
-                '{0}.get does not implement var args: {1!r} and {2!r}'.format(
+                '{}.get does not implement var args: {!r} and {!r}'.format(
                     self.__class__.__name__, args, kwargs))
 
         # todo: this variable is specific to ItemPage
@@ -3846,9 +3850,10 @@ class ItemPage(WikibasePage):
             # if none of the above applies, this item is in an invalid state
             # which needs to be raise as an exception, but also logged in case
             # an exception handler is catching the generic Error.
-            pywikibot.error('%s is in invalid state'
-                            % self.__class__.__name__)
-            raise Error('%s is in invalid state' % self.__class__.__name__)
+            pywikibot.error('{} is in invalid state'
+                            .format(self.__class__.__name__))
+            raise Error('{} is in invalid state'
+                        .format(self.__class__.__name__))
 
         return params
 
@@ -3958,7 +3963,7 @@ class ItemPage(WikibasePage):
             item.
         """
         if not isinstance(site, DataSite):
-            raise TypeError('{0} is not a data repository.'.format(site))
+            raise TypeError('{} is not a data repository.'.format(site))
 
         base_uri, _, qid = uri.rpartition('/')
         if base_uri != site.concept_base_uri.rstrip('/'):
@@ -4001,8 +4006,9 @@ class ItemPage(WikibasePage):
         target = super().getRedirectTarget()
         cmodel = target.content_model
         if cmodel != 'wikibase-item':
-            raise Error('%s has redirect target %s with content model %s '
-                        'instead of wikibase-item' % (self, target, cmodel))
+            raise Error('{} has redirect target {} with content model {} '
+                        'instead of wikibase-item'
+                        .format(self, target, cmodel))
         return self.__class__(target.site, target.title(), target.namespace())
 
     def iterlinks(self, family=None):
@@ -4399,7 +4405,7 @@ class Claim(Property):
 
     def __repr__(self):
         """Return the representation string."""
-        return '{cls_name}.fromJSON({0}, {1})'.format(
+        return '{cls_name}.fromJSON({}, {})'.format(
             repr(self.repo), self.toJSON(), cls_name=type(self).__name__)
 
     def __eq__(self, other):
@@ -4499,7 +4505,7 @@ class Claim(Property):
                     claim.type, lambda value, site: value)(value, site)
             else:
                 pywikibot.warning(
-                    '{0} datatype is not supported yet.'.format(claim.type))
+                    '{} datatype is not supported yet.'.format(claim.type))
                 claim.target = pywikibot.WbUnknown.fromWikibase(value)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
@@ -4615,8 +4621,8 @@ class Claim(Property):
         """
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
-            raise ValueError('%s is not type %s.'
-                             % (value, value_class))
+            raise ValueError('{} is not type {}.'
+                             .format(value, value_class))
         self.target = value
 
     def changeTarget(self, value=None, snaktype='value', **kwargs):
@@ -4872,7 +4878,7 @@ class Claim(Property):
             value = self.getTarget().toWikibase()
         else:  # WbUnknown
             pywikibot.warning(
-                '{0} datatype is not supported yet.'.format(self.type))
+                '{} datatype is not supported yet.'.format(self.type))
             value = self.getTarget().toWikibase()
         return value
 
@@ -4974,7 +4980,7 @@ class BaseLink(ComparableMixin):
         assert all(isinstance(item, (bytes, str)) for item in self._items)
 
         attrs = ('{0!r}'.format(getattr(self, attr)) for attr in self._items)
-        return 'pywikibot.page.{0}({1})'.format(
+        return 'pywikibot.page.{}({})'.format(
             self.__class__.__name__, ', '.join(attrs))
 
     def lookup_namespace(self):
@@ -5029,8 +5035,8 @@ class BaseLink(ComparableMixin):
         """Return full page title, including localized namespace."""
         # Avoid that ':' will be added to the title for Main ns.
         if self.namespace != Namespace.MAIN:
-            return '%s:%s' % (self.site.namespace(self.namespace),
-                              self.title)
+            return '{}:{}'.format(self.site.namespace(self.namespace),
+                                  self.title)
         return self.title
 
     def ns_title(self, onsite=None):
@@ -5056,11 +5062,11 @@ class BaseLink(ComparableMixin):
             else:
                 # not found
                 raise Error(
-                    'No corresponding namespace found for namespace %s on %s.'
-                    % (self.namespace, onsite))
+                    'No corresponding namespace found for namespace {} on {}.'
+                    .format(self.namespace, onsite))
 
         if self.namespace != Namespace.MAIN:
-            return '%s:%s' % (name, self.title)
+            return '{}:{}'.format(name, self.title)
         return self.title
 
     def astext(self, onsite=None):
@@ -5077,14 +5083,14 @@ class BaseLink(ComparableMixin):
         if self.namespace != Namespace.MAIN:
             title = onsite.namespace(self.namespace) + ':' + title
         if onsite == self.site:
-            return '[[%s]]' % title
+            return '[[{}]]'.format(title)
         if onsite.family == self.site.family:
-            return '[[%s:%s]]' % (self.site.code, title)
+            return '[[{}:{}]]'.format(self.site.code, title)
         if self.site.family.name == self.site.code:
             # use this form for sites like commons, where the
             # code is the same as the family name
-            return '[[%s:%s]]' % (self.site.code, title)
-        return '[[%s:%s:%s]]' % (self.site.family.name, self.site.code, title)
+            return '[[{}:{}]]'.format(self.site.code, title)
+        return '[[{}:{}]]'.format(self.site.sitename, title)
 
     def _cmpkey(self):
         """
@@ -5209,7 +5215,7 @@ class Link(BaseLink):
         # This code was adapted from Title.php : secureAndSplit()
         if '\ufffd' in t:
             raise InvalidTitleError(
-                '%r contains illegal char %r' % (t, '\ufffd'))
+                '{!r} contains illegal char {!r}'.format(t, '\ufffd'))
 
         # Cleanup whitespace
         t = re.sub(
@@ -5289,7 +5295,7 @@ class Link(BaseLink):
             if ns:
                 if len(self._text) <= colon_position:
                     raise InvalidTitleError(
-                        "'{0}' has no title.".format(self._text))
+                        "'{}' has no title.".format(self._text))
                 self._namespace = ns
                 ns_prefix = True
                 old_position = colon_position
@@ -5301,15 +5307,15 @@ class Link(BaseLink):
                 break  # text before : doesn't match any known prefix
             except SiteDefinitionError as e:
                 raise SiteDefinitionError(
-                    '{0} is not a local page on {1}, and the interwiki '
-                    'prefix {2} is not supported by Pywikibot!\n{3}'
+                    '{} is not a local page on {}, and the interwiki '
+                    'prefix {} is not supported by Pywikibot!\n{}'
                     .format(self._text, self._site, prefix, e))
             else:
                 if first_other_site:
                     if not self._site.local_interwiki(prefix):
                         raise InvalidTitleError(
-                            '{0} links to a non local site {1} via an '
-                            'interwiki link to {2}.'.format(
+                            '{} links to a non local site {} via an '
+                            'interwiki link to {}.'.format(
                                 self._text, newsite, first_other_site))
                 elif newsite != self._source:
                     first_other_site = newsite
@@ -5331,7 +5337,7 @@ class Link(BaseLink):
             # 'namespace:' is not a valid title
             if not t:
                 raise InvalidTitleError(
-                    "'{0}' has no title.".format(self._text))
+                    "'{}' has no title.".format(self._text))
 
             if ':' in t and self._namespace >= 0:  # < 0 don't have talk
                 other_ns = self._site.namespaces[self._namespace - 1
@@ -5341,14 +5347,14 @@ class Link(BaseLink):
                     next_ns = t[:t.index(':')]
                     if self._site.namespaces.lookup_name(next_ns):
                         raise InvalidTitleError(
-                            "The (non-)talk page of '{0}' is a valid title "
+                            "The (non-)talk page of '{}' is a valid title "
                             'in another namespace.'.format(self._text))
 
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
         if m:
-            raise InvalidTitleError(
-                '%r contains illegal char(s) %r' % (t, m.group(0)))
+            raise InvalidTitleError('{!r} contains illegal char(s) {!r}'
+                                    .format(t, m.group(0)))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
@@ -5360,15 +5366,16 @@ class Link(BaseLink):
                          or '/../' in t
                          or t.endswith(('/.', '/..'))):
             raise InvalidTitleError(
-                "(contains . / combinations): '%s'"
-                % self._text)
+                "(contains . / combinations): '{}'"
+                .format(self._text))
 
         # Magic tilde sequences? Nu-uh!
         if '~~~' in t:
-            raise InvalidTitleError("(contains ~~~): '%s'" % self._text)
+            raise InvalidTitleError("(contains ~~~): '{}'"
+                                    .format(self._text))
 
         if self._namespace != -1 and len(t) > 255:
-            raise InvalidTitleError("(over 255 bytes): '%s'" % t)
+            raise InvalidTitleError("(over 255 bytes): '{}'".format(t))
 
         # "empty" local links can only be self-links
         # with a fragment identifier.
@@ -5438,7 +5445,7 @@ class Link(BaseLink):
             onsite = self._source
         text = super().astext(onsite)
         if self.section:
-            text = '{0}#{1}]]'.format(text.rstrip(']'), self.section)
+            text = '{}#{}]]'.format(text.rstrip(']'), self.section)
 
         return text
 

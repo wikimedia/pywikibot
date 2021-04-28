@@ -570,7 +570,7 @@ class Family:
                 Family._families[fam] = myfamily
                 return Family._families[fam]
         else:
-            raise UnknownFamilyError('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family {} does not exist'.format(fam))
 
         try:
             # Ignore warnings due to dots in family names.
@@ -581,7 +581,7 @@ class Family:
                 sys.path.append(dirname(family_file))
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
-            raise UnknownFamilyError('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family {} does not exist'.format(fam))
         cls = mod.Family.instance
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
@@ -761,19 +761,19 @@ class Family:
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
             uri = self.ssl_pathprefix(code) + uri
-        return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
+        return urlparse.urljoin('{}://{}'.format(protocol, host), uri)
 
     def path(self, code):
         """Return path to index.php."""
-        return '%s/index.php' % self.scriptpath(code)
+        return '{}/index.php'.format(self.scriptpath(code))
 
     def querypath(self, code):
         """Return path to query.php."""
-        return '%s/query.php' % self.scriptpath(code)
+        return '{}/query.php'.format(self.scriptpath(code))
 
     def apipath(self, code):
         """Return path to api.php."""
-        return '%s/api.php' % self.scriptpath(code)
+        return '{}/api.php'.format(self.scriptpath(code))
 
     def eventstreams_host(self, code):
         """Hostname for EventStreams."""
@@ -786,7 +786,7 @@ class Family:
     @deprecated_args(name='title')
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
-        return '%s?title=%s&redirect=no' % (self.path(code), title)
+        return '{}?title={}&redirect=no'.format(self.path(code), title)
 
     def interface(self, code):
         """
@@ -796,8 +796,8 @@ class Family:
         """
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn('Interwiki removal %s is in %s codes'
-                               % (code, self))
+                pywikibot.warn('Interwiki removal {} is in {} codes'
+                               .format(code, self))
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:
@@ -856,7 +856,7 @@ class Family:
                 # Use the code and family instead of the url
                 # This is only creating a Site instance if domain matches
                 site = pywikibot.Site(code, self.name)
-                pywikibot.log('Found candidate {0}'.format(site))
+                pywikibot.log('Found candidate {}'.format(site))
 
                 for iw_url in site._interwiki_urls():
                     if path.startswith(iw_url):
@@ -870,7 +870,7 @@ class Family:
             return None
 
         raise RuntimeError(
-            'Found multiple matches for URL "{0}": {1}'
+            'Found multiple matches for URL "{}": {}'
             .format(url, ', '.join(str(s) for s in matched_sites)))
 
     def maximum_GET_length(self, code):
@@ -879,7 +879,7 @@ class Family:
 
     def dbName(self, code):
         """Return the name of the MySQL database."""
-        return '%s%s' % (code, self.name)
+        return '{}{}'.format(code, self.name)
 
     def encoding(self, code):
         """Return the encoding for a specific language wiki."""
@@ -912,7 +912,7 @@ class Family:
         return self.name
 
     def __repr__(self):
-        return 'Family("%s")' % self.name
+        return 'Family("{}")'.format(self.name)
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
@@ -1030,11 +1030,11 @@ class SubdomainFamily(Family):
             codes += cls.closed_wikis
 
         # shortcut this classproperty
-        cls.langs = {code: '{0}.{1}'.format(code, cls.domain)
+        cls.langs = {code: '{}.{}'.format(code, cls.domain)
                      for code in codes}
 
         if hasattr(cls, 'code_aliases'):
-            cls.langs.update({alias: '{0}.{1}'.format(code, cls.domain)
+            cls.langs.update({alias: '{}.{}'.format(code, cls.domain)
                               for alias, code in cls.code_aliases.items()})
 
         return cls.langs
@@ -1045,8 +1045,8 @@ class SubdomainFamily(Family):
         if cls.languages_by_size:
             return cls.languages_by_size
         raise NotImplementedError(
-            'Family %s needs property "languages_by_size" or "codes"'
-            % cls.name)
+            'Family {} needs property "languages_by_size" or "codes"'
+            .format(cls.name))
 
     @classproperty
     def domains(cls):
@@ -1178,7 +1178,7 @@ class WikimediaFamily(Family):
             return 'wikimedia.org'
 
         raise NotImplementedError(
-            "Family %s needs to define property 'domain'" % cls.name)
+            "Family {} needs to define property 'domain'".format(cls.name))
 
     @classproperty
     def interwiki_removals(cls):
@@ -1214,7 +1214,7 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     @classproperty
     def domain(cls):
         """Return the parents domain with a subdomain prefix."""
-        return '{0}.wikimedia.org'.format(cls.name)
+        return '{}.wikimedia.org'.format(cls.name)
 
 
 @deprecated_args(site=True)

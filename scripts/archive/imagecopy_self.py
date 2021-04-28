@@ -57,6 +57,17 @@ except ImportError as _tk_error:
 
 NL = ''
 
+CID_INFO = """\
+{{{{Information
+|description={description}
+|date={date}
+|source={source}
+|author={author}
+|permission={permission}
+|other_versions={other_versions}
+}}}}
+"""
+
 nowCommonsTemplate = {
     'ar': '{{الآن كومنز|%s}}',
     'ary': '{{Now Commons|%s}}',
@@ -546,9 +557,9 @@ class imageFetcher(threading.Thread):
         uploadtime = imagepage.get_file_history()[-1][0]
         uploadDatetime = datetime.strptime(uploadtime, '%Y-%m-%dT%H:%M:%SZ')
         return ('{{Date|%s|%s|%s}} (original upload date)'
-                % (str(uploadDatetime.year),
-                   str(uploadDatetime.month),
-                   str(uploadDatetime.day)))
+                % (uploadDatetime.year,
+                   uploadDatetime.month,
+                   uploadDatetime.day))
 
     def getSource(self, imagepage, source=''):
         """Get text to put in the source field of new information template."""
@@ -559,8 +570,8 @@ class imageFetcher(threading.Thread):
             source = '{{Own}}'
 
         return (source.strip()
-                + '<BR />Transferred from [http://%(lang)s.%(family)s.org '
-                '%(lang)s.%(family)s]') % {'lang': lang, 'family': family}
+                + '<BR />Transferred from [http://{lang}.{family}.org '
+                '{lang}.{family}]').format(lang=lang, family=family)
 
     def getAuthorText(self, imagepage):
         """Get uploader to put in the author field of information template."""
@@ -582,12 +593,12 @@ class imageFetcher(threading.Thread):
         lang = sourceSite.code
         family = sourceSite.family.name
         conversions = [
-            (r'\[\[([^\[\]\|]+)\|([^\[\]\|]+)\]\]', r'[[:%(lang)s:\1|\2]]'),
-            (r'\[\[([^\[\]\|]+)\]\]', r'[[:%(lang)s:\1|\1]]'),
+            (r'\[\[([^\[\]\|]+)\|([^\[\]\|]+)\]\]', r'[[:{lang}:\1|\2]]'),
+            (r'\[\[([^\[\]\|]+)\]\]', r'[[:{lang}:\1|\1]]'),
         ]
         for (regex, replacement) in conversions:
-            text = re.sub(regex, replacement % {'lang': lang,
-                                                'family': family}, text)
+            text = re.sub(regex, replacement.format(lang=lang,
+                                                    family=family), text)
         return text
 
     def getNewLicensetemplate(self, imagepage):
@@ -909,25 +920,17 @@ class uploader(threading.Thread):
                     '|month={{subst:CURRENTMONTHNAME}}'
                     '|day={{subst:CURRENTDAY}}}}\n'
                     % {'lang': lang, 'family': family}
-                    )
         cid += '== {{int:filedesc}} ==\n'
-        cid += '{{Information\n'
-        cid += '|description=%(description)s\n' % fields
-        cid += '|date=%(date)s\n' % fields
-        cid += '|source=%(source)s\n' % fields
-        cid += '|author=%(author)s\n' % fields
-        cid += '|permission=%(permission)s\n' % fields
-        cid += '|other_versions=%(other_versions)s\n' % fields
-        cid += '}}\n'
+        cid += CID_INFO.format_map(fields)
         cid += '== {{int:license}} ==\n'
-        cid += '%(licensetemplate)s\n' % fields
+        cid += '{licensetemplate}\n'.format_map(fields)
         cid += '\n'
         cid += self.getOriginalUploadLog(fields.get('imagepage'))
         cid += '__NOTOC__\n'
         if not fields.get('categories').strip():
             cid = cid + '{{Subst:Unc}}'
         else:
-            cid = cid + '%(categories)s\n' % fields
+            cid = cid + '{categories}\n'.format_map(fields)
         return cid
 
     def getOriginalUploadLog(self, imagepage):
@@ -948,23 +951,18 @@ class uploader(threading.Thread):
 
         result = '== {{Original upload log}} ==\n'
         result += ('The original description page is/was '
-                   '[http://%(lang)s.%(family)s.org%(sourceimage)s here]. '
-                   'All following user names refer to %(lang)s.%(family)s.\n'
-                   % {'lang': lang, 'family': family,
-                      'sourceimage': sourceimage})
+                   '[http://{lang}.{family}.org{sourceimage} here]. '
+                   'All following user names refer to {lang}.{family}.\n'
+                   .format(lang=lang, family=family, sourceimage=sourceimage))
         for (timestamp, username, resolution, size, comment) in filehistory:
             date = datetime.strptime(
                 timestamp, '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%d %H:%M')
             result += (
-                '* %(date)s [[:%(lang)s:user:%(username)s|%(username)s]] '
-                "%(resolution)s (%(size)s bytes) ''"
-                "<nowiki>%(comment)s</nowiki>''\n" % {
-                    'lang': lang,
-                    'date': date,
-                    'username': username,
-                    'resolution': resolution,
-                    'size': size,
-                    'comment': comment})
+                '* {date} [[:{lang}:user:{username}|{username}]] '
+                "{resolution} ({size} bytes) ''"
+                "<nowiki>{comment}</nowiki>''\n"
+                .format(lang=lang, date=date, username=username,
+                        resolution=resolution, size=size, comment=comment))
 
         return result
 

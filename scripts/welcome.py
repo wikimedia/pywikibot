@@ -484,7 +484,7 @@ class WelcomeBot(SingleSiteBot):
         site_netext = i18n.translate(self.site, netext)
         if site_netext is None:
             raise KeyError(
-                'welcome.py is not localized for site {0} in netext dict.'
+                'welcome.py is not localized for site {} in netext dict.'
                 .format(self.site))
         self.welcome_text = site_netext
 
@@ -785,7 +785,7 @@ class WelcomeBot(SingleSiteBot):
         elif user.editCount() < globalvar.attachEditCount:
             if not user.editCount() == 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.output('{0} has only {1} contributions.'
+                pywikibot.output('{} has only {} contributions.'
                                  .format(user.username, user.editCount()))
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)

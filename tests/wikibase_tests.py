@@ -401,17 +401,17 @@ class TestWbQuantity(WbRepresentationTestCase):
         """Test WbQuantity formatting with bounds."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
-        self.assertEqual('%s' % q,
-                         '{\n'
-                         '    "amount": "+%(val)s",\n'
-                         '    "lowerBound": "+%(val)s",\n'
+        self.assertEqual(str(q),
+                         '{{\n'
+                         '    "amount": "+{val}",\n'
+                         '    "lowerBound": "+{val}",\n'
                          '    "unit": "1",\n'
-                         '    "upperBound": "+%(val)s"\n'
-                         '}' % {'val': '0.044405586'})
-        self.assertEqual('%r' % q,
-                         'WbQuantity(amount=%(val)s, '
-                         'upperBound=%(val)s, lowerBound=%(val)s, '
-                         'unit=1)' % {'val': '0.044405586'})
+                         '    "upperBound": "+{val}"\n'
+                         '}}'.format(val='0.044405586'))
+        self.assertEqual(repr(q),
+                         'WbQuantity(amount={val}, '
+                         'upperBound={val}, lowerBound={val}, '
+                         'unit=1)'.format(val='0.044405586'))
 
     def test_WbQuantity_self_equality(self):
         """Test WbQuantity equality."""
@@ -492,17 +492,17 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
             self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
                           'support unbound uncertainties.')
         q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
-        self.assertEqual('%s' % q,
-                         '{\n'
-                         '    "amount": "+%(val)s",\n'
+        self.assertEqual(str(q),
+                         '{{\n'
+                         '    "amount": "+{val}",\n'
                          '    "lowerBound": null,\n'
                          '    "unit": "1",\n'
                          '    "upperBound": null\n'
-                         '}' % {'val': '0.044405586'})
-        self.assertEqual('%r' % q,
-                         'WbQuantity(amount=%(val)s, '
+                         '}}'.format(val='0.044405586'))
+        self.assertEqual(repr(q),
+                         'WbQuantity(amount={val}, '
                          'upperBound=None, lowerBound=None, '
-                         'unit=1)' % {'val': '0.044405586'})
+                         'unit=1)'.format(val='0.044405586'))
 
     def test_WbQuantity_fromWikibase_unbound(self):
         """Test WbQuantity.fromWikibase() instantiating without bounds."""

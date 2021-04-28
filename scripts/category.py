@@ -473,12 +473,12 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
-            pywikibot.output('Adding %s' % catpl.title(as_link=True))
+            pywikibot.output('Adding {}'.format(catpl.title(as_link=True)))
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 tagname = 'noinclude'
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
-                tagnameregexp = re.compile(r'(.*)(<\/{0}>)'.format(tagname),
+                tagnameregexp = re.compile(r'(.*)(<\/{}>)'.format(tagname),
                                            re.I | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
@@ -488,7 +488,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
                     # in the template page
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
-                        r'\1{0}\n\2'.format(categorytitle),
+                        r'\1{}\n\2'.format(categorytitle),
                         ['comment', 'math', 'nowiki', 'pre',
                          'syntaxhighlight'],
                         site=self.current_page.site)
@@ -607,7 +607,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             if self.wikibase and repo.username() is None:
                 # The bot can't move categories nor update the Wikibase repo
                 raise NoUsernameError(
-                    "The 'wikibase' option is turned on and {0} has no "
+                    "The 'wikibase' option is turned on and {} has no "
                     'registered username.'.format(repo))
 
         template_vars = {'oldcat': self.oldcat.title(with_ns=False)}
@@ -775,14 +775,14 @@ class CategoryMoveRobot(CategoryPreprocess):
         """
         move_possible = True
         if new_page and new_page.exists():
-            pywikibot.warning("The {0} target '{1}' already exists."
+            pywikibot.warning("The {} target '{}' already exists."
                               .format(name, new_page.title()))
             move_possible = False
         if not old_page.exists():
             # only warn if not a talk page
             log = (pywikibot.log if old_page.namespace() % 2 else
                    pywikibot.warning)
-            log("Moving {0} '{1}' requested, but the page doesn't exist."
+            log("Moving {} '{}' requested, but the page doesn't exist."
                 .format(name, old_page.title()))
             move_possible = False
         return move_possible
@@ -1256,7 +1256,7 @@ class CategoryTreeRobot:
         if currentDepth > 0:
             result += ' '
         result += cat.title(as_link=True, textlink=True, with_ns=False)
-        result += ' (%d)' % cat.categoryinfo['pages']
+        result += ' ({})'.format(int(cat.categoryinfo['pages']))
         if currentDepth < self.maxDepth // 2:
             # noisy dots
             pywikibot.output('.', newline=False)

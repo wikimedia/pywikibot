@@ -64,17 +64,17 @@ def main(*args) -> None:
     settings.update(['PYWIKIBOT_DIR', 'PYWIKIBOT_DIR_PWB',
                      'PYWIKIBOT_NO_USER_CONFIG'])
     for environ_name in sorted(settings):
-        pywikibot.output('{0}: {1}'.format(environ_name,
-                                           os.environ.get(environ_name,
-                                                          'Not set')))
+        pywikibot.output('{}: {}'.format(environ_name,
+                                         os.environ.get(environ_name,
+                                                        'Not set')))
 
     pywikibot.output('Config base dir: ' + pywikibot.config.base_dir)
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.output('Usernames for family "{0}":'.format(family))
+        pywikibot.output('Usernames for family "{}":'.format(family))
         for lang, username in usernames.items():
-            pywikibot.output('\t{0}: {1}'.format(lang, username))
+            pywikibot.output('\t{}: {}'.format(lang, username))
 
 
 if __name__ == '__main__':

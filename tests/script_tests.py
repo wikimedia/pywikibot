@@ -191,7 +191,7 @@ class TestScriptMeta(MetaTestCaseClass):
             def test_skip_script(self):
                 raise unittest.SkipTest(
                     'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{0}"'
+                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{}"'
                     .format(script_name))
 
             def testScript(self):

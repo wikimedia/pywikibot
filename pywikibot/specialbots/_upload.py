@@ -150,8 +150,8 @@ class UploadRobot(BaseBot):
                 # raised from connection lost during response.iter_content()
                 except requests.ConnectionError:
                     fd.flush()
-                    pywikibot.output(
-                        'Connection closed at byte %s' % path.stat().st_size)
+                    pywikibot.output('Connection closed at byte {}'
+                                     .format(path.stat().st_size))
                 # raised from response.raise_for_status()
                 except requests.HTTPError as e:
                     # exit criteria if size is not available
@@ -261,13 +261,13 @@ class UploadRobot(BaseBot):
             if invalid:
                 c = ''.join(invalid)
                 pywikibot.output(
-                    'Invalid character(s): %s. Please try again' % c)
+                    'Invalid character(s): {}. Please try again'.format(c))
                 continue
 
             if allowed_formats and ext not in allowed_formats:
                 if self.opt.always:
                     pywikibot.output('File format is not one of '
-                                     '[{0}]'.format(' '.join(allowed_formats)))
+                                     '[{}]'.format(' '.join(allowed_formats)))
                     continue
 
                 if not pywikibot.input_yn(
@@ -288,10 +288,10 @@ class UploadRobot(BaseBot):
                 if potential_file_page.has_permission():
                     if overwrite is None:
                         overwrite = not pywikibot.input_yn(
-                            'File with name %s already exists. '
+                            'File with name {} already exists. '
                             'Would you like to change the name? '
                             '(Otherwise file will be overwritten.)'
-                            % filename, default=True,
+                            .format(filename), default=True,
                             automatic_quit=False)
                     if not overwrite:
                         continue
@@ -313,8 +313,8 @@ class UploadRobot(BaseBot):
         # A proper description for the submission.
         # Empty descriptions are not accepted.
         if self.description:
-            pywikibot.output('The suggested description is:\n%s'
-                             % self.description)
+            pywikibot.output('The suggested description is:\n{}'
+                             .format(self.description))
 
         while not self.description or self.verify_description:
             if not self.description:
@@ -380,7 +380,7 @@ class UploadRobot(BaseBot):
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
-        pywikibot.output('Uploading file to {0}...'.format(site))
+        pywikibot.output('Uploading file to {}...'.format(site))
 
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
         if '://' in file_url and not site.has_right('upload_by_url'):
@@ -398,8 +398,8 @@ class UploadRobot(BaseBot):
         except APIError as error:
             if error.code == 'uploaddisabled':
                 pywikibot.error(
-                    'Upload error: Local file uploads are disabled on %s.'
-                    % site)
+                    'Upload error: Local file uploads are disabled on {}.'
+                    .format(site))
             else:
                 pywikibot.error('Upload error: ', exc_info=True)
         except Exception:
@@ -407,7 +407,7 @@ class UploadRobot(BaseBot):
         else:
             if success:
                 # No warning, upload complete.
-                pywikibot.output('Upload of %s successful.' % filename)
+                pywikibot.output('Upload of {} successful.'.format(filename))
                 self._save_counter += 1
                 return filename  # data['filename']
             pywikibot.output('Upload aborted.')
@@ -441,13 +441,13 @@ class UploadRobot(BaseBot):
                 self.upload_file(file_url)
                 self._treat_counter += 1
         except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nUser quit {} bot run...'
+                             .format(self.__class__.__name__))
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nKeyboardInterrupt during {} bot run...'
+                             .format(self.__class__.__name__))
         finally:
             self.exit()

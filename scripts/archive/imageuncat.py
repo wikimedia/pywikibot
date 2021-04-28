@@ -1323,13 +1323,13 @@ def main(*args):
 
     if site.code != 'commons' or site.family.name != 'commons':
         pywikibot.warning('This script is primarily written for Wikimedia '
-                          'Commons, but has been invoked with site {0}. It '
+                          'Commons, but has been invoked with site {}. It '
                           'might work for other sites but there is no '
                           'guarantee that it does the right thing.'
                           .format(site))
         choice = pywikibot.input_choice(
             'How do you want to continue?',
-            (('Continue using {0}'.format(site), 'c'),
+            (('Continue using {}'.format(site), 'c'),
              ('Switch to Wikimedia Commons', 's'),
              ('Quit', 'q')),
             automatic_quit=False)

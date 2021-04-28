@@ -120,12 +120,14 @@ class TestLink(DefaultDrySiteTestCase):
 
         # Tilde
         def generate_contains_tilde_exc_regex(text):
-            exc_regex = r'^\(contains ~~~\): (u|)\'%s\'$' % re.escape(text)
+            exc_regex = r'^\(contains ~~~\): (u|)\'{}\'$' \
+                        .format(re.escape(text))
             return exc_regex
 
         # Overlength
         def generate_overlength_exc_regex(text):
-            exc_regex = r'^\(over 255 bytes\): (u|)\'%s\'$' % re.escape(text)
+            exc_regex = r'^\(over 255 bytes\): (u|)\'{}\'$' \
+                        .format(re.escape(text))
             return exc_regex
 
         # Namespace prefix without actual title

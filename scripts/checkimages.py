@@ -482,7 +482,7 @@ class LogIsFull(Error):
 def printWithTimeZone(message) -> None:
     """Print the messages followed by the TimeZone encoded correctly."""
     time_zone = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-    pywikibot.output('{0} {1}'.format(message.rstrip(), time_zone))
+    pywikibot.output('{} {}'.format(message.rstrip(), time_zone))
 
 
 class checkImagesBot:
@@ -502,7 +502,7 @@ class checkImagesBot:
                 'No report page provided in "report_page" dict '
                 'for your project!')
         self.image_namespace = site.namespaces.FILE.custom_name + ':'
-        self.list_entry = '\n* [[:{0}%s]] '.format(self.image_namespace)
+        self.list_entry = '\n* [[:{}%s]] '.format(self.image_namespace)
 
         # The summary of the report
         self.com = i18n.twtranslate(self.site, 'checkimages-log-comment')
@@ -901,7 +901,7 @@ class checkImagesBot:
                             '{} is a duplicate and has to be tagged...'
                             .format(dup_page))
                         images_to_tag_list.append(dup_page.title())
-                        string += '* {0}\n'.format(
+                        string += '* {}\n'.format(
                             dup_page.title(as_link=True, textlink=True))
                     else:
                         pywikibot.output(
@@ -916,7 +916,7 @@ class checkImagesBot:
                 if '__images__' in dupText:
                     text_for_the_report = dupText.replace(
                         '__images__',
-                        '\n{0}* {1}\n'.format(
+                        '\n{}* {}\n'.format(
                             string,
                             Page_older_image.title(
                                 as_link=True, textlink=True)))
@@ -937,9 +937,9 @@ class checkImagesBot:
                             only_report = True
                             break
                         # Delete the image in the list where we're write on
+                        image = self.image_namespace + image_to_tag
                         text_for_the_report = re.sub(
-                            r'\n\*\[\[:%s\]\]'
-                            % re.escape(self.image_namespace + image_to_tag),
+                            r'\n\*\[\[:{}\]\]'.format(re.escape(image)),
                             '', text_for_the_report)
                         self.report(text_for_the_report, image_to_tag,
                                     commImage=dupComment_image, unver=True)
@@ -947,9 +947,9 @@ class checkImagesBot:
                 if images_to_tag_list and not only_report:
                     fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                     already_reported_in_past = fp.revision_count(self.bots)
-                    from_regex = (r'\n\*\[\[:%s%s\]\]'
-                                  % (self.image_namespace,
-                                     re.escape(self.image.title(as_url=True))))
+                    image_title = re.escape(self.image.title(as_url=True))
+                    from_regex = (r'\n\*\[\[:{}{}\]\]'
+                                  .format(self.image_namespace, image_title))
                     # Delete the image in the list where we're write on
                     text_for_the_report = re.sub(from_regex, '',
                                                  text_for_the_report)

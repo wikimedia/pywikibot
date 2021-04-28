@@ -83,7 +83,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
         if (image.get_file_url() and not image.file_is_shared()
                 and 'http://' not in image.text):
             if self.opt.filetemplate in image.text:
-                pywikibot.output('{0} done already'
+                pywikibot.output('{} done already'
                                  .format(image.title(as_link=True)))
                 return
 

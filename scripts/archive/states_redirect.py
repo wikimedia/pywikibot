@@ -67,7 +67,7 @@ class StatesRedirectBot(SingleSiteBot):
         if so, create a redirect from Something, ST..
         """
         for sn in self.abbrev:
-            if re.fullmatch(r', %s' % sn, page.title()):
+            if re.fullmatch(r', {}'.format(sn), page.title()):
                 pl = pywikibot.Page(self.site, page.title().replace(sn,
                                     self.abbrev[sn]))
                 # A bit hacking here - the real work is done in the
@@ -78,15 +78,15 @@ class StatesRedirectBot(SingleSiteBot):
                     goal = pl.getRedirectTarget().title()
                     if pywikibot.Page(self.site, goal).exists():
                         pywikibot.output(
-                            'Not creating {0} - redirect already exists.'
+                            'Not creating {} - redirect already exists.'
                             .format(goal))
                     else:
                         pywikibot.warning(
-                            '{0} already exists but redirects elsewhere!'
+                            '{} already exists but redirects elsewhere!'
                             .format(goal))
                 except IsNotRedirectPageError:
                     pywikibot.warning(
-                        'Page {0} already exists and is not a redirect '
+                        'Page {} already exists and is not a redirect '
                         'Please check page!'
                         .format(pl.title()))
                 except NoPageError:
@@ -94,11 +94,11 @@ class StatesRedirectBot(SingleSiteBot):
                         p2 = page.getRedirectTarget()
                         pywikibot.output(
                             'Note: goal page is redirect.\nCreating redirect '
-                            'to "{0}" to avoid double redirect.'
+                            'to "{}" to avoid double redirect.'
                             .format(p2.title()))
                     else:
                         p2 = page
-                    if self.force or pywikibot.input_yn('Create redirect {0}?'
+                    if self.force or pywikibot.input_yn('Create redirect {}?'
                                                         .format(pl.title())):
                         pl.set_redirect_target(
                             p2, create=True,

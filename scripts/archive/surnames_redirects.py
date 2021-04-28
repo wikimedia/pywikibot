@@ -83,10 +83,10 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
 
             new_page = pywikibot.Page(site, possible_name)
             if new_page.exists():
-                pywikibot.output('{0} already exists, skipping...'
+                pywikibot.output('{} already exists, skipping...'
                                  .format(new_page.title(as_link=True)))
             else:
-                pywikibot.output("{0} doesn't exist"
+                pywikibot.output("{} doesn't exist"
                                  .format(new_page.title(as_link=True)))
                 choice = pywikibot.input_yn(
                     'Do you want to create a redirect?')

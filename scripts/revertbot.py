@@ -84,11 +84,11 @@ class BaseRevertBot(OptionHandler):
             if callback(item):
                 result = self.revert(item)
                 if result:
-                    self.log('{0}: {1}'.format(item['title'], result))
+                    self.log('{}: {}'.format(item['title'], result))
                 else:
-                    self.log('Skipped {0}'.format(item['title']))
+                    self.log('Skipped {}'.format(item['title']))
             else:
-                self.log('Skipped {0} by callback'.format(item['title']))
+                self.log('Skipped {} by callback'.format(item['title']))
 
     def callback(self, item) -> bool:
         """Callback function."""

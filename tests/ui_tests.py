@@ -85,7 +85,7 @@ class Stream:
             the patched stream.
         """
         self._stream = io.StringIO()
-        self._name = 'std{0}'.format(name)
+        self._name = 'std{}'.format(name)
         self._original = getattr(sys, self._name)
         patched_streams[self._original] = self._stream
 

@@ -1187,7 +1187,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
                 gf = pagegenerators.GeneratorFactory()
-                gf.handle_arg('-property:{0}'.format(item))
+                gf.handle_arg('-property:{}'.format(item))
                 gf.handle_arg('-limit:10')
                 gen = gf.getCombinedGenerator()
                 self.assertIsNotNone(gen)
@@ -1201,7 +1201,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {0}'.format(item))
+                        'NotImplementedError not raised for {}'.format(item))
 
     def test_empty_generator(self):
         """Test empty generator."""
@@ -1238,7 +1238,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_ns_valid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {0} does not use Linter extension'
+            self.skipTest('The site {} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-ns:1')
@@ -1256,7 +1256,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_invalid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {0} does not use Linter extension'
+            self.skipTest('The site {} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(AssertionError):
@@ -1607,7 +1607,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         super().setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
-            raise unittest.SkipTest('{0} is not available'.format(cls.client))
+            raise unittest.SkipTest('{} is not available'.format(cls.client))
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""

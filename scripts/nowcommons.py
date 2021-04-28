@@ -348,24 +348,24 @@ class NowCommonsDeleteBot(Bot):
                                     'information?',
                                     default=False, automatic_quit=False):
                                 local_file_page.delete(
-                                    '{0} [[:commons:File:{1}]]'
+                                    '{} [[:commons:File:{}]]'
                                     .format(comment, file_on_commons),
                                     prompt=False)
                         else:
                             local_file_page.delete(
-                                comment + ' [[:commons:File:{0}]]'
+                                comment + ' [[:commons:File:{}]]'
                                           .format(file_on_commons),
                                           prompt=False)
                     else:
                         pywikibot.output('The file is not identical to '
                                          'the one on Commons.')
             except (NoPageError, IsRedirectPageError) as e:
-                pywikibot.output('{0}'.format(e[0]))
+                pywikibot.output(str(e[0]))
                 continue
             else:
                 self._treat_counter += 1
         if not self._treat_counter:
-            pywikibot.output('No transcluded files found for {0}.'
+            pywikibot.output('No transcluded files found for {}.'
                              .format(self.nc_templates_list()[0]))
         self.exit()
 

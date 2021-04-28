@@ -26,10 +26,10 @@ class KnownTypesTestBase(TestCaseBase):
             param = site._paraminfo.parameter(module, parameter)
         except ValueError:
             raise unittest.SkipTest(
-                'Paraminfo for {0} could not be loaded'.format(module))
+                'Paraminfo for {} could not be loaded'.format(module))
         if not param or 'type' not in param:
             raise unittest.SkipTest(
-                'No defined values for {0}.{1}'.format(module, parameter))
+                'No defined values for {}.{}'.format(module, parameter))
         return param['type']
 
     def _check_param_values(self, site, module, parameter, expected):

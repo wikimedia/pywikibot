@@ -102,8 +102,8 @@ class MWSite:
               '&sifilteriw=local&format=json')
         iw = json.loads(response.text)
         if 'error' in iw:
-            raise RuntimeError('%s - %s' % (iw['error']['code'],
-                                            iw['error']['info']))
+            raise RuntimeError('{} - {}'.format(iw['error']['code'],
+                                                iw['error']['info']))
         return [wiki for wiki in iw['query']['interwikimap']
                 if 'language' in wiki]
 

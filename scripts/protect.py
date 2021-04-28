@@ -96,7 +96,7 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         the protections using this method.
         """
         if not self.user_confirm(
-                'Do you want to change the protection level of {0}?'
+                'Do you want to change the protection level of {}?'
                 .format(self.current_page.title(as_link=True,
                                                 force_interwiki=True))):
             return
@@ -134,7 +134,7 @@ def check_protection_level(operation, level, levels, default=None):
         if level == default:
             default_char = first_char[-1]
 
-    choice = pywikibot.input_choice('Choose a protection level to {0}:'
+    choice = pywikibot.input_choice('Choose a protection level to {}:'
                                     .format(operation),
                                     zip(levels, first_char),
                                     default=default_char)
@@ -195,7 +195,7 @@ def main(*args):
             protections[option] = value
         else:
             if not gen_factory.handle_arg(arg):
-                raise ValueError('Unknown parameter "{0}"'.format(arg))
+                raise ValueError('Unknown parameter "{}"'.format(arg))
             if value:
                 message_properties.update({'cat': value, 'page': value})
             if 'summary' not in options:
@@ -206,11 +206,11 @@ def main(*args):
         if message_type == 'simple' or message_properties:
             if default_level == 'all':
                 options['summary'] = i18n.twtranslate(
-                    site, 'unprotect-{0}'.format(message_type),
+                    site, 'unprotect-{}'.format(message_type),
                     message_properties)
             else:
                 options['summary'] = i18n.twtranslate(
-                    site, 'protect-{0}'.format(message_type),
+                    site, 'protect-{}'.format(message_type),
                     message_properties)
 
     generator = gen_factory.getCombinedGenerator()

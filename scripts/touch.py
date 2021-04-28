@@ -57,13 +57,13 @@ class TouchBot(MultipleSitesBot):
         try:
             page.touch(botflag=self.opt.botflag)
         except (NoCreateError, NoPageError):
-            pywikibot.error('Page {0} does not exist.'
+            pywikibot.error('Page {} does not exist.'
                             .format(page.title(as_link=True)))
         except LockedPageError:
-            pywikibot.error('Page {0} is locked.'
+            pywikibot.error('Page {} is locked.'
                             .format(page.title(as_link=True)))
         except PageSaveRelatedError:
-            pywikibot.error('Page {0} not saved.'
+            pywikibot.error('Page {} not saved.'
                             .format(page.title(as_link=True)))
 
 

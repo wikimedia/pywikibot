@@ -37,11 +37,11 @@ def _call_cmd(args, lib='djvulibre') -> tuple:
     stdoutdata, stderrdata = dp.communicate()
 
     if dp.returncode != 0:
-        pywikibot.error('{0} error; {1}'.format(lib, cmd))
-        pywikibot.error('{0}'.format(stderrdata))
+        pywikibot.error('{} error; {}'.format(lib, cmd))
+        pywikibot.error(str(stderrdata))
         return (False, stdoutdata)
 
-    pywikibot.log('SUCCESS: {0} (PID: {1})'.format(cmd, dp.pid))
+    pywikibot.log('SUCCESS: {} (PID: {})'.format(cmd, dp.pid))
 
     return (True, stdoutdata)
 
@@ -81,9 +81,9 @@ class DjVuFile:
 
     def __repr__(self) -> str:
         """Return a more complete string representation."""
-        return str("{0}.{1}('{2}')").format(self.__module__,
-                                            self.__class__.__name__,
-                                            self._filename)
+        return str("{}.{}('{}')").format(self.__module__,
+                                         self.__class__.__name__,
+                                         self._filename)
 
     def __str__(self) -> str:
         """Return a string representation."""
@@ -111,8 +111,9 @@ class DjVuFile:
             n = args[0]
             force = kwargs.get('force', False)
             if not (1 <= n <= obj.number_of_images(force=force)):
-                raise ValueError('Page %d not in file %s [%d-%d]'
-                                 % (n, obj.file, n, obj.number_of_images()))
+                raise ValueError('Page {} not in file {} [{}-{}]'
+                                 .format(int(n), obj.file, int(n),
+                                         int(obj.number_of_images())))
             _res = fn(obj, *args, **kwargs)
             return _res
         return wrapper
@@ -230,8 +231,10 @@ class DjVuFile:
         @type force: bool
         """
         if not self.has_text(force=force):
-            raise ValueError('Djvu file %s has no text layer.' % self.file)
-        res, stdoutdata = _call_cmd(['djvutxt', '--page=%d' % n, self.file])
+            raise ValueError('Djvu file {} has no text layer.'
+                             .format(self.file))
+        res, stdoutdata = _call_cmd(['djvutxt', '--page={}'.format(int(n)),
+                                     self.file])
         if not res:
             return False
         return self._remove_control_chars(stdoutdata)

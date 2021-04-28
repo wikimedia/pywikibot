@@ -178,12 +178,12 @@ class TemplateRobot(ReplaceBot):
                                              'pagelist', ]
             elif self.opt.remove:
                 separate_line_regex = re.compile(
-                    r'^[*#:]* *{0} *\n'.format(template_regex.pattern),
+                    r'^[*#:]* *{} *\n'.format(template_regex.pattern),
                     re.DOTALL | re.MULTILINE)
                 replacements.append((separate_line_regex, ''))
 
                 spaced_regex = re.compile(
-                    r' +{0} +'.format(template_regex.pattern),
+                    r' +{} +'.format(template_regex.pattern),
                     re.DOTALL)
                 replacements.append((spaced_regex, ' '))
 
@@ -191,7 +191,7 @@ class TemplateRobot(ReplaceBot):
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
-                    pywikibot.warning('Template "{0}" does not exist.'
+                    pywikibot.warning('Template "{}" does not exist.'
                                       .format(new))
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
                                               default=False,

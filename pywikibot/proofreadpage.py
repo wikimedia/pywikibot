@@ -270,12 +270,12 @@ class ProofreadPage(pywikibot.Page):
         page, others = self._index
         if others:
             pywikibot.warning('{} linked to several Index pages.'.format(self))
-            pywikibot.output('{0}{1!s}'.format(' ' * 9, [page] + others))
+            pywikibot.output('{}{!s}'.format(' ' * 9, [page] + others))
 
             if page:
                 pywikibot.output(
-                    '{0}Selected Index: {1}'.format(' ' * 9, page))
-                pywikibot.output('{0}remaining: {1!s}'.format(' ' * 9, others))
+                    '{}Selected Index: {}'.format(' ' * 9, page))
+                pywikibot.output('{}remaining: {!s}'.format(' ' * 9, others))
 
         if not page:
             pywikibot.warning('Page {} is not linked to any Index page.'
@@ -326,8 +326,8 @@ class ProofreadPage(pywikibot.Page):
     @decompose
     def ql(self, value):
         if value not in self.site.proofread_levels:
-            raise ValueError('Not valid QL value: %s (legal values: %s)'
-                             % (value, self.site.proofread_levels))
+            raise ValueError('Not valid QL value: {} (legal values: {})'
+                             .format(value, self.site.proofread_levels))
         # TODO: add logic to validate ql value change, considering
         # site.proofread_levels.
         self._full_header.ql = value
@@ -350,8 +350,8 @@ class ProofreadPage(pywikibot.Page):
         try:
             return self.site.proofread_levels[self.ql]
         except KeyError:
-            pywikibot.warning('Not valid status set for %s: quality level = %s'
-                              % (self.title(as_link=True), self.ql))
+            pywikibot.warning('Not valid status set for {}: quality level = {}'
+                              .format(self.title(as_link=True), self.ql))
             return None
 
     def without_text(self):
@@ -553,7 +553,7 @@ class ProofreadPage(pywikibot.Page):
             if self.exists():
                 url = self.full_url()
             else:
-                path = 'w/index.php?title={0}&action=edit&redlink=1'
+                path = 'w/index.php?title={}&action=edit&redlink=1'
                 url = self.site.base_url(path.format(self.title(as_url=True)))
 
             try:
@@ -571,7 +571,8 @@ class ProofreadPage(pywikibot.Page):
                 # if None raises TypeError.
                 self._url_image = self._url_image['src']
             except (TypeError, AttributeError):
-                raise ValueError('No prp-page-image src found for %s.' % self)
+                raise ValueError('No prp-page-image src found for {}.'
+                                 .format(self))
             else:
                 self._url_image = 'https:' + self._url_image
 
@@ -606,7 +607,7 @@ class ProofreadPage(pywikibot.Page):
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
-                pywikibot.warning('ReadTimeout %s: %s' % (cmd_uri, e))
+                pywikibot.warning('ReadTimeout {}: {}'.format(cmd_uri, e))
             except Exception as e:
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
                 return True, e
@@ -626,7 +627,7 @@ class ProofreadPage(pywikibot.Page):
         data = json.loads(response.text)
 
         if ocr_tool == self._PHETOOLS:  # phetools
-            assert 'error' in data, 'Error from phetools: %s' % data
+            assert 'error' in data, 'Error from phetools: {}'.format(data)
             assert data['error'] in [0, 1, 2, 3], \
                 'Error from phetools: {}'.format(data)
             error, _text = bool(data['error']), data['text']
@@ -637,7 +638,7 @@ class ProofreadPage(pywikibot.Page):
                 error, _text = False, data['text']
 
         if error:
-            pywikibot.error('OCR query %s: %s' % (cmd_uri, _text))
+            pywikibot.error('OCR query {}: {}'.format(cmd_uri, _text))
             return error, _text
         return error, parser_func(_text)
 
@@ -678,7 +679,7 @@ class ProofreadPage(pywikibot.Page):
         try:
             url_image = self.url_image
         except ValueError:
-            error_text = 'No prp-page-image src found for %s.' % self
+            error_text = 'No prp-page-image src found for {}.'.format(self)
             pywikibot.error(error_text)
             return True, error_text
 
@@ -735,7 +736,7 @@ class ProofreadPage(pywikibot.Page):
         if not error:
             return text
         raise ValueError(
-            '{0}: not possible to perform OCR. {1}'.format(self, text))
+            '{}: not possible to perform OCR. {}'.format(self, text))
 
 
 class PurgeRequest(Request):
@@ -935,8 +936,8 @@ class IndexPage(pywikibot.Page):
             # Sanity check if WS site use page convention name/number.
             if page._num is not None:
                 assert page_cnt == int(page._num), (
-                    'Page number %s not recognised as page %s.'
-                    % (page_cnt, title))
+                    'Page number {} not recognised as page {}.'
+                    .format(page_cnt, title))
 
             # Mapping: numbers <-> pages.
             self._page_from_numbers[page_cnt] = page
@@ -1076,7 +1077,7 @@ class IndexPage(pywikibot.Page):
         try:
             return self._page_from_numbers[page_number]
         except KeyError:
-            raise KeyError('Invalid page number: %s.' % page_number)
+            raise KeyError('Invalid page number: {}.'.format(page_number))
 
     @check_if_cached
     def pages(self) -> list:

@@ -86,14 +86,15 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
         self.assertIsInstance(mysite.user(), (str, type(None)))
-        self.assertEqual(mysite.sitename, '%s:%s' % (self.family, code))
+        self.assertEqual(mysite.sitename, '{}:{}'.format(self.family, code))
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)
 
         # sitename attribute could also be referenced like a function
 
         with suppress_warnings(WARN_SELF_CALL, category=FutureWarning):
-            self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
+            self.assertEqual(mysite.sitename(), '{}:{}'
+                                                .format(self.family, code))
 
         try:
             dabcat = mysite.disambcategory()

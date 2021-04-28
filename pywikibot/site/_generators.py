@@ -161,11 +161,11 @@ class GeneratorsMixin:
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = self._rvprops(content=True)
-            pywikibot.output('Retrieving %s pages from %s.'
-                             % (len(cache), self))
+            pywikibot.output('Retrieving {} pages from {}.'
+                             .format(len(cache), self))
 
             for pagedata in rvgen:
-                pywikibot.debug('Preloading %s' % pagedata, _logger)
+                pywikibot.debug('Preloading {}'.format(pagedata), _logger)
                 try:
                     if pagedata['title'] not in cache:
                         # API always returns a "normalized" title which is
@@ -182,12 +182,14 @@ class GeneratorsMixin:
                         else:
                             pywikibot.warning(
                                 'preloadpages: Query returned unexpected '
-                                "title '%s'" % pagedata['title'])
+                                "title '{}'".format(pagedata['title']))
                             continue
                 except KeyError:
-                    pywikibot.debug("No 'title' in %s" % pagedata, _logger)
-                    pywikibot.debug('pageids=%s' % pageids, _logger)
-                    pywikibot.debug('titles=%s' % list(cache.keys()), _logger)
+                    pywikibot.debug("No 'title' in {}"
+                                    .format(pagedata), _logger)
+                    pywikibot.debug('pageids={}'.format(pageids), _logger)
+                    pywikibot.debug('titles={}'
+                                    .format(list(cache.keys())), _logger)
                     continue
                 priority, page = cache[pagedata['title']]
                 api.update_page(page, pagedata, rvgen.props)
@@ -1340,14 +1342,14 @@ class GeneratorsMixin:
         if not searchstring:
             raise Error('search: searchstring cannot be empty')
         if where not in where_types:
-            raise Error("search: unrecognized 'where' value: %s" % where)
+            raise Error("search: unrecognized 'where' value: {}".format(where))
         if where in ('title', 'titles'):
             if self.has_extension('CirrusSearch'):
                 # 'title' search was disabled, use intitle instead
                 searchstring = 'intitle:' + searchstring
                 issue_deprecation_warning(
-                    "where='{0}'".format(where),
-                    "searchstring='{0}'".format(searchstring),
+                    "where='{}'".format(where),
+                    "searchstring='{}'".format(searchstring),
                     since='20160224')
                 where = None  # default
             else:
@@ -1702,7 +1704,7 @@ class GeneratorsMixin:
             if self.mw_version < '1.26':
                 if redirects == 'all':
                     warn("parameter redirects=None to retrieve 'all' random"
-                         'page types is not supported by mw version {0}. '
+                         'page types is not supported by mw version {}. '
                          'Using default.'.format(self.mw_version),
                          UserWarning)
                 params['grnredirect'] = redirects == 'redirects'
@@ -1715,13 +1717,13 @@ class GeneratorsMixin:
     # TODO: implement undelete
 
     _patrol_errors = {
-        'nosuchrcid': 'There is no change with rcid %(rcid)s',
-        'nosuchrevid': 'There is no change with revid %(revid)s',
-        'patroldisabled': 'Patrolling is disabled on %(site)s wiki',
-        'noautopatrol': 'User %(user)s has no permission to patrol its own '
+        'nosuchrcid': 'There is no change with rcid {rcid}',
+        'nosuchrevid': 'There is no change with revid {revid}',
+        'patroldisabled': 'Patrolling is disabled on {site} wiki',
+        'noautopatrol': 'User {user} has no permission to patrol its own '
                         'changes, "autopatrol" is needed',
         'notpatrollable':
-            "The revision %(revid)s can't be patrolled as it's too old."
+            "The revision {revid} can't be patrolled as it's too old."
     }
 
     @need_right('patrol')
@@ -1799,9 +1801,10 @@ class GeneratorsMixin:
                 }
                 errdata[idtype] = idvalue
                 if err.code in self._patrol_errors:
-                    raise Error(self._patrol_errors[err.code] % errdata)
-                pywikibot.debug("protect: Unexpected error code '%s' received."
-                                % err.code,
+                    raise Error(self._patrol_errors[err.code]
+                                .format_map(errdata))
+                pywikibot.debug("protect: Unexpected error code '{}' received."
+                                .format(err.code),
                                 _logger)
                 raise
 
@@ -1891,7 +1894,7 @@ class GeneratorsMixin:
         """
         param = self._paraminfo.parameter('query+querypage', 'page')
         assert special_page in param['type'], (
-            '{0} not in {1}'.format(special_page, param['type']))
+            '{} not in {}'.format(special_page, param['type']))
 
         return self._generator(api.PageGenerator,
                                type_arg='querypage', gqppage=special_page,
@@ -2122,7 +2125,7 @@ class GeneratorsMixin:
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(
-                '"{0}" is not a valid page property'.format(propname))
+                '"{}" is not a valid page property'.format(propname))
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 

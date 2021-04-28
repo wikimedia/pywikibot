@@ -76,7 +76,7 @@ def mysql_query(query: str, params=None,
             if not isinstance(_query, str):
                 _query = str(_query, encoding='utf-8')
             _query = _query.strip()
-            _query = '\n'.join('    {0}'.format(line)
+            _query = '\n'.join('    {}'.format(line)
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
 

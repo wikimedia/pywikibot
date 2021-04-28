@@ -41,31 +41,31 @@ class TextEditor:
         # Linux editors. We use startswith() because some users might use
         # parameters.
         if config.editor.startswith('kate'):
-            command = ['-l', '%i' % (line + 1), '-c', '%i' % (column + 1)]
+            command = ['-l', str(line + 1), '-c', str(column + 1)]
         elif config.editor.startswith('gedit'):
-            command = ['+%i' % (line + 1)]  # seems not to support columns
+            command = ['+{}'.format(line + 1)]  # columns seem unsupported
         elif config.editor.startswith('emacs'):
-            command = ['+%i' % (line + 1)]  # seems not to support columns
+            command = ['+{}'.format(line + 1)]  # columns seem unsupported
         elif config.editor.startswith('jedit'):
-            command = ['+line:%i' % (line + 1)]  # seems not to support columns
+            command = ['+line:{}'.format(line + 1)]  # columns seem unsupported
         elif config.editor.startswith('vim'):
-            command = ['+%i' % (line + 1)]  # seems not to support columns
+            command = ['+{}'.format(line + 1)]  # columns seem unsupported
         elif config.editor.startswith('nano'):
-            command = ['+%i,%i' % (line + 1, column + 1)]
+            command = ['+{},{}'.format(line + 1, column + 1)]
         # Windows editors
         elif config.editor.lower().endswith('notepad++.exe'):
-            command = ['-n%i' % (line + 1)]  # seems not to support columns
+            command = ['-n{}'.format(line + 1)]  # seems not to support columns
         else:
             command = []
 
         # See T102465 for problems relating to using config.editor unparsed.
         command = [config.editor] + command + [file_name]
-        pywikibot.log('Running editor: %s' % TextEditor._concat(command))
+        pywikibot.log('Running editor: {}'.format(TextEditor._concat(command)))
         return command
 
     @staticmethod
     def _concat(command):
-        return ' '.join("'{0}'".format(part) if ' ' in part else part
+        return ' '.join("'{}'".format(part) if ' ' in part else part
                         for part in command)
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,

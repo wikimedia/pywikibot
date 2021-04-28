@@ -72,8 +72,8 @@ class BaseSite(ComparableMixin):
             else:
                 # no such language anymore
                 self.obsolete = True
-                pywikibot.log('Site %s instantiated and marked "obsolete" '
-                              'to prevent access' % self)
+                pywikibot.log('Site {} instantiated and marked "obsolete" '
+                              'to prevent access'.format(self))
         elif self.__code not in self.languages():
             if self.__family.name in self.__family.langs \
                and len(self.__family.langs) == 1:
@@ -82,8 +82,8 @@ class BaseSite(ComparableMixin):
                    and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
-                         '"%s" while instantiating site %s'
-                         % (self.__code, self), UserWarning)
+                         '"{}" while instantiating site {}'
+                         .format(self.__code, self), UserWarning)
             else:
                 error_msg = ("Language '{}' does not exist in family {}"
                              .format(self.__code, self.__family.name))
@@ -146,14 +146,14 @@ class BaseSite(ComparableMixin):
                     # should it just raise an Exception and fail?
                     # this will help to check the dictionary ...
                     except KeyError:
-                        warn('Site {0} has no language defined in '
-                             'doc_subpages dict in {1}_family.py file'
+                        warn('Site {} has no language defined in '
+                             'doc_subpages dict in {}_family.py file'
                              .format(self, self.family.name),
                              FamilyMaintenanceWarning, 2)
             # doc_subpages not defined in x_family.py file
             except AttributeError:
                 doc = ()  # default
-                warn('Site {0} has no doc_subpages dict in {1}_family.py file'
+                warn('Site {} has no doc_subpages dict in {}_family.py file'
                      .format(self, self.family.name),
                      FamilyMaintenanceWarning, 2)
             self._doc_subpage = doc
@@ -204,8 +204,8 @@ class BaseSite(ComparableMixin):
                 f.__doc__ = method.__doc__
             return f
         except AttributeError:
-            raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr))
+            raise AttributeError("{} instance has no attribute '{}'"
+                                 .format(self.__class__.__name__, attr))
 
     def __str__(self):
         """Return string representing this Site's name and code."""
@@ -218,7 +218,7 @@ class BaseSite(ComparableMixin):
 
     def __repr__(self):
         """Return internal representation."""
-        return '{0}("{1}", "{2}")'.format(
+        return '{}("{}", "{}")'.format(
             self.__class__.__name__, self.code, self.family)
 
     def __hash__(self):

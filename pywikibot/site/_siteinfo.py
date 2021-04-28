@@ -164,10 +164,10 @@ class Siteinfo(Container):
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
                     pywikibot.log(
-                        "Unable to get siprop '{0}'".format(props[0]))
+                        "Unable to get siprop '{}'".format(props[0]))
                     return {props[0]: (Siteinfo._get_default(props[0]), False)}
                 pywikibot.log('Unable to get siteinfo, because at least '
-                              "one property is unknown: '{0}'".format(
+                              "one property is unknown: '{}'".format(
                                   "', '".join(props)))
                 results = {}
                 for prop in props:
@@ -179,7 +179,7 @@ class Siteinfo(Container):
             if invalid_properties:
                 for prop in invalid_properties:
                     result[prop] = (Siteinfo._get_default(prop), False)
-                pywikibot.log("Unable to get siprop(s) '{0}'".format(
+                pywikibot.log("Unable to get siprop(s) '{}'".format(
                     "', '".join(invalid_properties)))
             if 'query' in data:
                 # If the request is a CachedRequest, use the _cachetime attr.
@@ -231,7 +231,7 @@ class Siteinfo(Container):
             props = [prop for prop in props if prop not in self._cache]
             if props:
                 pywikibot.debug(
-                    "Load siteinfo properties '{0}' along with 'general'"
+                    "Load siteinfo properties '{}' along with 'general'"
                     .format("', '".join(props)), _logger)
             props += ['general']
             default_info = self._get_siteinfo(props, expiry)

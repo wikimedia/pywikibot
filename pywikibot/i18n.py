@@ -23,7 +23,6 @@ import json
 import os
 import pkgutil
 import re
-
 from collections import defaultdict
 from collections.abc import Mapping
 from contextlib import suppress
@@ -32,7 +31,6 @@ from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
-
 from pywikibot import __url__, config
 from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
@@ -444,7 +442,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
         num = parameters[selector]
         if not isinstance(num, int):
             issue_deprecation_warning(
-                'type {0} for value {1} ({2})'
+                'type {} for value {} ({})'
                 .format(type(num), selector, num),
                 'an int', 1,
                 warning_class=FutureWarning, since='20151009')
@@ -461,7 +459,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
                 specific_entries[int(number)] = plural
             else:
                 assert not specific_entries, (
-                    'generic entries defined after specific in "{0}"'
+                    'generic entries defined after specific in "{}"'
                     .format(variants))
                 plural_entries += [plural]
 
@@ -711,10 +709,10 @@ def twtranslate(source,
             return fallback_prompt
 
         raise pywikibot.exceptions.TranslationError(
-            'Unable to load messages package %s for bundle %s'
+            'Unable to load messages package {} for bundle {}'
             '\nIt can happen due to lack of i18n submodule or files. '
-            'See %s/i18n'
-            % (_messages_package_name, twtitle, __url__))
+            'See {}/i18n'
+            .format(_messages_package_name, twtitle, __url__))
 
     source_needed = False
     # If a site is given instead of a lang, use its language

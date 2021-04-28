@@ -337,7 +337,7 @@ class DataSite(APISite):
             if arg in ['clear', 'summary']:
                 params[arg] = kwargs[arg]
             elif arg != 'baserevid':
-                warn('Unknown wbeditentity parameter {0} ignored'.format(arg),
+                warn('Unknown wbeditentity parameter {} ignored'.format(arg),
                      UserWarning, 2)
 
         params['data'] = json.dumps(data)

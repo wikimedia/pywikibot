@@ -152,7 +152,7 @@ def svn_rev_info(path):  # pragma: no cover
                 t = tag.split('://', 1)
                 t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/',
                                     '')
-                tag = '[{0}] {1}'.format(*t)
+                tag = '[{}] {}'.format(*t)
                 for _ in range(4):
                     entries.readline()
                 date = time.strptime(entries.readline()[:19],
@@ -220,7 +220,7 @@ def getversion_svn(path=None):  # pragma: no cover
         for i in range(len(date) - 1):
             assert date[i] == date2[i], 'Date of version is not consistent'
 
-    rev = 's%s' % rev
+    rev = 's{}'.format(rev)
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
     return (tag, rev, date, hsh)
@@ -258,7 +258,7 @@ def getversion_git(path=None):
         e = tag.find('\n', s)
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
-        tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
+        tag = '[{}] {}'.format(t[0][:-1], '-'.join(t[3:]))
     dp = subprocess.Popen([cmd, '--no-pager',
                            'log', '-1',
                            '--pretty=format:"%ad|%an|%h|%H|%d"',
@@ -274,7 +274,7 @@ def getversion_git(path=None):
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
     rev, stderr = dp.communicate()
-    rev = 'g%s' % len(rev.splitlines())
+    rev = 'g{}'.format(len(rev.splitlines()))
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
@@ -338,7 +338,7 @@ def getversion_onlinerepo(path='branches/master'):
         hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
-        raise VersionParseError(repr(e) + ' while parsing ' + repr(buf))
+        raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
 
 
 @deprecated('pywikibot.__version__', since='20201003')

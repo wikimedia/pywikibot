@@ -31,8 +31,8 @@ class MetaPluralRulesTest(MetaTestCaseClass):
                 for num in range(self.max_num + 1):
                     index = rule['plural'](num)
                     self.assertLess(index, rule['nplurals'],
-                                    msg='Plural for {0} created an index {1} '
-                                        '(greater than {2})'
+                                    msg='Plural for {} created an index {} '
+                                        '(greater than {})'
                                         .format(num, index, rule['nplurals']))
                     num_plurals.add(index)
                 self.assertCountEqual(num_plurals,
@@ -44,9 +44,9 @@ class MetaPluralRulesTest(MetaTestCaseClass):
             return test_static_rule
 
         for lang, rule in plural.plural_rules.items():
-            cls.add_method(dct, 'test_{0}'.format(lang.replace('-', '_')),
+            cls.add_method(dct, 'test_{}'.format(lang.replace('-', '_')),
                            create_test(rule),
-                           doc_suffix='for "{0}"'.format(lang))
+                           doc_suffix='for "{}"'.format(lang))
         return super(MetaPluralRulesTest, cls).__new__(cls, name, bases, dct)
 
 

@@ -48,7 +48,7 @@ class Option:
         for option in options:
             formatted_options.append(option.format(default=default))
         # remove color highlights before fill function
-        text = '{0} ({1})'.format(text, ', '.join(formatted_options))
+        text = '{} ({})'.format(text, ', '.join(formatted_options))
         pattern = '\03{[a-z]+}'
         highlights = re.findall(pattern, text)
         return fill(re.sub(pattern, '{}', text), width=77).format(*highlights)
@@ -123,10 +123,10 @@ class StandardOption(Option):
         if self.shortcut == default:
             shortcut = self.shortcut.upper()
         if index >= 0:
-            return '{0}[{1}]{2}'.format(
+            return '{}[{}]{}'.format(
                 self.option[:index], shortcut,
                 self.option[index + len(self.shortcut):])
-        return '{0} [{1}]'.format(self.option, shortcut)
+        return '{} [{}]'.format(self.option, shortcut)
 
     def result(self, value):
         """Return the lowercased shortcut."""
@@ -357,7 +357,7 @@ class IntegerOption(Option):
         """Return a formatted string showing the range."""
         if default is not None and self.test(default):
             value = self.parse(default)
-            default = '[{0}]'.format(value)
+            default = '[{}]'.format(value)
         else:
             value = None
             default = ''
@@ -372,14 +372,14 @@ class IntegerOption(Option):
                 default = ''
             else:
                 maximum = '' if self.maximum is None else str(self.maximum)
-            default = '-{0}-'.format(default) if default else '-'
+            default = '-{}-'.format(default) if default else '-'
             if self.minimum == self.maximum:
                 rng = minimum
             else:
                 rng = minimum + default + maximum
         else:
             rng = 'any' + default
-        return '{0}<number> [{1}]'.format(self.prefix, rng)
+        return '{}<number> [{}]'.format(self.prefix, rng)
 
     def parse(self, value) -> int:
         """Return integer from value with prefix removed."""

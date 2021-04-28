@@ -83,7 +83,7 @@ class DashRedirectBot(
 
         # skip unchanged
         if redir.title() == origin:
-            pywikibot.output('No need to process {0}, skipping...'
+            pywikibot.output('No need to process {}, skipping...'
                              .format(redir.title()))
             # suggest -reversed parameter
             if '-' in origin and not self.opt.reversed:
@@ -92,7 +92,7 @@ class DashRedirectBot(
         else:
             # skip existing
             if redir.exists():
-                pywikibot.output('{0} already exists, skipping...'
+                pywikibot.output('{} already exists, skipping...'
                                  .format(redir.title()))
             else:
                 # confirm and save redirect

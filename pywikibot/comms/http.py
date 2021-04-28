@@ -383,9 +383,9 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
-            warn('%s' % requests_oauthlib, ImportWarning)
-            error('OAuth authentication not supported: %s'
-                  % requests_oauthlib)
+            warn(str(requests_oauthlib), ImportWarning)
+            error('OAuth authentication not supported: {}'
+                  .format(requests_oauthlib))
             auth = None
         else:
             auth = requests_oauthlib.OAuth1(*auth)

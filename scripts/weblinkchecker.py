@@ -199,14 +199,14 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
     mementos = memento_info.get('mementos')
     if not mementos:
         raise Exception(
-            'mementos not found for {0} via {1}'.format(url, timegate_uri))
+            'mementos not found for {} via {}'.format(url, timegate_uri))
     if 'closest' not in mementos:
         raise Exception(
-            'closest memento not found for {0} via {1}'.format(
+            'closest memento not found for {} via {}'.format(
                 url, timegate_uri))
     if 'uri' not in mementos['closest']:
         raise Exception(
-            'closest memento uri not found for {0} via {1}'.format(
+            'closest memento uri not found for {} via {}'.format(
                 url, timegate_uri))
     return mementos['closest']['uri'][0]
 
@@ -301,8 +301,8 @@ class LinkCheckThread(threading.Thread):
             'Connection': 'keep-alive',
         }
         # identification for debugging purposes
-        self.setName(('{0} - {1}'.format(page.title(),
-                                         url.encode('utf-8', 'replace'))))
+        self.setName(('{} - {}'.format(page.title(),
+                                       url.encode('utf-8', 'replace'))))
         self.HTTPignore = HTTPignore
         self._use_fake_user_agent = config.fake_user_agent_default.get(
             'weblinkchecker', False)
@@ -320,7 +320,7 @@ class LinkCheckThread(threading.Thread):
                                        'weblinkchecker-badurl_msg',
                                        {'URL': self.url})
         except Exception:
-            pywikibot.output('Exception while processing URL {0} in page {1}'
+            pywikibot.output('Exception while processing URL {} in page {}'
                              .format(self.url, self.page.title()))
             raise
 
@@ -370,8 +370,8 @@ class History:
             self.site = site
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
-            'deadlinks', 'deadlinks-{0}-{1}.dat'.format(self.site.family.name,
-                                                        self.site.code))
+            'deadlinks', 'deadlinks-{}-{}.dat'.format(self.site.family.name,
+                                                      self.site.code))
         # Count the number of logged links, so that we can insert captions
         # from time to time
         self.logCount = 0
@@ -385,17 +385,17 @@ class History:
     def log(self, url, error, containingPage, archiveURL):
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archiveURL:
-            errorReport = '* {0} ([{1} archive])\n'.format(url, archiveURL)
+            errorReport = '* {} ([{} archive])\n'.format(url, archiveURL)
         else:
-            errorReport = '* {0}\n'.format(url)
+            errorReport = '* {}\n'.format(url)
         for (pageTitle, date, error) in self.historyDict[url]:
             # ISO 8601 formulation
             isoDate = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
-            errorReport += '** In [[{0}]] on {1}, {2}\n'.format(
+            errorReport += '** In [[{}]] on {}, {}\n'.format(
                 pageTitle, isoDate, error)
         pywikibot.output('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath('deadlinks',
-                                                    'results-{0}-{1}.txt'
+                                                    'results-{}-{}.txt'
                                                     .format(
                                                         self.site.family.name,
                                                         self.site.lang))
@@ -431,7 +431,7 @@ class History:
                         archiveURL = get_archive_url(url)
                     except Exception as e:
                         pywikibot.warning(
-                            'get_closest_memento_url({0}) failed: {1}'.format(
+                            'get_closest_memento_url({}) failed: {}'.format(
                                 url, e))
                         archiveURL = None
                     self.log(url, error, page, archiveURL)
@@ -532,7 +532,7 @@ class DeadLinkReportThread(threading.Thread):
                 count = ''
                 # Check if there is already such a caption on
                 # the talk page.
-                while re.search('= *{0}{1} *='
+                while re.search('= *{}{} *='
                                 .format(caption, count), content) is not None:
                     i += 1
                     count = ' ' + str(i)
@@ -542,7 +542,7 @@ class DeadLinkReportThread(threading.Thread):
                     i18n.twtranslate(containingPage.site,
                                      'weblinkchecker-report'))
 
-                comment = '[[{0}#{1}|→]] {2}'.format(
+                comment = '[[{}#{}|→]] {}'.format(
                     talkPage.title(), caption,
                     i18n.twtranslate(containingPage.site,
                                      'weblinkchecker-summary'))
@@ -694,7 +694,7 @@ def main(*args):
             # Don't wait longer than 30 seconds for threads to finish.
             while countLinkCheckThreads() > 0 and waitTime < 30:
                 try:
-                    pywikibot.output('Waiting for remaining {0} threads to '
+                    pywikibot.output('Waiting for remaining {} threads to '
                                      'finish, please wait...'
                                      .format(countLinkCheckThreads()))
                     # wait 1 second
@@ -704,7 +704,7 @@ def main(*args):
                     pywikibot.output('Interrupted.')
                     break
             if countLinkCheckThreads() > 0:
-                pywikibot.output('Remaining {0} threads will be killed.'
+                pywikibot.output('Remaining {} threads will be killed.'
                                  .format(countLinkCheckThreads()))
                 # Threads will die automatically because they are daemonic.
             if bot.history.reportThread:

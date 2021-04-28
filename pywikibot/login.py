@@ -241,12 +241,12 @@ class LoginManager:
                 entry = None
 
             if not isinstance(entry, tuple):
-                warn('Invalid tuple in line {0}'.format(line_nr),
+                warn('Invalid tuple in line {}'.format(line_nr),
                      _PasswordFileWarning)
                 continue
 
             if not 2 <= len(entry) <= 4:
-                warn('The length of tuple in line {0} should be 2 to 4 ({1} '
+                warn('The length of tuple in line {} should be 2 to 4 ({} '
                      'given)'.format(line_nr, entry), _PasswordFileWarning)
                 continue
 
@@ -358,7 +358,7 @@ class BotPassword:
 
         @param user: username (without suffix)
         """
-        return '{0}@{1}'.format(username, self.suffix)
+        return '{}@{}'.format(username, self.suffix)
 
 
 class OauthLoginManager(LoginManager):
@@ -386,7 +386,7 @@ class OauthLoginManager(LoginManager):
         @raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
-            raise ImportError('mwoauth is not installed: %s.' % mwoauth)
+            raise ImportError('mwoauth is not installed: {}.'.format(mwoauth))
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:

@@ -565,7 +565,7 @@ class TestPageObject(DefaultSiteTestCase):
         for page in site.allpages(filterredir=True, total=1):
             break
         else:
-            self.skipTest('No redirect pages on site {0!r}'.format(site))
+            self.skipTest('No redirect pages on site {!r}'.format(site))
         # This page is already initialised
         self.assertTrue(hasattr(page, '_isredir'))
         # call api.update_page without prop=info
@@ -719,7 +719,7 @@ class TestPageRepr(TestPageBaseUnicode):
         """Test to capture actual Python result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
-        self.assertEqual('{0!r}'.format(self.page), "Page('Ō')")
+        self.assertEqual('{!r}'.format(self.page), "Page('Ō')")
 
 
 class TestPageReprASCII(TestPageBaseUnicode):
@@ -766,7 +766,7 @@ class TestPageBotMayEdit(TestCase):
     def _run_test(self, template, user, expected_result):
         """Run a single template test."""
         del self.page.text
-        self.page._text = template % {'user': user}
+        self.page._text = template.format(user=user)
         with self.subTest(template=template, user=user):
             self.assertEqual(self.page.botMayEdit(), expected_result)
         self.page.botMayEdit.cache_clear()
@@ -985,7 +985,7 @@ class TestPageRedirects(TestCase):
         self.assertEqual(p1.get(), text)
         with self.assertRaisesRegex(
                 IsRedirectPageError,
-                r'{0} is a redirect page\.'
+                r'{} is a redirect page\.'
                 .format(re.escape(str(p2)))):
             p2.get()
         with self.assertRaisesRegex(
@@ -1004,7 +1004,7 @@ class TestPageRedirects(TestCase):
         text = p2.get(get_redirect=True)
         with self.assertRaisesRegex(
                 IsNotRedirectPageError,
-                r'{0} is not a redirect page\.'
+                r'{} is not a redirect page\.'
                 .format(re.escape(str(p1)))):
             p1.set_redirect_target(p2)
         with self.assertRaisesRegex(

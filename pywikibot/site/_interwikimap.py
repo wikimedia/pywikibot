@@ -71,14 +71,14 @@ class _InterwikiMap:
         @raises TypeError: Site for the prefix is of wrong type
         """
         if prefix not in self._iw_sites:
-            raise KeyError("'{0}' is not an interwiki prefix.".format(prefix))
+            raise KeyError("'{}' is not an interwiki prefix.".format(prefix))
         if isinstance(self._iw_sites[prefix].site, pywikibot.site.BaseSite):
             return self._iw_sites[prefix]
         if isinstance(self._iw_sites[prefix].site, Exception):
             raise self._iw_sites[prefix].site
         else:
-            raise TypeError('_iw_sites[%s] is wrong type: %s'
-                            % (prefix, type(self._iw_sites[prefix].site)))
+            raise TypeError('_iw_sites[{}] is wrong type: {}'
+                            .format(prefix, type(self._iw_sites[prefix].site)))
 
     def get_by_url(self, url: str) -> Set[str]:
         """

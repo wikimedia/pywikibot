@@ -604,7 +604,7 @@ def main(*args):
         bot.run()
     else:
         pywikibot.output(
-            '\nScript is not localised for {0}. Terminating program.'
+            '\nScript is not localised for {}. Terminating program.'
             .format(site))
 
 

@@ -196,7 +196,7 @@ class GlobalUsageMixin:
             defined for a returned entry in API response.
         """
         if not isinstance(page, pywikibot.FilePage):
-            raise TypeError('Page %s must be a FilePage.' % page)
+            raise TypeError('Page {} must be a FilePage.'.format(page))
 
         title = page.title(with_section=False)
         args = {'titles': title,
@@ -223,7 +223,7 @@ class GlobalUsageMixin:
                 except SiteDefinitionError:
                     pywikibot.warning(
                         'Site could not be defined for global'
-                        ' usage for {0}: {1}.'.format(page, entry))
+                        ' usage for {}: {}.'.format(page, entry))
                     continue
                 gu_page = pywikibot.Page(gu_site, entry['title'])
                 yield gu_page

@@ -356,7 +356,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '%s' does not exist." % base_dir)
+        raise RuntimeError("Directory '{}' does not exist.".format(base_dir))
     # check if user-config.py is in base_dir
     if not exists(base_dir):
         exc_text = 'No user-config.py found in directory {!r}.\n'.format(
@@ -902,7 +902,7 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        output('Unable to detect program for file extension "{0}": {1!r}'
+        output('Unable to detect program for file extension "{}": {!r}'
                .format(extension, e))
 
 
@@ -960,10 +960,10 @@ class _DifferentTypeError(UserWarning, TypeError):
 
     def __init__(self, name, actual_type, allowed_types):
         super().__init__(
-            'Configuration variable "{0}" is defined as "{1.__name__}" in '
-            'your user-config.py but expected "{2}".'
-            .format(name, actual_type, '", "'.join(t.__name__
-                                                   for t in allowed_types)))
+            'Configuration variable "{}" is defined as "{}" in '
+            'your user-config.py but expected "{}".'
+            .format(name, actual_type.__name__,
+                    '", "'.join(t.__name__ for t in allowed_types)))
 
 
 def _assert_default_type(name, value, default_value):
@@ -1008,7 +1008,7 @@ def _check_user_config_types(user_config, default_values, skipped):
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
-                warn('\n' + fill('Configuration variable "{0}" is defined in '
+                warn('\n' + fill('Configuration variable "{}" is defined in '
                                  'your user-config.py but unknown. It can be '
                                  'a misspelled one or a variable that is no '
                                  'longer supported.'.format(name)),
@@ -1098,7 +1098,7 @@ if __name__ == '__main__':
         if _arg == 'modified':
             _all = False
         else:
-            warning('Unknown arg {0} ignored'.format(_arg))
+            warning('Unknown arg {} ignored'.format(_arg))
     for _name in sorted(globals().keys()):
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType,
@@ -1115,7 +1115,7 @@ if __name__ == '__main__':
                             _value = repr('xxxxxxxx')
                     else:
                         _value = repr(_value)
-                    output('{0}={1}'.format(_name, _value))
+                    output('{}={}'.format(_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):

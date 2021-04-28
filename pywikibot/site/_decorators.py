@@ -111,9 +111,9 @@ def need_version(version: str):
         def callee(self, *args, **kwargs):
             if MediaWikiVersion(self.version()) < MediaWikiVersion(version):
                 raise NotImplementedError(
-                    'Method or function "%s"\n'
-                    "isn't implemented in MediaWiki version < %s"
-                    % (fn.__name__, version))
+                    'Method or function "{}"\n'
+                    "isn't implemented in MediaWiki version < {}"
+                    .format(fn.__name__, version))
             return fn(self, *args, **kwargs)
 
         if not __debug__:

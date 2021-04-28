@@ -101,7 +101,7 @@ class TestUpload(TestCase):
         with self.assertAPIError('siiinvalidsessiondata') as cm:
             self.site.stash_info(self._file_key)
         self.assertTrue(cm.exception.info.startswith('File not found'),
-                        'info ({0}) did not start with '
+                        'info ({}) did not start with '
                         '"File not found"'.format(cm.exception.info))
 
     def test_continue_filekey_once(self):
@@ -120,7 +120,7 @@ class TestUpload(TestCase):
             self._finish_upload(1024, self.arrow_png)
         self.assertEqual(
             str(cm.exception),
-            'The SHA1 of 1024 bytes of the stashed "{0}" is '
+            'The SHA1 of 1024 bytes of the stashed "{}" is '
             '3503db342c8dfb0a38db0682b7370ddd271fa163 while the local file is '
             '3dd334f11aa1e780d636416dc0649b96b67588b6'.format(self._file_key))
         self._verify_stash()
@@ -133,7 +133,7 @@ class TestUpload(TestCase):
             self._finish_upload(1024, self.sounds_png)
         self.assertEqual(
             str(cm.exception),
-            'For the file key "{0}" the server reported a size 1024 while the '
+            'For the file key "{}" the server reported a size 1024 while the '
             'offset was 0'.format(self._file_key))
         self._verify_stash()
 
@@ -145,7 +145,7 @@ class TestUpload(TestCase):
             self._finish_upload(1024, self.sounds_png)
         self.assertEqual(
             str(cm.exception),
-            'For the file key "{0}" the offset was set to 2000 while the file '
+            'For the file key "{}" the offset was set to 2000 while the file '
             'is only 1276 bytes large.'.format(self._file_key))
         self._verify_stash()
 

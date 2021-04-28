@@ -179,7 +179,7 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         uc = list(user.contributions(total=10))
         if not uc:
-            self.skipTest('User {0} has no contributions on site {1}.'
+            self.skipTest('User {} has no contributions on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(uc), 10)
         last = uc[0]
@@ -199,7 +199,7 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         le = list(user.logevents(total=10))
         if not le:
-            self.skipTest('User {0} has no logevents on site {1}.'
+            self.skipTest('User {} has no logevents on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(le), 10)
         last = le[0]

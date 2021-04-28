@@ -31,11 +31,11 @@ def main(*args):
     comm = i18n.twtranslate(site, 'standardize_interwiki-comment')
     for pl in site.allpages(start):
         plname = pl.title()
-        pywikibot.output('\nLoading {0}...'.format(plname))
+        pywikibot.output('\nLoading {}...'.format(plname))
         try:
             oldtext = pl.get()
         except IsRedirectPageError:
-            pywikibot.output('{0} is a redirect!'.format(plname))
+            pywikibot.output('{} is a redirect!'.format(plname))
             continue
         old = pl.interwiki()
         new = {}
@@ -49,7 +49,7 @@ def main(*args):
                 try:
                     pl.put(newtext, comment=comm)
                 except LockedPageError:
-                    pywikibot.output('{0} is locked'.format(plname))
+                    pywikibot.output('{} is locked'.format(plname))
                     continue
             else:
                 pywikibot.output('No changes needed.')

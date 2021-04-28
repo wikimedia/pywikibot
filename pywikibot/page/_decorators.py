@@ -38,7 +38,7 @@ def allow_asynchronous(func):
             if do_async:
                 pywikibot.error('page {} not saved due to {}\n'
                                 .format(link, err))
-            pywikibot.log('Error saving page %s (%s)\n' % (link, err),
+            pywikibot.log('Error saving page {} ({})\n'.format(link, err),
                           exc_info=True)
             if not callback and not do_async:
                 if isinstance(err, PageSaveRelatedError):

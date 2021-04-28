@@ -197,20 +197,20 @@ class IsbnBot(Bot):
             try:
                 self.userPut(page, page.text, new_text, summary=self.comment)
             except EditConflictError:
-                pywikibot.output('Skipping {0} because of edit conflict'
+                pywikibot.output('Skipping {} because of edit conflict'
                                  .format(page.title()))
             except SpamblacklistError as e:
                 pywikibot.output(
-                    'Cannot change {0} because of blacklist entry {1}'
+                    'Cannot change {} because of blacklist entry {1}'
                     .format(page.title(), e.url))
             except LockedPageError:
-                pywikibot.output('Skipping {0} (locked page)'
+                pywikibot.output('Skipping {} (locked page)'
                                  .format(page.title()))
         except NoPageError:
-            pywikibot.output('Page {0} does not exist'
+            pywikibot.output('Page {} does not exist'
                              .format(page.title(as_link=True)))
         except IsRedirectPageError:
-            pywikibot.output('Page {0} is a redirect; skipping.'
+            pywikibot.output('Page {} is a redirect; skipping.'
                              .format(page.title(as_link=True)))
 
 
@@ -265,7 +265,7 @@ class IsbnWikibaseBot(WikidataBot):
                         item.claims[self.isbn_13_prop_id].append(claim)
                     else:
                         item.claims[self.isbn_13_prop_id] = [claim]
-                    change_messages.append('Changing {0} ({1}) to {2} ({3})'
+                    change_messages.append('Changing {} ({}) to {} ({})'
                                            .format(self.isbn_10_prop_id,
                                                    old_isbn,
                                                    self.isbn_13_prop_id,
@@ -298,7 +298,7 @@ class IsbnWikibaseBot(WikidataBot):
                 if old_isbn == new_isbn:
                     continue
                 change_messages.append(
-                    'Changing {0} ({1} --> {2})'.format(
+                    'Changing {} ({} --> {})'.format(
                         self.isbn_13_prop_id, claim.getTarget(), new_isbn))
                 claim.setTarget(new_isbn)
 

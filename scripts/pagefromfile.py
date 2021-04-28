@@ -136,12 +136,12 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             self.site, 'pagefromfile-msg_top')
         comment_bottom = comment + ' - ' + i18n.twtranslate(
             self.site, 'pagefromfile-msg_bottom')
-        comment_force = '{0} *** {1} ***'.format(
+        comment_force = '{} *** {} ***'.format(
             comment, i18n.twtranslate(self.site, 'pagefromfile-msg_force'))
 
         if page.exists():
             if not self.opt.redirect and page.isRedirectPage():
-                pywikibot.output('Page {0} is redirect, skipping!'
+                pywikibot.output('Page {} is redirect, skipping!'
                                  .format(title))
                 return
             pagecontents = page.text
@@ -149,7 +149,7 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             if (nocontent
                     and (nocontent in pagecontents
                          or nocontent.lower() in pagecontents)):
-                pywikibot.output('Page has {0} so it is skipped'
+                pywikibot.output('Page has {} so it is skipped'
                                  .format(nocontent))
                 return
             if self.opt.append:
@@ -162,15 +162,15 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
                 else:
                     above, below = pagecontents, contents
                     comment = comment_bottom
-                pywikibot.output('Page {0} already exists, appending on {1}!'
+                pywikibot.output('Page {} already exists, appending on {}!'
                                  .format(title, self.opt.append[0]))
                 contents = above + separator + below
             elif self.opt.force:
-                pywikibot.output('Page {0} already exists, ***overwriting!'
+                pywikibot.output('Page {} already exists, ***overwriting!'
                                  .format(title))
                 comment = comment_force
             else:
-                pywikibot.output('Page {0} already exists, not adding!'
+                pywikibot.output('Page {} already exists, not adding!'
                                  .format(title))
                 return
         else:
@@ -214,7 +214,7 @@ class PageFromFileReader(OptionHandler):
 
     def __iter__(self) -> Generator[Tuple[str, str], None, None]:
         """Read file and yield a tuple of page title and content."""
-        pywikibot.output("\n\nReading '{0}'...".format(self.filename))
+        pywikibot.output("\n\nReading '{}'...".format(self.filename))
         try:
             with codecs.open(self.filename, 'r',
                              encoding=config.textfile_encoding) as f:
@@ -309,11 +309,11 @@ def main(*args) -> None:
         elif option in ('nocontent', 'summary'):
             options[option] = value
         else:
-            pywikibot.output('Disregarding unknown argument {0}.'.format(arg))
+            pywikibot.output('Disregarding unknown argument {}.'.format(arg))
 
     failed_filename = False
     while not os.path.isfile(filename):
-        pywikibot.output("\nFile '{0}' does not exist. ".format(filename))
+        pywikibot.output("\nFile '{}' does not exist. ".format(filename))
         _input = pywikibot.input(
             'Please enter the file name [q to quit]:')
         if _input == 'q':

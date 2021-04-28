@@ -191,7 +191,7 @@ def _format_isbn_match(match, strict=True):
     except stdnum_isbn.ValidationError as e:
         if strict:
             raise
-        pywikibot.log('ISBN "%s" validation error: %s' % (isbn, e))
+        pywikibot.log('ISBN "{}" validation error: {}'.format(isbn, e))
         return isbn
 
     return stdnum_isbn.format(isbn)
@@ -325,7 +325,7 @@ class CosmeticChangesToolkit:
             new_text = self._change(text)
         except Exception as e:
             if self.ignore == CANCEL_PAGE:
-                pywikibot.warning('Skipped "{0}", because an error occurred.'
+                pywikibot.warning('Skipped "{}", because an error occurred.'
                                   .format(self.title))
                 pywikibot.exception(e)
                 return False
@@ -342,8 +342,8 @@ class CosmeticChangesToolkit:
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
-            interwikiR = re.compile(r'\[\[(?: *:)? *%s *: *([^\[\]\n]*)\]\]'
-                                    % self.site.code)
+            interwikiR = re.compile(r'\[\[(?: *:)? *{} *: *([^\[\]\n]*)\]\]'
+                                    .format(self.site.code))
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
@@ -445,7 +445,7 @@ class CosmeticChangesToolkit:
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
                 item = item.replace(' ', '[ _]')
-                item = '[%s%s]' % (item[0], item[0].lower()) + item[1:]
+                item = '[{}{}]'.format(item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
@@ -463,9 +463,9 @@ class CosmeticChangesToolkit:
                 else:
                     text = textlib.replaceExcept(
                         text,
-                        r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
-                        % '|'.join(namespaces),
-                        r'[[%s:\g<nameAndLabel>]]' % final_ns,
+                        r'\[\[\s*({}) *:(?P<nameAndLabel>.*?)\]\]'
+                        .format('|'.join(namespaces)),
+                        r'[[{}:\g<nameAndLabel>]]'.format(final_ns),
                         exceptions)
         return text
 
@@ -619,13 +619,13 @@ class CosmeticChangesToolkit:
                 firstcase_label = label
 
             if firstcase_label == firstcase_title:
-                newLink = '[[%s]]' % label
+                newLink = '[[{}]]'.format(label)
             # Check if we can create a link with trailing characters
             # instead of a pipelink
             elif (firstcase_label.startswith(firstcase_title)
                   and trailR.sub('', label[len(titleWithSection):]) == ''):
-                newLink = '[[%s]]%s' % (label[:len(titleWithSection)],
-                                        label[len(titleWithSection):])
+                newLink = '[[{}]]{}'.format(label[:len(titleWithSection)],
+                                            label[len(titleWithSection):])
 
             else:
                 # Try to capitalize the first letter of the title.
@@ -635,7 +635,7 @@ class CosmeticChangesToolkit:
                 # uppercase
                 if self.site.sitename == 'wikipedia:de':
                     titleWithSection = first_upper(titleWithSection)
-                newLink = '[[%s|%s]]' % (titleWithSection, label)
+                newLink = '[[{}|{}]]'.format(titleWithSection, label)
             # re-add spaces that were pulled out of the link.
             # Examples:
             #   text[[ title ]]text        -> text [[title]] text
@@ -883,7 +883,7 @@ class CosmeticChangesToolkit:
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
-        extensions = [r'\.{0}'.format(ext)
+        extensions = [r'\.{}'.format(ext)
                       for ext in ['pdf', 'html?', 'php', 'aspx?', 'jsp']]
         text = textlib.replaceExcept(
             text,

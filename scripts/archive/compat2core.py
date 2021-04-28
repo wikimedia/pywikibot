@@ -171,7 +171,7 @@ class ConvertBot:
 
     def get_dest(self):
         """Ask for destination script name."""
-        self.dest = '%s-core.%s' % tuple(self.source.rsplit('.', 1))
+        self.dest = '{}-core.{}'.format(*self.source.rsplit('.', 1))
         if not self.warnonly and not pywikibot.input_yn(
                 'Destination file is {}.'.format(self.dest),
                 default=True, automatic_quit=False):
@@ -196,7 +196,7 @@ class ConvertBot:
                 for w in warnings:
                     if w[0] in line:
                         pywikibot.warning(
-                            'line {0}: {1}>>> {2}\n'.format(i, line, w[1]))
+                            'line {}: {}>>> {}\n'.format(i, line, w[1]))
 
 
 def main():

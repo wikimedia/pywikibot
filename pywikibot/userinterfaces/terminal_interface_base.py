@@ -47,7 +47,7 @@ colors = [
     'white',
 ]
 
-_color_pat = '%s|previous' % '|'.join(colors)
+_color_pat = '{}|previous'.format('|'.join(colors))
 colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
 
 
@@ -120,7 +120,7 @@ class UI:
 
     def encounter_color(self, color, target_stream):
         """Handle the next color encountered."""
-        raise NotImplementedError('The {0} class does not support '
+        raise NotImplementedError('The {} class does not support '
                                   'colors.'.format(self.__class__.__name__))
 
     @classmethod
@@ -219,8 +219,10 @@ class UI:
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText += '\03{lightyellow}%s\03{previous}' \
-                                          % transliterated
+                    transliteratedText = ''.join((transliteratedText,
+                                                  '\03{lightyellow}',
+                                                  transliterated,
+                                                  '\03{previous}'))
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if transliterated:
@@ -269,7 +271,7 @@ class UI:
             question = question[:-1]
             end_marker = '?'
         if default:
-            question = question + ' (default: %s)' % default
+            question = question + ' (default: {})'.format(default)
         question = question + end_marker
         if force:
             self.output(question + '\n')
@@ -353,7 +355,7 @@ class UI:
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError('Option #{0} does not consist of an '
+                    raise ValueError('Option #{} does not consist of an '
                                      'option and shortcut.'.format(i))
                 options[i] = StandardOption(*option)
             # TODO: Test for uniquity
@@ -396,7 +398,7 @@ class UI:
         @return: Return a single Sequence entry.
         """
         if not force:
-            line_template = '{{0: >{0}}}: {{1}}'.format(len(str(len(answers))))
+            line_template = '{{0: >{}}}: {{1}}'.format(len(str(len(answers))))
             for i, entry in enumerate(answers, start=1):
                 pywikibot.output(line_template.format(i, entry))
 
@@ -436,7 +438,7 @@ class UI:
         try:
             from pywikibot.userinterfaces import gui
         except ImportError as e:
-            pywikibot.warning('Could not load GUI modules: {0}'.format(e))
+            pywikibot.warning('Could not load GUI modules: {}'.format(e))
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)

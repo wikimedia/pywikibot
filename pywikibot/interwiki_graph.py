@@ -117,9 +117,9 @@ class GraphDrawer:
     def addNode(self, page):
         """Add a node for page."""
         node = pydot.Node(self.getLabel(page), shape='rectangle')
-        node.set_URL('"http://%s%s"'
-                     % (page.site.hostname(),
-                        page.site.get_address(page.title(as_url=True))))
+        node.set_URL('"http://{}{}"'
+                     .format(page.site.hostname(),
+                             page.site.get_address(page.title(as_url=True))))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')

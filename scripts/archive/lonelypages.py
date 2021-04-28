@@ -60,12 +60,12 @@ class OrphanTemplate:
         template_ns = site.namespaces[10]
         # TODO: Add redirects to self.names too
         if not pywikibot.Page(site, self._name, template_ns.id).exists():
-            raise ValueError('Orphan template "{0}" does not exist on '
-                             '"{1}".'.format(self._name, site))
+            raise ValueError('Orphan template "{}" does not exist on "{}".'
+                             .format(self._name, site))
         for name in self._names:
             if not pywikibot.Page(site, name, template_ns.id).exists():
-                pywikibot.warning('Orphan template alias "{0}" does not exist '
-                                  'on "{1}"'.format(name, site))
+                pywikibot.warning('Orphan template alias "{}" does not exist '
+                                  'on "{}"'.format(name, site))
         self.regex = re.compile(
             r'\{\{(?:'
             + ':|'.join(template_ns) + '|)('
@@ -133,11 +133,11 @@ class LonelyPagesBot(SingleSiteBot):
             try:
                 self.disambigtext = self.disambigpage.get()
             except NoPageError:
-                pywikibot.output("{0} doesn't exist, skip!"
+                pywikibot.output("{} doesn't exist, skip!"
                                  .format(self.disambigpage.title()))
                 self.disambigtext = ''
             except IsRedirectPageError:
-                pywikibot.output("{0} is a redirect, don't use it!"
+                pywikibot.output("{} is a redirect, don't use it!"
                                  .format(self.disambigpage.title()))
                 self.opt.disambigPage = None
 
@@ -154,11 +154,11 @@ class LonelyPagesBot(SingleSiteBot):
                 getenable = enable.get()
             except NoPageError:
                 pywikibot.output(
-                    "{0} doesn't exist, I use the page as if it was blank!"
+                    "{} doesn't exist, I use the page as if it was blank!"
                     .format(enable.title()))
                 getenable = ''
             except IsRedirectPageError:
-                pywikibot.output('{0} is a redirect, skip!'
+                pywikibot.output('{} is a redirect, skip!'
                                  .format(enable.title()))
                 getenable = ''
             return getenable == 'enable'
@@ -176,51 +176,51 @@ class LonelyPagesBot(SingleSiteBot):
 
     def treat(self, page):
         """Check if page is applicable and not marked and add template then."""
-        pywikibot.output('Checking {0}...'.format(page.title()))
+        pywikibot.output('Checking {}...'.format(page.title()))
         if page.isRedirectPage():  # If redirect, skip!
-            pywikibot.output('{0} is a redirect! Skip...'
+            pywikibot.output('{} is a redirect! Skip...'
                              .format(page.title()))
             return
         refs = list(page.getReferences(total=1))
         if len(refs) > 0:
-            pywikibot.output("{0} isn't orphan! Skip..."
+            pywikibot.output("{} isn't orphan! Skip..."
                              .format(page.title()))
             return
         # no refs, no redirect; check if there's already the template
         try:
             oldtxt = page.get()
         except NoPageError:
-            pywikibot.output("{0} doesn't exist! Skip..."
+            pywikibot.output("{} doesn't exist! Skip..."
                              .format(page.title()))
             return
         except IsRedirectPageError:
-            pywikibot.output('{0} is a redirect! Skip...'
+            pywikibot.output('{} is a redirect! Skip...'
                              .format(page.title()))
             return
         if self.settings.regex.search(oldtxt):
             pywikibot.output(
-                'Your regex has found something in {0}, skipping...'
+                'Your regex has found something in {}, skipping...'
                 .format(page.title()))
             return
         if (page.isDisambig()
                 and self.opt.disambigPage is not None):
-            pywikibot.output('{0} is a disambig page, report..'
+            pywikibot.output('{} is a disambig page, report..'
                              .format(page.title()))
             if not page.title().lower() in self.disambigtext.lower():
-                self.disambigtext = '{0}\n*[[{1}]]'.format(
+                self.disambigtext = '{}\n*[[{}]]'.format(
                     self.disambigtext, page.title())
                 self.disambigpage.text = self.disambigtext
                 self.disambigpage.save(self.commentdisambig)
                 return
         # Is the page a disambig but there's not disambigPage? Skip!
         elif page.isDisambig():
-            pywikibot.output('{0} is a disambig page, skip...'
+            pywikibot.output('{} is a disambig page, skip...'
                              .format(page.title()))
             return
         else:
             # Ok, the page need the template. Let's put it there!
             # Adding the template in the text
-            newtxt = '{0}\n{1}'.format(self.settings.template, oldtxt)
+            newtxt = '{}\n{}'.format(self.settings.template, oldtxt)
             self.userPut(page, oldtxt, newtxt, summary=self.comment)
 
 

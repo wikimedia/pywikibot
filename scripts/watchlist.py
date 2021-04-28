@@ -70,7 +70,7 @@ def isWatched(pageName, site=None):  # noqa N802, N803
 
 def refresh(site):
     """Fetch the watchlist."""
-    pywikibot.output('Retrieving watchlist for {0}.'.format(str(site)))
+    pywikibot.output('Retrieving watchlist for {}.'.format(str(site)))
     return list(site.watched_pages(force=True))
 
 

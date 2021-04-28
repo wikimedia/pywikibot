@@ -183,7 +183,7 @@ class TestSimpleLogentries(TestLogentriesBase):
                 self._test_logevent(simple_type)
             except StopIteration:
                 unittest_print(
-                    'Unable to test "{0}" on "{1}" because there are no log '
+                    'Unable to test "{}" on "{}" because there are no log '
                     'entries with that type.'.format(simple_type, key))
 
 

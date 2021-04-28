@@ -64,8 +64,8 @@ class CategoryRedirectBot(SingleSiteBot):
         self.template_list = []
         self.cat = None
         self.log_page = pywikibot.Page(self.site,
-                                       'User:%(user)s/category redirect log'
-                                       % {'user': self.site.username()})
+                                       'User:{}/category redirect log'
+                                       .format(self.site.username()))
 
         # Localization:
 
@@ -292,7 +292,7 @@ class CategoryRedirectBot(SingleSiteBot):
         self.newredirs = []
 
         localtime = time.localtime()
-        today = '%04d-%02d-%02d' % localtime[:3]
+        today = '{:04d}-{:02d}-{:02d}'.format(*localtime[:3])
         self.datafile = pywikibot.config.datafilepath(
             '{}-catmovebot-data'.format(self.site.dbName()))
         try:
@@ -473,8 +473,9 @@ class CategoryRedirectBot(SingleSiteBot):
         self.newredirs.sort()
         comment = i18n.twtranslate(self.site, self.maint_comment)
         message = i18n.twtranslate(self.site, 'category_redirect-log-new')
-        self.log_page.text = ('\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n'
-                              % time.gmtime()[:6]
+        date_line = '\n== {}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z ==\n' \
+                    .format(*time.gmtime()[:6])
+        self.log_page.text = (date_line,
                               + '\n'.join(self.log_text)
                               + '\n* ' + message + '\n'
                               + '\n'.join(self.newredirs)

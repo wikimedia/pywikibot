@@ -103,7 +103,7 @@ class PatrolBot(BaseBot):
         else:
             local_whitelist_subpage_name = pywikibot.translate(
                 self.site, self.whitelist_subpage_name, fallback=True)
-            self.whitelist_pagename = '{0}:{1}/{2}'.format(
+            self.whitelist_pagename = '{}:{}/{}'.format(
                 self.site.namespace(2), self.site.username(),
                 local_whitelist_subpage_name)
         self.whitelist = None
@@ -165,7 +165,7 @@ class PatrolBot(BaseBot):
             # cascade if there isn't a whitelist to fallback on
             if not self.whitelist:
                 raise
-            pywikibot.error('{0}'.format(e))
+            pywikibot.error(str(e))
 
     def in_list(self, pagelist, title):
         """Check if title present in pagelist."""
@@ -210,7 +210,7 @@ class PatrolBot(BaseBot):
                 continue
             if isinstance(node, mwparserfromhell.nodes.wikilink.Wikilink):
                 if current_user is False:
-                    pywikibot.debug('Link to "{0}" ignored as outside '
+                    pywikibot.debug('Link to "{}" ignored as outside '
                                     'list'.format(node.title), _logger)
                     continue
 
@@ -247,7 +247,7 @@ class PatrolBot(BaseBot):
                             page = LinkedPagesRule(page)
                         else:
                             verbose_output('Whitelist page: ' + page)
-                        verbose_output('Adding {0}:{1}'
+                        verbose_output('Adding {}:{}'
                                        .format(current_user, page))
                         whitelist[current_user].add(page)
                     else:
@@ -296,20 +296,20 @@ class PatrolBot(BaseBot):
             self.setup()
 
         if pywikibot.config.verbose_output or self.opt.ask:
-            pywikibot.output('User {0} has created or modified page {1}'
+            pywikibot.output('User {} has created or modified page {}'
                              .format(username, title))
 
         if (self.opt.autopatroluserns
                 and page['ns'] in (2, 3)):
             # simple rule to whitelist any user editing their own userspace
             if title.partition(':')[2].split('/')[0].startswith(username):
-                verbose_output('{0} is whitelisted to modify {1}'
+                verbose_output('{} is whitelisted to modify {}'
                                .format(username, title))
                 choice = True
 
         if not choice and username in self.whitelist:
             if self.in_list(self.whitelist[username], title):
-                verbose_output('{0} is whitelisted to modify {1}'
+                verbose_output('{} is whitelisted to modify {}'
                                .format(username, title))
                 choice = True
 
@@ -321,7 +321,7 @@ class PatrolBot(BaseBot):
         if choice:
             # list() iterates over patrol() which returns a generator
             list(self.site.patrol(rcid))
-            pywikibot.output('Patrolled {0} (rcid {1}) by user {2}'
+            pywikibot.output('Patrolled {} (rcid {}) by user {}'
                              .format(title, rcid, username))
         else:
             verbose_output('Skipped')
@@ -360,10 +360,10 @@ class LinkedPagesRule:
                 linkedpages.append(linkedpage.title())
 
             self.linkedpages = linkedpages
-            verbose_output('Loaded {0} page links'.format(len(linkedpages)))
+            verbose_output('Loaded {} page links'.format(len(linkedpages)))
 
         for p in self.linkedpages:
-            verbose_output("Checking against '{0}'".format(p))
+            verbose_output("Checking against '{}'".format(p))
             if page_title.startswith(p):
                 verbose_output('Matched.')
                 return True
@@ -385,7 +385,7 @@ def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
             else:
                 yield page[1]
         if repeat:
-            pywikibot.output('Sleeping for {0} seconds'.format(delay))
+            pywikibot.output('Sleeping for {} seconds'.format(delay))
             pywikibot.sleep(delay)
         else:
             break

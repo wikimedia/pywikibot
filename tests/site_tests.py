@@ -860,7 +860,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 levels.add(level)
         if not levels:
             self.skipTest(
-                'The site "{0}" has no protected pages in main namespace.'
+                'The site "{}" has no protected pages in main namespace.'
                 .format(site))
         # select one level which won't yield all pages from above
         level = next(iter(levels))
@@ -892,7 +892,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {0}'.format(item))
+                        'NotImplementedError not raised for {}'.format(item))
 
     def test_unconnected(self):
         """Test site.unconnected_pages method."""
@@ -1117,7 +1117,7 @@ class TestImageUsage(DefaultSiteTestCase):
             self.assertIsInstance(using, pywikibot.Page)
             if using.isRedirectPage():
                 unittest_print(
-                    '{0} is a redirect, although just non-redirects were '
+                    '{} is a redirect, although just non-redirects were '
                     'searched. See also T75120'.format(using))
             self.assertFalse(using.isRedirectPage())
 
@@ -1492,7 +1492,7 @@ class SearchTestCase(DefaultSiteTestCase):
         except APIError as e:
             if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
                 self.skipTest(
-                    'Title search disabled on site: {0}'.format(self.site))
+                    'Title search disabled on site: {}'.format(self.site))
             raise
 
 
@@ -1913,7 +1913,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {0}.'.format(mysite))
+                'on {}.'.format(mysite))
         mainpage = self.get_mainpage()
         gen = mysite.deletedrevs(total=10, titles=mainpage)
 
@@ -1921,7 +1921,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             break
         else:
             self.skipTest(
-                '{0} contains no deleted revisions.'.format(mainpage))
+                '{} contains no deleted revisions.'.format(mainpage))
         self.assertLessEqual(len(dr['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict) for rev in dr['revisions']))
 
@@ -2014,14 +2014,14 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {0}.'.format(mysite))
+                'on {}.'.format(mysite))
         prop = ['ids', 'timestamp', 'flags', 'user', 'comment']
         gen = mysite.alldeletedrevisions(total=10, prop=prop)
 
         for data in gen:
             break
         else:
-            self.skipTest('{0} does not have deleted edits.'.format(myuser))
+            self.skipTest('{} does not have deleted edits.'.format(myuser))
         self.assertIn('revisions', data)
         for drev in data['revisions']:
             for key in ('revid', 'timestamp', 'user', 'comment'):

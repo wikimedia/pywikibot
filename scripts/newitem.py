@@ -85,13 +85,13 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
             pywikibot.output('Doing a null edit on the page.')
             page.touch()
         except (NoCreateError, NoPageError):
-            pywikibot.error('Page {0} does not exist.'.format(
+            pywikibot.error('Page {} does not exist.'.format(
                 page.title(as_link=True)))
         except LockedPageError:
-            pywikibot.error('Page {0} is locked.'.format(
+            pywikibot.error('Page {} is locked.'.format(
                 page.title(as_link=True)))
         except PageSaveRelatedError:
-            pywikibot.error('Page {0} not saved.'.format(
+            pywikibot.error('Page {} not saved.'.format(
                 page.title(as_link=True)))
 
     def _callback(self, page, exc) -> None:
@@ -177,7 +177,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""
         if item and item.exists():
-            pywikibot.output('{0} already has an item: {1}.'
+            pywikibot.output('{} already has an item: {}.'
                              .format(page, item))
             if self.opt.touch is True:
                 self._touch_page(page)

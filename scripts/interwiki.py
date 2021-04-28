@@ -1264,8 +1264,8 @@ class Subject(interwiki_graph.Subject):
                         pywikibot.config.datafilepath(
                             'autonomous_problems.dat'),
                             'a', 'utf-8') as f:
-                        f.write('* %s {Found more than one link for %s}'
-                                % (self.origin, page.site))
+                        f.write('* {} {{Found more than one link for {}}}'
+                                .format(self.origin, page.site))
                         if config.interwiki_graph \
                            and config.interwiki_graph_url:
                             filename = interwiki_graph.getFilename(
@@ -1313,7 +1313,7 @@ class Subject(interwiki_graph.Subject):
                             else:
                                 if config.interwiki_shownew:
                                     pywikibot.output(
-                                        '{0}: {1} gives new interwiki {2}'
+                                        '{}: {} gives new interwiki {}'
                                         .format(self.origin, page, linkedPage))
                 if self.forcedStop:
                     break
@@ -1781,7 +1781,7 @@ class Subject(interwiki_graph.Subject):
                 raise SaveError('Edit conflict')
             except SpamblacklistError as error:
                 pywikibot.output(
-                    'ERROR putting page: {0} blacklisted by spamfilter. '
+                    'ERROR putting page: {} blacklisted by spamfilter. '
                     'Giving up.'.format(error.url))
                 raise SaveError('Spam filter')
             except PageSaveRelatedError as error:
@@ -1928,19 +1928,19 @@ class InterwikiBot:
             self.conf.note('The first unfinished subject is {}'
                            .format(fs.origin))
         pywikibot.output(
-            'NOTE: Number of pages queued is {0}, trying to add {1} more.'
+            'NOTE: Number of pages queued is {}, trying to add {} more.'
             .format(len(self.subjects), number))
         for i in range(number):
             for page in self.pageGenerator:
                 if page in self.conf.skip:
-                    pywikibot.output('Skipping: {0} is in the skip list'
+                    pywikibot.output('Skipping: {} is in the skip list'
                                      .format(page))
                     continue
                 if self.conf.skipauto:
                     dictName, year = page.autoFormat()
                     if dictName is not None:
                         pywikibot.output(
-                            'Skipping: {0} is an auto entry {1}({2})'
+                            'Skipping: {} is an auto entry {}({})'
                             .format(page, dictName, year))
                         continue
                 if self.conf.parenthesesonly:

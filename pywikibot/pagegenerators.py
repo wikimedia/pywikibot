@@ -718,7 +718,7 @@ class GeneratorFactory:
                 '{}. Start parameter has wrong format!'.format(err))
             return None
         except AssertionError:
-            pywikibot.error('Total number of log ({0}) events must be a '
+            pywikibot.error('Total number of log ({}) events must be a '
                             'positive int.'.format(start))
             return None
 
@@ -773,7 +773,7 @@ class GeneratorFactory:
                 txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
                 txt += ''.join(
                     '{indent}{cat}\n'.format(indent=_2i, cat=c) for c in _list)
-            pywikibot.output('%s' % txt)
+            pywikibot.output(txt)
 
         if cat == 'show':  # Display categories of lint errors.
             show_available_categories(cats)
@@ -786,7 +786,7 @@ class GeneratorFactory:
         else:
             lint_cats = cat.split(',')
             assert set(lint_cats) <= set(valid_cats), \
-                'Invalid category of lint errors: %s' % cat
+                'Invalid category of lint errors: {}'.format(cat)
 
         return self.site.linter_pages(
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
@@ -1146,11 +1146,11 @@ class GeneratorFactory:
         value = [int(_) for _ in value.split(',')]
         if min(value) < 0 or max(value) > 4:  # Invalid input ql.
             valid_ql = [
-                '{0}: {1}'.format(*i)
+                '{}: {}'.format(*i)
                 for i in self.site.proofread_levels.items()]
             valid_ql = ', '.join(valid_ql)
-            pywikibot.warning('Acceptable values for -ql are:\n    %s'
-                              % valid_ql)
+            pywikibot.warning('Acceptable values for -ql are:\n    {}'
+                              .format(valid_ql))
         self.qualityfilter_list = value
         return True
 
@@ -1211,7 +1211,7 @@ class GeneratorFactory:
         params = value.split(',')
         if params[0] not in self.site.logtypes:
             raise NotImplementedError(
-                'Invalid -logevents parameter "{0}"'.format(params[0]))
+                'Invalid -logevents parameter "{}"'.format(params[0]))
         return self._parse_log_events(*params)
 
     def handle_args(self, args: Iterable[str]) -> List[str]:
@@ -1370,8 +1370,8 @@ def LogeventsPageGenerator(logtype: Optional[str] = None,
             yield entry.page()
         except KeyError as e:
             pywikibot.warning('LogeventsPageGenerator: '
-                              'failed to load page for %r; skipping'
-                              % entry.data)
+                              'failed to load page for {!r}; skipping'
+                              .format(entry.data))
             pywikibot.exception(e)
 
 
@@ -1707,7 +1707,7 @@ def PageTitleFilterPageGenerator(generator, ignore_list: dict):
             continue
 
         if config.verbose_output:
-            pywikibot.output('Ignoring page %s' % page.title())
+            pywikibot.output('Ignoring page {}'.format(page.title()))
 
 
 def RedirectFilterPageGenerator(generator, no_redirects: bool = True,
@@ -1818,8 +1818,8 @@ def SubpageFilterGenerator(generator, max_depth: int = 0,
         else:
             if show_filtered:
                 pywikibot.output(
-                    'Page %s is a subpage that is too deep. Skipping.'
-                    % page)
+                    'Page {} is a subpage that is too deep. Skipping.'
+                    .format(page))
 
 
 class RegexFilter:
@@ -2041,7 +2041,7 @@ def UserEditFilterGenerator(generator, username: str, timestamp=None,
         if bool(contribs[username]) is not bool(skip):  # xor operation
             yield page
         elif show_filtered:
-            pywikibot.output('Skipping %s' % page.title(as_link=True))
+            pywikibot.output('Skipping {}'.format(page.title(as_link=True)))
 
 
 @deprecated('itertools.chain(*iterables)', since='20180513')
@@ -2639,9 +2639,9 @@ class GoogleSearchPageGenerator:
     def __iter__(self):
         """Iterate results."""
         # restrict query to local site
-        localQuery = '%s site:%s' % (self.query, self.site.hostname())
-        base = 'http://%s%s' % (self.site.hostname(),
-                                self.site.article_path)
+        localQuery = '{} site:{}'.format(self.query, self.site.hostname())
+        base = 'http://{}{}'.format(self.site.hostname(),
+                                    self.site.article_path)
         for url in self.queryGoogle(localQuery):
             if url[:len(base)] == base:
                 title = url[len(base):]
@@ -2786,10 +2786,10 @@ def YearPageGenerator(start=1, end=2050, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    pywikibot.output('Starting with year %i' % start)
+    pywikibot.output('Starting with year {}'.format(start))
     for i in range(start, end + 1):
         if i % 100 == 0:
-            pywikibot.output('Preparing %i...' % i)
+            pywikibot.output('Preparing {}...'.format(i))
         # There is no year 0
         if i != 0:
             current_year = date.formatYear(site.lang, i)
@@ -2810,7 +2810,7 @@ def DayPageGenerator(start_month: int = 1, end_month: int = 12,
         site = pywikibot.Site()
     lang = site.lang
     firstPage = pywikibot.Page(site, date.format_date(start_month, 1, lang))
-    pywikibot.output('Starting with %s' % firstPage.title(as_link=True))
+    pywikibot.output('Starting with {}'.format(firstPage.title(as_link=True)))
     for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(
@@ -2955,7 +2955,7 @@ class PetScanPageGenerator:
 
         if namespaces:
             for namespace in namespaces:
-                query['ns[{0}]'.format(int(namespace))] = 1
+                query['ns[{}]'.format(int(namespace))] = 1
 
         query_final = query.copy()
         query_final.update(extra_options)
