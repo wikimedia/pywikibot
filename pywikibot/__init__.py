@@ -45,9 +45,6 @@ from pywikibot.bot import (
     show_help,
     ui,
 )
-from pywikibot.bot_choice import (
-    QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
-)
 from pywikibot.diff import PatchManager
 from pywikibot.family import AutoFamily, Family
 from pywikibot.i18n import translate
@@ -128,14 +125,14 @@ __all__ = (
     'NoCreateError', 'NoMoveTarget', 'NoPage', 'NoUsername',
     'NoWikibaseEntity', 'OtherPageSaveError', 'output', 'Page',
     'PageCreatedConflict', 'PageDeletedConflict', 'PageRelatedError',
-    'PageSaveRelatedError', 'PropertyPage', '_QuitKeyboardInterrupt',
-    'SectionError', 'Server414Error', 'Server504Error', 'ServerError',
-    'showDiff', 'show_help', 'Site', 'SiteDefinitionError', 'SiteLink',
-    'SpamblacklistError', 'stdout', 'Timestamp', 'TitleblacklistError',
-    'translate', 'ui', 'unicode2html', 'UnknownExtension', 'UnknownFamily',
-    'UnknownSite', 'UnsupportedPage', 'UploadWarning', 'url2unicode', 'User',
-    'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
-    'WbTabularData', 'WbTime', 'WbUnknown', 'WikiBaseError', 'WikidataBot',
+    'PageSaveRelatedError', 'PropertyPage', 'SectionError', 'Server414Error',
+    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'Site',
+    'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
+    'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
+    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
+    'UploadWarning', 'url2unicode', 'User', 'warning', 'WbGeoShape',
+    'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
+    'WikiBaseError', 'WikidataBot',
 )
 
 
@@ -1356,11 +1353,6 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
-    warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
-                    'use pywikibot.bot.QuitKeyboardInterrupt instead.',
-    since='20150619', future_warning=True)
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')
