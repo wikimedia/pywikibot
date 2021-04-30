@@ -56,7 +56,7 @@ class FamilyFileGenerator:
         for verify in (True, False):
             try:
                 w = self.Wiki(self.base_url, verify=verify)
-            except pywikibot.FatalServerError:
+            except pywikibot.exceptions.FatalServerError:
                 print('ERROR: '
                       + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()

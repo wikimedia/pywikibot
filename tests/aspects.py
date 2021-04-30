@@ -28,7 +28,11 @@ from pywikibot import Site
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.exceptions import NoUsernameError, ServerError
+from pywikibot.exceptions import (
+    NoUsernameError,
+    ServerError,
+    SiteDefinitionError,
+)
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 from pywikibot.tools import suppress_warnings
@@ -357,7 +361,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
 
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
-        raise pywikibot.SiteDefinitionError(
+        raise SiteDefinitionError(
             'Loading site {}:{} during dry test not permitted'
             .format(fam, code))
 
