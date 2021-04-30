@@ -54,7 +54,7 @@ the framework::
           +-- UnknownExtensionError (NotImplementedError)
           +-- VersionParseError
           +-- WikiBaseError
-               +-- CoordinateGlobeUnknownError (NotimplementedError)
+               +-- CoordinateGlobeUnknownError (NotImplementedError)
                +-- EntityTypeUnknownError
                +-- NoWikibaseEntityError
 
