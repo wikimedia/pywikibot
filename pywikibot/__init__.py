@@ -62,7 +62,6 @@ from pywikibot.logging import (
     warning,
 )
 from pywikibot.site import APISite, BaseSite, ClosedSite, DataSite
-from pywikibot.tools import MediaWikiVersion as _MediaWikiVersion
 from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
 )
@@ -1362,11 +1361,6 @@ wrapper._add_deprecated_attr(
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
                     'use pywikibot.bot.QuitKeyboardInterrupt instead.',
     since='20150619', future_warning=True)
-wrapper._add_deprecated_attr(
-    'MediaWikiVersion', _MediaWikiVersion,
-    warning_message='pywikibot.MediaWikiVersion is deprecated; '
-                    'use pywikibot.tools.MediaWikiVersion instead.',
-    since='20180827')
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')
