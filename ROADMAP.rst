@@ -1,11 +1,16 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* (no changes yet)
+* L10N updates
+* Fix __getattr__ for WikibaseEntity (T281389)
+* Handle abusefilter-{disallow,warning} codes (T85656)
+* Exceptions were renamed having a suffix "Error" due to PEP8 (T280227)
 
 Deprecations
 ~~~~~~~~~~~~
 
+* 6.2.0: Deprecated exception identifiers will be removed (T280227)
+* 6.2.0: empty_iterator will be removed in favour of iter()
 * 6.1.0: tools.frozenmap will be removed in favour of types.MappingProxyType
 * 6.1.0: tools.DotReadableDict will be removed
 * 6.1.0: mwparserfromhell or wikitextparser MediaWiki markup parser becomes mandatory (T106763)
