@@ -603,7 +603,7 @@ class Subject(interwiki_graph.Subject):
 
     With P a set of pages, NL ('NextLevel') a function on sets defined as:
 
-        NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }
+        `NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }`
 
     pseudocode::
 

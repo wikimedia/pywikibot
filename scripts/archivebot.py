@@ -189,11 +189,15 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
     Return a timedelta for a shorthand duration.
 
     @param string: a string defining a time period:
+
+    Examples::
+
         300s - 300 seconds
         36h - 36 hours
         7d - 7 days
         2w - 2 weeks (14 days)
         1y - 1 year
+
     @param timestamp: a timestamp to calculate a more accurate duration offset
         used by years
     @type timestamp: datetime.datetime
@@ -255,6 +259,7 @@ def str2size(string: str) -> Size:
     Return a size for a shorthand size.
 
     Accepts a string defining a size::
+
       1337 - 1337 bytes
       150K - 150 kilobytes
       2M - 2 megabytes
