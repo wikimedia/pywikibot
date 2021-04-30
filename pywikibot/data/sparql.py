@@ -5,13 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import json
-
 from typing import Optional
 from urllib.parse import quote
 
 from requests.exceptions import Timeout
 
-from pywikibot import config, warning, Site, sleep
+from pywikibot import Site, config, sleep, warning
 from pywikibot.comms import http
 from pywikibot.exceptions import Error, TimeoutError
 

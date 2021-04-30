@@ -7,17 +7,17 @@
 import calendar
 import datetime
 import re
-
-from collections.abc import Mapping, MutableMapping
 from collections import defaultdict
+from collections.abc import Mapping, MutableMapping
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 
-from pywikibot.backports import Tuple
 from pywikibot import Site
+from pywikibot.backports import Tuple
 from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import deprecated, first_lower, first_upper
+
 
 #
 # Different collections of well known formats

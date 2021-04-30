@@ -16,7 +16,6 @@ The following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators, textlib
 
 

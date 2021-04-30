@@ -9,13 +9,12 @@
 import os
 import subprocess
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.tools.djvu import DjVuFile
-
-from tests import join_data_path, create_path_func
+from tests import create_path_func, join_data_path
 from tests.aspects import TestCase
+
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 

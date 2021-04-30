@@ -64,19 +64,17 @@ import codecs
 import re
 import threading
 import webbrowser
-
 from os import path
 
 from requests.exceptions import RequestException
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import remove_last_args
-
 from scripts.image import ImageRobot
+
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog, Tkinter

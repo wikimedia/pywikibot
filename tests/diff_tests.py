@@ -6,8 +6,7 @@
 # Distributed under the terms of the MIT license.
 from contextlib import suppress
 
-from pywikibot.diff import cherry_pick, html_comparator, PatchManager
-
+from pywikibot.diff import PatchManager, cherry_pick, html_comparator
 from tests import join_html_data_path, patch
 from tests.aspects import TestCase, require_modules, unittest
 

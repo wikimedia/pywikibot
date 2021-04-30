@@ -64,7 +64,6 @@ import threading
 import time
 
 import pywikibot
-
 from pywikibot import i18n
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import Error

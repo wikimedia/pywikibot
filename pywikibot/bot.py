@@ -93,7 +93,6 @@ import sys
 import time
 import warnings
 import webbrowser
-
 from collections.abc import Generator
 from contextlib import closing
 from importlib import import_module
@@ -103,38 +102,72 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-
 from pywikibot import config2 as config
 from pywikibot import daemonize, i18n, version
 from pywikibot.backports import Dict, Iterable, List, Sequence
-from pywikibot.tools.formatter import color_format
-from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
-
 from pywikibot.bot_choice import (
-    Option, StandardOption, NestedOption, IntegerOption, ContextOption,
-    ListOption, ShowingListOption, MultipleChoiceList,
-    ShowingMultipleChoiceList, OutputProxyOption, HighlightContextOption,
-    ChoiceException, QuitKeyboardInterrupt,
-    Choice, StaticChoice, LinkChoice, AlwaysChoice
+    AlwaysChoice,
+    Choice,
+    ChoiceException,
+    ContextOption,
+    HighlightContextOption,
+    IntegerOption,
+    LinkChoice,
+    ListOption,
+    MultipleChoiceList,
+    NestedOption,
+    Option,
+    OutputProxyOption,
+    QuitKeyboardInterrupt,
+    ShowingListOption,
+    ShowingMultipleChoiceList,
+    StandardOption,
+    StaticChoice,
 )
-
 from pywikibot.exceptions import (
-    EditConflictError, Error, LockedPageError, NoPageError,
-    PageSaveRelatedError, ServerError, SpamblacklistError,
-    UnhandledAnswerError, UnknownFamilyError,
-    UnknownSiteError, VersionParseError, WikiBaseError,
+    EditConflictError,
+    Error,
+    LockedPageError,
+    NoPageError,
+    PageSaveRelatedError,
+    ServerError,
+    SpamblacklistError,
+    UnhandledAnswerError,
+    UnknownFamilyError,
+    UnknownSiteError,
+    VersionParseError,
+    WikiBaseError,
 )
-
 from pywikibot.logging import (
+    CRITICAL,
+    DEBUG,
+    ERROR,
+    INFO,
+    INPUT,
+    STDOUT,
+    VERBOSE,
+    WARNING,
     add_init_routine,
-    CRITICAL, DEBUG, ERROR, INFO, INPUT, STDOUT, VERBOSE, WARNING,
-    critical, debug, error, exception, log, output, stdout, warning,
+    critical,
+    debug,
+    error,
+    exception,
+    log,
+    output,
+    stdout,
+    warning,
 )
-
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    PYTHON_VERSION, ModuleDeprecationWrapper, suppress_warnings,
+    PYTHON_VERSION,
+    ModuleDeprecationWrapper,
+    deprecate_arg,
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+    suppress_warnings,
 )
+from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
+from pywikibot.tools.formatter import color_format
 
 
 # Note: all output goes through python std library "logging" module

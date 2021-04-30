@@ -29,9 +29,9 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 # Distributed under the terms of the MIT license.
 #
 import codecs
-from importlib import import_module
 import json
 import os
+from importlib import import_module
 
 from pywikibot import config
 

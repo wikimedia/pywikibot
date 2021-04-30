@@ -5,9 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from scripts.noreferences import NoReferencesBot
-
 from tests.aspects import TestCase, unittest
 
 

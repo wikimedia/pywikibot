@@ -30,10 +30,8 @@ Example:
 # Automatically converted from compat branch by compat2core.py script
 #
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.backports import Tuple
-
 from pywikibot.bot import (
     ExistingPageBot,
     FollowRedirectPageBot,

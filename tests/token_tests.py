@@ -8,13 +8,7 @@ from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
 from pywikibot.site import TokenWallet
-
-from tests.aspects import (
-    DefaultSiteTestCase,
-    TestCase,
-    TestCaseBase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, TestCase, TestCaseBase, unittest
 
 
 class TestSiteTokens(DefaultSiteTestCase):

@@ -10,6 +10,7 @@ It imports the appropriate operating system specific implementation.
 #
 import sys
 
+
 if sys.platform == 'win32':
     from pywikibot.userinterfaces.terminal_interface_win32 import Win32UI as UI
 else:

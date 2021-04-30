@@ -95,10 +95,10 @@ import os
 import re
 
 import pywikibot
-
-from pywikibot import config2 as config, i18n
+from pywikibot import config, i18n
 from pywikibot.exceptions import Error
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
+
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 

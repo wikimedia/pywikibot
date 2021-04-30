@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from textwrap import fill
 from typing import Optional
 

@@ -5,6 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 from time import strftime
+
+
 __name__ = 'pywikibot'
 __version__ = '6.1.1.dev0'
 __description__ = 'Python MediaWiki Bot Framework'

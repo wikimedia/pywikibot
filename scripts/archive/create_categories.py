@@ -35,7 +35,6 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot

@@ -99,27 +99,25 @@ import os
 import re
 import time
 import types
-
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from hashlib import md5
 from math import ceil
 from typing import Any, Optional, Pattern
 from warnings import warn
 
 import pywikibot
-
 from pywikibot import i18n
 from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
 from pywikibot.exceptions import Error, NoPageError
-from pywikibot.tools import issue_deprecation_warning
-
 from pywikibot.textlib import (
+    TimeStripper,
     extract_sections,
     findmarker,
-    TimeStripper,
     to_local_digits,
 )
+from pywikibot.tools import issue_deprecation_warning
+
 
 ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]

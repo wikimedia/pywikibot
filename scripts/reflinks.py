@@ -46,31 +46,27 @@ import re
 import socket
 import subprocess
 import tempfile
-
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
 from textwrap import shorten
 
 import pywikibot
-
+from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
-from pywikibot import comms, i18n, pagegenerators, textlib
-from pywikibot import config2 as config
-from pywikibot.pagegenerators import (
-    XMLDumpPageGenerator as _XMLDumpPageGenerator,
-)
-from pywikibot.textlib import replaceExcept
-from pywikibot.tools.formatter import color_format
-
-from scripts import noreferences
-
 from pywikibot.exceptions import (
     FatalServerError,
     Server414Error,
     Server504Error,
 )
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator as _XMLDumpPageGenerator,
+)
+from pywikibot.textlib import replaceExcept
+from pywikibot.tools.formatter import color_format
+from scripts import noreferences
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

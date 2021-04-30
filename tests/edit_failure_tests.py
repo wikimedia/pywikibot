@@ -12,16 +12,10 @@ These tests use special code 'write = -1' for edit failures.
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import config
-
-from tests import patch
-from tests.aspects import TestCase, WikibaseTestCase
-
 from pywikibot.exceptions import (
     Error,
     LockedPageError,
@@ -33,6 +27,8 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     TitleblacklistError,
 )
+from tests import patch
+from tests.aspects import TestCase, WikibaseTestCase
 
 
 class TestSaveFailure(TestCase):

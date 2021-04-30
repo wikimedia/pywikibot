@@ -121,20 +121,14 @@ import math
 import os
 import pickle
 import re
-
 from contextlib import suppress
 from operator import methodcaller
 from textwrap import fill
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Set, Tuple
-from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import deprecated_args, open_archive
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -144,13 +138,16 @@ from pywikibot.bot import (
     StandardOption,
     suggest_help,
 )
-
+from pywikibot.cosmetic_changes import moved_links
 from pywikibot.exceptions import (
     Error,
     NoPageError,
     NoUsernameError,
     PageSaveRelatedError,
 )
+from pywikibot.tools import deprecated_args, open_archive
+from pywikibot.tools.formatter import color_format
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

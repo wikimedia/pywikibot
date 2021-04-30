@@ -5,13 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot import xmlreader
-
 from tests import join_xml_data_path
-
 from tests.aspects import TestCase
 
 

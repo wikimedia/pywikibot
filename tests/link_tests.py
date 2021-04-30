@@ -5,23 +5,20 @@
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from contextlib import suppress
 
 import pywikibot
-
-from pywikibot import config2 as config
 from pywikibot import Site
+from pywikibot import config2 as config
+from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
-
+from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase
 from tests.aspects import (
-    AlteredDefaultSiteTestCase as LinkTestCase,
     DefaultDrySiteTestCase,
     TestCase,
-    unittest,
     WikimediaDefaultSiteTestCase,
+    unittest,
 )
 
 

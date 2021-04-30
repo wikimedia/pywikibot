@@ -22,10 +22,10 @@ PRE-REQUISITE : Need to install python-pycountry library.
 import re
 
 import pywikibot
-
 from pywikibot import i18n
 from pywikibot.bot import SingleSiteBot, suggest_help
 from pywikibot.exceptions import IsNotRedirectPageError, NoPageError
+
 
 try:
     import pycountry

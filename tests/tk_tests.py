@@ -6,15 +6,15 @@
 #
 import os
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import TestCase, DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':
     import tkinter
+
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 

@@ -5,11 +5,9 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from scripts.upload import CHUNK_SIZE_REGEX, get_chunk_size
-
 from tests.aspects import TestCase
 
 

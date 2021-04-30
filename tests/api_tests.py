@@ -6,7 +6,6 @@
 #
 import datetime
 import types
-
 from collections import defaultdict
 from contextlib import suppress
 
@@ -14,21 +13,18 @@ import pywikibot.family
 import pywikibot.login
 import pywikibot.page
 import pywikibot.site
-
 from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-
 from tests import patch
-from tests.utils import FakeLoginManager
-
 from tests.aspects import (
-    unittest,
-    TestCase,
-    DefaultSiteTestCase,
     DefaultDrySiteTestCase,
+    DefaultSiteTestCase,
+    TestCase,
+    unittest,
 )
+from tests.utils import FakeLoginManager
 
 
 class TestApiFunctions(DefaultSiteTestCase):

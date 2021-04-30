@@ -114,7 +114,6 @@ import pickle
 import re
 import threading
 import time
-
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
@@ -122,22 +121,19 @@ from http import HTTPStatus
 import requests
 
 import pywikibot
-
-from pywikibot import comms, i18n, pagegenerators, textlib
-from pywikibot import config2 as config
-
+from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
-from pywikibot.pagegenerators import (
-    XMLDumpPageGenerator as _XMLDumpPageGenerator,
-)
-from pywikibot.tools.formatter import color_format
-from pywikibot.tools import ThreadList
-
 from pywikibot.exceptions import (
     IsRedirectPageError,
     NoPageError,
     SpamblacklistError,
 )
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator as _XMLDumpPageGenerator,
+)
+from pywikibot.tools import ThreadList
+from pywikibot.tools.formatter import color_format
+
 
 try:
     import memento_client

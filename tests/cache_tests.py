@@ -6,12 +6,10 @@
 #
 import unittest
 
-from pywikibot.site import BaseSite
-
 import scripts.maintenance.cache as cache
-
-from tests.aspects import TestCase
+from pywikibot.site import BaseSite
 from tests import join_cache_path
+from tests.aspects import TestCase
 
 
 class RequestCacheTests(TestCase):

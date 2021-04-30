@@ -6,6 +6,7 @@
 #
 from pywikibot.tools import PYTHON_VERSION
 
+
 # functools.cache
 if PYTHON_VERSION >= (3, 9):
     from functools import cache
@@ -58,7 +59,7 @@ if PYTHON_VERSION >= (3, 9):
     Set = set
     Tuple = tuple
 else:
-    from typing import Dict, FrozenSet, Iterable, List, Set, Sequence, Tuple
+    from typing import Dict, FrozenSet, Iterable, List, Sequence, Set, Tuple
 
 
 # PEP 616 string methods

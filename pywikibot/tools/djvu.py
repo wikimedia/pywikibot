@@ -8,11 +8,9 @@
 import os
 import re
 import subprocess
-
 from collections import Counter
 
 import pywikibot
-
 from pywikibot.tools import deprecated_args
 
 

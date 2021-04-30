@@ -8,11 +8,9 @@ from collections.abc import Mapping
 from contextlib import suppress
 
 import pywikibot.site
-
 from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.tools import suppress_warnings
-
 from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 

@@ -27,7 +27,6 @@ Command line options:
 import os
 
 import pywikibot
-
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from pywikibot.exceptions import InvalidTitleError

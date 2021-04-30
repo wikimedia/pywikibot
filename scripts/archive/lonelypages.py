@@ -29,10 +29,10 @@ import re
 import sys
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import suggest_help, SingleSiteBot
+from pywikibot.bot import SingleSiteBot, suggest_help
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

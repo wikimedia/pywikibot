@@ -9,17 +9,15 @@ import os.path
 import subprocess
 import tempfile
 import unittest
-
-from collections.abc import Mapping
 from collections import OrderedDict
+from collections.abc import Mapping
 from contextlib import suppress
 from importlib import import_module
 
 from pywikibot import tools
 from pywikibot.tools import classproperty, has_module, suppress_warnings
-
 from tests import join_xml_data_path, mock
-from tests.aspects import require_modules, TestCase
+from tests.aspects import TestCase, require_modules
 
 
 class OpenArchiveTestCase(TestCase):

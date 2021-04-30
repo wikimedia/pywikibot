@@ -4,12 +4,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from collections.abc import MutableMapping
 from collections import defaultdict
+from collections.abc import MutableMapping
 from typing import Optional
 
 import pywikibot
-
 from pywikibot.site import BaseSite
 
 

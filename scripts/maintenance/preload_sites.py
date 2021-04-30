@@ -24,8 +24,8 @@ from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
 
 import pywikibot
-
 from pywikibot.family import Family
+
 
 # supported families by this script
 families_list = [

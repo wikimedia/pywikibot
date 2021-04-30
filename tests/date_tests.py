@@ -5,12 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 from datetime import datetime
 
 from pywikibot import date
-
 from tests.aspects import MetaTestCaseClass, TestCase
 
 

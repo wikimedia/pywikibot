@@ -39,15 +39,11 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from contextlib import suppress
 from functools import partial
 
 import pywikibot
-
-from pywikibot import i18n, pagegenerators, textlib, Bot, WikidataBot
-from pywikibot.tools import has_module
-
+from pywikibot import Bot, WikidataBot, i18n, pagegenerators, textlib
 from pywikibot.exceptions import (
     EditConflictError,
     Error,
@@ -56,6 +52,8 @@ from pywikibot.exceptions import (
     NoPageError,
     SpamblacklistError,
 )
+from pywikibot.tools import has_module
+
 
 try:
     import stdnum.isbn

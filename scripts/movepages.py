@@ -38,7 +38,6 @@ Furthermore, the following command line parameters are supported:
 import re
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import CurrentPageBot, MultipleSitesBot
 from pywikibot.exceptions import PageRelatedError

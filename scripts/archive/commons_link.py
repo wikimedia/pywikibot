@@ -32,10 +32,8 @@ and pagegenerator can be one of these:
 import re
 
 import pywikibot
-
-from pywikibot import textlib, pagegenerators, i18n, Bot
+from pywikibot import Bot, i18n, pagegenerators, textlib
 from pywikibot.backports import Tuple
-
 from pywikibot.exceptions import (
     EditConflictError,
     IsRedirectPageError,

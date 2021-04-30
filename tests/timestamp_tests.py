@@ -8,11 +8,9 @@ import calendar
 import datetime
 import re
 import unittest
-
 from contextlib import suppress
 
 from pywikibot import Timestamp
-
 from tests.aspects import TestCase
 
 

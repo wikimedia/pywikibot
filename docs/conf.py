@@ -23,8 +23,8 @@
 import os
 import re
 import sys
-
 from os.path import abspath, dirname, join
+
 
 docs_dir = dirname(__file__)
 repo_dir = abspath(join(docs_dir, '..'))
@@ -33,6 +33,7 @@ os.chdir(repo_dir)
 
 os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 import pywikibot  # noqa: E402
+
 
 # -- General configuration ------------------------------------------------
 

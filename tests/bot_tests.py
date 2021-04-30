@@ -5,15 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import sys
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.bot
-
 from pywikibot import i18n
 from pywikibot.tools import suppress_warnings
-
 from tests.aspects import (
     DefaultSiteTestCase,
     SiteAttributeTestCase,

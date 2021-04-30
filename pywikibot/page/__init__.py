@@ -19,8 +19,7 @@ import logging
 import os.path
 import re
 import unicodedata
-
-from collections import Counter, defaultdict, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 from contextlib import suppress
 from html.entities import name2codepoint
 from http import HTTPStatus
@@ -30,16 +29,9 @@ from urllib.parse import quote_from_bytes, unquote_to_bytes
 from warnings import warn
 
 import pywikibot
-
 from pywikibot import config, i18n, textlib
-from pywikibot.backports import cache, Dict, Iterable, List, Tuple
+from pywikibot.backports import Dict, Iterable, List, Tuple, cache
 from pywikibot.comms import http
-from pywikibot.family import Family
-from pywikibot.page._decorators import allow_asynchronous
-from pywikibot.page._revision import Revision
-from pywikibot.site import DataSite, Namespace
-from pywikibot.tools import is_IP
-
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -62,24 +54,28 @@ from pywikibot.exceptions import (
     UserRightsError,
     WikiBaseError,
 )
-
+from pywikibot.family import Family
 from pywikibot.page._collections import (
     AliasesDict,
     ClaimCollection,
     LanguageDict,
     SiteLinkCollection,
 )
-
+from pywikibot.page._decorators import allow_asynchronous
+from pywikibot.page._revision import Revision
+from pywikibot.site import DataSite, Namespace
 from pywikibot.tools import (
-    compute_file_hash,
     ComparableMixin,
-    deprecated,
+    compute_file_hash,
     deprecate_arg,
+    deprecated,
     deprecated_args,
     first_upper,
+    is_IP,
     redirect_func,
     remove_last_args,
 )
+
 
 PROTOCOL_REGEX = r'\Ahttps?://'
 
@@ -1230,7 +1226,9 @@ class BasePage(ComparableMixin):
                       % (family, self.site.lang))
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
-            CANCEL_MATCH, CosmeticChangesToolkit)
+            CANCEL_MATCH,
+            CosmeticChangesToolkit,
+        )
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL_MATCH)
         self.text = cc_toolkit.change(old)
 

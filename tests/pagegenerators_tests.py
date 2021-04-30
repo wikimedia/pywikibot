@@ -9,26 +9,20 @@ import datetime
 import logging
 import sys
 import unittest
-
 from contextlib import suppress
 from typing import Optional
 
 import pywikibot
-
-from pywikibot import pagegenerators, date
+from pywikibot import date, pagegenerators
 from pywikibot.exceptions import ServerError, UnknownExtensionError
-from pywikibot.tools import has_module, suppress_warnings
-
-from tests import join_data_path, mock
-from tests.thread_tests import GeneratorIntersectTestCase
-
 from pywikibot.pagegenerators import (
     CategorizedPageGenerator,
     PagesFromTitlesGenerator,
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-
+from pywikibot.tools import has_module, suppress_warnings
+from tests import join_data_path, mock
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
@@ -36,6 +30,8 @@ from tests.aspects import (
     TestCase,
     WikidataTestCase,
 )
+from tests.thread_tests import GeneratorIntersectTestCase
+
 
 LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
                   r'is deprecated for .*; use Site\.exturlusage')

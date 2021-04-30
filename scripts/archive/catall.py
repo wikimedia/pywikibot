@@ -25,7 +25,6 @@ Options:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import i18n, textlib
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import QuitKeyboardInterrupt

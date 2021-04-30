@@ -58,10 +58,9 @@ Delete everything in the category "To delete" without prompting:
 import collections
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.backports import DefaultDict, Set, Tuple
-from pywikibot.bot import MultipleSitesBot, CurrentPageBot
+from pywikibot.bot import CurrentPageBot, MultipleSitesBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
 from pywikibot.tools import islice_with_ellipsis

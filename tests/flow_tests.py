@@ -5,17 +5,14 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.exceptions import NoPageError
-from pywikibot.flow import Board, Topic, Post
-
+from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
-
 from tests.basepage import (
-    BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
+    BasePageMethodsTestBase,
 )
 
 

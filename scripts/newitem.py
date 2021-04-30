@@ -28,12 +28,9 @@ from datetime import timedelta
 from textwrap import fill
 
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.backports import Set
 from pywikibot.bot import NoRedirectPageBot, WikidataBot
-
 from pywikibot.exceptions import (
     LockedPageError,
     NoCreateError,

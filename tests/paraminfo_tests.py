@@ -7,13 +7,12 @@
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
-
 from tests.aspects import (
     DefaultSiteTestCase,
     DefaultWikibaseClientTestCase,
     TestCaseBase,
-    unittest,
     WikimediaDefaultSiteTestCase,
+    unittest,
 )
 
 

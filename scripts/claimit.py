@@ -51,7 +51,8 @@ but 'p' must be included.
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import pagegenerators, WikidataBot
+from pywikibot import WikidataBot, pagegenerators
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help or without parameters.

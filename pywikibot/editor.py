@@ -9,14 +9,13 @@ import codecs
 import os
 import subprocess
 import tempfile
-
 from sys import platform
 from textwrap import fill
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import config
+
 
 try:
     from pywikibot.userinterfaces import gui

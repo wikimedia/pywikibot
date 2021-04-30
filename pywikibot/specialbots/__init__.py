@@ -9,6 +9,7 @@ from pywikibot.specialbots._unlink import BaseUnlinkBot, InteractiveUnlink
 from pywikibot.specialbots._upload import UploadRobot
 from pywikibot.tools import ModuleDeprecationWrapper, suppress_warnings
 
+
 with suppress_warnings(category=FutureWarning):
     from pywikibot.specialbots._unlink import EditReplacement
 

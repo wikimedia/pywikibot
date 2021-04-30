@@ -7,12 +7,10 @@
 import unittest
 
 import pywikibot
-
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.textlib import _MultiTemplateMatchBuilder
-
-from tests.aspects import TestCase
 from tests import join_xml_data_path
+from tests.aspects import TestCase
 
 
 class TestXMLPageGenerator(TestCase):

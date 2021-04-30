@@ -20,11 +20,11 @@ Parameters:
 import re
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
+from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import Error, NoPageError, TranslationError
 from pywikibot.flow import Board
+
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',

@@ -20,15 +20,14 @@ The following parameters are supported:
 import datetime
 
 import pywikibot
-
-from pywikibot import i18n, pagegenerators, editor
-from pywikibot.bot import SingleSiteBot, CurrentPageBot, QuitKeyboardInterrupt
-
+from pywikibot import editor, i18n, pagegenerators
+from pywikibot.bot import CurrentPageBot, QuitKeyboardInterrupt, SingleSiteBot
 from pywikibot.exceptions import (
     EditConflictError,
     IsRedirectPageError,
     NoPageError,
 )
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

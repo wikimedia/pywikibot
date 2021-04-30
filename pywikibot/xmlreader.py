@@ -15,7 +15,6 @@ XmlEntry objects which can be used by other bots.
 import re
 import threading
 import xml.sax
-
 from xml.etree.ElementTree import iterparse
 
 from pywikibot.tools import open_archive

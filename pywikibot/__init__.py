@@ -11,9 +11,6 @@ import math
 import re
 import threading
 import time
-
-import pywikibot.exceptions
-
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
@@ -21,56 +18,100 @@ from typing import Optional, Union
 from urllib.parse import urlparse
 from warnings import warn
 
+import pywikibot.exceptions
+from pywikibot import config2 as config
 from pywikibot.__metadata__ import (
-    __copyright__, __description__, __download_url__, __license__,
-    __maintainer__, __maintainer_email__, __name__, __url__, __version__)
-
+    __copyright__,
+    __description__,
+    __download_url__,
+    __license__,
+    __maintainer__,
+    __maintainer_email__,
+    __name__,
+    __url__,
+    __version__,
+)
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.backports import cache, removesuffix
-from pywikibot import config2 as config
-from pywikibot.diff import PatchManager
-from pywikibot.family import AutoFamily, Family
-from pywikibot.i18n import translate
-from pywikibot.site import BaseSite, DataSite, APISite, ClosedSite
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.bot import (
-    input, input_choice, input_yn, handle_args, show_help, ui,
-    calledModuleName, Bot, CurrentPageBot, WikidataBot,
+    Bot,
+    CurrentPageBot,
+    WikidataBot,
+    calledModuleName,
+    handle_args,
+    input,
+    input_choice,
+    input_yn,
+    show_help,
+    ui,
 )
-
 from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
 )
-
+from pywikibot.diff import PatchManager
+from pywikibot.family import AutoFamily, Family
+from pywikibot.i18n import translate
 from pywikibot.logging import (
-    critical, debug, error, exception, log, output, stdout, warning
+    critical,
+    debug,
+    error,
+    exception,
+    log,
+    output,
+    stdout,
+    warning,
 )
-
+from pywikibot.site import APISite, BaseSite, ClosedSite, DataSite
+from pywikibot.tools import MediaWikiVersion as _MediaWikiVersion
 from pywikibot.tools import (
-    classproperty,
-    deprecate_arg as _deprecate_arg,
-    normalize_username,
-    MediaWikiVersion as _MediaWikiVersion,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    suppress_warnings,
 )
+from pywikibot.tools import classproperty
+from pywikibot.tools import deprecate_arg as _deprecate_arg
+from pywikibot.tools import normalize_username, suppress_warnings
+from pywikibot.tools.formatter import color_format
+
 
 with suppress_warnings(category=FutureWarning):
     from pywikibot.data.api import UploadWarning
-
     from pywikibot.exceptions import (
-        CaptchaError, CascadeLockedPage, CircularRedirect,
-        CoordinateGlobeUnknownError, CoordinateGlobeUnknownException,
-        EditConflict, Error, FatalServerError, InterwikiRedirectPage,
-        InvalidTitle, IsNotRedirectPage, IsRedirectPage, LockedNoPage,
-        LockedPage, NoCreateError, NoMoveTarget, NoPage, NoUsername,
-        NoWikibaseEntity, OtherPageSaveError, PageCreatedConflict,
-        PageDeletedConflict, PageRelatedError, PageSaveRelatedError,
-        SectionError, Server414Error, Server504Error, ServerError,
-        SiteDefinitionError, SpamblacklistError, TitleblacklistError,
-        UnknownExtension, UnknownFamily, UnknownSite, UnsupportedPage,
-        WikiBaseError, DEPRECATED_EXCEPTIONS,
+        DEPRECATED_EXCEPTIONS,
+        CaptchaError,
+        CascadeLockedPage,
+        CircularRedirect,
+        CoordinateGlobeUnknownError,
+        CoordinateGlobeUnknownException,
+        EditConflict,
+        Error,
+        FatalServerError,
+        InterwikiRedirectPage,
+        InvalidTitle,
+        IsNotRedirectPage,
+        IsRedirectPage,
+        LockedNoPage,
+        LockedPage,
+        NoCreateError,
+        NoMoveTarget,
+        NoPage,
+        NoUsername,
+        NoWikibaseEntity,
+        OtherPageSaveError,
+        PageCreatedConflict,
+        PageDeletedConflict,
+        PageRelatedError,
+        PageSaveRelatedError,
+        SectionError,
+        Server414Error,
+        Server504Error,
+        ServerError,
+        SiteDefinitionError,
+        SpamblacklistError,
+        TitleblacklistError,
+        UnknownExtension,
+        UnknownFamily,
+        UnknownSite,
+        UnsupportedPage,
+        WikiBaseError,
     )
 
 
@@ -1173,18 +1214,19 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
 
 # These imports depend on Wb* classes above.
 from pywikibot.page import (  # noqa: E402
-    Page,
-    FilePage,
     Category,
+    Claim,
+    FilePage,
+    ItemPage,
     Link,
+    Page,
+    PropertyPage,
     SiteLink,
     User,
-    ItemPage,
-    PropertyPage,
-    Claim,
+    html2unicode,
+    unicode2html,
+    url2unicode,
 )
-from pywikibot.page import (  # noqa: E402
-    html2unicode, url2unicode, unicode2html)
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')

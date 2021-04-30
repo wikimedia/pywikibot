@@ -28,17 +28,15 @@ Purge mode:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.bot import MultipleSitesBot
-
 from pywikibot.exceptions import (
     LockedPageError,
     NoCreateError,
     NoPageError,
     PageSaveRelatedError,
 )
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

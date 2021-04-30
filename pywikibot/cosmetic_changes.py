@@ -56,21 +56,17 @@ or by adding a list to the given one:
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from typing import Optional
 
 import pywikibot
-
+from pywikibot import textlib
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import url2unicode
-from pywikibot import textlib
-
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     _get_regexes,
     _MultiTemplateMatchBuilder,
 )
-
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
@@ -78,6 +74,7 @@ from pywikibot.tools import (
     first_upper,
     issue_deprecation_warning,
 )
+
 
 try:
     import stdnum.isbn as stdnum_isbn

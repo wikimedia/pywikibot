@@ -12,7 +12,6 @@ import pickle
 import pprint
 import re
 import traceback
-
 from collections.abc import Container, MutableMapping, Sized
 from contextlib import suppress
 from email.generator import BytesGenerator
@@ -21,21 +20,14 @@ from email.mime.nonmultipart import MIMENonMultipart
 from inspect import getfullargspec
 from io import BytesIO
 from typing import Optional, Union
+from urllib.parse import unquote, urlencode
 from warnings import warn
-from urllib.parse import urlencode, unquote
 
 import pywikibot
 import pywikibot.exceptions
-
 from pywikibot import config, login
-from pywikibot.backports import removeprefix, Tuple
+from pywikibot.backports import Tuple, removeprefix
 from pywikibot.comms import http
-from pywikibot.family import SubdomainFamily
-from pywikibot.login import LoginStatus
-from pywikibot.textlib import removeHTMLParts
-from pywikibot.tools import itergroup, ModuleDeprecationWrapper, PYTHON_VERSION
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.exceptions import (
     CaptchaError,
     Error,
@@ -49,6 +41,11 @@ from pywikibot.exceptions import (
     TimeoutError,
     UnsupportedPageError,
 )
+from pywikibot.family import SubdomainFamily
+from pywikibot.login import LoginStatus
+from pywikibot.textlib import removeHTMLParts
+from pywikibot.tools import PYTHON_VERSION, ModuleDeprecationWrapper, itergroup
+from pywikibot.tools.formatter import color_format
 
 
 _logger = 'data.api'

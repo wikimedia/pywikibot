@@ -9,7 +9,6 @@ from contextlib import suppress
 from typing import Optional
 
 import pywikibot
-
 from pywikibot.backports import List
 from pywikibot.exceptions import Error, HiddenKeyError
 from pywikibot.tools import deprecated

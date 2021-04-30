@@ -7,28 +7,24 @@
 import datetime
 
 import pywikibot
-
-from pywikibot.exceptions import Error
-from pywikibot.family import Family
-from pywikibot.login import LoginStatus
-from pywikibot.tools import suppress_warnings
-
-from tests import join_images_path, patch
-from tests.utils import DummySiteinfo
-
 from pywikibot.data.api import (
     CachedRequest,
     ParamInfo,
     QueryGenerator,
     Request,
 )
-
+from pywikibot.exceptions import Error
+from pywikibot.family import Family
+from pywikibot.login import LoginStatus
+from pywikibot.tools import suppress_warnings
+from tests import join_images_path, patch
 from tests.aspects import (
     DefaultDrySiteTestCase,
     SiteAttributeTestCase,
     TestCase,
     unittest,
 )
+from tests.utils import DummySiteinfo
 
 
 class DryCachedRequestTests(SiteAttributeTestCase):

@@ -7,15 +7,12 @@
 import os
 import re
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot.exceptions import NoPageError, PageRelatedError
-
-from tests.aspects import TestCase
 from tests import join_images_path
+from tests.aspects import TestCase
 
 
 class TestShareFiles(TestCase):

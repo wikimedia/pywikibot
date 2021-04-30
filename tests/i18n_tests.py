@@ -7,10 +7,8 @@
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import bot, config, i18n, plural
 from pywikibot.exceptions import TranslationError
-
 from tests.aspects import (
     AutoDeprecationTestCase,
     DefaultSiteTestCase,

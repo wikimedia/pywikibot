@@ -5,13 +5,10 @@
 #
 # Distributed under the terms of the MIT license.
 import unittest
-
 from contextlib import suppress
 
-from pywikibot.tools import is_IP, PYTHON_VERSION
-
+from pywikibot.tools import PYTHON_VERSION, is_IP
 from tests import unittest_print
-
 from tests.aspects import TestCase
 from tests.utils import expected_failure_if
 

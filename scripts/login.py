@@ -45,9 +45,8 @@ subdirectory.
 #
 import pywikibot
 import pywikibot.bot
-
-from pywikibot.backports import Tuple
 from pywikibot import config
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 

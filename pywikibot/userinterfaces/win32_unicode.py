@@ -23,11 +23,12 @@
 ################################################
 import codecs
 import sys
-
 from contextlib import suppress
-from ctypes import Structure, byref, create_unicode_buffer, sizeof
+from ctypes import Structure, byref
 from ctypes import c_void_p as LPVOID
+from ctypes import create_unicode_buffer, sizeof
 from io import IOBase, UnsupportedOperation
+
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -39,9 +40,17 @@ argv = sys.argv
 original_stderr = sys.stderr
 
 if OSWIN32:
-    from ctypes import WINFUNCTYPE, windll, POINTER, WinError
-    from ctypes.wintypes import (BOOL, DWORD, HANDLE, LPWSTR,
-                                 SHORT, ULONG, UINT, WCHAR)
+    from ctypes import POINTER, WINFUNCTYPE, WinError, windll
+    from ctypes.wintypes import (
+        BOOL,
+        DWORD,
+        HANDLE,
+        LPWSTR,
+        SHORT,
+        UINT,
+        ULONG,
+        WCHAR,
+    )
 
 try:
     ReadConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPVOID, DWORD, POINTER(DWORD),

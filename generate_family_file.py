@@ -9,9 +9,9 @@ import codecs
 import os
 import string
 import sys
-
 from os import environ, getenv
 from urllib.parse import urlparse
+
 
 # see pywikibot.family.py
 # Legal characters for Family name and Family langs keys

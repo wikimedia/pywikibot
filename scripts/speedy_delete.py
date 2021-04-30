@@ -25,11 +25,9 @@ NOTE: This script currently only works for the Wikipedia project.
 # Distributed under the terms of the MIT license.
 #
 import time
-
 from textwrap import fill, wrap
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import Error

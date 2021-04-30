@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 from http import HTTPStatus
 from urllib.parse import urlparse
@@ -13,12 +12,10 @@ from urllib.parse import urlparse
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 
 import pywikibot
-
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
-
 from tests import unittest_print
-from tests.aspects import TestCase, PatchingTestCase
+from tests.aspects import PatchingTestCase, TestCase
 from tests.utils import DrySite
 
 

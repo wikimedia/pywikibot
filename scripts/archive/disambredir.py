@@ -15,15 +15,13 @@ If no starting name is provided, the bot starts at '!'.
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot import textlib, pagegenerators
-from pywikibot.exceptions import Error, SectionError
-
+from pywikibot import pagegenerators, textlib
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     InteractiveReplace,
     MultipleSitesBot,
 )
+from pywikibot.exceptions import Error, SectionError
 
 
 class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):

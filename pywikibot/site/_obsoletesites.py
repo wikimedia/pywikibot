@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot.exceptions import NoPageError
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite

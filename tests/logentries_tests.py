@@ -6,27 +6,18 @@
 #
 import datetime
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot.exceptions import HiddenKeyError, NoMoveTargetError
 from pywikibot.family import AutoFamily
-
-from tests import unittest_print
-
 from pywikibot.logentries import (
     LogEntryFactory,
     OtherLogEntry,
     UserTargetLogEntry,
 )
-
-from tests.aspects import (
-    DeprecationTestCase,
-    MetaTestCaseClass,
-    TestCase,
-)
+from tests import unittest_print
+from tests.aspects import DeprecationTestCase, MetaTestCaseClass, TestCase
 
 
 class TestLogentriesBase(TestCase):

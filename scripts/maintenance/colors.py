@@ -6,9 +6,8 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.tools.formatter import color_format
 from pywikibot.tools import itergroup
+from pywikibot.tools.formatter import color_format
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 

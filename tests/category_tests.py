@@ -5,14 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
-
 from pywikibot.exceptions import IsNotRedirectPageError
-
 from tests.aspects import TestCase
 
 

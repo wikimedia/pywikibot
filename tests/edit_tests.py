@@ -6,16 +6,14 @@
 #
 import time
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import config, page_put_queue
 from pywikibot.exceptions import Error
-
 from tests.aspects import TestCase
 from tests.oauth_tests import OAuthSiteTestCase
+
 
 called_back = False
 

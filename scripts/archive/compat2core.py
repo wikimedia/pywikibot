@@ -36,6 +36,7 @@ import sys
 
 import pywikibot
 
+
 # be careful with replacement order!
 replacements = (
     # doc strings

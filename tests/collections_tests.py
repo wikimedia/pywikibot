@@ -5,10 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
-
-from tests.aspects import WikidataTestCase
 
 from pywikibot.page import (
     AliasesDict,
@@ -16,6 +13,7 @@ from pywikibot.page import (
     LanguageDict,
     SiteLinkCollection,
 )
+from tests.aspects import WikidataTestCase
 
 
 class DataCollectionTestCase(WikidataTestCase):

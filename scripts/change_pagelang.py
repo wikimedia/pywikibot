@@ -22,11 +22,10 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.bot import SingleSiteBot
 from pywikibot.tools.formatter import color_format
+
 
 docuReplacements = {  # noqa: N816
     '&params;': pagegenerators.parameterHelp,

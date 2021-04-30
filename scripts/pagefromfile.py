@@ -67,11 +67,9 @@ can be added between them by specifying '\n' as a value.
 import codecs
 import os
 import re
-
 from typing import Generator
 
 import pywikibot
-
 from pywikibot import config, i18n
 from pywikibot.backports import Tuple
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot

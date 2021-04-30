@@ -9,12 +9,11 @@ Useful for editing the contents of an article.
 # Distributed under the terms of the MIT license.
 #
 import tkinter
-from tkinter.scrolledtext import ScrolledText
 from tkinter import simpledialog as tkSimpleDialog
+from tkinter.scrolledtext import ScrolledText
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import __url__
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
@@ -22,15 +21,13 @@ from pywikibot.tools import PYTHON_VERSION
 
 # T164163: Fix idlelib import in Python 3.6
 if PYTHON_VERSION >= (3, 6):
-    from idlelib import (
-        search as SearchDialog,
-        replace as ReplaceDialog,
-    )
+    from idlelib import replace as ReplaceDialog
+    from idlelib import search as SearchDialog
     from idlelib.config import idleConf
     from idlelib.configdialog import ConfigDialog
     from idlelib.multicall import MultiCallCreator
 else:
-    from idlelib import SearchDialog, ReplaceDialog
+    from idlelib import ReplaceDialog, SearchDialog
     from idlelib.configDialog import ConfigDialog
     from idlelib.configHandler import idleConf
     from idlelib.MultiCall import MultiCallCreator

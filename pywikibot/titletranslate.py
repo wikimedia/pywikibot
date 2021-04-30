@@ -5,9 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import date
-
-from pywikibot import config
+from pywikibot import config, date
 from pywikibot.tools import deprecated_args
 
 

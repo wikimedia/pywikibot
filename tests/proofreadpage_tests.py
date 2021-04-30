@@ -7,21 +7,18 @@
 import difflib
 import json
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot.data import api
 from pywikibot.exceptions import UnknownExtensionError
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
 from pywikibot.tools import has_module
-
 from tests import unittest_print
-from tests.aspects import require_modules, TestCase
+from tests.aspects import TestCase, require_modules
 from tests.basepage import (
-    BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
+    BasePageMethodsTestBase,
 )
 
 

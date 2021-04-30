@@ -13,13 +13,8 @@ from io import StringIO
 
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
-
 from tests import mock
-
-from tests.aspects import (
-    DefaultDrySiteTestCase,
-    unittest,
-)
+from tests.aspects import DefaultDrySiteTestCase, unittest
 
 
 class FakeFamily:

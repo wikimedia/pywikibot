@@ -47,16 +47,14 @@ Commandline parameters:
 # Distributed under the terms of the MIT license.
 #
 import time
-
 from collections import defaultdict
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.backports import removeprefix
 from pywikibot.bot import BaseBot, suggest_help
+
 
 try:
     import mwparserfromhell

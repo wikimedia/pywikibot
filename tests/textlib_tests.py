@@ -9,27 +9,24 @@ import functools
 import os
 import re
 import unittest
-
 from collections import OrderedDict
 from contextlib import suppress
 
 import pywikibot
-
+from pywikibot import textlib
 from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
-from pywikibot import textlib
 from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import suppress_warnings
-
 from tests import mock
-
 from tests.aspects import (
     DefaultDrySiteTestCase,
-    require_modules,
     SiteAttributeTestCase,
     TestCase,
+    require_modules,
 )
+
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), 'pages')

@@ -9,8 +9,9 @@ import os
 import sys
 
 # logging levels
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
 from typing import Optional
+
 
 STDOUT = 16
 VERBOSE = 18

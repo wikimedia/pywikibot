@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import math
-
 from string import Formatter
 from typing import Any, Mapping, Sequence
 

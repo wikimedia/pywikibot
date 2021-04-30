@@ -104,12 +104,10 @@ import hashlib
 import io
 import os
 import posixpath
-
 from urllib.parse import urlparse
 from warnings import warn
 
 import pywikibot
-
 from pywikibot import pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch

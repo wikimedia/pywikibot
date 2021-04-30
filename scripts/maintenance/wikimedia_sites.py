@@ -15,9 +15,9 @@ import codecs
 import re
 
 import pywikibot
-
 from pywikibot.data import wikistats
 from pywikibot.family import Family
+
 
 # supported families by this script
 families_list = [

@@ -11,11 +11,9 @@ class in edit_failiure_tests.py
 #
 import time
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from tests.aspects import WikibaseTestCase
 
 

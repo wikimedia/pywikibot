@@ -4,20 +4,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import pkg_resources
-
 from typing import Optional
 
+import pkg_resources
+
 import pywikibot
+from pywikibot import config2 as config
+from pywikibot.tools import deprecated_args
+
 
 try:
     import pymysql
 except ImportError:
     raise ImportError('MySQL python module not found. Please install PyMySQL.')
-
-
-from pywikibot import config2 as config
-from pywikibot.tools import deprecated_args
 
 
 @deprecated_args(encoding=True)

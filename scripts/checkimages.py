@@ -84,22 +84,16 @@ Todo
 import collections
 import re
 import time
-
 from typing import Generator
 
 import pywikibot
-
+from pywikibot import config, i18n
+from pywikibot import pagegenerators as pg
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import suggest_help
-from pywikibot import config2 as config
-from pywikibot.family import Family
-from pywikibot import i18n
-from pywikibot import pagegenerators as pg
-from pywikibot.site import Namespace
-
 from pywikibot.exceptions import (
-    Error,
     EditConflictError,
+    Error,
     IsRedirectPageError,
     LockedPageError,
     NoPageError,
@@ -107,6 +101,9 @@ from pywikibot.exceptions import (
     PageRelatedError,
     TranslationError,
 )
+from pywikibot.family import Family
+from pywikibot.site import Namespace
+
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#

@@ -13,6 +13,7 @@ from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import ModuleDeprecationWrapper, suppress_warnings
 
+
 with suppress_warnings(category=FutureWarning):
     from pywikibot.site._basesite import PageInUse
 

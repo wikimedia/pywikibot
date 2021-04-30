@@ -5,14 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
-
 from scripts import delete
-
 from tests.aspects import ScriptMainTestCase
 from tests.utils import empty_sites
 

@@ -9,13 +9,10 @@ These tests write to the wiki.
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from scripts import disambredir
-
 from tests.bot_tests import FakeSaveBotTestCase, TWNBotTestCase
 from tests.utils import fixed_generator
 

@@ -10,8 +10,8 @@ import os
 import sys
 
 import pywikibot
+from pywikibot.version import get_toolforge_hostname, getversion
 
-from pywikibot.version import getversion, get_toolforge_hostname
 
 try:
     import requests

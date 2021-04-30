@@ -8,25 +8,23 @@
 import codecs
 import os
 import webbrowser
-
 from enum import IntEnum
 from typing import Optional
 from warnings import warn
 
 import pywikibot
 import pywikibot.data.api
-
-from pywikibot import config, __url__
+from pywikibot import __url__, config
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-
 from pywikibot.tools import (
+    ModuleDeprecationWrapper,
     deprecated_args,
     file_mode_checker,
-    ModuleDeprecationWrapper,
     normalize_username,
     remove_last_args,
 )
+
 
 try:
     import mwoauth

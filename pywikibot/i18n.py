@@ -23,9 +23,8 @@ import json
 import os
 import pkgutil
 import re
-
-from collections.abc import Mapping
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import suppress
 from textwrap import fill
 from typing import Optional, Union
@@ -33,18 +32,17 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.exceptions
-
 from pywikibot import __url__
 from pywikibot import config2 as config
-from pywikibot.backports import cache, List
+from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
-
 from pywikibot.tools import (
+    ModuleDeprecationWrapper,
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
 )
+
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 

@@ -6,26 +6,21 @@
 #
 import pickle
 import re
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
-
 from pywikibot import config
-from pywikibot.tools import suppress_warnings
-
-from tests import mock, WARN_SITE_CODE
-
 from pywikibot.exceptions import (
     Error,
+    InvalidTitleError,
     IsNotRedirectPageError,
     IsRedirectPageError,
-    InvalidTitleError,
     NoPageError,
     UnknownExtensionError,
 )
-
+from pywikibot.tools import suppress_warnings
+from tests import WARN_SITE_CODE, mock
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,

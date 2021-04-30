@@ -12,7 +12,6 @@ Parameters:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import i18n, textlib
 from pywikibot.exceptions import IsRedirectPageError, LockedPageError
 

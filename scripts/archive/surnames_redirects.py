@@ -24,9 +24,9 @@ Example:
 from difflib import SequenceMatcher
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
+from pywikibot.bot import ExistingPageBot, FollowRedirectPageBot
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

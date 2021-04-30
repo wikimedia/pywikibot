@@ -8,11 +8,6 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot.editor import TextEditor
-from pywikibot.exceptions import UnhandledAnswerError
-from pywikibot.textlib import replace_links
-from pywikibot.tools import ModuleDeprecationWrapper
-
 from pywikibot.bot import (
     AlwaysChoice,
     AutomaticTWSummaryBot,
@@ -21,6 +16,10 @@ from pywikibot.bot import (
     InteractiveReplace,
     NoRedirectPageBot,
 )
+from pywikibot.editor import TextEditor
+from pywikibot.exceptions import UnhandledAnswerError
+from pywikibot.textlib import replace_links
+from pywikibot.tools import ModuleDeprecationWrapper
 
 
 class EditReplacementError(ChoiceException, UnhandledAnswerError):

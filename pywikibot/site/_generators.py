@@ -7,7 +7,6 @@
 import heapq
 import itertools
 import typing
-
 from contextlib import suppress
 from itertools import zip_longest
 from typing import Any, Optional, Union
@@ -15,20 +14,17 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-
 from pywikibot.backports import Dict, List
 from pywikibot.data import api
-from pywikibot.site._decorators import need_right, need_version
-
 from pywikibot.exceptions import (
     APIError,
     Error,
     InconsistentTitleError,
     InvalidTitleError,
     NoPageError,
-    UserRightsError
+    UserRightsError,
 )
-
+from pywikibot.site._decorators import need_right, need_version
 from pywikibot.tools import (
     deprecated,
     deprecated_args,

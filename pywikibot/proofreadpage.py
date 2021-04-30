@@ -26,12 +26,19 @@ OCR support of page scans via:
 import json
 import re
 import time
-
 from functools import partial
 from http import HTTPStatus
 from typing import Optional
 
 from requests.exceptions import ReadTimeout
+
+import pywikibot
+from pywikibot import textlib
+from pywikibot.comms import http
+from pywikibot.data.api import Request
+from pywikibot.exceptions import Error, OtherPageSaveError
+from pywikibot.tools import ModuleDeprecationWrapper
+
 
 try:
     from bs4 import BeautifulSoup
@@ -50,13 +57,6 @@ else:
     else:
         _bs4_soup = partial(BeautifulSoup, features='lxml')
 
-import pywikibot
-
-from pywikibot.comms import http
-from pywikibot.data.api import Request
-from pywikibot.exceptions import Error, OtherPageSaveError
-from pywikibot import textlib
-from pywikibot.tools import ModuleDeprecationWrapper
 
 _logger = 'proofreadpage'
 

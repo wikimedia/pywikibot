@@ -7,8 +7,7 @@
 from contextlib import suppress
 
 from scripts.patrol import PatrolBot
-
-from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
+from tests.aspects import DefaultDrySiteTestCase, require_modules, unittest
 
 
 DUMMY_PAGE_TUPLES = """

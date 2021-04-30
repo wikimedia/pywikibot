@@ -7,11 +7,9 @@
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUserError
 from pywikibot.tools import suppress_warnings
-
 from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 

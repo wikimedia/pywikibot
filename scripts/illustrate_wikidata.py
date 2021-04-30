@@ -18,8 +18,8 @@ Usage:
 # Distributed under the terms of MIT License.
 #
 import pywikibot
+from pywikibot import WikidataBot, pagegenerators
 
-from pywikibot import pagegenerators, WikidataBot
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

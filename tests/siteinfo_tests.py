@@ -6,18 +6,13 @@
 #
 import re
 import unittest
-
 from contextlib import suppress
 from datetime import datetime
 
 import pywikibot
-
 from pywikibot import async_request, page_put_queue
-
-from tests import patch, MagicMock
-from tests.aspects import (
-    DefaultSiteTestCase, DefaultDrySiteTestCase,
-)
+from tests import MagicMock, patch
+from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase
 from tests.utils import entered_loop
 
 

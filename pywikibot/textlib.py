@@ -13,25 +13,24 @@ and return a unicode string.
 import datetime
 import html
 import re
-
-from collections.abc import Sequence
 from collections import OrderedDict, namedtuple
+from collections.abc import Sequence
 from contextlib import suppress
 from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import List
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
-
 from pywikibot.tools import (
-    deprecated,
     deprecate_arg,
+    deprecated,
     issue_deprecation_warning,
 )
+
 
 try:
     import wikitextparser

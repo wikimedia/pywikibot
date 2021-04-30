@@ -38,11 +38,9 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 # Distributed under the terms of the MIT license.
 #
 import datetime
-
 from typing import Generator
 
 import pywikibot
-
 from pywikibot.backports import Dict, List, Tuple
 
 

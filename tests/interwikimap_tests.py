@@ -7,11 +7,9 @@
 import unittest
 
 import pywikibot
-
 from pywikibot.tools import suppress_warnings
-
-from tests.aspects import TestCase
 from tests import WARN_SITE_CODE
+from tests.aspects import TestCase
 
 
 class TestInterwikiMap(TestCase):

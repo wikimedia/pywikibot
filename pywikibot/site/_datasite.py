@@ -7,18 +7,13 @@
 import datetime
 import json
 import uuid
-
 from contextlib import suppress
 from typing import Optional
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
-
 from pywikibot.data import api
-from pywikibot.site._apisite import APISite
-from pywikibot.site._decorators import need_right, need_version
-
 from pywikibot.exceptions import (
     APIError,
     EntityTypeUnknownError,
@@ -26,7 +21,8 @@ from pywikibot.exceptions import (
     NoPageError,
     NoWikibaseEntityError,
 )
-
+from pywikibot.site._apisite import APISite
+from pywikibot.site._decorators import need_right, need_version
 from pywikibot.tools import (
     deprecated,
     deprecated_args,

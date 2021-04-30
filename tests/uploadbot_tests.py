@@ -10,13 +10,11 @@ These tests write to the wiki.
 #
 import os
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.specialbots import UploadRobot
-
 from tests import join_images_path
-from tests.aspects import TestCase, DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class TestUploadbot(TestCase):

@@ -14,7 +14,6 @@ import sys
 import sysconfig
 import time
 import xml.dom.minidom
-
 from contextlib import closing, suppress
 from importlib import import_module
 from io import BytesIO
@@ -22,12 +21,11 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-
+from pywikibot import config2 as config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
-from pywikibot import config2 as config
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import deprecated, ModuleDeprecationWrapper
+from pywikibot.tools import ModuleDeprecationWrapper, deprecated
 
 
 _logger = 'version'
@@ -330,6 +328,7 @@ def getversion_package(path=None):
 def getversion_onlinerepo(path='branches/master'):
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
+
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
     buf = http.fetch(

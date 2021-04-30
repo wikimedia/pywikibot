@@ -144,14 +144,12 @@ the top of the help.
 #
 import codecs
 import re
-
 from collections.abc import Sequence
 from contextlib import suppress
 from queue import Queue
 
 import pywikibot
-
-from pywikibot import fixes, editor, i18n, textlib, pagegenerators
+from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import NoPageError
 from pywikibot.tools import chars, deprecated_args

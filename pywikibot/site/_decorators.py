@@ -5,7 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot.exceptions import UnknownExtensionError, UserRightsError
-from pywikibot.tools import manage_wrapping, MediaWikiVersion
+from pywikibot.tools import MediaWikiVersion, manage_wrapping
 
 
 def must_be(group=None):

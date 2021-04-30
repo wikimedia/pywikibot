@@ -10,7 +10,6 @@ import hashlib
 import inspect
 import itertools
 import os
-import pkg_resources
 import queue
 import re
 import stat
@@ -19,9 +18,8 @@ import sys
 import threading
 import time
 import types
-
-from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from collections import defaultdict
+from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from contextlib import suppress
 from datetime import datetime
 from functools import wraps
@@ -32,8 +30,11 @@ from itertools import chain, zip_longest
 from typing import Optional
 from warnings import catch_warnings, showwarning, warn
 
+import pkg_resources
+
 from pywikibot.logging import debug
 from pywikibot.tools._unidata import _first_upper_exception
+
 
 try:
     import bz2

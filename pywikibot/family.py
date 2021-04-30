@@ -12,23 +12,20 @@ import sys
 import types
 import urllib.parse as urlparse
 import warnings
-
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import config
 from pywikibot.backports import Dict, List, Tuple
-from pywikibot.exceptions import UnknownFamilyError, FamilyMaintenanceWarning
-
+from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import (
+    ModuleDeprecationWrapper,
     classproperty,
     deprecated,
     deprecated_args,
-    ModuleDeprecationWrapper,
 )
 
 

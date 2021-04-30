@@ -9,18 +9,14 @@ import codecs
 import os
 import re
 import sys
-
 from itertools import chain, combinations
 from string import ascii_letters
 
 import pywikibot
-
 from pywikibot import i18n
-
 from pywikibot.data import api
 from pywikibot.exceptions import LockedPageError, PageSaveRelatedError
 from pywikibot.tools import first_lower, first_upper, formatter
-
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
 

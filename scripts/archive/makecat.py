@@ -53,8 +53,7 @@ from itertools import chain
 from textwrap import fill
 
 import pywikibot
-
-from pywikibot import pagegenerators, i18n, textlib
+from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
 from pywikibot.exceptions import Error
 from pywikibot.tools import DequeGenerator

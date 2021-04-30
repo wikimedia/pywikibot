@@ -19,14 +19,12 @@ This script supports the following command line parameters:
 #
 import binascii
 import os.path
-
 from http import HTTPStatus
 from os import remove, replace, symlink, urandom
 
 import pywikibot
-
-from pywikibot.backports import Tuple
 from pywikibot import Bot
+from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
 
 

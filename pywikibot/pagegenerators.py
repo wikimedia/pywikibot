@@ -24,35 +24,32 @@ import itertools
 import json
 import re
 import sys
-
-from collections.abc import Iterator
 from collections import namedtuple
+from collections.abc import Iterator
 from datetime import timedelta
 from functools import partial
 from http import HTTPStatus
 from itertools import zip_longest
-from requests.exceptions import ReadTimeout
 from typing import Optional, Union
 
-import pywikibot
+from requests.exceptions import ReadTimeout
 
-from pywikibot import date, config, i18n, xmlreader
+import pywikibot
+from pywikibot import config, date, i18n, xmlreader
 from pywikibot.backports import Iterable, List
 from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
 from pywikibot.data import api
-from pywikibot.proofreadpage import ProofreadPage
-
 from pywikibot.exceptions import (
     NoPageError,
     ServerError,
     UnknownExtensionError,
 )
-
+from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
+    DequeGenerator,
     deprecated,
     deprecated_args,
-    DequeGenerator,
     filter_unique,
     intersect_generators,
     itergroup,

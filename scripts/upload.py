@@ -60,7 +60,6 @@ import os
 import re
 
 import pywikibot
-
 from pywikibot.bot import suggest_help
 from pywikibot.specialbots import UploadRobot
 

@@ -43,8 +43,7 @@ The following command line parameters are supported:
 from typing import Optional
 
 import pywikibot
-
-from pywikibot import pagegenerators, WikidataBot
+from pywikibot import WikidataBot, pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import CoordinateGlobeUnknownError
 

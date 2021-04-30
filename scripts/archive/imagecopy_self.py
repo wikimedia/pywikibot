@@ -38,18 +38,16 @@ check it yourself.
 import re
 import threading
 import webbrowser
-
 from datetime import datetime
 from queue import Queue
 from textwrap import fill
 
 import pywikibot
-
-from pywikibot import pagegenerators, i18n
+from pywikibot import i18n, pagegenerators
 from pywikibot.specialbots import UploadRobot
 from pywikibot.textlib import removeCategoryLinks
+from scripts import image, imagerecat
 
-from scripts import imagerecat, image
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog, Tkinter

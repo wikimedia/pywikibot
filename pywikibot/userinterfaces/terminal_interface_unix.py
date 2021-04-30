@@ -8,6 +8,7 @@ import re
 
 from pywikibot.userinterfaces import terminal_interface_base
 
+
 unixColors = {
     'default':     chr(27) + '[0m',   # Unix end tag to switch back to default
     'black':       chr(27) + '[30m',  # Black start tag

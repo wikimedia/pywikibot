@@ -6,16 +6,13 @@
 #
 import json
 import unittest
-
 from contextlib import suppress
 
-from tests import mock
-
 from pywikibot import config
-from pywikibot.comms.eventstreams import EventStreams, EventSource
+from pywikibot.comms.eventstreams import EventSource, EventStreams
 from pywikibot.family import WikimediaFamily
-
-from tests.aspects import TestCase, DefaultSiteTestCase, require_modules
+from tests import mock
+from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())

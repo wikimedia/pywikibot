@@ -82,18 +82,15 @@ To complete a move of a page, one can use:
 import codecs
 import os
 import re
-
 from contextlib import suppress
 from itertools import chain
 from typing import Generator, Optional, Tuple
 
 import pywikibot
-
-from pywikibot.backports import List
-from pywikibot import config, i18n, pagegenerators
+from pywikibot import config
 from pywikibot import editor as editarticle
-from pywikibot.tools.formatter import SequenceOutputter
-
+from pywikibot import i18n, pagegenerators
+from pywikibot.backports import List
 from pywikibot.bot import (
     HighlightContextOption,
     ListOption,
@@ -101,7 +98,6 @@ from pywikibot.bot import (
     SingleSiteBot,
     StandardOption,
 )
-
 from pywikibot.exceptions import (
     Error,
     IsNotRedirectPageError,
@@ -110,13 +106,13 @@ from pywikibot.exceptions import (
     NoPageError,
     PageSaveRelatedError,
 )
-
 from pywikibot.tools import (
     deprecated,
     first_lower,
     first_upper,
     issue_deprecation_warning,
 )
+from pywikibot.tools.formatter import SequenceOutputter
 
 
 # Disambiguation Needed template

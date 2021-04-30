@@ -42,15 +42,11 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-
 from pywikibot.bot import SingleSiteBot
-
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 

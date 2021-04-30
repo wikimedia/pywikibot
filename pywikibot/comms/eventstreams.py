@@ -14,22 +14,23 @@ This module requires sseclient to be installed::
 #
 import json
 import socket
-
 from functools import partial
-from pkg_resources import parse_version
 from typing import Optional
 
+from pkg_resources import parse_version
 from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
+
+from pywikibot import Site, Timestamp, config, debug, warning
+from pywikibot.tools import deprecated_args
+
 
 try:
     from sseclient import SSEClient as EventSource
 except ImportError as e:
     EventSource = e
 
-from pywikibot import config, debug, Timestamp, Site, warning
-from pywikibot.tools import deprecated_args
 
 if parse_version(requests_version) < parse_version('2.20.1'):
     raise ImportError(

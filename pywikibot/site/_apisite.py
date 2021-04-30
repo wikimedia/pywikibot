@@ -10,8 +10,7 @@ import os
 import re
 import time
 import typing
-
-from collections import defaultdict, namedtuple, OrderedDict
+from collections import OrderedDict, defaultdict, namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
@@ -20,20 +19,10 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
-from pywikibot.exceptions import APIError
-from pywikibot.login import LoginStatus as _LoginStatus
-from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right, need_version
-from pywikibot.site._generators import GeneratorsMixin
-from pywikibot.site._interwikimap import _InterwikiMap
-from pywikibot.site._namespace import Namespace
-from pywikibot.site._siteinfo import Siteinfo
-from pywikibot.site._tokenwallet import TokenWallet
-
 from pywikibot.exceptions import (
+    APIError,
     ArticleExistsConflictError,
     CaptchaError,
     CascadeLockedPageError,
@@ -55,10 +44,12 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
-    UploadError,
     UnknownExtensionError,
+    UploadError,
 )
-
+from pywikibot.login import LoginStatus as _LoginStatus
+from pywikibot.site._basesite import BaseSite
+from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._extensions import (
     EchoMixin,
     FlowMixin,
@@ -72,14 +63,18 @@ from pywikibot.site._extensions import (
     UrlShortenerMixin,
     WikibaseClientMixin,
 )
-
+from pywikibot.site._generators import GeneratorsMixin
+from pywikibot.site._interwikimap import _InterwikiMap
+from pywikibot.site._namespace import Namespace
+from pywikibot.site._siteinfo import Siteinfo
+from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
+    MediaWikiVersion,
     compute_file_hash,
-    deprecated,
     deprecate_arg,
+    deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    MediaWikiVersion,
     merge_unique_dicts,
     normalize_username,
     remove_last_args,

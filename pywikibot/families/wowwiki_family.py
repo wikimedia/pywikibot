@@ -5,7 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import deprecated, classproperty
+from pywikibot.tools import classproperty, deprecated
 
 
 class Family(family.FandomFamily):

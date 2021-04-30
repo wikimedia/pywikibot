@@ -43,10 +43,9 @@ and override its `callback` method. Here is a sample:
 from typing import Union
 
 import pywikibot
-
+from pywikibot import i18n
 from pywikibot.bot import OptionHandler
 from pywikibot.exceptions import APIError, Error
-from pywikibot import i18n
 from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
 

@@ -7,28 +7,18 @@
 import json
 import re
 import warnings
-
 from contextlib import suppress
 from http import HTTPStatus
 
 import requests
 
 import pywikibot
-
 from pywikibot import config2 as config
-
 from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.tools import PYTHON_VERSION, suppress_warnings
-
 from tests import join_images_path, patch
-
-from tests.aspects import (
-    unittest,
-    TestCase,
-    HttpbinTestCase,
-    require_modules,
-)
+from tests.aspects import HttpbinTestCase, TestCase, require_modules, unittest
 
 
 class HttpTestCase(TestCase):

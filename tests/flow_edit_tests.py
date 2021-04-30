@@ -5,12 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import contextmanager, suppress
 
 from pywikibot.exceptions import LockedPageError
-from pywikibot.flow import Board, Topic, Post
-
+from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
 
 

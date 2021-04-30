@@ -7,9 +7,8 @@
 import unittest
 
 from pywikibot.exceptions import UserRightsError
-from pywikibot.tools import deprecated
 from pywikibot.site._decorators import must_be, need_right, need_version
-
+from pywikibot.tools import deprecated
 from tests.aspects import DebugOnlyTestCase, DeprecationTestCase
 
 

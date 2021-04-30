@@ -18,15 +18,14 @@ from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
-
 from pywikibot import pagegenerators
-from pywikibot.tools import issue_deprecation_warning
-
 from pywikibot.exceptions import (
     ArgumentDeprecationWarning,
     EditConflictError,
     LockedPageError,
 )
+from pywikibot.tools import issue_deprecation_warning
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,

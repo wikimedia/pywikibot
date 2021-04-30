@@ -29,14 +29,9 @@ import os
 import subprocess
 import sys
 import time
-
 from contextlib import suppress
 
 import pywikibot
-
-from tests.aspects import TestCase, TestCaseBase
-from tests.utils import unittest, FakeModule
-
 from pywikibot.bot import (
     CRITICAL,
     DEBUG,
@@ -44,20 +39,22 @@ from pywikibot.bot import (
     INFO,
     INPUT,
     STDOUT,
-    ui,
     VERBOSE,
     WARNING,
+    ui,
 )
-
 from pywikibot.userinterfaces import (
     terminal_interface_base,
     terminal_interface_unix,
     terminal_interface_win32,
 )
+from tests.aspects import TestCase, TestCaseBase
+from tests.utils import FakeModule, unittest
+
 
 if os.name == 'nt':
-    from multiprocessing.managers import BaseManager
     import threading
+    from multiprocessing.managers import BaseManager
 
     try:
         import win32api

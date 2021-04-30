@@ -32,13 +32,10 @@ The following parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import os.path
-
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import i18n
-
 from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import NoPageError

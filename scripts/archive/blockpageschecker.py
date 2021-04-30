@@ -49,10 +49,7 @@ import time
 import webbrowser
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.exceptions import (
     EditConflictError,
     Error,
@@ -63,6 +60,8 @@ from pywikibot.exceptions import (
     ServerError,
     SpamblacklistError,
 )
+from pywikibot.tools.formatter import color_format
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

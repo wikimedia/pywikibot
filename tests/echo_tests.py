@@ -5,14 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot.echo import Notification
 from pywikibot.tools import suppress_warnings
-
 from tests.aspects import DefaultDrySiteTestCase
 
 

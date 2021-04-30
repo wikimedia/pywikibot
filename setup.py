@@ -35,6 +35,7 @@ import sys
 from pkg_resources import parse_version, safe_version
 from setuptools import setup
 
+
 PYTHON_VERSION = sys.version_info[:3]
 
 VERSIONS_REQUIRED_MESSAGE = """
@@ -80,6 +81,7 @@ extra_deps = {
         'flake8-comprehensions>=2.2.0',
         'flake8-docstrings>=1.3.1',
         'flake8-future-import',
+        'flake8-isort;python_version>="3.6"',
         'flake8-mock>=0.3',
         'flake8-print>=2.0.1',
         'flake8-quotes>=2.0.1',
@@ -167,7 +169,7 @@ def get_validated_version():  # pragma: no cover
 
     # validate version for sdist
     from contextlib import suppress
-    from subprocess import run, PIPE
+    from subprocess import PIPE, run
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()

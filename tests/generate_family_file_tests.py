@@ -5,16 +5,13 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 from random import sample
 from urllib.parse import urlparse
 
-from pywikibot import Site
-
-from tests.aspects import DefaultSiteTestCase
-
 import generate_family_file
+from pywikibot import Site
+from tests.aspects import DefaultSiteTestCase
 
 
 class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):

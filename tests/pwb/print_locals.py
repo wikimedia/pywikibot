@@ -7,6 +7,7 @@
 #
 import os.path
 
+
 if __name__ == '__main__':
     for k, v in sorted(locals().copy().items()):
         # Skip a few items that Python 3 adds and are not emulated in pwb.

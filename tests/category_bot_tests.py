@@ -5,15 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import BaseSite
-
-from scripts.category import CategoryPreprocess, CategoryMoveRobot
-
-from tests import patch, Mock
+from scripts.category import CategoryMoveRobot, CategoryPreprocess
+from tests import Mock, patch
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 

@@ -58,17 +58,12 @@ Warning! Put it in one line, otherwise it won't work correctly:
 import codecs
 import re
 import sys
-
 from typing import Optional, Union
 
 import pywikibot
-
+from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Tuple
 from pywikibot.bot_choice import QuitKeyboardInterrupt
-from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning
-
 from pywikibot.exceptions import (
     ArgumentDeprecationWarning,
     EditConflictError,
@@ -79,6 +74,9 @@ from pywikibot.exceptions import (
     ServerError,
     SpamblacklistError,
 )
+from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools.formatter import color_format
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

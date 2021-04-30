@@ -165,7 +165,6 @@ import locale
 import pickle
 import re
 import time
-
 from contextlib import suppress
 from datetime import timedelta
 from enum import Enum
@@ -174,7 +173,6 @@ from textwrap import fill
 from typing import Generator
 
 import pywikibot
-
 from pywikibot import config, i18n
 from pywikibot.backports import List
 from pywikibot.bot import SingleSiteBot

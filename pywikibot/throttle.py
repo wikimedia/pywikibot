@@ -7,14 +7,13 @@
 import math
 import threading
 import time
-
 from collections import namedtuple
 from contextlib import suppress
 from typing import Optional, Union
 
 import pywikibot
-
 from pywikibot import config
+
 
 _logger = 'wiki.throttle'
 

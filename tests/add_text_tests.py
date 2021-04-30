@@ -7,9 +7,7 @@
 import unittest
 
 import pywikibot
-
 from scripts.add_text import add_text, get_text
-
 from tests.aspects import TestCase
 
 

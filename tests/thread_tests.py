@@ -5,13 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from collections import Counter
 from contextlib import suppress
 
-from tests.aspects import TestCase
-
 from pywikibot.tools import ThreadedGenerator, intersect_generators
+from tests.aspects import TestCase
 
 
 class BasicThreadedGeneratorTestCase(TestCase):

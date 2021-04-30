@@ -17,39 +17,35 @@ import sys
 import time
 import unittest
 import warnings
-
-from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from contextlib import contextmanager, suppress
 from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
-
 import pywikibot.config2 as config
-
+from pywikibot import Site
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.exceptions import ServerError, NoUsernameError
+from pywikibot.exceptions import NoUsernameError, ServerError
 from pywikibot.family import WikimediaFamily
-from pywikibot import Site
 from pywikibot.site import BaseSite
 from pywikibot.tools import suppress_warnings
-
 from tests import (
-    patch_request,
-    unpatch_request,
-    unittest_print,
     WARN_SITE_CODE,
+    patch_request,
+    unittest_print,
+    unpatch_request,
 )
-
 from tests.utils import (
     AssertAPIErrorContextManager,
     DryRequest,
     DrySite,
-    execute_pwb,
     WarningSourceSkipContextManager,
+    execute_pwb,
 )
+
 
 try:
     import pytest_httpbin

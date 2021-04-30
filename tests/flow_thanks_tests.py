@@ -7,7 +7,6 @@
 import unittest
 
 from pywikibot.flow import Topic
-
 from tests.aspects import TestCase
 
 

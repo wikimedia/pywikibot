@@ -5,19 +5,15 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 from datetime import datetime, timedelta
 
 import pywikibot
 import pywikibot.page
-
 from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper
 from pywikibot.tools import suppress_warnings
-
 from scripts import archivebot
-
 from tests.aspects import TestCase
 
 

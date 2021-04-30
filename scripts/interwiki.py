@@ -337,35 +337,38 @@ import os
 import re
 import socket
 import sys
-
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from contextlib import suppress
 from textwrap import fill
 
 import pywikibot
-
-from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
-from pywikibot import titletranslate
-
-from pywikibot.bot import OptionHandler, ListOption, StandardOption
+from pywikibot import (
+    config,
+    i18n,
+    interwiki_graph,
+    pagegenerators,
+    textlib,
+    titletranslate,
+)
+from pywikibot.bot import ListOption, OptionHandler, StandardOption
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import first_upper, SizedKeyCollection
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.exceptions import (
     EditConflictError,
     Error,
     InvalidTitleError,
+    LockedPageError,
     NoCreateError,
     NoPageError,
     NoUsernameError,
-    LockedPageError,
     PageSaveRelatedError,
     ServerError,
     SiteDefinitionError,
     SpamblacklistError,
     UnknownSiteError,
 )
+from pywikibot.tools import SizedKeyCollection, first_upper
+from pywikibot.tools.formatter import color_format
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

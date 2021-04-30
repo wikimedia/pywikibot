@@ -5,18 +5,16 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
-
-from tests.aspects import DeprecationTestCase
 
 from pywikibot.tools import (
     add_full_name,
-    deprecated,
     deprecate_arg,
+    deprecated,
     deprecated_args,
     remove_last_args,
 )
+from tests.aspects import DeprecationTestCase
 
 
 @add_full_name

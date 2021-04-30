@@ -7,14 +7,9 @@
 import functools
 import re
 import threading
-
 from warnings import warn
 
 import pywikibot
-
-from pywikibot.site._namespace import Namespace, NamespacesDict
-from pywikibot.throttle import Throttle
-
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -22,15 +17,16 @@ from pywikibot.exceptions import (
     PageInUseError,
     UnknownSiteError,
 )
-
+from pywikibot.site._namespace import Namespace, NamespacesDict
+from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
+    ModuleDeprecationWrapper,
+    SelfCallString,
     deprecated,
     first_upper,
-    ModuleDeprecationWrapper,
     normalize_username,
     remove_last_args,
-    SelfCallString,
 )
 
 

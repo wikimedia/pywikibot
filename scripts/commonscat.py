@@ -41,11 +41,10 @@ For example to go through all categories:
 import re
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot, ExistingPageBot, NoRedirectPageBot
-
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from scripts.add_text import add_text
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

@@ -7,14 +7,12 @@
 #
 
 import pywikibot
-
-from pywikibot.tools import add_full_name, manage_wrapping
-
 from pywikibot.exceptions import (
     Error,
     OtherPageSaveError,
     PageSaveRelatedError,
 )
+from pywikibot.tools import add_full_name, manage_wrapping
 
 
 @add_full_name

@@ -6,8 +6,9 @@
 #
 import sys
 
-from pywikibot.tools._unidata import _category_cf
 from pywikibot.tools import LazyRegex
+from pywikibot.tools._unidata import _category_cf
+
 
 # This is a set of all invisible characters
 # At the moment we've only added the characters from the Cf category

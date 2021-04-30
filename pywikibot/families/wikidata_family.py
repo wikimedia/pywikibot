@@ -4,8 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot import config
-from pywikibot import family
+from pywikibot import config, family
 
 
 # The Wikidata family

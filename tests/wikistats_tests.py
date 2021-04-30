@@ -6,11 +6,9 @@
 #
 import sys
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.data.wikistats import WikiStats
-
 from tests.aspects import TestCase
 
 

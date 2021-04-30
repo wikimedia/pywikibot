@@ -9,30 +9,24 @@ Do not import classes directly from here but from specialbots.
 # Distributed under the terms of the MIT license.
 #
 import os
-import requests
 import tempfile
-
 from contextlib import suppress
 from http import HTTPStatus
 from pathlib import Path
 from typing import Optional, Union
 from urllib.parse import urlparse
 
+import requests
+
 import pywikibot
 import pywikibot.comms.http as http
 import pywikibot.data.api
-
+from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot import config
-from pywikibot.exceptions import APIError
+from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
-
-from pywikibot.exceptions import (
-    FatalServerError,
-    NoPageError,
-)
 
 
 class UploadRobot(BaseBot):

@@ -32,8 +32,7 @@ import pywikibot
 import pywikibot.data.api
 import pywikibot.i18n
 import pywikibot.textlib
-
-from pywikibot import pagegenerators, output, warning
+from pywikibot import output, pagegenerators, warning
 from pywikibot.backports import Set
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import APIError, NoPageError

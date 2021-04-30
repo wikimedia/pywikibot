@@ -93,14 +93,13 @@ will not add duplicate claims for the same member:
 #
 import signal
 import sys
-
 from typing import Any, Optional
 
 import pywikibot
-
-from pywikibot import pagegenerators as pg, textlib
+from pywikibot import pagegenerators as pg
+from pywikibot import textlib
 from pywikibot.backports import List
-from pywikibot.bot import WikidataBot, OptionHandler
+from pywikibot.bot import OptionHandler, WikidataBot
 from pywikibot.exceptions import InvalidTitleError, NoPageError
 
 

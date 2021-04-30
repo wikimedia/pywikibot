@@ -7,6 +7,7 @@
 #
 import pywikibot
 
+
 if __name__ == '__main__':
     pywikibot.output('Häuser')
     print('Häuser')

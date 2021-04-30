@@ -6,12 +6,10 @@
 #
 import unittest
 
-from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
-
 from pywikibot.tools import suppress_warnings
-
+from scripts.reflinks import ReferencesRobot, XmlDumpPageGenerator, main
 from tests import WARN_SITE_OBJ, join_xml_data_path
-from tests.aspects import TestCase, ScriptMainTestCase
+from tests.aspects import ScriptMainTestCase, TestCase
 from tests.utils import empty_sites
 
 

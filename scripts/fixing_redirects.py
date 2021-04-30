@@ -14,15 +14,10 @@ Can be used with:
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.textlib import does_text_contain_section, isDisabled
-from pywikibot.tools import first_lower, first_upper as firstcap
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
@@ -30,13 +25,17 @@ from pywikibot.bot import (
     SingleSiteBot,
     suggest_help,
 )
-
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
     InvalidTitleError,
     NoMoveTargetError,
 )
+from pywikibot.textlib import does_text_contain_section, isDisabled
+from pywikibot.tools import first_lower
+from pywikibot.tools import first_upper as firstcap
+from pywikibot.tools.formatter import color_format
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

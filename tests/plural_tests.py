@@ -5,12 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot import plural
-
-from tests.aspects import TestCase, MetaTestCaseClass
+from tests.aspects import MetaTestCaseClass, TestCase
 
 
 class MetaPluralRulesTest(MetaTestCaseClass):

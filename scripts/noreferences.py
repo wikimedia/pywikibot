@@ -34,16 +34,15 @@ a list of affected articles
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from functools import partial
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot.exceptions import LockedPageError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools import remove_last_args
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

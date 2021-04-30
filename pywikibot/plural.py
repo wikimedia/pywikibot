@@ -5,8 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 import sys
-
 from typing import Callable, Union
+
 
 if sys.version_info[:2] >= (3, 9):
     Dict = dict

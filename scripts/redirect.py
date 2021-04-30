@@ -71,24 +71,19 @@ Furthermore the following options are provided:
 # Distributed under the terms of the MIT license.
 #
 import datetime
-
 from contextlib import suppress
 from typing import Any, Generator, Optional, Union
 
 import pywikibot
 import pywikibot.data
-
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.textlib import extract_templates_and_params_regex_simple
-
 from pywikibot.bot import (
     ExistingPageBot,
     MultipleSitesBot,
     OptionHandler,
     RedirectPageBot,
 )
-
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
@@ -102,6 +97,8 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     UnsupportedPageError,
 )
+from pywikibot.textlib import extract_templates_and_params_regex_simple
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

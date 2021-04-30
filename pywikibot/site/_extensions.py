@@ -6,17 +6,15 @@
 #
 import pywikibot
 import pywikibot.family
-
 from pywikibot.data import api
 from pywikibot.echo import Notification
-from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.tools import deprecate_arg, deprecated_args, merge_unique_dicts
-
 from pywikibot.exceptions import (
     APIError,
     InconsistentTitleError,
     SiteDefinitionError,
 )
+from pywikibot.site._decorators import need_extension, need_right
+from pywikibot.tools import deprecate_arg, deprecated_args, merge_unique_dicts
 
 
 class EchoMixin:

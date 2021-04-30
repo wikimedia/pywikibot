@@ -19,9 +19,8 @@ import atexit
 import codecs
 import re
 import sys
-
 from contextlib import suppress
-from http import cookiejar, HTTPStatus
+from http import HTTPStatus, cookiejar
 from string import Formatter
 from typing import Optional, Union
 from urllib.parse import quote, urlparse
@@ -30,23 +29,21 @@ from warnings import warn
 import requests
 
 import pywikibot
-
-from pywikibot.backports import Tuple
 from pywikibot import config2 as config
-from pywikibot.logging import critical, debug, error, log, warning
-
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     FatalServerError,
-    Server504Error,
     Server414Error,
+    Server504Error,
 )
-
+from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
-    issue_deprecation_warning,
     file_mode_checker,
+    issue_deprecation_warning,
 )
+
 
 try:
     import requests_oauthlib

@@ -47,10 +47,8 @@ cannot be set by settings file:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.backports import Tuple
 from pywikibot import pagegenerators
-
+from pywikibot.backports import Tuple
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ConfigParserBot,

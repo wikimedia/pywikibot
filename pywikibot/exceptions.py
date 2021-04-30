@@ -159,7 +159,6 @@ UserWarning: warnings targeted at users
 #
 import re
 import sys
-
 from typing import Optional, Union
 
 from pywikibot.tools import ModuleDeprecationWrapper, _NotImplementedWarning

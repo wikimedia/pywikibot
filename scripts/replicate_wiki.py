@@ -43,13 +43,11 @@ The following parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import sys
-
 from argparse import ArgumentParser
 from collections import defaultdict
 
 import pywikibot
-
-from pywikibot import config, Page
+from pywikibot import Page, config
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 
 

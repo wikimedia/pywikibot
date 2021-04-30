@@ -6,15 +6,13 @@
 #
 import os
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import i18n
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-
 from tests.aspects import MetaTestCaseClass, TestCase
+
 
 PACKAGES = (
     'redirect-broken-redirect-template',  # speedy deletion template

@@ -5,13 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot.data.sparql as sparql
-
-from tests.aspects import TestCase, WikidataTestCase
 from tests import patch
+from tests.aspects import TestCase, WikidataTestCase
 
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/

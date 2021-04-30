@@ -11,6 +11,7 @@ import sys
 
 from pywikibot.tools import deprecated_args
 
+
 is_daemon = False
 
 

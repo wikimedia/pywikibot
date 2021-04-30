@@ -37,7 +37,6 @@ import re
 import sys
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError

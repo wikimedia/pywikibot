@@ -9,21 +9,14 @@ import random
 import threading
 import time
 import unittest
-
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from http import HTTPStatus
 
 import pywikibot
-
-from pywikibot.comms import http
 from pywikibot import config
+from pywikibot.comms import http
 from pywikibot.data import api
-from pywikibot.tools import suppress_warnings
-
-from tests import WARN_SITE_CODE, patch, unittest_print
-from tests.basepage import BasePageLoadRevisionsCachingTestBase
-
 from pywikibot.exceptions import (
     APIError,
     Error,
@@ -34,7 +27,8 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
     UnknownSiteError,
 )
-
+from pywikibot.tools import suppress_warnings
+from tests import WARN_SITE_CODE, patch, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -43,6 +37,7 @@ from tests.aspects import (
     TestCase,
     WikimediaDefaultSiteTestCase,
 )
+from tests.basepage import BasePageLoadRevisionsCachingTestBase
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,

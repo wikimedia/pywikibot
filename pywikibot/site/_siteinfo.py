@@ -7,13 +7,11 @@
 import copy
 import datetime
 import re
-
 from collections.abc import Container
 from contextlib import suppress
 from typing import Optional
 
 import pywikibot
-
 from pywikibot.exceptions import APIError
 from pywikibot.tools import EMPTY_DEFAULT, issue_deprecation_warning
 

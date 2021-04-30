@@ -31,16 +31,13 @@ Usage:
 import pickle
 import re
 import time
-
 from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
-
 from pywikibot.exceptions import (
     CircularRedirectError,
     Error,

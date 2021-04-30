@@ -39,15 +39,14 @@ import pipes
 import tempfile
 
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
     MultipleSitesBot,
     NoRedirectPageBot,
 )
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

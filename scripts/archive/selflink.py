@@ -17,10 +17,10 @@ These command line parameters can be used to specify which pages to work on:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot.bot import Choice, MultipleSitesBot
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 from pywikibot.specialbots import BaseUnlinkBot
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

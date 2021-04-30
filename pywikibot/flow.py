@@ -6,17 +6,16 @@
 #
 import abc
 import logging
-
-from urllib.parse import urlparse, parse_qs
-
-from pywikibot.page import BasePage, User
-from pywikibot.tools import deprecate_arg
+from urllib.parse import parse_qs, urlparse
 
 from pywikibot.exceptions import (
     LockedPageError,
     NoPageError,
     UnknownExtensionError,
 )
+from pywikibot.page import BasePage, User
+from pywikibot.tools import deprecate_arg
+
 
 logger = logging.getLogger('pywiki.wiki.flow')
 

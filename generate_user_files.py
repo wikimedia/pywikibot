@@ -9,13 +9,12 @@ import codecs
 import os
 import re
 import sys
-
-from typing import Optional
-
 from collections import namedtuple
 from textwrap import fill
+from typing import Optional
 
 from generate_family_file import _import_with_no_user_config
+
 
 if sys.version_info[:2] >= (3, 9):
     Tuple = tuple

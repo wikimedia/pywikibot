@@ -32,11 +32,9 @@ For further information see pywikibot/cosmetic_changes.py
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
-
+from pywikibot.bot import ExistingPageBot, MultipleSitesBot, NoRedirectPageBot
 from pywikibot.cosmetic_changes import (
     CANCEL_ALL,
     CANCEL_MATCH,

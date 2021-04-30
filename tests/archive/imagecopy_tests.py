@@ -7,7 +7,6 @@
 import re
 
 from scripts.imagecopy import pageTextPost
-
 from tests import join_data_path, unittest
 from tests.aspects import TestCase
 

@@ -29,11 +29,10 @@ from itertools import chain
 from typing import Generator, Tuple
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.tools.formatter import color_format
-
 from scripts.solve_disambiguation import DisambiguationRobot as BaseDisambigBot
+
 
 HELP_MSG = """\n
 misspelling.py does not support site {site}.

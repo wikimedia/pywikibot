@@ -33,17 +33,16 @@ In addition, these arguments can be used to restrict changes to some pages:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators
-from pywikibot.editor import TextEditor
-from pywikibot.tools.formatter import color_format
-
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
     NoRedirectPageBot,
     SingleSiteBot,
 )
+from pywikibot.editor import TextEditor
+from pywikibot.tools.formatter import color_format
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 

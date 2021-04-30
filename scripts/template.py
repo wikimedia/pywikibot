@@ -110,11 +110,9 @@ user talk pages (namespace #3):
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from itertools import chain
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
