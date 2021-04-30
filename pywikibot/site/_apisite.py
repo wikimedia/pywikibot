@@ -2324,11 +2324,11 @@ class APISite(
             'never', 'infinite', 'indefinite' it never does. If the value is
             given as a str it's parsed by php's strtotime function:
 
-                U{http://php.net/manual/en/function.strtotime.php}
+                U{https://www.php.net/manual/en/function.strtotime.php}
 
             The relative format is described there:
 
-                U{http://php.net/manual/en/datetime.formats.relative.php}
+                U{https://www.php.net/manual/en/datetime.formats.relative.php}
 
             It is recommended to not use a str if possible to be
             independent of the API.

@@ -2666,7 +2666,7 @@ def MySQLPageGenerator(query, site=None, verbose=None):
         FROM page
         WHERE page_namespace = 0;
 
-    See https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL.
+    See https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL
 
     @param query: MySQL query to execute
     @param site: Site object

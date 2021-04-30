@@ -26,7 +26,7 @@ class TestDjVuFile(TestCase):
     net = False
 
     file_djvu_not_existing = join_djvu_data_path('not_existing.djvu')
-    file_djvu = join_djvu_data_path('myfilé.djvu')  # test non-ascii name
+    file_djvu = join_djvu_data_path('myfilé.djvu')  # test non-ASCII name
     file_djvu_wo_text = join_djvu_data_path('myfile_wo_text.djvu')
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
 

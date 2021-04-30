@@ -35,7 +35,7 @@ class TestColorFormat(TestCase):
 
     class DummyUnicode:
 
-        """Dummy class that __str__ returns a non-ascii unicode value."""
+        """Dummy class that __str__ returns a non-ASCII Unicode value."""
 
         def __str__(self):
             """Return ä."""
