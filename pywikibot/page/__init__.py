@@ -3250,7 +3250,8 @@ class WikibaseEntity:
                 return getattr(self, name)
             return self.get()[name]
 
-        return super().__getattr__(name)
+        raise AttributeError("'{}' object has no attribute '{}'"
+                             .format(self.__class__.__name__, name))
 
     def _defined_by(self, singular: bool = False) -> dict:
         """
