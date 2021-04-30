@@ -81,6 +81,7 @@ auto_run_script_list = [
     'misspelling',
     'revertbot',
     'noreferences',
+    'nowcommons',
     'parser_function_count',
     'patrol',
     'shell',
@@ -101,7 +102,6 @@ no_args_expected_results = {
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
     'login': 'Logged in on ',
-    'nowcommons': 'No transcluded files found for NowCommons.',
     'pagefromfile': 'Please enter the file name',
     'parser_function_count': 'Hold on, this will need some time.',
     'replace': 'Press Enter to use this automatic message',
