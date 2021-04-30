@@ -1,4 +1,4 @@
-# See tests/README.rst for instructions for using travis with developer builds.
+# See tests/README.rst for instructions for using Travis with developer builds.
 
 language: python
 

@@ -121,7 +121,7 @@ test_deps = ['mock']
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.
 # These tests may be disabled because pywin32 depends on VC++, is time
-# consuming to build, and the console window can't be accessed during appveyor
+# consuming to build, and the console window can't be accessed during AppVeyor
 # builds.
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
     test_deps += [

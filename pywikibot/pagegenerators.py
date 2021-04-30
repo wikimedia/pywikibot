@@ -2591,8 +2591,8 @@ class GoogleSearchPageGenerator:
 
         L{https://pypi.org/project/google}
 
-    This package has been available since 2010, hosted on github
-    since 2012, and provided by pypi since 2013.
+    This package has been available since 2010, hosted on GitHub
+    since 2012, and provided by PyPI since 2013.
 
     As there are concerns about Google's Terms of Service, this
     generator prints a warning for each query.

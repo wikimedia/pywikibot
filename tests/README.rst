@@ -95,21 +95,21 @@ env
 Travis CI
 =========
 
-After changes are published into a github repository, tests may be run on
+After changes are published into a GitHub repository, tests may be run on
 travis-ci.org according to the configuration in .travis.yml .
 
 When changes are merged into the main repository, they are replicated to
-https://github.com/wikimedia/pywikibot , and travis tests are run and
+https://github.com/wikimedia/pywikibot , and Travis tests are run and
 published at https://travis-ci.org/wikimedia/pywikibot/builds .  These tests
 use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
 securely stored in .travis.yml file. See section env:global:secure.
 
-Anyone can run these tests on travis-ci.org using their own github account, with
+Anyone can run these tests on travis-ci.org using their own GitHub account, with
 code changes that have not been merged into the main repository. To do this:
 
-1. create a github and travis-ci account
-2. fork the main github repository https://github.com/wikimedia/pywikibot
-3. enable builds from the travis profile page: https://travis-ci.org/profile
+1. create a GitHub and travis-ci account
+2. fork the main GitHub repository https://github.com/wikimedia/pywikibot
+3. enable builds from the Travis profile page: https://travis-ci.org/profile
 4. push changes into the forked git repository
 5. watch the build at https://travis-ci.org/<username>/pywikibot/builds
 
@@ -118,7 +118,7 @@ Wikimedia account 'Pywikibot-test'. All tests which require a logged in user
 are skipped if the travis-ci build environment does not have a password.
 
 To enable 'user' tests on travis-ci builds for a different repository, add
-a username and password to travis:
+a username and password to Travis:
 
 1. Go to https://travis-ci.org/<username>/pywikibot/settings
 2. Add a new variable named PYWIKIBOT_USERNAME and a value of a valid
@@ -138,33 +138,33 @@ single quotes it is necessary to surround them in double quotes (see also
 `travis-ci #4350 <https://github.com/travis-ci/travis-ci/issues/4350>`_).
 
 It is strongly recommended that an untrusted bot account is created for
-travis tests, using a password that is not shared with trusted accounts.
+Travis tests, using a password that is not shared with trusted accounts.
 
-Appveyor CI
+AppVeyor CI
 ===========
 
-After changes are published into a github repository, tests may be run on
+After changes are published into a GitHub repository, tests may be run on
 a Microsoft Windows box provided by ci.appveyor.com according to the
 configuration in .appveyor.yml file. To do this:
 
-1. create a github and appveyor account
-2. fork the main github repository
+1. create a GitHub and AppVeyor account
+2. fork the main GitHub repository
 3. create a project in ci.appveyor.com
 4. go to https://ci.appveyor.com/project/<username>/pywikibot/settings
    and enter the custom configuration .yml filename: .appveyor.yml
 5. push changes into the forked git repository
 6. watch the build at https://ci.appveyor.com/<username>/pywikibot/history
 
-The 'user' tests are not yet enabled on appveyor builds.
+The 'user' tests are not yet enabled on AppVeyor builds.
 
 CircleCI
 ========
 
-After changes are published into a github repository, tests may be run on
+After changes are published into a GitHub repository, tests may be run on
 CircleCI Ubuntu servers.
 
-1. create a github and circleci account
-2. fork the main github repository
+1. create a GitHub and CircleCI account
+2. fork the main GitHub repository
 3. create a project in circleci.com
 4. go to https://circleci.com/gh/<username>/pywikibot/edit#env-vars
    and add the following variables:
@@ -190,7 +190,7 @@ and **should** fail. If there is a bug in pywikibot or MediaWiki, these
 tests **may** actually perform a write operation.
 
 These 'edit failure' tests are disabled by default. On Travis they are enabled
-by default on builds by any other github account except 'wikimedia'.
+by default on builds by any other GitHub account except 'wikimedia'.
 
 To disable 'edit failure' tests, set PYWIKIBOT_TEST_WRITE_FAIL=0
 
@@ -199,7 +199,7 @@ write operations successfully.  These **will** write to the wikis, and they
 should always only write to 'test' wikis.
 
 These 'write' tests are disabled by default, and currently can not be
-run on travis or appveyor as they require interaction using a terminal. Also
+run on Travis or AppVeyor as they require interaction using a terminal. Also
 enabling them won't enable 'edit failure' tests.
 
 To enable 'write' tests, set PYWIKIBOT_TEST_WRITE=1
