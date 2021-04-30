@@ -1390,5 +1390,5 @@ for name in __all__:
         wrapper._add_deprecated_attr(
             name,
             replacement_name='pywikibot.exceptions.{}'.format(replacement),
-            since='20210424',
+            since='20210424', future_warning=True
         )
