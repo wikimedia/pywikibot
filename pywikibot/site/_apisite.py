@@ -22,6 +22,7 @@ import pywikibot.family
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.exceptions import (
+    AbuseFilterDisallowedError,
     APIError,
     ArticleExistsConflictError,
     CaptchaError,
@@ -1525,6 +1526,7 @@ class APISite(
         'cascadeprotected': CascadeLockedPageError,
         'titleblacklist-forbidden': TitleblacklistError,
         'spamblacklist': SpamblacklistError,
+        'abusefilter-disallowed': AbuseFilterDisallowedError,
     }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
@@ -1640,6 +1642,12 @@ class APISite(
                             "editpage: received '%s' even though bot is "
                             'logged in' % err.code,
                             _logger)
+                    if err.code == 'abusefilter-warning':
+                        pywikibot.warning('{info}\n{warning}\nRetrying.'
+                                          .format(info=err.info,
+                                                  warning=err.other['warning'],
+                                                  ))
+                        continue
                     if err.code in self._ep_errors:
                         exception = self._ep_errors[err.code]
                         if isinstance(exception, str):
@@ -1650,6 +1658,12 @@ class APISite(
                                 'info': err.info
                             }
                             raise Error(exception % errdata)
+                        if issubclass(exception, AbuseFilterDisallowedError):
+                            errdata = {
+                                'info': err.info,
+                                'warning': err.other['warning'],
+                            }
+                            raise exception(page, **errdata) from None
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
