@@ -52,11 +52,12 @@ class FamilyFileGenerator:
     def get_wiki(self):
         """Get wiki from base_url."""
         import pywikibot
+        from pywikibot.exceptions import FatalServerError
         print('Generating family file from ' + self.base_url)
         for verify in (True, False):
             try:
                 w = self.Wiki(self.base_url, verify=verify)
-            except pywikibot.exceptions.FatalServerError:
+            except FatalServerError:
                 print('ERROR: '
                       + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()
