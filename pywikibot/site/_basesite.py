@@ -21,7 +21,6 @@ from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
-    ModuleDeprecationWrapper,
     SelfCallString,
     deprecated,
     first_upper,
@@ -456,13 +455,3 @@ class BaseSite(ComparableMixin):
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
-
-
-PageInUse = PageInUseError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'PageInUse',
-    replacement_name='pywikibot.exceptions.PageInUseError',
-    since='20210423',
-    future_warning=True)

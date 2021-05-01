@@ -11,11 +11,8 @@ from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.site._obsoletesites import ClosedSite, RemovedSite
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
-from pywikibot.tools import ModuleDeprecationWrapper, suppress_warnings
+from pywikibot.tools import ModuleDeprecationWrapper
 
-
-with suppress_warnings(category=FutureWarning):
-    from pywikibot.site._basesite import PageInUse
 
 __all__ = ('APISite', 'BaseSite', 'ClosedSite', 'DataSite', 'RemovedSite',
            'Namespace', 'NamespacesDict', 'PageInUse', 'Siteinfo',
