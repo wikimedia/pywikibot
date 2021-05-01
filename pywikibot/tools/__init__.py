@@ -1937,3 +1937,7 @@ wrapper._add_deprecated_attr('frozenmap',
                              replacement_name='types.MappingProxyType',
                              since='20210415',
                              future_warning=True)
+wrapper._add_deprecated_attr('LazyRegex', replacement_name='',
+                             since='20210418', future_warning=True)
+wrapper._add_deprecated_attr('DeprecatedRegex', replacement_name='',
+                             since='20210418', future_warning=True)

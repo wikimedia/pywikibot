@@ -4,9 +4,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import re
 import sys
 
-from pywikibot.tools import LazyRegex
 from pywikibot.tools._unidata import _category_cf
 
 
@@ -14,7 +14,7 @@ from pywikibot.tools._unidata import _category_cf
 # At the moment we've only added the characters from the Cf category
 _invisible_chars = _category_cf
 
-invisible_regex = LazyRegex(lambda: '[{}]'.format(''.join(_invisible_chars)))
+INVISIBLE_REGEX = re.compile('[{}]'.format(''.join(_invisible_chars)))
 
 
 def contains_invisible(text):
@@ -34,4 +34,5 @@ def replace_invisible(text):
         else:
             codepoint = ord(match)
         return '<{0:x}>'.format(codepoint)
-    return invisible_regex.sub(replace, text)
+
+    return INVISIBLE_REGEX.sub(replace, text)
