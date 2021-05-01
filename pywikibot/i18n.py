@@ -23,6 +23,7 @@ import json
 import os
 import pkgutil
 import re
+
 from collections import defaultdict
 from collections.abc import Mapping
 from contextlib import suppress
@@ -31,7 +32,7 @@ from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
-import pywikibot.exceptions
+
 from pywikibot import __url__, config
 from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
@@ -861,11 +862,8 @@ def input(twtitle: str,
     return pywikibot.input(prompt, password)
 
 
-TranslationError = pywikibot.exceptions.TranslationError
-
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr(
     'TranslationError',
     replacement_name='pywikibot.exceptions.TranslationError',
-    since='20210423',
-    future_warning=True)
+    since='20210423', future_warning=True)

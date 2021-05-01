@@ -12,6 +12,7 @@ import pickle
 import pprint
 import re
 import traceback
+
 from collections.abc import Container, MutableMapping, Sized
 from contextlib import suppress
 from email.generator import BytesGenerator
@@ -24,7 +25,7 @@ from urllib.parse import unquote, urlencode
 from warnings import warn
 
 import pywikibot
-import pywikibot.exceptions
+
 from pywikibot import config, login
 from pywikibot.backports import Tuple, removeprefix
 from pywikibot.comms import http
@@ -3155,23 +3156,13 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('ns')
 
 
-APIError = pywikibot.exceptions.APIError
-UploadWarning = pywikibot.exceptions.UploadError
-APIMWException = pywikibot.exceptions.APIMWError
-
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr(
-    'APIError',
-    replacement_name='pywikibot.exceptions.APIError',
-    since='20210423',
-    future_warning=True)
+    'APIError', replacement_name='pywikibot.exceptions.APIError',
+    since='20210423', future_warning=True)
 wrapper._add_deprecated_attr(
-    'UploadWarning',
-    replacement_name='pywikibot.exceptions.UploadError',
-    since='20210423',
-    future_warning=True)
+    'UploadWarning', replacement_name='pywikibot.exceptions.UploadError',
+    since='20210423', future_warning=True)
 wrapper._add_deprecated_attr(
-    'APIMWException',
-    replacement_name='pywikibot.exceptions.APIMWError',
-    since='20210423',
-    future_warning=True)
+    'APIMWException', replacement_name='pywikibot.exceptions.APIMWError',
+    since='20210423', future_warning=True)

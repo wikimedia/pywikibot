@@ -18,7 +18,7 @@ from typing import Optional, Union
 from urllib.parse import urlparse
 from warnings import warn
 
-import pywikibot.exceptions
+import pywikibot.exceptions as exceptions
 from pywikibot import config as _config
 from pywikibot.__metadata__ import (
     __copyright__,
@@ -46,6 +46,10 @@ from pywikibot.bot import (
     ui,
 )
 from pywikibot.diff import PatchManager
+from pywikibot.exceptions import (
+    CoordinateGlobeUnknownError,
+    DEPRECATED_EXCEPTIONS,
+)
 from pywikibot.family import AutoFamily, Family
 from pywikibot.i18n import translate
 from pywikibot.logging import (
@@ -62,53 +66,9 @@ from pywikibot.site import APISite, BaseSite, ClosedSite, DataSite
 from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
 )
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, normalize_username
 from pywikibot.tools import deprecate_arg as _deprecate_arg
-from pywikibot.tools import normalize_username, suppress_warnings
 from pywikibot.tools.formatter import color_format
-
-
-with suppress_warnings(category=FutureWarning):
-    from pywikibot.data.api import UploadWarning
-    from pywikibot.exceptions import (
-        DEPRECATED_EXCEPTIONS,
-        CaptchaError,
-        CascadeLockedPage,
-        CircularRedirect,
-        CoordinateGlobeUnknownError,
-        CoordinateGlobeUnknownException,
-        EditConflict,
-        Error,
-        FatalServerError,
-        InterwikiRedirectPage,
-        InvalidTitle,
-        IsNotRedirectPage,
-        IsRedirectPage,
-        LockedNoPage,
-        LockedPage,
-        NoCreateError,
-        NoMoveTarget,
-        NoPage,
-        NoUsername,
-        NoWikibaseEntity,
-        OtherPageSaveError,
-        PageCreatedConflict,
-        PageDeletedConflict,
-        PageRelatedError,
-        PageSaveRelatedError,
-        SectionError,
-        Server414Error,
-        Server504Error,
-        ServerError,
-        SiteDefinitionError,
-        SpamblacklistError,
-        TitleblacklistError,
-        UnknownExtension,
-        UnknownFamily,
-        UnknownSite,
-        UnsupportedPage,
-        WikiBaseError,
-    )
 
 
 __all__ = (
@@ -1366,7 +1326,7 @@ wrapper._add_deprecated_attr('showHelp', show_help,
 # we can drop them from both our import and __all__ listing.
 
 EXCEPTION_CLASSES = {
-    n for n, _ in inspect.getmembers(pywikibot.exceptions, inspect.isclass)
+    n for n, _ in inspect.getmembers(exceptions, inspect.isclass)
 }
 
 EXCEPTION_CLASSES.add('UploadWarning')
