@@ -112,7 +112,7 @@ script:
     fi
 
 after_script:
-    # codecov
+    codecov
 
 env:
   global:
