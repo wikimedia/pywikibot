@@ -191,8 +191,8 @@ filename, script_args, global_args = handle_args(*sys.argv)
 
 # Search for user-config.py before creating one.
 # If successful, user-config.py already exists in one of the candidate
-# directories. See config2.py for details on search order.
-# Use env var to communicate to config2.py pwb.py location (bug T74918).
+# directories. See config.py for details on search order.
+# Use env var to communicate to config.py pwb.py location (bug T74918).
 _pwb_dir = os.path.split(__file__)[0]
 os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:

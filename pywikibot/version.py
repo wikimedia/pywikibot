@@ -21,7 +21,7 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError

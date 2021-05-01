@@ -186,7 +186,7 @@ class TestPageObjectEnglish(TestCase):
         maintalk = mainpage.toggleTalkPage()
 
         family_name = (site.family.name + ':'
-                       if pywikibot.config2.family != site.family.name
+                       if pywikibot.config.family != site.family.name
                        else '')
         self.assertEqual(str(mainpage), '[[{}{}:{}]]'
                                         .format(family_name, site.code,

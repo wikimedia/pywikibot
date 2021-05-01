@@ -10,7 +10,7 @@ from collections import Counter
 from typing import Optional
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 from pywikibot.tools import ModuleDeprecationWrapper
 
 

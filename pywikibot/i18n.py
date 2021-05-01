@@ -32,8 +32,7 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.exceptions
-from pywikibot import __url__
-from pywikibot import config2 as config
+from pywikibot import __url__, config
 from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
 from pywikibot.tools import (

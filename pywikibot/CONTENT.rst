@@ -17,7 +17,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |
     +----------------------------+------------------------------------------------------+
-    | config2.py                 | Module to define and load Pywikibot configuration    |
+    | config.py                  | Module to define and load Pywikibot configuration    |
     +----------------------------+------------------------------------------------------+
     | cosmetic_changes.py        | Slight modifications to a wiki page's source code    |
     +----------------------------+------------------------------------------------------+

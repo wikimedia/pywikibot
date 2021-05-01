@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 from warnings import warn
 
 import pywikibot.exceptions
-from pywikibot import config2 as config
+from pywikibot import config as _config
 from pywikibot.__metadata__ import (
     __copyright__,
     __description__,
@@ -116,7 +116,7 @@ __all__ = (
     '__maintainer__', '__maintainer_email__', '__name__',
     '__url__', '__version__',
     'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
-    'Category', 'CircularRedirect', 'Claim', 'config', 'Coordinate',
+    'Category', 'CircularRedirect', 'Claim', 'Coordinate',
     'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
     'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
     'FilePage', 'handle_args', 'html2unicode', 'input', 'input_choice',
@@ -1105,7 +1105,7 @@ def _code_fam_from_url(url: str, name: Optional[str] = None):
     matched_sites = []
     # Iterate through all families and look, which does apply to
     # the given URL
-    for fam in config.family_files:
+    for fam in _config.family_files:
         family = Family.load(fam)
         code = family.from_url(url)
         if code is not None:
@@ -1165,8 +1165,8 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         fam, _, code = code.partition(':')
     else:
         # Fallback to config defaults
-        code = code or config.mylang
-        fam = fam or config.family
+        code = code or _config.mylang
+        fam = fam or _config.family
 
     if not isinstance(fam, Family):
         fam = Family.load(fam)
@@ -1177,9 +1177,9 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
     family_name = str(fam)
 
     code_to_user = {}
-    if '*' in config.usernames:  # T253127: usernames is a defaultdict
-        code_to_user = config.usernames['*'].copy()
-    code_to_user.update(config.usernames[family_name])
+    if '*' in _config.usernames:  # T253127: usernames is a defaultdict
+        code_to_user = _config.usernames['*'].copy()
+    code_to_user.update(_config.usernames[family_name])
     user = user or code_to_user.get(code) or code_to_user.get('*')
 
     if not isinstance(interface, type):
@@ -1282,7 +1282,7 @@ def _flush(stop=True):
             remainingPages -= 1
 
         remainingSeconds = datetime.timedelta(
-            seconds=round(remainingPages * config.put_throttle))
+            seconds=round(remainingPages * _config.put_throttle))
         return (remainingPages, remainingSeconds)
 
     if stop:
@@ -1290,7 +1290,7 @@ def _flush(stop=True):
         page_put_queue.put((None, [], {}))
 
     num, sec = remaining()
-    if num > 0 and sec.total_seconds() > config.noisysleep:
+    if num > 0 and sec.total_seconds() > _config.noisysleep:
         output(color_format(
             '{lightblue}Waiting for {num} pages to be put. '
             'Estimated time remaining: {sec}{default}', num=num, sec=sec))
@@ -1343,9 +1343,9 @@ def async_request(request, *args, **kwargs):
 
 
 # queue to hold pending requests
-page_put_queue = Queue(config.max_queue_size)
+page_put_queue = Queue(_config.max_queue_size)
 # queue to signal that async_manager is working on a request. See T147178.
-page_put_queue_busy = Queue(config.max_queue_size)
+page_put_queue_busy = Queue(_config.max_queue_size)
 # set up the background thread
 _putthread = threading.Thread(target=async_manager)
 # identification for debugging purposes
@@ -1353,6 +1353,8 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('config2', replacement_name='pywikibot.config',
+                             since='20210426', future_warning=True)
 wrapper._add_deprecated_attr('__release__', __version__,
                              replacement_name='pywikibot.__version__',
                              since='20200707')

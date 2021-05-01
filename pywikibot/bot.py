@@ -102,8 +102,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot import config2 as config
-from pywikibot import daemonize, i18n, version
+from pywikibot import config, daemonize, i18n, version
 from pywikibot.backports import Dict, Iterable, List, Sequence
 from pywikibot.bot_choice import (
     AlwaysChoice,
@@ -409,7 +408,7 @@ def writelogheader():
         log('SYSTEM: {}'.format(os.uname()))
 
     # config file dir
-    log('CONFIG FILE DIR: {}'.format(pywikibot.config2.base_dir))
+    log('CONFIG FILE DIR: {}'.format(pywikibot.config.base_dir))
 
     all_modules = sys.modules.keys()
 

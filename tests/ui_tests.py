@@ -732,12 +732,12 @@ class FakeUIColorizedTestBase(TestCase):
     def setUp(self):
         """Force colorized_output to True."""
         super().setUp()
-        self._old_config = pywikibot.config2.colorized_output
-        pywikibot.config2.colorized_output = True
+        self._old_config = pywikibot.config.colorized_output
+        pywikibot.config.colorized_output = True
 
     def tearDown(self):
         """Undo colorized_output configuration."""
-        pywikibot.config2.colorized_output = self._old_config
+        pywikibot.config.colorized_output = self._old_config
         super().tearDown()
 
 
