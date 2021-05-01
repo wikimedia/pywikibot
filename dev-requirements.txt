@@ -16,6 +16,7 @@ pep257>=0.6
 pyflakes>=2.1.0
 flake8>=3.7.5
 flake8-docstrings>=0.2.6
+flake8-isort;python_version>=3.6
 flake8-mock>=0.3
 codecov
 coverage

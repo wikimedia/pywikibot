@@ -81,7 +81,6 @@ extra_deps = {
         'flake8-comprehensions>=2.2.0',
         'flake8-docstrings>=1.3.1',
         'flake8-future-import',
-        'flake8-isort;python_version>="3.6"',
         'flake8-mock>=0.3',
         'flake8-print>=2.0.1',
         'flake8-quotes>=2.0.1',
