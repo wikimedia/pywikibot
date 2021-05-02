@@ -1,17 +1,12 @@
 """Module containing plural rules of various languages."""
 #
-# (C) Pywikibot team, 2011-2020
+# (C) Pywikibot team, 2011-2021
 #
 # Distributed under the terms of the MIT license.
 #
-import sys
 from typing import Callable, Union
 
-
-if sys.version_info[:2] >= (3, 9):
-    Dict = dict
-else:
-    from typing import Dict
+from pywikibot.backports import Dict
 
 
 PluralRule = Dict[str, Union[int, Callable]]
