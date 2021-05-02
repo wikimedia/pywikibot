@@ -388,7 +388,7 @@ def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
                       r'\1:\2:', line)  # short token
         line = re.sub(r'(\A *)@(?:kwarg|kwparam) ',
                       r'\1:keyword ', line)  # keyword
-        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
+        line = re.sub(r'(\A| )L\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
         line = re.sub(r'(\A| )B\{([^}]*)\}', r'\1**\2**', line)  # Bold
         line = re.sub(r'(\A| )I\{([^}]*)\}', r'\1*\2*', line)  # Italic
         line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1``\2``', line)  # Code
