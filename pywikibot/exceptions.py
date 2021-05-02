@@ -23,6 +23,7 @@ the framework::
           |    +-- NotEmailableError
           |    +-- PageLoadRelatedError
           |    |    +-- InconsistentTitleError
+          |    |    +-- InvalidPageError
           |    +-- PageSaveRelatedError
           |    |    +-- EditConflictError
           |    |    |    +-- ArticleExistsConflictError
@@ -99,6 +100,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - IsNotRedirectPageError: Page is not a redirect page
   - CircularRedirectError: Page is a circular redirect
   - InterwikiRedirectPageError: Page is a redirect to another site
+  - InvalidPageError: Page is invalid e.g. without history
   - NotEmailableError: The target user has disabled email
   - NoMoveTargetError: An expected move target page does not exist
 
@@ -463,6 +465,13 @@ class InterwikiRedirectPageError(PageRelatedError):
         self.target_page = target_page
         self.target_site = target_page.site
         super().__init__(page)
+
+
+class InvalidPageError(PageLoadRelatedError):
+
+    """Invalid page title."""
+
+    message = 'Page %s is invalid.'
 
 
 class InvalidTitleError(Error):
