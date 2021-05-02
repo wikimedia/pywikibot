@@ -11,6 +11,7 @@ import math
 import re
 import threading
 import time
+
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
@@ -18,8 +19,8 @@ from typing import Optional, Union
 from urllib.parse import urlparse
 from warnings import warn
 
-import pywikibot.exceptions as exceptions
 from pywikibot import config as _config
+from pywikibot import exceptions
 from pywikibot.__metadata__ import (
     __copyright__,
     __description__,
