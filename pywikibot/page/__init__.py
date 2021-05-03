@@ -1781,7 +1781,10 @@ class BasePage(ComparableMixin):
                     self.save(summary=reason)
 
     def has_deleted_revisions(self) -> bool:
-        """Return True if the page has deleted revisions."""
+        """Return True if the page has deleted revisions.
+
+        *New in version 4.2.*
+        """
         if not hasattr(self, '_has_deleted_revisions'):
             gen = self.site.deletedrevs(self, total=1, prop=['ids'])
             self._has_deleted_revisions = bool(list(gen))
@@ -2195,6 +2198,8 @@ class Page(BasePage):
 
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
+
+        *New in version 3.0.*
 
         @param prop: property id, "P###"
         @return: Claim object given by Wikibase property number
@@ -3146,6 +3151,8 @@ class User(Page):
         self, *, total: int = 500, **kwargs
     ) -> Iterable[Tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
+
+        *New in version 5.5.*
 
         @param total: Limit results to this number of pages
         @keyword start: Iterate contributions starting at this Timestamp
@@ -5566,6 +5573,8 @@ class SiteLink(BaseLink):
     Extends BaseLink by the following attribute:
 
       - badges: Any badges associated with the sitelink
+
+    *New in version 3.0.*
     """
 
     # Components used for __repr__

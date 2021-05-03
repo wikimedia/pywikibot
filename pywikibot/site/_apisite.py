@@ -1438,6 +1438,8 @@ class APISite(
         If more than one target id is provided, the same action is taken for
         all of them.
 
+        *New in version 6.0.*
+
         @param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
         @param ids: Identifiers for the revision, log, file version or archive.
@@ -2061,6 +2063,9 @@ class APISite(
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
+        *Renamed in version 6.1.*
+
+        *New in version 6.1:* keyword only parameter *oldimage* was added.
 
         @param page: Page to be deleted or its pageid.
         @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
@@ -2149,6 +2154,12 @@ class APISite(
         """Undelete page from the wiki. Requires appropriate privilege level.
 
         @see: U{https://www.mediawiki.org/wiki/API:Undelete}
+
+        *Renamed in version 6.1.*
+
+        *New in version 6.1:* *fileids* parameter was added.
+
+        *Changed in verson 6.1:* keyword argument required for *revisions*.
 
         @param page: Page to be deleted.
         @type page: pywikibot.BasePage
@@ -2544,6 +2555,9 @@ class APISite(
         @see: U{https://www.mediawiki.org/wiki/API:Upload}
 
         Either source_filename or source_url, but not both, must be provided.
+
+        *Changed in version 6.0:* keyword arguments required for all
+        parameters except *filepage*.
 
         @param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.

@@ -1,4 +1,7 @@
-"""Pywikibot metadata file."""
+"""Pywikibot metadata file.
+
+*New in version 4.0.*
+"""
 #
 # (C) Pywikibot team, 2020-2021
 #

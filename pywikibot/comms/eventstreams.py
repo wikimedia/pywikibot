@@ -6,6 +6,8 @@ This file is part of the Pywikibot framework.
 This module requires sseclient to be installed::
 
     pip install sseclient
+
+*New in version 3.0.*
 """
 #
 # (C) Pywikibot team, 2017-2020

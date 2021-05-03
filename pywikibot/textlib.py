@@ -897,6 +897,7 @@ def extract_sections(
                            ('== Usage of A ==', 'Some usage...')]
             result.footer = '[[Category:Things starting with A]]'
 
+    *New in version 3.0.*
     """
     headings = _extract_headings(text, site)
     sections = _extract_sections(text, headings)
