@@ -2683,7 +2683,6 @@ def MySQLPageGenerator(query, site=None, verbose=None):
 
     row_gen = mysql.mysql_query(query,
                                 dbname=site.dbName(),
-                                encoding=site.encoding(),
                                 verbose=verbose)
 
     for row in row_gen:
