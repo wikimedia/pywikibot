@@ -1,5 +1,5 @@
 Current release changes
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 * L10N updates
 * Fix __getattr__ for WikibaseEntity (T281389)
@@ -7,7 +7,7 @@ Current release changes
 * Exceptions were renamed having a suffix "Error" due to PEP8 (T280227)
 
 Deprecations
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 * 6.2.0: Deprecated exception identifiers will be removed (T280227)
 * 6.2.0: empty_iterator will be removed in favour of iter()
