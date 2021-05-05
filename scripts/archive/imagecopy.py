@@ -336,7 +336,6 @@ class imageTransfer(threading.Thread):
             # it will be marked for deletion.
             if self.delete_after_done:
                 self.imagePage.delete(moveSummary, False)
-        return
 
     def fixAuthor(self, pageText):
         """Fix the author field in the information template."""

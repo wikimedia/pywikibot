@@ -37,7 +37,6 @@ def initLists():
                                  'User:Multichill/Countries')
     for country in countryPage.linkedPages():
         countries.append(country.title(with_ns=False))
-    return
 
 
 def categorizeImages(generator, onlyUncat):
@@ -164,7 +163,6 @@ def saveImagePage(imagepage, newcats):
     pywikibot.showDiff(imagepage.text, newtext)
     imagepage.text = newtext
     imagepage.save(comment)
-    return
 
 
 def main(*args):
