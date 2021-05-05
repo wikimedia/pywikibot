@@ -465,7 +465,7 @@ class DeadLinkReportThread(threading.Thread):
     A Thread that is responsible for posting error reports on talk pages.
 
     There is only one DeadLinkReportThread, and it is using a semaphore to make
-    sure that two LinkCheckerThreads can not access the queue at the same time.
+    sure that two LinkCheckerThreads cannot access the queue at the same time.
     """
 
     def __init__(self):

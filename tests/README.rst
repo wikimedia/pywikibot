@@ -198,7 +198,7 @@ There are also several other 'write' tests which also attempt to perform
 write operations successfully.  These **will** write to the wikis, and they
 should always only write to 'test' wikis.
 
-These 'write' tests are disabled by default, and currently can not be
+These 'write' tests are disabled by default, and currently cannot be
 run on Travis or AppVeyor as they require interaction using a terminal. Also
 enabling them won't enable 'edit failure' tests.
 

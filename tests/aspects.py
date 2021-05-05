@@ -504,7 +504,7 @@ class SiteWriteMixin(TestCaseBase):
         """
         if issubclass(cls, ForceCacheMixin):
             raise Exception(
-                '{} can not be a subclass of both '
+                '{} cannot be a subclass of both '
                 'SiteWriteMixin and ForceCacheMixin'
                 .format(cls.__name__))
 

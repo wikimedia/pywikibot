@@ -985,7 +985,7 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links(self.text, callback, self.wp_site)
 
     def test_replace_interwiki_links(self):
-        """Make sure interwiki links can not be replaced."""
+        """Make sure interwiki links cannot be replaced."""
         link = '[[fr:how]]'
         self.assertEqual(
             textlib.replace_links(link, ('fr:how', 'de:are'), self.wp_site),
