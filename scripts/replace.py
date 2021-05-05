@@ -151,7 +151,7 @@ from queue import Queue
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-from pywikibot.exceptions import NoPageError
+from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars, deprecated_args
 
 
@@ -672,7 +672,11 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
     def treat(self, page):
         """Work on each page retrieved from generator."""
-        original_text = page.text
+        try:
+            original_text = page.text
+        except InvalidPageError:
+            pywikibot.exception()
+            return
         applied = set()
         new_text = original_text
         last_text = None

@@ -28,6 +28,7 @@ from pywikibot.bot import (
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
+    InvalidPageError,
     InvalidTitleError,
     NoMoveTargetError,
 )
@@ -171,7 +172,12 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     def treat_page(self):
         """Change all redirects from the current page to actual links."""
         links = self.current_page.linkedPages()
-        newtext = self.current_page.text
+        try:
+            newtext = self.current_page.text
+        except InvalidPageError:
+            pywikibot.exception()
+            return
+
         i = None
         for i, page in enumerate(links):
             target = self.get_target(page)

@@ -38,6 +38,7 @@ from pywikibot.exceptions import (
     EntityTypeUnknownError,
     Error,
     InterwikiRedirectPageError,
+    InvalidPageError,
     InvalidTitleError,
     IsNotRedirectPageError,
     IsRedirectPageError,
@@ -556,7 +557,10 @@ class BasePage(ComparableMixin):
         rev = self._latest_cached_revision()
         if rev is not None:
             return rev
-        return next(self.revisions(content=True, total=1))
+
+        with suppress(StopIteration):
+            return next(self.revisions(content=True, total=1))
+        raise InvalidPageError(self)
 
     @property
     def text(self) -> str:
