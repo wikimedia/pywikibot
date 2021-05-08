@@ -766,7 +766,7 @@ class TestPageBotMayEdit(TestCase):
     def _run_test(self, template, user, expected_result):
         """Run a single template test."""
         del self.page.text
-        self.page._text = template.format(user=user)
+        self.page._text = template % {'user': user}
         with self.subTest(template=template, user=user):
             self.assertEqual(self.page.botMayEdit(), expected_result)
         self.page.botMayEdit.cache_clear()
