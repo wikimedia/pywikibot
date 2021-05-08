@@ -3,10 +3,10 @@ userinterfaces package
 
 .. automodule:: pywikibot.userinterfaces
 
-gui module
-----------
+\_interface\_base module
+------------------------
 
-.. automodule:: pywikibot.userinterfaces.gui
+.. automodule:: pywikibot.userinterfaces._interface_base
 
 terminal\_interface module
 --------------------------
@@ -27,6 +27,11 @@ terminal\_interface\_win32 module
 ---------------------------------
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface_win32
+
+gui module
+----------
+
+.. automodule:: pywikibot.userinterfaces.gui
 
 transliteration module
 ----------------------

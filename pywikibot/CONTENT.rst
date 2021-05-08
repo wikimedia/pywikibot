@@ -172,6 +172,8 @@ The contents of the package
     +-----------------------------------------------------------------------------------+
     | User Interface                                                                    |
     +============================+======================================================+
+    | _interface_base.py         | Abstract base user interface module                  |
+    +----------------------------+------------------------------------------------------+
     | gui.py                     | GUI with a unicode textfield where the user can edit |
     +----------------------------+------------------------------------------------------+
     | terminal_interface.py      | Platform independent terminal interface module       |

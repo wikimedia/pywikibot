@@ -22,6 +22,7 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
+from pywikibot.userinterfaces._interface_base import ABUIC
 from pywikibot.userinterfaces import transliteration
 
 
@@ -51,7 +52,7 @@ _color_pat = '{}|previous'.format('|'.join(colors))
 colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
 
 
-class UI:
+class UI(ABUIC):
 
     """Base for terminal user interfaces."""
 
