@@ -59,6 +59,11 @@ content = {
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
             '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
+    'wikibooks': {
+        'ru': '{{/Шапка}}\n'
+              '<!-- Не удаляйте, пожалуйста, эту строку, '
+              'тестируйте ниже -->',
+    },
     'wikivoyage': {
         'es': '<!--No borres este mensaje-->'
               '{{Zona de pruebas}}'
