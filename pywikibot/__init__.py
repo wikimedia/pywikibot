@@ -1097,12 +1097,49 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
     By default rely on config settings. These defaults may all be overridden
     using the method parameters.
 
+    Creating the default site using config.mylang and config.family::
+
+        site = pywikibot.Site()
+
+    Override default site code::
+
+        site = pywikibot.Site('fr')
+
+    Override default family::
+
+        site = pywikibot.Site(family='wikisource')
+
+    Setting a specific site::
+
+        site = pywikibot.Site('fr', 'wikisource')
+
+    which is equal to::
+
+        site = pywikibot.Site('wikisource:fr')
+
+    :Note: An already created site is cached an a new variable points to
+        the same object if interface, family, code and user are equal:
+
+    >>> import pywikibot
+    >>> site_1 = pywikibot.Site('wikisource:fr')
+    >>> site_2 = pywikibot.Site('fr', 'wikisource')
+    >>> site_1 is site_2
+    True
+    >>> site_1
+    APISite("fr", "wikisource")
+
+    C{APISite} is the default interface. Refer L{pywikibot.site} for
+    other interface types.
+
+    **Never create a site object via interface class directly.**
+    Always use this factory method.
+
     @param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
     @param fam: family name or object (override config.family)
     @type fam: str or pywikibot.family.Family
     @param user: bot user name to use on this site (override config.usernames)
-    @param interface: site class or name of class in pywikibot.site
+    @param interface: site class or name of class in L{pywikibot.site}
         (override config.site_interface)
     @type interface: subclass of L{pywikibot.site.BaseSite} or string
     @param url: Instead of code and fam, does try to get a Site based on the
