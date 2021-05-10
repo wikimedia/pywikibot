@@ -1047,8 +1047,8 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertTrue(user['name'].startswith('D'))
             self.assertIn('editcount', user)
             self.assertIn('registration', user)
-            self.assertIn('groups' in user)
-            self.assertIn('sysop' in user['groups'])
+            self.assertIn('groups', user)
+            self.assertIn('sysop', user['groups'])
 
 
 class TestImageUsage(DefaultSiteTestCase):
