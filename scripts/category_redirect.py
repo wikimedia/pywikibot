@@ -475,7 +475,7 @@ class CategoryRedirectBot(SingleSiteBot):
         message = i18n.twtranslate(self.site, 'category_redirect-log-new')
         date_line = '\n== {}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z ==\n' \
                     .format(*time.gmtime()[:6])
-        self.log_page.text = (date_line,
+        self.log_page.text = (date_line
                               + '\n'.join(self.log_text)
                               + '\n* ' + message + '\n'
                               + '\n'.join(self.newredirs)
