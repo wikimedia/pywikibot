@@ -171,13 +171,13 @@ def add_text(page, addText: str, summary: Optional[str] = None,
     @param always: Always add text without user confirmation
     @param up: If True, add text to top of page, else add at bottom.
     @param putText: If True, save changes to the page, else return
-        (_, newtext, _)
+        (text, newtext, always)
     @param oldTextGiven: If None fetch page text, else use this text
     @param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
     @param create: Create page if it does not exist
     @return: If putText=True: (success, success, always)
-        else: (_, newtext, _)
+        else: (text, newtext, always)
     """
     site = page.site
     if not summary:
@@ -343,11 +343,9 @@ def main(*args: Tuple[str, ...]) -> None:
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
     for page in generator:
-        (_, newtext, _) = add_text(page, addText, summary,
-                                   regexSkipUrl=regexSkipUrl,
-                                   always=always, up=up,
-                                   reorderEnabled=reorderEnabled,
-                                   create=talkPage)
+        add_text(page, addText, summary,
+                 regexSkipUrl=regexSkipUrl, always=always, up=up,
+                 reorderEnabled=reorderEnabled, create=talkPage)
 
 
 if __name__ == '__main__':
