@@ -568,15 +568,15 @@ class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
                 pywikibot.output('Skipping {}.'.format(newRedir))
                 break
             except NoPageError:
+                title = newRedir.title(as_link=True)
                 if self.opt.always:
                     pywikibot.output(
                         "Skipping: Redirect target {} doesn't exist."
-                        .format(newRedir.title(as_link=True)))
+                        .format(title))
                     break  # skip if automatic
-                else:
-                    pywikibot.warning(
-                        "Redirect target {} doesn't exist."
-                        .format(newRedir.title(as_link=True)))
+                pywikibot.warning(
+                    "Redirect target {} doesn't exist."
+                    .format(title))
             except ServerError:
                 pywikibot.output('Skipping due to server error: '
                                  'No textarea found')
