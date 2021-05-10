@@ -41,7 +41,8 @@ class OpenArchiveTestCase(TestCase):
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read().replace(b'\r\n', b'\n')
 
-    def _get_content(self, *args, **kwargs):
+    @staticmethod
+    def _get_content(*args, **kwargs):
         """Use open_archive and return content using a with-statement."""
         with tools.open_archive(*args, **kwargs) as f:
             return f.read().replace(b'\r\n', b'\n')

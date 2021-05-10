@@ -105,10 +105,12 @@ if os.name == 'nt':
 
         """pywikibot wrapper class."""
 
-        def init(self):
+        @staticmethod
+        def init():
             pywikibot.version._get_program_dir()
 
-        def output(self, *args, **kwargs):
+        @staticmethod
+        def output(*args, **kwargs):
             return pywikibot.output(*args, **kwargs)
 
         def request_input(self, *args, **kwargs):
@@ -123,13 +125,16 @@ if os.name == 'nt':
             self.inputthread.join()
             return self.input
 
-        def set_config(self, key, value):
+        @staticmethod
+        def set_config(key, value):
             setattr(pywikibot.config, key, value)
 
-        def set_ui(self, key, value):
+        @staticmethod
+        def set_ui(key, value):
             setattr(pywikibot.ui, key, value)
 
-        def cls(self):
+        @staticmethod
+        def cls():
             subprocess.run('cls', shell=True)
 
     class pywikibotManager(BaseManager):
@@ -538,12 +543,14 @@ class WindowsTerminalTestCase(UITestCase):
                 return data
             time.sleep(0.01)
 
-    def setclip(self, text):
+    @staticmethod
+    def setclip(text):
         win32clipboard.OpenClipboard()
         win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, text)
         win32clipboard.CloseClipboard()
 
-    def getclip(self):
+    @staticmethod
+    def getclip():
         win32clipboard.OpenClipboard()
         data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
         win32clipboard.CloseClipboard()

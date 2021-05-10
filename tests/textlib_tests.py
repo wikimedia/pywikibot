@@ -48,7 +48,8 @@ class TestSectionFunctions(TestCase):
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super().setUp()
 
-    def contains(self, fn, sn):
+    @staticmethod
+    def contains(fn, sn):
         """Invoke does_text_contain_section()."""
         return textlib.does_text_contain_section(
             files[fn], sn)
