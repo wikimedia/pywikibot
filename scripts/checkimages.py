@@ -595,9 +595,8 @@ class checkImagesBot:
         if results:
             luser = results[0]
             return luser
-        else:
-            # we can't find the user, report the problem to the bot
-            return upBotArray[0]
+        # we can't find the user, report the problem to the bot
+        return upBotArray[0]
 
     def tag_image(self, put=True) -> bool:
         """Add template to the Image page and find out the uploader."""

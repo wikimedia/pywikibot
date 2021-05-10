@@ -390,14 +390,13 @@ class SiteLinkCollection(MutableMapping):
     def _extract_json(cls, obj):
         if isinstance(obj, pywikibot.page.SiteLink):
             return obj.toJSON()
-        elif isinstance(obj, pywikibot.page.BaseLink):
+        if isinstance(obj, pywikibot.page.BaseLink):
             db_name = cls.getdbName(obj.site)
             return {'site': db_name, 'title': obj.title}
-        elif isinstance(obj, pywikibot.page.Page):
+        if isinstance(obj, pywikibot.page.Page):
             db_name = cls.getdbName(obj.site)
             return {'site': db_name, 'title': obj.title()}
-        else:
-            return obj
+        return obj
 
     @classmethod
     def normalizeData(cls, data) -> dict:

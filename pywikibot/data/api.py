@@ -533,10 +533,9 @@ class ParamInfo(Sized, Container):
         self.fetch({key})
         if key in self._paraminfo:
             return self._paraminfo[key]
-        elif '+' not in key:
+        if '+' not in key:
             return self._paraminfo['query+' + key]
-        else:
-            raise KeyError(key)
+        raise KeyError(key)
 
     def __contains__(self, key) -> bool:
         """Return whether the key is valid."""
@@ -1132,11 +1131,10 @@ class Request(MutableMapping):
         """
         if isinstance(value, datetime.datetime):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
-        elif isinstance(value, pywikibot.page.BasePage):
+        if isinstance(value, pywikibot.page.BasePage):
             assert(value.site == self.site)
             return value.title(with_section=False)
-        else:
-            return str(value)
+        return str(value)
 
     def __getitem__(self, key):
         """Implement dict interface."""
