@@ -37,12 +37,13 @@ def _get_program_dir():
     return _program_dir
 
 
-def get_toolforge_hostname():
+def get_toolforge_hostname() -> Optional[str]:
     """Get hostname of the current Toolforge host.
+
+    *New in version 3.0.*
 
     @return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
-    @rtype: str or None
     """
     if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
         return socket.gethostname()

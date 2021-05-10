@@ -1,6 +1,6 @@
 """This module contains backports to support older Python versions."""
 #
-# (C) Pywikibot team, 2020-2021
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,13 +68,19 @@ if PYTHON_VERSION >= (3, 9):
     removesuffix = str.removesuffix
 else:
     def removeprefix(string: str, prefix: str) -> str:
-        """Remove prefix from a string or return a copy otherwise."""
+        """Remove prefix from a string or return a copy otherwise.
+
+        *New in version 5.4.*
+        """
         if string.startswith(prefix):
             return string[len(prefix):]
         return string[:]
 
     def removesuffix(string: str, suffix: str) -> str:
-        """Remove prefix from a string or return a copy otherwise."""
+        """Remove prefix from a string or return a copy otherwise.
+
+        *New in version 5.4.*
+        """
         if string.endswith(suffix):
             return string[:-len(suffix)]
         return string[:]

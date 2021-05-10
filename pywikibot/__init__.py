@@ -1022,6 +1022,8 @@ class WbUnknown(_WbRepresentation):
     is introduced.
 
     This data type is just a json container
+
+    *New in version 3.0.*
     """
 
     _items = ('json',)

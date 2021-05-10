@@ -656,11 +656,17 @@ class Family:
         self._get_cr_templates(code, fallback)
 
     def get_edit_restricted_templates(self, code):
-        """Return tuple of edit restricted templates."""
+        """Return tuple of edit restricted templates.
+
+        *New in version 3.0.*
+        """
         return self.edit_restricted_templates.get(code, ())
 
     def get_archived_page_templates(self, code):
-        """Return tuple of archived page templates."""
+        """Return tuple of archived page templates.
+
+        *New in version 3.0.*
+        """
         return self.archived_page_templates.get(code, ())
 
     def disambig(self, code, fallback='_default'):
@@ -691,6 +697,8 @@ class Family:
         """
         Return whether a HTTPS certificate should be verified.
 
+        *Renamed in version 5.3.*
+
         @param code: language code
         @return: flag to verify the SSL certificate;
                  set it to False to allow access if certificate has an error.
@@ -701,7 +709,7 @@ class Family:
                 future_warning=True)
     def ignore_certificate_error(self, code: str) -> bool:
         """
-        Return whether a HTTPS certificate error should be ignored.
+        DEPRECATED. Return whether a HTTPS certificate error should be ignored.
 
         @param code: language code
         @return: flag to allow access if certificate has an error.
@@ -776,11 +784,17 @@ class Family:
         return '{}/api.php'.format(self.scriptpath(code))
 
     def eventstreams_host(self, code):
-        """Hostname for EventStreams."""
+        """Hostname for EventStreams.
+
+        *New in version 3.0.*
+        """
         raise NotImplementedError('This family does not support EventStreams')
 
     def eventstreams_path(self, code):
-        """Return path for EventStreams."""
+        """Return path for EventStreams.
+
+        *New in version 3.0.*
+        """
         raise NotImplementedError('This family does not support EventStreams')
 
     @deprecated_args(name='title')
@@ -1056,7 +1070,10 @@ class SubdomainFamily(Family):
 
 class FandomFamily(Family):
 
-    """Common features of Fandom families."""
+    """Common features of Fandom families.
+
+    *Renamed in version 3.0.*
+    """
 
     @classproperty
     def langs(cls):

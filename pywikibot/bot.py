@@ -887,7 +887,10 @@ def handle_args(args: Optional[Iterable[str]] = None,
 
 
 def show_help(module_name=None, show_global=False):
-    """Show help for the Bot."""
+    """Show help for the Bot.
+
+    *Renamed in version 4.0.*
+    """
     if not module_name:
         module_name = calledModuleName()
     if not module_name:
@@ -1008,7 +1011,10 @@ def open_webbrowser(page):
 
 class _OptionDict(dict):
 
-    """The option dict which holds the options of OptionHandler."""
+    """The option dict which holds the options of OptionHandler.
+
+    *New in version 4.1.*
+    """
 
     def __init__(self, classname, options):
         self._classname = classname
@@ -1378,7 +1384,7 @@ class BaseBot(OptionHandler):
 
     @deprecated('generator.close()', since='20200804')
     def stop(self):  # pragma: no cover
-        """Stop iterating."""
+        """DEPRECATED. Stop iterating."""
         pywikibot.output('Generator has been stopped.')
         self.generator.close()
 
@@ -1454,6 +1460,8 @@ class BaseBot(OptionHandler):
     def skip_page(self, page):
         """Return whether treat should be skipped for the page.
 
+        *New in version 3.0.*
+
         @param page: Page object to be processed
         @type page: pywikibot.Page
         """
@@ -1474,10 +1482,15 @@ class BaseBot(OptionHandler):
         This can be used for reading huge parts from life wiki or file
         operation which is more than just initialize the instance.
         Invoked by run() before running through generator loop.
+
+        *New in version 3.0.*
         """
 
     def teardown(self):
-        """Some cleanups after run operation. Invoked by exit()."""
+        """Some cleanups after run operation. Invoked by exit().
+
+        *New in version 3.0.*
+        """
 
     def run(self):
         """Process all pages in generator.
@@ -1743,6 +1756,8 @@ class ConfigParserBot(BaseBot):
     - available_options default setting
     - script.ini options settings
     - command line arguments
+
+    *New in version 3.0.*
     """
 
     INI = 'scripts.ini'

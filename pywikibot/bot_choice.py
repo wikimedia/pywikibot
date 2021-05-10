@@ -424,7 +424,10 @@ class ListOption(IntegerOption):
 
 class ShowingListOption(ListOption, OutputOption):
 
-    """An option to show a list and select an item."""
+    """An option to show a list and select an item.
+
+    *New in version 3.0.*
+    """
 
     before_question = True
 
@@ -457,7 +460,10 @@ class ShowingListOption(ListOption, OutputOption):
 
 class MultipleChoiceList(ListOption):
 
-    """An option to select multiple items from a list."""
+    """An option to select multiple items from a list.
+
+    *New in version 3.0.*
+    """
 
     def test(self, value) -> bool:
         """Return whether the values are int and in the specified range."""
@@ -485,7 +491,10 @@ class MultipleChoiceList(ListOption):
 
 class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
-    """An option to show a list and select multiple items."""
+    """An option to show a list and select multiple items.
+
+    *New in version 3.0.*
+    """
 
 
 class HighlightContextOption(ContextOption):

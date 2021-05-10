@@ -1,4 +1,7 @@
-"""Family module for Wikihow Wiki."""
+"""Family module for Wikihow Wiki.
+
+*New in version 3.0.*
+"""
 #
 # (C) Pywikibot team, 2020
 #
