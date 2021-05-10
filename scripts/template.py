@@ -280,7 +280,7 @@ def main(*args) -> None:
             return
 
     old_templates = []
-    for template_name in templates.keys():
+    for template_name in templates:
         old_template = pywikibot.Page(site, template_name, ns=10)
         old_templates.append(old_template)
 

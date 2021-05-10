@@ -53,7 +53,7 @@ class DataSite(APISite):
     def _cache_entity_namespaces(self):
         """Find namespaces for each known wikibase entity type."""
         self._entity_namespaces = {}
-        for entity_type in self._type_to_class.keys():
+        for entity_type in self._type_to_class:
             for namespace in self.namespaces.values():
                 if not hasattr(namespace, 'defaultcontentmodel'):
                     continue
