@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Test diff module."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2021
 #
 # Distributed under the terms of the MIT license.
 from contextlib import suppress
@@ -176,7 +176,7 @@ class TestPatchManager(TestCase):
         """Test PatchManager."""
         for case in self.cases:
             p = PatchManager(case[0], case[1])
-            for key in case[2].keys():  # for each hunk
+            for key in case[2]:  # for each hunk
                 with self.subTest(case=case[0].strip(), key=key):
                     self.assertEqual(p.hunks[key].diff_plain_text,
                                      case[2][key])
