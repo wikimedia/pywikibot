@@ -2178,8 +2178,7 @@ class QueryGenerator(_RequestWrapper):
         if 'action' in parameters and parameters['action'] != 'query':
             raise Error("{}: 'action' must be 'query', not {}"
                         .format(self.__class__.__name__, kwargs['action']))
-        else:
-            parameters['action'] = 'query'
+        parameters['action'] = 'query'
         # make sure request type is valid, and get limit key if any
         for modtype in ('generator', 'list', 'prop', 'meta'):
             if modtype in parameters:
@@ -2424,9 +2423,8 @@ class QueryGenerator(_RequestWrapper):
             if self._check_result_namespace is NotImplemented:
                 raise TypeError('{} module does not support multiple '
                                 'namespaces'.format(self.limited_module))
-            else:
-                self._namespaces = set(namespaces)
-                namespaces = None
+            self._namespaces = set(namespaces)
+            namespaces = None
 
         if namespaces:
             self.request[self.prefix + 'namespace'] = namespaces
