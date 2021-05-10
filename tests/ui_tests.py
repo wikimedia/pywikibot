@@ -638,7 +638,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
             'Alpha Bετα Гамма دلتا\n')
         lines = []
 
-        for i in range(3):
+        for _ in range(3):
             lines = self.getstdouterr().split('\n')
             if len(lines) >= 4 and 'Alpha' not in lines:
                 # if len(lines) < 4, we assume not all lines had been output
