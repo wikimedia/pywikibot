@@ -136,8 +136,6 @@ if os.name == 'nt':
 
         """pywikibot manager class."""
 
-        pass
-
     pywikibotManager.register('pywikibot', pywikibotWrapper)
     _manager = pywikibotManager(
         address=('127.0.0.1', 47228),

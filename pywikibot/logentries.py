@@ -135,8 +135,6 @@ class OtherLogEntry(LogEntry):
 
     """A log entry class for unspecified log events."""
 
-    pass
-
 
 class UserTargetLogEntry(LogEntry):
 

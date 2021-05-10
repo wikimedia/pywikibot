@@ -89,8 +89,6 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
     """Feature that is no longer supported."""
 
-    pass
-
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make

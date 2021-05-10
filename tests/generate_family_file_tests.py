@@ -28,7 +28,6 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
 
     def writefile(self, verify):
         """Pass writing."""
-        pass
 
 
 class TestGenerateFamilyFiles(DefaultSiteTestCase):

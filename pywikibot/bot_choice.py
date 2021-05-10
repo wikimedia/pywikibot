@@ -487,8 +487,6 @@ class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
     """An option to show a list and select multiple items."""
 
-    pass
-
 
 class HighlightContextOption(ContextOption):
 

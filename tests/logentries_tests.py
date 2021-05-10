@@ -162,8 +162,6 @@ class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
 
     """Test general LogEntry properties."""
 
-    pass
-
 
 class TestSimpleLogentries(TestLogentriesBase):
 

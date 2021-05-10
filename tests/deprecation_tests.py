@@ -40,19 +40,16 @@ def noop2():
 @noop()
 def decorated_func():
     """Test dummy decorator."""
-    pass
 
 
 @noop(foo='bar')
 def decorated_func2():
     """Test dummy decorator."""
-    pass
 
 
 @noop('baz')
 def decorated_func3():
     """Test dummy decorator."""
-    pass
 
 
 class DecoratorFullNameTestCase(DeprecationTestCase):
@@ -246,8 +243,6 @@ class DeprecatedMethodClass:
 class DeprecatedClassNoInit:
 
     """Deprecated class."""
-
-    pass
 
 
 @deprecated()

@@ -851,7 +851,6 @@ class TestItemPageExtensibility(TestCase):
 
             """Dummy ItemPage subclass."""
 
-            pass
         page = pywikibot.Page(self.site, 'foo')
         self.assertIsInstance(MyItemPage.fromPage(page, lazy_load=True),
                               MyItemPage)

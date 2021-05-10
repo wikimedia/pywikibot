@@ -48,8 +48,6 @@ class DefaultOAuthSiteTestCase(DefaultSiteTestCase, OAuthSiteTestCase):
 
     """Default OAuth site test."""
 
-    pass
-
 
 class TestOauthLoginManger(DefaultOAuthSiteTestCase):
 

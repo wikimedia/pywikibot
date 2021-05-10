@@ -36,8 +36,6 @@ class _PasswordFileWarning(UserWarning):
 
     """The format of password file is incorrect."""
 
-    pass
-
 
 _logger = 'wiki.login'
 
