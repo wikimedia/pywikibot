@@ -222,8 +222,8 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
                 new = textlib.replaceCategoryInPlace(temp, dummy, cat,
                                                      site=self.site)
                 self.assertEqual(self.old, new)
-        else:
-            self.assertEqual(count, 3)
+
+        self.assertEqual(count, 3)
 
         # Testing removing categories
         temp = textlib.replaceCategoryInPlace(self.old, cats[0],

@@ -651,8 +651,8 @@ class APISite(
                 except KeyError:
                     raise KeyError("No message '{}' found for lang '{}'"
                                    .format(key, amlang))
-            else:
-                return result
+
+            return result
 
         return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
@@ -1260,17 +1260,15 @@ class APISite(
             for _from, _to in redirmap.items():
                 if _to['title'] in redirmap:
                     raise CircularRedirectError(page)
-            else:
-                target = pywikibot.Page(source=page.site, title=target_title)
 
-                # Check if target is on another site.
-                if target.site != page.site:
-                    raise InterwikiRedirectPageError(page, target)
-
-                # Redirect to Special: & Media: pages, which do not work
-                # like redirects, but are rendered like a redirect.
-                page._redirtarget = target
-                return page._redirtarget
+            target = pywikibot.Page(source=page.site, title=target_title)
+            # Check if target is on another site.
+            if target.site != page.site:
+                raise InterwikiRedirectPageError(page, target)
+            # Redirect to Special: & Media: pages, which do not work
+            # like redirects, but are rendered like a redirect.
+            page._redirtarget = target
+            return page._redirtarget
 
         pagedata = list(result['query']['pages'].values())[0]
         # There should be only one value in 'pages' (the ultimate
