@@ -25,7 +25,8 @@ class BasicThreadedGeneratorTestCase(TestCase):
         thd_gen.start()
         self.assertEqual(list(thd_gen), list(iterable))
 
-    def gen_func(self):
+    @staticmethod
+    def gen_func():
         """Helper method for generator test."""
         iterable = 'abcd'
         yield from iterable

@@ -205,7 +205,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
     login = True
     write = True
 
-    def _clean_item(self, repo, prop: str):
+    @staticmethod
+    def _clean_item(repo, prop: str):
         """
         Return an item without any existing claims of the given property.
 

@@ -12,26 +12,21 @@ from tests import join_xml_data_path
 from tests.aspects import TestCase
 
 
-class XmlReaderTestCase(TestCase):
-
-    """XML Reader test cases."""
-
-    net = False
-
-    def _get_entries(self, filename, **kwargs):
-        """Get all entries via XmlDump."""
-        entries = list(xmlreader.XmlDump(join_xml_data_path(filename),
-                                         **kwargs).parse())
-        return entries
+def get_entries(filename, **kwargs):
+    """Get all entries via XmlDump."""
+    return list(xmlreader.XmlDump(join_xml_data_path(filename),
+                                  **kwargs).parse())
 
 
-class ExportDotThreeTestCase(XmlReaderTestCase):
+class ExportDotThreeTestCase(TestCase):
 
     """XML export version 0.3 tests."""
 
+    net = False
+
     def test_XmlDumpAllRevs(self):
         """Test loading all revisions."""
-        pages = self._get_entries('article-pear.xml', allrevisions=True)
+        pages = get_entries('article-pear.xml', allrevisions=True)
         self.assertLength(pages, 4)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
@@ -42,7 +37,7 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
 
     def test_XmlDumpFirstRev(self):
         """Test loading the first revision."""
-        pages = self._get_entries('article-pear.xml', allrevisions=False)
+        pages = get_entries('article-pear.xml', allrevisions=False)
         self.assertLength(pages, 1)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
@@ -52,15 +47,15 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
 
     def test_XmlDumpRedirect(self):
         """Test XmlDump correctly parsing whether a page is a redirect."""
-        self._get_entries('article-pyrus.xml', allrevisions=True)
+        get_entries('article-pyrus.xml', allrevisions=True)
         pages = list(xmlreader.XmlDump(
             join_xml_data_path('article-pyrus.xml')).parse())
         self.assertTrue(pages[0].isredirect)
 
     def _compare(self, previous, variant, all_revisions):
         """Compare the tested variant with the previous (if not None)."""
-        entries = self._get_entries('article-pyrus' + variant,
-                                    allrevisions=all_revisions)
+        entries = get_entries('article-pyrus' + variant,
+                              allrevisions=all_revisions)
         result = [entry.__dict__ for entry in entries]
         if previous:
             self.assertEqual(previous, result)
@@ -83,13 +78,15 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
         self._compare_variants(False)
 
 
-class ExportDotTenTestCase(XmlReaderTestCase):
+class ExportDotTenTestCase(TestCase):
 
     """XML export version 0.10 tests."""
 
+    net = False
+
     def test_pair(self):
         """Test reading the main page/user talk page pair file."""
-        entries = self._get_entries('pair-0.10.xml', allrevisions=True)
+        entries = get_entries('pair-0.10.xml', allrevisions=True)
         self.assertLength(entries, 4)
         self.assertTrue(all(entry.username == 'Carlossuarez46'
                             for entry in entries))
@@ -115,7 +112,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
 
     def test_edit_summary_decoding(self):
         """Test edit summaries are decoded."""
-        entries = self._get_entries('pair-0.10.xml', allrevisions=True)
+        entries = get_entries('pair-0.10.xml', allrevisions=True)
         articles = [entry for entry in entries if entry.ns == '0']
 
         # It does not decode the edit summary
