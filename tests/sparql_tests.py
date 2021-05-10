@@ -146,8 +146,8 @@ class TestSparql(WikidataTestCase):
     def testGetItems(self, mock_method):
         """Test item list retrieval via SPARQL."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % '{}, {}, {}'.format(
-                ITEM_Q498787, ITEM_Q677525, ITEM_Q677525))
+            SQL_RESPONSE_CONTAINER % '{0}, {1}, {1}'.format(ITEM_Q498787,
+                                                            ITEM_Q677525))
         q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
         self.assertSetEqual(res, {'Q498787', 'Q677525'})

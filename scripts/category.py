@@ -1049,10 +1049,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                     new_column = 0
 
                 # determine number format
-                if count > 9:
-                    index = '%2d'
-                else:
-                    index = '%d'
+                index = '%2d' if count > 9 else '%d'
 
                 lines = []
                 for i, cat in enumerate(cat_list):
@@ -1062,9 +1059,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                         # columnify
                         i2 = i + new_column
                         if i2 < count:
-                            lines.append('[{}{}] {:35}[{}{}] {}'.format(
-                                prefix, index % i, cat,
-                                prefix, index % i2, cat_list[i2]))
+                            lines.append('[{0}{1}] {2:35}[{0}{3}] {4}'
+                                         .format(prefix, index % i, cat,
+                                                 index % i2, cat_list[i2]))
                         else:
                             lines.append('[{}{}] {}'.format(
                                 prefix, index % i, cat))
