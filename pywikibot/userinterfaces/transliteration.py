@@ -1104,7 +1104,7 @@ class transliterator:  # noqa: N801
             while (value.encode(encoding, 'replace').decode(encoding) == '?'
                    and value in trans):
                 assert value != trans[value], \
-                    '{!r} == trans[{!r}]!'.format(value, value)
+                    '{0!r} == trans[{0!r}]!'.format(value)
                 value = trans[value]
             trans[char] = value
         self.trans = trans
