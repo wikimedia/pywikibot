@@ -10,7 +10,7 @@ This module requires sseclient to be installed::
 *New in version 3.0.*
 """
 #
-# (C) Pywikibot team, 2017-2020
+# (C) Pywikibot team, 2017-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -323,9 +323,9 @@ class EventStreams:
                 warning('Encountered error: {}'.format(event.data))
             else:
                 warning('Unknown event {} occurred.'.format(event.event))
-        else:
-            debug('{}: Stopped iterating due to exceeding item limit.'
-                  .format(self.__class__.__name__), _logger)
+
+        debug('{}: Stopped iterating due to exceeding item limit.'
+              .format(self.__class__.__name__), _logger)
         del self.source
 
 

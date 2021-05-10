@@ -1348,8 +1348,8 @@ class Request(MutableMapping):
                 action = err_msg.get(message)
                 if action is True or action == self.action:
                     return True
-            else:
-                return False
+
+            return False
 
         if isinstance(messages, dict):
             try:  # behaviour before gerrit 124323 breaking change

@@ -2303,8 +2303,8 @@ class InterwikiDumps(OptionHandler):
                     self._next_page = page.title(with_ns=False) + '!'
                     self._next_namespace = page.namespace()
                 yield page
-            else:
-                self.restored_files.add(filename)
+
+            self.restored_files.add(filename)
 
         if self.opt.do_continue:
             yield from self.site.allpages(start=self.next_page,

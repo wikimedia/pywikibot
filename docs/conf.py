@@ -493,8 +493,8 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
             return safe_getattr(obj, name, *defargs)
 
         return prop
-    else:
-        return safe_getattr(obj, name, *defargs)
+
+    return safe_getattr(obj, name, *defargs)
 
 
 def setup(app):

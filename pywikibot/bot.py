@@ -645,8 +645,8 @@ class InteractiveReplace:
         for c in self.choices:
             if c.shortcut == choice:
                 return c.handle()
-        else:
-            raise ValueError('Invalid choice "{}"'.format(choice))
+
+        raise ValueError('Invalid choice "{}"'.format(choice))
 
     def __call__(self, link, text, groups, rng):
         """Ask user how the selected link should be replaced."""
@@ -1532,8 +1532,8 @@ class BaseBot(OptionHandler):
                 # Process the page
                 self.treat(page)
                 self._treat_counter += 1
-            else:
-                self._generator_completed = True
+
+            self._generator_completed = True
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit {} bot run...'
                              .format(self.__class__.__name__))

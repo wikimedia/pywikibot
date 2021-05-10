@@ -178,8 +178,8 @@ class NestedOption(OutputOption, StandardOption):
             handled = option.handled(value)
             if handled is not None:
                 return handled
-        else:
-            return super().handled(value)
+
+        return super().handled(value)
 
     def output(self):
         """Output the suboptions."""
