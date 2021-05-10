@@ -1827,7 +1827,7 @@ class BasePage(ComparableMixin):
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1, **kwargs):
             # should only be one item with one revision
-            if item['title'] == self.title:
+            if item['title'] == self.title():
                 if 'revisions' in item:
                     return item['revisions'][0]
         return []
