@@ -350,9 +350,9 @@ class DuplicateReferences:
             with suppress(ValueError):
                 used_numbers.add(int(number))
 
-        # iterator to give the next free number
-        free_number = iter({str(i) for i in range(1, 1000)  # should be enough
-                            if i not in used_numbers})
+        # generator to give the next free number
+        free_number = (str(i) for i in range(1, 1000)  # should be enough
+                       if i not in used_numbers)
 
         for (g, d) in found_refs.items():
             group = ''
