@@ -54,7 +54,6 @@ class TestReplacementsMain(TWNBotTestCase):
 
         def patched_login():
             """Do nothing."""
-            pass
 
         def patched_site(*args, **kwargs):
             """Patching a Site instance replacing it's login."""

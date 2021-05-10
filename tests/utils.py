@@ -434,7 +434,6 @@ class FakeLoginManager(pywikibot.data.api.LoginManager):
     @password.setter
     def password(self, value):
         """Ignore password changes."""
-        pass
 
 
 def execute(command, data_in=None, timeout=None, error=None):

@@ -26,8 +26,6 @@ class Site:
 
         """Nested class to hold the family name attribute."""
 
-        pass
-
     def __init__(self, code, family='wikipedia'):
         """Initializer."""
         self.code = code

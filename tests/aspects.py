@@ -1031,7 +1031,6 @@ class CapturingTestCase(TestCase):
 
     def after_assert(self, assertion, *args, **kwargs):
         """Handle after the assertion."""
-        pass
 
     def patch_assert(self, assertion):
         """Execute process_assert when the assertion is called."""
@@ -1282,8 +1281,6 @@ class DefaultWikibaseClientTestCase(WikibaseClientTestCase,
                                     DefaultSiteTestCase):
 
     """Run tests against any site connected to a Wikibase."""
-
-    pass
 
 
 class WikidataTestCase(WikibaseTestCase):

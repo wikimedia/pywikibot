@@ -61,8 +61,6 @@ class _NotImplementedWarning(RuntimeWarning):
 
     """Feature that is no longer implemented."""
 
-    pass
-
 
 def is_IP(IP: str) -> bool:  # noqa N802, N803
     """Verify the IP address provided is valid.
@@ -1049,14 +1047,10 @@ class SelfCallDict(SelfCallMixin, dict):
 
     """Dict with SelfCallMixin."""
 
-    pass
-
 
 class SelfCallString(SelfCallMixin, str):
 
     """String with SelfCallMixin."""
-
-    pass
 
 
 class DequeGenerator(Iterator, collections.deque):

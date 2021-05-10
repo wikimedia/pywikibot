@@ -502,8 +502,6 @@ class TerminalFormatter(logging.Formatter):
 
     """Terminal logging formatter."""
 
-    pass
-
 
 class MaxLevelFilter(logging.Filter):
 

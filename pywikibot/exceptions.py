@@ -176,21 +176,15 @@ class NotImplementedWarning(_NotImplementedWarning):
 
     """Feature that is no longer implemented."""
 
-    pass
-
 
 class ArgumentDeprecationWarning(UserWarning, FutureWarning):
 
     """Command line argument that is no longer supported."""
 
-    pass
-
 
 class FamilyMaintenanceWarning(UserWarning):
 
     """Family class is missing definitions."""
-
-    pass
 
 
 class Error(Exception):
@@ -348,8 +342,6 @@ class NoUsernameError(Error):
 
     """Username is not in user-config.py."""
 
-    pass
-
 
 class NoPageError(PageRelatedError):
 
@@ -400,28 +392,20 @@ class SiteDefinitionError(Error):
 
     """Site does not exist."""
 
-    pass
-
 
 class UnknownSiteError(SiteDefinitionError):
 
     """Site does not exist in Family."""
-
-    pass
 
 
 class UnknownFamilyError(SiteDefinitionError):
 
     """Family is not registered."""
 
-    pass
-
 
 class UnknownExtensionError(Error, NotImplementedError):
 
     """Extension is not defined."""
-
-    pass
 
 
 class VersionParseError(Error):
@@ -490,8 +474,6 @@ class InvalidPageError(PageLoadRelatedError):
 class InvalidTitleError(Error):
 
     """Invalid page title."""
-
-    pass
 
 
 class LockedPageError(PageSaveRelatedError):
@@ -596,35 +578,25 @@ class ServerError(Error):
 
     """Got unexpected server response."""
 
-    pass
-
 
 class FatalServerError(ServerError):
 
     """A fatal server error will not be corrected by resending the request."""
-
-    pass
 
 
 class Server504Error(ServerError):
 
     """Server timed out with HTTP 504 code."""
 
-    pass
-
 
 class Server414Error(ServerError):
 
     """Server returned with HTTP 414 code."""
 
-    pass
-
 
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
-
-    pass
 
 
 class AutoblockUserError(Error):
@@ -635,8 +607,6 @@ class AutoblockUserError(Error):
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
-
-    pass
 
 
 class UnhandledAnswerError(Error):
@@ -650,27 +620,22 @@ class UnhandledAnswerError(Error):
 
 class TranslationError(Error, ImportError):
 
-    """Raised when no correct translation could be found."""
+    """Raised when no correct translation could be found.
 
-    # Inherits from ImportError, as this exception is now used
-    # where previously an ImportError would have been raised,
-    # and may have been caught by scripts as such.
-
-    pass
+    Inherits from ImportError, as this exception is now used
+    where previously an ImportError would have been raised,
+    and may have been caught by scripts as such.
+    """
 
 
 class UserRightsError(Error):
 
     """Insufficient user rights to perform an action."""
 
-    pass
-
 
 class HiddenKeyError(UserRightsError, KeyError):
 
     """Insufficient user rights to view the hidden key."""
-
-    pass
 
 
 class NotEmailableError(PageRelatedError):
@@ -688,8 +653,6 @@ class PageInUseError(Error):
 class WikiBaseError(Error):
 
     """Wikibase related error."""
-
-    pass
 
 
 class NoWikibaseEntityError(WikiBaseError):
@@ -712,28 +675,20 @@ class CoordinateGlobeUnknownError(WikiBaseError, NotImplementedError):
 
     """This globe is not implemented yet in either WikiBase or pywikibot."""
 
-    pass
-
 
 class EntityTypeUnknownError(WikiBaseError):
 
     """The requested entity type is not recognised on this site."""
-
-    pass
 
 
 class TimeoutError(Error):
 
     """Request failed with a timeout error."""
 
-    pass
-
 
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
-
-    pass
 
 
 DEPRECATED_EXCEPTIONS = {

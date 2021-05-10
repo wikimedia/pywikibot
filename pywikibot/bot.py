@@ -1475,11 +1475,9 @@ class BaseBot(OptionHandler):
         operation which is more than just initialize the instance.
         Invoked by run() before running through generator loop.
         """
-        pass
 
     def teardown(self):
         """Some cleanups after run operation. Invoked by exit()."""
-        pass
 
     def run(self):
         """Process all pages in generator.
