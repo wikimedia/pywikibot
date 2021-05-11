@@ -206,7 +206,8 @@ class ParamInfo(Sized, Container):
         # the same data available in the paraminfo for query.
         query_modules_param = self.parameter('paraminfo', 'querymodules')
 
-        assert('limit' in query_modules_param)
+        if 'limit' not in query_modules_param:
+            raise RuntimeError('"limit" not found in query modules')
         self._limit = query_modules_param['limit']
 
         if query_modules_param and 'type' in query_modules_param:
@@ -583,7 +584,10 @@ class ParamInfo(Sized, Container):
         if not param_data:
             return None
 
-        assert(len(param_data) == 1)
+        if len(param_data) != 1:
+            raise RuntimeError(
+                'parameter data length is eiter empty or not unique.\n{}'
+                .format(param_data))
         return param_data[0]
 
     @property
@@ -1132,7 +1136,10 @@ class Request(MutableMapping):
         if isinstance(value, datetime.datetime):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
         if isinstance(value, pywikibot.page.BasePage):
-            assert(value.site == self.site)
+            if value.site != self.site:
+                raise RuntimeError(
+                    'value.site {!r} is different from Request.site {!r}'
+                    .format(value.site, self.site))
             return value.title(with_section=False)
         return str(value)
 
@@ -1972,7 +1979,9 @@ class CachedRequest(Request):
             filename = self._cachefile_path()
             with open(filename, 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
-            assert(uniquedescr == self._uniquedescriptionstr())
+            if uniquedescr != self._uniquedescriptionstr():
+                raise RuntimeError('Expected unique description for the cache '
+                                   'entry is different from file entry.')
             if self._expired(self._cachetime):
                 self._data = None
                 return False
@@ -3110,7 +3119,10 @@ def update_page(page, pagedict: dict, props=None):
         page.latest_revision_id = pagedict['lastrevid']
 
     if 'imageinfo' in pagedict:
-        assert(isinstance(page, pywikibot.FilePage))
+        if not isinstance(page, pywikibot.FilePage):
+            raise RuntimeError(
+                '"imageinfo" found but {} is not a FilePage object'
+                .format(page))
         page._load_file_revisions(pagedict['imageinfo'])
 
     if 'categoryinfo' in pagedict:
