@@ -9,6 +9,17 @@ This module is responsible for
     - Translate site objects with query strings into URLs
     - URL-encoding all data
     - Basic HTTP error handling
+
+This module creates and uses its own C{requests.Session} object.
+The session is closed if the module terminates.
+If required you can use your own Session object passing it to the
+C{http.session} variable::
+
+    from pywikibot.comms import http
+    session = requests.Session()
+    http.session = session
+
+L{flush()} can be called to close the session object.
 """
 #
 # (C) Pywikibot team, 2007-2021
@@ -72,7 +83,8 @@ session.cookies = cookie_jar
 
 
 # Prepare flush on quit
-def _flush():
+def flush():
+    """Close the session object. This is called when the module terminates."""
     log('Closing network session.')
     session.close()
 
@@ -82,7 +94,7 @@ def _flush():
     log('Network session closed.')
 
 
-atexit.register(_flush)
+atexit.register(flush)
 
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join(str(i) for i in sys.version_info),
