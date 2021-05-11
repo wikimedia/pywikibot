@@ -861,7 +861,7 @@ class Family:
         else:
             return None
 
-        matched_sites = []
+        matched_sites = set()
         for code in chain(self.codes,
                           getattr(self, 'test_codes', ()),
                           getattr(self, 'closed_wikis', ()),
@@ -874,11 +874,11 @@ class Family:
 
                 for iw_url in site._interwiki_urls():
                     if path.startswith(iw_url):
-                        matched_sites += [site]
+                        matched_sites.add(site)
                         break
 
         if len(matched_sites) == 1:
-            return matched_sites[0].code
+            return matched_sites.pop().code
 
         if not matched_sites:
             return None
