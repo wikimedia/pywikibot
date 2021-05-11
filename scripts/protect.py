@@ -228,7 +228,7 @@ def main(*args):
             level = check_protection_level(p_type, level, protection_levels,
                                            default_level)
             # '' is equivalent to 'all'
-            if level == 'none' or level == '':
+            if level in ('none', ''):
                 level = 'all'
             combined_protections[p_type] = level
         if not options.get('summary'):

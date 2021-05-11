@@ -98,7 +98,7 @@ class _UserAgentFormatter(Formatter):
     def get_value(self, key, args, kwargs):
         """Get field as usual except for version and revision."""
         # This is the Pywikibot version; also map it to {revision} at present.
-        if key == 'version' or key == 'revision':
+        if key in ('version', 'revision'):
             return pywikibot.version.getversiondict()['rev']
         return super().get_value(key, args, kwargs)
 

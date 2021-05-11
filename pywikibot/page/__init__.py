@@ -310,8 +310,8 @@ class BasePage(ComparableMixin):
                or (allow_interwiki
                    and (self.site.family.name != target_family
                         or self.site.code != target_code)):
-                if self.site.family.name != target_family \
-                   and self.site.family.name != self.site.code:
+                if self.site.family.name not in (
+                        target_family, self.site.code):
                     title = '{site.family.name}:{site.code}:{title}'.format(
                         site=self.site, title=title)
                 else:

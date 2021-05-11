@@ -402,7 +402,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 continue
             if dest.isCategoryRedirect():
                 double = dest.getCategoryRedirectTarget()
-                if double == dest or double == cat:
+                if double in (dest, cat):
                     message = i18n.twtranslate(
                         self.site, 'category_redirect-log-loop',
                         {'oldcat': dest.title(as_link=True, textlink=True)})

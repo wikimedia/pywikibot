@@ -130,7 +130,7 @@ class UnicodeOutput(IOBase):
                     retval = WriteConsoleW(self._hConsole, text,
                                            min(remaining, 10000),
                                            byref(n), None)
-                    if retval == 0 or n.value == 0:
+                    if 0 in (retval, n.value):
                         msg = 'WriteConsoleW returned {!r}, n.value = {!r}' \
                               .format(retval, n.value)
                         raise IOError(msg)

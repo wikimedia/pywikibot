@@ -27,7 +27,7 @@ plural_rules = {
     'cy': {'nplurals': 4, 'plural': lambda n:
            0 if (n == 1) else
            1 if (n == 2) else
-           2 if (n != 8 and n != 11) else
+           2 if n not in (8, 11) else
            3},
     'ga': {'nplurals': 5, 'plural': lambda n:
            0 if (n == 1) else
@@ -36,8 +36,8 @@ plural_rules = {
            3 if (n < 11) else
            4},
     'gd': {'nplurals': 4, 'plural': lambda n:
-           0 if (n == 1 or n == 11) else
-           1 if (n == 2 or n == 12) else
+           0 if n in (1, 11) else
+           1 if n in (2, 12) else
            2 if (2 < n < 20) else
            3},
     'is': {'nplurals': 2, 'plural': lambda n: (n % 10 != 1 or n % 100 == 11)},
