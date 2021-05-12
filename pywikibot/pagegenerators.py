@@ -1259,11 +1259,6 @@ class GeneratorFactory:
 
         return False
 
-    @deprecated('handle_arg', since='20210113', future_warning=True)
-    def handleArg(self, arg: str):
-        """DEPRECATED. Use handle_arg()."""
-        return self.handle_arg(arg)
-
 
 def _int_none(v):
     """Return None if v is None or '' else return int(v)."""
@@ -1459,21 +1454,6 @@ def InterwikiPageGenerator(page):
 def LanguageLinksPageGenerator(page, total=None):
     """Iterate over all interwiki language links on a page."""
     return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
-
-
-@deprecated('Page.getReferences(follow_redirects=False)', since='20200515',
-            future_warning=True)
-@deprecated_args(step=True)
-def ReferringPageGenerator(referredPage, followRedirects=False,
-                           withTemplateInclusion=True,
-                           onlyTemplateInclusion=False,
-                           total=None, content=False):
-    """DEPRECATED. Yield all pages referring to a specific page."""
-    return referredPage.getReferences(
-        follow_redirects=followRedirects,
-        with_template_inclusion=withTemplateInclusion,
-        only_template_inclusion=onlyTemplateInclusion,
-        total=total, content=content)
 
 
 @deprecated_args(step=True)
@@ -2717,7 +2697,7 @@ class XMLDumpOldPageGenerator(Iterator):
     @ivar parser: holds the xmlreader.XmlDump parse method
     """
 
-    @deprecated_args(xmlFilename='filename', xmlStart='start')
+    @deprecated_args(xmlFilename='filename')
     def __init__(self, filename: str, start: Optional[str] = None,
                  namespaces=None, site=None,
                  text_predicate=None):
@@ -2738,17 +2718,6 @@ class XMLDumpOldPageGenerator(Iterator):
 
         dump = xmlreader.XmlDump(filename)
         self.parser = dump.parse()
-
-    @property
-    @deprecated('self.start', since='20160414', future_warning=True)
-    def xmlStart(self):
-        """Deprecated xmlStart instance variable."""
-        return self.start
-
-    @xmlStart.setter
-    @deprecated('self.start', since='20160414', future_warning=True)
-    def xmlStart(self, value):
-        self.start = value
 
     def __next__(self):
         """Get next Page."""
@@ -2992,16 +2961,6 @@ DuplicateFilterPageGenerator = redirect_func(
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         old_name='PreloadingItemGenerator',
                                         since='20170314')
-# Deprecated old names available for compatibility with compat.
-ImageGenerator = redirect_func(
-    PageClassGenerator, old_name='ImageGenerator', since='20161017',
-    future_warning=True)
-FileGenerator = redirect_func(
-    PageClassGenerator, old_name='FileGenerator', since='20161017',
-    future_warning=True)
-CategoryGenerator = redirect_func(
-    PageClassGenerator, old_name='CategoryGenerator', since='20161017',
-    future_warning=True)
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '

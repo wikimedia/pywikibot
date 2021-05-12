@@ -39,9 +39,6 @@ LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
 PAGES_ID_GEN_MSG = (r'.*pywikibot\.pagegenerators\.PagesFromPageidGenerator .*'
                     r'is deprecated for .*; use site\.load_pages_from_pageids')
 
-REFERRING_PAGE_MSG = (r'.*pywikibot\.pagegenerators\.ReferringPageGenerator .*'
-                      r'is deprecated for .*; use Page\.getReferences')
-
 
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
@@ -634,15 +631,13 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
     """Test preloading item generator."""
 
     def test_non_item_gen(self):
-        """Test TestPreloadingEntityGenerator with ReferringPageGenerator."""
-        with suppress_warnings(REFERRING_PAGE_MSG, category=FutureWarning):
-            site = self.get_site()
-            instance_of_page = pywikibot.Page(site, 'Property:P31')
-            ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page,
-                                                            total=5)
-            gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-            is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
-            self.assertTrue(is_all_type)
+        """Test TestPreloadingEntityGenerator with getReferences."""
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = page.getReferences(follow_redirects=False, total=5)
+        gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
+        is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
+        self.assertTrue(is_all_type)
 
 
 class WikibaseItemFilterPageGeneratorTestCase(TestCase):
