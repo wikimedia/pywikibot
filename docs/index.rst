@@ -49,6 +49,7 @@ For bot users:
    :maxdepth: 1
 
    installation
+   utilities/index
    scripts/index
    getting_help
 
