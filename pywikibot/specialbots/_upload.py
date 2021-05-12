@@ -52,6 +52,9 @@ class UploadRobot(BaseBot):
                  filename_prefix: Optional[str] = None, **kwargs):
         """Initializer.
 
+        *Changed in version 6.2:* asynchronous upload is used if
+        *asynchronous* parameter is set.
+
         @param url: path to url or local file, or list of urls or paths
             to local files.
         @param description: Description of file for its page. If multiple files

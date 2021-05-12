@@ -24,6 +24,8 @@ build paths relative to base_dir:
  - makepath
  - datafilepath
  - shortpath
+
+*Renamed in version 6.2*
 """
 #
 # (C) Pywikibot team, 2003-2021

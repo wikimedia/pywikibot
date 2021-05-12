@@ -1612,6 +1612,9 @@ def extract_templates_and_params(text: str,
         such as comments and pre.
     @param strip: If enabled, strip arguments and values of templates.
     @return: list of template name and params
+
+    *New in version 6.1:* *wikitextparser* package is supported; either
+    *wikitextparser* or *mwparserfromhell* is strictly recommended.
     """
     use_regex = isinstance(wikitextparser, ImportError)
 

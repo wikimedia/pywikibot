@@ -155,6 +155,8 @@ UserWarning: warnings targeted at users
   - login._PasswordFileWarning: password file problems
   - ArgumentDeprecationWarning: command line argument problems
   - FamilyMaintenanceWarning: missing information in family definition
+
+*Changed in version 6.0:* exceptions were renamed and are ending with "Error".
 """
 #
 # (C) Pywikibot team, 2008-2021
@@ -466,7 +468,10 @@ class InterwikiRedirectPageError(PageRelatedError):
 
 class InvalidPageError(PageLoadRelatedError):
 
-    """Invalid page title."""
+    """Missing page history.
+
+    *New in version 6.2.*
+    """
 
     message = 'Page %s is invalid.'
 

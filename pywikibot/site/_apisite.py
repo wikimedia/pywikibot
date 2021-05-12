@@ -2557,6 +2557,9 @@ class APISite(
         *Changed in version 6.0:* keyword arguments required for all
         parameters except *filepage*.
 
+        *Changed in version 6.2:* asynchronous upload is used if
+        *asynchronous* parameter is set.
+
         @param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.
         @param source_filename: path to the file to be uploaded
