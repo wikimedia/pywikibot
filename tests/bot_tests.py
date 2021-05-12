@@ -1,6 +1,6 @@
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ import pywikibot
 import pywikibot.bot
 from pywikibot import i18n
 from pywikibot.tools import suppress_warnings
+
 from tests.aspects import (
     DefaultSiteTestCase,
     SiteAttributeTestCase,
@@ -392,20 +393,6 @@ class TestOptionHandler(TestCase):
         self.assertEqual(oh.opt.baz, 'Hey')
         self.assertEqual(oh.opt['baz'], 'Hey')
         self.assertNotIn('baz', oh.opt.__dict__)
-        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
-            self.assertEqual(oh.options['baz'], 'Hey')
-
-    def test_options(self):
-        """Test deprecated option attribute."""
-        oh = self.option_handler
-        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
-            self.assertNotIn('bar', oh.options)
-            self.assertIn('baz', oh.options)
-            self.assertTrue(oh.options['baz'])
-            self.assertEqual(oh.opt['baz'], oh.options['baz'])
-            oh.options['baz'] = False
-            self.assertFalse(oh.options['baz'])
-            self.assertFalse(oh.opt.baz)
 
 
 if __name__ == '__main__':  # pragma: no cover

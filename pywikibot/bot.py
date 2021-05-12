@@ -1018,7 +1018,6 @@ class _OptionDict(dict):
 
     def __init__(self, classname, options):
         self._classname = classname
-        self._options = {}
         super().__init__(options)
 
     def __missing__(self, key):
@@ -1031,25 +1030,10 @@ class _OptionDict(dict):
 
     def __setattr__(self, name, value):
         """Set item or attribute."""
-        if name not in ('_classname', '_options'):
+        if name != '_classname':
             self.__setitem__(name, value)
         else:
             super().__setattr__(name, value)
-
-    def __getitem__(self, key):
-        """Update options fro backward compatibility and get item."""
-        self.update_options()
-        return super().__getitem__(key)
-
-    def __setitem__(self, key, value):
-        """Set item in dict and deprecated option dict."""
-        if key in self._options:
-            self._options[key] = value
-        super().__setitem__(key, value)
-
-    def update_options(self):
-        """Update dict from deprecated options for backward compatibility."""
-        self.update(self._options)
 
 
 _DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
@@ -1114,12 +1098,12 @@ class OptionHandler:
         self.set_options(**kwargs)
 
     @property
-    @deprecated('available_options', since='20201006')
+    @deprecated('available_options', since='20201006', future_warning=True)
     def availableOptions(self):
         """DEPRECATED. Available_options class property."""
         return self.available_options
 
-    @deprecated('set_options', since='20201006')
+    @deprecated('set_options', since='20201006', future_warning=True)
     def setOptions(self, **kwargs):  # pragma: no cover
         """DEPRECATED. Set the instance options."""
         self.set_options(**kwargs)
@@ -1149,7 +1133,7 @@ class OptionHandler:
             pywikibot.warning('{} is not a valid option. It was ignored.'
                               .format(opt))
 
-    @deprecated(_DEPRECATION_MSG, since='20201006')
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
     def getOption(self, option):  # pragma: no cover
         """DEPRECATED. Get the current value of an option.
 
@@ -1158,25 +1142,6 @@ class OptionHandler:
             option parameter
         """
         return self.opt[option]
-
-    @property
-    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self):  # pragma: no cover
-        """DEPRECATED. Return changed options."""
-        return self.opt._options
-
-    @options.setter
-    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self, options):  # pragma: no cover
-        """DEPRECATED. Return changed options."""
-        self.set_options(**options)
-
-    def __getattribute__(self, name):
-        """Update options for backward compatibility of options property."""
-        attr = super().__getattribute__(name)
-        if name == 'opt':
-            attr.update_options()
-        return attr
 
 
 class BaseBot(OptionHandler):
