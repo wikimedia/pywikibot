@@ -1,6 +1,11 @@
 Current release changes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
+* tools.is_IP was renamed to is_ip_address due to PEP8
+* Fix Page.getDeletedRevision() method which always returned an empty list
+* Async chunked uploads are supported (T129216, 133443)
+* A new InvalidPageError will be raised if a Page has no version history (T280043)
+* config2.py was renamed to config.py
 * L10N updates
 * Fix __getattr__ for WikibaseEntity (T281389)
 * Handle abusefilter-{disallow,warning} codes (T85656)
@@ -9,6 +14,9 @@ Current release changes
 Deprecations
 ~~~~~~~~~~~~
 
+* 6.2.0: deprecated tools.is_IP will be removed
+* 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped
+* 6.2.0: Exceptions must be imported from exceptions namespace (T280227)
 * 6.2.0: Deprecated exception identifiers will be removed (T280227)
 * 6.2.0: empty_iterator will be removed in favour of iter()
 * 6.1.0: tools.frozenmap will be removed in favour of types.MappingProxyType
