@@ -1661,23 +1661,6 @@ class BasePage(ComparableMixin):
         return sum(cnt[user.username] if isinstance(user, User) else cnt[user]
                    for user in contributors)
 
-    @deprecated('contributors() or revisions()', since='20150206',
-                future_warning=True)
-    @deprecated_args(limit='total')  # pragma: no cover
-    def getLatestEditors(self, total=1) -> list:
-        """
-        Get a list of revision information of the last total edits.
-
-        DEPRECATED: Use Page.revisions.
-
-        @param total: iterate no more than this number of revisions in total
-        @return: list of dict, each dict containing the username and Timestamp
-        """
-        return [
-            {'user': rev.user,
-             'timestamp': rev.timestamp.isoformat()}
-            for rev in self.revisions(total=total)]
-
     def merge_history(self, dest, timestamp=None, reason=None):
         """
         Merge revisions from this page into another page.
@@ -2834,15 +2817,6 @@ class User(Page):
             # an autoblock.
             pywikibot.output(
                 'This is an autoblock ID, you can only use to unblock it.')
-
-    @deprecated('User.username', since='20160504', future_warning=True)
-    def name(self) -> str:  # pragma: no cover
-        """
-        The username.
-
-        DEPRECATED: use username instead.
-        """
-        return self.username
 
     @property
     def username(self) -> str:
