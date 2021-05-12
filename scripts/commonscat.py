@@ -447,6 +447,9 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         If the page doesn't exists the function will return an empty string
 
         """
+        if not name:  # target name is empty
+            return ''
+
         pywikibot.log('getCommonscat: ' + name)
         commonsSite = self.site.image_repository()
         commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
@@ -466,17 +469,19 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     r'Robot: Changing Category:(.+) '
                     r'to Category:(?P<newcat2>.+)')
                 m = re.search(regex, logcomment, flags=re.I)
-                if m:
-                    if m.group('newcat1'):
-                        return self.checkCommonscatLink(m.group('newcat1'))
-                    if m.group('newcat2'):
-                        return self.checkCommonscatLink(m.group('newcat2'))
-                else:
+
+                if not m:
                     pywikibot.output(
                         "getCommonscat: {} deleted by {}. Couldn't find "
                         'move target in "{}"'
                         .format(commonsPage, loguser, logcomment))
                     break
+
+                if m.group('newcat1'):
+                    return self.checkCommonscatLink(m.group('newcat1'))
+                if m.group('newcat2'):
+                    return self.checkCommonscatLink(m.group('newcat2'))
+
             return ''
 
         if commonsPage.isRedirectPage():
