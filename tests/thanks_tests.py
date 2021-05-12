@@ -21,6 +21,7 @@ class TestThankRevision(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    login = True
     write = True
 
     def test_thank_revision(self):
