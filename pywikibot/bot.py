@@ -1742,19 +1742,19 @@ class ConfigParserBot(BaseBot):
     All options must be predefined in available_options dictionary. The type
     of these options is responsible for the correct interpretation of the
     options type given by the .ini file. They can be interpreted as bool,
-    int, float or str (default). The settings file may be like:
+    int, float or str (default). The settings file may be like::
 
-    [add_text]
-    # edit summary for the bot.
-    summary = Bot: Aggiungo template Categorizzare
+        [add_text]
+        # edit summary for the bot.
+        summary = Bot: Aggiungo template Categorizzare
 
-    [shell] ; Shell options
-    always: true
+        [shell] ; Shell options
+        always: true
 
     The option values are interpreted in this order::
 
-    - available_options default setting
-    - script.ini options settings
+    - `available_options` default setting
+    - `script.ini options` settings
     - command line arguments
 
     *New in version 3.0.*

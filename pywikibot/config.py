@@ -1,20 +1,20 @@
 """
 Module to define and load pywikibot configuration default and user preferences.
 
-User preferences are loaded from a python file called user-config.py, which
-may be located in directory specified by the environment variable
-PYWIKIBOT_DIR, or the same directory as pwb.py, or in a directory within
-the users home. See get_base_dir for more information.
+User preferences are loaded from a python file called `user-config.py`,
+which may be located in directory specified by the environment variable
+`PYWIKIBOT_DIR`, or the same directory as `pwb.py`, or in a directory
+within the users home. See L{get_base_dir} for more information.
 
 If user-config.py cannot be found in any of those locations, this module
-will fail to load unless the environment variable PYWIKIBOT_NO_USER_CONFIG
-is set to a value other than '0'. i.e. PYWIKIBOT_NO_USER_CONFIG=1 will
-allow config to load without a user-config.py. However, warnings will be
-shown if user-config.py was not loaded. To prevent these warnings, set
-PYWIKIBOT_NO_USER_CONFIG=2. If pywikibot is installed as a site-package
-the behaviour is like PYWIKIBOT_NO_USER_CONFIG=2 is set.
+will fail to load unless the environment variable `PYWIKIBOT_NO_USER_CONFIG`
+is set to a value other than `'0'`. i.e. `PYWIKIBOT_NO_USER_CONFIG=1` will
+allow config to load without a `user-config.py`. However, warnings will be
+shown if `user-config.py` was not loaded. To prevent these warnings, set
+`PYWIKIBOT_NO_USER_CONFIG=2`. If Pywikibot is installed as a site-package
+the behaviour is like `PYWIKIBOT_NO_USER_CONFIG=2` is set.
 
-Functions made available to user-config:
+Functions made available to `user-config`:
 
  - user_home_path
 
@@ -283,20 +283,21 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order:
-     1.  If the script was called with a -dir: argument, use the directory
-         provided in this argument.
-     2.  If the user has a PYWIKIBOT_DIR environment variable, use the value
-         of it.
-     3.  If user-config is present in current directory, use the current
-         directory.
-     4.  If user-config is present in pwb.py directory, use that directory
-     5.  Use (and if necessary create) a 'pywikibot' folder under
-         'Application Data' or 'AppData\Roaming' (Windows) or
-         '.pywikibot' directory (Unix and similar) under the user's home
-         directory.
+     1.  If the script was called with a `-dir:` argument, use the
+         directory provided in this argument.
+     2.  If the user has a `PYWIKIBOT_DIR` environment variable, use the
+         value of it.
+     3.  If `user-config` is present in current directory, use the
+         current directory.
+     4.  If `user-config` is present in `pwb.py` directory, use that
+         directory
+     5.  Use (and if necessary create) a `'pywikibot'` folder under
+         `'Application Data'` or `'AppData\Roaming'` (Windows) or
+         `'.pywikibot'` directory (Unix and similar) under the user's
+         home directory.
 
-    Set PYWIKIBOT_NO_USER_CONFIG=1 to disable loading user-config.py or
-    install pywikibot as a site-package.
+    Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading `user-config.py`
+    or install Pywikibot as a site-package.
 
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this

@@ -32,11 +32,11 @@ class Throttle:
 
     """Control rate of access to wiki server.
 
-    Calling this object blocks the calling thread until at least 'delay'
-    seconds have passed since the previous call.
+    Calling this object blocks the calling thread until at least
+    `'delay'` seconds have passed since the previous call.
 
-    Each Site initiates one Throttle object (site.throttle) to control the
-    rate of access.
+    Each Site initiates one Throttle object (`site.throttle`) to control
+    the rate of access.
 
     """
 
@@ -256,20 +256,21 @@ class Throttle:
     def lag(self, lagtime: Optional[float] = None):
         """Seize the throttle lock due to server lag.
 
-        Usually the self.retry-after value from response_header of the last
-        request if available which will be used for wait time. Otherwise
-        lagtime from api maxlag is used. If neither retry_after nor lagtime is
-        set, fallback to config.retry_wait.
+        Usually the `self.retry-after` value from `response_header` of the
+        last request if available which will be used for wait time.
+        Otherwise `lagtime` from api `maxlag` is used. If neither
+        `self.retry_after` nor `lagtime` is set, fallback to
+        `config.retry_wait`.
 
-        If the lagtime is disproportionately high compared to retry-after
-        value, the wait time will be increased.
+        If the `lagtime` is disproportionately high compared to
+        `self.retry_after` value, the wait time will be increased.
 
-        This method is used by api.request. It will prevent any thread from
-        accessing this site.
+        This method is used by `api.request`. It will prevent any thread
+        from accessing this site.
 
-        @param lagtime: The time to wait for the next request which is the
-            last maxlag time from api warning. This is only used as a fallback
-            if self.retry-after isn't set.
+        @param lagtime: The time to wait for the next request which is
+            the last `maxlag` time from api warning. This is only used
+            as a fallback if `self.retry_after` isn't set.
         """
         started = time.time()
         with self.lock:

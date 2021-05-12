@@ -4,11 +4,11 @@ This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
-If you wish to run this as an stand-alone script, use:
+If you wish to run this as an stand-alone script, use::
 
     scripts/cosmetic_changes.py
 
-For regular use, it is recommended to put this line into your user-config.py:
+For regular use, it is recommended to put this line into your user-config.py::
 
     cosmetic_changes = True
 
@@ -16,11 +16,11 @@ You may enable cosmetic changes for additional languages by adding the
 dictionary cosmetic_changes_enable to your user-config.py. It should contain
 a tuple of languages for each site where you wish to enable in addition to
 your own langlanguage if cosmetic_changes_mylang_only is True (see below).
-Please set your dictionary by adding such lines to your user-config.py:
+Please set your dictionary by adding such lines to your user-config.py::
 
     cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 
-There is another config variable: You can set
+There is another config variable: You can set::
 
     cosmetic_changes_mylang_only = False
 
@@ -33,7 +33,7 @@ a tuple of languages for each site where you wish to disable cosmetic changes.
 You may use it with cosmetic_changes_mylang_only is False, but you can also
 disable your own language. This also overrides the settings in the dictionary
 cosmetic_changes_enable. Please set this dictionary by adding such lines to
-your user-config.py:
+your user-config.py::
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 
@@ -41,11 +41,11 @@ You may disable cosmetic changes for a given script by appending the all
 unwanted scripts to the list cosmetic_changes_deny_script in your
 user-config.py. By default it contains cosmetic_changes.py itself and touch.py.
 This overrides all other enabling settings for cosmetic changes. Please modify
-the given list by adding such lines to your user-config.py:
+the given list by adding such lines to your user-config.py::
 
     cosmetic_changes_deny_script.append('your_script_name_1')
 
-or by adding a list to the given one:
+or by adding a list to the given one::
 
     cosmetic_changes_deny_script += ['your_script_name_1',
                                      'your_script_name_2']
@@ -766,12 +766,19 @@ class CosmeticChangesToolkit:
         """
         Add a space between the equal signs and the section title.
 
-        Example: ==Section title== becomes == Section title ==
+        Example::
 
-        NOTE: This space is recommended in the syntax help on the English and
-        German Wikipedia. It is not wanted on Lojban and English Wiktionary
-        (T168399, T169064) and it might be that it is not wanted on other
-        wikis. If there are any complaints, please file a bug report.
+            ==Section title==
+
+        becomes::
+
+        == Section title ==
+
+        :NOTE: This space is recommended in the syntax help on the
+            English and German Wikipedia. It is not wanted on Lojban and
+            English Wiktionary (T168399, T169064) and it might be that
+            it is not wanted on other wikis. If there are any complaints,
+            please file a bug report.
         """
         if self.site.sitename in ['wiktionary:jbo', 'wiktionary:en']:
             return text
@@ -785,9 +792,10 @@ class CosmeticChangesToolkit:
         """
         Add a space between the * or # and the text.
 
-        NOTE: This space is recommended in the syntax help on the English,
-        German, and French Wikipedia. It might be that it is not wanted on
-        other wikis. If there are any complaints, please file a bug report.
+        :NOTE: This space is recommended in the syntax help on the
+            English, German, and French Wikipedia. It might be that it
+            is not wanted on other wikis. If there are any complaints,
+            please file a bug report.
         """
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre',
