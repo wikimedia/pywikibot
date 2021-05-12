@@ -705,17 +705,6 @@ class Family:
         """
         return True
 
-    @deprecated('verify_SSL_certificate', since='20201013',
-                future_warning=True)
-    def ignore_certificate_error(self, code: str) -> bool:
-        """
-        DEPRECATED. Return whether a HTTPS certificate error should be ignored.
-
-        @param code: language code
-        @return: flag to allow access if certificate has an error.
-        """
-        return not self.verify_SSL_certificate
-
     def hostname(self, code):
         """The hostname to use for standard http connections."""
         return self.langs[code]
