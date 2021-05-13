@@ -65,6 +65,8 @@ from pywikibot.pagegenerators import (
 )
 from pywikibot.textlib import replaceExcept
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools.chars import string2html
+
 from scripts import noreferences
 
 
@@ -246,7 +248,7 @@ class RefLink:
         self.title = self.title.replace('}}', '}&#125;')
         # prevent multiple quotes being interpreted as '' or '''
         self.title = self.title.replace("''", "'&#39;")
-        self.title = pywikibot.unicode2html(self.title, self.site.encoding())
+        self.title = string2html(self.title, self.site.encoding())
         # TODO : remove HTML when both opening and closing tags are included
 
     def avoid_uppercase(self):

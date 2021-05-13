@@ -25,7 +25,7 @@ from html.entities import name2codepoint
 from http import HTTPStatus
 from itertools import chain
 from typing import Any, Optional, Union
-from urllib.parse import quote_from_bytes, unquote_to_bytes
+from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
@@ -73,6 +73,8 @@ from pywikibot.tools import (
     deprecated_args,
     first_upper,
     is_ip_address,
+    issue_deprecation_warning,
+    ModuleDeprecationWrapper,
     redirect_func,
     remove_last_args,
 )
@@ -5181,9 +5183,8 @@ class Link(BaseLink):
             self._anchor = None
 
         # Convert URL-encoded characters to unicode
-        encodings = [self._source.encoding()] + list(self._source.encodings())
-
-        self._text = url2unicode(self._text, encodings=encodings)
+        self._text = pywikibot.tools.chars.url2string(
+            self._text, encodings=self._source.encodings())
 
         # Clean up the name, it can come from anywhere.
         # Convert HTML entities to unicode
@@ -5724,40 +5725,12 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
     return _ENTITY_SUB(handle_entity, text)
 
 
-def UnicodeToAsciiHtml(string) -> str:
-    """Convert unicode to a str using HTML entities."""
-    html = []
-    for c in string:
-        cord = ord(c)
-        if 31 < cord < 127:
-            html.append(c)
-        else:
-            html.append('&#{};'.format(cord))
-    return ''.join(html)
-
-
-def unicode2html(string: str, encoding: str) -> str:
-    """
-    Convert unicode string to requested HTML encoding.
-
-    Attempt to encode the
-    string into the desired format; if that doesn't work, encode the unicode
-    into HTML &#; entities. If it does work, return it unchanged.
-
-    @param string: String to update
-    @param encoding: Encoding to use
-    """
-    try:
-        string.encode(encoding)
-    except UnicodeError:
-        string = UnicodeToAsciiHtml(string)
-    return string
-
-
 @deprecated_args(site='encodings')
+@deprecated('pywikibot.tools.chars.url2string', since='6.2.0',
+            future_warning=True)
 def url2unicode(title: str, encodings='utf-8') -> str:
     """
-    Convert URL-encoded text to unicode using several encoding.
+    DEPRECATED. Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error.
 
@@ -5767,21 +5740,24 @@ def url2unicode(title: str, encodings='utf-8') -> str:
 
     @raise UnicodeError: Could not convert using any encoding.
     """
-    if isinstance(encodings, str):
-        encodings = [encodings]
-    elif isinstance(encodings, pywikibot.site.BaseSite):
-        # create a list of all possible encodings for both hint sites
-        site = encodings
-        encodings = [site.encoding()] + list(site.encodings())
+    if isinstance(encodings, pywikibot.site.BaseSite):
+        # use all possible encodings from Site object
+        encodings = encodings.encodings()
+        issue_deprecation_warning(
+            'Passing BaseSite object to encodings parameter',
+            'BaseSite.endcodings()',
+            depth=1,
+            warning_class=FutureWarning,
+            since='6.2.0'
+        )
 
-    first_exception = None
-    for enc in encodings:
-        try:
-            t = title.encode(enc)
-            t = unquote_to_bytes(t)
-            return t.decode(enc)
-        except UnicodeError as ex:
-            if not first_exception:
-                first_exception = ex
-    # Couldn't convert, raise the original exception
-    raise first_exception
+    return pywikibot.tools.chars.url2string(title, encodings)
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('UnicodeToAsciiHtml',
+                             pywikibot.tools.chars.string_to_ascii_html,
+                             since='6.2.0', future_warning=True)
+wrapper._add_deprecated_attr('unicode2html',
+                             pywikibot.tools.chars.string2html,
+                             since='6.2.0', future_warning=True)

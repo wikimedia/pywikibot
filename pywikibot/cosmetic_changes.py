@@ -61,7 +61,6 @@ from typing import Optional
 import pywikibot
 from pywikibot import textlib
 from pywikibot.exceptions import InvalidTitleError
-from pywikibot.page import url2unicode
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     _get_regexes,
@@ -74,6 +73,7 @@ from pywikibot.tools import (
     first_upper,
     issue_deprecation_warning,
 )
+from pywikibot.tools.chars import url2string
 
 
 try:
@@ -582,8 +582,8 @@ class CosmeticChangesToolkit:
                 hadTrailingSpaces = len(titleWithSection) != titleLength
 
             # Convert URL-encoded characters to str
-            titleWithSection = url2unicode(titleWithSection,
-                                           encodings=self.site)
+            titleWithSection = url2string(titleWithSection,
+                                          encodings=self.site.encodings())
 
             if not titleWithSection:
                 # just skip empty links.
