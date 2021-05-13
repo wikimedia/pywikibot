@@ -67,7 +67,7 @@ script:
       python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
     fi
   - if [[ $FAMILY == 'portalwiki' ]]; then
-      python -m generate_family_file 'https://theportalwiki.com/wiki/Main_Page' 'portalwiki' 'y' ;
+      python -m generate_family_file 'https://theportalwiki.com/wiki/Main_Page' 'portalwiki' 'y' 'y';
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"

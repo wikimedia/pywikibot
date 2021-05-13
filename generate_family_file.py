@@ -25,7 +25,7 @@ class FamilyFileGenerator:
 
     """Family file creator."""
 
-    def __init__(self, url=None, name=None, dointerwiki=None):
+    def __init__(self, url=None, name=None, dointerwiki=None, verify=None):
         """Initializer."""
         # from pywikibot.site_detect import MWSite
         # when required but disable user-config checks
@@ -45,6 +45,7 @@ class FamilyFileGenerator:
         self.dointerwiki = dointerwiki
         self.base_url = url
         self.name = name
+        self.verify = verify
 
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
@@ -63,7 +64,8 @@ class FamilyFileGenerator:
                 pywikibot.exception()
                 if not pywikibot.bot.input_yn(
                     'Retry with disabled ssl certificate validation',
-                        automatic_quit=False):
+                    default=self.verify, automatic_quit=False,
+                        force=self.verify is not None):
                     break
             else:
                 return w, verify
