@@ -1217,8 +1217,8 @@ class HtmlEntity(TestCase):
 
     def test_invalid_entities(self):
         """Test texts with invalid entities."""
-        self.assertEqual(pywikibot.page.html2unicode('A&notaname;O'),
-                         'A&notaname;O')
+        self.assertEqual(pywikibot.page.html2unicode('A&invalidname;O'),
+                         'A&invalidname;O')
         self.assertEqual(pywikibot.page.html2unicode('A&#7f;O'), 'A&#7f;O')
         self.assertEqual(pywikibot.page.html2unicode('&#7f'), '&#7f')
         self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
