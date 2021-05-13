@@ -111,10 +111,10 @@ class TestDeletionBot(ScriptMainTestCase):
             self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(self, reason, prompt, mark, quit):
+def delete_dummy(self, reason, prompt, mark, automatic_quit):
     """Dummy delete method."""
     TestDeletionBot.delete_args = [self.title(as_link=True), reason, prompt,
-                                   mark, quit]
+                                   mark, automatic_quit]
 
 
 def undelete_dummy(self, reason):
