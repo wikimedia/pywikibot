@@ -1,5 +1,24 @@
 #!/usr/bin/python
-"""This script generates a family file from a given URL."""
+"""This script generates a family file from a given URL.
+
+Usage::
+
+    generate_family_file.py [<url>] [<name>] [<dointerwiki>] [<verify>]
+
+Parameters are optional. They must be given consecutively but may be
+omitted if there is no successor parameter. The parameters are::
+
+    <url>:         an url from where the family settings are loaded
+    <name>:        the family name without "_family.py" tail.
+    <dointerwiki>: predefined answer (y|n) to add multiple language
+    <verify>:      disable certificate validaton `(y|n)
+
+Example::
+
+    generate_family_file.py https://www.mywiki.bogus/wiki/Main_Page mywiki
+
+This will create the file mywiki_family.py in pywikibot/families folder
+"""
 #
 # (C) Pywikibot team, 2010-2021
 #
@@ -9,7 +28,9 @@ import codecs
 import os
 import string
 import sys
+
 from os import environ, getenv
+from typing import Optional
 from urllib.parse import urlparse
 
 
@@ -23,32 +44,58 @@ CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 class FamilyFileGenerator:
 
-    """Family file creator."""
+    """Family file creator object."""
 
-    def __init__(self, url=None, name=None, dointerwiki=None, verify=None):
-        """Initializer."""
+    def __init__(self,
+                 url: Optional[str] = None,
+                 name: Optional[str] = None,
+                 dointerwiki: Optional[str] = None,
+                 verify: Optional[str] = None):
+        """
+        Parameters are optional. If not given the script asks for the values.
+
+        @param url: an url from where the family settings are loaded
+        @param name: the family name without "_family.py" tail.
+        @param dointerwiki: Predefined answer to add multiple language
+            codes. Pass `Y` or `y` for yes `N` or `n` for no and
+            `E` or `e` if you want to edit the collection of sites.
+        @param verify: If a certificate verification failes, you may
+            pass `Y` or `y` to disable certificate validaton `N` or `n`
+            to keep it enabled.
+        """
         # from pywikibot.site_detect import MWSite
         # when required but disable user-config checks
         # so the family can be created first,
         # and then used when generating the user-config
         self.Wiki = _import_with_no_user_config(
             'pywikibot.site_detect').site_detect.MWSite
-        if url is None:
-            url = input('Please insert URL to wiki: ')
-        if name is None:
-            name = input('Please insert a short name (eg: freeciv): ')
 
-        assert all(x in NAME_CHARACTERS for x in name), \
-            'Name of family "{}" must be ASCII letters and digits ' \
-            '[a-zA-Z0-9]'.format(name)
-
-        self.dointerwiki = dointerwiki
         self.base_url = url
         self.name = name
+        self.dointerwiki = dointerwiki
         self.verify = verify
 
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
+
+    def get_params(self):
+        """Ask for parameters if necessary."""
+        if self.base_url is None:
+            self.base_url = input('Please insert URL to wiki: ')
+            if not self.base_url:
+                return False
+
+        if self.name is None:
+            self.name = input('Please insert a short name (eg: freeciv): ')
+            if not self.name:
+                return False
+
+        if any(x not in NAME_CHARACTERS for x in self.name):
+            print('ERROR: Name of family "{}" must be ASCII letters and '
+                  'digits [a-zA-Z0-9]'.format(self.name))
+            return False
+
+        return True
 
     def get_wiki(self):
         """Get wiki from base_url."""
@@ -73,6 +120,9 @@ class FamilyFileGenerator:
 
     def run(self):
         """Main method, generate family file."""
+        if not self.get_params():
+            return
+
         w, verify = self.get_wiki()
         if w is None:
             return
@@ -241,15 +291,10 @@ def _import_with_no_user_config(*import_args):
 
 def main():
     """Process command line arguments and generate a family file."""
-    if len(sys.argv) != 3:
-        print("""
-Usage: {module} <url> <short name>
-Example: {module} https://www.mywiki.bogus/wiki/Main_Page mywiki
-This will create the file mywiki_family.py in pywikibot{sep}families"""
-              .format(module=sys.argv[0].strip('.' + os.sep),
-                      sep=os.sep))
-
-    FamilyFileGenerator(*sys.argv[1:]).run()
+    if len(sys.argv) > 1 and sys.argv[1] == '-help':
+        print(__doc__)
+    else:
+        FamilyFileGenerator(*sys.argv[1:]).run()
 
 
 if __name__ == '__main__':
