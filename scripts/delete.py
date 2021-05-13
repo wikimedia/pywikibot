@@ -215,7 +215,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
             self.current_page.delete(self.summary,
                                      not self.opt.always,
                                      self.opt.always,
-                                     quit=True)
+                                     automatic_quit=True)
 
 
 def main(*args: Tuple[str, ...]) -> None:
