@@ -1702,11 +1702,12 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
+    @deprecate_arg('quit', 'automatic_quit')
     def delete(self,
                reason: Optional[str] = None,
                prompt: bool = True,
                mark: bool = False,
-               quit: bool = False):
+               automatic_quit: bool = False):
         """
         Delete the page from the wiki. Requires administrator status.
 
@@ -1716,7 +1717,8 @@ class BasePage(ComparableMixin):
         @param mark: If true, and user does not have sysop rights, place a
             speedy-deletion request on the page instead. If false, non-sysops
             will be asked before marking pages for deletion.
-        @param quit: show also the quit option, when asking for confirmation.
+        @param automatic_quit: show also the quit option, when asking
+            for confirmation.
         """
         if reason is None:
             pywikibot.output('Deleting {}.'.format(self.title(as_link=True)))
@@ -1730,7 +1732,7 @@ class BasePage(ComparableMixin):
                     'Do you want to delete {}?'.format(self.title(
                         as_link=True, force_interwiki=True)),
                     [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
-                    'n', automatic_quit=quit)
+                    'n', automatic_quit=automatic_quit)
                 if answer == 'a':
                     answer = 'y'
                     self.site._noDeletePrompt = True

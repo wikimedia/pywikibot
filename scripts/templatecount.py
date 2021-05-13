@@ -33,7 +33,7 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,16 +61,16 @@ class TemplateCountRobot:
         @param namespaces: list of namespace numbers
         @type namespaces: list
         """
-        format = '{0:<10}: {1:>5}'
+        formatstr = '{0:<10}: {1:>5}'
         template_dict = cls.template_dict(templates, namespaces)
         pywikibot.stdout('\nNumber of transclusions per template')
         pywikibot.stdout('-' * 36)
         total = 0
         for key in template_dict:
             count = len(template_dict[key])
-            pywikibot.stdout(format.format(key, count))
+            pywikibot.stdout(formatstr.format(key, count))
             total += count
-        pywikibot.stdout(format.format('TOTAL', total))
+        pywikibot.stdout(formatstr.format('TOTAL', total))
         pywikibot.stdout('Report generated on {}'
                          .format(datetime.datetime.utcnow().isoformat()))
 
