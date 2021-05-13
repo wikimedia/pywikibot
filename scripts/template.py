@@ -161,7 +161,7 @@ class TemplateRobot(ReplaceBot):
 
         replacements = []
         exceptions = {}
-        builder = textlib._MultiTemplateMatchBuilder(self.site)
+        builder = textlib.MultiTemplateMatchBuilder(self.site)
         for old, new in self.templates.items():
             template_regex = builder.pattern(old)
 
@@ -285,7 +285,7 @@ def main(*args) -> None:
         old_templates.append(old_template)
 
     if xmlfilename:
-        builder = textlib._MultiTemplateMatchBuilder(site)
+        builder = textlib.MultiTemplateMatchBuilder(site)
         predicate = builder.search_any_predicate(old_templates)
 
         gen = XMLDumpPageGenerator(

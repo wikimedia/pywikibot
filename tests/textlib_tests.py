@@ -17,7 +17,7 @@ from pywikibot import textlib
 from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
-from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
+from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import suppress_warnings
 from tests import mock
 from tests.aspects import (
@@ -1470,7 +1470,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
 
 class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
 
-    """Test _MultiTemplateMatchBuilder."""
+    """Test MultiTemplateMatchBuilder."""
 
     @classmethod
     def setUpClass(cls):
@@ -1482,13 +1482,13 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     def test_no_match(self):
         """Test text without any desired templates."""
         string = 'The quick brown fox'
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         self.assertIsNone(re.search(builder.pattern('quick'), string))
 
     def test_match(self):
         """Test text with one match without parameters."""
         string = 'The {{quick}} brown fox'
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
         self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
                          self._template_not_case_sensitive)
@@ -1496,7 +1496,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     def test_match_with_params(self):
         """Test text with one match with parameters."""
         string = 'The {{quick|brown}} fox'
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
         self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
                          self._template_not_case_sensitive)
@@ -1504,7 +1504,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     def test_match_msg(self):
         """Test text with {{msg:..}}."""
         string = 'The {{msg:quick}} brown fox'
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
         self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
                          self._template_not_case_sensitive)
@@ -1513,7 +1513,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
         """Test pages with {{template:..}}."""
         string = 'The {{%s:%s}} brown fox'
         template = 'template'
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         if self._template_not_case_sensitive:
             quick_list = ('quick', 'Quick')
         else:

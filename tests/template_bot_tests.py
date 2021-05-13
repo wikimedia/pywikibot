@@ -8,7 +8,7 @@ import unittest
 
 import pywikibot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.textlib import _MultiTemplateMatchBuilder
+from pywikibot.textlib import MultiTemplateMatchBuilder
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 
@@ -25,7 +25,7 @@ class TestXMLPageGenerator(TestCase):
     def generator(self, title, xml='article-pear-0.10.xml'):
         """Return XMLDumpPageGenerator list for a given template title."""
         template = pywikibot.Page(self.site, title, ns=10)
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
         predicate = builder.search_any_predicate([template])
         gen = XMLDumpPageGenerator(
             filename=join_xml_data_path(xml),
@@ -53,7 +53,7 @@ class TestXMLPageGenerator(TestCase):
         """Test pages with one of many matches."""
         template1 = pywikibot.Page(self.site, 'Template:stack begin')
         template2 = pywikibot.Page(self.site, 'Template:foobar')
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
 
         predicate = builder.search_any_predicate([template1, template2])
         gen = XMLDumpPageGenerator(

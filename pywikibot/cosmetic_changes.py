@@ -64,8 +64,8 @@ from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import url2unicode
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
+    MultiTemplateMatchBuilder,
     _get_regexes,
-    _MultiTemplateMatchBuilder,
 )
 from pywikibot.tools import (
     deprecated,
@@ -812,7 +812,7 @@ class CosmeticChangesToolkit:
     def replaceDeprecatedTemplates(self, text):
         """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
 
         if self.site.family.name in deprecatedTemplates \
            and self.site.code in deprecatedTemplates[self.site.family.name]:

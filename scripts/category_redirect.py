@@ -304,9 +304,9 @@ class CategoryRedirectBot(SingleSiteBot):
             with open(self.datafile + '.bak', 'wb') as f:
                 pickle.dump(self.record, f, protocol=config.pickle_protocol)
         # regex to match soft category redirects
-        # TODO: enhance and use textlib._MultiTemplateMatchBuilder
-        #  note that any templates containing optional "category:" are
-        #  incorrect and will be fixed by the bot
+        # TODO: enhance and use textlib.MultiTemplateMatchBuilder
+        # note that any templates containing optional "category:" are
+        # incorrect and will be fixed by the bot
         template_regex = re.compile(
             r"""{{\s*(?:%(prefix)s\s*:\s*)?  # optional "template:"
                      (?:%(template)s)\s*\|   # catredir template name
