@@ -730,13 +730,18 @@ class GeneratorsMixin:
             api.update_page(page, pagedata, rvgen.props)
 
     @deprecated_args(step=True)
-    def pagelanglinks(self, page, *, total=None, include_obsolete=False):
+    def pagelanglinks(self, page, *,
+                      total: Optional[int] = None,
+                      include_obsolete: bool = False,
+                      include_empty_titles: bool = False):
         """Iterate all interlanguage links on page, yielding Link objects.
 
         @see: U{https://www.mediawiki.org/wiki/API:Langlinks}
 
         @param include_obsolete: if true, yield even Link objects whose
-                                 site is obsolete
+            site is obsolete
+        @param include_empty_titles: if true, yield even Link objects whose
+            title is empty but redirects to a site like [[en:]]
         """
         lltitle = page.title(with_section=False)
         llquery = self._generator(api.PropertyGenerator,
@@ -755,7 +760,8 @@ class GeneratorsMixin:
                 if link.site.obsolete and not include_obsolete:
                     continue
 
-                yield link
+                if link.title or include_empty_titles:
+                    yield link
 
     @deprecated_args(step=True)
     def page_extlinks(self, page, *, total=None):

@@ -179,6 +179,13 @@ class BasePage(ComparableMixin):
                 self._link = Link(title, source=source.site,
                                   default_namespace=ns)
         elif isinstance(source, BaseLink):
+            if not source.title:
+                raise InvalidTitleError(
+                    '{} title of {} {} cannot be empty.'
+                    .format(self.__class__.__name__,
+                            source.__class__.__name__,
+                            source.astext()))
+
             self._link = source
             self._revisions = {}
         else:
@@ -707,7 +714,9 @@ class BasePage(ComparableMixin):
         If the title includes a section, return False if this section isn't
         found.
         """
-        return self.pageid > 0
+        with suppress(AttributeError):
+            return self.pageid > 0
+        raise InvalidPageError(self)
 
     @property
     def oldest_revision(self):
