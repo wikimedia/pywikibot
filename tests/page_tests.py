@@ -326,15 +326,19 @@ class TestPageObject(DefaultSiteTestCase):
                 InvalidTitleError,
                 INVALID_TITLE_RE):
             page.title()
+
         page = pywikibot.page.BasePage(site, title='')
         with self.assertRaisesRegex(
                 InvalidTitleError,
                 INVALID_TITLE_RE):
             page.title()
-        with self.assertRaisesRegex(
-                ValueError,
-                'Title cannot be None.'):
+
+        with self.assertRaisesRegex(ValueError, 'Title cannot be None.'):
             pywikibot.page.BasePage(site, title=None)
+
+        with self.assertRaisesRegex(InvalidTitleError,
+                                    r' contains illegal char\(s\) '):
+            pywikibot.Page(pywikibot.page.Link('[]', site))
 
     def testPageConstructor(self):
         """Test Page constructor."""
