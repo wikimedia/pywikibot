@@ -19,7 +19,6 @@ import sys
 import threading
 import time
 import types
-from collections import defaultdict
 from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from contextlib import suppress
 from datetime import datetime
@@ -352,6 +351,8 @@ class SizedKeyCollection(Container, Iterable, Sized):
         key = getattr(value, self.keyattr)
         if callable(key):
             key = key()
+        if key not in self.data:
+            self.data[key] = []
         self.data[key].append(value)
         self.size += 1
 
@@ -372,7 +373,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
 
     def clear(self):
         """Remove all elements from SizedKeyCollection."""
-        self.data = defaultdict(list)
+        self.data = {}  # defaultdict fails (T282865)
         self.size = 0
 
     def filter(self, key):
