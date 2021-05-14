@@ -79,6 +79,7 @@ Miscellaneous
 .. toctree::
    :maxdepth: 1
 
+   changelog
    licenses
    credits
 

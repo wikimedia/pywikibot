@@ -1,5 +1,5 @@
 Current release changes
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 * tools.is_IP was renamed to is_ip_address due to PEP8
 * Fix Page.getDeletedRevision() method which always returned an empty list
@@ -12,7 +12,7 @@ Current release changes
 * Exceptions were renamed having a suffix "Error" due to PEP8 (T280227)
 
 Deprecations
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 * 6.2.0: deprecated tools.is_IP will be removed
 * 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped
