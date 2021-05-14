@@ -1122,13 +1122,6 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def test_fromPage_invalid_title(self):
-        """Test item from page with invalid title."""
-        page = pywikibot.Page(pywikibot.page.Link('[]', self.site))
-        regex = r' contains illegal char\(s\) '
-        with self.assertRaisesRegex(InvalidTitleError, regex):
-            ItemPage.fromPage(page)
-
     def _test_fromPage_noitem(self, link):
         """Helper function to test a page without an associated item.
 
