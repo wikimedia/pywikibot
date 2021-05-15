@@ -181,13 +181,6 @@ class BasePage(ComparableMixin):
                 self._link = Link(title, source=source.site,
                                   default_namespace=ns)
         elif isinstance(source, BaseLink):
-            if not source.title:
-                raise InvalidTitleError(
-                    '{} title of {} {} cannot be empty.'
-                    .format(self.__class__.__name__,
-                            source.__class__.__name__,
-                            source.astext()))
-
             self._link = source
             self._revisions = {}
         else:
@@ -5374,7 +5367,8 @@ class Link(BaseLink):
         # with a fragment identifier.
         if not t.strip(' ') and not self._is_interwiki:  # T197642
             raise InvalidTitleError(
-                'The link does not contain a page title')
+                'The link [[{}]] does not contain a page title'
+                .format(self._text))
 
         if self._site.namespaces[self._namespace].case == 'first-letter':
             t = first_upper(t)
