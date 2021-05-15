@@ -146,7 +146,6 @@ import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
-from queue import Queue
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
@@ -550,8 +549,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         if self.opt.addcat and isinstance(self.opt.addcat, str):
             self.opt.addcat = pywikibot.Category(self.site, self.opt.addcat)
 
-        self._pending_processed_titles = Queue()
-
     def isTitleExcepted(self, title, exceptions=None) -> bool:
         """Return True if one of the exceptions applies for the given title."""
         if exceptions is None:
@@ -617,16 +614,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 applied.add(replacement)
 
         return new_text
-
-    def _replace_async_callback(self, page, err):
-        """Log changed titles for display."""
-        # This is an async put callback
-        if not isinstance(err, Exception):
-            self._pending_processed_titles.put((page.title(
-                as_link=True), True))
-        else:  # unsuccessful pages
-            self._pending_processed_titles.put((page.title(as_link=True),
-                                                False))
 
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
@@ -751,14 +738,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 self.opt.always = True
             if choice == 'y':
                 self.save(page, original_text, new_text, applied,
-                          show_diff=False, quiet=True,
-                          callback=self._replace_async_callback,
-                          asynchronous=True)
-            while not self._pending_processed_titles.empty():
-                proc_title, res = self._pending_processed_titles.get()
-                pywikibot.output('Page {}{} saved'
-                                 .format(proc_title,
-                                         '' if res else ' not'))
+                          show_diff=False, asynchronous=True)
+
             # choice must be 'N'
             break
 
@@ -1081,19 +1062,13 @@ LIMIT 200""".format(whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
 
     gen = genFactory.getCombinedGenerator(gen, preload=True)
-
-    if not gen:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    if pywikibot.bot.suggest_help(missing_generator=not gen):
         return
 
     bot = ReplaceRobot(gen, replacements, exceptions, site=site,
                        summary=edit_summary, **options)
     site.login()
     bot.run()
-
-    # Explicitly call pywikibot.stopme(). It will make sure the callback is
-    # triggered before replace.py is unloaded.
-    pywikibot.stopme()
 
 
 if __name__ == '__main__':

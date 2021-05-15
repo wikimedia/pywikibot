@@ -1012,19 +1012,24 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
 
-            def output_range(self, start, end) -> None:
-                """Output a section and categories from the text."""
-                pywikibot.output(self.text[start:end] + '...')
+            @property
+            def out(self) -> str:
+                """Create a section and categories from the text."""
+                start = max(0, self.start - self.context)
+                end = min(len(self.text), self.end + self.context)
+                text = self.text[start:end] + '...'
 
                 # if categories weren't visible, show them additionally
                 if len(self.text) > end:
                     for cat in member.categories():
                         if cat != original_cat:
-                            pywikibot.output(cat.title(as_link=True))
+                            text += cat.title(as_link=True)
                         else:
-                            pywikibot.output(color_format(
+                            text += color_format(
                                 '{lightpurple}{0}{default}',
-                                current_cat.title(as_link=True)))
+                                current_cat.title(as_link=True))
+                        text += '\n'
+                return text
 
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""

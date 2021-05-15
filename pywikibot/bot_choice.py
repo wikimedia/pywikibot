@@ -5,13 +5,21 @@
 # Distributed under the terms of the MIT license.
 #
 import re
+
+from abc import ABC, abstractmethod
 from textwrap import fill
 from typing import Optional
 
 import pywikibot
 
+from pywikibot.tools import (
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+)
 
-class Option:
+
+class Option(ABC):
 
     """
     A basic option for input_choice.
@@ -72,18 +80,27 @@ class Option:
         """Return a formatted string for that option."""
         raise NotImplementedError()
 
-    def result(self, value):
-        """Return the actual value which is associated by the given one."""
-        raise NotImplementedError()
-
     def test(self, value):
         """Return True whether this option applies."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def result(self, value):
+        """Return the actual value which is associated by the given one.
+
+        *New in version 6.2:* *result()* is an abstract method and must
+        be defined in subclasses
+        """
         raise NotImplementedError()
 
 
 class OutputOption(Option):
 
-    """An option that never stops and can output on each question."""
+    """An option that never stops and can output on each question.
+
+    :Note: OutputOption must have a an "out" property which returns a
+        string for output method.
+    """
 
     before_question = False
 
@@ -93,12 +110,25 @@ class OutputOption(Option):
         return False
 
     def result(self, value):
-        """Just output the value."""
-        self.output()
+        """Just return None."""
+        return None
+
+    @property
+    def out(self) -> str:
+        """String to be used when selected and possibly before the question.
+
+        :Note: This method is used by ui.input_choice instead of output().
+
+        *New in version 6.2.*
+        """
+        return ''
 
     def output(self):
-        """Output a string when selected and possibly before the question."""
-        raise NotImplementedError()
+        """Output string when selected and possibly before the question.
+
+        :Note: This method should never be overridden.
+        """
+        pywikibot.output(self.out)
 
 
 class StandardOption(Option):
@@ -140,16 +170,23 @@ class StandardOption(Option):
 
 class OutputProxyOption(OutputOption, StandardOption):
 
-    """An option which calls output of the given output class."""
+    """An option which calls out property of the given output class."""
 
     def __init__(self, option, shortcut, output, **kwargs):
         """Create a new option for the given sequence."""
         super().__init__(option, shortcut, **kwargs)
         self._outputter = output
 
-    def output(self):
-        """Output the contents."""
-        self._outputter.output()
+    @property
+    def out(self) -> str:
+        """Return te contents."""
+        if not hasattr(self._outputter, 'out'):
+            issue_deprecation_warning('{} without "out" property'
+                                      .format(self.__class__.__name__),
+                                      warning_class=FutureWarning,
+                                      since='6.2.0')
+            return self._outputter.output()
+        return self._outputter.out
 
 
 class NestedOption(OutputOption, StandardOption):
@@ -181,9 +218,10 @@ class NestedOption(OutputOption, StandardOption):
 
         return super().handled(value)
 
-    def output(self):
-        """Output the suboptions."""
-        pywikibot.output(self._output)
+    @property
+    def out(self):
+        """Output of suboptions."""
+        return self._output
 
 
 class ContextOption(OutputOption, StandardOption):
@@ -206,15 +244,19 @@ class ContextOption(OutputOption, StandardOption):
         self.context += self.delta
         super().result(value)
 
-    def output(self):
-        """Output the context."""
+    @property
+    def out(self):
+        """Output section of the text."""
         start = max(0, self.start - self.context)
         end = min(len(self.text), self.end + self.context)
-        self.output_range(start, end)
+        return self.text[start:end]
 
-    def output_range(self, start_context, end_context):
-        """Output a section from the text."""
-        pywikibot.output(self.text[start_context:end_context])
+    @deprecated_args(start_context='start', end_context='end')
+    @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0',
+                future_warning=True)
+    def output_range(self, start, end):
+        """DEPRECATED. Output a section from the text."""
+        pywikibot.output(self.text[start:end])
 
 
 class Choice(StandardOption):
@@ -231,6 +273,7 @@ class Choice(StandardOption):
         """The replacer."""
         return self._replacer
 
+    @abstractmethod
     def handle(self):
         """Handle this choice. Must be implemented."""
         raise NotImplementedError()
@@ -339,9 +382,9 @@ class IntegerOption(Option):
             value = self.parse(value)
         except ValueError:
             return False
-        else:
-            return ((self.minimum is None or value >= self.minimum)
-                    and (self.maximum is None or value <= self.maximum))
+
+        return ((self.minimum is None or value >= self.minimum)
+                and (self.maximum is None or value <= self.maximum))
 
     @property
     def minimum(self):
@@ -389,7 +432,7 @@ class IntegerOption(Option):
 
     def result(self, value):
         """Return the value converted into int."""
-        return (self.prefix, self.parse(value))
+        return self.prefix, self.parse(value)
 
 
 class ListOption(IntegerOption):
@@ -419,7 +462,7 @@ class ListOption(IntegerOption):
 
     def result(self, value):
         """Return a tuple with the prefix and selected value."""
-        return (self.prefix, self._list[self.parse(value) - 1])
+        return self.prefix, self._list[self.parse(value) - 1]
 
 
 class ShowingListOption(ListOption, OutputOption):
@@ -447,15 +490,18 @@ class ShowingListOption(ListOption, OutputOption):
         """Return whether this option stops asking."""
         return self._stop
 
-    def output(self):
-        """Output the enumerated list."""
+    @property
+    def out(self):
+        """Output text of the enumerated list."""
+        text = ''
         if self.pre is not None:
-            pywikibot.output(self.pre)
+            text = self.pre + '\n'
         width = len(str(self.maximum))
         for i, item in enumerate(self._list, self.minimum):
-            pywikibot.output('{:>{width}} - {}'.format(i, item, width=width))
+            text += '{:>{width}} - {}\n'.format(i, item, width=width)
         if self.post is not None:
-            pywikibot.output(self.post)
+            text += self.post + '\n'
+        return text
 
 
 class MultipleChoiceList(ListOption):
@@ -486,7 +532,7 @@ class MultipleChoiceList(ListOption):
         """Return a tuple with the prefix and selected values as a list."""
         values = (self.parse(val) for val in value.split(','))
         result = [self._list[val - 1] for val in values]
-        return (self.prefix, result)
+        return self.prefix, result
 
 
 class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
@@ -501,11 +547,30 @@ class HighlightContextOption(ContextOption):
 
     """Show the original region highlighted."""
 
+    color = 'lightred'
+
+    def out(self):
+        """Highlighted output section of the text."""
+        start = max(0, self.start - self.context)
+        end = min(len(self.text), self.end + self.context)
+        color_format = pywikibot.tools.formatter.color_format
+        return color_format('{}{%(color)s}{}{default}{}'
+                            % {'color': self.color},
+                            self.text[start:self.start],
+                            self.text[self.start:self.end],
+                            self.text[self.end:end])
+
+    @deprecated('pywikibot.output(HighlightContextOption.out)',
+                since='6.2.0', future_warning=True)
     def output_range(self, start, end):
-        """Show normal context with a red center region."""
-        pywikibot.output(self.text[start:self.start] + '\03{lightred}'
-                         + self.text[self.start:self.end] + '\03{default}'
-                         + self.text[self.end:end])
+        """DEPRECATED. Show normal context with a highlighted center region."""
+        color_format = pywikibot.tools.formatter.color_format
+        text = color_format('{}{%(color)s}{}{default}{}'
+                            % {'color': self.color},
+                            self.text[start:self.start],
+                            self.text[self.start:self.end],
+                            self.text[self.end:end])
+        pywikibot.output(text)
 
 
 class UnhandledAnswer(Exception):

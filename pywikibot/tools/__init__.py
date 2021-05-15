@@ -614,6 +614,68 @@ class MediaWikiVersion:
         return self._cmp(other) >= 0
 
 
+class RLock:
+    """Context manager which implements extended reentrant lock objects.
+
+    This RLock is implicit derived from threading.RLock but provides a
+    locked() method like in threading.Lock and a count attribute which
+    gives the active recursion level of locks.
+
+    Usage:
+
+    >>> from pywikibot.tools import RLock
+    >>> lock = RLock()
+    >>> lock.acquire()
+    True
+    >>> with lock: print(lock.count)  # nested lock
+    2
+    >>> lock.locked()
+    True
+    >>> lock.release()
+    >>> lock.locked()
+    False
+
+    *New in version 6.2*
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize RLock."""
+        self._lock = threading.RLock(*args, **kwargs)
+        self._block = threading.Lock()
+
+    def __enter__(self):
+        """Acquire lock and call atenter."""
+        return self._lock.__enter__()
+
+    def __exit__(self, *exc):
+        """Call atexit and release lock."""
+        return self._lock.__exit__(*exc)
+
+    def __getattr__(self, name):
+        """Delegate attributes and methods to self._lock."""
+        return getattr(self._lock, name)
+
+    def __repr__(self):
+        """Representation of tools.RLock instance."""
+        return repr(self._lock).replace(
+            '_thread.RLock',
+            '{cls.__module__}.{cls.__class__.__name__}'.format(cls=self))
+
+    @property
+    def count(self):
+        """Return number of acquired locks."""
+        with self._block:
+            counter = re.search(r'count=(\d+) ', repr(self))
+            return int(counter.group(1))
+
+    def locked(self):
+        """Return true if the lock is acquired."""
+        with self._block:
+            status = repr(self).split(maxsplit=1)[0][1:]
+            assert status in ('locked', 'unlocked')
+            return status == 'locked'
+
+
 class ThreadedGenerator(threading.Thread):
 
     """Look-ahead generator class.

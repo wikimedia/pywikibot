@@ -1,6 +1,6 @@
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from string import Formatter
 from typing import Any, Mapping, Sequence
 
 from pywikibot.logging import output
+from pywikibot.tools import deprecated
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -40,7 +41,13 @@ class SequenceOutputter:
         super().__init__()
         self.sequence = sequence
 
+    @deprecated('out', since='6.2.0', future_warning=True)
     def format_list(self):
+        """DEPRECATED: Create the text with one item on each line."""
+        return self.out
+
+    @property
+    def out(self):
         """Create the text with one item on each line."""
         if self.sequence:
             # Width is only defined when the length is greater 0
@@ -52,9 +59,11 @@ class SequenceOutputter:
             content = ''
         return self.prefix + content + self.suffix
 
+    @deprecated('pywikibot.output(SequenceOutputter.out)', since='6.2.0',
+                future_warning=True)
     def output(self):
         """Output the text of the current sequence."""
-        output(self.format_list())
+        output(self.out)
 
 
 class _ColorFormatter(Formatter):

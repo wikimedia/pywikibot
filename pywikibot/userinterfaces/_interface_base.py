@@ -30,6 +30,12 @@ class ABUIC(ABC):
         """
         return list(sys.argv)
 
+    def flush(self):
+        """Flush cached output.
+
+        May be passed to atexit.register() to flush any ui cache.
+        """
+
     @abstractmethod
     def init_handlers(self, *args, **kwargs):
         """Initialize the handlers for user output.
@@ -67,9 +73,3 @@ class ABUIC(ABC):
     def output(self, *args, **kwargs) -> None:
         """Output text to a stream."""
         print(*args, **kwargs)  # noqa: T001
-
-    def flush(self):
-        """Flush cached output.
-
-        May be passed to atexit.register() to flush any ui cache.
-        """
