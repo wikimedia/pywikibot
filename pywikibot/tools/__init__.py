@@ -640,7 +640,7 @@ class RLock:
     """
 
     def __init__(self, *args, **kwargs):
-        """Initialize RLock."""
+        """Initializer."""
         self._lock = threading.RLock(*args, **kwargs)
         self._block = threading.Lock()
 
