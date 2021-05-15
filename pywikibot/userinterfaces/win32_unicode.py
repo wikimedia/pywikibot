@@ -1,6 +1,6 @@
 """Stdout, stderr and argv support for unicode."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2021
 #
 ##############################################
 # Support for unicode in Windows cmd.exe
@@ -21,8 +21,8 @@
 # Licensed under both CC-BY-SA and the MIT license.
 #
 ################################################
-import codecs
 import sys
+
 from contextlib import suppress
 from ctypes import Structure, byref
 from ctypes import c_void_p as LPVOID
@@ -170,13 +170,6 @@ def old_fileno(std_name):
 def _complain(message):
     print(isinstance(message, str) and message or repr(message),
           file=original_stderr)
-
-
-def register_cp65001():
-    """Register codecs cp65001 as utf-8."""
-    # Work around <https://bugs.python.org/issue6058>
-    codecs.register(lambda name: name == 'cp65001'
-                    and codecs.lookup('utf-8') or None)
 
 
 def force_truetype_console(h_stdout):
@@ -331,7 +324,3 @@ def get_unicode_console():
                   .format(e))
 
     return stdin, stdout, stderr, argv
-
-
-if OSWIN32:
-    register_cp65001()
