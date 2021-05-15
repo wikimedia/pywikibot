@@ -1342,7 +1342,7 @@ class checkImagesBot:
 
     def isTagged(self) -> bool:
         """Understand if a file is already tagged or not."""
-        # TODO: enhance and use textlib._MultiTemplateMatchBuilder
+        # TODO: enhance and use textlib.MultiTemplateMatchBuilder
         # Is the image already tagged? If yes, no need to double-check, skip
         no_license = i18n.translate(self.site, txt_find)
         if not no_license:

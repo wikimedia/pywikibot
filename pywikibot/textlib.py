@@ -156,7 +156,7 @@ def unescape(s: str) -> str:
     return html.unescape(s)
 
 
-class _MultiTemplateMatchBuilder:
+class MultiTemplateMatchBuilder:
 
     """Build template matcher."""
 
