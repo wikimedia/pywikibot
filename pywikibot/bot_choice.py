@@ -1,6 +1,6 @@
 """Choices for input_choice."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -506,6 +506,15 @@ class HighlightContextOption(ContextOption):
         pywikibot.output(self.text[start:self.start] + '\03{lightred}'
                          + self.text[self.start:self.end] + '\03{default}'
                          + self.text[self.end:end])
+
+
+class UnhandledAnswer(Exception):
+
+    """The given answer didn't suffice."""
+
+    def __int__(self, stop=False):
+        """Initializer."""
+        self.stop = stop
 
 
 class ChoiceException(StandardOption, Exception):

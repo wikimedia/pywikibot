@@ -4,7 +4,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,12 +17,12 @@ from pywikibot.bot import (
     NoRedirectPageBot,
 )
 from pywikibot.editor import TextEditor
-from pywikibot.exceptions import UnhandledAnswerError
+from pywikibot.bot_choice import UnhandledAnswer
 from pywikibot.textlib import replace_links
 from pywikibot.tools import ModuleDeprecationWrapper
 
 
-class EditReplacementError(ChoiceException, UnhandledAnswerError):
+class EditReplacementError(ChoiceException, UnhandledAnswer):
 
     """The text should be edited and replacement should be restarted."""
 

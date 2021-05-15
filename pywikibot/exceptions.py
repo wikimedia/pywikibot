@@ -51,7 +51,6 @@ the framework::
           +-- TranslationError
           +-- UserRightsError
           |    +-- HiddenKeyError (KeyError)
-          +-- UnhandledAnswerError
           +-- UnknownExtensionError (NotImplementedError)
           +-- VersionParseError
           +-- WikiBaseError
@@ -77,7 +76,6 @@ Error: Base class, all exceptions should the subclass of this class.
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - i18n.TranslationError: i18n/l10n message not available
   - PageInUseError: Page cannot be reserved due to a lock
-  - UnhandledAnswerError: bot choice caused a problem to arise
   - UnknownExtensionError: Extension is not defined for this site
   - VersionParseError: failed to parse version information
   - SectionError: The section specified by # does not exist
@@ -612,15 +610,6 @@ class AutoblockUserError(Error):
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
-
-
-class UnhandledAnswerError(Error):
-
-    """The given answer didn't suffice."""
-
-    def __init__(self, stop=False):
-        """Initializer."""
-        self.stop = stop
 
 
 class TranslationError(Error, ImportError):

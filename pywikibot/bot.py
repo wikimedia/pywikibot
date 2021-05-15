@@ -66,7 +66,7 @@ __all__ = (
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
     'ShowingMultipleChoiceList', 'OutputProxyOption',
-    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswerError',
+    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
     'Choice', 'StaticChoice', 'LinkChoice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
@@ -122,6 +122,7 @@ from pywikibot.bot_choice import (
     ShowingMultipleChoiceList,
     StandardOption,
     StaticChoice,
+    UnhandledAnswer,
 )
 from pywikibot.exceptions import (
     EditConflictError,
@@ -131,7 +132,6 @@ from pywikibot.exceptions import (
     PageSaveRelatedError,
     ServerError,
     SpamblacklistError,
-    UnhandledAnswerError,
     UnknownFamilyError,
     UnknownSiteError,
     VersionParseError,
@@ -158,7 +158,6 @@ from pywikibot.logging import (
 )
 from pywikibot.tools import (
     PYTHON_VERSION,
-    ModuleDeprecationWrapper,
     deprecate_arg,
     deprecated,
     deprecated_args,
@@ -655,7 +654,7 @@ class InteractiveReplace:
             while True:
                 try:
                     answer = self.handle_link()
-                except UnhandledAnswerError as e:
+                except UnhandledAnswer as e:
                     if e.stop:
                         raise
                 else:
@@ -2271,13 +2270,3 @@ class WikidataBot(Bot, ExistingPageBot):
         raise NotImplementedError('Method {}.treat_page_and_item() not '
                                   'implemented.'
                                   .format(self.__class__.__name__))
-
-
-UnhandledAnswer = UnhandledAnswerError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
-    'UnhandledAnswer',
-    replacement_name='pywikibot.exceptions.UnhandledAnswerError',
-    since='20210423',
-    future_warning=True)
