@@ -1221,7 +1221,6 @@ from pywikibot.page import (  # noqa: E402
     SiteLink,
     User,
     html2unicode,
-    unicode2html,
     url2unicode,
 )
 
@@ -1361,6 +1360,9 @@ wrapper._add_deprecated_attr('__release__', __version__,
                              since='20200707')
 wrapper._add_deprecated_attr('showHelp', show_help,
                              since='20200705', future_warning=True)
+wrapper._add_deprecated_attr(
+    'unicode2html', replacement_name='pywikibot.tools.chars.string2html',
+    since='6.2.0', future_warning=True)
 
 # This module aliases many (but not all) pywikibot.exception classes and one
 # from pywikibot.data.api. Use of these aliases is deprecated. When removed
