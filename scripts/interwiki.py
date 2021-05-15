@@ -2478,7 +2478,7 @@ def main(*args):
     except KeyboardInterrupt:
         dump.write_dump(bot.dump_titles, append)
     except Exception:
-        pywikibot.exception()
+        pywikibot.exception(tb=bool(config.verbose_output))
         dump.write_dump(bot.dump_titles, append)
     else:
         pywikibot.output('Script terminated sucessfully.')
