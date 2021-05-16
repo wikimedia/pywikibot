@@ -5760,9 +5760,11 @@ def url2unicode(title: str, encodings='utf-8') -> str:
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('UnicodeToAsciiHtml',
-                             pywikibot.tools.chars.string_to_ascii_html,
-                             since='6.2.0', future_warning=True)
-wrapper._add_deprecated_attr('unicode2html',
-                             pywikibot.tools.chars.string2html,
-                             since='6.2.0', future_warning=True)
+wrapper._add_deprecated_attr(
+    'UnicodeToAsciiHtml',
+    replacement_name='pywikibot.tools.chars.string_to_ascii_html',
+    since='6.2.0', future_warning=True)
+wrapper._add_deprecated_attr(
+    'unicode2html',
+    replacement_name='pywikibot.tools.chars.string2html',
+    since='6.2.0', future_warning=True)
