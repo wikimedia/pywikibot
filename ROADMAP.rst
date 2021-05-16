@@ -5,7 +5,7 @@ Improvements and Bugfixes
 -------------------------
 
 * Fix iterating of SizedKeyCollection (T282865)
-* The cached output functionality from compat relase was re-implemented (T151727, T73646, T74942, T132135, T144698, T280466)
+* The cached output functionality from compat relase was re-implemented (T151727, T73646, T74942, T132135, T144698, T196039, T280466)
 * An abstract base user interface module was added
 * APISite method pagelanglinks() may skip links with empty titles (T223157)
 * Fix Page.getDeletedRevision() method which always returned an empty list
