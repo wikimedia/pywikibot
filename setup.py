@@ -116,17 +116,6 @@ dependencies = [
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']
-# Some of the ui_tests depend on accessing the console window's menu
-# to set the console font and copy and paste, achieved using pywinauto
-# which depends on pywin32.
-# These tests may be disabled because pywin32 depends on VC++, is time
-# consuming to build, and the console window can't be accessed during AppVeyor
-# builds.
-if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
-    test_deps += [
-        'pywinauto>0.6.4',
-        'pywin32>=225',
-    ]
 
 # Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.
