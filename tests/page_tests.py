@@ -336,10 +336,6 @@ class TestPageObject(DefaultSiteTestCase):
         with self.assertRaisesRegex(ValueError, 'Title cannot be None.'):
             pywikibot.page.BasePage(site, title=None)
 
-        with self.assertRaisesRegex(InvalidTitleError,
-                                    r' contains illegal char\(s\) '):
-            pywikibot.Page(pywikibot.page.Link('[]', site))
-
     def testPageConstructor(self):
         """Test Page constructor."""
         site = self.get_site()
