@@ -549,6 +549,7 @@ class HighlightContextOption(ContextOption):
 
     color = 'lightred'
 
+    @property
     def out(self):
         """Highlighted output section of the text."""
         start = max(0, self.start - self.context)

@@ -59,8 +59,6 @@ class SequenceOutputter:
             content = ''
         return self.prefix + content + self.suffix
 
-    @deprecated('pywikibot.output(SequenceOutputter.out)', since='6.2.0',
-                future_warning=True)
     def output(self):
         """Output the text of the current sequence."""
         output(self.out)

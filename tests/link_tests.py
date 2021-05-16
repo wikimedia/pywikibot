@@ -139,7 +139,7 @@ class TestLink(DefaultDrySiteTestCase):
         title_tests = [
             # Empty title
             (['', ':', '__  __', '  __  '],
-             r'^The link does not contain a page title$'),
+             r'^The link \[\[.*\]\] does not contain a page title$'),
 
             (['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B'],
              generate_contains_illegal_chars_exc_regex),
@@ -893,7 +893,7 @@ class TestEmptyTitle(TestCase):
         link = Link('', self.get_site())
         with self.assertRaisesRegex(
                 InvalidTitleError,
-                'The link does not contain a page title'):
+                r'The link \[\[.*\]\] does not contain a page title'):
             link.parse()
 
     def test_namespace_lookalike(self):
