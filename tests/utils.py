@@ -7,6 +7,7 @@
 import inspect
 import os
 import sys
+import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
@@ -19,7 +20,7 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from tests import _pwb_py, unittest
+from tests import _pwb_py
 
 
 try:
@@ -515,3 +516,12 @@ def empty_sites():
     pywikibot._sites = {}
     pywikibot._code_fam_from_url.cache_clear()
     yield
+
+
+@contextmanager
+def skipping(*exceptions):
+    """Context manager to skip test on specified exceptions."""
+    try:
+        yield
+    except exceptions as e:
+        raise unittest.SkipTest(e)
