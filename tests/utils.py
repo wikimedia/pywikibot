@@ -519,9 +519,11 @@ def empty_sites():
 
 
 @contextmanager
-def skipping(*exceptions):
+def skipping(*exceptions, msg=None):
     """Context manager to skip test on specified exceptions."""
     try:
         yield
     except exceptions as e:
-        raise unittest.SkipTest(e)
+        if msg is None:
+            msg = e
+        raise unittest.SkipTest(msg)

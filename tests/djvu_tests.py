@@ -14,6 +14,7 @@ from contextlib import suppress
 from pywikibot.tools.djvu import DjVuFile
 from tests import create_path_func, join_data_path
 from tests.aspects import TestCase
+from tests.utils import skipping
 
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
@@ -34,13 +35,11 @@ class TestDjVuFile(TestCase):
     def setUpClass(cls):
         """Setup tests."""
         super().setUpClass()
-        try:
+        with skipping(OSError, msg='djvulibre library not installed.'):
             dp = subprocess.Popen(['djvudump'],
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
             dp.communicate()
-        except OSError:
-            raise unittest.SkipTest('djvulibre library not installed.')
 
     def test_repr_method(self):
         """Test __repr__() method."""
