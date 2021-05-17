@@ -105,7 +105,7 @@ class UI(ABUIC):
         # this handler ignores levels above INPUT
         default_handler.addFilter(MaxLevelFilter(INPUT))
         default_handler.setFormatter(
-            TerminalFormatter(fmt='%(message)s%(newline)s'))
+            logging.Formatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(default_handler)
 
         # handler for level STDOUT
@@ -113,14 +113,14 @@ class UI(ABUIC):
         output_handler.setLevel(STDOUT)
         output_handler.addFilter(MaxLevelFilter(STDOUT))
         output_handler.setFormatter(
-            TerminalFormatter(fmt='%(message)s%(newline)s'))
+            logging.Formatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(output_handler)
 
         # handler for levels WARNING and higher
         warning_handler = TerminalHandler(self, strm=self.stderr)
         warning_handler.setLevel(WARNING)
         warning_handler.setFormatter(
-            TerminalFormatter(fmt='%(levelname)s: %(message)s%(newline)s'))
+            logging.Formatter(fmt='%(levelname)s: %(message)s%(newline)s'))
         root_logger.addHandler(warning_handler)
 
         warnings_logger = logging.getLogger('py.warnings')
@@ -542,11 +542,6 @@ class TerminalHandler(logging.Handler):
 
         text = self.format(record)
         return self.UI.output(text, targetStream=self.stream)
-
-
-class TerminalFormatter(logging.Formatter):
-
-    """Terminal logging formatter."""
 
 
 class MaxLevelFilter(logging.Filter):
