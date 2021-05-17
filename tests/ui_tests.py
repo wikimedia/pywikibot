@@ -33,11 +33,11 @@ from tests.utils import FakeModule, unittest
 
 class Stream:
 
-    """Handler for a StringIO or BytesIO instance able to patch itself."""
+    """Handler for a StringIO instance able to patch itself."""
 
     def __init__(self, name: str, patched_streams: dict):
         """
-        Create a new stream with a StringIO or BytesIO instance.
+        Create a new stream with a StringIO instance.
 
         @param name: The part after 'std' (e.g. 'err').
         @param patched_streams: A mapping which maps the original stream to
