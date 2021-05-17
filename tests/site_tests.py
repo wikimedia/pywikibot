@@ -38,6 +38,7 @@ from tests.aspects import (
     WikimediaDefaultSiteTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
+from tests.utils import skipping
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
@@ -1072,11 +1073,10 @@ class TestImageUsage(DefaultSiteTestCase):
 
         mysite = self.get_site()
         page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
-        try:
+        with skipping(
+            StopIteration,
+                msg='No images on the main page of site {0!r}'.format(mysite)):
             imagepage = next(iter(page.imagelinks()))  # 1st image of page
-        except StopIteration:
-            raise unittest.SkipTest(
-                'No images on the main page of site {0!r}'.format(mysite))
 
         pywikibot.output('site_tests.TestImageUsage found {} on {}'
                          .format(imagepage, page))

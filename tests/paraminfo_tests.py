@@ -14,6 +14,7 @@ from tests.aspects import (
     WikimediaDefaultSiteTestCase,
     unittest,
 )
+from tests.utils import skipping
 
 
 class KnownTypesTestBase(TestCaseBase):
@@ -22,11 +23,11 @@ class KnownTypesTestBase(TestCaseBase):
 
     def _get_param_values(self, site, module, parameter):
         """Perform check that a parameter matches the expected list."""
-        try:
+        with skipping(
+            ValueError,
+                msg='Paraminfo for {} could not be loaded'.format(module)):
             param = site._paraminfo.parameter(module, parameter)
-        except ValueError:
-            raise unittest.SkipTest(
-                'Paraminfo for {} could not be loaded'.format(module))
+
         if not param or 'type' not in param:
             raise unittest.SkipTest(
                 'No defined values for {}.{}'.format(module, parameter))
