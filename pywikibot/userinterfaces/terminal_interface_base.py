@@ -189,14 +189,14 @@ class UI(ABUIC):
                 # set the new color, but only if they change
                 self.encounter_color(color_stack[-1], target_stream)
 
-    def output(self, text, toStdout=False, targetStream=None):
+    def output(self, text, targetStream=None):
         """Forward text to cache and flush if output is not locked.
 
         All input methods locks the output to a stream but collect them
         in cache. They will be printed with next unlocked output call or
         at termination time.
         """
-        self.cache_output(text, toStdout, targetStream)
+        self.cache_output(text, targetStream=targetStream)
         if not self.lock.locked():
             self.flush()
 
@@ -213,7 +213,7 @@ class UI(ABUIC):
         """
         self.cache.put_nowait((args, kwargs))
 
-    def stream_output(self, text, toStdout=False, targetStream=None):
+    def stream_output(self, text, targetStream=None):
         """
         Output text to a stream.
 
@@ -268,10 +268,7 @@ class UI(ABUIC):
             text = transliteratedText
 
         if not targetStream:
-            if toStdout:
-                targetStream = self.stdout
-            else:
-                targetStream = self.stderr
+            targetStream = self.stderr
 
         self._print(text, targetStream)
 
