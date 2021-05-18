@@ -22,7 +22,6 @@ from pywikibot.bot import (
     STDOUT,
     VERBOSE,
     WARNING,
-    ui,
 )
 from pywikibot.userinterfaces import (
     terminal_interface_base,
@@ -60,21 +59,6 @@ class Stream:
         self._stream.seek(0)
 
 
-def patched_print(text, target_stream):
-    try:
-        stream = patched_streams[target_stream]
-    except KeyError:
-        assert isinstance(target_stream,
-                          pywikibot.userinterfaces.win32_unicode.UnicodeOutput)
-        assert target_stream._stream
-        stream = patched_streams[target_stream._stream]
-    org_print(text, stream)
-
-
-def patched_input():
-    return strin._stream.readline().strip()
-
-
 patched_streams = {}
 strout = Stream('out', patched_streams)
 strerr = Stream('err', patched_streams)
@@ -83,25 +67,6 @@ strin = Stream('in', {})
 newstdout = strout._stream
 newstderr = strerr._stream
 newstdin = strin._stream
-
-org_print = ui._print
-org_input = ui._raw_input
-
-
-def patch():
-    """Patch standard terminal files."""
-    strout.reset()
-    strerr.reset()
-    strin.reset()
-    ui._print = patched_print
-    ui._raw_input = patched_input
-
-
-def unpatch():
-    """Un-patch standard terminal files."""
-    ui._print = org_print
-    ui._raw_input = org_input
-
 
 logger = logging.getLogger('pywiki')
 loggingcontext = {'caller_name': 'ui_tests',
@@ -118,7 +83,18 @@ class UITestCase(TestCaseBase):
 
     def setUp(self):
         super().setUp()
-        patch()
+
+        pywikibot.bot.set_interface('terminal')
+
+        self.org_print = pywikibot.bot.ui._print
+        self.org_input = pywikibot.bot.ui._raw_input
+
+        pywikibot.bot.ui._print = self._patched_print
+        pywikibot.bot.ui._raw_input = self._patched_input
+
+        strout.reset()
+        strerr.reset()
+        strin.reset()
 
         pywikibot.config.colorized_output = True
         pywikibot.config.transliterate = False
@@ -127,7 +103,24 @@ class UITestCase(TestCaseBase):
 
     def tearDown(self):
         super().tearDown()
-        unpatch()
+
+        pywikibot.bot.ui._print = self.org_print
+        pywikibot.bot.ui._raw_input = self.org_input
+
+        pywikibot.bot.set_interface('buffer')
+
+    def _patched_print(self, text, target_stream):
+        try:
+            stream = patched_streams[target_stream]
+        except KeyError:
+            expected = pywikibot.userinterfaces.win32_unicode.UnicodeOutput
+            assert isinstance(target_stream, expected)
+            assert target_stream._stream
+            stream = patched_streams[target_stream._stream]
+        self.org_print(text, stream)
+
+    def _patched_input(self):
+        return strin._stream.readline().strip()
 
 
 class TestTerminalOutput(UITestCase):
@@ -152,7 +145,11 @@ class TestTerminalOutput(UITestCase):
                 logger.log(level, text, extra=loggingcontext)
                 self.assertEqual(newstdout.getvalue(), out)
                 self.assertEqual(newstderr.getvalue(), err)
-                patch()  # reset terminal files
+
+                # reset terminal files
+                strout.reset()
+                strerr.reset()
+                strin.reset()
 
     def test_output(self):
         pywikibot.output('output')
@@ -360,7 +357,7 @@ class TestTransliterationUnix(UITestCase):
     """Terminal output transliteration tests."""
 
     def testOutputTransliteratedUnicodeText(self):
-        pywikibot.ui.encoding = 'latin-1'
+        pywikibot.bot.ui.encoding = 'latin-1'
         pywikibot.config.transliterate = True
         pywikibot.output('abcd АБГД αβγδ あいうえお')
         self.assertEqual(newstdout.getvalue(), '')
@@ -544,8 +541,5 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
-        with suppress(SystemExit):
-            unittest.main()
-    finally:
-        unpatch()
+    with suppress(SystemExit):
+        unittest.main()

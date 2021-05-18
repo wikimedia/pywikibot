@@ -338,6 +338,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
     def setUp(self):
         """Patch the output and input methods."""
         super().setUp()
+        bot.set_interface('terminal')
         self.output_text = ''
         self.orig_raw_input = bot.ui._raw_input
         self.orig_output = bot.ui.output
@@ -350,6 +351,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         config.cosmetic_changes_mylang_only = self.old_cc_setting
         bot.ui._raw_input = self.orig_raw_input
         bot.ui.output = self.orig_output
+        bot.set_interface('buffer')
         super().tearDown()
 
     def test_i18n_input(self):
