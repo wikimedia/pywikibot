@@ -476,10 +476,10 @@ class TestYearPageGenerator(DefaultSiteTestCase):
         """Test YearPageGenerator."""
         site = self.get_site()
         # Some languages are missing (T85681)
-        if (site.lang not in date.formats['YearBC']
-                or site.lang not in date.formats['YearAD']):
+        if site.lang not in date.formats['YearBC']:
             self.skipTest(
-                'Date formats for this language are missing from date.py')
+                'Date formats for {!r} language are missing from date.py'
+                .format(site.lang))
         start = -20
         end = 2026
 
