@@ -4,14 +4,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import itertools
 import math
 import threading
 import time
+
 from collections import namedtuple
 from contextlib import suppress
 from typing import Optional, Union
 
 import pywikibot
+
 from pywikibot import config
 
 
@@ -117,11 +120,12 @@ class Throttle:
                         _logger)
         with self.lock:
             processes = []
-            my_pid = pid or 1  # start at 1 if global pid not yet set
+            used_pids = set()
             count = 1
 
             now = time.time()
             for proc in self._read_file(raise_exc=True):
+                used_pids.add(proc.pid)
                 if now - proc.time > self.releasepid:
                     continue    # process has expired, drop from file
                 if now - proc.time <= self.dropdelay \
@@ -130,16 +134,17 @@ class Throttle:
                     count += 1
                 if proc.site != self.mysite or proc.pid != pid:
                     processes.append(proc)
-                if not pid and proc.pid >= my_pid:
-                    my_pid = proc.pid + 1  # next unused process id
 
+            free_pid = (i for i in itertools.count(start=1)
+                        if i not in used_pids)
             if not pid:
-                pid = my_pid
+                pid = next(free_pid)
+
             self.checktime = time.time()
             processes.append(
                 ProcEntry(pid=pid, time=self.checktime, site=mysite))
 
-            self._write_file(processes)
+            self._write_file(sorted(processes, key=lambda x: x.pid))
 
             self.process_multiplicity = count
             pywikibot.log('Found {} {} processes running, including this one.'
