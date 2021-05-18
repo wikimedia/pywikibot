@@ -82,20 +82,19 @@ def has_module(module, version=None):
         m = import_module(module)
     except ImportError:
         return False
-    else:
-        if version:
-            if not hasattr(m, '__version__'):
-                return False
+    if version:
+        if not hasattr(m, '__version__'):
+            return False
 
-            required_version = pkg_resources.parse_version(version)
-            module_version = pkg_resources.parse_version(m.__version__)
+        required_version = pkg_resources.parse_version(version)
+        module_version = pkg_resources.parse_version(m.__version__)
 
-            if module_version < required_version:
-                warn('Module version {} is lower than requested version {}'
-                     .format(module_version, required_version), ImportWarning)
-                return False
+        if module_version < required_version:
+            warn('Module version {} is lower than requested version {}'
+                 .format(module_version, required_version), ImportWarning)
+            return False
 
-        return True
+    return True
 
 
 def empty_iterator():
