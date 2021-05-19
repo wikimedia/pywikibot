@@ -41,8 +41,11 @@ For example to go through all categories:
 import re
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.exceptions import InvalidTitleError
+
 from scripts.add_text import add_text
 
 
@@ -453,6 +456,11 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         pywikibot.log('getCommonscat: ' + name)
         commonsSite = self.site.image_repository()
         commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
+
+        try:  # parse title (T26742)
+            str(commonsPage)
+        except InvalidTitleError:
+            return ''
 
         if not commonsPage.exists():
             pywikibot.output('Commons category does not exist. '
