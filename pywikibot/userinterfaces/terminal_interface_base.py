@@ -442,7 +442,7 @@ class UI(ABUIC):
                 line_template = '{{0: >{}}}: {{1}}'.format(
                     len(str(len(answers))))
                 for i, entry in enumerate(answers, start=1):
-                    pywikibot.stream_output(line_template.format(i, entry))
+                    self.stream_output(line_template.format(i, entry))
 
             while True:
                 choice = self.input(question, default=default, force=force)
