@@ -41,11 +41,13 @@ The following generators and filters are supported:
 #
 import codecs
 import http.client as httplib
+import itertools
 import os
 import re
 import socket
 import subprocess
 import tempfile
+
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
@@ -353,7 +355,7 @@ class DuplicateReferences:
                 used_numbers.add(int(number))
 
         # generator to give the next free number
-        free_number = (str(i) for i in range(1, 1000)  # should be enough
+        free_number = (str(i) for i in itertools.count(start=1)
                        if i not in used_numbers)
 
         for (g, d) in found_refs.items():
