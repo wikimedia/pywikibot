@@ -77,8 +77,6 @@ class UI(ABUIC):
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
 
-        self.stderr = sys.stderr
-        self.stdout = sys.stdout
         self.cache = SimpleQueue()
         self.lock = RLock()
 
