@@ -1330,7 +1330,7 @@ class Request(MutableMapping):
         if action and config.simulate and (
                 self.write or action in config.actions_to_block):
             pywikibot.output(color_format(
-                '{lightyellow}SIMULATION: {0} action blocked.{default}',
+                '{black;yellow}SIMULATION: {} action blocked.{default}',
                 action))
             # for more realistic simulation
             if config.simulate is not True:
