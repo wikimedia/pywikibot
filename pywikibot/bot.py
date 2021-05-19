@@ -1113,12 +1113,12 @@ class OptionHandler:
         """Set the instance options."""
         warning = 'pywikibot.bot.OptionHandler.availableOptions'
         with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
-                               category=DeprecationWarning):
+                               category=FutureWarning):
             old_options = self.availableOptions is not self.available_options
         if old_options:  # old options were set and not updated
             self.available_options = self.availableOptions
             issue_deprecation_warning(warning, 'available_options',
-                                      since='20201006')
+                                      since='20201006', future_warning=True)
 
         valid_options = set(self.available_options)
         received_options = set(options)
