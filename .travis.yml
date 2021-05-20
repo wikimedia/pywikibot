@@ -167,7 +167,7 @@ notifications:
     on_failure: always
   irc:
     channels:
-      - "chat.freenode.net#pywikibot"
+      - "libera.chat#pywikibot"
     on_success: change
     on_failure: change
     template:
