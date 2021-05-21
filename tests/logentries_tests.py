@@ -17,7 +17,7 @@ from pywikibot.logentries import (
     UserTargetLogEntry,
 )
 from tests import unittest_print
-from tests.aspects import DeprecationTestCase, MetaTestCaseClass, TestCase
+from tests.aspects import MetaTestCaseClass, TestCase
 
 
 class TestLogentriesBase(TestCase):
@@ -282,26 +282,6 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(le4, OtherLogEntry)
         self.assertIsInstance(le5, OtherLogEntry)
         self.assertEqual(type(le4), type(le5))
-
-
-class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
-
-    """Test cases for deprecated logentry methods."""
-
-    def test_logentry_title(self, key):
-        """Test title and page return the same instance."""
-        # Request multiple log entries in the hope that one might have no
-        # title entry
-        self._do_test_warning_filename = False  # T271044
-        for logentry in self.site.logevents(total=5):
-            if 'title' in logentry.data:  # title may be missing
-                self.assertIsInstance(logentry.title(), pywikibot.Page)
-                self.assertIs(logentry.title(), logentry.page())
-            else:
-                with self.assertRaises(KeyError):
-                    logentry.title()
-            self.assertDeprecation()  # T271044
-        self._reset_messages()  # T271044
 
 
 if __name__ == '__main__':  # pragma: no cover
