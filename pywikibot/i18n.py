@@ -529,7 +529,7 @@ DEFAULT_FALLBACK = ('_default', )
 
 def translate(code,
               xdict: Union[dict, str],
-              parameters: Union[dict, str, int, None] = None,
+              parameters: Optional[Mapping] = None,
               fallback=False) -> str:
     """Return the most appropriate localization from a localization dict.
 
@@ -610,15 +610,11 @@ def translate(code,
         return trans
 
     if not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a mapping',
-                                  warning_class=FutureWarning,
-                                  since='20151008')
-        plural_parameters = _PluralMappingAlias(parameters)
-    else:
-        plural_parameters = parameters
+        raise ValueError('parameters should be a mapping, not {}'
+                         .format(type(parameters).__name__))
 
     # else we check for PLURAL variants
-    trans = _extract_plural(code, trans, plural_parameters)
+    trans = _extract_plural(code, trans, parameters)
     if parameters:
         # On error: parameter is for PLURAL variants only,
         # don't change the string
@@ -769,9 +765,8 @@ def twtranslate(source,
         parameters = None
 
     if parameters is not None and not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a Mapping',
-                                  warning_class=FutureWarning,
-                                  since='20151008')
+        raise ValueError('parameters should be a mapping, not {}'
+                         .format(type(parameters).__name__))
 
     if not only_plural and parameters:
         return trans % parameters
