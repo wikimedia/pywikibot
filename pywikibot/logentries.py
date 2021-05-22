@@ -11,7 +11,6 @@ from typing import Optional
 import pywikibot
 from pywikibot.backports import List
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated
 
 
 _logger = 'wiki'
@@ -101,16 +100,6 @@ class LogEntry(UserDict):
             return self['params']
 
         return self[self._expected_type]
-
-    @deprecated('page()', since='20150617', future_warning=True)
-    def title(self):
-        """
-        DEPRECATED: Alias for page().
-
-        This is going to be replaced by just returning the title as a string
-        instead of a Page instance.
-        """
-        return self.page()
 
     def page(self):
         """
