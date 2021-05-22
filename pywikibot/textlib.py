@@ -296,12 +296,8 @@ def _get_regexes(keys, site):
             if isinstance(_regex_cache[exc], tuple):
                 if not site and exc in ('interwiki', 'property', 'invoke',
                                         'category', 'file'):
-                    issue_deprecation_warning(
-                        'site=None',
-                        "a valid site for '{}' regex".format(exc),
-                        warning_class=FutureWarning,
-                        since='20151006')
-                    site = pywikibot.Site()
+                    raise ValueError("Site cannot be None for the '{}' regex"
+                                     .format(exc))
 
                 if (exc, site) not in _regex_cache:
                     re_text, re_var = _regex_cache[exc]
