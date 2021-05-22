@@ -38,7 +38,6 @@ from pywikibot.tools import (
     ModuleDeprecationWrapper,
     deprecated,
     deprecated_args,
-    issue_deprecation_warning,
 )
 
 
@@ -441,12 +440,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
         variants = match.group(2)
         num = parameters[selector]
         if not isinstance(num, int):
-            issue_deprecation_warning(
-                'type {} for value {} ({})'
-                .format(type(num), selector, num),
-                'an int', 1,
-                warning_class=FutureWarning, since='20151009')
-            num = int(num)
+            raise ValueError("'{}' must be a number, not a {} ({})"
+                             .format(selector, num, type(num).__name__))
 
         plural_entries = []
         specific_entries = {}
