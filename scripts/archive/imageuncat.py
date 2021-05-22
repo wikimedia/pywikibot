@@ -24,7 +24,6 @@ from pywikibot.exceptions import (
     EditConflictError,
     LockedPageError,
 )
-from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {
@@ -1247,21 +1246,6 @@ puttext = ('\n{{Uncategorized|year={{subst:CURRENTYEAR}}|'
 putcomment = 'Please add categories to this image'
 
 
-def uploadedYesterday(site):
-    """
-    Return a pagegenerator containing all the pictures uploaded yesterday.
-
-    DEPRECATED. Only used by a deprecated option.
-    """
-    today = pywikibot.Timestamp.utcnow()
-    yesterday = today + timedelta(days=-1)
-
-    for logentry in site.logevents(
-        logtype='upload', start=yesterday, end=today, reverse=True
-    ):
-        yield logentry.page()
-
-
 def isUncat(page):
     """
     Do we want to skip this page.
@@ -1344,14 +1328,7 @@ def main(*args):
         param_arg, sep, param_value = arg.partition(':')
         if param_value == '':
             param_value = None
-        if arg.startswith('-yesterday'):
-            generator = uploadedYesterday(site)
-            issue_deprecation_warning(
-                'The usage of "-yesterday"',
-                '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
-                2, ArgumentDeprecationWarning, since='20160305')
-        else:
-            gen_factory.handle_arg(arg)
+        gen_factory.handle_arg(arg)
 
     generator = gen_factory.getCombinedGenerator(gen=generator, preload=True)
     if not generator:
