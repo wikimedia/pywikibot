@@ -2419,28 +2419,6 @@ class APISite(
         unwatch = 'unwatched' if unwatch else 'watched'
         return all(unwatch in r for r in results['watch'])
 
-    @need_right('editmywatchlist')
-    @deprecated('Site().watch', since='20160102', future_warning=True)
-    def watchpage(self, page, unwatch=False) -> bool:
-        """
-        Add or remove page from watchlist.
-
-        DEPRECATED: Use Site().watch() instead.
-
-        @param page: A single page.
-        @type page: A page object, a page-title string.
-        @param unwatch: If True, remove page from watchlist;
-            if False (default), add it.
-        @return: True if API returned expected response; False otherwise
-
-        """
-        try:
-            result = self.watch(page, unwatch)
-        except KeyError:
-            pywikibot.error('watchpage: Unexpected API response')
-            result = False
-        return result
-
     @need_right('purge')
     def purgepages(self, pages, forcelinkupdate: bool = False,
                    forcerecursivelinkupdate: bool = False,
