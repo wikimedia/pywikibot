@@ -963,12 +963,6 @@ class APISite(
         """Return True if site has a shared data repository like Wikidata."""
         return self.data_repository() is not None
 
-    @property
-    @deprecated('has_data_repository', since='20160405', future_warning=True)
-    def has_transcluded_data(self):
-        """Return True if site has a shared data repository like Wikidata."""
-        return self.has_data_repository
-
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
