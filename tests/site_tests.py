@@ -48,31 +48,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
 
     cached = True
 
-    def test_siteinfo_normal_call(self):
-        """Test calling the Siteinfo without setting dump."""
-        old = self.site.siteinfo('general')
-        self.assertIn('time', old)
-        self.assertEqual(old, self.site.siteinfo['general'])
-        self.assertEqual(self.site.siteinfo('general'), old)
-        # Siteinfo always returns copies so it's not possible to directly
-        # check if they are the same dict or if they have been rerequested
-        # unless the content also changes so force that the content changes
-        self.assertNotIn('DUMMY', old)
-        self.site.siteinfo._cache['general'][0]['DUMMY'] = 42
-        old = self.site.siteinfo('general')
-        self.assertIn('DUMMY', old)
-        self.assertNotEqual(self.site.siteinfo('general', force=True), old)
-        self.assertOneDeprecationParts('Calling siteinfo',
-                                       'itself as a dictionary',
-                                       4)
-
-    def test_siteinfo_dump(self):
-        """Test calling the Siteinfo with dump=True."""
-        self.assertIn('statistics',
-                      self.site.siteinfo('statistics', dump=True))
-        self.assertOneDeprecationParts('Calling siteinfo',
-                                       'itself as a dictionary')
-
     def test_allpages_filterredir_True(self):
         """Test that filterredir set to 'only' is deprecated to True."""
         for page in self.site.allpages(filterredir='only', total=1):

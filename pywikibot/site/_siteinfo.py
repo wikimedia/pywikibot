@@ -13,7 +13,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot.exceptions import APIError
-from pywikibot.tools import EMPTY_DEFAULT, issue_deprecation_warning
+from pywikibot.tools import EMPTY_DEFAULT
 
 
 _logger = 'wiki.siteinfo'
@@ -345,14 +345,3 @@ class Siteinfo(Container):
             return self._get_cached(key)[1]
 
         return None
-
-    def __call__(self, key='general', force=False, dump=False):
-        """DEPRECATED: Return the entry for key or dump the complete cache."""
-        issue_deprecation_warning(
-            'Calling siteinfo', 'itself as a dictionary', since='20161221',
-            warning_class=FutureWarning
-        )
-        result = self.get(key, expiry=force)
-        if not dump:
-            return result
-        return self._cache
