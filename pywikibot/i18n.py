@@ -28,7 +28,6 @@ from collections.abc import Mapping
 from contextlib import suppress
 from textwrap import fill
 from typing import Optional, Union
-from warnings import warn
 
 import pywikibot
 from pywikibot import __url__, config
@@ -36,7 +35,6 @@ from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
 from pywikibot.tools import (
     ModuleDeprecationWrapper,
-    deprecated,
     deprecated_args,
     issue_deprecation_warning,
 )
@@ -710,21 +708,9 @@ def twtranslate(source,
             'See {}/i18n'
             .format(_messages_package_name, twtitle, __url__))
 
-    source_needed = False
-    # If a site is given instead of a lang, use its language
-    if hasattr(source, 'lang'):
-        lang = source.lang
-    # check whether we need the language code back
-    elif isinstance(source, list):
-        # For backwards compatibility still support lists, when twntranslate
-        # was not deprecated and needed a way to get the used language code
-        # back.
-        warn('The source argument should not be a list but either a BaseSite '
-             'or a str/unicode.', DeprecationWarning, 2)
-        lang = source.pop()
-        source_needed = True
-    else:
-        lang = source
+    # if source is a site then use its lang attribute, otherwise it's a str
+
+    lang = getattr(source, 'lang', source)
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -743,9 +729,6 @@ def twtranslate(source,
             'outdated submodule. See {}/i18n'
             .format('English' if 'en' in langs else "'{}'".format(lang),
                     twtitle, __url__)))
-    # send the language code back via the given mutable list parameter
-    if source_needed:
-        source.append(alt)
 
     if '{{PLURAL:' in trans:
         # _extract_plural supports in theory non-mappings, but they are
@@ -754,16 +737,6 @@ def twtranslate(source,
             raise TypeError('parameters must be a mapping.')
         trans = _extract_plural(alt, trans, parameters)
 
-    # this is only the case when called in twntranslate, and that didn't apply
-    # parameters when it wasn't a dict
-    if isinstance(parameters, _PluralMappingAlias):
-        # This is called due to the old twntranslate function which ignored
-        # KeyError. Instead only_plural should be used.
-        if isinstance(parameters.source, dict):
-            with suppress(KeyError):
-                trans %= parameters.source
-        parameters = None
-
     if parameters is not None and not isinstance(parameters, Mapping):
         raise ValueError('parameters should be a mapping, not {}'
                          .format(type(parameters).__name__))
@@ -771,16 +744,6 @@ def twtranslate(source,
     if not only_plural and parameters:
         return trans % parameters
     return trans
-
-
-@deprecated('twtranslate', since='20151009', future_warning=True)
-@deprecated_args(code='source')
-def twntranslate(source, twtitle: str,
-                 parameters: Optional[Mapping] = None) -> Optional[str]:
-    """DEPRECATED: Get translated string for the key."""
-    if parameters is not None:
-        parameters = _PluralMappingAlias(parameters)
-    return twtranslate(source, twtitle, parameters)
 
 
 @deprecated_args(code='source')
