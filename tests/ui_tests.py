@@ -8,6 +8,8 @@ import io
 import logging
 import os
 import sys
+import unittest
+
 from contextlib import suppress
 
 import pywikibot
@@ -28,10 +30,7 @@ from pywikibot.userinterfaces import (
     terminal_interface_win32,
 )
 from tests.aspects import TestCase, TestCaseBase
-from tests.utils import expected_failure_if, FakeModule, unittest
-
-
-TRAVIS = os.getenv('TRAVIS', 'false') == 'true'
+from tests.utils import FakeModule
 
 
 class Stream:
@@ -146,7 +145,6 @@ class TestTerminalOutput(UITestCase):
         ('CRITICAL', CRITICAL, '', 'CRITICAL: CRITICAL\n'),
     ]
 
-    @expected_failure_if(TRAVIS)
     def test_outputlevels_logging(self):
         """Test logger with output levels."""
         for text, level, out, err in self.tests:
@@ -156,7 +154,6 @@ class TestTerminalOutput(UITestCase):
                 self.assertEqual(newstderr.getvalue(), err)
                 patch()  # reset terminal files
 
-    @expected_failure_if(TRAVIS)
     def test_output(self):
         pywikibot.output('output')
         self.assertEqual(newstdout.getvalue(), '')
@@ -167,13 +164,11 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstdout.getvalue(), 'output\n')
         self.assertEqual(newstderr.getvalue(), '')
 
-    @expected_failure_if(TRAVIS)
     def test_warning(self):
         pywikibot.warning('warning')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), 'WARNING: warning\n')
 
-    @expected_failure_if(TRAVIS)
     def test_error(self):
         pywikibot.error('error')
         self.assertEqual(newstdout.getvalue(), '')
@@ -184,7 +179,6 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), '')
 
-    @expected_failure_if(TRAVIS)
     def test_critical(self):
         pywikibot.critical('critical')
         self.assertEqual(newstdout.getvalue(), '')
@@ -195,7 +189,6 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(), '')
 
-    @expected_failure_if(TRAVIS)
     def test_exception(self):
         class TestException(Exception):
 
@@ -209,7 +202,6 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstderr.getvalue(),
                          'ERROR: TestException: Testing Exception\n')
 
-    @expected_failure_if(TRAVIS)
     def test_exception_tb(self):
         class TestException(Exception):
 
@@ -237,7 +229,6 @@ class TestTerminalInput(UITestCase):
 
     input_choice_output = 'question ([A]nswer 1, a[n]swer 2, an[s]wer 3): '
 
-    @expected_failure_if(TRAVIS)
     def testInput(self):
         newstdin.write('input to read\n')
         newstdin.seek(0)
@@ -248,7 +239,6 @@ class TestTerminalInput(UITestCase):
         self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'input to read')
 
-    @expected_failure_if(TRAVIS)
     def test_input_yn(self):
         newstdin.write('\n')
         newstdin.seek(0)
@@ -278,7 +268,6 @@ class TestTerminalInput(UITestCase):
 
         self.assertEqual(returned, 'a')
 
-    @expected_failure_if(TRAVIS)
     def testInputChoiceCapital(self):
         newstdin.write('N\n')
         newstdin.seek(0)
@@ -287,7 +276,6 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
         self.assertEqual(returned, 'n')
 
-    @expected_failure_if(TRAVIS)
     def testInputChoiceNonCapital(self):
         newstdin.write('n\n')
         newstdin.seek(0)
@@ -296,7 +284,6 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(newstderr.getvalue(), self.input_choice_output)
         self.assertEqual(returned, 'n')
 
-    @expected_failure_if(TRAVIS)
     def testInputChoiceIncorrectAnswer(self):
         newstdin.write('X\nN\n')
         newstdin.seek(0)
@@ -307,7 +294,6 @@ class TestTerminalInput(UITestCase):
 
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
-@expected_failure_if(TRAVIS)
 class TestTerminalOutputColorUnix(UITestCase):
 
     """Terminal output color tests."""
@@ -345,7 +331,6 @@ class TestTerminalOutputColorUnix(UITestCase):
 
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
-@expected_failure_if(TRAVIS)
 class TestTerminalUnicodeUnix(UITestCase):
 
     """Terminal output tests for unix."""
@@ -370,7 +355,6 @@ class TestTerminalUnicodeUnix(UITestCase):
 
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
-@expected_failure_if(TRAVIS)
 class TestTransliterationUnix(UITestCase):
 
     """Terminal output transliteration tests."""

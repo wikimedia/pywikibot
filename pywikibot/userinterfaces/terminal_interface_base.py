@@ -523,6 +523,7 @@ class TerminalHandler(logging.StreamHandler):
 
     def emit(self, record):
         """Emit the record formatted to the output."""
+        self.flush()
         if record.name == 'py.warnings':
             # Each warning appears twice
             # the second time it has a 'message'
