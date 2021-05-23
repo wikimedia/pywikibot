@@ -1144,7 +1144,7 @@ class APISite(
                                 **args)
         self._update_page(page, query, verify_imageinfo=True)
 
-    @deprecated('page.exists()', since='20180218')
+    @deprecated('page.exists()', since='20180218', future_warning=True)
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         return page.pageid > 0

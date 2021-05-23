@@ -1281,7 +1281,7 @@ class BasePage(ComparableMixin):
                   **kwargs)
 
     @deprecated('put(asynchronous=True) or save(asynchronous=True)',
-                since='20180501')
+                since='20180501', future_warning=True)
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
@@ -4148,7 +4148,7 @@ class ItemPage(WikibasePage):
 # alias for backwards compatibility
 ItemPage.concept_url = redirect_func(
     ItemPage.concept_uri, old_name='concept_url', class_name='ItemPage',
-    since='20170222')
+    since='20170222', future_warning=True)
 
 
 class Property:

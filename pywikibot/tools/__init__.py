@@ -1966,7 +1966,8 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-@deprecated('bot_choice.Option and its subclasses', since='20181217')
+@deprecated('bot_choice.Option and its subclasses', since='20181217',
+            future_warning=True)
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
     indent = len(message) + 2

@@ -262,7 +262,8 @@ class DataSite(APISite):
                     page.get()  # cannot provide get_redirect=True (T145971)
                 yield page
 
-    @deprecated('DataSite.preload_entities', since='20170314')
+    @deprecated('DataSite.preload_entities', since='20170314',
+                future_warning=True)
     def preloaditempages(self, pagelist, groupsize=50):
         """DEPRECATED."""
         return self.preload_entities(pagelist, groupsize)
