@@ -116,7 +116,6 @@ from pywikibot.textlib import (
     findmarker,
     to_local_digits,
 )
-from pywikibot.tools import issue_deprecation_warning
 
 
 ShouldArchive = Tuple[str, str]
@@ -242,15 +241,19 @@ def checkstr(string: str) -> Tuple[str, str]:
 
     @return: key and duration extracted form the string
     """
-    if string.isdigit():
-        key = 's'
-        duration = string
-        issue_deprecation_warning('Time period without qualifier',
-                                  string + key, 1, FutureWarning,
-                                  since='20161009')
-    else:
-        key = string[-1]
-        duration = string[:-1]
+    if len(string) < 2:
+        raise MalformedConfigError('Time period should be a numeric value '
+                                   'followed by its qualifier')
+
+    key, duration = string[-1], string[:-1]
+
+    if key not in MW_KEYS:
+        raise MalformedConfigError('Time period qualifier is unrecognized: {}'
+                                   .format(string))
+    if not duration.isdigit():
+        raise MalformedConfigError("Time period's duration should be "
+                                   'numeric: {}'.format(string))
+
     return key, duration
 
 
