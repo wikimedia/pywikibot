@@ -1,6 +1,6 @@
-"""User interface for unix terminals."""
+"""User interface for Unix terminals."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,7 +32,7 @@ unixColors = {
 
 class UnixUI(terminal_interface_base.UI):
 
-    """User interface for unix terminals."""
+    """User interface for Unix terminals."""
 
     def support_color(self, target_stream):
         """Return that the target stream supports colors."""
@@ -44,7 +44,7 @@ class UnixUI(terminal_interface_base.UI):
         return chr(27) + '[' + str(int(code) + 10) + 'm'
 
     def encounter_color(self, color, target_stream):
-        """Write the unix color directly to the stream."""
+        """Write the Unix color directly to the stream."""
         fg, bg = self.divide_color(color)
         fg = unixColors[fg]
         self._write(fg, target_stream)

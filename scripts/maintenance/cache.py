@@ -218,7 +218,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
     whether cache files are being used.
     However file access times are not always usable.
     On many modern filesystems, they have been disabled.
-    On unix, check the filesystem mount options. You may
+    On Unix, check the filesystem mount options. You may
     need to remount with 'strictatime'.
 
     @param use_accesstime: Whether access times should be used.

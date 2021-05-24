@@ -333,7 +333,7 @@ class TestTerminalOutputColorUnix(UITestCase):
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
 class TestTerminalUnicodeUnix(UITestCase):
 
-    """Terminal output tests for unix."""
+    """Terminal output tests for Unix."""
 
     def testOutputUnicodeText(self):
         pywikibot.output('Заглавная_страница')
