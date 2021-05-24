@@ -168,10 +168,9 @@ ignore_title = {
             '.+/[aA]rxiu.*',
         ],
         'cs': [
-            'Wikipedie:Chybějící interwiki/.+',
             'Wikipedie:Rozcestníky',
-            'Wikipedie diskuse:Rozcestníky',
-            'Wikipedie:Seznam nejvíce odkazovaných rozcestníků',
+            'Diskuse k Wikipedii:Rozcestníky',
+            'Wikipedie:Údržbové seznamy/Nejvíce odkazované rozcestníky/seznam',
             'Wikipedie:Seznam rozcestníků/první typ',
             'Wikipedie:Seznam rozcestníků/druhý typ',
             'Wikipedista:Zirland/okres',
