@@ -72,10 +72,16 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 break
             # Make sure that next time around we will not find this same hit.
             curpos = m.start() + 1
+            # T283403
+            try:
+                is_interwikilink = mysite.isInterwikiLink(m.group('title'))
+            except ValueError:
+                pywikibot.exception()
+                continue
             # ignore interwiki links, links in the disabled area
             # and links to sections of the same page
             if (m.group('title').strip() == ''
-                    or mysite.isInterwikiLink(m.group('title'))
+                    or is_interwikilink
                     or isDisabled(text, m.start())):
                 continue
             actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
