@@ -73,7 +73,7 @@ between Friday or Sunday (including) the following week is then the first week
 of the year. So up to three days are still counted as the year before.
 
 See also:
- - http://www.phys.uu.nl/~vgent/calendar/isocalendar.htm
+ - https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
  - https://docs.python.org/3.4/library/datetime.html#datetime.date.isocalendar
 
 Options (may be omitted):

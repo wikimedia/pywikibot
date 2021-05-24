@@ -66,7 +66,7 @@ class TestMonthName(TestCase):
     net = True
 
     def test_month_name_formats(self):
-        """Test MonthName format for codes retrieved via mediawiki message."""
+        """Test MonthName format for codes retrieved via MediaWiki message."""
         formatname = 'MonthName'
         for code in date.formats['Cat_BirthsAD']:
             convert = date.formats[formatname][code]

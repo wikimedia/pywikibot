@@ -2283,7 +2283,7 @@ class QueryGenerator(_RequestWrapper):
         * list=alldeletedrevisions
 
         More info:
-        https://lists.wikimedia.org/pipermail/mediawiki-api-announce/2018-August/000140.html
+        https://lists.wikimedia.org/hyperkitty/list/mediawiki-api-announce@lists.wikimedia.org/message/AXO4G4OOMTG7CEUU5TGAWXBI2LD4G3BC/
         """
         if self.site.mw_version < '1.32':
             return

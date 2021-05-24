@@ -584,7 +584,7 @@ def html_comparator(compare_string: str) -> dict:
     Site.compare() returns HTML that is useful for displaying on a page.
     Here we use BeautifulSoup to get the un-HTML-ify the context of changes.
     Finally we present the added and deleted contexts.
-    @param compare_string: HTML string from mediawiki API
+    @param compare_string: HTML string from MediaWiki API
     @return: deleted and added list of contexts
     """
     from bs4 import BeautifulSoup
