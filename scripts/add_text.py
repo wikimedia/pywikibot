@@ -1,20 +1,19 @@
 #!/usr/bin/python
 r"""
-This is a Bot to add a text at the end of the content of the page.
+This is a Bot to add text to the top or bottom of a page.
 
-By default it adds the text above categories and interwiki.
+By default this adds the text to the bottom above the categories and interwiki.
 
-Alternatively it may also add a text at the top of the page.
 These command line parameters can be used to specify which pages to work on:
 
 &params;
 
 Furthermore, the following command line parameters are supported:
 
--talkpage         Put the text onto the talk page instead the generated on
+-talkpage         Put the text onto the talk page instead
 -talk
 
--text             Define which text to add. "\n" are interpreted as newlines.
+-text             Define what text to add. "\n" are interpreted as newlines.
 
 -textfile         Define a texfile name which contains the text to add
 
@@ -25,26 +24,28 @@ Furthermore, the following command line parameters are supported:
 
 -newimages        Add text in the new images
 
--always           If used, the bot won't ask if it should add the text
-                  specified
+-always           If used, the bot won't ask if it should add the specified
+                  text
 
 -up               If used, put the text at the top of the page
 
--noreorder        Avoid to reorder cats and interwiki
+-noreorder        Avoid reordering cats and interwiki
 
 Example
 -------
 
-1. This is a script to add a template to the top of the pages with
-category:catname
-Warning! Put it in one line, otherwise it won't work correctly:
+1. Append 'hello world' to the bottom of the sandbox:
+
+    python pwb.py add_text -page:Wikipedia:Sandbox \
+        -summary:"Bot: pywikibot practice" -text:"hello world"
+
+2. Add a template to the top of the pages with 'category:catname':
 
     python pwb.py add_text -cat:catname -summary:"Bot: Adding a template" \
         -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
 
-2. Command used on it.wikipedia to put the template in the page without any
-category.
-Warning! Put it in one line, otherwise it won't work correctly:
+3. Command used on it.wikipedia to put the template in the page without any
+   category:
 
     python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
         -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
@@ -81,50 +82,46 @@ from pywikibot.tools.formatter import color_format
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def get_text(page, old: str, create: bool) -> str:
+def get_text(page: pywikibot.page.BasePage, old: Optional[str],
+             create: bool) -> str:
     """
     Get text on page. If old is not None, return old.
 
     @param page: The page to get text from
-    @type page: pywikibot.page.BasePage
-    @param old: If not None, this parameter is returned instead
-        of fetching text from the page
-    @param create: Create the page if it doesn't exist
-    @return: The page's text or old parameter if not None
+    @param old: If not None, return this rather than the page's text
+    @param create: Declare that the page will be created if it doesn't exist
+    @return: The page's text or the old parameter if not None
     """
-    if old is None:
-        try:
-            text = page.get()
-        except NoPageError:
-            if create:
-                pywikibot.output(
-                    "{} doesn't exist, creating it!".format(page.title()))
-                text = ''
-            else:
-                pywikibot.output(
-                    "{} doesn't exist, skip!".format(page.title()))
-                return None
-        except IsRedirectPageError:
-            pywikibot.output('{} is a redirect, skip!'.format(page.title()))
+    if old is not None:
+        return old
+
+    try:
+        return page.get()
+    except NoPageError:
+        if create:
+            pywikibot.output("{} doesn't exist, creating it!"
+                             .format(page.title()))
+            return ''
+        else:
+            pywikibot.output("{} doesn't exist, skip!".format(page.title()))
             return None
-    else:
-        text = old
-    return text
+    except IsRedirectPageError:
+        pywikibot.output('{} is a redirect, skip!'.format(page.title()))
+        return None
 
 
-def put_text(page, new: str, summary: str, count: int,
+def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
              asynchronous: bool = False) -> Optional[bool]:
     """
     Save the new text.
 
-    @param page: The page to update and save
-    @type page: pywikibot.page.BasePage
+    @param page: The page to change the text of
     @param new: The new text for the page
-    @param summary: Summary of page changes.
-    @param count: Maximum num attempts to reach the server
-    @param asynchronous: Save the page asynchronously
-    @return: True if successful, False if unsuccessful, None if
-        waiting for server
+    @param summary: Summary of the page change
+    @param count: Maximum number of attempts to reach the server
+    @param asynchronous: If True, saves the page asynchronously
+    @return: True if successful, False if unsuccessful, and None if
+        awaiting the server
     """
     page.text = new
     try:
@@ -152,7 +149,8 @@ def put_text(page, new: str, summary: str, count: int,
     return False
 
 
-def add_text(page, addText: str, summary: Optional[str] = None,
+def add_text(page: pywikibot.page.BasePage, addText: str,
+             summary: Optional[str] = None,
              regexSkip: Optional[str] = None,
              regexSkipUrl: Optional[str] = None,
              always: bool = False, up: bool = False,
@@ -163,21 +161,21 @@ def add_text(page, addText: str, summary: Optional[str] = None,
     Add text to a page.
 
     @param page: The page to add text to
-    @type page: pywikibot.page.BasePage
     @param addText: Text to add
-    @param summary: Summary of changes. If None, beginning of addText is used.
-    @param regexSkip: Abort if text on page matches
-    @param regexSkipUrl: Abort if full url matches
-    @param always: Always add text without user confirmation
-    @param up: If True, add text to top of page, else add at bottom.
-    @param putText: If True, save changes to the page, else return
+    @param summary: Change summary, if None this uses the beginning of addText
+    @param regexSkip: Abort if the text on the page matches this
+    @param regexSkipUrl: Abort if the url matches this
+    @param always: Edit without user confirmation
+    @param up: Append text to the top of the page if True, otherwise the
+        bottom
+    @param putText: Save changes to the page if True, otherwise return
         (text, newtext, always)
     @param oldTextGiven: If None fetch page text, else use this text
     @param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
-    @param create: Create page if it does not exist
-    @return: If putText=True: (success, success, always)
-        else: (text, newtext, always)
+    @param create: Create the page if it does not exist
+    @return: (success, success, always) if putText is True, otherwise
+        (text, newtext, always)
     """
     site = page.site
     if not summary:
@@ -282,7 +280,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    @param args: Command line arguments
     """
     # If none, the var is set only for check purpose.
     summary = None
