@@ -373,6 +373,12 @@ class UI(ABUIC):
             options. If default is not a shortcut, it'll return -1.
         @rtype: int (if not return_shortcut), lowercased str (otherwise)
         """
+        def output_option(option, before_question):
+            """Print an OutputOption before or after question."""
+            if isinstance(option, OutputOption) \
+               and option.before_question is before_question:
+                self.stream_output(option.out + '\n')
+
         if force and default is None:
             raise ValueError('With no default option it cannot be forced')
         if isinstance(options, Option):
@@ -399,9 +405,7 @@ class UI(ABUIC):
         with self.lock:
             while not handled:
                 for option in options:
-                    if isinstance(option, OutputOption) \
-                       and option.before_question:
-                        self.stream_output(option.out + '\n')
+                    output_option(option, before_question=True)
                 output = Option.formatted(question, options, default)
                 if force:
                     self.stream_output(output + '\n')
@@ -413,6 +417,7 @@ class UI(ABUIC):
                     for index, option in enumerate(options):
                         if option.handled(answer):
                             answer = option.result(answer)
+                            output_option(option, before_question=False)
                             handled = option.stop
                             break
 
@@ -528,7 +533,7 @@ class TerminalHandler(logging.StreamHandler):
             # Each warning appears twice
             # the second time it has a 'message'
             if 'message' in record.__dict__:
-                return None
+                return
 
             record.__dict__.setdefault('newline', '\n')
 
