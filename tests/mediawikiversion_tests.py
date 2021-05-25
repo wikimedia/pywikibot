@@ -57,6 +57,15 @@ class TestMediaWikiVersion(TestCase):
         self.assertEqual(v._dev_version, dev_version)
         self.assertEqual(v.suffix, suffix)
 
+    def test_invalid_type_comparison(self):
+        """Compare with a type other than a version or string."""
+        self.assertNotEqual(self._make('1.32.0'), ['wrong type'])
+
+        exc = "Comparison between 'MediaWikiVersion' and 'list' unsupported"
+
+        with self.assertRaisesRegex(TypeError, exc):
+            assert self._make('1.32.0') > ['wrong type']
+
     def test_interpretation(self):
         """Test if the data is correctly interpreted."""
         self._version_check('1.33', (1, 33), (4, ), '')
