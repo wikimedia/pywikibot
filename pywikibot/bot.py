@@ -103,7 +103,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot import config, daemonize, i18n, throttle, version
+from pywikibot import config, daemonize, i18n, version
 from pywikibot.backports import Dict, Iterable, List, Sequence
 from pywikibot.bot_choice import (
     AlwaysChoice,
@@ -346,19 +346,11 @@ def init_handlers(strm=None):
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
-        # get PID
-        pywikibot.Site().throttle  # initialize a Throttle object and set PID
-        pid = throttle.pid  # get the global PID
-        pid = str(pid) + '-' if pid > 1 else ''
-
         if config.logfilename:
-            # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
         else:
-            # add PID to logfle name
-            logfile = config.datafilepath('logs', '{}-{}bot.log'
-                                          .format(module_name, pid))
-
+            logfile = config.datafilepath('logs', '{}-bot.log'
+                                          .format(module_name))
         file_handler = RotatingFileHandler(filename=logfile,
                                            maxBytes=1024 * config.logfilesize,
                                            backupCount=config.logfilecount,
