@@ -346,11 +346,19 @@ def init_handlers(strm=None):
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
+        # get PID
+        throttle = pywikibot.Site().throttle  # initialize a Throttle object
+        pid = throttle.get_pid(module_name)  # get the global PID if needed
+        pid = str(pid) + '-' if pid > 1 else ''
+
         if config.logfilename:
+            # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
         else:
-            logfile = config.datafilepath('logs', '{}-bot.log'
-                                          .format(module_name))
+            # add PID to logfle name
+            logfile = config.datafilepath('logs', '{}-{}bot.log'
+                                          .format(module_name, pid))
+
         file_handler = RotatingFileHandler(filename=logfile,
                                            maxBytes=1024 * config.logfilesize,
                                            backupCount=config.logfilecount,

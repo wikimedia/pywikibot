@@ -102,7 +102,7 @@ class BaseSite(ComparableMixin):
     def throttle(self):
         """Return this Site's throttle. Initialize a new one if needed."""
         if not hasattr(self, '_throttle'):
-            self._throttle = Throttle(self, multiplydelay=True)
+            self._throttle = Throttle(self)
         return self._throttle
 
     @property
