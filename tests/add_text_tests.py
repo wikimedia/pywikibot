@@ -5,9 +5,14 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
+from unittest.mock import Mock, patch
 
 import pywikibot
-from scripts.add_text import add_text, get_text
+import pywikibot.pagegenerators
+
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import suppress_warnings
+from scripts.add_text import add_text, get_text, parse
 from tests.aspects import TestCase
 
 
@@ -24,6 +29,69 @@ class TestAdding(TestCase):
         """Setup test."""
         super().setUp()
         self.page = pywikibot.Page(self.site, 'foo')
+        self.generator_factory = pywikibot.pagegenerators.GeneratorFactory()
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_parse(self):
+        """Basic argument parsing."""
+        args = parse(['-text:"hello world"'], self.generator_factory)
+        self.assertEqual('"hello world"', args.text)
+        self.assertFalse(args.up)
+        self.assertTrue(args.reorder)
+
+        args = parse(['-text:hello', '-up', '-noreorder'],
+                     self.generator_factory)
+        self.assertEqual('hello', args.text)
+        self.assertTrue(args.up)
+        self.assertFalse(args.reorder)
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_unrecognized_argument(self):
+        """Provide an argument that doesn't exist."""
+        expected_error = "Argument '-no_such_arg' is unrecognized"
+
+        for invalid_arg in ('-no_such_arg', '-no_such_arg:hello'):
+            with self.assertRaisesRegex(ValueError, expected_error):
+                parse([invalid_arg], self.generator_factory)
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_neither_text_argument(self):
+        """Don't provide either -text or -textfile."""
+        expected_error = "Either the '-text' or '-textfile' is required"
+
+        with self.assertRaisesRegex(ValueError, expected_error):
+            parse(['-noreorder'], self.generator_factory)
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_both_text_arguments(self):
+        """Provide both -text and -textfile."""
+        expected_error = "'-text' and '-textfile' cannot both be used"
+
+        with self.assertRaisesRegex(ValueError, expected_error):
+            parse(['-text:hello', '-textfile:/some/path'],
+                  self.generator_factory)
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_except_argument(self):
+        """Check the deprecated -except argument."""
+        generator_factory = Mock()
+        generator_factory.handle_args.side_effect = lambda args: args
+
+        with suppress_warnings('-except:stuff is deprecated',
+                               ArgumentDeprecationWarning):
+            parse(['-text:hello', '-except:stuff'], generator_factory)
+
+        generator_factory.handle_arg.assert_called_with('-grepnot:stuff')
+
+    @patch('pywikibot.input')
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_argument_prompt(self, input_mock):
+        """Reqest an argument that requres a prompt."""
+        input_mock.return_value = 'hello world'
+
+        args = parse(['-text'], self.generator_factory)
+        self.assertEqual('hello world', args.text)
+        input_mock.assert_called_with('What text do you want to add?')
 
     def test_basic(self):
         """Test adding text."""
