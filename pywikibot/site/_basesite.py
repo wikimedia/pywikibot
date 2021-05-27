@@ -435,12 +435,6 @@ class BaseSite(ComparableMixin):
         """Return local name for the Category namespace."""
         return self.namespace(14)
 
-    @deprecated('list(namespaces.CATEGORY)', since='20150829',
-                future_warning=True)
-    def category_namespaces(self):  # pragma: no cover
-        """Return names for the Category namespace."""
-        return list(self.namespace(14, all=True))
-
     # site-specific formatting preferences
 
     def category_on_one_line(self):
