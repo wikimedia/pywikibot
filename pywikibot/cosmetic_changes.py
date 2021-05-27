@@ -775,8 +775,8 @@ class CosmeticChangesToolkit:
         == Section title ==
 
         :NOTE: This space is recommended in the syntax help on the
-            English and German Wikipedia. It is not wanted on Lojban and
-            English Wiktionary (T168399, T169064) and it might be that
+            English and German Wikipedias. It is not wanted on Lojban and
+            English Wiktionaries (T168399, T169064) and it might be that
             it is not wanted on other wikis. If there are any complaints,
             please file a bug report.
         """
@@ -793,7 +793,7 @@ class CosmeticChangesToolkit:
         Add a space between the * or # and the text.
 
         :NOTE: This space is recommended in the syntax help on the
-            English, German, and French Wikipedia. It might be that it
+            English, German and French Wikipedias. It might be that it
             is not wanted on other wikis. If there are any complaints,
             please file a bug report.
         """
@@ -1028,10 +1028,10 @@ class CosmeticChangesToolkit:
 
     def commonsfiledesc(self, text):
         """
-        Clean up file descriptions on the Wikimedia Commons.
+        Clean up file descriptions on Wikimedia Commons.
 
-        It is working according to [1] and works only on pages in the file
-        namespace on the Wikimedia Commons.
+        It works according to [1] and works only on pages in the file
+        namespace on Wikimedia Commons.
 
         [1]:
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
