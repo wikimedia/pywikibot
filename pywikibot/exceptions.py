@@ -717,5 +717,5 @@ module = sys.modules[__name__]
 
 for old_name, new_name in DEPRECATED_EXCEPTIONS.items():
     setattr(module, old_name, getattr(module, new_name))
-    wrapper._add_deprecated_attr(old_name, replacement_name=new_name,
-                                 since='20210423', future_warning=True)
+    wrapper.add_deprecated_attr(old_name, replacement_name=new_name,
+                                since='20210423', future_warning=True)

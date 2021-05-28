@@ -1818,11 +1818,11 @@ class ModuleDeprecationWrapper(types.ModuleType):
         if __debug__:
             sys.modules[module.__name__] = self
 
-    def _add_deprecated_attr(self, name: str, replacement=None,
-                             replacement_name: Optional[str] = None,
-                             warning_message: Optional[str] = None,
-                             since: Optional[str] = None,
-                             future_warning: bool = False):
+    def add_deprecated_attr(self, name: str, replacement: Any = None, *,
+                            replacement_name: Optional[str] = None,
+                            warning_message: Optional[str] = None,
+                            since: Optional[str] = None,
+                            future_warning: bool = False):
         """
         Add the name to the local deprecated names dict.
 
@@ -1831,7 +1831,6 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param replacement: The replacement value which should be returned
             instead. If the name is already an attribute of that module this
             must be None. If None it'll return the attribute of the module.
-        @type replacement: any
         @param replacement_name: The name of the new replaced value. Required
             if C{replacement} is not None and it has no __name__ attribute.
             If it contains a '.', it will be interpreted as a Python dotted
@@ -1992,18 +1991,18 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('empty_iterator', replacement_name='iter(())',
-                             since='20220422', future_warning=True)
-wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
-                             since='20210416', future_warning=True)
-wrapper._add_deprecated_attr('frozenmap',
-                             replacement_name='types.MappingProxyType',
-                             since='20210415',
-                             future_warning=True)
-wrapper._add_deprecated_attr('LazyRegex', replacement_name='',
-                             since='20210418', future_warning=True)
-wrapper._add_deprecated_attr('DeprecatedRegex', replacement_name='',
-                             since='20210418', future_warning=True)
+wrapper.add_deprecated_attr('empty_iterator', replacement_name='iter(())',
+                            since='20220422', future_warning=True)
+wrapper.add_deprecated_attr('DotReadableDict', replacement_name='',
+                            since='20210416', future_warning=True)
+wrapper.add_deprecated_attr('frozenmap',
+                            replacement_name='types.MappingProxyType',
+                            since='20210415',
+                            future_warning=True)
+wrapper.add_deprecated_attr('LazyRegex', replacement_name='',
+                            since='20210418', future_warning=True)
+wrapper.add_deprecated_attr('DeprecatedRegex', replacement_name='',
+                            since='20210418', future_warning=True)
 
 
 is_IP = redirect_func(is_ip_address, old_name='is_IP',  # noqa N816
