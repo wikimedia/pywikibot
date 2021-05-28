@@ -134,7 +134,6 @@ from pywikibot.bot import (
     Bot,
     ContextOption,
     IntegerOption,
-    MultipleSitesBot,
     StandardOption,
     suggest_help,
 )
@@ -403,7 +402,7 @@ class CategoryDatabase:
                                  .format(config.shortpath(filename)))
 
 
-class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
+class CategoryAddBot(CategoryPreprocess):
 
     """A robot to mass-add a category to a list of pages."""
 
