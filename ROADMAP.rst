@@ -4,6 +4,9 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Use different logfiles for multiple processes of the same script (T56685)
+* throttle.pip will be reused as soon as possbile
+* terminal_interface_base.TerminalHandler is subclassed from logging.StreamHandler
 * Fix iterating of SizedKeyCollection (T282865)
 * An abstract base user interface module was added
 * APISite method pagelanglinks() may skip links with empty titles (T223157)
@@ -17,6 +20,16 @@ Improvements and Bugfixes
 Code cleanups
 -------------
 
+* MultipleSitesBot.site attribute was removed (T283209)
+* Deprecated BaseSite.category_namespaces() method was removed
+* i18n.twntranslate() function was removed in favour of twtranslate()
+* siteinfo must be used as a dictionary ad cannot be called anymore
+* APISite.has_transcluded_data() method was removed
+* Deprecated LogEntry.title() method was removed
+* Deprecated APISite.watchpage() method was removed
+* OptionHandler.options dict has been removed in favour of OptionHandler.opt
+* The toStdout parameter of ui.output has been dropped
+* terminal_interface_base.TerminalFormatter was removed
 * Move page functions UnicodeToAsciiHtml, unicode2html, url2unicode to tools.chars with renaming them
 * Rename _MultiTemplateMatchBuilder to MultiTemplateMatchBuilder
 * User.name() method was removed in favour of User.username property
@@ -31,6 +44,7 @@ Code cleanups
 Deprecations
 ^^^^^^^^^^^^
 
+* 6.2.0: Bot's availableOptions will be removed in favour of available_options
 * 6.2.0: deprecated tools.is_IP will be removed
 * 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped
 * 6.2.0: Exceptions must be imported from exceptions namespace (T280227)
@@ -43,5 +57,4 @@ Deprecations
 * 6.0.1: Site.undeletepage() and Site.undelete_file_versions() will be removed in favour of Site.undelete() method
 * 6.0.1: Site.deletepage() and Site.deleteoldimage() will be removed in favour of Site.delete() method
 * 6.0.1: DataSite.createNewItemFromPage() method will be removed in favour of ImagePage.fromPage() (T98663)
-* 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
