@@ -1,4 +1,7 @@
-"""Family module for Wikispore."""
+"""Family module for Wikispore.
+
+*New in version 4.1.*
+"""
 #
 # (C) Pywikibot team, 2020
 #

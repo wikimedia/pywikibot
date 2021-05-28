@@ -1,9 +1,9 @@
 """Stdout, stderr and argv support for unicode."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2021
 #
 ##############################################
-# Support for unicode in windows cmd.exe
+# Support for unicode in Windows cmd.exe
 # Posted on Stack Overflow [1], available under CC-BY-SA 3.0 [2]
 #
 # Question: "Windows cmd encoding change causes Python crash" [3] by Alex [4],
@@ -21,13 +21,14 @@
 # Licensed under both CC-BY-SA and the MIT license.
 #
 ################################################
-import codecs
 import sys
 
 from contextlib import suppress
-from ctypes import Structure, byref, create_unicode_buffer, sizeof
+from ctypes import Structure, byref
 from ctypes import c_void_p as LPVOID
+from ctypes import create_unicode_buffer, sizeof
 from io import IOBase, UnsupportedOperation
+
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -39,9 +40,17 @@ argv = sys.argv
 original_stderr = sys.stderr
 
 if OSWIN32:
-    from ctypes import WINFUNCTYPE, windll, POINTER, WinError
-    from ctypes.wintypes import (BOOL, DWORD, HANDLE, LPWSTR,
-                                 SHORT, ULONG, UINT, WCHAR)
+    from ctypes import POINTER, WINFUNCTYPE, WinError, windll
+    from ctypes.wintypes import (
+        BOOL,
+        DWORD,
+        HANDLE,
+        LPWSTR,
+        SHORT,
+        UINT,
+        ULONG,
+        WCHAR,
+    )
 
 try:
     ReadConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPVOID, DWORD, POINTER(DWORD),
@@ -100,8 +109,8 @@ class UnicodeOutput(IOBase):
             try:
                 self._stream.flush()
             except Exception as e:
-                _complain('%s.flush: %r from %r'
-                          % (self.name, e, self._stream))
+                _complain('{}.flush: {!r} from {!r}'
+                          .format(self.name, e, self._stream))
                 raise
 
     def write(self, text):
@@ -121,15 +130,16 @@ class UnicodeOutput(IOBase):
                     retval = WriteConsoleW(self._hConsole, text,
                                            min(remaining, 10000),
                                            byref(n), None)
-                    if retval == 0 or n.value == 0:
-                        raise IOError('WriteConsoleW returned %r, n.value = %r'
-                                      % (retval, n.value))
+                    if 0 in (retval, n.value):
+                        msg = 'WriteConsoleW returned {!r}, n.value = {!r}' \
+                              .format(retval, n.value)
+                        raise IOError(msg)
                     remaining -= n.value
                     if remaining == 0:
                         break
                     text = text[n.value:]
         except Exception as e:
-            _complain('%s.write: %r' % (self.name, e))
+            _complain('{}.write: {!r}'.format(self.name, e))
             raise
 
     def writelines(self, lines):
@@ -138,7 +148,7 @@ class UnicodeOutput(IOBase):
             for line in lines:
                 self.write(line)
         except Exception as e:
-            _complain('%s.writelines: %r' % (self.name, e))
+            _complain('{}.writelines: {!r}'.format(self.name, e))
             raise
 
 
@@ -146,7 +156,7 @@ def old_fileno(std_name):
     """Return the fileno or None if that doesn't work."""
     # some environments like IDLE don't support the fileno operation
     # handle those like std streams which don't have fileno at all
-    std = getattr(sys, 'std{0}'.format(std_name))
+    std = getattr(sys, 'std{}'.format(std_name))
     if hasattr(std, 'fileno'):
         with suppress(UnsupportedOperation):
             return std.fileno()
@@ -160,13 +170,6 @@ def old_fileno(std_name):
 def _complain(message):
     print(isinstance(message, str) and message or repr(message),
           file=original_stderr)
-
-
-def register_cp65001():
-    """Register codecs cp65001 as utf-8."""
-    # Work around <https://bugs.python.org/issue6058>
-    codecs.register(lambda name: name == 'cp65001'
-                    and codecs.lookup('utf-8') or None)
 
 
 def force_truetype_console(h_stdout):
@@ -321,7 +324,3 @@ def get_unicode_console():
                   .format(e))
 
     return stdin, stdout, stderr, argv
-
-
-if OSWIN32:
-    register_cp65001()

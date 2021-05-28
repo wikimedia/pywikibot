@@ -5,11 +5,9 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.page import BasePage
-
 from tests.aspects import TestCase
 
 

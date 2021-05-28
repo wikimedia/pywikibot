@@ -7,9 +7,8 @@
 import re
 import unittest
 
-from tests.aspects import TestCase
-
 import generate_user_files as guf
+from tests.aspects import TestCase
 
 
 class TestGenerateUserFiles(TestCase):

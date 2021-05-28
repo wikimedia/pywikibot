@@ -5,12 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.page
-
+from pywikibot.exceptions import IsNotRedirectPageError
 from tests.aspects import TestCase
 
 
@@ -154,7 +153,7 @@ class TestCategoryObject(TestCase):
         self.assertEqual(tgt, cat2)
 
         # Raise exception if target is fetched for non Category redirects.
-        with self.assertRaisesRegex(pywikibot.IsNotRedirectPage,
+        with self.assertRaisesRegex(IsNotRedirectPageError,
                                     self.NOREDIRECTPAGE_RE):
             cat2.getCategoryRedirectTarget()
 

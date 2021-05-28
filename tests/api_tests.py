@@ -6,26 +6,24 @@
 #
 import datetime
 import types
-
 from collections import defaultdict
 from contextlib import suppress
 
-import pywikibot.data.api as api
 import pywikibot.family
 import pywikibot.login
 import pywikibot.page
 import pywikibot.site
-
+from pywikibot.data import api
+from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-
-from tests.aspects import (
-    unittest,
-    TestCase,
-    DefaultSiteTestCase,
-    DefaultDrySiteTestCase,
-)
 from tests import patch
+from tests.aspects import (
+    DefaultDrySiteTestCase,
+    DefaultSiteTestCase,
+    TestCase,
+    unittest,
+)
 from tests.utils import FakeLoginManager
 
 
@@ -876,10 +874,10 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         """Test the query with a username which does not exist."""
         self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
-        with self.assertRaises(pywikibot.NoUsername):
+        with self.assertRaises(NoUsernameError):
             req.submit()
         # FIXME: T100965
-        with self.assertRaises(api.APIError):
+        with self.assertRaises(APIError):
             req.submit()
         warning.assert_called_with(
             'API error readapidenied: '
@@ -901,10 +899,10 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         """Test the query without a username."""
         self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
-        with self.assertRaises(pywikibot.NoUsername):
+        with self.assertRaises(NoUsernameError):
             req.submit()
         # FIXME: T100965
-        with self.assertRaises(api.APIError):
+        with self.assertRaises(APIError):
             req.submit()
         warning.assert_called_with(
             'API error readapidenied: '
@@ -1003,7 +1001,7 @@ class TestLagpattern(DefaultSiteTestCase):
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
             self.skipTest(
-                '{0} is not running on a replicated database cluster.'
+                '{} is not running on a replicated database cluster.'
                 .format(mysite)
             )
         mythrottle = DummyThrottle(mysite)
@@ -1016,7 +1014,7 @@ class TestLagpattern(DefaultSiteTestCase):
             req.submit()
         except SystemExit:
             pass  # expected exception from DummyThrottle instance
-        except api.APIError as e:
+        except APIError as e:
             pywikibot.warning(
                 'Wrong api.lagpattern regex, cannot retrieve lag value')
             raise e

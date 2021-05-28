@@ -4,16 +4,22 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import re
 import sys
 
+from contextlib import suppress
+from typing import Union
+from urllib.parse import unquote_to_bytes
+
+from pywikibot.backports import List, Tuple
 from pywikibot.tools._unidata import _category_cf
-from pywikibot.tools import LazyRegex
+
 
 # This is a set of all invisible characters
 # At the moment we've only added the characters from the Cf category
 _invisible_chars = _category_cf
 
-invisible_regex = LazyRegex(lambda: '[{}]'.format(''.join(_invisible_chars)))
+INVISIBLE_REGEX = re.compile('[{}]'.format(''.join(_invisible_chars)))
 
 
 def contains_invisible(text):
@@ -33,4 +39,65 @@ def replace_invisible(text):
         else:
             codepoint = ord(match)
         return '<{0:x}>'.format(codepoint)
-    return invisible_regex.sub(replace, text)
+
+    return INVISIBLE_REGEX.sub(replace, text)
+
+
+def string_to_ascii_html(string: str) -> str:
+    """Convert unicode chars of str to HTML entities if chars are not ASCII."""
+    html = []
+    for c in string:
+        cord = ord(c)
+        if 31 < cord < 127:
+            html.append(c)
+        else:
+            html.append('&#{};'.format(cord))
+    return ''.join(html)
+
+
+def string2html(string: str, encoding: str) -> str:
+    """Convert unicode string to requested HTML encoding.
+
+    Attempt to encode the string into the desired format; if that work
+    return it unchanged. Otherwise encode the non-ASCII characters into
+    HTML &#; entities.
+
+    @param string: String to update
+    @param encoding: Encoding to use
+    """
+    with suppress(UnicodeError):
+        string.encode(encoding)
+        return string
+
+    return string_to_ascii_html(string)
+
+
+def url2string(
+    title: str,
+    encodings: Union[str, List[str], Tuple[str, ...]] = 'utf-8'
+) -> str:
+    """Convert URL-encoded text to unicode using several encoding.
+
+    Uses the first encoding that doesn't cause an error.
+
+    @param title: URL-encoded character data to convert
+    @param encodings: Encodings to attempt to use during conversion.
+
+    @raise UnicodeError: Could not convert using any encoding.
+    """
+    if isinstance(encodings, str):
+        encodings = [encodings]
+
+    first_exception = None
+    for enc in encodings:
+        try:
+            t = title.encode(enc)
+            t = unquote_to_bytes(t)
+        except UnicodeError as e:
+            if not first_exception:
+                first_exception = e
+        else:
+            return t.decode(enc)
+
+    # Couldn't convert, raise the first exception
+    raise first_exception

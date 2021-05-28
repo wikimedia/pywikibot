@@ -50,9 +50,10 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+from pywikibot import pagegenerators
 from pywikibot.bot import suggest_help
 from pywikibot.i18n import twtranslate
-from pywikibot import pagegenerators
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -133,7 +134,7 @@ def main(*args) -> None:
         if targetpage.exists():
             if not overwrite:
                 pywikibot.warning(
-                    'Skipped {0} (target page {1} exists)'.format(
+                    'Skipped {} (target page {} exists)'.format(
                         page.title(as_link=True, force_interwiki=True),
                         targetpage.title(as_link=True)
                     )
@@ -141,7 +142,7 @@ def main(*args) -> None:
                 continue
             if not targetpage.botMayEdit():
                 pywikibot.warning(
-                    'Target page {0} is not editable by bots'.format(
+                    'Target page {} is not editable by bots'.format(
                         targetpage.title(as_link=True)
                     )
                 )
@@ -149,13 +150,13 @@ def main(*args) -> None:
 
         if not page.exists():
             pywikibot.warning(
-                "Page {0} doesn't exist".format(
+                "Page {} doesn't exist".format(
                     page.title(as_link=True)
                 )
             )
             continue
 
-        pywikibot.output('Moving {0} to {1}...'
+        pywikibot.output('Moving {} to {}...'
                          .format(page.title(as_link=True,
                                             force_interwiki=True),
                                  targetpage.title(as_link=True)))

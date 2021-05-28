@@ -29,9 +29,9 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 # Distributed under the terms of the MIT license.
 #
 import codecs
-from importlib import import_module
 import json
 import os
+from importlib import import_module
 
 from pywikibot import config
 
@@ -53,7 +53,7 @@ class i18nBot:  # noqa: N801
             if hasattr(self.script, msg):
                 self.messages[msg] = msg
             else:
-                print('message {0} not found'.format(msg))
+                print('message {} not found'.format(msg))
         for new, old in kwargs.items():
             self.messages[old] = new.replace('_', '-')
         self.dict = {}
@@ -74,7 +74,7 @@ class i18nBot:  # noqa: N801
 
         print('msg = {')
         for code in keys:
-            print("    '%s': {" % code)
+            print("    '{}': {{".format(code))
             for msg in sorted(self.messages.values()):
                 label = '{}-{}'.format(self.scriptname, msg)
                 if label in self.dict[code]:

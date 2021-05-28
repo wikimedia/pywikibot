@@ -16,7 +16,6 @@ The following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators, textlib
 
 
@@ -38,7 +37,6 @@ def initLists():
                                  'User:Multichill/Countries')
     for country in countryPage.linkedPages():
         countries.append(country.title(with_ns=False))
-    return
 
 
 def categorizeImages(generator, onlyUncat):
@@ -165,7 +163,6 @@ def saveImagePage(imagepage, newcats):
     pywikibot.showDiff(imagepage.text, newtext)
     imagepage.text = newtext
     imagepage.save(comment)
-    return
 
 
 def main(*args):

@@ -5,11 +5,9 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.tools import formatter
-
 from tests.aspects import TestCase
 
 
@@ -23,11 +21,11 @@ class TestListOutputter(TestCase):
         """Test format method."""
         options = ['foo', 'bar']
         outputter = formatter.SequenceOutputter(options)
-        self.assertEqual(outputter.format_list(), '\n  1 - foo\n  2 - bar\n')
+        self.assertEqual(outputter.out, '\n  1 - foo\n  2 - bar\n')
         outputter.format_string = '({index} {width} {item})'
-        self.assertEqual(outputter.format_list(), '\n(1 1 foo)\n(2 1 bar)\n')
+        self.assertEqual(outputter.out, '\n(1 1 foo)\n(2 1 bar)\n')
         outputter.format_string = '{item}'
-        self.assertEqual(outputter.format_list(), '\nfoo\nbar\n')
+        self.assertEqual(outputter.out, '\nfoo\nbar\n')
 
 
 # TODO: add tests for background colors.
@@ -37,7 +35,7 @@ class TestColorFormat(TestCase):
 
     class DummyUnicode:
 
-        """Dummy class that __str__ returns a non-ascii unicode value."""
+        """Dummy class that __str__ returns a non-ASCII Unicode value."""
 
         def __str__(self):
             """Return ä."""

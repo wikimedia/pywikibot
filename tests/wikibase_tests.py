@@ -7,23 +7,27 @@
 import copy
 import json
 import unittest
-
 from contextlib import suppress
 from decimal import Decimal
 
 import pywikibot
-
 from pywikibot import pagegenerators
+from pywikibot.exceptions import (
+    InvalidTitleError,
+    IsNotRedirectPageError,
+    IsRedirectPageError,
+    NoPageError,
+    UnknownExtensionError,
+    WikiBaseError,
+)
 from pywikibot.page import ItemPage, Page, PropertyPage, WikibasePage
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
-
 from tests import WARN_SITE_CODE, join_pages_path, mock
 from tests.aspects import TestCase, WikidataTestCase
-
 from tests.basepage import (
-    BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
+    BasePageMethodsTestBase,
 )
 
 
@@ -397,17 +401,17 @@ class TestWbQuantity(WbRepresentationTestCase):
         """Test WbQuantity formatting with bounds."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
-        self.assertEqual('%s' % q,
-                         '{\n'
-                         '    "amount": "+%(val)s",\n'
-                         '    "lowerBound": "+%(val)s",\n'
+        self.assertEqual(str(q),
+                         '{{\n'
+                         '    "amount": "+{val}",\n'
+                         '    "lowerBound": "+{val}",\n'
                          '    "unit": "1",\n'
-                         '    "upperBound": "+%(val)s"\n'
-                         '}' % {'val': '0.044405586'})
-        self.assertEqual('%r' % q,
-                         'WbQuantity(amount=%(val)s, '
-                         'upperBound=%(val)s, lowerBound=%(val)s, '
-                         'unit=1)' % {'val': '0.044405586'})
+                         '    "upperBound": "+{val}"\n'
+                         '}}'.format(val='0.044405586'))
+        self.assertEqual(repr(q),
+                         'WbQuantity(amount={val}, '
+                         'upperBound={val}, lowerBound={val}, '
+                         'unit=1)'.format(val='0.044405586'))
 
     def test_WbQuantity_self_equality(self):
         """Test WbQuantity equality."""
@@ -488,17 +492,17 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
             self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
                           'support unbound uncertainties.')
         q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
-        self.assertEqual('%s' % q,
-                         '{\n'
-                         '    "amount": "+%(val)s",\n'
+        self.assertEqual(str(q),
+                         '{{\n'
+                         '    "amount": "+{val}",\n'
                          '    "lowerBound": null,\n'
                          '    "unit": "1",\n'
                          '    "upperBound": null\n'
-                         '}' % {'val': '0.044405586'})
-        self.assertEqual('%r' % q,
-                         'WbQuantity(amount=%(val)s, '
+                         '}}'.format(val='0.044405586'))
+        self.assertEqual(repr(q),
+                         'WbQuantity(amount={val}, '
                          'upperBound=None, lowerBound=None, '
-                         'unit=1)' % {'val': '0.044405586'})
+                         'unit=1)'.format(val='0.044405586'))
 
     def test_WbQuantity_fromWikibase_unbound(self):
         """Test WbQuantity.fromWikibase() instantiating without bounds."""
@@ -847,7 +851,6 @@ class TestItemPageExtensibility(TestCase):
 
             """Dummy ItemPage subclass."""
 
-            pass
         page = pywikibot.Page(self.site, 'foo')
         self.assertIsInstance(MyItemPage.fromPage(page, lazy_load=True),
                               MyItemPage)
@@ -992,11 +995,11 @@ class TestItemLoad(WikidataTestCase):
         for title in ['null', 'NULL', 'None',
                       '-2', '1', '0', '+1', 'Q0',
                       'Q0.5', 'Q', 'Q-1', 'Q+1']:
-            with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
+            with self.assertRaisesRegex(InvalidTitleError, regex):
                 ItemPage(wikidata, title)
 
         regex = r"^Item's title cannot be empty$"
-        with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
+        with self.assertRaisesRegex(InvalidTitleError, regex):
             ItemPage(wikidata, '')
 
     def test_item_untrimmed_title(self):
@@ -1026,16 +1029,14 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(numeric_id, 7)
         self.assertFalse(hasattr(item, '_content'))
         regex = r"^Page .+ doesn't exist\.$"
-        with self.assertRaisesRegex(
-                pywikibot.NoPage,
-                regex):
+        with self.assertRaisesRegex(NoPageError, regex):
             item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item.id, 'Q7')
         self.assertEqual(item.getID(), 'Q7')
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.title(), 'Q7')
-        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+        with self.assertRaisesRegex(NoPageError, regex):
             item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item._link._title, 'Q7')
@@ -1050,7 +1051,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertFalse(item.exists())
         self.assertEqual(item.getID(), 'Q9999999999999999999')
         regex = r"^Page .+ doesn't exist\.$"
-        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+        with self.assertRaisesRegex(NoPageError, regex):
             item.get()
 
     def test_fromPage_noprops(self):
@@ -1121,13 +1122,6 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def test_fromPage_invalid_title(self):
-        """Test item from page with invalid title."""
-        page = pywikibot.Page(pywikibot.page.Link('[]', self.site))
-        regex = r' contains illegal char\(s\) '
-        with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
-            ItemPage.fromPage(page)
-
     def _test_fromPage_noitem(self, link):
         """Helper function to test a page without an associated item.
 
@@ -1157,7 +1151,7 @@ class TestItemLoad(WikidataTestCase):
                     self.assertFalse(item.exists())
                 else:
                     regex = r"^Page .+ doesn't exist\.$"
-                    with self.assertRaisesRegex(pywikibot.NoPage, regex):
+                    with self.assertRaisesRegex(NoPageError, regex):
                         getattr(item, method)()
 
                 # The invocation above of a fetching method shouldn't change
@@ -1180,7 +1174,7 @@ class TestItemLoad(WikidataTestCase):
 
                 # by default, fromPage should always raise the same exception
                 regex = r"^Page .+ doesn't exist\.$"
-                with self.assertRaisesRegex(pywikibot.NoPage, regex):
+                with self.assertRaisesRegex(NoPageError, regex):
                     ItemPage.fromPage(page)
 
     def test_fromPage_redirect(self):
@@ -1219,18 +1213,19 @@ class TestItemLoad(WikidataTestCase):
         # ItemPage.fromPage should raise an exception when not lazy loading
         # and that exception should refer to the source title 'Test page'
         # not the Item being created.
-        with self.assertRaisesRegex(pywikibot.NoPage, 'Test page'):
+        with self.assertRaisesRegex(NoPageError, 'Test page'):
             ItemPage.fromPage(page, lazy_load=False)
 
         item = ItemPage.fromPage(page, lazy_load=True)
 
         # Now verify that delay loading will result in the desired semantics.
-        # It should not raise NoPage on the wikibase item which has a title
-        # like '-1' or 'Null', as that is useless to determine the cause
+        # It should not raise NoPageError on the wikibase item which has a
+        # title like '-1' or 'Null', as that is useless to determine the cause
         # without a full debug log.
-        # It should raise NoPage on the source page, with title 'Test page'
-        # as that is what the bot operator needs to see in the log output.
-        with self.assertRaisesRegex(pywikibot.NoPage, 'Test page'):
+        # It should raise NoPageError on the source page, with title 'Test
+        # page' as that is what the bot operator needs to see in the log
+        # output.
+        with self.assertRaisesRegex(NoPageError, 'Test page'):
             item.get()
 
     def test_from_entity_uri(self):
@@ -1262,7 +1257,7 @@ class TestItemLoad(WikidataTestCase):
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Nonsense'
         regex = r"^'.+' is not a valid .+ page title$"
-        with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
+        with self.assertRaisesRegex(InvalidTitleError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
     def test_from_entity_uri_no_item(self):
@@ -1270,7 +1265,7 @@ class TestItemLoad(WikidataTestCase):
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
         regex = r"^Page .+ doesn't exist\.$"
-        with self.assertRaisesRegex(pywikibot.NoPage, regex):
+        with self.assertRaisesRegex(NoPageError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
     def test_from_entity_uri_no_item_lazy(self):
@@ -1296,7 +1291,7 @@ class TestRedirects(WikidataTestCase):
         self.assertFalse(item.isRedirectPage())
         self.assertTrue(item.exists())
         regex = r'^Page .+ is not a redirect page\.$'
-        with self.assertRaisesRegex(pywikibot.IsNotRedirectPage, regex):
+        with self.assertRaisesRegex(IsNotRedirectPageError, regex):
             item.getRedirectTarget()
 
     def test_redirect_item(self):
@@ -1311,7 +1306,7 @@ class TestRedirects(WikidataTestCase):
         self.assertEqual(item.getRedirectTarget(), target)
         self.assertIsInstance(item.getRedirectTarget(), ItemPage)
         regex = r'^Page .+ is a redirect page\.$'
-        with self.assertRaisesRegex(pywikibot.IsRedirectPage, regex):
+        with self.assertRaisesRegex(IsRedirectPageError, regex):
             item.get()
 
     def test_redirect_item_without_get(self):
@@ -1339,7 +1334,7 @@ class TestPropertyPage(WikidataTestCase):
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
         regex = r"^Property's title cannot be empty$"
-        with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
+        with self.assertRaisesRegex(InvalidTitleError, regex):
             PropertyPage(wikidata, title='')
 
     def test_globe_coordinate(self):
@@ -1944,7 +1939,7 @@ class TestNamespaces(WikidataTestCase):
         #       raise an error.
         wikidata = self.get_repo()
         regex = r"^'.+' is not a valid item page title$"
-        with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
+        with self.assertRaisesRegex(InvalidTitleError, regex):
             ItemPage(wikidata, 'Invalid:Q1')
 
 
@@ -2062,9 +2057,9 @@ class TestUnconnectedClient(TestCase):
 
         self.wdp = pywikibot.Page(site, self.sites[key]['page_title'])
         regex = r' has no data repository$'
-        with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
+        with self.assertRaisesRegex(WikiBaseError, regex):
             ItemPage.fromPage(self.wdp)
-        with self.assertRaisesRegex(pywikibot.WikiBaseError, regex):
+        with self.assertRaisesRegex(WikiBaseError, regex):
             self.wdp.data_item()
 
     def test_has_data_repository(self, key):
@@ -2077,7 +2072,7 @@ class TestUnconnectedClient(TestCase):
         site = self.get_site(key)
         dummy_item = 'Q1'
         regex = r'^Wikibase is not implemented for .+\.$'
-        with self.assertRaisesRegex(pywikibot.UnknownExtension, regex):
+        with self.assertRaisesRegex(UnknownExtensionError, regex):
             site.page_from_repository(dummy_item)
 
 

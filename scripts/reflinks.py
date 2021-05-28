@@ -41,6 +41,7 @@ The following generators and filters are supported:
 #
 import codecs
 import http.client as httplib
+import itertools
 import os
 import re
 import socket
@@ -53,16 +54,20 @@ from http import HTTPStatus
 from textwrap import shorten
 
 import pywikibot
-
-from pywikibot import comms, i18n, pagegenerators, textlib
+from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
-from pywikibot import config2 as config
+from pywikibot.exceptions import (
+    FatalServerError,
+    Server414Error,
+    Server504Error,
+)
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
 from pywikibot.textlib import replaceExcept
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools.chars import string2html
 
 from scripts import noreferences
 
@@ -245,7 +250,7 @@ class RefLink:
         self.title = self.title.replace('}}', '}&#125;')
         # prevent multiple quotes being interpreted as '' or '''
         self.title = self.title.replace("''", "'&#39;")
-        self.title = pywikibot.unicode2html(self.title, self.site.encoding())
+        self.title = string2html(self.title, self.site.encoding())
         # TODO : remove HTML when both opening and closing tags are included
 
     def avoid_uppercase(self):
@@ -349,9 +354,9 @@ class DuplicateReferences:
             with suppress(ValueError):
                 used_numbers.add(int(number))
 
-        # iterator to give the next free number
-        free_number = iter({str(i) for i in range(1, 1000)  # should be enough
-                            if i not in used_numbers})
+        # generator to give the next free number
+        free_number = (str(i) for i in itertools.count(start=1)
+                       if i not in used_numbers)
 
         for (g, d) in found_refs.items():
             group = ''
@@ -608,9 +613,9 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     socket.error,
                     IOError,
                     httplib.error,
-                    pywikibot.FatalServerError,
-                    pywikibot.Server414Error,
-                    pywikibot.Server504Error) as e:
+                    FatalServerError,
+                    Server414Error,
+                    Server504Error) as e:
                 pywikibot.output(
                     "{err.__class__.__name__}: Can't retrieve url {url}: {err}"
                     .format(url=ref.url, err=e))

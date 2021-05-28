@@ -20,9 +20,14 @@ The following parameters are supported:
 import datetime
 
 import pywikibot
+from pywikibot import editor, i18n, pagegenerators
+from pywikibot.bot import CurrentPageBot, QuitKeyboardInterrupt, SingleSiteBot
+from pywikibot.exceptions import (
+    EditConflictError,
+    IsRedirectPageError,
+    NoPageError,
+)
 
-from pywikibot import i18n, pagegenerators, editor
-from pywikibot.bot import SingleSiteBot, CurrentPageBot, QuitKeyboardInterrupt
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -450,10 +455,10 @@ What is it? """
         """Process one bad page."""
         try:
             self.content = self.page.get()
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('Already redirected, skipping.')
             return
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Already deleted')
             return
 
@@ -493,7 +498,7 @@ What is it? """
                                       self.site.lang,
                                       'followlive-blanking',
                                       {'content': self.content}))
-                except pywikibot.EditConflict:
+                except EditConflictError:
                     pywikibot.output(
                         'An edit conflict occurred! Automatically retrying')
                     self.handle_bad_page(self)
@@ -599,7 +604,7 @@ def main(*args):
         bot.run()
     else:
         pywikibot.output(
-            '\nScript is not localised for {0}. Terminating program.'
+            '\nScript is not localised for {}. Terminating program.'
             .format(site))
 
 

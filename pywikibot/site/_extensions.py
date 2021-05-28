@@ -6,10 +6,13 @@
 #
 import pywikibot
 import pywikibot.family
-
 from pywikibot.data import api
 from pywikibot.echo import Notification
-from pywikibot.exceptions import InconsistentTitleReceived, SiteDefinitionError
+from pywikibot.exceptions import (
+    APIError,
+    InconsistentTitleError,
+    SiteDefinitionError,
+)
 from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import deprecate_arg, deprecated_args, merge_unique_dicts
 
@@ -193,7 +196,7 @@ class GlobalUsageMixin:
             defined for a returned entry in API response.
         """
         if not isinstance(page, pywikibot.FilePage):
-            raise TypeError('Page %s must be a FilePage.' % page)
+            raise TypeError('Page {} must be a FilePage.'.format(page))
 
         title = page.title(with_section=False)
         args = {'titles': title,
@@ -208,7 +211,7 @@ class GlobalUsageMixin:
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(with_section=False)):
-                raise InconsistentTitleReceived(page, pageitem['title'])
+                raise InconsistentTitleError(page, pageitem['title'])
 
             api.update_page(page, pageitem, query.props)
 
@@ -220,7 +223,7 @@ class GlobalUsageMixin:
                 except SiteDefinitionError:
                     pywikibot.warning(
                         'Site could not be defined for global'
-                        ' usage for {0}: {1}.'.format(page, entry))
+                        ' usage for {}: {}.'.format(page, entry))
                     continue
                 gu_page = pywikibot.Page(gu_site, entry['title'])
                 yield gu_page
@@ -230,7 +233,7 @@ class WikibaseClientMixin:
 
     """APISite mixin for WikibaseClient extension."""
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     @need_extension('WikibaseClient')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
@@ -319,7 +322,7 @@ class ThanksMixin:
                                    source=source)
         data = req.submit()
         if data['result']['success'] != 1:
-            raise api.APIError('Thanking unsuccessful', '')
+            raise APIError('Thanking unsuccessful', '')
         return data
 
 
@@ -343,7 +346,7 @@ class ThanksFlowMixin:
                                    postid=post_id, token=token)
         data = req.submit()
         if data['result']['success'] != 1:
-            raise api.APIError('Thanking unsuccessful', '')
+            raise APIError('Thanking unsuccessful', '')
         return data
 
 

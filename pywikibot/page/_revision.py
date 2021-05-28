@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import hashlib
-
 from collections.abc import Mapping
 from contextlib import suppress
 

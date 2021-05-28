@@ -4,11 +4,11 @@ This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
-If you wish to run this as an stand-alone script, use:
+If you wish to run this as an stand-alone script, use::
 
     scripts/cosmetic_changes.py
 
-For regular use, it is recommended to put this line into your user-config.py:
+For regular use, it is recommended to put this line into your user-config.py::
 
     cosmetic_changes = True
 
@@ -16,11 +16,11 @@ You may enable cosmetic changes for additional languages by adding the
 dictionary cosmetic_changes_enable to your user-config.py. It should contain
 a tuple of languages for each site where you wish to enable in addition to
 your own langlanguage if cosmetic_changes_mylang_only is True (see below).
-Please set your dictionary by adding such lines to your user-config.py:
+Please set your dictionary by adding such lines to your user-config.py::
 
     cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 
-There is another config variable: You can set
+There is another config variable: You can set::
 
     cosmetic_changes_mylang_only = False
 
@@ -33,7 +33,7 @@ a tuple of languages for each site where you wish to disable cosmetic changes.
 You may use it with cosmetic_changes_mylang_only is False, but you can also
 disable your own language. This also overrides the settings in the dictionary
 cosmetic_changes_enable. Please set this dictionary by adding such lines to
-your user-config.py:
+your user-config.py::
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 
@@ -41,11 +41,11 @@ You may disable cosmetic changes for a given script by appending the all
 unwanted scripts to the list cosmetic_changes_deny_script in your
 user-config.py. By default it contains cosmetic_changes.py itself and touch.py.
 This overrides all other enabling settings for cosmetic changes. Please modify
-the given list by adding such lines to your user-config.py:
+the given list by adding such lines to your user-config.py::
 
     cosmetic_changes_deny_script.append('your_script_name_1')
 
-or by adding a list to the given one:
+or by adding a list to the given one::
 
     cosmetic_changes_deny_script += ['your_script_name_1',
                                      'your_script_name_2']
@@ -56,20 +56,25 @@ or by adding a list to the given one:
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from typing import Optional
 
 import pywikibot
-
-from pywikibot.page import url2unicode
 from pywikibot import textlib
+from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
-    _get_regexes, _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+    FILE_LINK_REGEX,
+    MultiTemplateMatchBuilder,
+    _get_regexes,
 )
 from pywikibot.tools import (
-    deprecated, deprecated_args, first_lower, first_upper,
+    deprecated,
+    deprecated_args,
+    first_lower,
+    first_upper,
     issue_deprecation_warning,
 )
+from pywikibot.tools.chars import url2string
+
 
 try:
     import stdnum.isbn as stdnum_isbn
@@ -186,7 +191,7 @@ def _format_isbn_match(match, strict=True):
     except stdnum_isbn.ValidationError as e:
         if strict:
             raise
-        pywikibot.log('ISBN "%s" validation error: %s' % (isbn, e))
+        pywikibot.log('ISBN "{}" validation error: {}'.format(isbn, e))
         return isbn
 
     return stdnum_isbn.format(isbn)
@@ -205,7 +210,7 @@ class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
-    @deprecated_args(redirect=None, diff='show_diff', site='page')
+    @deprecated_args(redirect=True, diff='show_diff', site='page')
     def __init__(self, page, *,
                  show_diff: bool = False,
                  namespace: Optional[int] = None,
@@ -320,7 +325,7 @@ class CosmeticChangesToolkit:
             new_text = self._change(text)
         except Exception as e:
             if self.ignore == CANCEL_PAGE:
-                pywikibot.warning('Skipped "{0}", because an error occurred.'
+                pywikibot.warning('Skipped "{}", because an error occurred.'
                                   .format(self.title))
                 pywikibot.exception(e)
                 return False
@@ -337,8 +342,8 @@ class CosmeticChangesToolkit:
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
-            interwikiR = re.compile(r'\[\[(?: *:)? *%s *: *([^\[\]\n]*)\]\]'
-                                    % self.site.code)
+            interwikiR = re.compile(r'\[\[(?: *:)? *{} *: *([^\[\]\n]*)\]\]'
+                                    .format(self.site.code))
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
@@ -440,7 +445,7 @@ class CosmeticChangesToolkit:
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
                 item = item.replace(' ', '[ _]')
-                item = '[%s%s]' % (item[0], item[0].lower()) + item[1:]
+                item = '[{}{}]'.format(item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
@@ -458,9 +463,9 @@ class CosmeticChangesToolkit:
                 else:
                     text = textlib.replaceExcept(
                         text,
-                        r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
-                        % '|'.join(namespaces),
-                        r'[[%s:\g<nameAndLabel>]]' % final_ns,
+                        r'\[\[\s*({}) *:(?P<nameAndLabel>.*?)\]\]'
+                        .format('|'.join(namespaces)),
+                        r'[[{}:\g<nameAndLabel>]]'.format(final_ns),
                         exceptions)
         return text
 
@@ -551,7 +556,7 @@ class CosmeticChangesToolkit:
             page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
             try:
                 in_main_namespace = page.namespace() == 0
-            except pywikibot.InvalidTitle:
+            except InvalidTitleError:
                 in_main_namespace = False
             if not in_main_namespace:
                 return match.group()
@@ -577,8 +582,8 @@ class CosmeticChangesToolkit:
                 hadTrailingSpaces = len(titleWithSection) != titleLength
 
             # Convert URL-encoded characters to str
-            titleWithSection = url2unicode(titleWithSection,
-                                           encodings=self.site)
+            titleWithSection = url2string(titleWithSection,
+                                          encodings=self.site.encodings())
 
             if not titleWithSection:
                 # just skip empty links.
@@ -614,13 +619,13 @@ class CosmeticChangesToolkit:
                 firstcase_label = label
 
             if firstcase_label == firstcase_title:
-                newLink = '[[%s]]' % label
+                newLink = '[[{}]]'.format(label)
             # Check if we can create a link with trailing characters
             # instead of a pipelink
             elif (firstcase_label.startswith(firstcase_title)
                   and trailR.sub('', label[len(titleWithSection):]) == ''):
-                newLink = '[[%s]]%s' % (label[:len(titleWithSection)],
-                                        label[len(titleWithSection):])
+                newLink = '[[{}]]{}'.format(label[:len(titleWithSection)],
+                                            label[len(titleWithSection):])
 
             else:
                 # Try to capitalize the first letter of the title.
@@ -630,7 +635,7 @@ class CosmeticChangesToolkit:
                 # uppercase
                 if self.site.sitename == 'wikipedia:de':
                     titleWithSection = first_upper(titleWithSection)
-                newLink = '[[%s|%s]]' % (titleWithSection, label)
+                newLink = '[[{}|{}]]'.format(titleWithSection, label)
             # re-add spaces that were pulled out of the link.
             # Examples:
             #   text[[ title ]]text        -> text [[title]] text
@@ -761,12 +766,19 @@ class CosmeticChangesToolkit:
         """
         Add a space between the equal signs and the section title.
 
-        Example: ==Section title== becomes == Section title ==
+        Example::
 
-        NOTE: This space is recommended in the syntax help on the English and
-        German Wikipedia. It is not wanted on Lojban and English Wiktionary
-        (T168399, T169064) and it might be that it is not wanted on other
-        wikis. If there are any complaints, please file a bug report.
+            ==Section title==
+
+        becomes::
+
+        == Section title ==
+
+        :NOTE: This space is recommended in the syntax help on the
+            English and German Wikipedias. It is not wanted on Lojban and
+            English Wiktionaries (T168399, T169064) and it might be that
+            it is not wanted on other wikis. If there are any complaints,
+            please file a bug report.
         """
         if self.site.sitename in ['wiktionary:jbo', 'wiktionary:en']:
             return text
@@ -780,9 +792,10 @@ class CosmeticChangesToolkit:
         """
         Add a space between the * or # and the text.
 
-        NOTE: This space is recommended in the syntax help on the English,
-        German, and French Wikipedia. It might be that it is not wanted on
-        other wikis. If there are any complaints, please file a bug report.
+        :NOTE: This space is recommended in the syntax help on the
+            English, German and French Wikipedias. It might be that it
+            is not wanted on other wikis. If there are any complaints,
+            please file a bug report.
         """
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre',
@@ -799,7 +812,7 @@ class CosmeticChangesToolkit:
     def replaceDeprecatedTemplates(self, text):
         """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
-        builder = _MultiTemplateMatchBuilder(self.site)
+        builder = MultiTemplateMatchBuilder(self.site)
 
         if self.site.family.name in deprecatedTemplates \
            and self.site.code in deprecatedTemplates[self.site.family.name]:
@@ -878,7 +891,7 @@ class CosmeticChangesToolkit:
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
-        extensions = [r'\.{0}'.format(ext)
+        extensions = [r'\.{}'.format(ext)
                       for ext in ['pdf', 'html?', 'php', 'aspx?', 'jsp']]
         text = textlib.replaceExcept(
             text,
@@ -1015,10 +1028,10 @@ class CosmeticChangesToolkit:
 
     def commonsfiledesc(self, text):
         """
-        Clean up file descriptions on the Wikimedia Commons.
+        Clean up file descriptions on Wikimedia Commons.
 
-        It is working according to [1] and works only on pages in the file
-        namespace on the Wikimedia Commons.
+        It works according to [1] and works only on pages in the file
+        namespace on Wikimedia Commons.
 
         [1]:
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup

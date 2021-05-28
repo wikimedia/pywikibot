@@ -53,10 +53,9 @@ from itertools import chain
 from textwrap import fill
 
 import pywikibot
-
+from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
-from pywikibot import pagegenerators, i18n, textlib
-
+from pywikibot.exceptions import Error
 from pywikibot.tools import DequeGenerator
 from pywikibot.tools.formatter import color_format
 
@@ -215,7 +214,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 self.include(pl)
                 break
             if answer == 'n':
-                excludefile.write('%s\n' % pl.title())
+                excludefile.write('{}\n'.format(pl.title()))
                 break
             if answer == 'i':
                 break
@@ -310,7 +309,7 @@ def main(*args):
 
     bot = MakeCatBot(site=mysite, summary=summary, **options)
 
-    workingcat = pywikibot.Category(mysite, '{0}{1}'
+    workingcat = pywikibot.Category(mysite, '{}{}'
                                             .format(mysite.namespaces.CATEGORY,
                                                     workingcatname))
     filename = pywikibot.config.datafilepath(
@@ -335,7 +334,7 @@ def main(*args):
     # Get parent categories in order to `removeparent`
     try:
         parentcats = workingcat.categories()
-    except pywikibot.Error:
+    except Error:
         parentcats = []
 
     # Do not include articles already in subcats; only checking direct subcats

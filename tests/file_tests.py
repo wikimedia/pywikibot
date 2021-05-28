@@ -7,13 +7,11 @@
 import os
 import re
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
+from pywikibot.exceptions import NoPageError, PageRelatedError
 from tests import join_images_path
-
 from tests.aspects import TestCase
 
 
@@ -63,8 +61,9 @@ class TestShareFiles(TestCase):
 
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
-                (r'Page \[\[(wikipedia:|)it:%s\]\] doesn\'t exist.' % title)):
+                NoPageError,
+                r'Page \[\[(wikipedia:|)it:{}\]\] doesn\'t exist.'
+                .format(title)):
             itwp_file.get()
 
     def testLocalOnly(self):
@@ -89,17 +88,17 @@ class TestShareFiles(TestCase):
         page_doesnt_exist_exc_regex = re.escape(
             "Page [[commons:{}]] doesn't exist.".format(title))
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
+                NoPageError,
                 page_doesnt_exist_exc_regex):
             commons_file.file_is_shared()
 
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
+                NoPageError,
                 page_doesnt_exist_exc_regex):
             commons_file.get_file_url()
 
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
+                NoPageError,
                 page_doesnt_exist_exc_regex):
             commons_file.get()
 
@@ -156,13 +155,13 @@ class TestFilePage(TestCase):
     cached = True
 
     def test_file_info_with_no_page(self):
-        """FilePage:latest_file_info raises NoPage for non existing pages."""
+        """FilePage:latest_file_info raises NoPageError for missing pages."""
         site = self.get_site()
         image = pywikibot.FilePage(site, 'File:NoPage')
         self.assertFalse(image.exists())
 
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
+                NoPageError,
                 (r'Page \[\[(wikipedia\:|)test:File:NoPage\]\] '
                  r"doesn't exist\.")):
             image = image.latest_file_info
@@ -173,7 +172,7 @@ class TestFilePage(TestCase):
         image = pywikibot.FilePage(site, 'File:Test with no image')
         self.assertTrue(image.exists())
         with self.assertRaisesRegex(
-                pywikibot.PageRelatedError,
+                PageRelatedError,
                 (r'loadimageinfo: Query on '
                  r'\[\[(wikipedia\:|)test:File:Test with no image\]\]'
                  r' returned no imageinfo')):
@@ -269,7 +268,7 @@ class TestFilePageDownload(TestCase):
         filename = join_images_path('Albert Einstein.jpg')
 
         with self.assertRaisesRegex(
-                pywikibot.NoPage,
+                NoPageError,
                 re.escape('Page [[commons:File:Albert Einstein.jpg '
                           "notexisting]] doesn't exist.")):
             page.download(filename)

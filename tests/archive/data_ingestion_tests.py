@@ -8,9 +8,8 @@
 import unittest
 
 from scripts import data_ingestion
-
 from tests import join_data_path, join_images_path
-from tests.aspects import TestCase, ScriptMainTestCase
+from tests.aspects import ScriptMainTestCase, TestCase
 from tests.utils import empty_sites
 
 

@@ -31,11 +31,9 @@ The following generators and filters are supported:
 #
 import pywikibot
 from pywikibot import i18n, pagegenerators
-
-from pywikibot.bot import (MultipleSitesBot, ExistingPageBot,
-                           NoRedirectPageBot)
-
+from pywikibot.bot import ExistingPageBot, MultipleSitesBot, NoRedirectPageBot
 from pywikibot.tools.formatter import color_format
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -85,7 +83,7 @@ class DashRedirectBot(
 
         # skip unchanged
         if redir.title() == origin:
-            pywikibot.output('No need to process {0}, skipping...'
+            pywikibot.output('No need to process {}, skipping...'
                              .format(redir.title()))
             # suggest -reversed parameter
             if '-' in origin and not self.opt.reversed:
@@ -94,7 +92,7 @@ class DashRedirectBot(
         else:
             # skip existing
             if redir.exists():
-                pywikibot.output('{0} already exists, skipping...'
+                pywikibot.output('{} already exists, skipping...'
                                  .format(redir.title()))
             else:
                 # confirm and save redirect

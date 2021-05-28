@@ -4,8 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot.exceptions import UnknownExtension, UserRightsError
-from pywikibot.tools import manage_wrapping, MediaWikiVersion
+from pywikibot.exceptions import UnknownExtensionError, UserRightsError
+from pywikibot.tools import MediaWikiVersion, manage_wrapping
 
 
 def must_be(group=None):
@@ -54,7 +54,7 @@ def need_extension(extension: str):
     def decorator(fn):
         def callee(self, *args, **kwargs):
             if not self.has_extension(extension):
-                raise UnknownExtension(
+                raise UnknownExtensionError(
                     'Method "{}" is not implemented without the extension {}'
                     .format(fn.__name__, extension))
             return fn(self, *args, **kwargs)
@@ -111,9 +111,9 @@ def need_version(version: str):
         def callee(self, *args, **kwargs):
             if MediaWikiVersion(self.version()) < MediaWikiVersion(version):
                 raise NotImplementedError(
-                    'Method or function "%s"\n'
-                    "isn't implemented in MediaWiki version < %s"
-                    % (fn.__name__, version))
+                    'Method or function "{}"\n'
+                    "isn't implemented in MediaWiki version < {}"
+                    .format(fn.__name__, version))
             return fn(self, *args, **kwargs)
 
         if not __debug__:

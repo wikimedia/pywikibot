@@ -1,21 +1,21 @@
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import sys
-
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.bot
-
 from pywikibot import i18n
-from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
-    unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
+    DefaultSiteTestCase,
+    SiteAttributeTestCase,
+    TestCase,
+    unittest,
 )
 
 
@@ -119,13 +119,16 @@ class TestBotTreatExit:
 
         Afterwards it calls post_treat so it's possible to do additional
         checks.
+
+        Site attributes are only present on Bot and SingleSitesBot, not
+        MultipleSitesBot.
         """
         def treat(page):
             self.assertEqual(page, next(self._page_iter))
             if self._treat_site is None:
                 self.assertFalse(hasattr(self.bot, 'site'))
                 self.assertFalse(hasattr(self.bot, '_site'))
-            else:
+            elif not isinstance(self.bot, pywikibot.bot.MultipleSitesBot):
                 self.assertIsNotNone(self.bot._site)
                 self.assertEqual(self.bot.site, self.bot._site)
                 if self._treat_site:
@@ -222,23 +225,15 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.run()
         self.assertEqual(self.bot.site, self._treat_site)
 
-    @suppress_warnings('pywikibot.bot.MultipleSitesBot.site is deprecated')
     def test_MultipleSitesBot(self):
         """Test MultipleSitesBot class."""
         # Assert no specific site
         self._treat_site = False
         self.bot = pywikibot.bot.MultipleSitesBot(generator=self._generator())
-        with self.assertRaisesRegex(AttributeError,
-                                    self.CANT_SET_ATTRIBUTE_RE):
-            self.bot.site = self.de
-        with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
-            self.bot.site
 
         self.bot.treat = self._treat(self._generator())
         self.bot.exit = self._exit(4)
         self.bot.run()
-        with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
-            self.bot.site
 
     def test_Bot(self):
         """Test normal Bot class."""
@@ -392,20 +387,6 @@ class TestOptionHandler(TestCase):
         self.assertEqual(oh.opt.baz, 'Hey')
         self.assertEqual(oh.opt['baz'], 'Hey')
         self.assertNotIn('baz', oh.opt.__dict__)
-        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
-            self.assertEqual(oh.options['baz'], 'Hey')
-
-    def test_options(self):
-        """Test deprecated option attribute."""
-        oh = self.option_handler
-        with suppress_warnings(r'pywikibot\.bot\.OptionHandler\.options'):
-            self.assertNotIn('bar', oh.options)
-            self.assertIn('baz', oh.options)
-            self.assertTrue(oh.options['baz'])
-            self.assertEqual(oh.opt['baz'], oh.options['baz'])
-            oh.options['baz'] = False
-            self.assertFalse(oh.options['baz'])
-            self.assertFalse(oh.opt.baz)
 
 
 if __name__ == '__main__':  # pragma: no cover

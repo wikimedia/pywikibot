@@ -43,13 +43,12 @@ The following parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import sys
-
 from argparse import ArgumentParser
 from collections import defaultdict
 
 import pywikibot
-
-from pywikibot import config, Page
+from pywikibot import Page, config
+from pywikibot.exceptions import IsRedirectPageError, NoPageError
 
 
 def multiple_replace(text, word_dict):
@@ -84,7 +83,7 @@ class SyncSites:
         if options.namespace and 'help' in options.namespace:
             for namespace in self.original.namespaces.values():
                 pywikibot.output(
-                    '{0} {1}'.format(namespace.id, namespace.custom_name))
+                    '{} {}'.format(namespace.id, namespace.custom_name))
             sys.exit()
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
@@ -126,7 +125,7 @@ class SyncSites:
         if self.options.namespace:
             pywikibot.output(str(self.options.namespace))
             namespaces = [int(self.options.namespace)]
-        pywikibot.output('Checking these namespaces: {0}\n'
+        pywikibot.output('Checking these namespaces: {}\n'
                          .format((namespaces,)))
 
         for ns in namespaces:
@@ -134,7 +133,7 @@ class SyncSites:
 
     def check_namespace(self, namespace):
         """Check an entire namespace."""
-        pywikibot.output('\nCHECKING NAMESPACE {0}'.format(namespace))
+        pywikibot.output('\nCHECKING NAMESPACE {}'.format(namespace))
         pages = (p.title() for p in self.original.allpages(
             '!', namespace=namespace))
         for p in pages:
@@ -142,10 +141,10 @@ class SyncSites:
                          'MediaWiki:Sitenotice', 'MediaWiki:MenuSidebar']:
                 try:
                     self.check_page(p)
-                except pywikibot.exceptions.NoPage:
-                    pywikibot.output('Bizarre NoPage exception that we are '
+                except NoPageError:
+                    pywikibot.output('Bizarre NoPageError that we are '
                                      'just going to ignore')
-                except pywikibot.exceptions.IsRedirectPage:
+                except IsRedirectPageError:
                     pywikibot.output(
                         'error: Redirectpage - todo: handle gracefully')
         pywikibot.output('')
@@ -154,7 +153,7 @@ class SyncSites:
         """Create page on wikis with overview of bot results."""
         for site in self.sites:
             sync_overview_page = Page(site,
-                                      'User:{0}/sync.py overview'
+                                      'User:{}/sync.py overview'
                                       .format(site.user()))
             output = '== Pages that differ from original ==\n\n'
             if self.differences[site]:
@@ -178,7 +177,7 @@ class SyncSites:
 
     def put_message(self, site):
         """Return synchronization message."""
-        return ('{0} replicate_wiki.py synchronization from {1}'
+        return ('{} replicate_wiki.py synchronization from {}'
                 .format(site.user(), str(self.original)))
 
     def check_page(self, pagename):
@@ -208,11 +207,11 @@ class SyncSites:
                 if txt1 != txt_new:
                     pywikibot.output(
                         'NOTE: text replaced using config.sync_replace')
-                    pywikibot.output('{0} {1} {2}'.format(txt1, txt_new, txt2))
+                    pywikibot.output('{} {} {}'.format(txt1, txt_new, txt2))
                     txt1 = txt_new
 
             if txt1 != txt2:
-                pywikibot.output('\n {0} DIFFERS'.format(site))
+                pywikibot.output('\n {} DIFFERS'.format(site))
                 self.differences[site].append(pagename)
 
             if self.options.replace:

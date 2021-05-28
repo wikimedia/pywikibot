@@ -240,13 +240,18 @@ class Namespace(Iterable, ComparableMixin):
 
         if extra:
             kwargs = ', ' + ', '.join(
-                key + '=' + repr(value) for key, value in extra)
+                key + '={!r}'.format(value) for key, value in extra)
         else:
             kwargs = ''
 
-        return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r%s)' \
-               % (self.__class__.__name__, self.id, self.custom_name,
-                  self.canonical_name, self.aliases, kwargs)
+        return '{}(id={}, custom_name={!r}, canonical_name={!r}, ' \
+               'aliases={!r}{})' \
+               .format(self.__class__.__name__,
+                       self.id,
+                       self.custom_name,
+                       self.canonical_name,
+                       self.aliases,
+                       kwargs)
 
     @staticmethod
     def default_case(id, default_case=None):
@@ -304,8 +309,6 @@ class NamespacesDict(Mapping, SelfCallMixin):
     It adds a deprecation message when called as the 'namespaces' property of
     APISite was callable.
     """
-
-    _own_desc = 'the namespaces property'
 
     def __init__(self, namespaces):
         """Create new dict using the given namespaces."""
@@ -418,8 +421,8 @@ class NamespacesDict(Mapping, SelfCallMixin):
                   for ns in identifiers]
 
         if NotImplemented in result:
-            raise TypeError('identifiers contains inappropriate types: %r'
-                            % identifiers)
+            raise TypeError('identifiers contains inappropriate types: {!r}'
+                            .format(identifiers))
 
         # Namespace.lookup_name returns None if the name is not recognised
         if None in result:

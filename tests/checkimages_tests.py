@@ -8,7 +8,6 @@
 import unittest
 
 from scripts import checkimages
-
 from tests.aspects import TestCase
 
 

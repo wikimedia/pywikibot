@@ -5,16 +5,14 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
-from pywikibot.exceptions import NoPage
-from pywikibot.flow import Board, Topic, Post
-
+from pywikibot.exceptions import NoPageError
+from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
 from tests.basepage import (
-    BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
+    BasePageMethodsTestBase,
 )
 
 
@@ -170,7 +168,7 @@ class TestFlowFactoryErrors(TestCase):
         with self.assertRaises(TypeError):
             Topic.from_topiclist_data(board,
                                       'slbktgav46omarsd', [0, 1, 2])
-        with self.assertRaises(NoPage):
+        with self.assertRaises(NoPageError):
             Topic.from_topiclist_data(board,
                                       'abc', {'stuff': 'blah'})
 
@@ -181,7 +179,7 @@ class TestFlowFactoryErrors(TestCase):
             Post.fromJSON(real_topic, 1234, {})
         with self.assertRaises(TypeError):
             Post.fromJSON(real_topic, 'abc', [])
-        with self.assertRaises(NoPage):
+        with self.assertRaises(NoPageError):
             Post.fromJSON(fake_topic, 'abc',
                           {'posts': [], 'revisions': []})
 

@@ -37,9 +37,9 @@ class WbRepresentation(abc.ABC):
         assert all(isinstance(item, str) for item in self._items)
 
         values = ((attr, getattr(self, attr)) for attr in self._items)
-        attrs = ', '.join('{0}={1}'.format(attr, value)
+        attrs = ', '.join('{}={}'.format(attr, value)
                           for attr, value in values)
-        return '{0}({1})'.format(self.__class__.__name__, attrs)
+        return '{}({})'.format(self.__class__.__name__, attrs)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

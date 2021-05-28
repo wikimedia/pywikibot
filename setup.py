@@ -35,6 +35,7 @@ import sys
 from pkg_resources import parse_version, safe_version
 from setuptools import setup
 
+
 PYTHON_VERSION = sys.version_info[:3]
 
 VERSIONS_REQUIRED_MESSAGE = """
@@ -115,17 +116,6 @@ dependencies = [
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']
-# Some of the ui_tests depend on accessing the console window's menu
-# to set the console font and copy and paste, achieved using pywinauto
-# which depends on pywin32.
-# These tests may be disabled because pywin32 depends on VC++, is time
-# consuming to build, and the console window can't be accessed during appveyor
-# builds.
-if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
-    test_deps += [
-        'pywinauto>0.6.4',
-        'pywin32>=225',
-    ]
 
 # Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.
@@ -167,7 +157,7 @@ def get_validated_version():  # pragma: no cover
 
     # validate version for sdist
     from contextlib import suppress
-    from subprocess import run, PIPE
+    from subprocess import PIPE, run
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()
@@ -223,7 +213,7 @@ def read_desc(filename):  # pragma: no cover
                     with open(include) as g:
                         desc.append(g.read())
                 else:
-                    print('Cannot include {0}; file not found'.format(include))
+                    print('Cannot include {}; file not found'.format(include))
             else:
                 desc.append(line)
     return ''.join(desc)

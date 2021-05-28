@@ -5,11 +5,9 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.page import Page, User
-
 from tests.aspects import TestCase
 
 
@@ -23,6 +21,7 @@ class TestThankRevision(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    login = True
     write = True
 
     def test_thank_revision(self):

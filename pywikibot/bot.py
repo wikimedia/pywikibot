@@ -82,6 +82,7 @@ __all__ = (
 )
 
 
+import atexit
 import codecs
 import configparser
 import datetime
@@ -93,7 +94,6 @@ import sys
 import time
 import warnings
 import webbrowser
-
 from collections.abc import Generator
 from contextlib import closing
 from importlib import import_module
@@ -103,28 +103,67 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
+from pywikibot import config, daemonize, i18n, version
 from pywikibot.backports import Dict, Iterable, List, Sequence
-from pywikibot import config2 as config
-from pywikibot import daemonize
-from pywikibot import i18n
-from pywikibot import version
 from pywikibot.bot_choice import (
-    Option, StandardOption, NestedOption, IntegerOption, ContextOption,
-    ListOption, ShowingListOption, MultipleChoiceList,
-    ShowingMultipleChoiceList, OutputProxyOption, HighlightContextOption,
-    ChoiceException, QuitKeyboardInterrupt,
-    Choice, StaticChoice, LinkChoice, AlwaysChoice
+    AlwaysChoice,
+    Choice,
+    ChoiceException,
+    ContextOption,
+    HighlightContextOption,
+    IntegerOption,
+    LinkChoice,
+    ListOption,
+    MultipleChoiceList,
+    NestedOption,
+    Option,
+    OutputProxyOption,
+    QuitKeyboardInterrupt,
+    ShowingListOption,
+    ShowingMultipleChoiceList,
+    StandardOption,
+    StaticChoice,
+    UnhandledAnswer,
 )
-from pywikibot.exceptions import UnknownFamily, UnknownSite
-from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING
-from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    LockedPageError,
+    NoPageError,
+    PageSaveRelatedError,
+    ServerError,
+    SpamblacklistError,
+    UnknownFamilyError,
+    UnknownSiteError,
+    VersionParseError,
+    WikiBaseError,
+)
 from pywikibot.logging import (
+    CRITICAL,
+    DEBUG,
+    ERROR,
+    INFO,
+    INPUT,
+    STDOUT,
+    VERBOSE,
+    WARNING,
     add_init_routine,
-    critical, debug, error, exception, log, output, stdout, warning,
+    critical,
+    debug,
+    error,
+    exception,
+    log,
+    output,
+    stdout,
+    warning,
 )
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    PYTHON_VERSION, suppress_warnings
+    PYTHON_VERSION,
+    deprecate_arg,
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+    suppress_warnings,
 )
 from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
 from pywikibot.tools.formatter import color_format
@@ -135,10 +174,10 @@ _logger = 'bot'
 
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
-uiModule = __import__('pywikibot.userinterfaces.%s_interface'
-                      % config.userinterface,
-                      fromlist=['UI'])
+uiModule = __import__('pywikibot.userinterfaces.{}_interface'
+                      .format(config.userinterface), fromlist=['UI'])
 ui = uiModule.UI()
+atexit.register(ui.flush)
 pywikibot.argvu = ui.argvu()
 
 _GLOBAL_HELP = """
@@ -215,15 +254,6 @@ For global options use -help:global or run pwb.py -help
 """
 
 
-class UnhandledAnswer(Exception):
-
-    """The given answer didn't suffice."""
-
-    def __init__(self, stop=False):
-        """Initializer."""
-        self.stop = stop
-
-
 # Initialize the handlers and formatters for the logging system.
 #
 # This relies on the global variable 'ui' which is a UserInterface object
@@ -273,6 +303,9 @@ def init_handlers(strm=None):
     Accordingly, do **not** use print statements in bot code; instead,
     use pywikibot.output function.
 
+    *New in version 6.2:* different logfiles are uses if multiple
+    processes of the same script are are running.
+
     @param strm: Output stream. If None, re-uses the last stream if one
         was defined, otherwise uses sys.stderr
 
@@ -316,10 +349,19 @@ def init_handlers(strm=None):
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
+        # get PID
+        throttle = pywikibot.Site().throttle  # initialize a Throttle object
+        pid = throttle.get_pid(module_name)  # get the global PID if needed
+        pid = str(pid) + '-' if pid > 1 else ''
+
         if config.logfilename:
+            # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
         else:
-            logfile = config.datafilepath('logs', '%s-bot.log' % module_name)
+            # add PID to logfle name
+            logfile = config.datafilepath('logs', '{}-{}bot.log'
+                                          .format(module_name, pid))
+
         file_handler = RotatingFileHandler(filename=logfile,
                                            maxBytes=1024 * config.logfilesize,
                                            backupCount=config.logfilecount,
@@ -370,7 +412,7 @@ def writelogheader():
     try:
         log('VERSION: {}'.format(
             version.getversion(online=config.log_pywiki_repo_version).strip()))
-    except version.ParseError:
+    except VersionParseError:
         exception()
 
     # system
@@ -378,7 +420,7 @@ def writelogheader():
         log('SYSTEM: {}'.format(os.uname()))
 
     # config file dir
-    log('CONFIG FILE DIR: {}'.format(pywikibot.config2.base_dir))
+    log('CONFIG FILE DIR: {}'.format(pywikibot.config.base_dir))
 
     all_modules = sys.modules.keys()
 
@@ -416,8 +458,7 @@ def writelogheader():
             param['timespec'] = 'seconds'
         mtime = version.get_module_mtime(module).isoformat(**param)
 
-        log('  {} {}'
-            .format(mtime, filename))
+        log('  {} {}'.format(mtime, filename))
 
     if config.log_pywiki_repo_version:
         log('PYWIKI REPO VERSION: {}'.format(version.getversion_onlinerepo()))
@@ -616,8 +657,8 @@ class InteractiveReplace:
         for c in self.choices:
             if c.shortcut == choice:
                 return c.handle()
-        else:
-            raise ValueError('Invalid choice "{0}"'.format(choice))
+
+        raise ValueError('Invalid choice "{}"'.format(choice))
 
     def __call__(self, link, text, groups, rng):
         """Ask user how the selected link should be replaced."""
@@ -781,8 +822,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
             config.log = []
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = not config.cosmetic_changes
-            output('NOTE: option cosmetic_changes is %s\n'
-                   % config.cosmetic_changes)
+            output('NOTE: option cosmetic_changes is {}\n'
+                   .format(config.cosmetic_changes))
         elif option == '-simulate':
             config.simulate = value or True
         #
@@ -836,7 +877,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
     if calledModuleName() != 'generate_user_files':  # T261771
         try:
             pywikibot.Site()
-        except (UnknownFamily, UnknownSite):
+        except (UnknownFamilyError, UnknownSiteError):
             pywikibot.exception()
             sys.exit(1)
 
@@ -858,7 +899,10 @@ def handle_args(args: Optional[Iterable[str]] = None,
 
 
 def show_help(module_name=None, show_global=False):
-    """Show help for the Bot."""
+    """Show help for the Bot.
+
+    *Renamed in version 4.0.*
+    """
     if not module_name:
         module_name = calledModuleName()
     if not module_name:
@@ -953,7 +997,7 @@ def writeToCommandLogFile():
     """
     modname = calledModuleName()
     # put quotation marks around all parameters
-    args = [modname] + ['"%s"' % s for s in pywikibot.argvu[1:]]
+    args = [modname] + ['"{}"'.format(s) for s in pywikibot.argvu[1:]]
     command_log_filename = config.datafilepath('logs', 'commands.log')
     try:
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
@@ -979,16 +1023,18 @@ def open_webbrowser(page):
 
 class _OptionDict(dict):
 
-    """The option dict which holds the options of OptionHandler."""
+    """The option dict which holds the options of OptionHandler.
+
+    *New in version 4.1.*
+    """
 
     def __init__(self, classname, options):
         self._classname = classname
-        self._options = {}
         super().__init__(options)
 
     def __missing__(self, key):
-        raise pywikibot.Error("'{}' is not a valid option for {}."
-                              .format(key, self._classname))
+        raise Error("'{}' is not a valid option for {}."
+                    .format(key, self._classname))
 
     def __getattr__(self, name):
         """Get item from dict."""
@@ -996,25 +1042,10 @@ class _OptionDict(dict):
 
     def __setattr__(self, name, value):
         """Set item or attribute."""
-        if name not in ('_classname', '_options'):
+        if name != '_classname':
             self.__setitem__(name, value)
         else:
             super().__setattr__(name, value)
-
-    def __getitem__(self, key):
-        """Update options fro backward compatibility and get item."""
-        self.update_options()
-        return super().__getitem__(key)
-
-    def __setitem__(self, key, value):
-        """Set item in dict and deprecated option dict."""
-        if key in self._options:
-            self._options[key] = value
-        super().__setitem__(key, value)
-
-    def update_options(self):
-        """Update dict from deprecated options for backward compatibility."""
-        self.update(self._options)
 
 
 _DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
@@ -1079,12 +1110,12 @@ class OptionHandler:
         self.set_options(**kwargs)
 
     @property
-    @deprecated('available_options', since='20201006')
+    @deprecated('available_options', since='20201006', future_warning=True)
     def availableOptions(self):
         """DEPRECATED. Available_options class property."""
         return self.available_options
 
-    @deprecated('set_options', since='20201006')
+    @deprecated('set_options', since='20201006', future_warning=True)
     def setOptions(self, **kwargs):  # pragma: no cover
         """DEPRECATED. Set the instance options."""
         self.set_options(**kwargs)
@@ -1093,12 +1124,12 @@ class OptionHandler:
         """Set the instance options."""
         warning = 'pywikibot.bot.OptionHandler.availableOptions'
         with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
-                               category=DeprecationWarning):
+                               category=FutureWarning):
             old_options = self.availableOptions is not self.available_options
         if old_options:  # old options were set and not updated
             self.available_options = self.availableOptions
             issue_deprecation_warning(warning, 'available_options',
-                                      since='20201006')
+                                      since='20201006', future_warning=True)
 
         valid_options = set(self.available_options)
         received_options = set(options)
@@ -1114,7 +1145,7 @@ class OptionHandler:
             pywikibot.warning('{} is not a valid option. It was ignored.'
                               .format(opt))
 
-    @deprecated(_DEPRECATION_MSG, since='20201006')
+    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
     def getOption(self, option):  # pragma: no cover
         """DEPRECATED. Get the current value of an option.
 
@@ -1123,25 +1154,6 @@ class OptionHandler:
             option parameter
         """
         return self.opt[option]
-
-    @property
-    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self):  # pragma: no cover
-        """DEPRECATED. Return changed options."""
-        return self.opt._options
-
-    @options.setter
-    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
-    def options(self, options):  # pragma: no cover
-        """DEPRECATED. Return changed options."""
-        self.set_options(**options)
-
-    def __getattribute__(self, name):
-        """Update options for backward compatibility of options property."""
-        attr = super().__getattribute__(name)
-        if name == 'opt':
-            attr.update_options()
-        return attr
 
 
 class BaseBot(OptionHandler):
@@ -1218,7 +1230,7 @@ class BaseBot(OptionHandler):
         """
         if page != self._current_page:
             self._current_page = page
-            msg = 'Working on %r' % page.title()
+            msg = 'Working on {!r}'.format(page.title())
             if config.colorized_output:
                 log(msg)
                 stdout(color_format('\n\n>>> {lightpurple}{0}{default} <<<',
@@ -1276,8 +1288,8 @@ class BaseBot(OptionHandler):
         @rtype: bool
         """
         if oldtext.rstrip() == newtext.rstrip():
-            pywikibot.output('No changes were needed on %s'
-                             % page.title(as_link=True))
+            pywikibot.output('No changes were needed on {}'
+                             .format(page.title(as_link=True)))
             return False
 
         self.current_page = page
@@ -1288,7 +1300,7 @@ class BaseBot(OptionHandler):
             pywikibot.showDiff(oldtext, newtext)
 
         if 'summary' in kwargs:
-            pywikibot.output('Edit summary: %s' % kwargs['summary'])
+            pywikibot.output('Edit summary: {}'.format(kwargs['summary']))
 
         page.text = newtext
         return self._save_page(page, page.save, **kwargs)
@@ -1323,35 +1335,33 @@ class BaseBot(OptionHandler):
         try:
             func(*args, **kwargs)
             self._save_counter += 1
-        except pywikibot.PageSaveRelatedError as e:
+        except PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
-            if isinstance(e, pywikibot.EditConflict):
-                pywikibot.output('Skipping %s because of edit conflict'
-                                 % page.title())
-            elif isinstance(e, pywikibot.SpamblacklistError):
-                pywikibot.output(
-                    'Cannot change %s because of blacklist entry %s'
-                    % (page.title(), e.url))
-            elif isinstance(e, pywikibot.LockedPage):
-                pywikibot.output('Skipping %s (locked page)'
-                                 % page.title())
+            if isinstance(e, EditConflictError):
+                pywikibot.output('Skipping {} because of edit conflict'
+                                 .format(page.title()))
+            elif isinstance(e, SpamblacklistError):
+                pywikibot.output('Cannot change {} because of blacklist '
+                                 'entry {}'.format(page.title(), e.url))
+            elif isinstance(e, LockedPageError):
+                pywikibot.output('Skipping {} (locked page)'
+                                 .format(page.title()))
             else:
-                pywikibot.error(
-                    'Skipping %s because of a save related error: %s'
-                    % (page.title(), e))
-        except pywikibot.ServerError as e:
+                pywikibot.error('Skipping {} because of a save related '
+                                'error: {}'.format(page.title(), e))
+        except ServerError as e:
             if not ignore_server_errors:
                 raise
-            pywikibot.error('Server Error while processing %s: %s'
-                            % (page.title(), e))
+            pywikibot.error('Server Error while processing {}: {}'
+                            .format(page.title(), e))
         else:
             return True
         return False
 
     @deprecated('generator.close()', since='20200804')
     def stop(self):  # pragma: no cover
-        """Stop iterating."""
+        """DEPRECATED. Stop iterating."""
         pywikibot.output('Generator has been stopped.')
         self.generator.close()
 
@@ -1427,6 +1437,8 @@ class BaseBot(OptionHandler):
     def skip_page(self, page):
         """Return whether treat should be skipped for the page.
 
+        *New in version 3.0.*
+
         @param page: Page object to be processed
         @type page: pywikibot.Page
         """
@@ -1438,8 +1450,8 @@ class BaseBot(OptionHandler):
         @param page: Page object to be processed
         @type page: pywikibot.Page
         """
-        raise NotImplementedError('Method %s.treat() not implemented.'
-                                  % self.__class__.__name__)
+        raise NotImplementedError('Method {}.treat() not implemented.'
+                                  .format(self.__class__.__name__))
 
     def setup(self):
         """Some initial setup before run operation starts.
@@ -1447,12 +1459,15 @@ class BaseBot(OptionHandler):
         This can be used for reading huge parts from life wiki or file
         operation which is more than just initialize the instance.
         Invoked by run() before running through generator loop.
+
+        *New in version 3.0.*
         """
-        pass
 
     def teardown(self):
-        """Some cleanups after run operation. Invoked by exit()."""
-        pass
+        """Some cleanups after run operation. Invoked by exit().
+
+        *New in version 3.0.*
+        """
 
     def run(self):
         """Process all pages in generator.
@@ -1494,17 +1509,17 @@ class BaseBot(OptionHandler):
                 # Process the page
                 self.treat(page)
                 self._treat_counter += 1
-            else:
-                self._generator_completed = True
+
+            self._generator_completed = True
         except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nUser quit {} bot run...'
+                             .format(self.__class__.__name__))
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nKeyboardInterrupt during {} bot run...'
+                             .format(self.__class__.__name__))
         finally:
             self.exit()
 
@@ -1539,7 +1554,7 @@ class Bot(BaseBot):
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
             self.site = pywikibot.Site()
-            warning('Using the default site: %s' % self.site)
+            warning('Using the default site: {}'.format(self.site))
         return self._site
 
     @site.setter
@@ -1575,12 +1590,12 @@ class Bot(BaseBot):
         # set self.site in __init__, and use page.site in treat().
         self._auto_update_site = not self._site
         if not self._auto_update_site:
-            warning(
-                '%s.__init__ set the Bot.site property; this is only needed '
-                'when the Bot accesses many sites.' % self.__class__.__name__)
+            warning('{}.__init__ set the Bot.site property; this is only '
+                    'needed when the Bot accesses many sites.'
+                    .format(self.__class__.__name__))
         else:
-            log('Bot is managing the %s.site property in run()'
-                % self.__class__.__name__)
+            log('Bot is managing the {}.site property in run()'
+                .format(self.__class__.__name__))
         super().run()
 
     def init_page(self, item):
@@ -1634,8 +1649,8 @@ class SingleSiteBot(BaseBot):
             if self._site == value:
                 pywikibot.warning('Defined site without changing it.')
             else:
-                pywikibot.warning('Changed the site from "{0}" to '
-                                  '"{1}"'.format(self._site, value))
+                pywikibot.warning('Changed the site from "{}" to '
+                                  '"{}"'.format(self._site, value))
         self._site = value
 
     def init_page(self, item):
@@ -1663,38 +1678,9 @@ class MultipleSitesBot(BaseBot):
 
     The bot should accommodate for that case and not store site specific
     information on only one site.
+
+    *New in version 6.2:* site attribute has been dropped.
     """
-
-    def __init__(self, **kwargs):
-        """Initializer."""
-        self._site = None
-        super().__init__(**kwargs)
-
-    @property
-    @deprecated("the page's site property", since='20150615',
-                future_warning=True)
-    def site(self):
-        """
-        Return the site if it's set and ValueError otherwise.
-
-        The site is only defined while in treat and it is preferred to use
-        the page's site instead.
-        """
-        if self._site is None:
-            raise ValueError('Requesting the site not while in treat is not '
-                             'allowed.')
-        return self._site
-
-    def run(self):
-        """Reset the bot's site after run."""
-        super().run()
-        self._site = None
-
-    def init_page(self, item):
-        """Define the site for this page."""
-        page = super().init_page(item)
-        self._site = page.site
-        return page
 
 
 class ConfigParserBot(BaseBot):
@@ -1704,20 +1690,22 @@ class ConfigParserBot(BaseBot):
     All options must be predefined in available_options dictionary. The type
     of these options is responsible for the correct interpretation of the
     options type given by the .ini file. They can be interpreted as bool,
-    int, float or str (default). The settings file may be like:
+    int, float or str (default). The settings file may be like::
 
-    [add_text]
-    # edit summary for the bot.
-    summary = Bot: Aggiungo template Categorizzare
+        [add_text]
+        # edit summary for the bot.
+        summary = Bot: Aggiungo template Categorizzare
 
-    [shell] ; Shell options
-    always: true
+        [shell] ; Shell options
+        always: true
 
     The option values are interpreted in this order::
 
-    - available_options default setting
-    - script.ini options settings
+    - `available_options` default setting
+    - `script.ini options` settings
     - command line arguments
+
+    *New in version 3.0.*
     """
 
     INI = 'scripts.ini'
@@ -1765,8 +1753,8 @@ class CurrentPageBot(BaseBot):
 
     def treat_page(self):
         """Process one page (Abstract method)."""
-        raise NotImplementedError('Method %s.treat_page() not implemented.'
-                                  % self.__class__.__name__)
+        raise NotImplementedError('Method {}.treat_page() not implemented.'
+                                  .format(self.__class__.__name__))
 
     def treat(self, page):
         """Set page to current page and treat that page."""
@@ -1828,8 +1816,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
             summary = i18n.twtranslate(self.current_page.site,
                                        self.summary_key,
                                        self.summary_parameters)
-            pywikibot.log(
-                'Use automatic summary message "{0}"'.format(summary))
+            pywikibot.log('Use automatic summary message "{}"'.format(summary))
             kwargs['summary'] = summary
         super().put_current(*args, **kwargs)
 
@@ -1839,11 +1826,10 @@ class ExistingPageBot(CurrentPageBot):
     """A CurrentPageBot class which only treats existing pages."""
 
     def skip_page(self, page):
-        """Treat page if it exists and handle NoPage from it."""
+        """Treat page if it exists and handle NoPageError."""
         if not page.exists():
-            pywikibot.warning(
-                'Page {page} does not exist on {page.site}.'
-                .format(page=page))
+            pywikibot.warning('Page {page} does not exist on {page.site}.'
+                              .format(page=page))
             return True
         return super().skip_page(page)
 
@@ -1866,9 +1852,8 @@ class CreatingPageBot(CurrentPageBot):
     def skip_page(self, page):
         """Treat page if doesn't exist."""
         if page.exists():
-            pywikibot.warning(
-                'Page {page} does already exist on {page.site}.'
-                .format(page=page))
+            pywikibot.warning('Page {page} does already exist on {page.site}.'
+                              .format(page=page))
             return True
         return super().skip_page(page)
 
@@ -1878,7 +1863,7 @@ class RedirectPageBot(CurrentPageBot):
     """A RedirectPageBot class which only treats redirects."""
 
     def skip_page(self, page):
-        """Treat only redirect pages and handle IsNotRedirectPage from it."""
+        """Treat only redirect pages and handle IsNotRedirectPageError."""
         if not page.isRedirectPage():
             pywikibot.warning(
                 'Page {page} on {page.site} is skipped because it is '
@@ -1892,7 +1877,7 @@ class NoRedirectPageBot(CurrentPageBot):
     """A NoRedirectPageBot class which only treats non-redirects."""
 
     def skip_page(self, page):
-        """Treat only non-redirect pages and handle IsRedirectPage from it."""
+        """Treat only non-redirect pages and handle IsRedirectPageError."""
         if page.isRedirectPage():
             pywikibot.warning(
                 'Page {page} on {page.site} is skipped because it is '
@@ -1931,7 +1916,7 @@ class WikidataBot(Bot, ExistingPageBot):
     use_from_page = True
     treat_missing_item = False
 
-    @deprecated_args(use_from_page=None)
+    @deprecated_args(use_from_page=True)
     def __init__(self, **kwargs):
         """Initializer of the WikidataBot."""
         self.create_missing_item = False
@@ -1939,8 +1924,8 @@ class WikidataBot(Bot, ExistingPageBot):
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
         if self.repo is None:
-            raise pywikibot.exceptions.WikiBaseError(
-                '%s is not connected to a data repository' % self.site)
+            raise WikiBaseError(
+                '{} is not connected to a data repository'.format(self.site))
 
     def cacheSources(self):
         """
@@ -1970,12 +1955,12 @@ class WikidataBot(Bot, ExistingPageBot):
         for page in self.site.search(property_name, total=1, namespaces=ns):
             page = pywikibot.PropertyPage(self.site.data_repository(),
                                           page.title())
-            pywikibot.output('Assuming that %s property is %s.' %
-                             (property_name, page.id))
+            pywikibot.output('Assuming that {} property is {}.'
+                             .format(property_name, page.id))
             return page.id
-        return pywikibot.input('Property %s was not found. Please enter the '
+        return pywikibot.input('Property {} was not found. Please enter the '
                                'property ID (e.g. P123) of it:'
-                               % property_name).upper()
+                               .format(property_name).upper())
 
     def user_edit_entity(self, entity, data=None,
                          ignore_save_related_errors=None,
@@ -2014,7 +1999,7 @@ class WikidataBot(Bot, ExistingPageBot):
             pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
-            pywikibot.output('Change summary: %s' % kwargs['summary'])
+            pywikibot.output('Change summary: {}'.format(kwargs['summary']))
 
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
@@ -2051,8 +2036,8 @@ class WikidataBot(Bot, ExistingPageBot):
             if sourceclaim:
                 claim.addSource(sourceclaim)
 
-        pywikibot.output('Adding %s --> %s' % (claim.getID(),
-                                               claim.getTarget()))
+        pywikibot.output('Adding {} --> {}'.format(claim.getID(),
+                                                   claim.getTarget()))
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
     def getSource(self, site):
@@ -2093,8 +2078,8 @@ class WikidataBot(Bot, ExistingPageBot):
             # If claim with same property already exists...
             if 'p' not in exists_arg:
                 logger_callback(
-                    'Skipping %s because claim with same property '
-                    'already exists' % (claim.getID(),))
+                    'Skipping {} because claim with same property '
+                    'already exists'.format(claim.getID()))
                 log('Use -exists:p option to override this behavior')
                 break
 
@@ -2107,22 +2092,22 @@ class WikidataBot(Bot, ExistingPageBot):
             # 'exists' argument overrides it.
             if 't' not in exists_arg:
                 logger_callback(
-                    'Skipping %s because claim with same target already exists'
-                    % (claim.getID(),))
+                    'Skipping {} because claim with same target already exists'
+                    .format(claim.getID()))
                 log("Append 't' to -exists argument to override this behavior")
                 break
 
             if 'q' not in exists_arg and not existing.qualifiers:
                 logger_callback(
-                    'Skipping %s because claim without qualifiers already '
-                    'exists' % (claim.getID(),))
+                    'Skipping {} because claim without qualifiers already '
+                    'exists'.format(claim.getID()))
                 log("Append 'q' to -exists argument to override this behavior")
                 break
 
             if ('s' not in exists_arg or not source) and not existing.sources:
                 logger_callback(
-                    'Skipping %s because claim without source already exists'
-                    % (claim.getID(),))
+                    'Skipping {} because claim without source already exists'
+                    .format(claim.getID(),))
                 log("Append 's' to -exists argument to override this behavior")
                 break
 
@@ -2132,8 +2117,8 @@ class WikidataBot(Bot, ExistingPageBot):
                                 for snak in ref[source.getID()])
                         for ref in existing.sources)):
                 logger_callback(
-                    'Skipping %s because claim with the same source already '
-                    'exists' % (claim.getID(),))
+                    'Skipping {} because claim with the same source already '
+                    'exists'.format(claim.getID()))
                 log("Append 's' to -exists argument to override this behavior")
                 break
         else:
@@ -2157,8 +2142,8 @@ class WikidataBot(Bot, ExistingPageBot):
         """
         if not summary:
             # FIXME: i18n
-            summary = ('Bot: New item with sitelink from %s'
-                       % page.title(as_link=True, insite=self.repo))
+            summary = 'Bot: New item with sitelink from {}'.format(
+                      page.title(as_link=True, insite=self.repo))
 
         if data is None:
             data = {}
@@ -2174,7 +2159,7 @@ class WikidataBot(Bot, ExistingPageBot):
                 'value': page.title(without_brackets=page.namespace() == 0)
             }
         })
-        pywikibot.output('Creating item for %s...' % page)
+        pywikibot.output('Creating item for {}...'.format(page))
         item = pywikibot.ItemPage(page.site.data_repository())
         kwargs.setdefault('show_diff', False)
         result = self.user_edit_entity(item, data, summary=summary, **kwargs)
@@ -2188,7 +2173,7 @@ class WikidataBot(Bot, ExistingPageBot):
         if self.use_from_page is True:
             try:
                 item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
+            except NoPageError:
                 item = None
         else:
             if isinstance(page, pywikibot.ItemPage):
@@ -2209,10 +2194,10 @@ class WikidataBot(Bot, ExistingPageBot):
                 else:
                     try:
                         item = pywikibot.ItemPage.fromPage(page)
-                    except pywikibot.NoPage:
+                    except NoPageError:
                         item = None
                     if self.use_from_page is False:
-                        pywikibot.error('{0} is not in the item namespace but '
+                        pywikibot.error('{} is not in the item namespace but '
                                         'must be an item.'.format(page))
                         return
 
@@ -2220,7 +2205,7 @@ class WikidataBot(Bot, ExistingPageBot):
             item = self.create_item_for_page(page, asynchronous=False)
 
         if not item and not self.treat_missing_item:
-            pywikibot.output("%s doesn't have a Wikidata item." % page)
+            pywikibot.output("{} doesn't have a Wikidata item.".format(page))
             return
 
         self.treat_page_and_item(page, item)
@@ -2231,5 +2216,6 @@ class WikidataBot(Bot, ExistingPageBot):
 
         Must be implemented in subclasses.
         """
-        raise NotImplementedError('Method %s.treat_page_and_item() not '
-                                  'implemented.' % self.__class__.__name__)
+        raise NotImplementedError('Method {}.treat_page_and_item() not '
+                                  'implemented.'
+                                  .format(self.__class__.__name__))

@@ -26,15 +26,14 @@ import base64
 import hashlib
 import io
 import re
-
 from contextlib import suppress
 from urllib.parse import urlencode
 
 import pywikibot
+from pywikibot import config, textlib
 from pywikibot.comms.http import fetch
-from pywikibot import config2 as config
 from pywikibot.specialbots import UploadRobot
-from pywikibot import textlib
+
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
@@ -42,7 +41,7 @@ except ImportError as _tk_error:
     Tkdialog = _tk_error
 
 try:
-    import flickrapi  # see: https://stuvel.eu/software/flickrapi/
+    import flickrapi
 except ImportError as e:
     flickrapi = e
 
@@ -151,7 +150,7 @@ def getFlinfoDescription(photo_id):
     parameters = urlencode({'id': photo_id, 'raw': 'on'})
 
     return fetch(
-        'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).text
+        'http://wikipedia.ramselehof.de/flinfo.php?{}'.format(parameters)).text
 
 
 def getFilename(photoInfo, site=None, project='Flickr', photo_url=None):

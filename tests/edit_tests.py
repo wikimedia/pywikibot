@@ -6,16 +6,14 @@
 #
 import time
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
-from pywikibot import config
-from pywikibot import page_put_queue
-
+from pywikibot import config, page_put_queue
+from pywikibot.exceptions import Error
 from tests.aspects import TestCase
 from tests.oauth_tests import OAuthSiteTestCase
+
 
 called_back = False
 
@@ -150,7 +148,7 @@ class TestSiteMergeHistory(TestCase):
         for params, error_msg in test_errors:
             try:
                 site.merge_history(**params)
-            except pywikibot.Error as err:
+            except Error as err:
                 self.assertEqual(str(err), error_msg)
 
     def test_merge_history(self):

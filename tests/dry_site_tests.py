@@ -7,9 +7,7 @@
 import unittest
 
 import pywikibot
-
 from pywikibot.comms.http import user_agent
-
 from tests.aspects import DefaultDrySiteTestCase
 
 

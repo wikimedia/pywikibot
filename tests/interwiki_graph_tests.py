@@ -6,12 +6,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot import interwiki_graph
-
-from tests.aspects import require_modules, SiteAttributeTestCase
+from tests.aspects import SiteAttributeTestCase, require_modules
 from tests.utils import DryPage
 
 

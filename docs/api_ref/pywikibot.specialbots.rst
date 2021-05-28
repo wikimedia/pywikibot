@@ -1,4 +1,4 @@
-pywikibot.specialbots package
-=============================
+specialbots package
+===================
 
 .. automodule:: pywikibot.specialbots

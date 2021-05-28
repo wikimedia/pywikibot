@@ -43,10 +43,9 @@ The following command line parameters are supported:
 from typing import Optional
 
 import pywikibot
-
-from pywikibot import pagegenerators, WikidataBot
+from pywikibot import WikidataBot, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.exceptions import CoordinateGlobeUnknownException
+from pywikibot.exceptions import CoordinateGlobeUnknownError
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -141,7 +140,7 @@ class CoordImportRobot(WikidataBot):
         # todo: handle exceptions using self.user_add_claim
         try:
             item.addClaim(newclaim)
-        except CoordinateGlobeUnknownException as e:
+        except CoordinateGlobeUnknownError as e:
             pywikibot.output('Skipping unsupported globe: {}'.format(e.args))
             return False
         else:

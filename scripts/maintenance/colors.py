@@ -6,9 +6,8 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.tools.formatter import color_format
 from pywikibot.tools import itergroup
+from pywikibot.tools.formatter import color_format
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -36,7 +35,7 @@ def main():
                                      fg_col.ljust(max_len_fg_colors),
                                      color='{};{}'.format(fg_col, bg_col))
 
-            line = '{0} {1}'.format(bg_col.ljust(max_len_bc_color), line)
+            line = '{} {}'.format(bg_col.ljust(max_len_bc_color), line)
             pywikibot.output(line)
 
         pywikibot.output('')

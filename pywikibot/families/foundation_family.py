@@ -1,4 +1,7 @@
-"""Family module for Foundation wiki."""
+"""Family module for Foundation wiki.
+
+*New in version 3.0.*
+"""
 #
 # (C) Pywikibot team, 2019-2020
 #

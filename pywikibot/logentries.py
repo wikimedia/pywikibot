@@ -9,10 +9,8 @@ from contextlib import suppress
 from typing import Optional
 
 import pywikibot
-
 from pywikibot.backports import List
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated
 
 
 _logger = 'wiki'
@@ -41,8 +39,8 @@ class LogEntry(UserDict):
         self.site = site
         expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
-            raise Error('Wrong log type! Expecting %s, received %s instead.'
-                        % (expected_type, self.type()))
+            raise Error('Wrong log type! Expecting {}, received {} instead.'
+                        .format(expected_type, self.type()))
 
     def __missing__(self, key: str):
         """Debug when the key is missing.
@@ -52,7 +50,7 @@ class LogEntry(UserDict):
 
         It also logs debugging information when a key is missing.
         """
-        pywikibot.debug('API log entry received:\n' + repr(self),
+        pywikibot.debug('API log entry received:\n{!r}'.format(self),
                         _logger)
         hidden = {'action', 'logpage', 'ns', 'pageid', 'params', 'title'}
         if ((key in hidden and 'actionhidden' in self)
@@ -67,8 +65,8 @@ class LogEntry(UserDict):
 
     def __repr__(self) -> str:
         """Return a string representation of LogEntry object."""
-        return '<{0}({1}, logid={2})>'.format(type(self).__name__,
-                                              self.site.sitename, self.logid())
+        return '<{}({}, logid={})>'.format(type(self).__name__,
+                                           self.site.sitename, self.logid())
 
     def __hash__(self):
         """Combine site and logid as the hash."""
@@ -77,7 +75,7 @@ class LogEntry(UserDict):
     def __eq__(self, other) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
-            pywikibot.debug("'{0}' cannot be compared with '{1}'"
+            pywikibot.debug("'{}' cannot be compared with '{}'"
                             .format(type(self).__name__, type(other).__name__),
                             _logger)
             return False
@@ -103,16 +101,6 @@ class LogEntry(UserDict):
 
         return self[self._expected_type]
 
-    @deprecated('page()', since='20150617', future_warning=True)
-    def title(self):
-        """
-        DEPRECATED: Alias for page().
-
-        This is going to be replaced by just returning the title as a string
-        instead of a Page instance.
-        """
-        return self.page()
-
     def page(self):
         """
         Page on which action was performed.
@@ -135,8 +123,6 @@ class LogEntry(UserDict):
 class OtherLogEntry(LogEntry):
 
     """A log entry class for unspecified log events."""
-
-    pass
 
 
 class UserTargetLogEntry(LogEntry):
@@ -444,7 +430,7 @@ class LogEntryFactory:
         try:
             logtype = logdata['type']
         except KeyError:
-            pywikibot.debug('API log entry received:\n{0}'.format(logdata),
+            pywikibot.debug('API log entry received:\n{}'.format(logdata),
                             _logger)
             raise Error("Log entry has no 'type' key")
 

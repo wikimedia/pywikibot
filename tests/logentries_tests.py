@@ -6,20 +6,18 @@
 #
 import datetime
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
-from pywikibot.exceptions import HiddenKeyError
+from pywikibot.exceptions import HiddenKeyError, NoMoveTargetError
 from pywikibot.family import AutoFamily
 from pywikibot.logentries import (
-    LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
-
-from tests import unittest_print
-from tests.aspects import (
-    MetaTestCaseClass, TestCase, DeprecationTestCase
+    LogEntryFactory,
+    OtherLogEntry,
+    UserTargetLogEntry,
 )
+from tests import unittest_print
+from tests.aspects import MetaTestCaseClass, TestCase
 
 
 class TestLogentriesBase(TestCase):
@@ -164,8 +162,6 @@ class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
 
     """Test general LogEntry properties."""
 
-    pass
-
 
 class TestSimpleLogentries(TestLogentriesBase):
 
@@ -185,7 +181,7 @@ class TestSimpleLogentries(TestLogentriesBase):
                 self._test_logevent(simple_type)
             except StopIteration:
                 unittest_print(
-                    'Unable to test "{0}" on "{1}" because there are no log '
+                    'Unable to test "{}" on "{}" because there are no log '
                     'entries with that type.'.format(simple_type, key))
 
 
@@ -252,13 +248,13 @@ class TestLogentryParams(TestLogentriesBase):
     def test_moved_target_fail_old(self):
         """Test moved_target method failing on older wiki."""
         site = self.get_site('old')
-        with self.assertRaises(pywikibot.NoMoveTarget):
+        with self.assertRaises(NoMoveTargetError):
             self.get_mainpage(site).moved_target()
 
     def test_moved_target_fail_de(self):
         """Test moved_target method failing on de-wiki."""
         page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
-        with self.assertRaises(pywikibot.NoMoveTarget):
+        with self.assertRaises(NoMoveTargetError):
             page.moved_target()
 
     def test_thanks_page(self, key):
@@ -286,26 +282,6 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(le4, OtherLogEntry)
         self.assertIsInstance(le5, OtherLogEntry)
         self.assertEqual(type(le4), type(le5))
-
-
-class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
-
-    """Test cases for deprecated logentry methods."""
-
-    def test_logentry_title(self, key):
-        """Test title and page return the same instance."""
-        # Request multiple log entries in the hope that one might have no
-        # title entry
-        self._do_test_warning_filename = False  # T271044
-        for logentry in self.site.logevents(total=5):
-            if 'title' in logentry.data:  # title may be missing
-                self.assertIsInstance(logentry.title(), pywikibot.Page)
-                self.assertIs(logentry.title(), logentry.page())
-            else:
-                with self.assertRaises(KeyError):
-                    logentry.title()
-            self.assertDeprecation()  # T271044
-        self._reset_messages()  # T271044
 
 
 if __name__ == '__main__':  # pragma: no cover

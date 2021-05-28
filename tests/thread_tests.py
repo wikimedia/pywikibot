@@ -5,13 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from collections import Counter
 from contextlib import suppress
 
-from tests.aspects import TestCase
-
 from pywikibot.tools import ThreadedGenerator, intersect_generators
+from tests.aspects import TestCase
 
 
 class BasicThreadedGeneratorTestCase(TestCase):
@@ -27,7 +25,8 @@ class BasicThreadedGeneratorTestCase(TestCase):
         thd_gen.start()
         self.assertEqual(list(thd_gen), list(iterable))
 
-    def gen_func(self):
+    @staticmethod
+    def gen_func():
         """Helper method for generator test."""
         iterable = 'abcd'
         yield from iterable

@@ -17,7 +17,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | bot_choice.py              | Classes for input_choice                             |
     +----------------------------+------------------------------------------------------+
-    | config2.py                 | Module to define and load Pywikibot configuration    |
+    | config.py                  | Module to define and load Pywikibot configuration    |
     +----------------------------+------------------------------------------------------+
     | cosmetic_changes.py        | Slight modifications to a wiki page's source code    |
     +----------------------------+------------------------------------------------------+
@@ -47,7 +47,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | interwiki_graph.py         | Possible create graph with interwiki.py script       |
     +----------------------------+------------------------------------------------------+
-    | logentries.py              | Objects representing Mediawiki log entries           |
+    | logentries.py              | Objects representing MediaWiki log entries           |
     +----------------------------+------------------------------------------------------+
     | logging.py                 | Logging and output functions                         |
     +----------------------------+------------------------------------------------------+
@@ -89,7 +89,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | data                       | Module providing layers of data access to wiki       |
     +============================+======================================================+
-    | api.py                     | Interface to Mediawiki's api.php                     |
+    | api.py                     | Interface to MediaWiki's api.php                     |
     +----------------------------+------------------------------------------------------+
     | mysql.py                   | Miscellaneous helper functions for mysql queries     |
     +----------------------------+------------------------------------------------------+
@@ -172,19 +172,21 @@ The contents of the package
     +-----------------------------------------------------------------------------------+
     | User Interface                                                                    |
     +============================+======================================================+
-    | gui.py                     | GUI with a unicode textfield where the user can edit |
+    | _interface_base.py         | Abstract base user interface module                  |
+    +----------------------------+------------------------------------------------------+
+    | gui.py                     | GUI with a Unicode textfield where the user can edit |
     +----------------------------+------------------------------------------------------+
     | terminal_interface.py      | Platform independent terminal interface module       |
     +----------------------------+------------------------------------------------------+
     | terminal_interface_base.py | Base for terminal user interfaces                    |
     +----------------------------+------------------------------------------------------+
-    | terminal_interface_unix.py | User interface for unix terminals                    |
+    | terminal_interface_unix.py | User interface for Unix terminals                    |
     +----------------------------+------------------------------------------------------+
     | terminal_interface_win32.py| User interface for Win32 terminals                   |
     +----------------------------+------------------------------------------------------+
     | transliteration.py         | Module to transliterate text                         |
     +----------------------------+------------------------------------------------------+
-    | win32_unicode.py           | Stdout, stderr and argv support for unicode          |
+    | win32_unicode.py           | Stdout, stderr and argv support for Unicode          |
     +----------------------------+------------------------------------------------------+
 
 
@@ -195,8 +197,6 @@ The contents of the package
     |                            | languages, encodings etc                             |
     +----------------------------+------------------------------------------------------+
     | CONTENT.rst                | This file ( Short info on all modules )              |
-    +----------------------------+------------------------------------------------------+
-    | epydoc.cfg                 | The list of objects to document                      |
     +----------------------------+------------------------------------------------------+
     | README.rst                 | Package description file                             |
     +----------------------------+------------------------------------------------------+

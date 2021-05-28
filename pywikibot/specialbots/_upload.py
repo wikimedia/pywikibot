@@ -9,24 +9,22 @@ Do not import classes directly from here but from specialbots.
 # Distributed under the terms of the MIT license.
 #
 import os
-import requests
 import tempfile
-
 from contextlib import suppress
 from http import HTTPStatus
 from pathlib import Path
 from typing import Optional, Union
 from urllib.parse import urlparse
 
+import requests
+
 import pywikibot
 import pywikibot.comms.http as http
 import pywikibot.data.api
-
-from pywikibot.backports import List
 from pywikibot import config
+from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot.data.api import APIError
-from pywikibot.exceptions import FatalServerError
+from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
 
@@ -49,9 +47,13 @@ class UploadRobot(BaseBot):
                  target_site=None,
                  aborts: Union[bool, list, None] = None,
                  chunk_size: int = 0,
+                 asynchronous: bool = False,
                  summary: Optional[str] = None,
                  filename_prefix: Optional[str] = None, **kwargs):
         """Initializer.
+
+        *Changed in version 6.2:* asynchronous upload is used if
+        *asynchronous* parameter is set.
 
         @param url: path to url or local file, or list of urls or paths
             to local files.
@@ -76,6 +78,8 @@ class UploadRobot(BaseBot):
         @param chunk_size: Upload the file in chunks (more overhead, but
             restartable) specified in bytes. If no value is specified the file
             will be uploaded as whole.
+        @param asynchronous: Make potentially large file operations
+            asynchronous on the server side when possible.
         @param filename_prefix: Specify prefix for the title of every
             file's page.
         @keyword always: Disables any input, requires that either
@@ -103,6 +107,7 @@ class UploadRobot(BaseBot):
         self.ignore_warning = ignore_warning
         self.aborts = aborts or []
         self.chunk_size = chunk_size
+        self.asynchronous = asynchronous
         self.summary = summary
         self.filename_prefix = filename_prefix
 
@@ -152,8 +157,8 @@ class UploadRobot(BaseBot):
                 # raised from connection lost during response.iter_content()
                 except requests.ConnectionError:
                     fd.flush()
-                    pywikibot.output(
-                        'Connection closed at byte %s' % path.stat().st_size)
+                    pywikibot.output('Connection closed at byte {}'
+                                     .format(path.stat().st_size))
                 # raised from response.raise_for_status()
                 except requests.HTTPError as e:
                     # exit criteria if size is not available
@@ -263,13 +268,13 @@ class UploadRobot(BaseBot):
             if invalid:
                 c = ''.join(invalid)
                 pywikibot.output(
-                    'Invalid character(s): %s. Please try again' % c)
+                    'Invalid character(s): {}. Please try again'.format(c))
                 continue
 
             if allowed_formats and ext not in allowed_formats:
                 if self.opt.always:
                     pywikibot.output('File format is not one of '
-                                     '[{0}]'.format(' '.join(allowed_formats)))
+                                     '[{}]'.format(' '.join(allowed_formats)))
                     continue
 
                 if not pywikibot.input_yn(
@@ -290,10 +295,10 @@ class UploadRobot(BaseBot):
                 if potential_file_page.has_permission():
                     if overwrite is None:
                         overwrite = not pywikibot.input_yn(
-                            'File with name %s already exists. '
+                            'File with name {} already exists. '
                             'Would you like to change the name? '
                             '(Otherwise file will be overwritten.)'
-                            % filename, default=True,
+                            .format(filename), default=True,
                             automatic_quit=False)
                     if not overwrite:
                         continue
@@ -303,7 +308,7 @@ class UploadRobot(BaseBot):
                                  'cannot be overwritten.'.format(filename))
                 continue
 
-            with suppress(pywikibot.NoPage):
+            with suppress(NoPageError):
                 if potential_file_page.file_is_shared():
                     pywikibot.output(
                         'File with name {} already exists in shared '
@@ -315,8 +320,8 @@ class UploadRobot(BaseBot):
         # A proper description for the submission.
         # Empty descriptions are not accepted.
         if self.description:
-            pywikibot.output('The suggested description is:\n%s'
-                             % self.description)
+            pywikibot.output('The suggested description is:\n{}'
+                             .format(self.description))
 
         while not self.description or self.verify_description:
             if not self.description:
@@ -382,7 +387,7 @@ class UploadRobot(BaseBot):
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
-        pywikibot.output('Uploading file to {0}...'.format(site))
+        pywikibot.output('Uploading file to {}...'.format(site))
 
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
         if '://' in file_url and not site.has_right('upload_by_url'):
@@ -396,12 +401,13 @@ class UploadRobot(BaseBot):
                                        ignore_warnings=ignore_warnings,
                                        chunk_size=self.chunk_size,
                                        _file_key=_file_key, _offset=_offset,
+                                       asynchronous=self.asynchronous,
                                        comment=self.summary)
         except APIError as error:
             if error.code == 'uploaddisabled':
                 pywikibot.error(
-                    'Upload error: Local file uploads are disabled on %s.'
-                    % site)
+                    'Upload error: Local file uploads are disabled on {}.'
+                    .format(site))
             else:
                 pywikibot.error('Upload error: ', exc_info=True)
         except Exception:
@@ -409,7 +415,7 @@ class UploadRobot(BaseBot):
         else:
             if success:
                 # No warning, upload complete.
-                pywikibot.output('Upload of %s successful.' % filename)
+                pywikibot.output('Upload of {} successful.'.format(filename))
                 self._save_counter += 1
                 return filename  # data['filename']
             pywikibot.output('Upload aborted.')
@@ -443,13 +449,13 @@ class UploadRobot(BaseBot):
                 self.upload_file(file_url)
                 self._treat_counter += 1
         except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nUser quit {} bot run...'
+                             .format(self.__class__.__name__))
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                             self.__class__.__name__)
+            pywikibot.output('\nKeyboardInterrupt during {} bot run...'
+                             .format(self.__class__.__name__))
         finally:
             self.exit()

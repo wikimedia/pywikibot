@@ -55,13 +55,11 @@ functions will be listed.
 
 import codecs
 import re
-
 from collections import Counter
 
 import pywikibot
-
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot import pagegenerators
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 
 
 class ParserFunctionCountBot(SingleSiteBot,

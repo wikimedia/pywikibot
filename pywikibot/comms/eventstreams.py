@@ -6,30 +6,33 @@ This file is part of the Pywikibot framework.
 This module requires sseclient to be installed::
 
     pip install sseclient
+
+*New in version 3.0.*
 """
 #
-# (C) Pywikibot team, 2017-2020
+# (C) Pywikibot team, 2017-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import json
 import socket
-
 from functools import partial
-from pkg_resources import parse_version
 from typing import Optional
 
+from pkg_resources import parse_version
 from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
+
+from pywikibot import Site, Timestamp, config, debug, warning
+from pywikibot.tools import deprecated_args
+
 
 try:
     from sseclient import SSEClient as EventSource
 except ImportError as e:
     EventSource = e
 
-from pywikibot import config, debug, Timestamp, Site, warning
-from pywikibot.tools import deprecated_args
 
 if parse_version(requests_version) < parse_version('2.20.1'):
     raise ImportError(
@@ -136,8 +139,8 @@ class EventStreams:
             kwargs['since'] = self._since
         if kwargs['timeout'] == config.socket_timeout:
             kwargs.pop('timeout')
-        return '{0}({1})'.format(self.__class__.__name__, ', '.join(
-            '%s=%r' % x for x in kwargs.items()))
+        return '{}({})'.format(self.__class__.__name__, ', '.join(
+            '{}={!r}'.format(k, v) for k, v in kwargs.items()))
 
     @property
     def url(self):
@@ -148,13 +151,13 @@ class EventStreams:
         if not hasattr(self, '_url'):
             if self._streams is None:
                 raise NotImplementedError(
-                    'No streams specified for class {0}'
+                    'No streams specified for class {}'
                     .format(self.__class__.__name__))
             self._url = ('{host}{path}/{streams}{since}'
                          .format(host=self._site.eventstreams_host(),
                                  path=self._site.eventstreams_path(),
                                  streams=self._streams,
-                                 since=('?since=%s' % self._since
+                                 since=('?since={}'.format(self._since)
                                         if self._since else '')))
         return self._url
 
@@ -170,7 +173,7 @@ class EventStreams:
         """
         if value is not None:
             self._total = int(value)
-            debug('{0}: Set limit (maximum_items) to {1}.'
+            debug('{}: Set limit (maximum_items) to {}.'
                   .format(self.__class__.__name__, self._total), _logger)
 
     def register_filter(self, *args, **kwargs):
@@ -247,7 +250,7 @@ class EventStreams:
             if callable(func):
                 self.filter[ftype].append(func)
             else:
-                raise TypeError('{0} is not a callable'.format(func))
+                raise TypeError('{} is not a callable'.format(func))
 
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():
@@ -295,7 +298,7 @@ class EventStreams:
             try:
                 event = next(self.source)
             except (ProtocolError, socket.error, httplib.IncompleteRead) as e:
-                warning('Connection error: {0}.\n'
+                warning('Connection error: {}.\n'
                         'Try to re-establish connection.'.format(e))
                 del self.source
                 if event is not None:
@@ -306,7 +309,7 @@ class EventStreams:
                     try:
                         element = json.loads(event.data)
                     except ValueError as e:
-                        warning('Could not load json data from\n{0}\n{1}'
+                        warning('Could not load json data from\n{}\n{}'
                                 .format(event, e))
                     else:
                         if self.streamfilter(element):
@@ -317,13 +320,12 @@ class EventStreams:
                 else:
                     ignore_first_empty_warning = False
             elif event.event == 'error':
-                warning('Encountered error: {0}'.format(event.data))
+                warning('Encountered error: {}'.format(event.data))
             else:
-                warning('Unknown event {0} occurred.'.format(event.event))
-        else:
-            debug('{0}: Stopped iterating due to '
-                  'exceeding item limit.'
-                  .format(self.__class__.__name__), _logger)
+                warning('Unknown event {} occurred.'.format(event.event))
+
+        debug('{}: Stopped iterating due to exceeding item limit.'
+              .format(self.__class__.__name__), _logger)
         del self.source
 
 

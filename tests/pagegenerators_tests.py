@@ -9,42 +9,35 @@ import datetime
 import logging
 import sys
 import unittest
-
 from contextlib import suppress
 from typing import Optional
 
 import pywikibot
-from pywikibot import pagegenerators, date
-
-from pywikibot.exceptions import ServerError, UnknownExtension
-
+from pywikibot import date, pagegenerators
+from pywikibot.exceptions import ServerError, UnknownExtensionError
 from pywikibot.pagegenerators import (
+    CategorizedPageGenerator,
     PagesFromTitlesGenerator,
     PreloadingGenerator,
-    CategorizedPageGenerator,
     WikibaseItemFilterPageGenerator,
 )
-
 from pywikibot.tools import has_module, suppress_warnings
-
 from tests import join_data_path, mock
 from tests.aspects import (
-    TestCase,
-    DeprecationTestCase,
-    WikidataTestCase,
     DefaultSiteTestCase,
+    DeprecationTestCase,
     RecentChangesTestCase,
+    TestCase,
+    WikidataTestCase,
 )
 from tests.thread_tests import GeneratorIntersectTestCase
+
 
 LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
                   r'is deprecated for .*; use Site\.exturlusage')
 
 PAGES_ID_GEN_MSG = (r'.*pywikibot\.pagegenerators\.PagesFromPageidGenerator .*'
                     r'is deprecated for .*; use site\.load_pages_from_pageids')
-
-REFERRING_PAGE_MSG = (r'.*pywikibot\.pagegenerators\.ReferringPageGenerator .*'
-                      r'is deprecated for .*; use Page\.getReferences')
 
 
 en_wp_page_titles = (
@@ -483,10 +476,10 @@ class TestYearPageGenerator(DefaultSiteTestCase):
         """Test YearPageGenerator."""
         site = self.get_site()
         # Some languages are missing (T85681)
-        if (site.lang not in date.formats['YearBC']
-                or site.lang not in date.formats['YearAD']):
+        if site.lang not in date.formats['YearBC']:
             self.skipTest(
-                'Date formats for this language are missing from date.py')
+                'Date formats for {!r} language are missing from date.py'
+                .format(site.lang))
         start = -20
         end = 2026
 
@@ -638,15 +631,13 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
     """Test preloading item generator."""
 
     def test_non_item_gen(self):
-        """Test TestPreloadingEntityGenerator with ReferringPageGenerator."""
-        with suppress_warnings(REFERRING_PAGE_MSG, category=FutureWarning):
-            site = self.get_site()
-            instance_of_page = pywikibot.Page(site, 'Property:P31')
-            ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page,
-                                                            total=5)
-            gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-            is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
-            self.assertTrue(is_all_type)
+        """Test TestPreloadingEntityGenerator with getReferences."""
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = page.getReferences(follow_redirects=False, total=5)
+        gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
+        is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
+        self.assertTrue(is_all_type)
 
 
 class WikibaseItemFilterPageGeneratorTestCase(TestCase):
@@ -726,7 +717,7 @@ class DryFactoryGeneratorTest(TestCase):
     def test_unsupported_quality_level_filter(self):
         """Test unsupported option."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        with self.assertRaises(UnknownExtension):
+        with self.assertRaises(UnknownExtensionError):
             gf.handle_arg('-ql:2')
 
     def test_one_excluded_namespaces(self):
@@ -1191,7 +1182,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
                 gf = pagegenerators.GeneratorFactory()
-                gf.handle_arg('-property:{0}'.format(item))
+                gf.handle_arg('-property:{}'.format(item))
                 gf.handle_arg('-limit:10')
                 gen = gf.getCombinedGenerator()
                 self.assertIsNotNone(gen)
@@ -1205,7 +1196,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {0}'.format(item))
+                        'NotImplementedError not raised for {}'.format(item))
 
     def test_empty_generator(self):
         """Test empty generator."""
@@ -1242,7 +1233,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_ns_valid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {0} does not use Linter extension'
+            self.skipTest('The site {} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-ns:1')
@@ -1260,7 +1251,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_invalid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {0} does not use Linter extension'
+            self.skipTest('The site {} does not use Linter extension'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(AssertionError):
@@ -1274,7 +1265,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 gf.handle_arg('-linter:show')
             self.assertEqual(cm.exception.code, 0)
         else:
-            with self.assertRaises(UnknownExtension):
+            with self.assertRaises(UnknownExtensionError):
                 gf.handle_arg('-linter:show')
 
     def test_querypage_generator_with_valid_page(self):
@@ -1611,7 +1602,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         super().setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
-            raise unittest.SkipTest('{0} is not available'.format(cls.client))
+            raise unittest.SkipTest('{} is not available'.format(cls.client))
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""

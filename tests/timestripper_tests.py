@@ -6,15 +6,11 @@
 #
 import datetime
 import re
-
 from contextlib import suppress
 
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
+from tests.aspects import TestCase, unittest
 
-from tests.aspects import (
-    unittest,
-    TestCase,
-)
 
 MatchObject = type(re.search('', ''))
 

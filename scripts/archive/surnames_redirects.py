@@ -25,7 +25,8 @@ from difflib import SequenceMatcher
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
+from pywikibot.bot import ExistingPageBot, FollowRedirectPageBot
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -82,10 +83,10 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
 
             new_page = pywikibot.Page(site, possible_name)
             if new_page.exists():
-                pywikibot.output('{0} already exists, skipping...'
+                pywikibot.output('{} already exists, skipping...'
                                  .format(new_page.title(as_link=True)))
             else:
-                pywikibot.output("{0} doesn't exist"
+                pywikibot.output("{} doesn't exist"
                                  .format(new_page.title(as_link=True)))
                 choice = pywikibot.input_yn(
                     'Do you want to create a redirect?')

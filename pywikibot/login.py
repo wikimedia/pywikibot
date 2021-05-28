@@ -8,19 +8,23 @@
 import codecs
 import os
 import webbrowser
-
 from enum import IntEnum
 from typing import Optional
 from warnings import warn
 
 import pywikibot
-
-from pywikibot import config, __url__
+import pywikibot.data.api
+from pywikibot import __url__, config
 from pywikibot.comms import http
-from pywikibot.exceptions import NoUsername
+from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.tools import (
-    deprecated_args, file_mode_checker, normalize_username, remove_last_args,
+    ModuleDeprecationWrapper,
+    deprecated_args,
+    file_mode_checker,
+    normalize_username,
+    remove_last_args,
 )
+
 
 try:
     import mwoauth
@@ -28,18 +32,9 @@ except ImportError as e:
     mwoauth = e
 
 
-class OAuthImpossible(ImportError):
-
-    """OAuth authentication is not possible on your system."""
-
-    pass
-
-
 class _PasswordFileWarning(UserWarning):
 
     """The format of password file is incorrect."""
-
-    pass
 
 
 _logger = 'wiki.login'
@@ -89,7 +84,7 @@ class LoginManager:
 
     """Site login manager."""
 
-    @deprecated_args(username='user', verbose=None, sysop=None)
+    @deprecated_args(username='user', verbose=True, sysop=True)
     def __init__(self, password: Optional[str] = None,
                  site=None, user: Optional[str] = None):
         """
@@ -103,7 +98,7 @@ class LoginManager:
             If user is None, the username is loaded from config.usernames.
         @param password: password to use
 
-        @raises pywikibot.exceptions.NoUsername: No username is configured
+        @raises pywikibot.exceptions.NoUsernameError: No username is configured
             for the requested site.
         """
         site = self.site = site or pywikibot.Site()
@@ -114,7 +109,7 @@ class LoginManager:
             try:
                 user = code_to_usr.get(site.code) or code_to_usr['*']
             except KeyError:
-                raise NoUsername(
+                raise NoUsernameError(
                     'ERROR: '
                     'username for {site.family.name}:{site.code} is undefined.'
                     '\nIf you have a username for that site, '
@@ -133,7 +128,7 @@ class LoginManager:
 
         @see: U{https://www.mediawiki.org/wiki/API:Users}
 
-        @raises pywikibot.exceptions.NoUsername: Username doesn't exist in
+        @raises pywikibot.exceptions.NoUsernameError: Username doesn't exist in
             user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
@@ -149,7 +144,7 @@ class LoginManager:
         try:
             data = self.site.allusers(start=main_username, total=1)
             user = next(iter(data))
-        except pywikibot.data.api.APIError as e:
+        except APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning("Could not check user '{}' exists on {}"
                                   .format(main_username, self.site))
@@ -158,8 +153,8 @@ class LoginManager:
 
         if user['name'] != main_username:
             # Report the same error as server error code NotExists
-            raise NoUsername("Username '{}' does not exist on {}"
-                             .format(main_username, self.site))
+            raise NoUsernameError("Username '{}' does not exist on {}"
+                                  .format(main_username, self.site))
 
     def botAllowed(self):
         """
@@ -244,12 +239,12 @@ class LoginManager:
                 entry = None
 
             if not isinstance(entry, tuple):
-                warn('Invalid tuple in line {0}'.format(line_nr),
+                warn('Invalid tuple in line {}'.format(line_nr),
                      _PasswordFileWarning)
                 continue
 
             if not 2 <= len(entry) <= 4:
-                warn('The length of tuple in line {0} should be 2 to 4 ({1} '
+                warn('The length of tuple in line {} should be 2 to 4 ({} '
                      'given)'.format(line_nr, entry), _PasswordFileWarning)
                 continue
 
@@ -290,8 +285,8 @@ class LoginManager:
                            using unified login
         @type autocreate: bool
 
-        @raises pywikibot.exceptions.NoUsername: Username is not recognised by
-            the site.
+        @raises pywikibot.exceptions.NoUsernameError: Username is not
+            recognised by the site.
         """
         if not self.password:
             # First check that the username exists,
@@ -310,7 +305,7 @@ class LoginManager:
                          .format(name=self.login_name, site=self.site))
         try:
             self.login_to_site()
-        except pywikibot.data.api.APIError as e:
+        except APIError as e:
             error_code = e.code
             pywikibot.error('Login failed ({}).'.format(error_code))
             if error_code in self._api_error:
@@ -318,7 +313,7 @@ class LoginManager:
                     self.login_name, self._api_error[error_code], self.site)
                 if error_code in ('Failed', 'FAIL'):
                     error_msg += '\n.{}'.format(e.info)
-                raise NoUsername(error_msg)
+                raise NoUsernameError(error_msg)
 
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
@@ -361,7 +356,7 @@ class BotPassword:
 
         @param user: username (without suffix)
         """
-        return '{0}@{1}'.format(username, self.suffix)
+        return '{}@{}'.format(username, self.suffix)
 
 
 class OauthLoginManager(LoginManager):
@@ -371,7 +366,7 @@ class OauthLoginManager(LoginManager):
     # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
     # authentication process
 
-    @deprecated_args(sysop=None)
+    @deprecated_args(sysop=True)
     def __init__(self, password: Optional[str] = None, site=None,
                  user: Optional[str] = None):
         """
@@ -384,12 +379,12 @@ class OauthLoginManager(LoginManager):
         @param user: consumer key
         @param password: consumer secret
 
-        @raises pywikibot.exceptions.NoUsername: No username is configured
+        @raises pywikibot.exceptions.NoUsernameError: No username is configured
             for the requested site.
-        @raises OAuthImpossible: mwoauth isn't installed
+        @raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
-            raise OAuthImpossible('mwoauth is not installed: %s.' % mwoauth)
+            raise ImportError('mwoauth is not installed: {}.'.format(mwoauth))
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:
@@ -476,3 +471,13 @@ class OauthLoginManager(LoginManager):
         except Exception as e:
             pywikibot.error(e)
             return None
+
+
+OAuthImpossible = ImportError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'OAuthImpossible',
+    replacement_name='ImportError',
+    since='20210423',
+    future_warning=True)

@@ -43,11 +43,9 @@ and override its `callback` method. Here is a sample:
 from typing import Union
 
 import pywikibot
-
-from pywikibot.bot import OptionHandler
-from pywikibot.data import api
-from pywikibot.exceptions import Error
 from pywikibot import i18n
+from pywikibot.bot import OptionHandler
+from pywikibot.exceptions import APIError, Error
 from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
 
@@ -86,11 +84,11 @@ class BaseRevertBot(OptionHandler):
             if callback(item):
                 result = self.revert(item)
                 if result:
-                    self.log('{0}: {1}'.format(item['title'], result))
+                    self.log('{}: {}'.format(item['title'], result))
                 else:
-                    self.log('Skipped {0}'.format(item['title']))
+                    self.log('Skipped {}'.format(item['title']))
             else:
-                self.log('Skipped {0} by callback'.format(item['title']))
+                self.log('Skipped {} by callback'.format(item['title']))
 
     def callback(self, item) -> bool:
         """Callback function."""
@@ -126,7 +124,7 @@ class BaseRevertBot(OptionHandler):
 
         try:
             self.site.rollbackpage(page, user=self.user, markbot=True)
-        except api.APIError as e:
+        except APIError as e:
             if e.code == 'badtoken':
                 pywikibot.error(
                     'There was an API token error rollbacking the edit')

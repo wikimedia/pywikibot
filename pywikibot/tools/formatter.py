@@ -1,15 +1,15 @@
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import math
-
 from string import Formatter
 from typing import Any, Mapping, Sequence
 
 from pywikibot.logging import output
+from pywikibot.tools import deprecated
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -41,7 +41,13 @@ class SequenceOutputter:
         super().__init__()
         self.sequence = sequence
 
+    @deprecated('out', since='6.2.0', future_warning=True)
     def format_list(self):
+        """DEPRECATED: Create the text with one item on each line."""
+        return self.out
+
+    @property
+    def out(self):
         """Create the text with one item on each line."""
         if self.sequence:
             # Width is only defined when the length is greater 0
@@ -55,7 +61,7 @@ class SequenceOutputter:
 
     def output(self):
         """Output the text of the current sequence."""
-        output(self.format_list())
+        output(self.out)
 
 
 class _ColorFormatter(Formatter):
@@ -65,12 +71,12 @@ class _ColorFormatter(Formatter):
     colors = set(colors)
     # Dot.product of colors to create all possible combinations of foreground
     # and background colors.
-    colors |= {'{0};{1}'.format(c1, c2) for c1 in colors for c2 in colors}
+    colors |= {'{};{}'.format(c1, c2) for c1 in colors for c2 in colors}
 
     def get_value(self, key, args, kwargs):
         """Get value, filling in 'color' when it is a valid color."""
         if key == 'color' and kwargs.get('color') in self.colors:
-            return '\03{{{0}}}'.format(kwargs[key])
+            return '\03{{{}}}'.format(kwargs[key])
         return super().get_value(key, args, kwargs)
 
     def parse(self, format_string: str):
@@ -80,21 +86,21 @@ class _ColorFormatter(Formatter):
             if field in self.colors:
                 if spec:
                     raise ValueError(
-                        'Color field "{0}" in "{1}" uses format spec '
-                        'information "{2}"'.format(field, format_string, spec))
+                        'Color field "{}" in "{}" uses format spec '
+                        'information "{}"'.format(field, format_string, spec))
                 if conv:
                     raise ValueError(
-                        'Color field "{0}" in "{1}" uses conversion '
-                        'information "{2}"'.format(field, format_string, conv))
+                        'Color field "{}" in "{}" uses conversion '
+                        'information "{}"'.format(field, format_string, conv))
                 if not literal or literal[-1] != '\03':
                     literal += '\03'
                 if '\03' in literal[:-1]:
-                    raise ValueError(r'Literal text in {0} contains '
+                    raise ValueError(r'Literal text in {} contains '
                                      r'\03'.format(format_string))
                 previous_literal += literal + '{' + field + '}'
             else:
                 if '\03' in literal:
-                    raise ValueError(r'Literal text in {0} contains '
+                    raise ValueError(r'Literal text in {} contains '
                                      r'\03'.format(format_string))
                 yield previous_literal + literal, field, spec, conv
                 previous_literal = ''

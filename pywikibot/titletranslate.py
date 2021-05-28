@@ -1,17 +1,15 @@
 """Title translate module."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import date
-
-from pywikibot import config
+from pywikibot import config, date
 from pywikibot.tools import deprecated_args
 
 
-@deprecated_args(family=None)
+@deprecated_args(family=True)
 def translate(page=None, hints=(), auto=True, removebrackets=False,
               site=None) -> list:
     """

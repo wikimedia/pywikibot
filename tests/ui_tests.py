@@ -4,78 +4,49 @@
 #
 # Distributed under the terms of the MIT license.
 #
-# NOTE FOR RUNNING WINDOWS UI TESTS
-#
-# Windows UI tests have to be run using the tests\ui_tests.bat helper script.
-# This will set PYTHONPATH and PYWIKIBOT_DIR, and then run the tests. Do not
-# touch mouse or keyboard while the tests are running, as this might disturb
-# the interaction tests.
-#
-# The Windows tests were developed on a Dutch Windows 7 OS. You might need to
-# adapt the helper functions in TestWindowsTerminalUnicode for other versions.
-#
-# For the Windows-based tests, you need the following packages installed:
-#   - pywin32, for clipboard access, which can be installed using:
-#     pip install -U pywin32
-#
-#   - pywinauto, to send keys to the terminal, which can be installed using:
-#     pip install -U pywinauto
-#
-#
-import inspect
 import io
 import logging
 import os
-import subprocess
 import sys
-import time
+import unittest
 
 from contextlib import suppress
 
 import pywikibot
 from pywikibot.bot import (
-    ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
+    CRITICAL,
+    DEBUG,
+    ERROR,
+    INFO,
+    INPUT,
+    STDOUT,
+    VERBOSE,
+    WARNING,
+    ui,
 )
 from pywikibot.userinterfaces import (
-    terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
+    terminal_interface_base,
+    terminal_interface_unix,
+    terminal_interface_win32,
 )
 from tests.aspects import TestCase, TestCaseBase
-from tests.utils import unittest, FakeModule
-
-if os.name == 'nt':
-    from multiprocessing.managers import BaseManager
-    import threading
-
-    try:
-        import win32api
-    except ImportError:
-        win32api = None
-
-    try:
-        import pywinauto
-    except ImportError:
-        pywinauto = None
-
-    try:
-        import win32clipboard
-    except ImportError:
-        win32clipboard = None
+from tests.utils import FakeModule
 
 
 class Stream:
 
-    """Handler for a StringIO or BytesIO instance able to patch itself."""
+    """Handler for a StringIO instance able to patch itself."""
 
     def __init__(self, name: str, patched_streams: dict):
         """
-        Create a new stream with a StringIO or BytesIO instance.
+        Create a new stream with a StringIO instance.
 
         @param name: The part after 'std' (e.g. 'err').
         @param patched_streams: A mapping which maps the original stream to
             the patched stream.
         """
         self._stream = io.StringIO()
-        self._name = 'std{0}'.format(name)
+        self._name = 'std{}'.format(name)
         self._original = getattr(sys, self._name)
         patched_streams[self._original] = self._stream
 
@@ -87,54 +58,6 @@ class Stream:
         """Reset own stream."""
         self._stream.truncate(0)
         self._stream.seek(0)
-
-
-if os.name == 'nt':
-
-    class pywikibotWrapper:
-
-        """pywikibot wrapper class."""
-
-        def init(self):
-            pywikibot.version._get_program_dir()
-
-        def output(self, *args, **kwargs):
-            return pywikibot.output(*args, **kwargs)
-
-        def request_input(self, *args, **kwargs):
-            self.input = None
-
-            def threadedinput():
-                self.input = pywikibot.input(*args, **kwargs)
-            self.inputthread = threading.Thread(target=threadedinput)
-            self.inputthread.start()
-
-        def get_input(self):
-            self.inputthread.join()
-            return self.input
-
-        def set_config(self, key, value):
-            setattr(pywikibot.config, key, value)
-
-        def set_ui(self, key, value):
-            setattr(pywikibot.ui, key, value)
-
-        def cls(self):
-            subprocess.run('cls', shell=True)
-
-    class pywikibotManager(BaseManager):
-
-        """pywikibot manager class."""
-
-        pass
-
-    pywikibotManager.register('pywikibot', pywikibotWrapper)
-    _manager = pywikibotManager(
-        address=('127.0.0.1', 47228),
-        authkey=b'4DJSchgwy5L5JxueZEWbxyeG')
-    if len(sys.argv) > 1 and sys.argv[1] == '--run-as-slave-interpreter':
-        s = _manager.get_server()
-        s.serve_forever()
 
 
 def patched_print(text, target_stream):
@@ -410,7 +333,7 @@ class TestTerminalOutputColorUnix(UITestCase):
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
 class TestTerminalUnicodeUnix(UITestCase):
 
-    """Terminal output tests for unix."""
+    """Terminal output tests for Unix."""
 
     def testOutputUnicodeText(self):
         pywikibot.output('Заглавная_страница')
@@ -447,195 +370,6 @@ class TestTransliterationUnix(UITestCase):
             '\x1b[93mD\x1b[0m \x1b[93ma\x1b[0m\x1b[93mb\x1b[0m\x1b[93mg'
             '\x1b[0m\x1b[93md\x1b[0m \x1b[93ma\x1b[0m\x1b[93mi\x1b[0m'
             '\x1b[93mu\x1b[0m\x1b[93me\x1b[0m\x1b[93mo\x1b[0m\n')
-
-
-@unittest.skipUnless(os.name == 'nt', 'requires Windows console')
-class WindowsTerminalTestCase(UITestCase):
-
-    """MS Windows terminal tests."""
-
-    @classmethod
-    def setUpClass(cls):
-        if os.name != 'nt':
-            raise unittest.SkipTest('requires Windows console')
-        if not win32api:
-            raise unittest.SkipTest('requires Windows package pywin32')
-        if not win32clipboard:
-            raise unittest.SkipTest('requires Windows package win32clipboard')
-        if not pywinauto:
-            raise unittest.SkipTest('requires Windows package pywinauto')
-        try:
-            # pywinauto 0.5.0
-            cls._app = pywinauto.Application()
-        except AttributeError as e1:
-            try:
-                cls._app = pywinauto.application.Application()
-            except AttributeError as e2:
-                raise unittest.SkipTest('pywinauto Application failed: {}\n{}'
-                                        .format(e1, e2))
-        super().setUpClass()
-
-    @classmethod
-    def setUpProcess(cls, command):
-        si = subprocess.STARTUPINFO()
-        si.dwFlags = subprocess.STARTF_USESTDHANDLES
-        cls._process = subprocess.Popen(
-            command, creationflags=subprocess.CREATE_NEW_CONSOLE)
-
-        cls._app.connect_(process=cls._process.pid)
-
-        # set truetype font (Lucida Console, hopefully)
-        try:
-            window = cls._app.window_()
-        except Exception as e:
-            cls.tearDownProcess()
-            raise unittest.SkipTest(
-                'Windows package pywinauto could not locate window: {!r}'
-                .format(e))
-
-        try:
-            window.TypeKeys('% {UP}{ENTER}%L{HOME}L{ENTER}', with_spaces=True)
-        except Exception as e:
-            cls.tearDownProcess()
-            raise unittest.SkipTest(
-                'Windows package pywinauto could not use window TypeKeys: {!r}'
-                .format(e))
-
-    @classmethod
-    def tearDownProcess(cls):
-        cls._process.kill()
-
-    def setUp(self):
-        super().setUp()
-        self.setclip('')
-
-    def waitForWindow(self):
-        while not self._app.window_().IsEnabled():
-            time.sleep(0.01)
-
-    def getstdouterr(self):
-        sentinel = '~~~~SENTINEL~~~~cedcfc9f-7eed-44e2-a176-d8c73136c185'
-        # select all and copy to clipboard
-        self._app.window_().SetFocus()
-        self.waitForWindow()
-        self._app.window_().TypeKeys(
-            '% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}',
-            with_spaces=True)
-
-        while True:
-            data = self.getclip()
-            if data != sentinel:
-                return data
-            time.sleep(0.01)
-
-    def setclip(self, text):
-        win32clipboard.OpenClipboard()
-        win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, text)
-        win32clipboard.CloseClipboard()
-
-    def getclip(self):
-        win32clipboard.OpenClipboard()
-        data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
-        win32clipboard.CloseClipboard()
-        data = data.split('\x00')[0]
-        data = data.replace('\r\n', '\n')
-        return data
-
-    def sendstdin(self, text):
-        self.setclip(text.replace('\n', '\r\n'))
-        self._app.window_().SetFocus()
-        self.waitForWindow()
-        self._app.window_().TypeKeys(
-            '% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}',
-            with_spaces=True)
-
-
-class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
-
-    """MS Windows terminal unicode tests."""
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        fn = inspect.getfile(inspect.currentframe())
-        cls.setUpProcess(['python', 'pwb.py', fn,
-                          '--run-as-slave-interpreter'])
-
-        _manager.connect()
-        cls.pywikibot = _manager.pywikibot()
-
-    @classmethod
-    def tearDownClass(cls):
-        del cls.pywikibot
-        cls.tearDownProcess()
-
-    def setUp(self):
-        super().setUp()
-
-        self.pywikibot.set_config('colorized_output', True)
-        self.pywikibot.set_config('transliterate', False)
-        self.pywikibot.set_config('console_encoding', 'utf-8')
-        self.pywikibot.set_ui('transliteration_target', None)
-        self.pywikibot.set_ui('encoding', 'utf-8')
-
-        self.pywikibot.cls()
-
-    def testOutputUnicodeText_no_transliterate(self):
-        self.pywikibot.output('Заглавная_страница')
-        self.assertEqual(self.getstdouterr(), 'Заглавная_страница\n')
-
-    def testOutputUnicodeText_transliterate(self):
-        self.pywikibot.set_config('transliterate', True)
-        self.pywikibot.set_ui('transliteration_target', 'latin-1')
-        self.pywikibot.output('Заглавная_страница')
-        self.assertEqual(self.getstdouterr(), 'Zaglavnaya_stranica\n')
-
-    def testInputUnicodeText(self):
-        self.pywikibot.set_config('transliterate', True)
-
-        self.pywikibot.request_input('Википедию? ')
-        self.assertEqual(self.getstdouterr(), 'Википедию?')
-        self.sendstdin('Заглавная_страница\n')
-        returned = self.pywikibot.get_input()
-
-        self.assertEqual(returned, 'Заглавная_страница')
-
-
-class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
-
-    """MS Windows terminal unicode argument tests."""
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.setUpProcess(['cmd', '/k', 'echo off'])
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.tearDownProcess()
-
-    def testOutputUnicodeText_no_transliterate(self):
-        self.sendstdin(
-            'python -c \"'
-            'import subprocess, pywikibot; '
-            "subprocess.run('cls', shell=True); "
-            "pywikibot.output('\\n'.join(pywikibot.handle_args()))\" "
-            'Alpha Bετα Гамма دلتا\n')
-        lines = []
-
-        for i in range(3):
-            lines = self.getstdouterr().split('\n')
-            if len(lines) >= 4 and 'Alpha' not in lines:
-                # if len(lines) < 4, we assume not all lines had been output
-                # yet, and retry. We check at least one of the lines contains
-                # "Alpha" to prevent using older clipboard content. We limit
-                # the number of retries to 3 so that the test will finish even
-                # if neither of these requirements are met.
-                break
-            time.sleep(1)
-
-        # empty line is the new command line
-        self.assertEqual(lines, ['Alpha', 'Bετα', 'Гамма', 'دلتا', ''])
 
 
 # TODO: add tests for background colors.
@@ -722,12 +456,12 @@ class FakeUIColorizedTestBase(TestCase):
     def setUp(self):
         """Force colorized_output to True."""
         super().setUp()
-        self._old_config = pywikibot.config2.colorized_output
-        pywikibot.config2.colorized_output = True
+        self._old_config = pywikibot.config.colorized_output
+        pywikibot.config.colorized_output = True
 
     def tearDown(self):
         """Undo colorized_output configuration."""
-        pywikibot.config2.colorized_output = self._old_config
+        pywikibot.config.colorized_output = self._old_config
         super().tearDown()
 
 

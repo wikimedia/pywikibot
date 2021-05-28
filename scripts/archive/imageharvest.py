@@ -22,14 +22,13 @@ Other options:
 # Distributed under the terms of the MIT license.
 #
 import os
-
 from urllib.parse import urljoin
 
 import pywikibot
-
 from pywikibot.bot import QuitKeyboardInterrupt
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
+
 
 try:
     from bs4 import BeautifulSoup

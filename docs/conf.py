@@ -23,8 +23,8 @@
 import os
 import re
 import sys
-
 from os.path import abspath, dirname, join
+
 
 docs_dir = dirname(__file__)
 repo_dir = abspath(join(docs_dir, '..'))
@@ -33,6 +33,7 @@ os.chdir(repo_dir)
 
 os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 import pywikibot  # noqa: E402
+
 
 # -- General configuration ------------------------------------------------
 
@@ -387,7 +388,7 @@ def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
                       r'\1:\2:', line)  # short token
         line = re.sub(r'(\A *)@(?:kwarg|kwparam) ',
                       r'\1:keyword ', line)  # keyword
-        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
+        line = re.sub(r'(\A| )L\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
         line = re.sub(r'(\A| )B\{([^}]*)\}', r'\1**\2**', line)  # Bold
         line = re.sub(r'(\A| )I\{([^}]*)\}', r'\1*\2*', line)  # Italic
         line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1``\2``', line)  # Code
@@ -398,7 +399,7 @@ def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
     """Fixup docstrings."""
-    if what != 'class':
+    if what not in ('class', 'exception'):
         return
 
     if lines and lines[0] == 'Initializer.':
@@ -492,8 +493,8 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
             return safe_getattr(obj, name, *defargs)
 
         return prop
-    else:
-        return safe_getattr(obj, name, *defargs)
+
+    return safe_getattr(obj, name, *defargs)
 
 
 def setup(app):

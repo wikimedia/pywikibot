@@ -7,7 +7,6 @@
 import unittest
 
 from pywikibot.titletranslate import translate
-
 from tests.aspects import TestCase
 
 

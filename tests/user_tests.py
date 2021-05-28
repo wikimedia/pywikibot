@@ -7,11 +7,8 @@
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import Page, Timestamp, User
-from pywikibot.exceptions import AutoblockUser
-from pywikibot.tools import suppress_warnings
-
+from pywikibot.exceptions import AutoblockUserError
 from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
@@ -25,8 +22,6 @@ class TestUserClass(TestCase):
 
     def _tests_unregistered_user(self, user, prop='invalid'):
         """Proceed user tests."""
-        with suppress_warnings(r'pywikibot\.page\.User\.name', FutureWarning):
-            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
         self.assertIsNone(user.registration())
@@ -56,8 +51,6 @@ class TestUserClass(TestCase):
     def test_registered_user(self):
         """Test registered user."""
         user = User(self.site, 'Xqt')
-        with suppress_warnings(r'pywikibot\.page\.User\.name', FutureWarning):
-            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertTrue(user.isRegistered())
         self.assertFalse(user.isAnonymous())
@@ -124,9 +117,6 @@ class TestUserClass(TestCase):
         p.assert_called_once_with(
             'This is an autoblock ID, you can only use to unblock it.')
         self.assertEqual('#1242976', user.username)
-        with suppress_warnings(r'pywikibot\.page\.User\.name is deprecated',
-                               FutureWarning):
-            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
@@ -135,11 +125,11 @@ class TestUserClass(TestCase):
         self.assertIn('invalid', user.getprops())
         self.assertTrue(user._isAutoblock)
         with self.assertRaisesRegex(
-                AutoblockUser,
+                AutoblockUserError,
                 'This is an autoblock ID'):
             user.getUserPage()
         with self.assertRaisesRegex(
-                AutoblockUser,
+                AutoblockUserError,
                 'This is an autoblock ID'):
             user.getUserTalkPage()
 
@@ -149,9 +139,6 @@ class TestUserClass(TestCase):
         with patch.object(pywikibot, 'output'):
             user = User(self.site, 'User:#1242976')
         self.assertEqual('#1242976', user.username)
-        with suppress_warnings(r'pywikibot\.page\.User\.name is deprecated',
-                               FutureWarning):
-            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
@@ -160,11 +147,11 @@ class TestUserClass(TestCase):
         self.assertIn('invalid', user.getprops())
         self.assertTrue(user._isAutoblock)
         with self.assertRaisesRegex(
-                AutoblockUser,
+                AutoblockUserError,
                 'This is an autoblock ID'):
             user.getUserPage()
         with self.assertRaisesRegex(
-                AutoblockUser,
+                AutoblockUserError,
                 'This is an autoblock ID'):
             user.getUserTalkPage()
 
@@ -181,7 +168,7 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         uc = list(user.contributions(total=10))
         if not uc:
-            self.skipTest('User {0} has no contributions on site {1}.'
+            self.skipTest('User {} has no contributions on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(uc), 10)
         last = uc[0]
@@ -201,7 +188,7 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         le = list(user.logevents(total=10))
         if not le:
-            self.skipTest('User {0} has no logevents on site {1}.'
+            self.skipTest('User {} has no logevents on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(le), 10)
         last = le[0]

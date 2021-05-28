@@ -1,44 +1,55 @@
 Current release changes
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Improvements and Bugfixes
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
-* proofreadpage: search for "new" class after purge (T280357)
-* Enable different types with BaseBot.treat()
-* Context manager depends on pymysql version, not Python release (T279753)
-* Bugfix for Site.interwiki_prefix() (T188179)
-* Exclude expressions from parsed template in mwparserfromhell (T71384)
-* Provide an object representation for DequeGenerator
-* Allow deleting any subclass of BasePage by title (T278659)
-* Add support for API:Revisiondelete with Site.deleterevs() method (T276726)
+* Use different logfiles for multiple processes of the same script (T56685)
+* throttle.pip will be reused as soon as possbile
+* terminal_interface_base.TerminalHandler is subclassed from logging.StreamHandler
+* Fix iterating of SizedKeyCollection (T282865)
+* An abstract base user interface module was added
+* APISite method pagelanglinks() may skip links with empty titles (T223157)
+* Fix Page.getDeletedRevision() method which always returned an empty list
+* Async chunked uploads are supported (T129216, T133443)
+* A new InvalidPageError will be raised if a Page has no version history (T280043)
 * L10N updates
-* Family files can be collected from a zip folder (T278076)
-
-Dependencies
-^^^^^^^^^^^^
-
-* **mwparserfromhell** or **wikitextparser** are strictly recommended (T106763)
-* Require **Pillow**>=8.1.1 due to vulnerability found (T278743)
-* TkDialog of GUI userinterface requires **Python 3.6+** (T278743)
-* Enable textlib.extract_templates_and_params with **wikitextparser** package
-* Add support for **PyMySQL** 1.0.0+
+* Fix __getattr__ for WikibaseEntity (T281389)
+* Handle abusefilter-{disallow,warning} codes (T85656)
 
 Code cleanups
-^^^^^^^^^^^^^
+-------------
 
-* APISite.resolvemagicwords(), BaseSite.ns_index() and  remove BaseSite.getNamespaceIndex() were removed
-* Deprecated MoveEntry.new_ns() and new_title() methods were removed
-* Unused NoSuchSite and PageNotSaved exception were removed
-* Unused BadTitle exception was removed (T267768)
-* getSite() function was removed in favour of Site() constructor
-* Page.fileUrl() was removed in favour of Page.get_file_url()
-* Deprecated getuserinfo and getglobaluserinfo Site methods were removed
-* compat2core.py script was archived
+* MultipleSitesBot.site attribute was removed (T283209)
+* Deprecated BaseSite.category_namespaces() method was removed
+* i18n.twntranslate() function was removed in favour of twtranslate()
+* siteinfo must be used as a dictionary ad cannot be called anymore
+* APISite.has_transcluded_data() method was removed
+* Deprecated LogEntry.title() method was removed
+* Deprecated APISite.watchpage() method was removed
+* OptionHandler.options dict has been removed in favour of OptionHandler.opt
+* The toStdout parameter of ui.output has been dropped
+* terminal_interface_base.TerminalFormatter was removed
+* Move page functions UnicodeToAsciiHtml, unicode2html, url2unicode to tools.chars with renaming them
+* Rename _MultiTemplateMatchBuilder to MultiTemplateMatchBuilder
+* User.name() method was removed in favour of User.username property
+* BasePage.getLatestEditors() method was removed in favour of contributors() or revisions()
+* pagenenerators.handleArg() method was renamed to handle_arg() (T271437)
+* CategoryGenerator, FileGenerator, ImageGenerator and ReferringPageGenerator pagegenerator functions were removed
+* Family.ignore_certificate_error() method was removed in favour of verify_SSL_certificate (T265205)
+* tools.is_IP was renamed to is_ip_address due to PEP8
+* config2.py was renamed to config.py
+* Exceptions were renamed having a suffix "Error" due to PEP8 (T280227)
 
 Deprecations
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
+* 6.2.0: Bot's availableOptions will be removed in favour of available_options
+* 6.2.0: deprecated tools.is_IP will be removed
+* 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped
+* 6.2.0: Exceptions must be imported from exceptions namespace (T280227)
+* 6.2.0: Deprecated exception identifiers will be removed (T280227)
+* 6.2.0: empty_iterator will be removed in favour of iter()
 * 6.1.0: tools.frozenmap will be removed in favour of types.MappingProxyType
 * 6.1.0: tools.DotReadableDict will be removed
 * 6.1.0: mwparserfromhell or wikitextparser MediaWiki markup parser becomes mandatory (T106763)
@@ -46,9 +57,4 @@ Deprecations
 * 6.0.1: Site.undeletepage() and Site.undelete_file_versions() will be removed in favour of Site.undelete() method
 * 6.0.1: Site.deletepage() and Site.deleteoldimage() will be removed in favour of Site.delete() method
 * 6.0.1: DataSite.createNewItemFromPage() method will be removed in favour of ImagePage.fromPage() (T98663)
-* 6.0.0: User.name() method will be removed in favour of User.username property
-* 5.6.0: pagenenerators.handleArg() method will be removed in favour of handle_arg() (T271437)
-* 5.6.0: Family.ignore_certificate_error() method will be removed in favour of verify_SSL_certificate() (T265205)
-* 5.0.0: OptionHandler.options dict will be removed in favour of OptionHandler.opt
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
-* 5.0.0: pagegenerators.ReferringPageGenerator is desupported and will be removed

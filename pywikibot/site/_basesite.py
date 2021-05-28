@@ -7,27 +7,26 @@
 import functools
 import re
 import threading
-
 from warnings import warn
 
 import pywikibot
-
-from pywikibot.exceptions import Error, FamilyMaintenanceWarning, UnknownSite
+from pywikibot.exceptions import (
+    Error,
+    FamilyMaintenanceWarning,
+    NoPageError,
+    PageInUseError,
+    UnknownSiteError,
+)
 from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
+    SelfCallString,
     deprecated,
     first_upper,
     normalize_username,
     remove_last_args,
-    SelfCallString,
 )
-
-
-class PageInUse(Error):
-
-    """Page cannot be reserved for writing due to existing lock."""
 
 
 class BaseSite(ComparableMixin):
@@ -73,8 +72,8 @@ class BaseSite(ComparableMixin):
             else:
                 # no such language anymore
                 self.obsolete = True
-                pywikibot.log('Site %s instantiated and marked "obsolete" '
-                              'to prevent access' % self)
+                pywikibot.log('Site {} instantiated and marked "obsolete" '
+                              'to prevent access'.format(self))
         elif self.__code not in self.languages():
             if self.__family.name in self.__family.langs \
                and len(self.__family.langs) == 1:
@@ -83,11 +82,12 @@ class BaseSite(ComparableMixin):
                    and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
-                         '"%s" while instantiating site %s'
-                         % (self.__code, self), UserWarning)
+                         '"{}" while instantiating site {}'
+                         .format(self.__code, self), UserWarning)
             else:
-                raise UnknownSite("Language '%s' does not exist in family %s"
-                                  % (self.__code, self.__family.name))
+                error_msg = ("Language '{}' does not exist in family {}"
+                             .format(self.__code, self.__family.name))
+                raise UnknownSiteError(error_msg)
 
         self._username = normalize_username(user)
 
@@ -102,7 +102,7 @@ class BaseSite(ComparableMixin):
     def throttle(self):
         """Return this Site's throttle. Initialize a new one if needed."""
         if not hasattr(self, '_throttle'):
-            self._throttle = Throttle(self, multiplydelay=True)
+            self._throttle = Throttle(self)
         return self._throttle
 
     @property
@@ -146,14 +146,14 @@ class BaseSite(ComparableMixin):
                     # should it just raise an Exception and fail?
                     # this will help to check the dictionary ...
                     except KeyError:
-                        warn('Site {0} has no language defined in '
-                             'doc_subpages dict in {1}_family.py file'
+                        warn('Site {} has no language defined in '
+                             'doc_subpages dict in {}_family.py file'
                              .format(self, self.family.name),
                              FamilyMaintenanceWarning, 2)
             # doc_subpages not defined in x_family.py file
             except AttributeError:
                 doc = ()  # default
-                warn('Site {0} has no doc_subpages dict in {1}_family.py file'
+                warn('Site {} has no doc_subpages dict in {}_family.py file'
                      .format(self, self.family.name),
                      FamilyMaintenanceWarning, 2)
             self._doc_subpage = doc
@@ -204,8 +204,8 @@ class BaseSite(ComparableMixin):
                 f.__doc__ = method.__doc__
             return f
         except AttributeError:
-            raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr))
+            raise AttributeError("{} instance has no attribute '{}'"
+                                 .format(self.__class__.__name__, attr))
 
     def __str__(self):
         """Return string representing this Site's name and code."""
@@ -218,7 +218,7 @@ class BaseSite(ComparableMixin):
 
     def __repr__(self):
         """Return internal representation."""
-        return '{0}("{1}", "{2}")'.format(
+        return '{}("{}", "{}")'.format(
             self.__class__.__name__, self.code, self.family)
 
     def __hash__(self):
@@ -296,7 +296,7 @@ class BaseSite(ComparableMixin):
         with self._pagemutex:
             while title in self._locked_pages:
                 if not block:
-                    raise PageInUse(title)
+                    raise PageInUseError(title)
                 self._pagemutex.wait()
             self._locked_pages.add(title)
 
@@ -328,7 +328,7 @@ class BaseSite(ComparableMixin):
             dp = pywikibot.ItemPage(repo, item)
             try:
                 name = dp.getSitelink(self)
-            except pywikibot.NoPage:
+            except NoPageError:
                 raise Error(
                     'No disambiguation category name found in {repo} '
                     'for {site}'.format(repo=repo_name, site=self))
@@ -434,12 +434,6 @@ class BaseSite(ComparableMixin):
     def category_namespace(self):
         """Return local name for the Category namespace."""
         return self.namespace(14)
-
-    @deprecated('list(namespaces.CATEGORY)', since='20150829',
-                future_warning=True)
-    def category_namespaces(self):  # pragma: no cover
-        """Return names for the Category namespace."""
-        return list(self.namespace(14, all=True))
 
     # site-specific formatting preferences
 

@@ -37,20 +37,16 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
-
 from pywikibot.bot import SingleSiteBot
-
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -100,8 +96,8 @@ class ImageRobot(ReplaceBot):
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
         if not self.opt.loose or not self.new_image:
             image_regex = re.compile(
-                r'\[\[ *(?:%s)\s*:\s*%s *(?P<parameters>\|[^\n]+|) *\]\]'
-                % ('|'.join(namespace), escaped))
+                r'\[\[ *(?:{})\s*:\s*{} *(?P<parameters>\|[^\n]+|) *\]\]'
+                .format('|'.join(namespace), escaped))
         else:
             image_regex = re.compile(r'' + escaped)
 

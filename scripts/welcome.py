@@ -165,7 +165,6 @@ import locale
 import pickle
 import re
 import time
-
 from contextlib import suppress
 from datetime import timedelta
 from enum import Enum
@@ -174,11 +173,10 @@ from textwrap import fill
 from typing import Generator
 
 import pywikibot
-
 from pywikibot import config, i18n
 from pywikibot.backports import List
 from pywikibot.bot import SingleSiteBot
-from pywikibot.exceptions import HiddenKeyError
+from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 from pywikibot.tools.formatter import color_format
 
 
@@ -435,7 +433,7 @@ class Msg(Enum):
     DEFAULT = 'MSG', 'lightpurple'
 
 
-class FilenameNotSet(pywikibot.Error):
+class FilenameNotSet(Error):
 
     """An exception indicating that a signature filename was not specified."""
 
@@ -486,7 +484,7 @@ class WelcomeBot(SingleSiteBot):
         site_netext = i18n.translate(self.site, netext)
         if site_netext is None:
             raise KeyError(
-                'welcome.py is not localized for site {0} in netext dict.'
+                'welcome.py is not localized for site {} in netext dict.'
                 .format(self.site))
         self.welcome_text = site_netext
 
@@ -687,7 +685,7 @@ class WelcomeBot(SingleSiteBot):
             try:
                 log_page.put(text, i18n.twtranslate(self.site,
                                                     'welcome-updating'))
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output('An edit conflict has occurred. Pausing for '
                                  '10 seconds before continuing.')
                 time.sleep(10)
@@ -787,7 +785,7 @@ class WelcomeBot(SingleSiteBot):
         elif user.editCount() < globalvar.attachEditCount:
             if not user.editCount() == 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.output('{0} has only {1} contributions.'
+                pywikibot.output('{} has only {} contributions.'
                                  .format(user.username, user.editCount()))
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)
@@ -830,7 +828,7 @@ class WelcomeBot(SingleSiteBot):
         try:
             # append welcomed, welcome_count++
             ustp.put(welcome_text, welcome_comment, minor=False)
-        except pywikibot.EditConflict:
+        except EditConflictError:
             self.show_status(Msg.WARN)
             pywikibot.output(
                 'An edit conflict has occurred, skipping this user.')

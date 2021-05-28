@@ -6,16 +6,13 @@
 #
 import json
 import unittest
-
 from contextlib import suppress
 
-from tests import mock
-
-from pywikibot.comms.eventstreams import EventStreams, EventSource
 from pywikibot import config
+from pywikibot.comms.eventstreams import EventSource, EventStreams
 from pywikibot.family import WikimediaFamily
-
-from tests.aspects import TestCase, DefaultSiteTestCase, require_modules
+from tests import mock
+from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())
@@ -70,7 +67,7 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
         fam = site.family
         if not isinstance(fam, WikimediaFamily):
             self.skipTest(
-                "Family '{0}' of site '{1}' is not a WikimediaFamily."
+                "Family '{}' of site '{}' is not a WikimediaFamily."
                 .format(fam, site))
 
     def test_url_with_streams(self):
@@ -242,8 +239,8 @@ class TestEventStreamsFilter(TestCase):
             self.es.register_filter(lambda x: any_type, ftype='any')
         self.assertEqual(self.es.streamfilter(self.data), result,
                          'Test EventStreams filter mixed function failed for\n'
-                         "'none': {0}, 'all': {1}, 'any': {2}\n"
-                         '(expected {3}, given {4})'
+                         "'none': {}, 'all': {}, 'any': {}\n"
+                         '(expected {}, given {})'
                          .format(none_type, all_type, any_type,
                                  result, not result))
 

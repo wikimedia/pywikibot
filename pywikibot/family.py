@@ -12,22 +12,20 @@ import sys
 import types
 import urllib.parse as urlparse
 import warnings
-
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from typing import Optional
 
 import pywikibot
-
-from pywikibot.backports import Dict, List, Tuple
 from pywikibot import config
-from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
+from pywikibot.backports import Dict, List, Tuple
+from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import (
+    ModuleDeprecationWrapper,
     classproperty,
     deprecated,
     deprecated_args,
-    ModuleDeprecationWrapper,
 )
 
 
@@ -546,13 +544,13 @@ class Family:
     _families = {}
 
     @staticmethod
-    @deprecated_args(fatal=None)
+    @deprecated_args(fatal=True)
     def load(fam: Optional[str] = None):
         """Import the named family.
 
         @param fam: family name (if omitted, uses the configured default)
         @return: a Family instance configured for the named family.
-        @raises pywikibot.exceptions.UnknownFamily: family not known
+        @raises pywikibot.exceptions.UnknownFamilyError: family not known
         """
         if fam is None:
             fam = config.family
@@ -572,7 +570,7 @@ class Family:
                 Family._families[fam] = myfamily
                 return Family._families[fam]
         else:
-            raise UnknownFamily('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family {} does not exist'.format(fam))
 
         try:
             # Ignore warnings due to dots in family names.
@@ -583,7 +581,7 @@ class Family:
                 sys.path.append(dirname(family_file))
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
-            raise UnknownFamily('Family %s does not exist' % fam)
+            raise UnknownFamilyError('Family {} does not exist'.format(fam))
         cls = mod.Family.instance
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
@@ -658,11 +656,17 @@ class Family:
         self._get_cr_templates(code, fallback)
 
     def get_edit_restricted_templates(self, code):
-        """Return tuple of edit restricted templates."""
+        """Return tuple of edit restricted templates.
+
+        *New in version 3.0.*
+        """
         return self.edit_restricted_templates.get(code, ())
 
     def get_archived_page_templates(self, code):
-        """Return tuple of archived page templates."""
+        """Return tuple of archived page templates.
+
+        *New in version 3.0.*
+        """
         return self.archived_page_templates.get(code, ())
 
     def disambig(self, code, fallback='_default'):
@@ -693,22 +697,13 @@ class Family:
         """
         Return whether a HTTPS certificate should be verified.
 
+        *Renamed in version 5.3.*
+
         @param code: language code
         @return: flag to verify the SSL certificate;
                  set it to False to allow access if certificate has an error.
         """
         return True
-
-    @deprecated('verify_SSL_certificate', since='20201013',
-                future_warning=True)
-    def ignore_certificate_error(self, code: str) -> bool:
-        """
-        Return whether a HTTPS certificate error should be ignored.
-
-        @param code: language code
-        @return: flag to allow access if certificate has an error.
-        """
-        return not self.verify_SSL_certificate
 
     def hostname(self, code):
         """The hostname to use for standard http connections."""
@@ -763,32 +758,38 @@ class Family:
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
             uri = self.ssl_pathprefix(code) + uri
-        return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
+        return urlparse.urljoin('{}://{}'.format(protocol, host), uri)
 
     def path(self, code):
         """Return path to index.php."""
-        return '%s/index.php' % self.scriptpath(code)
+        return '{}/index.php'.format(self.scriptpath(code))
 
     def querypath(self, code):
         """Return path to query.php."""
-        return '%s/query.php' % self.scriptpath(code)
+        return '{}/query.php'.format(self.scriptpath(code))
 
     def apipath(self, code):
         """Return path to api.php."""
-        return '%s/api.php' % self.scriptpath(code)
+        return '{}/api.php'.format(self.scriptpath(code))
 
     def eventstreams_host(self, code):
-        """Hostname for EventStreams."""
+        """Hostname for EventStreams.
+
+        *New in version 3.0.*
+        """
         raise NotImplementedError('This family does not support EventStreams')
 
     def eventstreams_path(self, code):
-        """Return path for EventStreams."""
+        """Return path for EventStreams.
+
+        *New in version 3.0.*
+        """
         raise NotImplementedError('This family does not support EventStreams')
 
     @deprecated_args(name='title')
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
-        return '%s?title=%s&redirect=no' % (self.path(code), title)
+        return '{}?title={}&redirect=no'.format(self.path(code), title)
 
     def interface(self, code):
         """
@@ -798,8 +799,8 @@ class Family:
         """
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn('Interwiki removal %s is in %s codes'
-                               % (code, self))
+                pywikibot.warn('Interwiki removal {} is in {} codes'
+                               .format(code, self))
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:
@@ -849,7 +850,7 @@ class Family:
         else:
             return None
 
-        matched_sites = []
+        matched_sites = set()
         for code in chain(self.codes,
                           getattr(self, 'test_codes', ()),
                           getattr(self, 'closed_wikis', ()),
@@ -858,21 +859,21 @@ class Family:
                 # Use the code and family instead of the url
                 # This is only creating a Site instance if domain matches
                 site = pywikibot.Site(code, self.name)
-                pywikibot.log('Found candidate {0}'.format(site))
+                pywikibot.log('Found candidate {}'.format(site))
 
                 for iw_url in site._interwiki_urls():
                     if path.startswith(iw_url):
-                        matched_sites += [site]
+                        matched_sites.add(site)
                         break
 
         if len(matched_sites) == 1:
-            return matched_sites[0].code
+            return matched_sites.pop().code
 
         if not matched_sites:
             return None
 
         raise RuntimeError(
-            'Found multiple matches for URL "{0}": {1}'
+            'Found multiple matches for URL "{}": {}'
             .format(url, ', '.join(str(s) for s in matched_sites)))
 
     def maximum_GET_length(self, code):
@@ -881,7 +882,7 @@ class Family:
 
     def dbName(self, code):
         """Return the name of the MySQL database."""
-        return '%s%s' % (code, self.name)
+        return '{}{}'.format(code, self.name)
 
     def encoding(self, code):
         """Return the encoding for a specific language wiki."""
@@ -904,7 +905,7 @@ class Family:
     def __ne__(self, other):
         try:
             return not self.__eq__(other)
-        except UnknownFamily:
+        except UnknownFamilyError:
             return False
 
     def __hash__(self):
@@ -914,7 +915,7 @@ class Family:
         return self.name
 
     def __repr__(self):
-        return 'Family("%s")' % self.name
+        return 'Family("{}")'.format(self.name)
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
@@ -1032,11 +1033,11 @@ class SubdomainFamily(Family):
             codes += cls.closed_wikis
 
         # shortcut this classproperty
-        cls.langs = {code: '{0}.{1}'.format(code, cls.domain)
+        cls.langs = {code: '{}.{}'.format(code, cls.domain)
                      for code in codes}
 
         if hasattr(cls, 'code_aliases'):
-            cls.langs.update({alias: '{0}.{1}'.format(code, cls.domain)
+            cls.langs.update({alias: '{}.{}'.format(code, cls.domain)
                               for alias, code in cls.code_aliases.items()})
 
         return cls.langs
@@ -1047,8 +1048,8 @@ class SubdomainFamily(Family):
         if cls.languages_by_size:
             return cls.languages_by_size
         raise NotImplementedError(
-            'Family %s needs property "languages_by_size" or "codes"'
-            % cls.name)
+            'Family {} needs property "languages_by_size" or "codes"'
+            .format(cls.name))
 
     @classproperty
     def domains(cls):
@@ -1058,7 +1059,10 @@ class SubdomainFamily(Family):
 
 class FandomFamily(Family):
 
-    """Common features of Fandom families."""
+    """Common features of Fandom families.
+
+    *Renamed in version 3.0.*
+    """
 
     @classproperty
     def langs(cls):
@@ -1180,7 +1184,7 @@ class WikimediaFamily(Family):
             return 'wikimedia.org'
 
         raise NotImplementedError(
-            "Family %s needs to define property 'domain'" % cls.name)
+            "Family {} needs to define property 'domain'".format(cls.name))
 
     @classproperty
     def interwiki_removals(cls):
@@ -1216,10 +1220,10 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     @classproperty
     def domain(cls):
         """Return the parents domain with a subdomain prefix."""
-        return '{0}.wikimedia.org'.format(cls.name)
+        return '{}.wikimedia.org'.format(cls.name)
 
 
-@deprecated_args(site=None)
+@deprecated_args(site=True)
 def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.
@@ -1250,5 +1254,5 @@ def AutoFamily(name: str, url: str):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
-                             since='20190420')
+wrapper.add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
+                            since='20190420')

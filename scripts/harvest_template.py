@@ -93,14 +93,14 @@ will not add duplicate claims for the same member:
 #
 import signal
 import sys
-
 from typing import Any, Optional
 
 import pywikibot
-
-from pywikibot import pagegenerators as pg, textlib
+from pywikibot import pagegenerators as pg
+from pywikibot import textlib
 from pywikibot.backports import List
-from pywikibot.bot import WikidataBot, OptionHandler
+from pywikibot.bot import OptionHandler, WikidataBot
+from pywikibot.exceptions import InvalidTitleError, NoPageError
 
 
 willstop = False
@@ -202,7 +202,7 @@ class HarvestRobot(WikidataBot):
         linked_page = pywikibot.Page(link)
         try:
             exists = linked_page.exists()
-        except pywikibot.exceptions.InvalidTitle:
+        except InvalidTitleError:
             pywikibot.error('"{}" is not a valid title so it cannot be linked.'
                             ' Skipping.'.format(link_text))
             return None
@@ -217,7 +217,7 @@ class HarvestRobot(WikidataBot):
 
         try:
             linked_item = pywikibot.ItemPage.fromPage(linked_page)
-        except pywikibot.NoPage:
+        except NoPageError:
             linked_item = None
 
         if not linked_item or not linked_item.exists():
@@ -255,7 +255,7 @@ class HarvestRobot(WikidataBot):
             try:
                 template = pywikibot.Page(page.site, template,
                                           ns=10).title(with_ns=False)
-            except pywikibot.exceptions.InvalidTitle:
+            except InvalidTitleError:
                 pywikibot.error(
                     "Failed parsing template; '{}' should be "
                     'the template name.'.format(template))

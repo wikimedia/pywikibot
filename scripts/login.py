@@ -44,17 +44,17 @@ subdirectory.
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.backports import Tuple
+import pywikibot.bot
 from pywikibot import config
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
 
 def _get_consumer_token(site) -> Tuple[str, str]:
-    key_msg = 'OAuth consumer key on {0}:{1}'.format(site.code, site.family)
+    key_msg = 'OAuth consumer key on {}:{}'.format(site.code, site.family)
     key = pywikibot.input(key_msg)
-    secret_msg = 'OAuth consumer secret for consumer {0}'.format(key)
+    secret_msg = 'OAuth consumer secret for consumer {}'.format(key)
     secret = pywikibot.input(secret_msg, password=True)
     return key, secret
 
@@ -124,9 +124,9 @@ def main(*args) -> None:
             try:
                 site = pywikibot.Site(code=lang, fam=family_name)
             except SiteDefinitionError:
-                pywikibot.output('{1}:{0} is not a valid site, '
+                pywikibot.output('{}:{} is not a valid site, '
                                  'please remove it from your user-config'
-                                 .format(lang, family_name))
+                                 .format(family_name, lang))
                 continue
 
             if oauth:

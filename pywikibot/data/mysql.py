@@ -4,11 +4,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import pkg_resources
-
 from typing import Optional
 
+import pkg_resources
+
 import pywikibot
+from pywikibot import config
+from pywikibot.tools import deprecated_args
+
 
 try:
     import pymysql
@@ -16,11 +19,7 @@ except ImportError:
     raise ImportError('MySQL python module not found. Please install PyMySQL.')
 
 
-from pywikibot import config2 as config
-from pywikibot.tools import deprecated_args
-
-
-@deprecated_args(encoding=None)
+@deprecated_args(encoding=True)
 def mysql_query(query: str, params=None,
                 dbname: Optional[str] = None,
                 verbose: Optional[bool] = None):
@@ -47,7 +46,7 @@ def mysql_query(query: str, params=None,
         if None, config.verbose_output will be used.
     @return: generator which yield tuples
     """
-    # These are specified in config2.py or user-config.py
+    # These are specified in config.py or user-config.py
     if verbose is None:
         verbose = config.verbose_output
 
@@ -77,7 +76,7 @@ def mysql_query(query: str, params=None,
             if not isinstance(_query, str):
                 _query = str(_query, encoding='utf-8')
             _query = _query.strip()
-            _query = '\n'.join('    {0}'.format(line)
+            _query = '\n'.join('    {}'.format(line)
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
 

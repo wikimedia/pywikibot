@@ -5,28 +5,27 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+from pywikibot import Bot, Claim, ItemPage
+from pywikibot.cosmetic_changes import CANCEL_MATCH, CosmeticChangesToolkit
+from pywikibot.tools import has_module
+from scripts.isbn import InvalidIsbnException as IsbnExc
+from scripts.isbn import convertIsbn10toIsbn13, hyphenateIsbnNumbers, main
+from tests.aspects import (
+    DefaultDrySiteTestCase,
+    ScriptMainTestCase,
+    TestCase,
+    WikibaseTestCase,
+    unittest,
+)
+from tests.bot_tests import TWNBotTestCase
+from tests.utils import empty_sites
+
 
 try:
     from stdnum.exceptions import ValidationError as StdNumValidationError
 except ImportError:
     StdNumValidationError = None
 
-from pywikibot import Bot, Claim, ItemPage
-from pywikibot.cosmetic_changes import CosmeticChangesToolkit, CANCEL_MATCH
-from pywikibot.tools import has_module
-
-from scripts.isbn import (
-    InvalidIsbnException as IsbnExc,
-    hyphenateIsbnNumbers, convertIsbn10toIsbn13,
-    main
-)
-
-from tests.aspects import (
-    unittest, TestCase, DefaultDrySiteTestCase,
-    WikibaseTestCase, ScriptMainTestCase,
-)
-from tests.bot_tests import TWNBotTestCase
-from tests.utils import empty_sites
 
 if StdNumValidationError:
     AnyIsbnValidationException = (StdNumValidationError, IsbnExc)

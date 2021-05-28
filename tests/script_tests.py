@@ -7,15 +7,13 @@
 import os
 import sys
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.tools import has_module
-
 from tests import join_root_path, unittest_print
-from tests.aspects import (DefaultSiteTestCase, MetaTestCaseClass,
-                           PwbTestCase)
+from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
+
 
 scripts_path = join_root_path('scripts')
 
@@ -83,6 +81,7 @@ auto_run_script_list = [
     'misspelling',
     'revertbot',
     'noreferences',
+    'nowcommons',
     'parser_function_count',
     'patrol',
     'shell',
@@ -192,7 +191,7 @@ class TestScriptMeta(MetaTestCaseClass):
             def test_skip_script(self):
                 raise unittest.SkipTest(
                     'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{0}"'
+                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{}"'
                     .format(script_name))
 
             def testScript(self):

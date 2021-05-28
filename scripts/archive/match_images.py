@@ -29,9 +29,9 @@ Expect the code to change a lot!
 import io
 
 import pywikibot
-
 from pywikibot.bot import suggest_help
 from pywikibot.comms import http
+
 
 try:
     from PIL import Image

@@ -33,11 +33,10 @@ import sys
 import tempfile
 
 import pywikibot
-
 from pywikibot import i18n
-
 from pywikibot.backports import Tuple
 from pywikibot.editor import TextEditor
+from pywikibot.exceptions import EditConflictError, NoPageError
 
 
 class ArticleEditor:
@@ -91,7 +90,7 @@ class ArticleEditor:
         self.site.login()
         try:
             old = self.page.get(get_redirect=self.options.edit_redirect)
-        except pywikibot.NoPage:
+        except NoPageError:
             old = ''
         text_editor = TextEditor()
         new = text_editor.edit(old)
@@ -103,7 +102,7 @@ class ArticleEditor:
             try:
                 self.page.put(new, summary=comment, minor=False,
                               watch=self.options.watch)
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 self.handle_edit_conflict(new)
         else:
             pywikibot.output('Nothing changed')

@@ -4,8 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot import config
-from pywikibot import family
+from pywikibot import config, family
 
 
 # The Wikidata family
@@ -20,6 +19,9 @@ class Family(family.WikimediaFamily):
         'test': 'test.wikidata.org',
         'beta': 'wikidata.beta.wmflabs.org',
     }
+
+    # Sites we want to edit but not count as real languages
+    test_codes = ['test', 'beta']
 
     interwiki_forward = 'wikipedia'
 

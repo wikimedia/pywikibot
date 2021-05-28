@@ -38,9 +38,9 @@ Furthermore, the following command line parameters are supported:
 import re
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import CurrentPageBot, MultipleSitesBot
+from pywikibot.exceptions import PageRelatedError
 
 
 # This is required for the text that is shown when you run this script
@@ -79,7 +79,7 @@ class MovePagesBot(MultipleSitesBot, CurrentPageBot):
                 newPageTitle, reason=msg,
                 movetalk=self.opt.movetalkpage,
                 noredirect=self.opt.noredirect)
-        except pywikibot.PageRelatedError as error:
+        except PageRelatedError as error:
             pywikibot.output(error)
 
     def skip_page(self, page):
@@ -205,7 +205,7 @@ def main(*args) -> None:
                     oldName1 = page.title()
             if oldName1:
                 pywikibot.warning(
-                    'file {0} contains odd number of links'.format(filename))
+                    'file {} contains odd number of links'.format(filename))
         elif arg == '-noredirect':
             options['noredirect'] = True
         elif arg == '-notalkpage':
@@ -216,14 +216,14 @@ def main(*args) -> None:
             options['skipredirects'] = True
         elif arg.startswith('-from:'):
             if oldName:
-                pywikibot.warning('-from:{0} without -to:'.format(oldName))
+                pywikibot.warning('-from:{} without -to:'.format(oldName))
             oldName = arg[len('-from:'):]
         elif arg.startswith('-to:'):
             if oldName:
                 fromToPairs.append([oldName, arg[len('-to:'):]])
                 oldName = None
             else:
-                pywikibot.warning('{0} without -from'.format(arg))
+                pywikibot.warning('{} without -from'.format(arg))
         elif arg.startswith('-prefix'):
             if len(arg) == len('-prefix'):
                 options['prefix'] = pywikibot.input('Enter the prefix:')
@@ -236,7 +236,7 @@ def main(*args) -> None:
                 options['summary'] = arg[9:]
 
     if oldName:
-        pywikibot.warning('-from:{0} without -to:'.format(oldName))
+        pywikibot.warning('-from:{} without -to:'.format(oldName))
     site = pywikibot.Site()
     for pair in fromToPairs:
         page = pywikibot.Page(site, pair[0])

@@ -25,10 +25,10 @@ Options:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import i18n, textlib
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import QuitKeyboardInterrupt
+from pywikibot.exceptions import IsRedirectPageError
 
 
 def choosecats(pagetext: str) -> List[str]:
@@ -113,7 +113,7 @@ def main(*args: Tuple[str, ...]):
     for p in mysite.allpages(start=start):
         try:
             text = p.get()
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('{} is a redirect'.format(p.title()))
         else:
             pywikibot.output('========== {} =========='.format(p.title()))

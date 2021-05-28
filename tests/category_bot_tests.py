@@ -5,22 +5,19 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import BaseSite
-
-from scripts.category import CategoryPreprocess, CategoryMoveRobot
-
-from tests import patch, Mock
+from scripts.category import CategoryMoveRobot, CategoryPreprocess
+from tests import Mock, patch
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 MOCKED_USERNAME = Mock(return_value='FakeUsername')
 
 
-# Temporarily set a username to circumvent NoUsername error; T161692
+# Temporarily set a username to circumvent NoUsernameError; T161692
 @patch.object(BaseSite, 'username', new=MOCKED_USERNAME)
 class CfdActions(DefaultSiteTestCase):
 

@@ -28,10 +28,15 @@ Purge mode:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.bot import MultipleSitesBot
+from pywikibot.exceptions import (
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    PageSaveRelatedError,
+)
+
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
@@ -51,14 +56,14 @@ class TouchBot(MultipleSitesBot):
         """Touch the given page."""
         try:
             page.touch(botflag=self.opt.botflag)
-        except (pywikibot.NoCreateError, pywikibot.NoPage):
-            pywikibot.error('Page {0} does not exist.'
+        except (NoCreateError, NoPageError):
+            pywikibot.error('Page {} does not exist.'
                             .format(page.title(as_link=True)))
-        except pywikibot.LockedPage:
-            pywikibot.error('Page {0} is locked.'
+        except LockedPageError:
+            pywikibot.error('Page {} is locked.'
                             .format(page.title(as_link=True)))
-        except pywikibot.PageSaveRelatedError:
-            pywikibot.error('Page {0} not saved.'
+        except PageSaveRelatedError:
+            pywikibot.error('Page {} not saved.'
                             .format(page.title(as_link=True)))
 
 

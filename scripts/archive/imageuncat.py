@@ -18,9 +18,13 @@ from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.exceptions import (
+    ArgumentDeprecationWarning,
+    EditConflictError,
+    LockedPageError,
+)
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1242,21 +1246,6 @@ puttext = ('\n{{Uncategorized|year={{subst:CURRENTYEAR}}|'
 putcomment = 'Please add categories to this image'
 
 
-def uploadedYesterday(site):
-    """
-    Return a pagegenerator containing all the pictures uploaded yesterday.
-
-    DEPRECATED. Only used by a deprecated option.
-    """
-    today = pywikibot.Timestamp.utcnow()
-    yesterday = today + timedelta(days=-1)
-
-    for logentry in site.logevents(
-        logtype='upload', start=yesterday, end=today, reverse=True
-    ):
-        yield logentry.page()
-
-
 def isUncat(page):
     """
     Do we want to skip this page.
@@ -1297,7 +1286,7 @@ def addUncat(page):
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
-    with suppress(pywikibot.EditConflict, pywikibot.LockedPage):
+    with suppress(EditConflictError, LockedPageError):
         page.put(newtext, putcomment)
 
 
@@ -1318,13 +1307,13 @@ def main(*args):
 
     if site.code != 'commons' or site.family.name != 'commons':
         pywikibot.warning('This script is primarily written for Wikimedia '
-                          'Commons, but has been invoked with site {0}. It '
+                          'Commons, but has been invoked with site {}. It '
                           'might work for other sites but there is no '
                           'guarantee that it does the right thing.'
                           .format(site))
         choice = pywikibot.input_choice(
             'How do you want to continue?',
-            (('Continue using {0}'.format(site), 'c'),
+            (('Continue using {}'.format(site), 'c'),
              ('Switch to Wikimedia Commons', 's'),
              ('Quit', 'q')),
             automatic_quit=False)
@@ -1339,14 +1328,7 @@ def main(*args):
         param_arg, sep, param_value = arg.partition(':')
         if param_value == '':
             param_value = None
-        if arg.startswith('-yesterday'):
-            generator = uploadedYesterday(site)
-            issue_deprecation_warning(
-                'The usage of "-yesterday"',
-                '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
-                2, ArgumentDeprecationWarning, since='20160305')
-        else:
-            gen_factory.handle_arg(arg)
+        gen_factory.handle_arg(arg)
 
     generator = gen_factory.getCombinedGenerator(gen=generator, preload=True)
     if not generator:

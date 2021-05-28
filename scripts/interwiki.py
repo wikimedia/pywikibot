@@ -337,27 +337,45 @@ import os
 import re
 import socket
 import sys
-
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from contextlib import suppress
 from textwrap import fill
 
 import pywikibot
-
-from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
-from pywikibot import titletranslate
-
-from pywikibot.bot import OptionHandler, ListOption, StandardOption
+from pywikibot import (
+    config,
+    i18n,
+    interwiki_graph,
+    pagegenerators,
+    textlib,
+    titletranslate,
+)
+from pywikibot.bot import ListOption, OptionHandler, StandardOption
 from pywikibot.cosmetic_changes import moved_links
-from pywikibot.tools import first_upper, SizedKeyCollection
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    InvalidTitleError,
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    NoUsernameError,
+    PageSaveRelatedError,
+    ServerError,
+    SiteDefinitionError,
+    SpamblacklistError,
+    UnknownSiteError,
+)
+from pywikibot.tools import SizedKeyCollection, first_upper
 from pywikibot.tools.formatter import color_format
+
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
 
-class SaveError(pywikibot.Error):
+class SaveError(Error):
 
     """An attempt to save a page with changed interwiki has failed."""
 
@@ -371,7 +389,7 @@ class LinkMustBeRemoved(SaveError):
     """
 
 
-class GiveUpOnPage(pywikibot.Error):
+class GiveUpOnPage(Error):
 
     """User chose not to work on this page and its linked pages any more."""
 
@@ -585,7 +603,7 @@ class Subject(interwiki_graph.Subject):
 
     With P a set of pages, NL ('NextLevel') a function on sets defined as:
 
-        NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }
+        `NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }`
 
     pseudocode::
 
@@ -1201,7 +1219,7 @@ class Subject(interwiki_graph.Subject):
 
             try:
                 iw = page.langlinks()
-            except pywikibot.UnknownSite:
+            except UnknownSiteError:
                 self.conf.note('site {} does not exist.'.format(page.site))
                 continue
 
@@ -1246,8 +1264,8 @@ class Subject(interwiki_graph.Subject):
                         pywikibot.config.datafilepath(
                             'autonomous_problems.dat'),
                             'a', 'utf-8') as f:
-                        f.write('* %s {Found more than one link for %s}'
-                                % (self.origin, page.site))
+                        f.write('* {} {{Found more than one link for {}}}'
+                                .format(self.origin, page.site))
                         if config.interwiki_graph \
                            and config.interwiki_graph_url:
                             filename = interwiki_graph.getFilename(
@@ -1295,7 +1313,7 @@ class Subject(interwiki_graph.Subject):
                             else:
                                 if config.interwiki_shownew:
                                     pywikibot.output(
-                                        '{0}: {1} gives new interwiki {2}'
+                                        '{}: {} gives new interwiki {}'
                                         .format(self.origin, page, linkedPage))
                 if self.forcedStop:
                     break
@@ -1515,7 +1533,7 @@ class Subject(interwiki_graph.Subject):
                         for link in new[site].iterlanglinks():
                             page = pywikibot.Page(link)
                             old[page.site] = page
-                    except pywikibot.NoPage:
+                    except NoPageError:
                         pywikibot.output('BUG>>> {} no longer exists?'
                                          .format(new[site]))
                         continue
@@ -1533,7 +1551,7 @@ class Subject(interwiki_graph.Subject):
                                 updatedSites.append(site)
                         except SaveError:
                             notUpdatedSites.append(site)
-                        except pywikibot.NoUsername:
+                        except NoUsernameError:
                             pass
                         except GiveUpOnPage:
                             break
@@ -1576,7 +1594,7 @@ class Subject(interwiki_graph.Subject):
 
         try:
             pagetext = page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Not editing {}: page does not exist'
                              .format(page))
             raise SaveError("Page doesn't exist")
@@ -1593,8 +1611,8 @@ class Subject(interwiki_graph.Subject):
         # remove interwiki links to ignore
         for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
             with suppress(KeyError,
-                          pywikibot.SiteDefinitionError,
-                          pywikibot.InvalidTitle):
+                          SiteDefinitionError,
+                          InvalidTitleError):
                 ignorepage = pywikibot.Page(page.site, iw.groups()[0])
                 if new[ignorepage.site] == ignorepage \
                    and ignorepage.site != page.site:
@@ -1749,24 +1767,24 @@ class Subject(interwiki_graph.Subject):
                 page.save(summary=mcomment,
                           asynchronous=self.conf.asynchronous,
                           nocreate=True)
-            except pywikibot.NoCreateError:
+            except NoCreateError:
                 pywikibot.exception()
                 return False
-            except pywikibot.LockedPage:
+            except LockedPageError:
                 pywikibot.output('Page {} is locked. Skipping.'
                                  .format(page))
                 raise SaveError('Locked')
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output(
                     'ERROR putting page: An edit conflict occurred. '
                     'Giving up.')
                 raise SaveError('Edit conflict')
-            except pywikibot.SpamblacklistError as error:
+            except SpamblacklistError as error:
                 pywikibot.output(
-                    'ERROR putting page: {0} blacklisted by spamfilter. '
+                    'ERROR putting page: {} blacklisted by spamfilter. '
                     'Giving up.'.format(error.url))
                 raise SaveError('Spam filter')
-            except pywikibot.PageSaveRelatedError as error:
+            except PageSaveRelatedError as error:
                 pywikibot.output('ERROR putting page: {}'
                                  .format(error.args,))
                 raise SaveError('PageSaveRelatedError')
@@ -1779,7 +1797,7 @@ class Subject(interwiki_graph.Subject):
                                  .format(timeout,))
                 timeout *= 2
                 pywikibot.sleep(timeout)
-            except pywikibot.ServerError:
+            except ServerError:
                 if timeout > 3600:
                     raise
                 pywikibot.output('ERROR putting page: ServerError.')
@@ -1811,7 +1829,7 @@ class Subject(interwiki_graph.Subject):
                 try:
                     linkedPages = {pywikibot.Page(link)
                                    for link in page.iterlanglinks()}
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.warning(
                         'Page {} does no longer exist?!'.format(page))
                     break
@@ -1910,19 +1928,19 @@ class InterwikiBot:
             self.conf.note('The first unfinished subject is {}'
                            .format(fs.origin))
         pywikibot.output(
-            'NOTE: Number of pages queued is {0}, trying to add {1} more.'
+            'NOTE: Number of pages queued is {}, trying to add {} more.'
             .format(len(self.subjects), number))
         for i in range(number):
             for page in self.pageGenerator:
                 if page in self.conf.skip:
-                    pywikibot.output('Skipping: {0} is in the skip list'
+                    pywikibot.output('Skipping: {} is in the skip list'
                                      .format(page))
                     continue
                 if self.conf.skipauto:
                     dictName, year = page.autoFormat()
                     if dictName is not None:
                         pywikibot.output(
-                            'Skipping: {0} is an auto entry {1}({2})'
+                            'Skipping: {} is an auto entry {}({})'
                             .format(page, dictName, year))
                         continue
                 if self.conf.parenthesesonly:
@@ -2010,7 +2028,7 @@ class InterwikiBot:
                 while timeout < 3600:
                     try:
                         self.generateMore(self.conf.maxquerysize - mycount)
-                    except pywikibot.ServerError:
+                    except ServerError:
                         # Could not extract allpages special page?
                         pywikibot.output(
                             'ERROR: could not retrieve more pages. '
@@ -2285,8 +2303,8 @@ class InterwikiDumps(OptionHandler):
                     self._next_page = page.title(with_ns=False) + '!'
                     self._next_namespace = page.namespace()
                 yield page
-            else:
-                self.restored_files.add(filename)
+
+            self.restored_files.add(filename)
 
         if self.opt.do_continue:
             yield from self.site.allpages(start=self.next_page,
@@ -2460,7 +2478,7 @@ def main(*args):
     except KeyboardInterrupt:
         dump.write_dump(bot.dump_titles, append)
     except Exception:
-        pywikibot.exception()
+        pywikibot.exception(tb=bool(config.verbose_output))
         dump.write_dump(bot.dump_titles, append)
     else:
         pywikibot.output('Script terminated sucessfully.')

@@ -8,9 +8,9 @@ import collections
 import gzip
 import hashlib
 import inspect
+import ipaddress
 import itertools
 import os
-import pkg_resources
 import queue
 import re
 import stat
@@ -19,21 +19,21 @@ import sys
 import threading
 import time
 import types
-
 from collections.abc import Container, Iterable, Iterator, Mapping, Sized
-from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
-from functools import wraps
+from functools import total_ordering, wraps
 from importlib import import_module
 from inspect import getfullargspec
-from ipaddress import ip_address
 from itertools import chain, zip_longest
-from typing import Optional
+from typing import Any, Optional
 from warnings import catch_warnings, showwarning, warn
+
+import pkg_resources
 
 from pywikibot.logging import debug
 from pywikibot.tools._unidata import _first_upper_exception
+
 
 try:
     import bz2
@@ -60,48 +60,46 @@ class _NotImplementedWarning(RuntimeWarning):
 
     """Feature that is no longer implemented."""
 
-    pass
 
+def is_ip_address(value: str) -> bool:
+    """Check if a value is a valid IPv4 or IPv6 address.
 
-def is_IP(IP: str) -> bool:  # noqa N802, N803
-    """Verify the IP address provided is valid.
-
-    No logging is performed. Use ip_address instead to catch errors.
-
-    @param IP: IP address
+    @param value: value to check
     """
     with suppress(ValueError):
-        ip_address(IP)
+        ipaddress.ip_address(value)
         return True
 
     return False
 
 
 def has_module(module, version=None):
-    """Check if a module can be imported."""
+    """Check if a module can be imported.
+
+    *New in version 3.0.*
+    """
     try:
         m = import_module(module)
     except ImportError:
         return False
-    else:
-        if version:
-            if not hasattr(m, '__version__'):
-                return False
+    if version:
+        if not hasattr(m, '__version__'):
+            return False
 
-            required_version = pkg_resources.parse_version(version)
-            module_version = pkg_resources.parse_version(m.__version__)
+        required_version = pkg_resources.parse_version(version)
+        module_version = pkg_resources.parse_version(m.__version__)
 
-            if module_version < required_version:
-                warn('Module version {} is lower than requested version {}'
-                     .format(module_version, required_version), ImportWarning)
-                return False
+        if module_version < required_version:
+            warn('Module version {} is lower than requested version {}'
+                 .format(module_version, required_version), ImportWarning)
+            return False
 
-        return True
+    return True
 
 
 def empty_iterator():
     # http://stackoverflow.com/a/13243870/473890
-    """An iterator which does nothing."""
+    """DEPRECATED. An iterator which does nothing."""
     return
     yield
 
@@ -140,6 +138,8 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     Those suppressed warnings that do not match the parameters will be raised
     shown upon exit.
+
+    *New in vesion 3.0.*
     """
 
     def __init__(self, message='', category=Warning, filename=''):
@@ -222,7 +222,7 @@ class ComparableMixin:
 
 class DotReadableDict:
 
-    """Parent class of Revision() and FileInfo().
+    """DEPRECATED. Lecacy class of Revision() and FileInfo().
 
     Provide: __getitem__() and __repr__().
     """
@@ -245,7 +245,7 @@ class DotReadableDict:
 
 class frozenmap(Mapping):  # noqa:  N801
 
-    """Frozen mapping, preventing write after initialisation."""
+    """DEPRECATED. Frozen mapping, preventing write after initialisation."""
 
     def __init__(self, data=(), **kwargs):
         """Initialize data in same ways like a dict."""
@@ -309,6 +309,8 @@ class SizedKeyCollection(Container, Iterable, Sized):
         >>> data.clear()
         >>> list(data)
         []
+
+    *New in version 6.1.*
     """
 
     def __init__(self, keyattr: str):
@@ -348,6 +350,8 @@ class SizedKeyCollection(Container, Iterable, Sized):
         key = getattr(value, self.keyattr)
         if callable(key):
             key = key()
+        if key not in self.data:
+            self.data[key] = []
         self.data[key].append(value)
         self.size += 1
 
@@ -368,7 +372,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
 
     def clear(self):
         """Remove all elements from SizedKeyCollection."""
-        self.data = defaultdict(list)
+        self.data = {}  # defaultdict fails (T282865)
         self.size = 0
 
     def filter(self, key):
@@ -385,7 +389,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
 class LazyRegex:
 
     """
-    Regex object that obtains and compiles the regex on usage.
+    DEPRECATED. Regex object that obtains and compiles the regex on usage.
 
     Instances behave like the object created using L{re.compile}.
     """
@@ -429,7 +433,8 @@ class LazyRegex:
     def __getattr__(self, attr):
         """Compile the regex and delegate all attribute to the regex."""
         if not self._raw:
-            raise AttributeError('%s.raw not set' % self.__class__.__name__)
+            raise AttributeError('{}.raw not set'
+                                 .format(self.__class__.__name__))
 
         if not self._compiled:
             self._compiled = re.compile(self.raw, self.flags)
@@ -437,8 +442,8 @@ class LazyRegex:
         if hasattr(self._compiled, attr):
             return getattr(self._compiled, attr)
 
-        raise AttributeError('%s: attr %s not recognised'
-                             % (self.__class__.__name__, attr))
+        raise AttributeError('{}: attr {} not recognised'
+                             .format(self.__class__.__name__, attr))
 
 
 class DeprecatedRegex(LazyRegex):
@@ -447,7 +452,7 @@ class DeprecatedRegex(LazyRegex):
 
     def __init__(self, pattern, flags=0, name=None, instead=None, since=None):
         """
-        Initializer.
+        DEPRECATED. Deprecate a give regex.
 
         If name is None, the regex pattern will be used as part of
         the deprecation warning.
@@ -502,6 +507,7 @@ def normalize_username(username) -> Optional[str]:
     return first_upper(username)
 
 
+@total_ordering
 class MediaWikiVersion:
 
     """
@@ -527,32 +533,26 @@ class MediaWikiVersion:
     MEDIAWIKI_VERSION = re.compile(
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
-    def __init__(self, version_str):
+    def __init__(self, version_str: str) -> None:
         """
         Initializer.
 
         @param version_str: version to parse
-        @type version: str
         """
-        self.parse(version_str)
+        self._parse(version_str)
 
-    @classmethod
-    def from_generator(cls, generator):
-        """Create instance using the generator string."""
-        if not generator.startswith('MediaWiki '):
-            raise ValueError('Generator string ({!r}) must start with '
-                             '"MediaWiki "'.format(generator))
-        return cls(generator[len('MediaWiki '):])
+    def _parse(self, version_str: str) -> None:
+        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(version_str)
 
-    def parse(self, vstring):
-        """Parse version string."""
-        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
         if not version_match:
-            raise ValueError('Invalid version number "{}"'.format(vstring))
+            raise ValueError('Invalid version number "{}"'.format(version_str))
+
         components = [int(n) for n in version_match.group(1).split('.')]
+
         # The _dev_version numbering scheme might change. E.g. if a stage
         # between 'alpha' and 'beta' is added, 'beta', 'rc' and stable releases
         # are reassigned (beta=3, rc=4, stable=5).
+
         if version_match.group(3):  # wmf version
             self._dev_version = (0, int(version_match.group(3)))
         elif version_match.group(4):
@@ -572,41 +572,107 @@ class MediaWikiVersion:
                       '"{}"'.format(version_match.group(2)),
                       _logger)
             self._dev_version = (4, )
+
         self.suffix = version_match.group(2) or ''
         self.version = tuple(components)
 
-    def __str__(self):
+    @staticmethod
+    def from_generator(generator: str) -> 'MediaWikiVersion':
+        """Create instance from a site's generator attribute."""
+        prefix = 'MediaWiki '
+
+        if not generator.startswith(prefix):
+            raise ValueError('Generator string ({!r}) must start with '
+                             '"{}"'.format(generator, prefix))
+
+        return MediaWikiVersion(generator[len(prefix):])
+
+    def __str__(self) -> str:
         """Return version number with optional suffix."""
         return '.'.join(str(v) for v in self.version) + self.suffix
 
-    def _cmp(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, str):
             other = MediaWikiVersion(other)
+        elif not isinstance(other, MediaWikiVersion):
+            return False
 
-        if self.version > other.version:
-            return 1
-        if self.version < other.version:
-            return -1
-        if self._dev_version > other._dev_version:
-            return 1
-        if self._dev_version < other._dev_version:
-            return -1
-        return 0
+        return self.version == other.version and \
+            self._dev_version == other._dev_version
 
-    def __eq__(self, other):
-        return self._cmp(other) == 0
+    def __lt__(self, other: Any) -> bool:
+        if isinstance(other, str):
+            other = MediaWikiVersion(other)
+        elif not isinstance(other, MediaWikiVersion):
+            raise TypeError("Comparison between 'MediaWikiVersion' and '{}' "
+                            'unsupported'.format(type(other).__name__))
 
-    def __lt__(self, other):
-        return self._cmp(other) < 0
+        if self.version != other.version:
+            return self.version < other.version
+        else:
+            return self._dev_version < other._dev_version
 
-    def __le__(self, other):
-        return self._cmp(other) <= 0
 
-    def __gt__(self, other):
-        return self._cmp(other) > 0
+class RLock:
+    """Context manager which implements extended reentrant lock objects.
 
-    def __ge__(self, other):
-        return self._cmp(other) >= 0
+    This RLock is implicit derived from threading.RLock but provides a
+    locked() method like in threading.Lock and a count attribute which
+    gives the active recursion level of locks.
+
+    Usage:
+
+    >>> from pywikibot.tools import RLock
+    >>> lock = RLock()
+    >>> lock.acquire()
+    True
+    >>> with lock: print(lock.count)  # nested lock
+    2
+    >>> lock.locked()
+    True
+    >>> lock.release()
+    >>> lock.locked()
+    False
+
+    *New in version 6.2*
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initializer."""
+        self._lock = threading.RLock(*args, **kwargs)
+        self._block = threading.Lock()
+
+    def __enter__(self):
+        """Acquire lock and call atenter."""
+        return self._lock.__enter__()
+
+    def __exit__(self, *exc):
+        """Call atexit and release lock."""
+        return self._lock.__exit__(*exc)
+
+    def __getattr__(self, name):
+        """Delegate attributes and methods to self._lock."""
+        return getattr(self._lock, name)
+
+    def __repr__(self):
+        """Representation of tools.RLock instance."""
+        return repr(self._lock).replace(
+            '_thread.RLock',
+            '{cls.__module__}.{cls.__class__.__name__}'.format(cls=self))
+
+    @property
+    def count(self):
+        """Return number of acquired locks."""
+        with self._block:
+            counter = re.search(r'count=(\d+) ', repr(self))
+            return int(counter.group(1))
+
+    def locked(self):
+        """Return true if the lock is acquired."""
+        with self._block:
+            status = repr(self).split(maxsplit=1)[0][1:]
+            assert status in ('locked', 'unlocked')
+            return status == 'locked'
 
 
 class ThreadedGenerator(threading.Thread):
@@ -919,6 +985,8 @@ def roundrobin_generators(*iterables):
     >>> tuple(roundrobin_generators('ABC', range(5)))
     ('A', 0, 'B', 1, 'C', 2, 3, 4)
 
+    *New in version 3.0.*
+
     @param iterables: any iterable to combine in roundrobin way
     @type iterables: iterable
     @return: the combined generator of iterables
@@ -1014,7 +1082,7 @@ class EmptyDefault(str, Mapping):
 
     def __iter__(self):
         """An iterator which does nothing and drops the argument."""
-        return empty_iterator()
+        return iter(())
 
     def __getitem__(self, key):
         """Raise always a L{CombinedError}."""
@@ -1035,11 +1103,11 @@ class SelfCallMixin:
 
     def __call__(self):
         """Do nothing and just return itself."""
-        if hasattr(self, '_own_desc'):
-            issue_deprecation_warning('Calling {}'.format(self._own_desc),
-                                      'it directly',
-                                      warning_class=FutureWarning,
-                                      since='20150515')
+        issue_deprecation_warning('Referencing this attribute like a function',
+                                  'it directly',
+                                  warning_class=FutureWarning,
+                                  since='20210420')
+
         return self
 
 
@@ -1047,14 +1115,10 @@ class SelfCallDict(SelfCallMixin, dict):
 
     """Dict with SelfCallMixin."""
 
-    pass
-
 
 class SelfCallString(SelfCallMixin, str):
 
     """String with SelfCallMixin."""
-
-    pass
 
 
 class DequeGenerator(Iterator, collections.deque):
@@ -1754,11 +1818,11 @@ class ModuleDeprecationWrapper(types.ModuleType):
         if __debug__:
             sys.modules[module.__name__] = self
 
-    def _add_deprecated_attr(self, name: str, replacement=None,
-                             replacement_name: Optional[str] = None,
-                             warning_message: Optional[str] = None,
-                             since: Optional[str] = None,
-                             future_warning: bool = False):
+    def add_deprecated_attr(self, name: str, replacement: Any = None, *,
+                            replacement_name: Optional[str] = None,
+                            warning_message: Optional[str] = None,
+                            since: Optional[str] = None,
+                            future_warning: bool = False):
         """
         Add the name to the local deprecated names dict.
 
@@ -1767,7 +1831,6 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param replacement: The replacement value which should be returned
             instead. If the name is already an attribute of that module this
             must be None. If None it'll return the attribute of the module.
-        @type replacement: any
         @param replacement_name: The name of the new replaced value. Required
             if C{replacement} is not None and it has no __name__ attribute.
             If it contains a '.', it will be interpreted as a Python dotted
@@ -1822,7 +1885,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             warn(warning_message.format(self._module.__name__, attr, name),
                  FutureWarning if future else DeprecationWarning, 2)
 
-            if repl:
+            if repl is not None:
                 return repl
 
             if '.' in name:
@@ -1928,9 +1991,19 @@ def concat_options(message, line_length, options):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('DotReadableDict', replacement_name='',
-                             since='20210416', future_warning=True)
-wrapper._add_deprecated_attr('frozenmap',
-                             replacement_name='types.MappingProxyType',
-                             since='20210415',
-                             future_warning=True)
+wrapper.add_deprecated_attr('empty_iterator', replacement_name='iter(())',
+                            since='20220422', future_warning=True)
+wrapper.add_deprecated_attr('DotReadableDict', replacement_name='',
+                            since='20210416', future_warning=True)
+wrapper.add_deprecated_attr('frozenmap',
+                            replacement_name='types.MappingProxyType',
+                            since='20210415',
+                            future_warning=True)
+wrapper.add_deprecated_attr('LazyRegex', replacement_name='',
+                            since='20210418', future_warning=True)
+wrapper.add_deprecated_attr('DeprecatedRegex', replacement_name='',
+                            since='20210418', future_warning=True)
+
+
+is_IP = redirect_func(is_ip_address, old_name='is_IP',  # noqa N816
+                      since='20210418')

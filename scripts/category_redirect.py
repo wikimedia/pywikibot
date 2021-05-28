@@ -31,15 +31,19 @@ Usage:
 import pickle
 import re
 import time
-
 from contextlib import suppress
 from datetime import timedelta
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
+from pywikibot.exceptions import (
+    CircularRedirectError,
+    Error,
+    NoPageError,
+    ServerError,
+)
 
 
 class CategoryRedirectBot(SingleSiteBot):
@@ -60,8 +64,8 @@ class CategoryRedirectBot(SingleSiteBot):
         self.template_list = []
         self.cat = None
         self.log_page = pywikibot.Page(self.site,
-                                       'User:%(user)s/category redirect log'
-                                       % {'user': self.site.username()})
+                                       'User:{}/category redirect log'
+                                       .format(self.site.username()))
 
         # Localization:
 
@@ -153,7 +157,7 @@ class CategoryRedirectBot(SingleSiteBot):
                                                         + '/doc', self.site))
                     try:
                         doc.get()
-                    except pywikibot.Error:
+                    except Error:
                         continue
                     changed = doc.change_category(oldCat, newCat,
                                                   summary=summary)
@@ -164,7 +168,7 @@ class CategoryRedirectBot(SingleSiteBot):
                     pywikibot.output('{}: {} found, {} moved'
                                      .format(oldCat.title(), found, moved))
                 return (found, moved)
-            except pywikibot.ServerError:
+            except ServerError:
                 pywikibot.output('Server error: retrying in 5 seconds...')
                 time.sleep(5)
                 continue
@@ -184,7 +188,7 @@ class CategoryRedirectBot(SingleSiteBot):
         LOG_SIZE = 7  # Number of items to keep in active log
         try:
             log_text = self.log_page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             log_text = ''
         log_items = {}
         header = None
@@ -230,7 +234,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 continue
             try:
                 target = page.getRedirectTarget()
-            except pywikibot.CircularRedirect:
+            except CircularRedirectError:
                 target = page
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-problem-self-linked',
@@ -265,7 +269,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-added', params)
                 self.log_text.append(message)
-            except pywikibot.Error:
+            except Error:
                 pywikibot.exception()
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-add-failed', params)
@@ -288,7 +292,7 @@ class CategoryRedirectBot(SingleSiteBot):
         self.newredirs = []
 
         localtime = time.localtime()
-        today = '%04d-%02d-%02d' % localtime[:3]
+        today = '{:04d}-{:02d}-{:02d}'.format(*localtime[:3])
         self.datafile = pywikibot.config.datafilepath(
             '{}-catmovebot-data'.format(self.site.dbName()))
         try:
@@ -300,9 +304,9 @@ class CategoryRedirectBot(SingleSiteBot):
             with open(self.datafile + '.bak', 'wb') as f:
                 pickle.dump(self.record, f, protocol=config.pickle_protocol)
         # regex to match soft category redirects
-        # TODO: enhance and use textlib._MultiTemplateMatchBuilder
-        #  note that any templates containing optional "category:" are
-        #  incorrect and will be fixed by the bot
+        # TODO: enhance and use textlib.MultiTemplateMatchBuilder
+        # note that any templates containing optional "category:" are
+        # incorrect and will be fixed by the bot
         template_regex = re.compile(
             r"""{{\s*(?:%(prefix)s\s*:\s*)?  # optional "template:"
                      (?:%(template)s)\s*\|   # catredir template name
@@ -343,7 +347,7 @@ class CategoryRedirectBot(SingleSiteBot):
             if cat_title not in self.record:
                 # make sure every redirect has a self.record entry
                 self.record[cat_title] = {today: None}
-                with suppress(pywikibot.Error):
+                with suppress(Error):
                     self.newredirs.append('*# {} → {}'.format(
                         cat.title(as_link=True, textlink=True),
                         cat.getCategoryRedirectTarget().title(
@@ -369,7 +373,7 @@ class CategoryRedirectBot(SingleSiteBot):
                         {'oldcat': cat.title(as_link=True, textlink=True)})
                     self.log_text.append(message)
                     continue
-            except pywikibot.Error:
+            except Error:
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-not-loaded',
                     {'oldcat': cat.title(as_link=True, textlink=True)})
@@ -398,7 +402,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 continue
             if dest.isCategoryRedirect():
                 double = dest.getCategoryRedirectTarget()
-                if double == dest or double == cat:
+                if double in (dest, cat):
                     message = i18n.twtranslate(
                         self.site, 'category_redirect-log-loop',
                         {'oldcat': dest.title(as_link=True, textlink=True)})
@@ -427,7 +431,7 @@ class CategoryRedirectBot(SingleSiteBot):
                         cat.text = newtext
                         cat.save(i18n.twtranslate(self.site,
                                                   self.dbl_redir_comment))
-                    except pywikibot.Error as e:
+                    except Error as e:
                         message = i18n.twtranslate(
                             self.site, 'category_redirect-log-failed',
                             {'error': e})
@@ -469,8 +473,9 @@ class CategoryRedirectBot(SingleSiteBot):
         self.newredirs.sort()
         comment = i18n.twtranslate(self.site, self.maint_comment)
         message = i18n.twtranslate(self.site, 'category_redirect-log-new')
-        self.log_page.text = ('\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n'
-                              % time.gmtime()[:6]
+        date_line = '\n== {}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z ==\n' \
+                    .format(*time.gmtime()[:6])
+        self.log_page.text = (date_line
                               + '\n'.join(self.log_text)
                               + '\n* ' + message + '\n'
                               + '\n'.join(self.newredirs)

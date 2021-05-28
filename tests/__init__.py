@@ -15,7 +15,6 @@ import functools
 import os
 import unittest
 import warnings
-
 from contextlib import suppress
 from itertools import chain
 from unittest import mock  # noqa: F401
@@ -29,11 +28,11 @@ from unittest.mock import MagicMock, Mock, patch  # noqa: F401
 import requests  # noqa: F401
 
 import pywikibot.data.api
-
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
+
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
@@ -55,7 +54,7 @@ def create_path_func(base_func, subpath):
     """Return a function returning a path relative to the given directory."""
     func = functools.partial(base_func, subpath)
     func.path = base_func.path + '/' + subpath
-    func.__doc__ = 'Return a path relative to `{0}/`.'.format(func.path)
+    func.__doc__ = 'Return a path relative to `{}/`.'.format(func.path)
     return func
 
 
@@ -132,7 +131,6 @@ library_test_modules = {
     'tools',
     'tools_chars',
     'tools_formatter',
-    'tools_ip',
     'ui',
     'ui_options',
     'upload',

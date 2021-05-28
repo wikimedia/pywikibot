@@ -14,7 +14,6 @@ import sys
 import sysconfig
 import time
 import xml.dom.minidom
-
 from contextlib import closing, suppress
 from importlib import import_module
 from io import BytesIO
@@ -22,19 +21,14 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-
+from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
-from pywikibot import config2 as config
-from pywikibot.tools import deprecated
+from pywikibot.exceptions import VersionParseError
+from pywikibot.tools import ModuleDeprecationWrapper, deprecated
 
 
 _logger = 'version'
-
-
-class ParseError(Exception):
-
-    """Parsing went wrong."""
 
 
 def _get_program_dir():
@@ -43,12 +37,13 @@ def _get_program_dir():
     return _program_dir
 
 
-def get_toolforge_hostname():
+def get_toolforge_hostname() -> Optional[str]:
     """Get hostname of the current Toolforge host.
+
+    *New in version 3.0.*
 
     @return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
-    @rtype: str or None
     """
     if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
         return socket.gethostname()
@@ -117,7 +112,7 @@ def getversiondict():
              .format(exceptions), UserWarning)
         exceptions = None
 
-    # git and svn can silently fail, as it may be a nightly.
+    # Git and SVN can silently fail, as it may be a nightly.
     if exceptions:
         pywikibot.debug('version algorithm exceptions:\n{!r}'
                         .format(exceptions), _logger)
@@ -158,7 +153,7 @@ def svn_rev_info(path):  # pragma: no cover
                 t = tag.split('://', 1)
                 t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/',
                                     '')
-                tag = '[{0}] {1}'.format(*t)
+                tag = '[{}] {}'.format(*t)
                 for _ in range(4):
                     entries.readline()
                 date = time.strptime(entries.readline()[:19],
@@ -226,9 +221,9 @@ def getversion_svn(path=None):  # pragma: no cover
         for i in range(len(date) - 1):
             assert date[i] == date2[i], 'Date of version is not consistent'
 
-    rev = 's%s' % rev
+    rev = 's{}'.format(rev)
     if (not date or not tag or not rev) and not path:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -248,7 +243,7 @@ def getversion_git(path=None):
     try:
         subprocess.Popen([cmd], stdout=subprocess.PIPE).communicate()
     except OSError:
-        # some windows git versions provide git.cmd instead of git.exe
+        # some Windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
     with open(os.path.join(_program_dir, '.git/config'), 'r') as f:
@@ -264,7 +259,7 @@ def getversion_git(path=None):
         e = tag.find('\n', s)
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
-        tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
+        tag = '[{}] {}'.format(t[0][:-1], '-'.join(t[3:]))
     dp = subprocess.Popen([cmd, '--no-pager',
                            'log', '-1',
                            '--pretty=format:"%ad|%an|%h|%H|%d"',
@@ -280,10 +275,10 @@ def getversion_git(path=None):
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
     rev, stderr = dp.communicate()
-    rev = 'g%s' % len(rev.splitlines())
+    rev = 'g{}'.format(len(rev.splitlines()))
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -307,7 +302,7 @@ def getversion_nightly(path=None):  # pragma: no cover
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
 
     if not date or not tag or not rev:
-        raise ParseError
+        raise VersionParseError
     return (tag, rev, date, hsh)
 
 
@@ -334,6 +329,7 @@ def getversion_package(path=None):
 def getversion_onlinerepo(path='branches/master'):
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
+
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
     buf = http.fetch(
@@ -343,7 +339,7 @@ def getversion_onlinerepo(path='branches/master'):
         hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
-        raise ParseError(repr(e) + ' while parsing ' + repr(buf))
+        raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
 
 
 @deprecated('pywikibot.__version__', since='20201003')
@@ -503,3 +499,13 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             del data[name]
 
     return data
+
+
+ParseError = VersionParseError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'ParseError',
+    replacement_name='pywikibot.exceptions.VersionParseError',
+    since='20210423',
+    future_warning=True)

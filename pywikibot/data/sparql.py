@@ -5,13 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import json
-
 from typing import Optional
 from urllib.parse import quote
 
 from requests.exceptions import Timeout
 
-from pywikibot import config, warning, Site, sleep
+from pywikibot import Site, config, sleep, warning
 from pywikibot.comms import http
 from pywikibot.exceptions import Error, TimeoutError
 
@@ -62,7 +61,7 @@ class SparqlQuery:
                     'Please provide the endpoint and entity_url '
                     'parameters instead of a repo.')
             if not self.endpoint:
-                raise Error('The site {0} does not provide a sparql endpoint.'
+                raise Error('The site {} does not provide a sparql endpoint.'
                             .format(repo))
         else:
             if not entity_url:
@@ -131,7 +130,7 @@ class SparqlQuery:
 
         @param query: Query text
         """
-        url = '{0}?query={1}'.format(self.endpoint, quote(query))
+        url = '{}?query={}'.format(self.endpoint, quote(query))
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
@@ -150,7 +149,7 @@ class SparqlQuery:
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
-        warning('Waiting {0} seconds before retrying.'.format(self.retry_wait))
+        warning('Waiting {} seconds before retrying.'.format(self.retry_wait))
         sleep(self.retry_wait)
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)

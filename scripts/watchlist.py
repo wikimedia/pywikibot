@@ -29,6 +29,7 @@ import os
 import pywikibot
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
+from pywikibot.exceptions import InvalidTitleError
 from scripts.maintenance.cache import CacheEntry
 
 
@@ -69,7 +70,7 @@ def isWatched(pageName, site=None):  # noqa N802, N803
 
 def refresh(site):
     """Fetch the watchlist."""
-    pywikibot.output('Retrieving watchlist for {0}.'.format(str(site)))
+    pywikibot.output('Retrieving watchlist for {}.'.format(str(site)))
     return list(site.watched_pages(force=True))
 
 
@@ -135,7 +136,7 @@ def main(*args):
         for page in watchlist:
             try:
                 pywikibot.stdout(page.title())
-            except pywikibot.InvalidTitle:
+            except InvalidTitleError:
                 pywikibot.exception()
 
 

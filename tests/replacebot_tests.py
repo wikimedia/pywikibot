@@ -5,20 +5,16 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from pywikibot import fixes
 from pywikibot.tools import suppress_warnings
-
 from scripts import replace
-
 from tests import WARN_SITE_OBJ, join_data_path
-
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
+
 
 # Load only the custom fixes
 fixes.fixes.clear()
@@ -58,7 +54,6 @@ class TestReplacementsMain(TWNBotTestCase):
 
         def patched_login():
             """Do nothing."""
-            pass
 
         def patched_site(*args, **kwargs):
             """Patching a Site instance replacing it's login."""
@@ -124,7 +119,7 @@ class TestReplacementsMain(TWNBotTestCase):
                                offset)
         if msg:
             self.assertEqual(replacement.edit_summary,
-                             'M{0}'.format(offset + 1))
+                             'M{}'.format(offset + 1))
         else:
             self.assertIs(replacement.edit_summary,
                           replacement.fix_set.edit_summary)

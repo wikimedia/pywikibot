@@ -3,12 +3,12 @@
 # (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
+#
 from csv import DictReader
 from io import StringIO
 from typing import Optional
 
 import pywikibot
-
 from pywikibot.comms import http
 from pywikibot.tools import remove_last_args
 

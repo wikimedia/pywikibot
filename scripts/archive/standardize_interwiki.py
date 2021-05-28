@@ -12,8 +12,8 @@ Parameters:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import i18n, textlib
+from pywikibot.exceptions import IsRedirectPageError, LockedPageError
 
 
 def main(*args):
@@ -31,11 +31,11 @@ def main(*args):
     comm = i18n.twtranslate(site, 'standardize_interwiki-comment')
     for pl in site.allpages(start):
         plname = pl.title()
-        pywikibot.output('\nLoading {0}...'.format(plname))
+        pywikibot.output('\nLoading {}...'.format(plname))
         try:
             oldtext = pl.get()
-        except pywikibot.IsRedirectPage:
-            pywikibot.output('{0} is a redirect!'.format(plname))
+        except IsRedirectPageError:
+            pywikibot.output('{} is a redirect!'.format(plname))
             continue
         old = pl.interwiki()
         new = {}
@@ -48,8 +48,8 @@ def main(*args):
                 # Submit changes
                 try:
                     pl.put(newtext, comment=comm)
-                except pywikibot.LockedPage:
-                    pywikibot.output('{0} is locked'.format(plname))
+                except LockedPageError:
+                    pywikibot.output('{} is locked'.format(plname))
                     continue
             else:
                 pywikibot.output('No changes needed.')

@@ -14,7 +14,7 @@ This script understands various command-line arguments:
 -pageage          The minimum number of days that has passed since the page was
                   created.
 
--touch            Do a null edit on every page which has a wikibase item.
+-touch            Do a null edit on every page which has a Wikibase item.
                   Be careful, this option can trigger edit rates or captchas
                   if your account is not autoconfirmed.
 
@@ -28,13 +28,15 @@ from datetime import timedelta
 from textwrap import fill
 
 import pywikibot
-
 from pywikibot import pagegenerators
-
 from pywikibot.backports import Set
 from pywikibot.bot import NoRedirectPageBot, WikidataBot
-from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
-                                  PageSaveRelatedError)
+from pywikibot.exceptions import (
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    PageSaveRelatedError,
+)
 
 
 DELETION_TEMPLATES = ('Q4847311', 'Q6687153', 'Q21528265')
@@ -82,14 +84,14 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         try:
             pywikibot.output('Doing a null edit on the page.')
             page.touch()
-        except (NoCreateError, NoPage):
-            pywikibot.error('Page {0} does not exist.'.format(
+        except (NoCreateError, NoPageError):
+            pywikibot.error('Page {} does not exist.'.format(
                 page.title(as_link=True)))
-        except LockedPage:
-            pywikibot.error('Page {0} is locked.'.format(
+        except LockedPageError:
+            pywikibot.error('Page {} is locked.'.format(
                 page.title(as_link=True)))
         except PageSaveRelatedError:
-            pywikibot.error('Page {0} not saved.'.format(
+            pywikibot.error('Page {} not saved.'.format(
                 page.title(as_link=True)))
 
     def _callback(self, page, exc) -> None:
@@ -175,7 +177,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""
         if item and item.exists():
-            pywikibot.output('{0} already has an item: {1}.'
+            pywikibot.output('{} already has an item: {}.'
                              .format(page, item))
             if self.opt.touch is True:
                 self._touch_page(page)

@@ -32,12 +32,14 @@ For further information see pywikibot/cosmetic_changes.py
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import ExistingPageBot, MultipleSitesBot, NoRedirectPageBot
 from pywikibot.cosmetic_changes import (
-    CANCEL_ALL, CANCEL_MATCH, CANCEL_METHOD, CANCEL_PAGE,
+    CANCEL_ALL,
+    CANCEL_MATCH,
+    CANCEL_METHOD,
+    CANCEL_PAGE,
     CosmeticChangesToolkit,
 )
 
@@ -111,7 +113,7 @@ def main(*args: Tuple[str, ...]) -> None:
                 options['ignore'] = CANCEL_MATCH
             else:
                 raise ValueError(
-                    'Unknown ignore mode "{0}"!'.format(ignore_mode))
+                    'Unknown ignore mode "{}"!'.format(ignore_mode))
         else:
             gen_factory.handle_arg(arg)
 

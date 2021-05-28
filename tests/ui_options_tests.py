@@ -5,12 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot import bot, bot_choice
-
+from pywikibot.bot_choice import ChoiceException, QuitKeyboardInterrupt
 from tests.aspects import TestCase
+
 
 message = bot.Option.formatted
 
@@ -195,21 +195,21 @@ class TestChoiceOptions(TestCase):
 
     def test_choice_excepton(self):
         """Test ChoiceException."""
-        option = bot.ChoiceException('Test', 'T')
+        option = ChoiceException('Test', 'T')
         self.assertTrue(option.stop)
         self.assertEqual(option.result('*'), option)
-        with self.assertRaises(bot.ChoiceException):
-            raise bot.ChoiceException('Test', 'T')
+        with self.assertRaises(ChoiceException):
+            raise ChoiceException('Test', 'T')
 
     def test_quit_keyboard_interrupt(self):
         """Test QuitKeyboardInterrupt."""
-        option = bot.QuitKeyboardInterrupt()
+        option = QuitKeyboardInterrupt()
         self.assertTrue(option.stop)
         self.assertEqual(option.result('*'), option)
         self.assertEqual(option.option, 'quit')
         self.assertEqual(option.shortcut, 'q')
-        with self.assertRaises(bot.QuitKeyboardInterrupt):
-            raise bot.QuitKeyboardInterrupt()
+        with self.assertRaises(QuitKeyboardInterrupt):
+            raise QuitKeyboardInterrupt()
 
 
 if __name__ == '__main__':  # pragma: no cover

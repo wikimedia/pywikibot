@@ -59,7 +59,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot, CurrentPageBot
+from pywikibot.bot import CurrentPageBot, SingleSiteBot
 
 
 # This is required for the text that is shown when you run this script
@@ -96,7 +96,7 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         the protections using this method.
         """
         if not self.user_confirm(
-                'Do you want to change the protection level of {0}?'
+                'Do you want to change the protection level of {}?'
                 .format(self.current_page.title(as_link=True,
                                                 force_interwiki=True))):
             return
@@ -134,7 +134,7 @@ def check_protection_level(operation, level, levels, default=None):
         if level == default:
             default_char = first_char[-1]
 
-    choice = pywikibot.input_choice('Choose a protection level to {0}:'
+    choice = pywikibot.input_choice('Choose a protection level to {}:'
                                     .format(operation),
                                     zip(levels, first_char),
                                     default=default_char)
@@ -195,7 +195,7 @@ def main(*args):
             protections[option] = value
         else:
             if not gen_factory.handle_arg(arg):
-                raise ValueError('Unknown parameter "{0}"'.format(arg))
+                raise ValueError('Unknown parameter "{}"'.format(arg))
             if value:
                 message_properties.update({'cat': value, 'page': value})
             if 'summary' not in options:
@@ -206,11 +206,11 @@ def main(*args):
         if message_type == 'simple' or message_properties:
             if default_level == 'all':
                 options['summary'] = i18n.twtranslate(
-                    site, 'unprotect-{0}'.format(message_type),
+                    site, 'unprotect-{}'.format(message_type),
                     message_properties)
             else:
                 options['summary'] = i18n.twtranslate(
-                    site, 'protect-{0}'.format(message_type),
+                    site, 'protect-{}'.format(message_type),
                     message_properties)
 
     generator = gen_factory.getCombinedGenerator()
@@ -228,7 +228,7 @@ def main(*args):
             level = check_protection_level(p_type, level, protection_levels,
                                            default_level)
             # '' is equivalent to 'all'
-            if level == 'none' or level == '':
+            if level in ('none', ''):
                 level = 'all'
             combined_protections[p_type] = level
         if not options.get('summary'):

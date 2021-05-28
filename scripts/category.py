@@ -51,7 +51,7 @@ Options for "move" action:
  -hist        - Creates a nice wikitable on the talk page of target category
                 that contains detailed page history of the source category.
  -nodelete    - Don't delete the old category after move.
- -nowb        - Don't update the wikibase repository.
+ -nowb        - Don't update the Wikibase repository.
  -allowsplit  - If that option is not set, it only moves the talk and main
                 page together.
  -mvtogether  - Only move the pages/subcategories of a category, if the
@@ -121,14 +121,12 @@ import math
 import os
 import pickle
 import re
-from textwrap import fill
-
 from contextlib import suppress
 from operator import methodcaller
+from textwrap import fill
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Set, Tuple
 from pywikibot.bot import (
@@ -141,6 +139,12 @@ from pywikibot.bot import (
     suggest_help,
 )
 from pywikibot.cosmetic_changes import moved_links
+from pywikibot.exceptions import (
+    Error,
+    NoPageError,
+    NoUsernameError,
+    PageSaveRelatedError,
+)
 from pywikibot.tools import deprecated_args, open_archive
 from pywikibot.tools.formatter import color_format
 
@@ -403,7 +407,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
 
     """A robot to mass-add a category to a list of pages."""
 
-    @deprecated_args(editSummary='comment', dry=None)
+    @deprecated_args(editSummary='comment', dry=True)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
                  create=False, comment='', follow_redirects=False) -> None:
         """Initializer."""
@@ -469,12 +473,12 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
-            pywikibot.output('Adding %s' % catpl.title(as_link=True))
+            pywikibot.output('Adding {}'.format(catpl.title(as_link=True)))
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 tagname = 'noinclude'
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
-                tagnameregexp = re.compile(r'(.*)(<\/{0}>)'.format(tagname),
+                tagnameregexp = re.compile(r'(.*)(<\/{}>)'.format(tagname),
                                            re.I | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
@@ -484,7 +488,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
                     # in the template page
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
-                        r'\1{0}\n\2'.format(categorytitle),
+                        r'\1{}\n\2'.format(categorytitle),
                         ['comment', 'math', 'nowiki', 'pre',
                          'syntaxhighlight'],
                         site=self.current_page.site)
@@ -506,7 +510,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
             try:
                 self.userPut(self.current_page, old_text, text,
                              summary=comment)
-            except pywikibot.PageSaveRelatedError as error:
+            except PageSaveRelatedError as error:
                 pywikibot.output('Page {} not saved: {}'
                                  .format(self.current_page.title(as_link=True),
                                          error))
@@ -592,7 +596,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
-        # if that page doesn't has a wikibase
+        # if that page doesn't have a Wikibase
         self.wikibase = wikibase and self.site.has_data_repository
         self.allow_split = allow_split
         self.move_together = move_together
@@ -602,8 +606,8 @@ class CategoryMoveRobot(CategoryPreprocess):
             repo = self.site.data_repository()
             if self.wikibase and repo.username() is None:
                 # The bot can't move categories nor update the Wikibase repo
-                raise pywikibot.NoUsername(
-                    "The 'wikibase' option is turned on and {0} has no "
+                raise NoUsernameError(
+                    "The 'wikibase' option is turned on and {} has no "
                     'registered username.'.format(repo))
 
         template_vars = {'oldcat': self.oldcat.title(with_ns=False)}
@@ -771,14 +775,14 @@ class CategoryMoveRobot(CategoryPreprocess):
         """
         move_possible = True
         if new_page and new_page.exists():
-            pywikibot.warning("The {0} target '{1}' already exists."
+            pywikibot.warning("The {} target '{}' already exists."
                               .format(name, new_page.title()))
             move_possible = False
         if not old_page.exists():
             # only warn if not a talk page
             log = (pywikibot.log if old_page.namespace() % 2 else
                    pywikibot.warning)
-            log("Moving {0} '{1}' requested, but the page doesn't exist."
+            log("Moving {} '{}' requested, but the page doesn't exist."
                 .format(name, old_page.title()))
             move_possible = False
         return move_possible
@@ -849,7 +853,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         if self.oldcat.exists():
             try:
                 item = pywikibot.ItemPage.fromPage(self.oldcat)
-            except pywikibot.NoPage:
+            except NoPageError:
                 item = None
             if item and item.exists():
                 cat_name_only = self.newcat.title(with_ns=False)
@@ -1008,19 +1012,24 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
 
-            def output_range(self, start, end) -> None:
-                """Output a section and categories from the text."""
-                pywikibot.output(self.text[start:end] + '...')
+            @property
+            def out(self) -> str:
+                """Create a section and categories from the text."""
+                start = max(0, self.start - self.context)
+                end = min(len(self.text), self.end + self.context)
+                text = self.text[start:end] + '...'
 
                 # if categories weren't visible, show them additionally
                 if len(self.text) > end:
                     for cat in member.categories():
                         if cat != original_cat:
-                            pywikibot.output(cat.title(as_link=True))
+                            text += cat.title(as_link=True)
                         else:
-                            pywikibot.output(color_format(
+                            text += color_format(
                                 '{lightpurple}{0}{default}',
-                                current_cat.title(as_link=True)))
+                                current_cat.title(as_link=True))
+                        text += '\n'
+                return text
 
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""
@@ -1045,10 +1054,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                     new_column = 0
 
                 # determine number format
-                if count > 9:
-                    index = '%2d'
-                else:
-                    index = '%d'
+                index = '%2d' if count > 9 else '%d'
 
                 lines = []
                 for i, cat in enumerate(cat_list):
@@ -1058,9 +1064,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                         # columnify
                         i2 = i + new_column
                         if i2 < count:
-                            lines.append('[{}{}] {:35}[{}{}] {}'.format(
-                                prefix, index % i, cat,
-                                prefix, index % i2, cat_list[i2]))
+                            lines.append('[{0}{1}] {2:35}[{0}{3}] {4}'
+                                         .format(prefix, index % i, cat,
+                                                 index % i2, cat_list[i2]))
                         else:
                             lines.append('[{}{}] {}'.format(
                                 prefix, index % i, cat))
@@ -1080,7 +1086,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         # determine a reasonable amount of context.
         try:
             full_text = member.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Page {} not found.'.format(member.title()))
             return
 
@@ -1252,7 +1258,7 @@ class CategoryTreeRobot:
         if currentDepth > 0:
             result += ' '
         result += cat.title(as_link=True, textlink=True, with_ns=False)
-        result += ' (%d)' % cat.categoryinfo['pages']
+        result += ' ({})'.format(int(cat.categoryinfo['pages']))
         if currentDepth < self.maxDepth // 2:
             # noisy dots
             pywikibot.output('.', newline=False)
@@ -1498,7 +1504,7 @@ def main(*args: Tuple[str, ...]) -> None:
         suggest_help(unknown_parameters=unknown)
         try:
             bot.run()
-        except pywikibot.Error:
+        except Error:
             pywikibot.error('Fatal error:', exc_info=True)
         finally:
             if cat_db:

@@ -5,8 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.exceptions import NoPage
+from pywikibot.exceptions import NoPageError
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
 from pywikibot.tools import remove_last_args
@@ -35,7 +34,7 @@ class ClosedSite(APISite):
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""
         if not self.page_exists(page):
-            raise NoPage(page)
+            raise NoPageError(page)
         if not hasattr(page, '_protection'):
             page._protection = {'edit': ('steward', 'infinity'),
                                 'move': ('steward', 'infinity'),

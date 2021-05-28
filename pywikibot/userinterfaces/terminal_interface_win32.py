@@ -8,6 +8,7 @@ import ctypes
 
 from pywikibot.userinterfaces import terminal_interface_base, win32_unicode
 
+
 windowsColors = {
     'default':     7,
     'black':       0,

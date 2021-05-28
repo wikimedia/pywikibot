@@ -10,8 +10,7 @@ import os
 import re
 import time
 import typing
-
-from collections import defaultdict, namedtuple, OrderedDict
+from collections import OrderedDict, defaultdict, namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
@@ -20,32 +19,34 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.exceptions import (
-    ArticleExistsConflict,
+    AbuseFilterDisallowedError,
+    APIError,
+    ArticleExistsConflictError,
     CaptchaError,
-    CascadeLockedPage,
-    CircularRedirect,
-    EditConflict,
+    CascadeLockedPageError,
+    CircularRedirectError,
+    EditConflictError,
     Error,
-    InconsistentTitleReceived,
-    InterwikiRedirectPage,
-    IsNotRedirectPage,
-    LockedNoPage,
-    LockedPage,
+    InconsistentTitleError,
+    InterwikiRedirectPageError,
+    IsNotRedirectPageError,
+    LockedNoPageError,
+    LockedPageError,
     NoCreateError,
-    NoPage,
-    NoUsername,
-    PageCreatedConflict,
-    PageDeletedConflict,
+    NoPageError,
+    NoUsernameError,
+    PageCreatedConflictError,
+    PageDeletedConflictError,
     PageRelatedError,
     PageSaveRelatedError,
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
-    UnknownExtension,
+    UnknownExtensionError,
+    UploadError,
 )
 from pywikibot.login import LoginStatus as _LoginStatus
 from pywikibot.site._basesite import BaseSite
@@ -69,12 +70,12 @@ from pywikibot.site._namespace import Namespace
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
+    MediaWikiVersion,
     compute_file_hash,
-    deprecated,
     deprecate_arg,
+    deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    MediaWikiVersion,
     merge_unique_dicts,
     normalize_username,
     remove_last_args,
@@ -161,7 +162,7 @@ class APISite(
             prefixes.update(self._interwikimap.get_by_url(url))
         if not prefixes:
             raise KeyError(
-                "There is no interwiki prefix to '{0}'".format(site))
+                "There is no interwiki prefix to '{}'".format(site))
         return sorted(prefixes, key=lambda p: (len(p), p))
 
     def local_interwiki(self, prefix):
@@ -210,9 +211,9 @@ class APISite(
                 for site in val:
                     if site['dbname'] == dbname:
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
-        raise ValueError('Cannot parse a site out of %s.' % dbname)
+        raise ValueError('Cannot parse a site out of {}.'.format(dbname))
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=True)
     def _generator(self, gen_class, type_arg: Optional[str] = None,
                    namespaces=None, total: Optional[int] = None, **args):
         """Convenience method that returns an API generator.
@@ -321,8 +322,8 @@ class APISite(
         @param user: bot user name. Overrides the username set by
             BaseSite initializer parameter or user-config.py setting
 
-        @raises pywikibot.exceptions.NoUsername: Username is not recognised
-            by the site.
+        @raises pywikibot.exceptions.NoUsernameError: Username is not
+            recognised by the site.
         @see: U{https://www.mediawiki.org/wiki/API:Login}
         """
         # TODO: this should include an assert that loginstatus
@@ -356,31 +357,32 @@ class APISite(
                 return
 
         # May occur if you are not logged in (no API read permissions).
-        except api.APIError:
+        except APIError:
             pass
-        except NoUsername as e:
+        except NoUsernameError as e:
             if not autocreate:
                 raise e
 
         if self.is_oauth_token_available():
             if self.userinfo['name'] == self.username():
-                raise NoUsername('Logging in on %s via OAuth failed' % self)
-
-            if self.username() is None:
-                raise NoUsername('No username has been defined in your '
-                                 'user-config.py: you have to add in this '
-                                 'file the following line:\n'
-                                 'usernames[{family!r}][{lang!r}]'
-                                 '= {username!r}'
-                                 .format(family=self.family,
-                                         lang=self.lang,
-                                         username=self.userinfo['name']))
-
-            raise NoUsername('Logged in on {site} via OAuth as '
-                             '{wrong}, but expect as {right}'
+                error_msg = ('Logging in on {} via OAuth failed'
+                             .format(self))
+            elif self.username() is None:
+                error_msg = ('No username has been defined in your '
+                             'user-config.py: you have to add in this '
+                             'file the following line:\n'
+                             'usernames[{family!r}][{lang!r}]= {username!r}'
+                             .format(family=self.family,
+                                     lang=self.lang,
+                                     username=self.userinfo['name']))
+            else:
+                error_msg = ('Logged in on {site} via OAuth as {wrong}, but '
+                             'expect as {right}'
                              .format(site=self,
                                      wrong=self.userinfo['name'],
                                      right=self.username()))
+
+            raise NoUsernameError(error_msg)
 
         login_manager = api.LoginManager(site=self, user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
@@ -549,7 +551,7 @@ class APISite(
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
         return {ns for ns in self.namespaces.values() if ns.id >= 0
-                and self._useroptions['searchNs{0}'.format(ns.id)]
+                and self._useroptions['searchNs{}'.format(ns.id)]
                 in ['1', True]}
 
     @property
@@ -649,12 +651,12 @@ class APISite(
                 except KeyError:
                     raise KeyError("No message '{}' found for lang '{}'"
                                    .format(key, amlang))
-            else:
-                return result
+
+            return result
 
         return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
-    @deprecated_args(forceReload=None)
+    @deprecated_args(forceReload=True)
     def mediawiki_message(self, key, lang=None) -> str:
         """Fetch the text for a MediaWiki message.
 
@@ -739,7 +741,7 @@ class APISite(
             msgs = self.mediawiki_messages(needed_mw_messages)
         except KeyError:
             raise NotImplementedError(
-                'MediaWiki messages missing: {0}'.format(needed_mw_messages))
+                'MediaWiki messages missing: {}'.format(needed_mw_messages))
 
         args = list(args)
         concat = msgs['and'] + msgs['word-separator']
@@ -880,7 +882,7 @@ class APISite(
                 namespace = _namespaces[ns]
             except KeyError:
                 pywikibot.warning(
-                    'Broken namespace alias "{0}" (id: {1}) on {2}'.format(
+                    'Broken namespace alias "{}" (id: {}) on {}'.format(
                         item['*'], ns, self))
             else:
                 if item['*'] not in namespace:
@@ -923,7 +925,7 @@ class APISite(
         """
         try:
             version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
-        except pywikibot.data.api.APIError:
+        except APIError:
             msg = 'You have no API read permissions.'
             if not self.logged_in():
                 msg += ' Seems you are not logged in.'
@@ -961,12 +963,6 @@ class APISite(
         """Return True if site has a shared data repository like Wikidata."""
         return self.data_repository() is not None
 
-    @property
-    @deprecated('has_data_repository', since='20160405', future_warning=True)
-    def has_transcluded_data(self):
-        """Return True if site has a shared data repository like Wikidata."""
-        return self.has_data_repository
-
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
@@ -998,8 +994,8 @@ class APISite(
                 return pywikibot.Site(url=url, user=self.username(),
                                       interface='DataSite')
             except SiteDefinitionError as e:
-                pywikibot.warning('Site "{0}" supports wikibase at "{1}", but '
-                                  'creation failed: {2}.'.format(self, url, e))
+                pywikibot.warning('Site "{}" supports wikibase at "{}", but '
+                                  'creation failed: {}.'.format(self, url, e))
                 return None
         else:
             assert 'warnings' in data
@@ -1015,30 +1011,30 @@ class APISite(
 
     def page_from_repository(self, item):
         """
-        Return a Page for this site object specified by wikibase item.
+        Return a Page for this site object specified by Wikibase item.
 
         @param item: id number of item, "Q###",
         @type item: str
-        @return: Page, or Category object given by wikibase item number
+        @return: Page, or Category object given by Wikibase item number
             for this site object.
         @rtype: pywikibot.Page or None
 
-        @raises pywikibot.exceptions.UnknownExtension: site has no wikibase
-            extension
-        @raises NotimplementedError: method not implemented for a wikibase site
+        @raises pywikibot.exceptions.UnknownExtensionError: site has no
+            Wikibase extension
+        @raises NotimplementedError: method not implemented for a Wikibase site
         """
         if not self.has_data_repository:
-            raise UnknownExtension(
-                'Wikibase is not implemented for {0}.'.format(self))
+            raise UnknownExtensionError(
+                'Wikibase is not implemented for {}.'.format(self))
         if self.is_data_repository():
             raise NotImplementedError(
                 'page_from_repository method is not implemented for '
-                'Wikibase {0}.'.format(self))
+                'Wikibase {}.'.format(self))
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)
         try:
             page_title = dp.getSitelink(self)
-        except pywikibot.NoPage:
+        except NoPageError:
             return None
         page = pywikibot.Page(self, page_title)
         if page.namespace() == Namespace.CATEGORY:
@@ -1076,20 +1072,20 @@ class APISite(
             whether 'imageinfo' is missing. In that case an exception
             is raised.
 
-        @raises NoPage: 'missing' key is found in pageitem
+        @raises NoPageError: 'missing' key is found in pageitem
         @raises PageRelatedError: 'imageinfo' is missing in pageitem
         """
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(with_section=False)):
-                raise InconsistentTitleReceived(page, pageitem['title'])
+                raise InconsistentTitleError(page, pageitem['title'])
             api.update_page(page, pageitem, query.props)
 
             if verify_imageinfo and 'imageinfo' not in pageitem:
                 if 'missing' in pageitem:
-                    raise NoPage(page)
+                    raise NoPageError(page)
                 raise PageRelatedError(
-                    page, 'loadimageinfo: Query on %s returned no imageinfo')
+                    page, 'loadimageinfo: Query on {} returned no imageinfo')
 
     def loadpageinfo(self, page, preload=False):
         """Load page info from api and store in page attributes.
@@ -1204,15 +1200,16 @@ class APISite(
         @return: redirect target of page
         @rtype: pywikibot.Page
 
-        @raises pywikibot.exceptions.IsNotRedirectPage: page is not a redirect
-        @raises RuntimeError: no redirects found
-        @raises pywikibot.exceptions.CircularRedirect: page is a circular
+        @raises pywikibot.exceptions.IsNotRedirectPageError: page is not a
             redirect
-        @raises pywikibot.exceptions.InterwikiRedirectPage: the redirect
+        @raises RuntimeError: no redirects found
+        @raises pywikibot.exceptions.CircularRedirectError: page is a circular
+            redirect
+        @raises pywikibot.exceptions.InterwikiRedirectPageError: the redirect
             target is on another site
         """
         if not self.page_isredirect(page):
-            raise IsNotRedirectPage(page)
+            raise IsNotRedirectPageError(page)
         if hasattr(page, '_redirtarget'):
             return page._redirtarget
 
@@ -1246,28 +1243,26 @@ class APISite(
             raise RuntimeError(
                 "getredirtarget: 'redirects' contains no key for page {}."
                 .format(title))
-        target_title = '%(title)s%(section)s' % redirmap[title]
+        target_title = '{title}{section}'.format_map(redirmap[title])
 
         if self.sametitle(title, target_title):
-            raise CircularRedirect(page)
+            raise CircularRedirectError(page)
 
         if 'pages' not in result['query']:
             # No "pages" element might indicate a circular redirect
             # Check that a "to" link is also a "from" link in redirmap
             for _from, _to in redirmap.items():
                 if _to['title'] in redirmap:
-                    raise CircularRedirect(page)
-            else:
-                target = pywikibot.Page(source=page.site, title=target_title)
+                    raise CircularRedirectError(page)
 
-                # Check if target is on another site.
-                if target.site != page.site:
-                    raise InterwikiRedirectPage(page, target)
-
-                # Redirect to Special: & Media: pages, which do not work
-                # like redirects, but are rendered like a redirect.
-                page._redirtarget = target
-                return page._redirtarget
+            target = pywikibot.Page(source=page.site, title=target_title)
+            # Check if target is on another site.
+            if target.site != page.site:
+                raise InterwikiRedirectPageError(page, target)
+            # Redirect to Special: & Media: pages, which do not work
+            # like redirects, but are rendered like a redirect.
+            page._redirtarget = target
+            return page._redirtarget
 
         pagedata = list(result['query']['pages'].values())[0]
         # There should be only one value in 'pages' (the ultimate
@@ -1435,6 +1430,8 @@ class APISite(
         If more than one target id is provided, the same action is taken for
         all of them.
 
+        *New in version 6.0.*
+
         @param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
         @param ids: Identifiers for the revision, log, file version or archive.
@@ -1472,16 +1469,16 @@ class APISite(
 
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': target,
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug("revdelete: Unexpected error code '%s' received."
-                            % err.code,
+                raise Error(self._dl_errors[err.code].format_map(errdata))
+            pywikibot.debug("revdelete: Unexpected error code '{}' received."
+                            .format(err.code),
                             _logger)
             raise
         else:
@@ -1494,35 +1491,36 @@ class APISite(
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
     _ep_errors = {
-        'noapiwrite': 'API editing not enabled on %(site)s wiki',
+        'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
-            'User %(user)s is not authorized to edit on %(site)s wiki',
+            'User {user} is not authorized to edit on {site} wiki',
         'cantcreate':
-            'User %(user)s not authorized to create new pages on %(site)s '
+            'User {user} not authorized to create new pages on {site} '
             'wiki',
         'cantcreate-anon':
             'Bot is not logged in, and anon users are not authorized to '
-            'create new pages on %(site)s wiki',
+            'create new pages on {site} wiki',
         'noimageredirect-anon':
             'Bot is not logged in, and anon users are not authorized to '
-            'create image redirects on %(site)s wiki',
-        'noimageredirect': 'User %(user)s not authorized to create image '
-                           'redirects on %(site)s wiki',
-        'filtered': '%(info)s',
-        'contenttoobig': '%(info)s',
+            'create image redirects on {site} wiki',
+        'noimageredirect': 'User {user} not authorized to create image '
+                           'redirects on {site} wiki',
+        'filtered': '{info}',
+        'contenttoobig': '{info}',
         'noedit-anon': 'Bot is not logged in, and anon users are not '
-                       'authorized to edit on %(site)s wiki',
+                       'authorized to edit on {site} wiki',
         'noedit':
-            'User %(user)s not authorized to edit pages on %(site)s wiki',
+            'User {user} not authorized to edit pages on {site} wiki',
         'missingtitle': NoCreateError,
-        'editconflict': EditConflict,
-        'articleexists': PageCreatedConflict,
-        'pagedeleted': PageDeletedConflict,
-        'protectedpage': LockedPage,
-        'protectedtitle': LockedNoPage,
-        'cascadeprotected': CascadeLockedPage,
+        'editconflict': EditConflictError,
+        'articleexists': PageCreatedConflictError,
+        'pagedeleted': PageDeletedConflictError,
+        'protectedpage': LockedPageError,
+        'protectedtitle': LockedNoPageError,
+        'cascadeprotected': CascadeLockedPageError,
         'titleblacklist-forbidden': TitleblacklistError,
         'spamblacklist': SpamblacklistError,
+        'abusefilter-disallowed': AbuseFilterDisallowedError,
     }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
@@ -1566,8 +1564,8 @@ class APISite(
         @type undo: int
         @return: True if edit succeeded, False if it failed
         @raises pywikibot.exceptions.Error: No text to be saved
-        @raises pywikibot.exceptions.NoPage: recreate is disabled and page does
-            not exist
+        @raises pywikibot.exceptions.NoPageError: recreate is disabled and page
+            does not exist
         @raises pywikibot.exceptions.CaptchaError: config.solve_captcha is
             False and saving the page requires solving a captcha
         """
@@ -1598,7 +1596,7 @@ class APISite(
             try:
                 lastrev = page.latest_revision
                 basetimestamp = lastrev.timestamp
-            except NoPage:
+            except NoPageError:
                 basetimestamp = False
                 if not recreate:
                     raise
@@ -1620,9 +1618,8 @@ class APISite(
         if watch in watch_items:
             params['watchlist'] = watch
         elif watch:
-            pywikibot.warning(
-                "editpage: Invalid watch value '%(watch)s' ignored."
-                % {'watch': watch})
+            pywikibot.warning("editpage: Invalid watch value '{}' ignored."
+                              .format(watch))
         req = self._simple_request(**params)
 
         self.lock_page(page)
@@ -1630,14 +1627,20 @@ class APISite(
             while True:
                 try:
                     result = req.submit()
-                    pywikibot.debug('editpage response: %s' % result,
+                    pywikibot.debug('editpage response: {}'.format(result),
                                     _logger)
-                except api.APIError as err:
+                except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
                         pywikibot.debug(
-                            "editpage: received '%s' even though bot is "
-                            'logged in' % err.code,
+                            "editpage: received '{}' even though bot is "
+                            'logged in'.format(err.code),
                             _logger)
+                    if err.code == 'abusefilter-warning':
+                        pywikibot.warning('{info}\n{warning}\nRetrying.'
+                                          .format(info=err.info,
+                                                  warning=err.other['warning'],
+                                                  ))
+                        continue
                     if err.code in self._ep_errors:
                         exception = self._ep_errors[err.code]
                         if isinstance(exception, str):
@@ -1647,14 +1650,20 @@ class APISite(
                                 'user': self.user(),
                                 'info': err.info
                             }
-                            raise Error(exception % errdata)
+                            raise Error(exception.format_map(errdata))
+                        if issubclass(exception, AbuseFilterDisallowedError):
+                            errdata = {
+                                'info': err.info,
+                                'warning': err.other['warning'],
+                            }
+                            raise exception(page, **errdata) from None
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
                         raise exception(page)
                     pywikibot.debug(
-                        "editpage: Unexpected error code '%s' received."
-                        % err.code,
+                        "editpage: Unexpected error code '{}' received."
+                        .format(err.code),
                         _logger)
                     raise
                 assert 'edit' in result and 'result' in result['edit'], result
@@ -1662,8 +1671,8 @@ class APISite(
                 if result['edit']['result'] == 'Success':
                     if 'nochange' in result['edit']:
                         # null edit, page not changed
-                        pywikibot.log('Page [[%s]] saved without any changes.'
-                                      % page.title())
+                        pywikibot.log('Page [[{}]] saved without any changes.'
+                                      .format(page.title()))
                         return True
                     page.latest_revision_id = result['edit']['newrevid']
                     # See:
@@ -1686,19 +1695,19 @@ class APISite(
 
                         if 'url' in captcha:
                             import webbrowser
-                            webbrowser.open('%s://%s%s'
-                                            % (self.protocol(),
-                                               self.hostname(),
-                                               captcha['url']))
+                            webbrowser.open('{}://{}{}'
+                                            .format(self.protocol(),
+                                                    self.hostname(),
+                                                    captcha['url']))
                             req['captchaword'] = pywikibot.input(
                                 'Please view CAPTCHA in your browser, '
                                 'then type answer here:')
                             continue
 
                         pywikibot.error(
-                            'editpage: unknown CAPTCHA response %s, '
+                            'editpage: unknown CAPTCHA response {}, '
                             'page not saved'
-                            % captcha)
+                            .format(captcha))
                         return False
 
                     if 'spamblacklist' in result['edit']:
@@ -1707,17 +1716,18 @@ class APISite(
 
                     if 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(
-                            'editpage: %s\n%s, '
-                            % (result['edit']['code'], result['edit']['info']))
+                            'editpage: {}\n{}, '
+                            .format(result['edit']['code'],
+                                    result['edit']['info']))
                         return False
 
-                    pywikibot.error('editpage: unknown failure reason %s'
-                                    % str(result))
+                    pywikibot.error('editpage: unknown failure reason {}'
+                                    .format(str(result)))
                     return False
 
                 pywikibot.error(
-                    "editpage: Unknown result code '%s' received; "
-                    'page not saved' % result['edit']['result'])
+                    "editpage: Unknown result code '{}' received; "
+                    'page not saved'.format(result['edit']['result']))
                 pywikibot.log(str(result))
                 return False
 
@@ -1778,15 +1788,15 @@ class APISite(
 
         # Check if pages exist before continuing
         if not source.exists():
-            raise NoPage(source,
-                         'Cannot merge revisions from source {source} because '
-                         'it does not exist on {site}'
-                         .format_map(errdata))
+            raise NoPageError(source,
+                              'Cannot merge revisions from source {source} '
+                              'because it does not exist on {site}'
+                              .format_map(errdata))
         if not dest.exists():
-            raise NoPage(dest,
-                         'Cannot merge revisions to destination {dest} '
-                         'because it does not exist on {site}'
-                         .format_map(errdata))
+            raise NoPageError(dest,
+                              'Cannot merge revisions to destination {dest} '
+                              'because it does not exist on {site}'
+                              .format_map(errdata))
 
         if source == dest:  # Same pages
             raise PageSaveRelatedError(
@@ -1811,7 +1821,7 @@ class APISite(
             pywikibot.debug('mergehistory response: {result}'
                             .format(result=result),
                             _logger)
-        except api.APIError as err:
+        except APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
                 raise Error(on_error.format_map(errdata))
@@ -1832,31 +1842,33 @@ class APISite(
 
     # catalog of move errors for use in error messages
     _mv_errors = {
-        'noapiwrite': 'API editing not enabled on %(site)s wiki',
+        'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
-            'User %(user)s is not authorized to edit on %(site)s wiki',
+            'User {user} is not authorized to edit on {site} wiki',
         'nosuppress':
-            'User %(user)s is not authorized to move pages without '
+            'User {user} is not authorized to move pages without '
             'creating redirects',
         'cantmove-anon':
             'Bot is not logged in, and anon users are not authorized to '
-            'move pages on %(site)s wiki',
+            'move pages on {site} wiki',
         'cantmove':
-            'User %(user)s is not authorized to move pages on %(site)s wiki',
+            'User {user} is not authorized to move pages on {site} wiki',
         'immobilenamespace':
-            'Pages in %(oldnamespace)s namespace cannot be moved on %(site)s '
+            'Pages in {oldnamespace} namespace cannot be moved on {site} '
             'wiki',
-        'articleexists': OnErrorExc(exception=ArticleExistsConflict,
+        'articleexists': OnErrorExc(exception=ArticleExistsConflictError,
                                     on_new_page=True),
         # "protectedpage" can happen in both directions.
-        'protectedpage': OnErrorExc(exception=LockedPage, on_new_page=None),
-        'protectedtitle': OnErrorExc(exception=LockedNoPage, on_new_page=True),
+        'protectedpage': OnErrorExc(exception=LockedPageError,
+                                    on_new_page=None),
+        'protectedtitle': OnErrorExc(exception=LockedNoPageError,
+                                     on_new_page=True),
         'nonfilenamespace':
-            'Cannot move a file to %(newnamespace)s namespace on %(site)s '
+            'Cannot move a file to {newnamespace} namespace on {site} '
             'wiki',
         'filetypemismatch':
-            '[[%(newtitle)s]] file extension does not match content of '
-            '[[%(oldtitle)s]]',
+            '[[{newtitle}]] file extension does not match content of '
+            '[[{oldtitle}]]',
     }
 
     @need_right('move')
@@ -1883,12 +1895,12 @@ class APISite(
         else:
             newtitle = newlink.title
         if oldtitle == newtitle:
-            raise Error('Cannot move page %s to its own title.'
-                        % oldtitle)
+            raise Error('Cannot move page {} to its own title.'
+                        .format(oldtitle))
         if not page.exists():
-            raise NoPage(page,
-                         'Cannot move page %(page)s because it '
-                         'does not exist on %(site)s.')
+            raise NoPageError(page,
+                              'Cannot move page {page} because it '
+                              'does not exist on {site}.')
         token = self.tokens['move']
         self.lock_page(page)
         req = self._simple_request(action='move',
@@ -1900,22 +1912,22 @@ class APISite(
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
-            pywikibot.debug('movepage response: %s' % result,
+            pywikibot.debug('movepage response: {}'.format(result),
                             _logger)
-        except api.APIError as err:
+        except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
                 pywikibot.debug(
-                    "movepage: received '%s' even though bot is logged in"
-                    % err.code,
+                    "movepage: received '{}' even though bot is logged in"
+                    .format(err.code),
                     _logger)
             if err.code in self._mv_errors:
                 on_error = self._mv_errors[err.code]
                 if hasattr(on_error, 'exception'):
-                    # LockedPage can be raised both if "from" or "to" page
+                    # LockedPageError can be raised both if "from" or "to" page
                     # are locked for the user.
                     # Both pages locked is not considered
                     # (a double failure has low probability)
-                    if issubclass(on_error.exception, LockedPage):
+                    if issubclass(on_error.exception, LockedPageError):
                         # we assume "from" is locked unless proven otherwise
                         failed_page = page
                         if newpage.exists():
@@ -1937,30 +1949,30 @@ class APISite(
                     'user': self.user(),
                 }
 
-                raise Error(on_error % errdata)
+                raise Error(on_error.format_map(errdata))
 
-            pywikibot.debug("movepage: Unexpected error code '%s' received."
-                            % err.code,
+            pywikibot.debug("movepage: Unexpected error code '{}' received."
+                            .format(err.code),
                             _logger)
             raise
         finally:
             self.unlock_page(page)
         if 'move' not in result:
-            pywikibot.error('movepage: %s' % result)
+            pywikibot.error('movepage: {}'.format(result))
             raise Error('movepage: unexpected response')
         # TODO: Check for talkmove-error messages
         if 'talkmove-error-code' in result['move']:
             pywikibot.warning(
-                'movepage: Talk page %s not moved'
-                % (page.toggleTalkPage().title(as_link=True)))
+                'movepage: Talk page {} not moved'
+                .format(page.toggleTalkPage().title(as_link=True)))
         return pywikibot.Page(page, newtitle)
 
     # catalog of rollback errors for use in error messages
     _rb_errors = {
-        'noapiwrite': 'API editing not enabled on %(site)s wiki',
-        'writeapidenied': 'User %(user)s not allowed to edit through the API',
+        'noapiwrite': 'API editing not enabled on {site} wiki',
+        'writeapidenied': 'User {user} not allowed to edit through the API',
         'alreadyrolled':
-            'Page [[%(title)s]] already rolled back; action aborted.',
+            'Page [[{title}]] already rolled back; action aborted.',
     }  # other errors shouldn't arise because we check for those errors
 
     @need_right('rollback')
@@ -2004,16 +2016,16 @@ class APISite(
         req = self._simple_request(**parameters)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(with_section=False),
                 'user': self.user(),
             }
             if err.code in self._rb_errors:
-                raise Error(self._rb_errors[err.code] % errdata)
-            pywikibot.debug("rollback: Unexpected error code '%s' received."
-                            % err.code,
+                raise Error(self._rb_errors[err.code].format_map(errdata))
+            pywikibot.debug("rollback: Unexpected error code '{}' received."
+                            .format(err.code),
                             _logger)
             raise
         finally:
@@ -2021,13 +2033,13 @@ class APISite(
 
     # catalog of delete errors for use in error messages
     _dl_errors = {
-        'noapiwrite': 'API editing not enabled on %(site)s wiki',
-        'writeapidenied': 'User %(user)s not allowed to edit through the API',
-        'permissiondenied': 'User %(user)s not authorized to (un)delete '
-                            'pages on %(site)s wiki.',
+        'noapiwrite': 'API editing not enabled on {site} wiki',
+        'writeapidenied': 'User {user} not allowed to edit through the API',
+        'permissiondenied': 'User {user} not authorized to (un)delete '
+                            'pages on {site} wiki.',
         'cantdelete':
-            'Could not delete [[%(title)s]]. Maybe it was deleted already.',
-        'cantundelete': 'Could not undelete [[%(title)s]]. '
+            'Could not delete [[{title}]]. Maybe it was deleted already.',
+        'cantundelete': 'Could not undelete [[{title}]]. '
                         'Revision may not exist or was already undeleted.',
         'nodeleteablefile': 'No such old version of file'
     }  # other errors shouldn't occur because of pre-submission checks
@@ -2043,6 +2055,9 @@ class APISite(
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
+        *Renamed in version 6.1.*
+
+        *New in version 6.1:* keyword only parameter *oldimage* was added.
 
         @param page: Page to be deleted or its pageid.
         @type page: L{pywikibot.page.BasePage} or, for pageid, int or str
@@ -2077,14 +2092,14 @@ class APISite(
         self.lock_page(page)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': msg,
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code] % errdata)
+                raise Error(self._dl_errors[err.code].format_map(errdata))
             pywikibot.debug('delete: Unexpected error code {!r} received.'
                             .format(err.code),
                             _logger)
@@ -2132,6 +2147,12 @@ class APISite(
 
         @see: U{https://www.mediawiki.org/wiki/API:Undelete}
 
+        *Renamed in version 6.1.*
+
+        *New in version 6.1:* *fileids* parameter was added.
+
+        *Changed in verson 6.1:* keyword argument required for *revisions*.
+
         @param page: Page to be deleted.
         @type page: pywikibot.BasePage
         @param reason: Undeletion reason.
@@ -2155,14 +2176,14 @@ class APISite(
         self.lock_page(page)
         try:
             req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(with_section=False),
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code] % errdata)
+                raise Error(self._dl_errors[err.code].format_map(errdata))
             pywikibot.debug('undelete: Unexpected error code {!r} received.'
                             .format(err.code),
                             _logger)
@@ -2202,12 +2223,12 @@ class APISite(
         self.undelete(page, reason, fileids=fileids)
 
     _protect_errors = {
-        'noapiwrite': 'API editing not enabled on %(site)s wiki',
-        'writeapidenied': 'User %(user)s not allowed to edit through the API',
+        'noapiwrite': 'API editing not enabled on {site} wiki',
+        'writeapidenied': 'User {user} not allowed to edit through the API',
         'permissiondenied':
-            'User %(user)s not authorized to protect pages on %(site)s wiki.',
+            'User {user} not authorized to protect pages on {site} wiki.',
         'cantedit':
-            "User %(user)s can't protect this page because user %(user)s "
+            "User {user} can't protect this page because user {user} "
             "can't edit it.",
         'protect-invalidlevel': 'Invalid protection level'
     }
@@ -2267,15 +2288,15 @@ class APISite(
         req = self._simple_request(**parameters)
         try:
             result = req.submit()
-        except api.APIError as err:
+        except APIError as err:
             errdata = {
                 'site': self,
                 'user': self.user(),
             }
             if err.code in self._protect_errors:
-                raise Error(self._protect_errors[err.code] % errdata)
-            pywikibot.debug("protect: Unexpected error code '%s' received."
-                            % err.code,
+                raise Error(self._protect_errors[err.code].format_map(errdata))
+            pywikibot.debug("protect: Unexpected error code '{}' received."
+                            .format(err.code),
                             _logger)
             raise
         else:
@@ -2306,11 +2327,11 @@ class APISite(
             'never', 'infinite', 'indefinite' it never does. If the value is
             given as a str it's parsed by php's strtotime function:
 
-                U{http://php.net/manual/en/function.strtotime.php}
+                U{https://www.php.net/manual/en/function.strtotime.php}
 
             The relative format is described there:
 
-                U{http://php.net/manual/en/datetime.formats.relative.php}
+                U{https://www.php.net/manual/en/datetime.formats.relative.php}
 
             It is recommended to not use a str if possible to be
             independent of the API.
@@ -2392,28 +2413,6 @@ class APISite(
         unwatch = 'unwatched' if unwatch else 'watched'
         return all(unwatch in r for r in results['watch'])
 
-    @need_right('editmywatchlist')
-    @deprecated('Site().watch', since='20160102', future_warning=True)
-    def watchpage(self, page, unwatch=False) -> bool:
-        """
-        Add or remove page from watchlist.
-
-        DEPRECATED: Use Site().watch() instead.
-
-        @param page: A single page.
-        @type page: A page object, a page-title string.
-        @param unwatch: If True, remove page from watchlist;
-            if False (default), add it.
-        @return: True if API returned expected response; False otherwise
-
-        """
-        try:
-            result = self.watch(page, unwatch)
-        except KeyError:
-            pywikibot.error('watchpage: Unexpected API response')
-            result = False
-        return result
-
     @need_right('purge')
     def purgepages(self, pages, forcelinkupdate: bool = False,
                    forcerecursivelinkupdate: bool = False,
@@ -2447,7 +2446,7 @@ class APISite(
             result = result['purge']
         except KeyError:
             pywikibot.error(
-                'purgepages: Unexpected API response:\n%s' % result)
+                'purgepages: Unexpected API response:\n{}'.format(result))
             return False
         if not all('purged' in page for page in result):
             return False
@@ -2479,7 +2478,7 @@ class APISite(
                                 parameters={'action': 'upload',
                                             'token': self.tokens['edit']})
             req.submit()
-        except api.APIError as error:
+        except APIError as error:
             if error.code == 'uploaddisabled':
                 self._uploaddisabled = True
             elif error.code == 'missingparam':
@@ -2515,6 +2514,7 @@ class APISite(
                watch: bool = False,
                ignore_warnings=False,
                chunk_size: int = 0,
+               asynchronous: bool = False,
                _file_key: Optional[str] = None,
                _offset: Union[bool, int] = 0,
                _verify_stash: Optional[bool] = None,
@@ -2525,6 +2525,12 @@ class APISite(
         @see: U{https://www.mediawiki.org/wiki/API:Upload}
 
         Either source_filename or source_url, but not both, must be provided.
+
+        *Changed in version 6.0:* keyword arguments required for all
+        parameters except *filepage*.
+
+        *Changed in version 6.2:* asynchronous upload is used if
+        *asynchronous* parameter is set.
 
         @param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.
@@ -2538,18 +2544,20 @@ class APISite(
         @param watch: If true, add filepage to the bot user's watchlist
         @param ignore_warnings: It may be a static boolean, a callable
             returning a boolean or an iterable. The callable gets a list of
-            UploadWarning instances and the iterable should contain the warning
+            UploadError instances and the iterable should contain the warning
             codes for which an equivalent callable would return True if all
-            UploadWarning codes are in thet list. If the result is False it'll
+            UploadError codes are in thet list. If the result is False it'll
             not continue uploading the file and otherwise disable any warning
             and reattempt to upload the file. NOTE: If report_success is True
-            or None it'll raise an UploadWarning exception if the static
+            or None it'll raise an UploadError exception if the static
             boolean is False.
         @type ignore_warnings: bool or callable or iterable of str
         @param chunk_size: The chunk size in bytes for chunked uploading (see
             U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}).
             It will only upload in chunks, if the chunk size is positive
             but lower than the file size.
+        @param asynchronous: Make potentially large file operations
+            asynchronous on the server side when possible.
         @param _file_key: Reuses an already uploaded file using the filekey. If
             None (default) it will upload the file.
         @param _offset: When file_key is not None this can be an integer to
@@ -2563,7 +2571,7 @@ class APISite(
             None it'll verifies the stash when a file key and offset is given.
         @param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
-            raise an UploadWarning if a warning occurred. If it's None
+            raise an UploadError if a warning occurred. If it's None
             (default) it'll be True if ignore_warnings is a bool and False
             otherwise. If it's True or None ignore_warnings must be a bool.
         @return: It returns True if the upload was successful and False
@@ -2571,28 +2579,28 @@ class APISite(
         """
         def create_warnings_list(response):
             return [
-                api.UploadWarning(
+                UploadError(
                     warning,
-                    upload_warnings.get(warning, '%(msg)s') % {'msg': data},
+                    upload_warnings.get(warning, '{msg}').format(msg=data),
                     _file_key, response['offset'])
                 for warning, data in response['warnings'].items()]
 
         upload_warnings = {
             # map API warning codes to user error messages
-            # %(msg)s will be replaced by message string from API response
+            # {msg} will be replaced by message string from API response
             'duplicate-archive':
-                'The file is a duplicate of a deleted file %(msg)s.',
-            'was-deleted': 'The file %(msg)s was previously deleted.',
-            'emptyfile': 'File %(msg)s is empty.',
-            'exists': 'File %(msg)s already exists.',
-            'duplicate': 'Uploaded file is a duplicate of %(msg)s.',
+                'The file is a duplicate of a deleted file {msg}.',
+            'was-deleted': 'The file {msg} was previously deleted.',
+            'emptyfile': 'File {msg} is empty.',
+            'exists': 'File {msg} already exists.',
+            'duplicate': 'Uploaded file is a duplicate of {msg}.',
             'badfilename': 'Target filename is invalid.',
-            'filetype-unwanted-type': 'File %(msg)s type is unwanted type.',
+            'filetype-unwanted-type': 'File {msg} type is unwanted type.',
             'exists-normalized': 'File exists with different extension as '
-                                 '"%(msg)s".',
-            'bad-prefix': 'Target filename has a bad prefix %(msg)s.',
+                                 '"{msg}".',
+            'bad-prefix': 'Target filename has a bad prefix {msg}.',
             'page-exists':
-                'Target filename exists but with a different file %(msg)s.',
+                'Target filename exists but with a different file {msg}.',
 
             # API-returned message string will be timestamps, not much use here
             'nochange': 'The upload is an exact duplicate of the current '
@@ -2639,13 +2647,14 @@ class APISite(
         file_page_title = filepage.title(with_ns=False)
         file_size = None
         offset = _offset
+
         # make sure file actually exists
         if source_filename:
             if os.path.isfile(source_filename):
                 file_size = os.path.getsize(source_filename)
             elif offset is not False:
-                raise ValueError("File '%s' does not exist."
-                                 % source_filename)
+                raise ValueError("File '{}' does not exist."
+                                 .format(source_filename))
 
         if source_filename and _file_key:
             assert offset is False or file_size is not None
@@ -2654,8 +2663,8 @@ class APISite(
             if (offset is not False and offset is not True
                     and offset > file_size):
                 raise ValueError(
-                    'For the file key "{0}" the offset was set to {1} '
-                    'while the file is only {2} bytes large.'.format(
+                    'For the file key "{}" the offset was set to {} '
+                    'while the file is only {} bytes large.'.format(
                         _file_key, offset, file_size))
 
         if _verify_stash or offset is True:
@@ -2674,24 +2683,24 @@ class APISite(
             elif offset is False:
                 if file_size != stash_info['size']:
                     raise ValueError(
-                        'For the file key "{0}" the server reported a size '
-                        '{1} while the file size is {2}'
+                        'For the file key "{}" the server reported a size '
+                        '{} while the file size is {}'
                         .format(_file_key, stash_info['size'], file_size))
             elif offset is not False and offset != stash_info['size']:
                 raise ValueError(
-                    'For the file key "{0}" the server reported a size {1} '
-                    'while the offset was {2}'.format(
+                    'For the file key "{}" the server reported a size {} '
+                    'while the offset was {}'.format(
                         _file_key, stash_info['size'], offset))
 
             if _verify_stash:
                 # The SHA1 was also requested so calculate and compare it
                 assert 'sha1' in stash_info, \
-                    'sha1 not in stash info: {0}'.format(stash_info)
+                    'sha1 not in stash info: {}'.format(stash_info)
                 sha1 = compute_file_hash(source_filename, bytes_to_read=offset)
                 if sha1 != stash_info['sha1']:
                     raise ValueError(
-                        'The SHA1 of {0} bytes of the stashed "{1}" is {2} '
-                        'while the local file is {3}'.format(
+                        'The SHA1 of {} bytes of the stashed "{}" is {} '
+                        'while the local file is {}'.format(
                             offset, _file_key, stash_info['sha1'], sha1))
 
         assert offset is not True
@@ -2700,12 +2709,19 @@ class APISite(
 
         if _file_key and offset is False or offset == file_size:
             pywikibot.log('Reused already upload file using '
-                          'filekey "{0}"'.format(_file_key))
+                          'filekey "{}"'.format(_file_key))
             # TODO: Use sessionkey instead of filekey if necessary
-            final_request = self._simple_request(action='upload', token=token,
-                                                 filename=file_page_title,
-                                                 comment=comment, text=text,
-                                                 filekey=_file_key)
+            final_request = self._request(
+                parameters={
+                    'action': 'upload',
+                    'token': token,
+                    'filename': file_page_title,
+                    'comment': comment,
+                    'text': text,
+                    'async': asynchronous,
+                    'filekey': _file_key
+                })
+
         elif source_filename:
             # TODO: Dummy value to allow also Unicode names, see bug T75661
             mime_filename = 'FAKE-NAME'
@@ -2720,44 +2736,56 @@ class APISite(
                         'filename': file_page_title, 'comment': comment})
                 if chunked_upload:
                     if offset > 0:
-                        pywikibot.log('Continuing upload from byte '
-                                      '{0}'.format(offset))
+                        pywikibot.log('Continuing upload from byte {}'
+                                      .format(offset))
+                    poll = False
                     while True:
-                        f.seek(offset)
-                        chunk = f.read(chunk_size)
-                        # workaround (hack) for T132676
-                        # append another '\r' so that one is the payload and
-                        # the second is used for newline when mangled by email
-                        # package.
-                        if (len(chunk) < chunk_size
-                                or (offset + len(chunk)) == filesize
-                                and chunk[-1] == b'\r'[0]):
-                            chunk += b'\r'
 
-                        mime_params = {
-                            'chunk': (chunk,
-                                      ('application', 'octet-stream'),
-                                      {'filename': mime_filename})
-                        }
-                        req = self._request(
-                            throttle=throttle,
-                            mime=mime_params,
-                            parameters={
-                                'action': 'upload',
-                                'token': token,
-                                'stash': True,
-                                'filesize': filesize,
-                                'offset': offset,
-                                'filename': file_page_title,
-                                'ignorewarnings': ignore_all_warnings})
+                        if poll:
+                            # run a poll; not possible in first iteration
+                            assert _file_key
+                            req = self._simple_request(
+                                action='upload',
+                                token=token,
+                                filekey=_file_key,
+                                checkstatus=True)
+                        else:
+                            f.seek(offset)
+                            chunk = f.read(chunk_size)
+                            # workaround (hack) for T132676
+                            # append another '\r' so that one is the payload
+                            # and the second is used for newline when mangled
+                            # by email package.
+                            if (len(chunk) < chunk_size
+                                    or (offset + len(chunk)) == filesize
+                                    and chunk[-1] == b'\r'[0]):
+                                chunk += b'\r'
 
-                        if _file_key:
-                            req['filekey'] = _file_key
+                            mime_params = {
+                                'chunk': (chunk,
+                                          ('application', 'octet-stream'),
+                                          {'filename': mime_filename})
+                            }
+                            req = self._request(
+                                throttle=throttle,
+                                mime=mime_params,
+                                parameters={
+                                    'action': 'upload',
+                                    'token': token,
+                                    'stash': True,
+                                    'filesize': filesize,
+                                    'offset': offset,
+                                    'filename': file_page_title,
+                                    'async': asynchronous,
+                                    'ignorewarnings': ignore_all_warnings})
+
+                            if _file_key:
+                                req['filekey'] = _file_key
 
                         try:
                             data = req.submit()['upload']
                             self._uploaddisabled = False
-                        except api.APIError as error:
+                        except APIError as error:
                             # TODO: catch and process foreseeable errors
                             if error.code == 'uploaddisabled':
                                 self._uploaddisabled = True
@@ -2777,10 +2805,10 @@ class APISite(
                                 # every time ApiError.
                                 if offset != new_offset:
                                     pywikibot.log(
-                                        'Old offset: {0}; Returned '
-                                        'offset: {1}; Chunk size: '
-                                        '{2}'.format(offset, new_offset,
-                                                     len(chunk)))
+                                        'Old offset: {}; Returned '
+                                        'offset: {}; Chunk size: {}'
+                                        .format(offset, new_offset,
+                                                len(chunk)))
                                     pywikibot.warning('Attempting to correct '
                                                       'automatically from '
                                                       'offset mismatch error.')
@@ -2789,8 +2817,12 @@ class APISite(
                             raise error
                         if 'nochange' in data:  # in simulation mode
                             break
-                        _file_key = data['filekey']
-                        if 'warnings' in data and not ignore_all_warnings:
+
+                        # Polls may not contain file key in response
+                        _file_key = data.get('filekey', _file_key)
+                        if data['result'] == 'Warning':
+                            assert('warnings' in data
+                                   and not ignore_all_warnings)
                             if callable(ignore_warnings):
                                 restart = False
                                 if 'offset' not in data:
@@ -2827,23 +2859,35 @@ class APISite(
                             result = data
                             result.setdefault('offset', 0)
                             break
-                        throttle = False
-                        if 'offset' in data:
-                            new_offset = int(data['offset'])
-                            if offset + len(chunk) != new_offset:
-                                pywikibot.log('Old offset: {0}; Returned '
-                                              'offset: {1}; Chunk size: '
-                                              '{2}'.format(offset, new_offset,
-                                                           len(chunk)))
-                                pywikibot.warning('Unexpected offset.')
-                            offset = new_offset
-                        else:
-                            pywikibot.warning('Offset was not supplied.')
-                            offset += len(chunk)
-                        if data['result'] != 'Continue':  # finished
+
+                        if data['result'] == 'Continue':
+                            throttle = False
+                            if 'offset' in data:
+                                new_offset = int(data['offset'])
+                                if offset + len(chunk) != new_offset:
+                                    pywikibot.log('Old offset: {0}; Returned '
+                                                  'offset: {1}; Chunk size: '
+                                                  '{2}'.format(offset,
+                                                               new_offset,
+                                                               len(chunk)))
+                                    pywikibot.warning('Unexpected offset.')
+                                offset = new_offset
+                            else:
+                                pywikibot.warning('Offset was not supplied.')
+                                offset += len(chunk)
+                        elif data['result'] == 'Poll':
+                            poll = True
+                            pywikibot.log('Waiting for server to '
+                                          'assemble chunks.')
+                        elif data['result'] == 'Success':  # finished
                             pywikibot.log('Finished uploading last chunk.')
                             final_request['filekey'] = _file_key
+                            final_request['async'] = asynchronous
                             break
+                        else:
+                            raise Error(
+                                'Unrecognized result: %s' % data['result'])
+
                 else:  # not chunked upload
                     if _file_key:
                         final_request['filekey'] = _file_key
@@ -2859,75 +2903,94 @@ class APISite(
             # upload by URL
             if not self.has_right('upload_by_url'):
                 raise Error(
-                    "User '%s' is not authorized to upload by URL on site %s."
-                    % (self.user(), self))
+                    "User '{}' is not authorized to upload by URL on site {}."
+                    .format(self.user(), self))
             final_request = self._simple_request(
                 action='upload', filename=file_page_title,
                 url=source_url, comment=comment, text=text, token=token)
 
-        if not result:
-            final_request['watch'] = watch
-            final_request['ignorewarnings'] = ignore_all_warnings
-            try:
-                result = final_request.submit()
-                self._uploaddisabled = False
-            except api.APIError as error:
-                # TODO: catch and process foreseeable errors
-                if error.code == 'uploaddisabled':
-                    self._uploaddisabled = True
-                raise error
-            result = result['upload']
-            pywikibot.debug(result, _logger)
+        while True:
+            if not result:
+                final_request['watch'] = watch
+                final_request['ignorewarnings'] = ignore_all_warnings
+                try:
+                    result = final_request.submit()
+                    self._uploaddisabled = False
+                except api.APIError as error:
+                    # TODO: catch and process foreseeable errors
+                    if error.code == 'uploaddisabled':
+                        self._uploaddisabled = True
+                    raise error
+                result = result['upload']
+                pywikibot.debug(result, _logger)
 
-        if 'warnings' in result and not ignore_all_warnings:
-            if 'filekey' in result:
-                _file_key = result['filekey']
-            elif 'sessionkey' in result:
-                # TODO: Probably needs to be reflected in the API call above
-                _file_key = result['sessionkey']
-                pywikibot.warning('Using sessionkey instead of filekey.')
-            else:
-                _file_key = None
-                pywikibot.warning('No filekey defined.')
+            if 'result' not in result:
+                raise Error('Upload: unrecognized response: {}'.format(result))
 
-            if not report_success:
-                result.setdefault('offset', True)
-                if ignore_warnings(create_warnings_list(result)):
-                    return self.upload(
-                        filepage, source_filename=source_filename,
-                        source_url=source_url, comment=comment, text=text,
-                        watch=watch, ignore_warnings=True,
-                        chunk_size=chunk_size, _file_key=_file_key,
-                        _offset=result['offset'], report_success=False
-                    )
-                return False
+            if result['result'] == 'Warning':
+                assert 'warnings' in result and not ignore_all_warnings
+                if 'filekey' in result:
+                    _file_key = result['filekey']
+                elif 'sessionkey' in result:
+                    # TODO: Probably needs to be reflected in the API call
+                    # above
+                    _file_key = result['sessionkey']
+                    pywikibot.warning('Using sessionkey instead of filekey.')
+                else:
+                    _file_key = None
+                    pywikibot.warning('No filekey defined.')
 
-            warn('When ignore_warnings=False in APISite.upload will change '
-                 'from raising an UploadWarning into behaving like being a '
-                 'callable returning False.', DeprecationWarning, 3)
-            if len(result['warnings']) > 1:
-                warn('The upload returned {0} warnings: '
-                     '{1}'.format(len(result['warnings']),
-                                  ', '.join(result['warnings'])),
-                     UserWarning, 3)
-            warning = list(result['warnings'].keys())[0]
-            message = result['warnings'][warning]
-            raise api.UploadWarning(warning, upload_warnings[warning]
-                                    % {'msg': message},
-                                    file_key=_file_key,
-                                    offset=result.get('offset', False))
-        if 'result' not in result:
-            pywikibot.output('Upload: unrecognized response: %s' % result)
+                if not report_success:
+                    result.setdefault('offset', True)
+                    if ignore_warnings(create_warnings_list(result)):
+                        return self.upload(
+                            filepage, source_filename=source_filename,
+                            source_url=source_url, comment=comment,
+                            text=text, watch=watch, ignore_warnings=True,
+                            chunk_size=chunk_size, asynchronous=asynchronous,
+                            _file_key=_file_key, offset=result['offset'],
+                            report_success=False)
+                    return False
 
-        if result['result'] == 'Success':
-            if report_success:
-                pywikibot.output('Upload successful.')
-            # If we receive a nochange, that would mean we're in simulation
-            # mode, don't attempt to access imageinfo
-            if 'nochange' not in result:
-                filepage._load_file_revisions([result['imageinfo']])
+                warn('When ignore_warnings=False in APISite.upload will '
+                     'change from raising an UploadWarning into behaving like '
+                     'being a callable returning False.',
+                     DeprecationWarning, 3)
+                if len(result['warnings']) > 1:
+                    warn('The upload returned {} warnings: {}'
+                         .format(len(result['warnings']),
+                                 ', '.join(result['warnings'])),
+                         UserWarning, 3)
+                warning = list(result['warnings'].keys())[0]
+                message = result['warnings'][warning]
+                raise UploadError(warning,
+                                  upload_warnings[warning]
+                                  .format(msg=message),
+                                  file_key=_file_key,
+                                  offset=result.get('offset', False))
 
-        return result['result'] == 'Success'
+            if result['result'] == 'Poll':
+                # Polling is meaningless without a file key
+                assert _file_key
+                pywikibot.log('Waiting for upload to be published.')
+                result = None
+                final_request = self._simple_request(
+                    action='upload',
+                    token=token,
+                    filekey=_file_key,
+                    checkstatus=True)
+                continue
+
+            if result['result'] == 'Success':
+                if report_success:
+                    pywikibot.output('Upload successful.')
+                # If we receive a nochange, that would mean we're in simulation
+                # mode, don't attempt to access imageinfo
+                if 'nochange' not in result:
+                    filepage._load_file_revisions([result['imageinfo']])
+                return True
+
+            raise Error('Unrecognized result: %s' % data['result'])
 
     def get_property_names(self, force: bool = False):
         """
@@ -2977,8 +3040,8 @@ class APISite(
             raise TypeError('diff parameter is of invalid type')
 
         params = {'action': 'compare',
-                  'from{0}'.format(old[0]): old[1],
-                  'to{0}'.format(diff[0]): diff[1]}
+                  'from{}'.format(old[0]): old[1],
+                  'to{}'.format(diff[0]): diff[1]}
 
         req = self._simple_request(**params)
         data = req.submit()

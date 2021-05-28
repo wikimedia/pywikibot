@@ -52,10 +52,15 @@ import re
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, xmlreader
-
-from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
-                           suggest_help, input_yn)
+from pywikibot.bot import (
+    ExistingPageBot,
+    NoRedirectPageBot,
+    SingleSiteBot,
+    input_yn,
+    suggest_help,
+)
 from pywikibot.textlib import replaceExcept
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -173,7 +178,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n! \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                'WARNING: found <th> without </th>. ({0} occurrences)\n'
+                'WARNING: found <th> without </th>. ({} occurrences)\n'
                 .format(n))
             warnings += n
 
@@ -183,7 +188,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\n!\g<attr> | \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                'WARNING: found <th ...> without </th>. ({0} occurrences\n)'
+                'WARNING: found <th ...> without </th>. ({} occurrences\n)'
                 .format(n))
             warnings += n
 
@@ -218,7 +223,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                '<td> used where </td> was expected. ({0} occurrences)\n'
+                '<td> used where </td> was expected. ({} occurrences)\n'
                 .format(n))
             warnings += n
 
@@ -229,7 +234,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         if n > 0:
             warning_messages.append(
                 "WARNING: (sorry, bot code unreadable (1). I don't know why "
-                'this warning is given.) ({0} occurrences)\n'.format(n))
+                'this warning is given.) ({} occurrences)\n'.format(n))
 
         # fail save. sometimes people forget </td>
         # <td> without arguments, with missing </td>
@@ -479,12 +484,12 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         if warnings:
             if self.opt.always and self.opt.skipwarning:
                 pywikibot.output(
-                    'There were {0} replacements that might lead to bad '
+                    'There were {} replacements that might lead to bad '
                     'output. Skipping.'.format(warnings))
                 return
             if not self.opt.always:
                 pywikibot.output(
-                    'There were {0} replacements that might lead to bad '
+                    'There were {} replacements that might lead to bad '
                     'output.'.format(warnings))
                 if not input_yn('Do you want to change the page anyway'):
                     return

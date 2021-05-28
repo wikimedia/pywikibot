@@ -15,12 +15,10 @@ linktrails dict.
 
 import codecs
 import re
-
 from contextlib import closing
 from os.path import join
 
 import pywikibot
-
 from pywikibot.family import CODE_CHARACTERS
 from pywikibot.tools import suppress_warnings
 

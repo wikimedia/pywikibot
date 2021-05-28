@@ -10,18 +10,21 @@ import pywikibot
 from pywikibot.data.api import (
     CachedRequest,
     ParamInfo,
-    Request,
     QueryGenerator,
+    Request,
 )
+from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
 from pywikibot.tools import suppress_warnings
-
 from tests import join_images_path, patch
-from tests.utils import DummySiteinfo
 from tests.aspects import (
-    unittest, TestCase, DefaultDrySiteTestCase, SiteAttributeTestCase,
+    DefaultDrySiteTestCase,
+    SiteAttributeTestCase,
+    TestCase,
+    unittest,
 )
+from tests.utils import DummySiteinfo
 
 
 class DryCachedRequestTests(SiteAttributeTestCase):
@@ -244,14 +247,14 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         self.site._userinfo = {}
         with self.subTest(userinfo=self.site._userinfo):
             with self.assertRaisesRegex(
-                    pywikibot.Error,
+                    Error,
                     'API write action attempted without user'):
                 Request(site=self.site, parameters={'action': 'edit'})
 
         self.site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
         with self.subTest(userinfo=self.site._userinfo):
             with self.assertRaisesRegex(
-                    pywikibot.Error,
+                    Error,
                     " as IP '1.2.3.4'"):
                 Request(site=self.site, parameters={'action': 'edit'})
 

@@ -9,13 +9,13 @@
 import os
 import subprocess
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.tools.djvu import DjVuFile
-
-from tests import join_data_path, create_path_func
+from tests import create_path_func, join_data_path
 from tests.aspects import TestCase
+from tests.utils import skipping
+
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 
@@ -27,7 +27,7 @@ class TestDjVuFile(TestCase):
     net = False
 
     file_djvu_not_existing = join_djvu_data_path('not_existing.djvu')
-    file_djvu = join_djvu_data_path('myfilé.djvu')  # test non-ascii name
+    file_djvu = join_djvu_data_path('myfilé.djvu')  # test non-ASCII name
     file_djvu_wo_text = join_djvu_data_path('myfile_wo_text.djvu')
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
 
@@ -35,13 +35,11 @@ class TestDjVuFile(TestCase):
     def setUpClass(cls):
         """Setup tests."""
         super().setUpClass()
-        try:
+        with skipping(OSError, msg='djvulibre library not installed.'):
             dp = subprocess.Popen(['djvudump'],
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
             dp.communicate()
-        except OSError:
-            raise unittest.SkipTest('djvulibre library not installed.')
 
     def test_repr_method(self):
         """Test __repr__() method."""

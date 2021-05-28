@@ -23,23 +23,20 @@ import json
 import os
 import pkgutil
 import re
-
-from collections.abc import Mapping
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import suppress
 from textwrap import fill
 from typing import Optional, Union
-from warnings import warn
 
 import pywikibot
-
-from pywikibot import __url__
-from pywikibot.backports import cache, List
-from pywikibot import config2 as config
-from pywikibot.exceptions import Error
+from pywikibot import __url__, config
+from pywikibot.backports import List, cache
 from pywikibot.plural import plural_rule
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning)
+    ModuleDeprecationWrapper,
+    deprecated_args,
+)
 
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
@@ -406,17 +403,6 @@ def _altlang(lang: str) -> List[str]:
     return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
 
 
-class TranslationError(Error, ImportError):
-
-    """Raised when no correct translation could be found."""
-
-    # Inherits from ImportError, as this exception is now used
-    # where previously an ImportError would have been raised,
-    # and may have been caught by scripts as such.
-
-    pass
-
-
 @cache
 def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     """
@@ -452,12 +438,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
         variants = match.group(2)
         num = parameters[selector]
         if not isinstance(num, int):
-            issue_deprecation_warning(
-                'type {0} for value {1} ({2})'
-                .format(type(num), selector, num),
-                'an int', 1,
-                warning_class=FutureWarning, since='20151009')
-            num = int(num)
+            raise ValueError("'{}' must be a number, not a {} ({})"
+                             .format(selector, num, type(num).__name__))
 
         plural_entries = []
         specific_entries = {}
@@ -470,7 +452,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
                 specific_entries[int(number)] = plural
             else:
                 assert not specific_entries, (
-                    'generic entries defined after specific in "{0}"'
+                    'generic entries defined after specific in "{}"'
                     .format(variants))
                 plural_entries += [plural]
 
@@ -540,7 +522,7 @@ DEFAULT_FALLBACK = ('_default', )
 
 def translate(code,
               xdict: Union[dict, str],
-              parameters: Union[dict, str, int, None] = None,
+              parameters: Optional[Mapping] = None,
               fallback=False) -> str:
     """Return the most appropriate localization from a localization dict.
 
@@ -621,15 +603,11 @@ def translate(code,
         return trans
 
     if not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a mapping',
-                                  warning_class=FutureWarning,
-                                  since='20151008')
-        plural_parameters = _PluralMappingAlias(parameters)
-    else:
-        plural_parameters = parameters
+        raise ValueError('parameters should be a mapping, not {}'
+                         .format(type(parameters).__name__))
 
     # else we check for PLURAL variants
-    trans = _extract_plural(code, trans, plural_parameters)
+    trans = _extract_plural(code, trans, parameters)
     if parameters:
         # On error: parameter is for PLURAL variants only,
         # don't change the string
@@ -719,27 +697,15 @@ def twtranslate(source,
                 return fallback_prompt % parameters
             return fallback_prompt
 
-        raise TranslationError(
-            'Unable to load messages package %s for bundle %s'
+        raise pywikibot.exceptions.TranslationError(
+            'Unable to load messages package {} for bundle {}'
             '\nIt can happen due to lack of i18n submodule or files. '
-            'See %s/i18n'
-            % (_messages_package_name, twtitle, __url__))
+            'See {}/i18n'
+            .format(_messages_package_name, twtitle, __url__))
 
-    source_needed = False
-    # If a site is given instead of a lang, use its language
-    if hasattr(source, 'lang'):
-        lang = source.lang
-    # check whether we need the language code back
-    elif isinstance(source, list):
-        # For backwards compatibility still support lists, when twntranslate
-        # was not deprecated and needed a way to get the used language code
-        # back.
-        warn('The source argument should not be a list but either a BaseSite '
-             'or a str/unicode.', DeprecationWarning, 2)
-        lang = source.pop()
-        source_needed = True
-    else:
-        lang = source
+    # if source is a site then use its lang attribute, otherwise it's a str
+
+    lang = getattr(source, 'lang', source)
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -752,15 +718,12 @@ def twtranslate(source,
         if trans:
             break
     else:
-        raise TranslationError(fill(
+        raise pywikibot.exceptions.TranslationError(fill(
             'No {} translation has been defined for TranslateWiki key "{}". '
             'It can happen due to lack of i18n submodule or files or an '
             'outdated submodule. See {}/i18n'
             .format('English' if 'en' in langs else "'{}'".format(lang),
                     twtitle, __url__)))
-    # send the language code back via the given mutable list parameter
-    if source_needed:
-        source.append(alt)
 
     if '{{PLURAL:' in trans:
         # _extract_plural supports in theory non-mappings, but they are
@@ -769,34 +732,13 @@ def twtranslate(source,
             raise TypeError('parameters must be a mapping.')
         trans = _extract_plural(alt, trans, parameters)
 
-    # this is only the case when called in twntranslate, and that didn't apply
-    # parameters when it wasn't a dict
-    if isinstance(parameters, _PluralMappingAlias):
-        # This is called due to the old twntranslate function which ignored
-        # KeyError. Instead only_plural should be used.
-        if isinstance(parameters.source, dict):
-            with suppress(KeyError):
-                trans %= parameters.source
-        parameters = None
-
     if parameters is not None and not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a Mapping',
-                                  warning_class=FutureWarning,
-                                  since='20151008')
+        raise ValueError('parameters should be a mapping, not {}'
+                         .format(type(parameters).__name__))
 
     if not only_plural and parameters:
         return trans % parameters
     return trans
-
-
-@deprecated('twtranslate', since='20151009', future_warning=True)
-@deprecated_args(code='source')
-def twntranslate(source, twtitle: str,
-                 parameters: Optional[Mapping] = None) -> Optional[str]:
-    """DEPRECATED: Get translated string for the key."""
-    if parameters is not None:
-        parameters = _PluralMappingAlias(parameters)
-    return twtranslate(source, twtitle, parameters)
 
 
 @deprecated_args(code='source')
@@ -865,7 +807,14 @@ def input(twtitle: str,
     elif fallback_prompt:
         prompt = fallback_prompt
     else:
-        raise TranslationError(
+        raise pywikibot.exceptions.TranslationError(
             'Unable to load messages package {} for bundle {}'
             .format(_messages_package_name, twtitle))
     return pywikibot.input(prompt, password)
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'TranslationError',
+    replacement_name='pywikibot.exceptions.TranslationError',
+    since='20210423', future_warning=True)

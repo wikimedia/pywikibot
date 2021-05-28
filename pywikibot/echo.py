@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot.tools import deprecated
 
 

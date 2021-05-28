@@ -17,10 +17,10 @@ These command line parameters can be used to specify which pages to work on:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
 from pywikibot.bot import Choice, MultipleSitesBot
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 from pywikibot.specialbots import BaseUnlinkBot
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -36,7 +36,7 @@ class _BoldChoice(Choice):
         self._page = page
 
     def handle(self):
-        return "'''{0}'''".format(self._page.title(with_section=False))
+        return "'''{}'''".format(self._page.title(with_section=False))
 
 
 class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
@@ -64,7 +64,7 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
         # https://de.wikipedia.org/w/index.php?diff=next&oldid=35721641
         if '<imagemap>' in self.current_page.text:
             pywikibot.output(
-                'Skipping page {0} because it contains an image map.'
+                'Skipping page {} because it contains an image map.'
                 .format(self.current_page.title(as_link=True)))
             return
         self.unlink(self.current_page)

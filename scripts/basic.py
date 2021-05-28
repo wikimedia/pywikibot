@@ -47,13 +47,15 @@ cannot be set by settings file:
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-
-from pywikibot.backports import Tuple
 from pywikibot import pagegenerators
-
+from pywikibot.backports import Tuple
 from pywikibot.bot import (
-    SingleSiteBot, ConfigParserBot, ExistingPageBot, NoRedirectPageBot,
-    AutomaticTWSummaryBot)
+    AutomaticTWSummaryBot,
+    ConfigParserBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+    SingleSiteBot,
+)
 
 
 # This is required for the text that is shown when you run this script

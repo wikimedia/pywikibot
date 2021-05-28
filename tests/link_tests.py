@@ -5,23 +5,19 @@
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from contextlib import suppress
 
 import pywikibot
-
-from pywikibot import config2 as config
-from pywikibot import Site
+from pywikibot import Site, config
+from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from pywikibot.exceptions import InvalidTitle, SiteDefinitionError
-
+from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase
 from tests.aspects import (
-    unittest,
-    AlteredDefaultSiteTestCase as LinkTestCase,
     DefaultDrySiteTestCase,
-    WikimediaDefaultSiteTestCase,
     TestCase,
+    WikimediaDefaultSiteTestCase,
+    unittest,
 )
 
 
@@ -108,7 +104,7 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(section_link.section, 'B')
 
     def test_invalid(self):
-        """Test that invalid titles raise InvalidTitle exception."""
+        """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
             exc_regex = (
@@ -124,12 +120,14 @@ class TestLink(DefaultDrySiteTestCase):
 
         # Tilde
         def generate_contains_tilde_exc_regex(text):
-            exc_regex = r'^\(contains ~~~\): (u|)\'%s\'$' % re.escape(text)
+            exc_regex = r'^\(contains ~~~\): (u|)\'{}\'$' \
+                        .format(re.escape(text))
             return exc_regex
 
         # Overlength
         def generate_overlength_exc_regex(text):
-            exc_regex = r'^\(over 255 bytes\): (u|)\'%s\'$' % re.escape(text)
+            exc_regex = r'^\(over 255 bytes\): (u|)\'{}\'$' \
+                        .format(re.escape(text))
             return exc_regex
 
         # Namespace prefix without actual title
@@ -141,7 +139,7 @@ class TestLink(DefaultDrySiteTestCase):
         title_tests = [
             # Empty title
             (['', ':', '__  __', '  __  '],
-             r'^The link does not contain a page title$'),
+             r'^The link \[\[.*\]\] does not contain a page title$'),
 
             (['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B'],
              generate_contains_illegal_chars_exc_regex),
@@ -178,7 +176,7 @@ class TestLink(DefaultDrySiteTestCase):
                         regex = exception_regex(text)
                     else:
                         regex = exception_regex
-                    with self.assertRaisesRegex(InvalidTitle, regex):
+                    with self.assertRaisesRegex(InvalidTitleError, regex):
                         Link(text, self.get_site()).parse()
 
     def test_relative(self):
@@ -886,7 +884,7 @@ class TestEmptyTitle(TestCase):
         """Test that Link doesn't allow links without a title."""
         link = Link('en:Help:', self.get_site())
         with self.assertRaisesRegex(
-                InvalidTitle,
+                InvalidTitleError,
                 "'en:Help:' has no title."):
             link.parse()
 
@@ -894,8 +892,8 @@ class TestEmptyTitle(TestCase):
         """Test that Link doesn't allow empty."""
         link = Link('', self.get_site())
         with self.assertRaisesRegex(
-                InvalidTitle,
-                'The link does not contain a page title'):
+                InvalidTitleError,
+                r'The link \[\[.*\]\] does not contain a page title'):
             link.parse()
 
     def test_namespace_lookalike(self):

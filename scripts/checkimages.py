@@ -84,18 +84,24 @@ Todo
 import collections
 import re
 import time
-
 from typing import Generator
 
 import pywikibot
-
+from pywikibot import config, i18n
+from pywikibot import pagegenerators as pg
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import suggest_help
-from pywikibot import config2 as config
-from pywikibot.exceptions import NotEmailableError
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    IsRedirectPageError,
+    LockedPageError,
+    NoPageError,
+    NotEmailableError,
+    PageRelatedError,
+    TranslationError,
+)
 from pywikibot.family import Family
-from pywikibot import i18n
-from pywikibot import pagegenerators as pg
 from pywikibot.site import Namespace
 
 
@@ -468,7 +474,7 @@ SETTINGS_REGEX = re.compile(r"""
 """, re.DOTALL | re.VERBOSE)
 
 
-class LogIsFull(pywikibot.Error):
+class LogIsFull(Error):
 
     """Log is full and the Bot cannot add other data to prevent Errors."""
 
@@ -476,7 +482,7 @@ class LogIsFull(pywikibot.Error):
 def printWithTimeZone(message) -> None:
     """Print the messages followed by the TimeZone encoded correctly."""
     time_zone = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-    pywikibot.output('{0} {1}'.format(message.rstrip(), time_zone))
+    pywikibot.output('{} {}'.format(message.rstrip(), time_zone))
 
 
 class checkImagesBot:
@@ -492,18 +498,18 @@ class checkImagesBot:
         self.logFulNumber = logFulNumber
         self.rep_page = i18n.translate(self.site, report_page)
         if not self.rep_page:
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'No report page provided in "report_page" dict '
                 'for your project!')
         self.image_namespace = site.namespaces.FILE.custom_name + ':'
-        self.list_entry = '\n* [[:{0}%s]] '.format(self.image_namespace)
+        self.list_entry = '\n* [[:{}%s]] '.format(self.image_namespace)
 
         # The summary of the report
         self.com = i18n.twtranslate(self.site, 'checkimages-log-comment')
 
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         if not hiddentemplatesRaw:
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'No non-license templates provided in "HiddenTemplate" dict '
                 'for your project!')
         self.hiddentemplates = {
@@ -547,7 +553,7 @@ class checkImagesBot:
         self.image_to_report = image_to_report
         self.newtext = newtext
         if not newtext:
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'No no-license template provided in "n_txt" dict '
                 'for your project!')
         self.head = head or ''
@@ -565,14 +571,14 @@ class checkImagesBot:
         image_tagged = False
         try:
             image_tagged = self.tag_image(unver)
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('The page has been deleted! Skip!')
-        except pywikibot.EditConflict:
+        except EditConflictError:
             pywikibot.output('Edit conflict! Skip!')
         if image_tagged and self.notification:
             try:
                 self.put_mex_in_talk()
-            except pywikibot.EditConflict:
+            except EditConflictError:
                 pywikibot.output('Edit Conflict! Retrying...')
                 try:
                     self.put_mex_in_talk()
@@ -589,9 +595,8 @@ class checkImagesBot:
         if results:
             luser = results[0]
             return luser
-        else:
-            # we can't find the user, report the problem to the bot
-            return upBotArray[0]
+        # we can't find the user, report the problem to the bot
+        return upBotArray[0]
 
     def tag_image(self, put=True) -> bool:
         """Add template to the Image page and find out the uploader."""
@@ -600,7 +605,7 @@ class checkImagesBot:
 
         try:
             reportPageText = reportPageObject.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output(self.imageName + ' has been deleted...')
             return False
 
@@ -613,7 +618,7 @@ class checkImagesBot:
             try:
                 reportPageObject.put(self.newtext + '\n' + reportPageText,
                                      summary=self.commImage)
-            except pywikibot.LockedPage:
+            except LockedPageError:
                 pywikibot.output('File is locked. Skipping.')
                 return False
 
@@ -623,7 +628,7 @@ class checkImagesBot:
                 nick = self.uploader
             else:
                 nick = reportPageObject.latest_file_info.user
-        except pywikibot.PageRelatedError:
+        except PageRelatedError:
             pywikibot.output(
                 'Seems that {} has only the description and not the file...'
                 .format(self.image_to_report))
@@ -670,15 +675,15 @@ class checkImagesBot:
             # welcomed users...
             if latest_user in self.bots and len(history) > 1:
                 second_text = True
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output(
                 'The user talk is a redirect, trying to get the right talk...')
             try:
                 self.talk_page = self.talk_page.getRedirectTarget()
                 testoattuale = self.talk_page.get()
-            except pywikibot.NoPage:
+            except NoPageError:
                 testoattuale = i18n.translate(self.site, empty)
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('The user page is blank')
             testoattuale = i18n.translate(self.site, empty)
 
@@ -701,7 +706,7 @@ class checkImagesBot:
 
         try:
             self.talk_page.put(newText, summary=commentox, minor=False)
-        except pywikibot.LockedPage:
+        except LockedPageError:
             pywikibot.output('Talk page blocked, skip.')
         else:
             if self.num_notify is not None:
@@ -711,7 +716,7 @@ class checkImagesBot:
             emailPage = pywikibot.Page(self.site, emailPageName)
             try:
                 emailText = emailPage.get()
-            except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+            except (NoPageError, IsRedirectPageError):
                 return
             if self.sendemailActive:
                 text_to_send = re.sub(r'__user-nickname__', r'{}'
@@ -742,7 +747,7 @@ class checkImagesBot:
             try:
                 pageHiddenText = pywikibot.Page(self.site,
                                                 self.pageHidden).get()
-            except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+            except (NoPageError, IsRedirectPageError):
                 pageHiddenText = ''
 
             for element in self.load(pageHiddenText):
@@ -779,7 +784,7 @@ class checkImagesBot:
                          .format(self.imageName))
         try:
             hash_found = self.image.latest_file_info.sha1
-        except pywikibot.NoPage:
+        except NoPageError:
             return False  # Image deleted, no hash found. Skip the image.
 
         site = pywikibot.Site('commons', 'commons')
@@ -868,7 +873,7 @@ class checkImagesBot:
                         try:
                             self.timestamp = (
                                 dup_page.latest_file_info.timestamp)
-                        except pywikibot.PageRelatedError:
+                        except PageRelatedError:
                             continue
                     data = self.timestamp.timetuple()
                     data_seconds = time.mktime(data)
@@ -886,7 +891,7 @@ class checkImagesBot:
                         continue
                     try:
                         DupPageText = dup_page.text
-                    except pywikibot.NoPage:
+                    except NoPageError:
                         continue
 
                     if not (re.findall(dupRegex, DupPageText)
@@ -895,7 +900,7 @@ class checkImagesBot:
                             '{} is a duplicate and has to be tagged...'
                             .format(dup_page))
                         images_to_tag_list.append(dup_page.title())
-                        string += '* {0}\n'.format(
+                        string += '* {}\n'.format(
                             dup_page.title(as_link=True, textlink=True))
                     else:
                         pywikibot.output(
@@ -910,7 +915,7 @@ class checkImagesBot:
                 if '__images__' in dupText:
                     text_for_the_report = dupText.replace(
                         '__images__',
-                        '\n{0}* {1}\n'.format(
+                        '\n{}* {}\n'.format(
                             string,
                             Page_older_image.title(
                                 as_link=True, textlink=True)))
@@ -931,9 +936,9 @@ class checkImagesBot:
                             only_report = True
                             break
                         # Delete the image in the list where we're write on
+                        image = self.image_namespace + image_to_tag
                         text_for_the_report = re.sub(
-                            r'\n\*\[\[:%s\]\]'
-                            % re.escape(self.image_namespace + image_to_tag),
+                            r'\n\*\[\[:{}\]\]'.format(re.escape(image)),
                             '', text_for_the_report)
                         self.report(text_for_the_report, image_to_tag,
                                     commImage=dupComment_image, unver=True)
@@ -941,9 +946,9 @@ class checkImagesBot:
                 if images_to_tag_list and not only_report:
                     fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                     already_reported_in_past = fp.revision_count(self.bots)
-                    from_regex = (r'\n\*\[\[:%s%s\]\]'
-                                  % (self.image_namespace,
-                                     re.escape(self.image.title(as_url=True))))
+                    image_title = re.escape(self.image.title(as_url=True))
+                    from_regex = (r'\n\*\[\[:{}{}\]\]'
+                                  .format(self.image_namespace, image_title))
                     # Delete the image in the list where we're write on
                     text_for_the_report = re.sub(from_regex, '',
                                                  text_for_the_report)
@@ -1004,9 +1009,9 @@ class checkImagesBot:
         another_page = pywikibot.Page(self.site, rep_page)
         try:
             text_get = another_page.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             text_get = ''
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             text_get = another_page.getRedirectTarget().get()
 
         # Don't care for differences inside brackets.
@@ -1072,10 +1077,10 @@ class checkImagesBot:
                             "You've set wrongly your settings, please take a "
                             'look to the relative page. (run without them)')
                         self.settingsData = None
-                except pywikibot.NoPage:
+                except NoPageError:
                     pywikibot.output("The settings' page doesn't exist!")
                     self.settingsData = None
-        except pywikibot.Error:
+        except Error:
             pywikibot.output(
                 'Problems with loading the settigs, run without them.')
             self.settingsData = None
@@ -1094,7 +1099,7 @@ class checkImagesBot:
         """Load the list of the licenses."""
         catName = i18n.translate(self.site, category_with_licenses)
         if not catName:
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'No allowed licenses category provided in '
                 '"category_with_licenses" dict for your project!')
         pywikibot.output('\nLoading the allowed licenses...\n')
@@ -1113,7 +1118,7 @@ class checkImagesBot:
             try:
                 pageAllowedText = pywikibot.Page(self.site,
                                                  self.pageAllowed).get()
-            except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+            except (NoPageError, IsRedirectPageError):
                 pageAllowedText = ''
 
             for nameLicense in self.load(pageAllowedText):
@@ -1190,13 +1195,13 @@ class checkImagesBot:
                 # that we haven't catch something like that.
                 licenses_TEST = regex_are_licenses.findall(self.imageCheckText)
                 if not self.licenses_found and licenses_TEST:
-                    raise pywikibot.Error(
+                    raise Error(
                         "Invalid or broken templates found in the image's "
                         'page {}!'.format(self.image))
             self.allLicenses = []
 
             if not self.list_licenses:
-                raise i18n.TranslationError(
+                raise TranslationError(
                     'No allowed licenses found in "category_with_licenses" '
                     'category for your project!')
 
@@ -1322,7 +1327,7 @@ class checkImagesBot:
             image = pywikibot.FilePage(page)
             try:
                 timestamp = image.latest_file_info.timestamp
-            except pywikibot.PageRelatedError:
+            except PageRelatedError:
                 continue
             now = pywikibot.Timestamp.utcnow()
             delta = now - timestamp
@@ -1337,11 +1342,11 @@ class checkImagesBot:
 
     def isTagged(self) -> bool:
         """Understand if a file is already tagged or not."""
-        # TODO: enhance and use textlib._MultiTemplateMatchBuilder
+        # TODO: enhance and use textlib.MultiTemplateMatchBuilder
         # Is the image already tagged? If yes, no need to double-check, skip
         no_license = i18n.translate(self.site, txt_find)
         if not no_license:
-            raise i18n.TranslationError(
+            raise TranslationError(
                 'No no-license templates provided in "txt_find" dict '
                 'for your project!')
         for i in no_license:
@@ -1449,11 +1454,11 @@ class checkImagesBot:
 
         try:
             self.imageCheckText = self.image.get()
-        except pywikibot.NoPage:
+        except NoPageError:
             pywikibot.output('Skipping {} because it has been deleted.'
                              .format(self.imageName))
             return
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output("Skipping {} because it's a redirect."
                              .format(self.imageName))
             return
@@ -1669,7 +1674,7 @@ def main(*args) -> bool:
             pageRegex = pywikibot.Page(site, regexPageName)
             try:
                 textRegex = pageRegex.get()
-            except pywikibot.NoPage:
+            except NoPageError:
                 pywikibot.output("{} doesn't exist!".format(pageRegex.title()))
                 textRegex = ''  # No source, so the bot will quit later.
         # If generator is the regex' one, use your own Generator using an url

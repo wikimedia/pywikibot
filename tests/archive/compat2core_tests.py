@@ -7,7 +7,6 @@
 import unittest
 
 import scripts.maintenance.compat2core as c2c
-
 from tests.aspects import TestCase
 
 

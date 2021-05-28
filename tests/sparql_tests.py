@@ -5,13 +5,13 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
+import pywikibot
 import pywikibot.data.sparql as sparql
-
-from tests.aspects import TestCase, WikidataTestCase
 from tests import patch
+from tests.aspects import TestCase, WikidataTestCase
+from tests.utils import skipping
 
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
@@ -99,7 +99,8 @@ class TestSparql(WikidataTestCase):
         mock_method.return_value = Container(
             SQL_RESPONSE_CONTAINER % '{}, {}'.format(
                 ITEM_Q498787, ITEM_Q677525))
-        q = sparql.SparqlQuery()
+        with skipping(pywikibot.exceptions.TimeoutError):
+            q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
         self.assertIsInstance(res, list, 'Result is not a list')
         self.assertLength(res, 2)
@@ -121,7 +122,8 @@ class TestSparql(WikidataTestCase):
         mock_method.return_value = Container(
             SQL_RESPONSE_CONTAINER % '{}, {}'.format(
                 ITEM_Q498787, ITEM_Q677525))
-        q = sparql.SparqlQuery()
+        with skipping(pywikibot.exceptions.TimeoutError):
+            q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)
         self.assertIsInstance(res, list, 'Result is not a list')
         self.assertLength(res, 2)
@@ -148,9 +150,10 @@ class TestSparql(WikidataTestCase):
     def testGetItems(self, mock_method):
         """Test item list retrieval via SPARQL."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % '{}, {}, {}'.format(
-                ITEM_Q498787, ITEM_Q677525, ITEM_Q677525))
-        q = sparql.SparqlQuery()
+            SQL_RESPONSE_CONTAINER % '{0}, {1}, {1}'.format(ITEM_Q498787,
+                                                            ITEM_Q677525))
+        with skipping(pywikibot.exceptions.TimeoutError):
+            q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
         self.assertSetEqual(res, {'Q498787', 'Q677525'})
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat',
@@ -161,7 +164,8 @@ class TestSparql(WikidataTestCase):
     def testQueryAsk(self, mock_method):
         """Test ASK query."""
         mock_method.return_value = Container(RESPONSE_TRUE)
-        q = sparql.SparqlQuery()
+        with skipping(pywikibot.exceptions.TimeoutError):
+            q = sparql.SparqlQuery()
 
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertTrue(res)

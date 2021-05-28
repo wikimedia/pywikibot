@@ -6,13 +6,13 @@
 #
 import datetime
 import unittest
-
 from contextlib import suppress
-from requests.exceptions import ConnectionError as RequestsConnectionError
 from urllib.parse import urlparse
 
+from requests.exceptions import ConnectionError as RequestsConnectionError
+
 from scripts import weblinkchecker
-from tests.aspects import require_modules, TestCase
+from tests.aspects import TestCase, require_modules
 
 
 @require_modules('memento_client')
@@ -21,8 +21,7 @@ class MementoTestCase(TestCase):
     """Test memento client."""
 
     def _get_archive_url(self, url, date_string=None):
-        from memento_client.memento_client import \
-            MementoClientException
+        from memento_client.memento_client import MementoClientException
 
         if date_string is None:
             when = datetime.datetime.now()

@@ -1,4 +1,7 @@
-"""Family module for Wikimania wikis."""
+"""Family module for Wikimania wikis.
+
+*New in version 3.0.*
+"""
 #
 # (C) Pywikibot team, 2017-2020
 #

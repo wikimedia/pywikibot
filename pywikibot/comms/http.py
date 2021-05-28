@@ -9,6 +9,17 @@ This module is responsible for
     - Translate site objects with query strings into URLs
     - URL-encoding all data
     - Basic HTTP error handling
+
+This module creates and uses its own C{requests.Session} object.
+The session is closed if the module terminates.
+If required you can use your own Session object passing it to the
+C{http.session} variable::
+
+    from pywikibot.comms import http
+    session = requests.Session()
+    http.session = session
+
+L{flush()} can be called to close the session object.
 """
 #
 # (C) Pywikibot team, 2007-2021
@@ -19,9 +30,8 @@ import atexit
 import codecs
 import re
 import sys
-
 from contextlib import suppress
-from http import cookiejar, HTTPStatus
+from http import HTTPStatus, cookiejar
 from string import Formatter
 from typing import Optional, Union
 from urllib.parse import quote, urlparse
@@ -30,19 +40,21 @@ from warnings import warn
 import requests
 
 import pywikibot
-
+from pywikibot import config
 from pywikibot.backports import Tuple
-from pywikibot import config2 as config
 from pywikibot.exceptions import (
-    FatalServerError, Server504Error, Server414Error
+    FatalServerError,
+    Server414Error,
+    Server504Error,
 )
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
-    issue_deprecation_warning,
     file_mode_checker,
+    issue_deprecation_warning,
 )
+
 
 try:
     import requests_oauthlib
@@ -71,7 +83,8 @@ session.cookies = cookie_jar
 
 
 # Prepare flush on quit
-def _flush():
+def flush():
+    """Close the session object. This is called when the module terminates."""
     log('Closing network session.')
     session.close()
 
@@ -81,7 +94,7 @@ def _flush():
     log('Network session closed.')
 
 
-atexit.register(_flush)
+atexit.register(flush)
 
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join(str(i) for i in sys.version_info),
@@ -97,7 +110,7 @@ class _UserAgentFormatter(Formatter):
     def get_value(self, key, args, kwargs):
         """Get field as usual except for version and revision."""
         # This is the Pywikibot version; also map it to {revision} at present.
-        if key == 'version' or key == 'revision':
+        if key in ('version', 'revision'):
             return pywikibot.version.getversiondict()['rev']
         return super().get_value(key, args, kwargs)
 
@@ -382,9 +395,9 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
-            warn('%s' % requests_oauthlib, ImportWarning)
-            error('OAuth authentication not supported: %s'
-                  % requests_oauthlib)
+            warn(str(requests_oauthlib), ImportWarning)
+            error('OAuth authentication not supported: {}'
+                  .format(requests_oauthlib))
             auth = None
         else:
             auth = requests_oauthlib.OAuth1(*auth)

@@ -17,34 +17,38 @@ import sys
 import time
 import unittest
 import warnings
-
-from contextlib import contextmanager, suppress
 from collections.abc import Sized
+from contextlib import contextmanager, suppress
 from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
-
-import pywikibot.config2 as config
-
-from pywikibot import Site
-
+from pywikibot import Site, config
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.exceptions import ServerError, NoUsername
+from pywikibot.exceptions import (
+    NoUsernameError,
+    ServerError,
+    SiteDefinitionError,
+)
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 from pywikibot.tools import suppress_warnings
-
 from tests import (
-    WARN_SITE_CODE, patch_request, unpatch_request, unittest_print
+    WARN_SITE_CODE,
+    patch_request,
+    unittest_print,
+    unpatch_request,
+)
+from tests.utils import (
+    AssertAPIErrorContextManager,
+    DryRequest,
+    DrySite,
+    WarningSourceSkipContextManager,
+    execute_pwb,
 )
 
-from tests.utils import (
-    execute_pwb, DrySite, DryRequest,
-    WarningSourceSkipContextManager, AssertAPIErrorContextManager,
-)
 
 try:
     import pytest_httpbin
@@ -69,7 +73,8 @@ class TestCaseBase(unittest.TestCase):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if seq:
-            msg = self._formatMessage(msg, '%s is not empty' % safe_repr(seq))
+            msg = self._formatMessage(msg, '{} is not empty'
+                                           .format(safe_repr(seq)))
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None):
@@ -77,7 +82,8 @@ class TestCaseBase(unittest.TestCase):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if not seq:
-            msg = self._formatMessage(msg, '%s is empty' % safe_repr(seq))
+            msg = self._formatMessage(msg, '{} is empty'
+                                           .format(safe_repr(seq)))
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
@@ -93,7 +99,7 @@ class TestCaseBase(unittest.TestCase):
 
         if first_len != second_len:
             msg = self._formatMessage(
-                msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
+                msg, 'len({}) != {}'.format(safe_repr(seq), second_len))
             self.fail(msg)
 
     def assertPageInNamespaces(self, page, namespaces):
@@ -298,7 +304,7 @@ def require_modules(*required_modules):
                 missing += [required_module]
         if not missing:
             return obj
-        skip_decorator = unittest.skip('{0} not installed'.format(
+        skip_decorator = unittest.skip('{} not installed'.format(
             ', '.join(missing)))
         return skip_decorator(obj)
 
@@ -356,7 +362,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
 
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
-        raise pywikibot.SiteDefinitionError(
+        raise SiteDefinitionError(
             'Loading site {}:{} during dry test not permitted'
             .format(fam, code))
 
@@ -500,7 +506,7 @@ class SiteWriteMixin(TestCaseBase):
         """
         if issubclass(cls, ForceCacheMixin):
             raise Exception(
-                '{} can not be a subclass of both '
+                '{} cannot be a subclass of both '
                 'SiteWriteMixin and ForceCacheMixin'
                 .format(cls.__name__))
 
@@ -567,7 +573,7 @@ class RequireLoginMixin(TestCaseBase):
                     'Site {} has readonly state: {}'.format(
                         site, site.siteinfo.get('readonlyreason', '')))
 
-            with suppress(NoUsername):
+            with suppress(NoUsernameError):
                 site.login()
 
             if not site.user():
@@ -694,7 +700,7 @@ class MetaTestCaseClass(type):
         if 'family' in dct or 'code' in dct:
             dct['site'] = True
 
-            if (('sites' not in dct or not len(dct['sites']))
+            if (('sites' not in dct or not dct['sites'])
                     and 'family' in dct
                     and 'code' in dct and dct['code'] != '*'):
                 # Add entry to self.sites
@@ -1025,7 +1031,6 @@ class CapturingTestCase(TestCase):
 
     def after_assert(self, assertion, *args, **kwargs):
         """Handle after the assertion."""
-        pass
 
     def patch_assert(self, assertion):
         """Execute process_assert when the assertion is called."""
@@ -1277,8 +1282,6 @@ class DefaultWikibaseClientTestCase(WikibaseClientTestCase,
 
     """Run tests against any site connected to a Wikibase."""
 
-    pass
-
 
 class WikidataTestCase(WikibaseTestCase):
 
@@ -1441,9 +1444,9 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     @classmethod
     def _build_message(cls, deprecated, instead):
         if deprecated is not None:
-            msg = '{0} is deprecated'.format(deprecated)
+            msg = '{} is deprecated'.format(deprecated)
             if instead:
-                msg += '; use {0} instead.'.format(instead)
+                msg += '; use {} instead.'.format(instead)
         elif instead is None:
             msg = None
         elif instead is True:
@@ -1489,8 +1492,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
                         or msg is None):
                     break
             else:
-                self.fail('No generic deprecation message match found in '
-                          '{0}'.format(deprecation_messages))
+                self.fail('No generic deprecation message match found in {}'
+                          .format(deprecation_messages))
         else:
             head, _, tail = msg.partition('; ')
             for message in self.deprecation_messages:
@@ -1618,5 +1621,5 @@ class HttpbinTestCase(TestCase):
         Otherwise, returns: httpbin.org
         """
         if hasattr(self, 'httpbin'):
-            return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
+            return '{}:{}'.format(self.httpbin.host, self.httpbin.port)
         return 'httpbin.org'

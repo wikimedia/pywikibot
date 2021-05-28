@@ -1,20 +1,20 @@
 """
 Module to define and load pywikibot configuration default and user preferences.
 
-User preferences are loaded from a python file called user-config.py, which
-may be located in directory specified by the environment variable
-PYWIKIBOT_DIR, or the same directory as pwb.py, or in a directory within
-the users home. See get_base_dir for more information.
+User preferences are loaded from a python file called `user-config.py`,
+which may be located in directory specified by the environment variable
+`PYWIKIBOT_DIR`, or the same directory as `pwb.py`, or in a directory
+within the users home. See L{get_base_dir} for more information.
 
 If user-config.py cannot be found in any of those locations, this module
-will fail to load unless the environment variable PYWIKIBOT_NO_USER_CONFIG
-is set to a value other than '0'. i.e. PYWIKIBOT_NO_USER_CONFIG=1 will
-allow config to load without a user-config.py. However, warnings will be
-shown if user-config.py was not loaded. To prevent these warnings, set
-PYWIKIBOT_NO_USER_CONFIG=2. If pywikibot is installed as a site-package
-the behaviour is like PYWIKIBOT_NO_USER_CONFIG=2 is set.
+will fail to load unless the environment variable `PYWIKIBOT_NO_USER_CONFIG`
+is set to a value other than `'0'`. i.e. `PYWIKIBOT_NO_USER_CONFIG=1` will
+allow config to load without a `user-config.py`. However, warnings will be
+shown if `user-config.py` was not loaded. To prevent these warnings, set
+`PYWIKIBOT_NO_USER_CONFIG=2`. If Pywikibot is installed as a site-package
+the behaviour is like `PYWIKIBOT_NO_USER_CONFIG=2` is set.
 
-Functions made available to user-config:
+Functions made available to `user-config`:
 
  - user_home_path
 
@@ -24,6 +24,8 @@ build paths relative to base_dir:
  - makepath
  - datafilepath
  - shortpath
+
+*Renamed in version 6.2*
 """
 #
 # (C) Pywikibot team, 2003-2021
@@ -38,19 +40,18 @@ import re
 import stat
 import sys
 import types
-
 from locale import getdefaultlocale
-from os import getenv, environ
+from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
 from typing import Optional, Union
 from warnings import warn
-from zipfile import is_zipfile, ZipFile
+from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import Dict, List, removesuffix, Tuple
+from pywikibot.backports import Dict, List, Tuple, removesuffix
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import issue_deprecation_warning, deprecated
+from pywikibot.tools import deprecated, issue_deprecation_warning
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -89,8 +90,6 @@ elif __no_user_config == '0':
 class _ConfigurationDeprecationWarning(UserWarning):
 
     """Feature that is no longer supported."""
-
-    pass
 
 
 # IMPORTANT:
@@ -284,20 +283,21 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order:
-     1.  If the script was called with a -dir: argument, use the directory
-         provided in this argument.
-     2.  If the user has a PYWIKIBOT_DIR environment variable, use the value
-         of it.
-     3.  If user-config is present in current directory, use the current
-         directory.
-     4.  If user-config is present in pwb.py directory, use that directory
-     5.  Use (and if necessary create) a 'pywikibot' folder under
-         'Application Data' or 'AppData\Roaming' (Windows) or
-         '.pywikibot' directory (Unix and similar) under the user's home
-         directory.
+     1.  If the script was called with a `-dir:` argument, use the
+         directory provided in this argument.
+     2.  If the user has a `PYWIKIBOT_DIR` environment variable, use the
+         value of it.
+     3.  If `user-config` is present in current directory, use the
+         current directory.
+     4.  If `user-config` is present in `pwb.py` directory, use that
+         directory
+     5.  Use (and if necessary create) a `'pywikibot'` folder under
+         `'Application Data'` or `'AppData\Roaming'` (Windows) or
+         `'.pywikibot'` directory (Unix and similar) under the user's
+         home directory.
 
-    Set PYWIKIBOT_NO_USER_CONFIG=1 to disable loading user-config.py or
-    install pywikibot as a site-package.
+    Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading `user-config.py`
+    or install Pywikibot as a site-package.
 
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
@@ -357,7 +357,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '%s' does not exist." % base_dir)
+        raise RuntimeError("Directory '{}' does not exist.".format(base_dir))
     # check if user-config.py is in base_dir
     if not exists(base_dir):
         exc_text = 'No user-config.py found in directory {!r}.\n'.format(
@@ -435,7 +435,7 @@ def register_families_folder(folder_path: str):
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
-# ‘families/’ is a subdirectory of the directory in which config2.py is found.
+# ‘families/’ is a subdirectory of the directory in which config.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
@@ -903,7 +903,7 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        output('Unable to detect program for file extension "{0}": {1!r}'
+        output('Unable to detect program for file extension "{}": {!r}'
                .format(extension, e))
 
 
@@ -961,10 +961,10 @@ class _DifferentTypeError(UserWarning, TypeError):
 
     def __init__(self, name, actual_type, allowed_types):
         super().__init__(
-            'Configuration variable "{0}" is defined as "{1.__name__}" in '
-            'your user-config.py but expected "{2}".'
-            .format(name, actual_type, '", "'.join(t.__name__
-                                                   for t in allowed_types)))
+            'Configuration variable "{}" is defined as "{}" in '
+            'your user-config.py but expected "{}".'
+            .format(name, actual_type.__name__,
+                    '", "'.join(t.__name__ for t in allowed_types)))
 
 
 def _assert_default_type(name, value, default_value):
@@ -1009,7 +1009,7 @@ def _check_user_config_types(user_config, default_values, skipped):
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
-                warn('\n' + fill('Configuration variable "{0}" is defined in '
+                warn('\n' + fill('Configuration variable "{}" is defined in '
                                  'your user-config.py but unknown. It can be '
                                  'a misspelled one or a variable that is no '
                                  'longer supported.'.format(name)),
@@ -1040,7 +1040,7 @@ for _key in _modified:
              _ConfigurationDeprecationWarning)
 
 # If we cannot auto-detect the console encoding (e.g. when piping data)
-# assume utf-8. On Linux, this will typically be correct; on windows,
+# assume utf-8. On Linux, this will typically be correct; on Windows,
 # this can be an issue when piping through more. However, the behavior
 # when redirecting to a file utf-8 is more reasonable.
 
@@ -1099,7 +1099,7 @@ if __name__ == '__main__':
         if _arg == 'modified':
             _all = False
         else:
-            warning('Unknown arg {0} ignored'.format(_arg))
+            warning('Unknown arg {} ignored'.format(_arg))
     for _name in sorted(globals().keys()):
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType,
@@ -1116,7 +1116,7 @@ if __name__ == '__main__':
                             _value = repr('xxxxxxxx')
                     else:
                         _value = repr(_value)
-                    output('{0}={1}'.format(_name, _value))
+                    output('{}={}'.format(_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):

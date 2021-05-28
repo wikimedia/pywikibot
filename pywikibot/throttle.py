@@ -4,21 +4,32 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import itertools
 import math
 import threading
 import time
 
-from collections import namedtuple
+from collections import namedtuple, Counter
 from contextlib import suppress
 from typing import Optional, Union
 
 import pywikibot
+
 from pywikibot import config
+
+from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
+
+if PYTHON_VERSION < (3, 6):
+    from hashlib import md5
+    blake2b = None
+else:
+    from hashlib import blake2b
+
 
 _logger = 'wiki.throttle'
 
-FORMAT_LINE = '{pid} {time} {site}\n'
-ProcEntry = namedtuple('ProcEntry', ['pid', 'time', 'site'])
+FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
+ProcEntry = namedtuple('ProcEntry', ['module_id', 'pid', 'time', 'site'])
 
 # global process identifier
 #
@@ -32,19 +43,19 @@ class Throttle:
 
     """Control rate of access to wiki server.
 
-    Calling this object blocks the calling thread until at least 'delay'
-    seconds have passed since the previous call.
+    Calling this object blocks the calling thread until at least
+    `'delay'` seconds have passed since the previous call.
 
-    Each Site initiates one Throttle object (site.throttle) to control the
-    rate of access.
+    Each Site initiates one Throttle object (`site.throttle`) to control
+    the rate of access.
 
     """
 
-    def __init__(self, site,
+    @deprecated_args(multiplydelay=True)
+    def __init__(self, site, *,
                  mindelay: Optional[int] = None,
                  maxdelay: Optional[int] = None,
-                 writedelay: Union[int, float, None] = None,
-                 multiplydelay: bool = True):
+                 writedelay: Union[int, float, None] = None):
         """Initializer."""
         self.lock = threading.RLock()
         self.lock_write = threading.RLock()
@@ -70,10 +81,33 @@ class Throttle:
         self.retry_after = 0  # set by http.request
         self.delay = 0
         self.checktime = 0
-        self.multiplydelay = multiplydelay
-        if self.multiplydelay:
-            self.checkMultiplicity()
+        self.modules = Counter()
+
+        self.checkMultiplicity()
         self.setDelays()
+
+    @property
+    @deprecated(since='6.2', future_warning=True)
+    def multiplydelay(self):
+        """DEPRECATED attribute."""
+        return True
+
+    @multiplydelay.setter
+    @deprecated(since='6.2', future_warning=True)
+    def multiplydelay(self):
+        """DEPRECATED attribute setter."""
+
+    @staticmethod
+    def _module_hash(module=None) -> str:
+        """Convert called module name to a hash."""
+        if module is None:
+            module = pywikibot.calledModuleName()
+        module = module.encode()
+        if blake2b:
+            hashobj = blake2b(module, digest_size=2)
+        else:
+            hashobj = md5(module)
+        return hashobj.hexdigest()[:4]  # slice for Python 3.5
 
     def _read_file(self, raise_exc=False):
         """Yield process entries from file."""
@@ -88,8 +122,13 @@ class Throttle:
         for line in lines:
             # parse line; format is "pid timestamp site"
             try:
-                _pid, _time, _site = line.split(' ')
+                items = line.split(' ')
+                if len(items) == 3:  # read legacy format
+                    _id, _pid, _time, _site = self._module_hash(), *items
+                else:
+                    _id, _pid, _time, _site = items
                 proc_entry = ProcEntry(
+                    module_id=_id,
                     pid=int(_pid),
                     time=int(float(_time)),
                     site=_site.rstrip()
@@ -117,11 +156,12 @@ class Throttle:
                         _logger)
         with self.lock:
             processes = []
-            my_pid = pid or 1  # start at 1 if global pid not yet set
+            used_pids = set()
             count = 1
 
             now = time.time()
             for proc in self._read_file(raise_exc=True):
+                used_pids.add(proc.pid)
                 if now - proc.time > self.releasepid:
                     continue    # process has expired, drop from file
                 if now - proc.time <= self.dropdelay \
@@ -130,16 +170,19 @@ class Throttle:
                     count += 1
                 if proc.site != self.mysite or proc.pid != pid:
                     processes.append(proc)
-                if not pid and proc.pid >= my_pid:
-                    my_pid = proc.pid + 1  # next unused process id
 
+            free_pid = (i for i in itertools.count(start=1)
+                        if i not in used_pids)
             if not pid:
-                pid = my_pid
+                pid = next(free_pid)
+
             self.checktime = time.time()
             processes.append(
-                ProcEntry(pid=pid, time=self.checktime, site=mysite))
+                ProcEntry(module_id=self._module_hash(), pid=pid,
+                          time=self.checktime, site=mysite))
+            self.modules = Counter(p.module_id for p in processes)
 
-            self._write_file(processes)
+            self._write_file(sorted(processes, key=lambda p: p.pid))
 
             self.process_multiplicity = count
             pywikibot.log('Found {} {} processes running, including this one.'
@@ -170,14 +213,13 @@ class Throttle:
             thisdelay = self.writedelay
         else:
             thisdelay = self.delay
-        if not self.multiplydelay:
-            return thisdelay
 
         # We're checking for multiple processes
         if time.time() > self.checktime + self.checkdelay:
             self.checkMultiplicity()
-        if thisdelay < (self.mindelay * self.next_multiplicity):
-            thisdelay = self.mindelay * self.next_multiplicity
+        multiplied_delay = self.mindelay * self.next_multiplicity
+        if thisdelay < multiplied_delay:
+            thisdelay = multiplied_delay
         elif thisdelay > self.maxdelay:
             thisdelay = self.maxdelay
         thisdelay *= self.process_multiplicity
@@ -256,20 +298,21 @@ class Throttle:
     def lag(self, lagtime: Optional[float] = None):
         """Seize the throttle lock due to server lag.
 
-        Usually the self.retry-after value from response_header of the last
-        request if available which will be used for wait time. Otherwise
-        lagtime from api maxlag is used. If neither retry_after nor lagtime is
-        set, fallback to config.retry_wait.
+        Usually the `self.retry-after` value from `response_header` of the
+        last request if available which will be used for wait time.
+        Otherwise `lagtime` from api `maxlag` is used. If neither
+        `self.retry_after` nor `lagtime` is set, fallback to
+        `config.retry_wait`.
 
-        If the lagtime is disproportionately high compared to retry-after
-        value, the wait time will be increased.
+        If the `lagtime` is disproportionately high compared to
+        `self.retry_after` value, the wait time will be increased.
 
-        This method is used by api.request. It will prevent any thread from
-        accessing this site.
+        This method is used by `api.request`. It will prevent any thread
+        from accessing this site.
 
-        @param lagtime: The time to wait for the next request which is the
-            last maxlag time from api warning. This is only used as a fallback
-            if self.retry-after isn't set.
+        @param lagtime: The time to wait for the next request which is
+            the last `maxlag` time from api warning. This is only used
+            as a fallback if `self.retry_after` isn't set.
         """
         started = time.time()
         with self.lock:
@@ -281,3 +324,8 @@ class Throttle:
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
             self.wait(wait)
+
+    def get_pid(self, module: str) -> int:
+        """Get the global pid if the module is running multiple times."""
+        global pid
+        return pid if self.modules[self._module_hash(module)] > 1 else 0

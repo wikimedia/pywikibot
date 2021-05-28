@@ -9,17 +9,22 @@ import logging
 import re
 import sys
 import threading
-
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot import config2 as config
-
+from pywikibot import config
 from pywikibot.backports import Sequence
-from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
-from pywikibot.bot_choice import (ChoiceException, Option, OutputOption,
-                                  QuitKeyboardInterrupt, StandardOption)
+from pywikibot.bot_choice import (
+    ChoiceException,
+    Option,
+    OutputOption,
+    QuitKeyboardInterrupt,
+    StandardOption,
+)
+from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
+from pywikibot.tools import deprecated_args
 from pywikibot.userinterfaces import transliteration
+from pywikibot.userinterfaces._interface_base import ABUIC
 
 
 transliterator = transliteration.transliterator(config.console_encoding)
@@ -44,13 +49,17 @@ colors = [
     'white',
 ]
 
-_color_pat = '%s|previous' % '|'.join(colors)
+_color_pat = '{}|previous'.format('|'.join(colors))
 colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
 
 
-class UI:
+class UI(ABUIC):
 
-    """Base for terminal user interfaces."""
+    """Base for terminal user interfaces.
+
+    *New in version 6.2:* subclassed from
+    L{pywikibot.userinterfaces._interface_base.ABUIC}.
+    """
 
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
 
@@ -68,9 +77,6 @@ class UI:
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
 
-        self.stderr = sys.stderr
-        self.stdout = sys.stdout
-
     def init_handlers(self, root_logger, default_stream='stderr'):
         """Initialize the handlers for user output.
 
@@ -86,7 +92,7 @@ class UI:
             default_stream = self.stderr
 
         # default handler for display to terminal
-        default_handler = TerminalHandler(self, strm=default_stream)
+        default_handler = TerminalHandler(self, stream=default_stream)
         if config.verbose_output:
             default_handler.setLevel(VERBOSE)
         else:
@@ -94,22 +100,22 @@ class UI:
         # this handler ignores levels above INPUT
         default_handler.addFilter(MaxLevelFilter(INPUT))
         default_handler.setFormatter(
-            TerminalFormatter(fmt='%(message)s%(newline)s'))
+            logging.Formatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(default_handler)
 
         # handler for level STDOUT
-        output_handler = TerminalHandler(self, strm=self.stdout)
+        output_handler = TerminalHandler(self, stream=self.stdout)
         output_handler.setLevel(STDOUT)
         output_handler.addFilter(MaxLevelFilter(STDOUT))
         output_handler.setFormatter(
-            TerminalFormatter(fmt='%(message)s%(newline)s'))
+            logging.Formatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(output_handler)
 
         # handler for levels WARNING and higher
-        warning_handler = TerminalHandler(self, strm=self.stderr)
+        warning_handler = TerminalHandler(self, stream=self.stderr)
         warning_handler.setLevel(WARNING)
         warning_handler.setFormatter(
-            TerminalFormatter(fmt='%(levelname)s: %(message)s%(newline)s'))
+            logging.Formatter(fmt='%(levelname)s: %(message)s%(newline)s'))
         root_logger.addHandler(warning_handler)
 
         warnings_logger = logging.getLogger('py.warnings')
@@ -117,7 +123,7 @@ class UI:
 
     def encounter_color(self, color, target_stream):
         """Handle the next color encountered."""
-        raise NotImplementedError('The {0} class does not support '
+        raise NotImplementedError('The {} class does not support '
                                   'colors.'.format(self.__class__.__name__))
 
     @classmethod
@@ -178,7 +184,7 @@ class UI:
                 # set the new color, but only if they change
                 self.encounter_color(color_stack[-1], target_stream)
 
-    def output(self, text, toStdout=False, targetStream=None):
+    def output(self, text, targetStream=None):
         """
         Output text to a stream.
 
@@ -216,8 +222,10 @@ class UI:
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText += '\03{lightyellow}%s\03{previous}' \
-                                          % transliterated
+                    transliteratedText = ''.join((transliteratedText,
+                                                  '\03{lightyellow}',
+                                                  transliterated,
+                                                  '\03{previous}'))
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if transliterated:
@@ -229,10 +237,7 @@ class UI:
             text = transliteratedText
 
         if not targetStream:
-            if toStdout:
-                targetStream = self.stdout
-            else:
-                targetStream = self.stderr
+            targetStream = self.stderr
 
         self._print(text, targetStream)
 
@@ -258,16 +263,20 @@ class UI:
         @param force: Automatically use the default
         """
         assert(not password or not default)
-        end_marker = ':'
+
         question = question.strip()
-        if question[-1] == ':':
+        end_marker = question[-1]
+        if end_marker in (':', '?'):
             question = question[:-1]
-        elif question[-1] == '?':
-            question = question[:-1]
-            end_marker = '?'
+        else:
+            end_marker = ':'
+
         if default:
-            question = question + ' (default: %s)' % default
-        question = question + end_marker
+            question += ' (default: {})'.format(default)
+        question += end_marker
+
+        # lock stream output
+        # with self.lock: (T282962)
         if force:
             self.output(question + '\n')
             return default
@@ -335,6 +344,12 @@ class UI:
             options. If default is not a shortcut, it'll return -1.
         @rtype: int (if not return_shortcut), lowercased str (otherwise)
         """
+        def output_option(option, before_question):
+            """Print an OutputOption before or after question."""
+            if isinstance(option, OutputOption) \
+               and option.before_question is before_question:
+                self.output(option.out + '\n')
+
         if force and default is None:
             raise ValueError('With no default option it cannot be forced')
         if isinstance(options, Option):
@@ -350,16 +365,18 @@ class UI:
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError('Option #{0} does not consist of an '
+                    raise ValueError('Option #{} does not consist of an '
                                      'option and shortcut.'.format(i))
                 options[i] = StandardOption(*option)
             # TODO: Test for uniquity
 
         handled = False
+
+        # lock stream output
+        # with self.lock: (T282962)
         while not handled:
             for option in options:
-                if isinstance(option, OutputOption) and option.before_question:
-                    option.output()
+                output_option(option, before_question=True)
             output = Option.formatted(question, options, default)
             if force:
                 self.output(output + '\n')
@@ -371,6 +388,7 @@ class UI:
                 for index, option in enumerate(options):
                     if option.handled(answer):
                         answer = option.result(answer)
+                        output_option(option, before_question=False)
                         handled = option.stop
                         break
 
@@ -392,10 +410,12 @@ class UI:
         @param force: Automatically use the default.
         @return: Return a single Sequence entry.
         """
+        # lock stream output
+        # with self.lock: (T282962)
         if not force:
-            line_template = '{{0: >{0}}}: {{1}}'.format(len(str(len(answers))))
+            line_template = '{{0: >{}}}: {{1}}'.format(len(str(len(answers))))
             for i, entry in enumerate(answers, start=1):
-                pywikibot.output(line_template.format(i, entry))
+                self.output(line_template.format(i, entry))
 
         while True:
             choice = self.input(question, default=default, force=force)
@@ -433,7 +453,7 @@ class UI:
         try:
             from pywikibot.userinterfaces import gui
         except ImportError as e:
-            pywikibot.warning('Could not load GUI modules: {0}'.format(e))
+            pywikibot.warning('Could not load GUI modules: {}'.format(e))
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
@@ -443,61 +463,51 @@ class UI:
         return list(self.argv)
 
 
-class TerminalHandler(logging.Handler):
+class TerminalHandler(logging.StreamHandler):
 
     """A handler class that writes logging records to a terminal.
 
-    This class does not close the stream,
-    as sys.stdout or sys.stderr may be (and usually will be) used.
+    This class does not close the stream, as sys.stdout or sys.stderr
+    may be (and usually will be) used.
 
     Slightly modified version of the StreamHandler class that ships with
     logging module, plus code for colorization of output.
-
     """
 
     # create a class-level lock that can be shared by all instances
     sharedlock = threading.RLock()
 
-    def __init__(self, UI, strm=None):
+    @deprecated_args(strm='stream')
+    def __init__(self, UI, stream=None):
         """Initialize the handler.
 
-        If strm is not specified, sys.stderr is used.
-
+        If stream is not specified, sys.stderr is used.
         """
-        super().__init__()
-        # replace Handler's instance-specific lock with the shared class lock
-        # to ensure that only one instance of this handler can write to
-        # the console at a time
-        self.lock = TerminalHandler.sharedlock
-        if strm is None:
-            strm = sys.stderr
-        self.stream = strm
-        self.formatter = None
+        super().__init__(stream=stream)
         self.UI = UI
 
-    def flush(self):
-        """Flush the stream."""
-        self.stream.flush()
+    def createLock(self):
+        """Acquire a thread lock for serializing access to the underlying I/O.
+
+        Replace Handler's instance-specific lock with the shared
+        class lock to ensure that only one instance of this handler can
+        write to the console at a time.
+        """
+        self.lock = TerminalHandler.sharedlock
 
     def emit(self, record):
-        """Emit the record formatted to the output and return it."""
+        """Emit the record formatted to the output."""
+        self.flush()
         if record.name == 'py.warnings':
             # Each warning appears twice
             # the second time it has a 'message'
             if 'message' in record.__dict__:
-                return None
+                return
 
             record.__dict__.setdefault('newline', '\n')
 
-        text = self.format(record)
-        return self.UI.output(text, targetStream=self.stream)
-
-
-class TerminalFormatter(logging.Formatter):
-
-    """Terminal logging formatter."""
-
-    pass
+        msg = self.format(record)
+        self.UI.output(msg, targetStream=self.stream)
 
 
 class MaxLevelFilter(logging.Filter):

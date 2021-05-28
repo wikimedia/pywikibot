@@ -8,6 +8,7 @@ import os.path
 
 from pywikibot import config
 
+
 parameter_help = """
                   Currently available predefined fixes are:
 

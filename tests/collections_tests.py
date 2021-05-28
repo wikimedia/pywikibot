@@ -5,11 +5,13 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.page import (
-    LanguageDict, AliasesDict, ClaimCollection, SiteLinkCollection,
+    AliasesDict,
+    ClaimCollection,
+    LanguageDict,
+    SiteLinkCollection,
 )
 from tests.aspects import WikidataTestCase
 

@@ -6,11 +6,9 @@
 # Distributed under the terms of the MIT license.
 import unicodedata
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.tools import chars
-
 from tests.aspects import TestCase
 
 

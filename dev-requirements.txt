@@ -8,7 +8,7 @@ pytest-subtests >= 0.3.2
 pytest-attrib>=0.1.3
 # pytest-httpbin needs httpbin needs werkzeug >= 0.14.1
 # Python 3.8 needs werkzeug >= 0.15.5
-# github vulnerable depedency suggests werkzeug >= 0.15.3
+# GitHub vulnerable dependency suggests werkzeug >= 0.15.3
 werkzeug>=0.15.5
 pytest-httpbin
 
@@ -16,12 +16,7 @@ pep257>=0.6
 pyflakes>=2.1.0
 flake8>=3.7.5
 flake8-docstrings>=0.2.6
+flake8-isort;python_version>="3.6"
 flake8-mock>=0.3
 codecov
 coverage
-
-# pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
-# excluded from this file as they are quite expensive to install, and they
-# are not useful on the Appveyor Win32 builds since the relevant UI tests
-# also require accessing the menu of the console window, which doesn't exist
-# in the Appveyor environment.

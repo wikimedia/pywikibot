@@ -9,8 +9,8 @@ import codecs
 import re
 
 import pywikibot
-
 from pywikibot.family import Family
+
 
 # MediaWiki page names for interwiki sorting order
 pages = {

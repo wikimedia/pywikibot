@@ -12,22 +12,21 @@ These tests use special code 'write = -1' for edit failures.
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-from pywikibot import (
-    config,
+from pywikibot import config
+from pywikibot.exceptions import (
     Error,
-    NoPage,
-    LockedPage,
+    LockedPageError,
+    NoCreateError,
+    NoPageError,
+    OtherPageSaveError,
+    PageCreatedConflictError,
+    PageSaveRelatedError,
     SpamblacklistError,
     TitleblacklistError,
-    OtherPageSaveError,
-    NoCreateError,
-    PageCreatedConflict,
 )
-
 from tests import patch
 from tests.aspects import TestCase, WikibaseTestCase
 
@@ -48,7 +47,7 @@ class TestSaveFailure(TestCase):
             self.skipTest(
                 'Testing failure of edit protected with a sysop account')
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
-        with self.assertRaises(LockedPage):
+        with self.assertRaises(LockedPageError):
             page.save()
 
     def test_spam(self):
@@ -90,7 +89,7 @@ class TestSaveFailure(TestCase):
     def test_createonly(self):
         """Test that Page.save with createonly fails if page exists."""
         page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
-        with self.assertRaises(PageCreatedConflict):
+        with self.assertRaises(PageCreatedConflictError):
             page.save(createonly=True)
 
     def test_nocreate(self):
@@ -132,7 +131,7 @@ class TestActionFailure(TestCase):
 
         page_from = self.get_missing_article()
         if not page_from.exists():
-            with self.assertRaises(NoPage):
+            with self.assertRaises(NoPageError):
                 mysite.movepage(page_from, 'Main Page', 'test')
 
 
@@ -150,7 +149,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         """Test ItemPage save method inherited from superclass Page."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q6')
-        with self.assertRaises(pywikibot.PageSaveRelatedError):
+        with self.assertRaises(PageSaveRelatedError):
             item.save()
 
     def _make_WbMonolingualText_claim(self, repo, text, language):

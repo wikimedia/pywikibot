@@ -49,11 +49,19 @@ import time
 import webbrowser
 
 import pywikibot
-
-from pywikibot import config
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import config, i18n, pagegenerators
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    IsRedirectPageError,
+    LockedPageError,
+    NoPageError,
+    PageSaveRelatedError,
+    ServerError,
+    SpamblacklistError,
+)
 from pywikibot.tools.formatter import color_format
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -192,7 +200,7 @@ def showQuest(page):
         [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n',
         automatic_quit=False)
     if quest == 'b':
-        webbrowser.open('%s?redirect=no' % page.full_url())
+        webbrowser.open('{}?redirect=no'.format(page.full_url()))
     elif quest == 'g':
         from pywikibot import editor as editarticle
         editor = editarticle.TextEditor()
@@ -280,13 +288,13 @@ def main(*args):
                                                        groupsize=60)
     for page in generator:
         pagename = page.title(as_link=True)
-        pywikibot.output('Loading %s...' % pagename)
+        pywikibot.output('Loading {}...'.format(pagename))
         try:
             text = page.text
-        except pywikibot.NoPage:
-            pywikibot.output("%s doesn't exist! Skipping..." % pagename)
+        except NoPageError:
+            pywikibot.output("{} doesn't exist! Skipping...".format(pagename))
             continue
-        except pywikibot.IsRedirectPage:
+        except IsRedirectPageError:
             pywikibot.output('{} is a redirect! Skipping...'.format(pagename))
             if show:
                 showQuest(page)
@@ -296,8 +304,8 @@ def main(*args):
         # (see bug T57322)
         # if not page.has_permission():
         #    pywikibot.output(
-        #        "%s is sysop-protected : this account can't edit "
-        #        "it! Skipping..." % pagename)
+        #        "{} is sysop-protected : this account can't edit "
+        #        "it! Skipping...".format(pagename))
         #    continue
         restrictions = page.protection()
         try:
@@ -305,9 +313,9 @@ def main(*args):
         except KeyError:
             editRestr = None
         if not page.has_permission():
-            pywikibot.output('%s is protected: '
+            pywikibot.output('{} is protected: '
                              "this account can't edit it! Skipping..."
-                             % pagename)
+                             .format(pagename))
             continue
 
         # Understand, according to the template in the page, what should be the
@@ -322,8 +330,8 @@ def main(*args):
             # page is not edit-protected
             # Deleting the template because the page doesn't need it.
             if not (TTP or TSP):
-                raise pywikibot.Error(
-                    'This script is not localized to use it on \n{0}. '
+                raise Error(
+                    'This script is not localized to use it on \n{}. '
                     'Missing "templateSemiProtection" or'
                     '"templateTotalProtection"'.format(site.sitename))
 
@@ -331,10 +339,10 @@ def main(*args):
                 replaceToPerform = '|'.join(TTP + TSP + TU)
             else:
                 replaceToPerform = '|'.join(TTP + TSP)
-            text, changes = re.subn('<noinclude>(%s)</noinclude>'
-                                    % replaceToPerform, '', text)
+            text, changes = re.subn('<noinclude>({})</noinclude>'
+                                    .format(replaceToPerform, '', text))
             if changes == 0:
-                text, changes = re.subn('(%s)' % replaceToPerform, '', text)
+                text, changes = re.subn('({})'.format(replaceToPerform, '', text))
             msg = 'The page is editable for all'
             if not moveBlockCheck:
                 msg += ', deleting the template..'
@@ -350,8 +358,8 @@ def main(*args):
                 pywikibot.output(msg)
             else:
                 if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
-                    raise pywikibot.Error(
-                        'This script is not localized to use it on \n{0}. '
+                    raise Error(
+                        'This script is not localized to use it on \n{}. '
                         'Missing "templateNoRegex"'.format(
                             site.sitename))
 
@@ -372,8 +380,8 @@ def main(*args):
                 pywikibot.output(msg)
             else:
                 if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
-                    raise pywikibot.Error(
-                        'This script is not localized to use it on \n{0}. '
+                    raise Error(
+                        'This script is not localized to use it on \n{}. '
                         'Missing "templateNoRegex"'.format(
                             site.sitename))
                 pywikibot.output('The page is editable only for the '
@@ -404,8 +412,8 @@ def main(*args):
                     replaceToPerform = '|'.join(TSMP + TTMP + TU)
                 else:
                     replaceToPerform = '|'.join(TSMP + TTMP)
-                text, changes = re.subn('<noinclude>(%s)</noinclude>'
-                                        % replaceToPerform, '', text)
+                text, changes = re.subn('<noinclude>({})</noinclude>'
+                                        .format(replaceToPerform, '', text))
                 if changes == 0:
                     text, changes = re.subn('({})'.format(replaceToPerform),
                                             '', text)
@@ -477,9 +485,9 @@ def save_page(page, text, comment):
     while True:
         try:
             page.put(text, comment, force=True)
-        except pywikibot.EditConflict:
+        except EditConflictError:
             pywikibot.output('Edit conflict! skip!')
-        except pywikibot.ServerError:
+        except ServerError:
             # Sometimes there is this error that's quite annoying
             # because can block the whole process for nothing.
             error_count += 1
@@ -488,17 +496,17 @@ def save_page(page, text, comment):
                 time.sleep(3)
                 continue
             # Prevent Infinite Loops
-            raise pywikibot.ServerError('Fifth Server Error!')
-        except pywikibot.SpamblacklistError as e:
-            pywikibot.output('Cannot change %s because of '
-                             'blacklist entry %s'
-                             % (page.title(), e.url))
-        except pywikibot.LockedPage:
+            raise ServerError('Fifth Server Error!')
+        except SpamblacklistError as e:
+            pywikibot.output('Cannot change {} because of '
+                             'blacklist entry {}'
+                             .format(page.title(), e.url))
+        except LockedPageError:
             pywikibot.output('The page is still protected. '
                              'Skipping...')
-        except pywikibot.PageSaveRelatedError as error:
-            pywikibot.output('Error putting page: %s'
-                             % (error.args,))
+        except PageSaveRelatedError as error:
+            pywikibot.output('Error putting page: {}'
+                             .format(error.args))
         break
 
 

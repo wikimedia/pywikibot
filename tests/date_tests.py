@@ -5,12 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 from datetime import datetime
 
 from pywikibot import date
-
 from tests.aspects import MetaTestCaseClass, TestCase
 
 
@@ -49,7 +47,7 @@ class TestDateMeta(MetaTestCaseClass):
 
         for formatname in date.formats:
             cls.add_method(dct, 'test_' + formatname, test_method(formatname),
-                           doc_suffix='using {0} format'.format(formatname))
+                           doc_suffix='using {} format'.format(formatname))
 
         return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
 
@@ -68,7 +66,7 @@ class TestMonthName(TestCase):
     net = True
 
     def test_month_name_formats(self):
-        """Test MonthName format for codes retrieved via mediawiki message."""
+        """Test MonthName format for codes retrieved via MediaWiki message."""
         formatname = 'MonthName'
         for code in date.formats['Cat_BirthsAD']:
             convert = date.formats[formatname][code]

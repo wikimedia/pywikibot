@@ -6,23 +6,18 @@
 #
 import itertools
 import threading
-
 from collections import Counter
 from typing import Optional
 
 import pywikibot
+from pywikibot import config
+from pywikibot.tools import ModuleDeprecationWrapper
 
-from pywikibot import config2 as config
 
 try:
     import pydot
 except ImportError as e:
     pydot = e
-
-
-class GraphImpossible(Exception):
-
-    """Drawing a graph is not possible on your system."""
 
 
 class GraphSavingThread(threading.Thread):
@@ -96,10 +91,10 @@ class GraphDrawer:
         @param subject: page data to graph
         @type subject: pywikibot.interwiki_graph.Subject
 
-        @raises GraphImpossible: pydot is not installed
+        @raises ImportError if pydot is not installed
         """
         if isinstance(pydot, ImportError):
-            raise GraphImpossible('pydot is not installed: {}.'.format(pydot))
+            raise ImportError('pydot is not installed: {}.'.format(pydot))
         self.graph = None
         self.subject = subject
 
@@ -122,9 +117,9 @@ class GraphDrawer:
     def addNode(self, page):
         """Add a node for page."""
         node = pydot.Node(self.getLabel(page), shape='rectangle')
-        node.set_URL('"http://%s%s"'
-                     % (page.site.hostname(),
-                        page.site.get_address(page.title(as_url=True))))
+        node.set_URL('"http://{}{}"'
+                     .format(page.site.hostname(),
+                             page.site.get_address(page.title(as_url=True))))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')
@@ -226,3 +221,13 @@ def getFilename(page, extension: Optional[str] = None) -> str:
     if extension:
         filename += '.{}'.format(extension)
     return filename
+
+
+GraphImpossible = ImportError
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'GraphImpossible',
+    replacement_name='ImportError',
+    since='20210423',
+    future_warning=True)

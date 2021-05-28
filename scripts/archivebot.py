@@ -73,7 +73,7 @@ between Friday or Sunday (including) the following week is then the first week
 of the year. So up to three days are still counted as the year before.
 
 See also:
- - http://www.phys.uu.nl/~vgent/calendar/isocalendar.htm
+ - https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
  - https://docs.python.org/3.4/library/datetime.html#datetime.date.isocalendar
 
 Options (may be omitted):
@@ -99,20 +99,23 @@ import os
 import re
 import time
 import types
-
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from hashlib import md5
 from math import ceil
 from typing import Any, Optional, Pattern
 from warnings import warn
 
 import pywikibot
-
+from pywikibot import i18n
 from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
-from pywikibot import i18n
-from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
-                               to_local_digits)
+from pywikibot.exceptions import Error, NoPageError
+from pywikibot.textlib import (
+    TimeStripper,
+    extract_sections,
+    findmarker,
+    to_local_digits,
+)
 from pywikibot.tools import issue_deprecation_warning
 
 
@@ -131,7 +134,7 @@ MW_KEYS = types.MappingProxyType({
 })
 
 
-class ArchiveBotSiteConfigError(pywikibot.Error):
+class ArchiveBotSiteConfigError(Error):
 
     """There is an error originated by archivebot's on-site configuration."""
 
@@ -186,11 +189,15 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
     Return a timedelta for a shorthand duration.
 
     @param string: a string defining a time period:
+
+    Examples::
+
         300s - 300 seconds
         36h - 36 hours
         7d - 7 days
         2w - 2 weeks (14 days)
         1y - 1 year
+
     @param timestamp: a timestamp to calculate a more accurate duration offset
         used by years
     @type timestamp: datetime.datetime
@@ -211,7 +218,7 @@ def str2time(string: str, timestamp=None) -> datetime.timedelta:
         duration *= 12
     else:
         raise MalformedConfigError(
-            'Unrecognized parameter in template: {0}'.format(string))
+            'Unrecognized parameter in template: {}'.format(string))
 
     if timestamp:
         return apply_month_delta(
@@ -252,6 +259,7 @@ def str2size(string: str) -> Size:
     Return a size for a shorthand size.
 
     Accepts a string defining a size::
+
       1337 - 1337 bytes
       150K - 150 kilobytes
       2M - 2 megabytes
@@ -411,7 +419,7 @@ class DiscussionPage(pywikibot.Page):
         self.params = params
         try:
             self.load_page()
-        except pywikibot.NoPage:
+        except NoPageError:
             self.header = archiver.get_attr('archiveheader',
                                             i18n.twtranslate(
                                                 self.site.code,
@@ -590,7 +598,7 @@ class PageArchiver:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
                 tpl_page.title()
-            except pywikibot.Error:
+            except Error:
                 continue
             if tpl_page == self.tpl:
                 for item, value in params.items():
@@ -769,7 +777,7 @@ class PageArchiver:
                     "Couldn't find the template in the header"
                 )
 
-            pywikibot.output('Archiving {0} thread(s).'
+            pywikibot.output('Archiving {} thread(s).'
                              .format(self.archived_threads))
             # Save the archives first (so that bugs don't cause a loss of data)
             for title, archive in sorted(self.archives.items()):
@@ -864,7 +872,7 @@ def main(*args) -> None:
             calc = page.title()
         else:
             pywikibot.output(
-                'NOTE: the specified page "{0}" does not (yet) exist.'
+                'NOTE: the specified page "{}" does not (yet) exist.'
                 .format(calc))
         pywikibot.output('key = {}'.format(calc_md5_hexdigest(calc, salt)))
         return

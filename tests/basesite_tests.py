@@ -7,8 +7,13 @@
 from contextlib import suppress
 
 import pywikibot
-
+from pywikibot.exceptions import Error
+from pywikibot.tools import suppress_warnings
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
+
+
+WARN_SELF_CALL = (r'Referencing this attribute like a function '
+                  r'is deprecated for .*; use it directly instead')
 
 
 class TestBaseSiteProperties(TestCase):
@@ -81,12 +86,19 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
         self.assertIsInstance(mysite.user(), (str, type(None)))
-        self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
+        self.assertEqual(mysite.sitename, '{}:{}'.format(self.family, code))
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)
+
+        # sitename attribute could also be referenced like a function
+
+        with suppress_warnings(WARN_SELF_CALL, category=FutureWarning):
+            self.assertEqual(mysite.sitename(), '{}:{}'
+                                                .format(self.family, code))
+
         try:
             dabcat = mysite.disambcategory()
-        except pywikibot.Error as e:
+        except Error as e:
             try:
                 self.assertIn('No disambiguation category name found', str(e))
             except AssertionError:

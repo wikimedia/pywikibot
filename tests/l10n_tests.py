@@ -6,14 +6,13 @@
 #
 import os
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import i18n
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-
 from tests.aspects import MetaTestCaseClass, TestCase
+
 
 PACKAGES = (
     'redirect-broken-redirect-template',  # speedy deletion template
@@ -78,7 +77,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                              .format(package, code)).replace('-', '_')
                 cls.add_method(
                     dct, test_name, test_method(current_site, package),
-                    doc_suffix='{0} and language {1}'.format(
+                    doc_suffix='{} and language {}'.format(
                         package, code))
 
         return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)

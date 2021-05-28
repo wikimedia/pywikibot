@@ -8,11 +8,11 @@
 import copy
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.bot import SingleSiteBot, ExistingPageBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.tools.formatter import color_format
+
 
 try:
     import mwparserfromhell

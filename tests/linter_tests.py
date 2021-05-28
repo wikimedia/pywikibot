@@ -5,11 +5,9 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from tests.aspects import DefaultSiteTestCase
 
 
@@ -22,7 +20,7 @@ class TestLinterPages(DefaultSiteTestCase):
         super().setUp()
         if not self.site.has_extension('Linter'):
             self.skipTest(
-                'The site {0} does not use Linter extension'.format(self.site))
+                'The site {} does not use Linter extension'.format(self.site))
 
     def test_linter_pages(self):
         """Test the deprecated site.logpages() method."""

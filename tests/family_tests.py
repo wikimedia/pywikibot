@@ -8,11 +8,9 @@ from collections.abc import Mapping
 from contextlib import suppress
 
 import pywikibot.site
-
-from pywikibot.exceptions import UnknownFamily
+from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.tools import suppress_warnings
-
 from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 
@@ -56,9 +54,9 @@ class TestFamily(TestCase):
                     self.assertEqual(set(f.codes), {f.code})
 
     def test_family_load_invalid(self):
-        """Test that an invalid family raised UnknownFamily exception."""
+        """Test that an invalid family raised UnknownFamilyError."""
         with self.assertRaisesRegex(
-                UnknownFamily,
+                UnknownFamilyError,
                 'Family unknown does not exist'):
             Family.load('unknown')
 
@@ -95,7 +93,7 @@ class TestFamily(TestCase):
         family = Family.load('wikipedia')
         other = 'unknown'
         with self.assertRaisesRegex(
-                UnknownFamily,
+                UnknownFamilyError,
                 'Family unknown does not exist'):
             family.__eq__(other)
 

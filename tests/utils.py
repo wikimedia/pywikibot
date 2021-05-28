@@ -7,20 +7,21 @@
 import inspect
 import os
 import sys
+import unittest
 import warnings
-
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
 from types import ModuleType
 
 import pywikibot
-
 from pywikibot import config
-from pywikibot.data.api import CachedRequest, APIError
+from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
+from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from tests import _pwb_py, unittest
+from tests import _pwb_py
+
 
 try:
     from cryptography import __version__ as cryptography_version
@@ -434,7 +435,6 @@ class FakeLoginManager(pywikibot.data.api.LoginManager):
     @password.setter
     def password(self, value):
         """Ignore password changes."""
-        pass
 
 
 def execute(command, data_in=None, timeout=None, error=None):
@@ -516,3 +516,14 @@ def empty_sites():
     pywikibot._sites = {}
     pywikibot._code_fam_from_url.cache_clear()
     yield
+
+
+@contextmanager
+def skipping(*exceptions, msg=None):
+    """Context manager to skip test on specified exceptions."""
+    try:
+        yield
+    except exceptions as e:
+        if msg is None:
+            msg = e
+        raise unittest.SkipTest(msg)

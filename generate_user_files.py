@@ -9,13 +9,12 @@ import codecs
 import os
 import re
 import sys
-
-from typing import Optional
-
 from collections import namedtuple
 from textwrap import fill
+from typing import Optional
 
 from generate_family_file import _import_with_no_user_config
+
 
 if sys.version_info[:2] >= (3, 9):
     Tuple = tuple
@@ -34,8 +33,8 @@ OBSOLETE_SECTIONS = {
 
 # Disable user-config usage as we are creating it here
 pywikibot = _import_with_no_user_config('pywikibot')
-config, __url__ = pywikibot.config2, pywikibot.__url__
-base_dir = pywikibot.config2.base_dir
+config, __url__ = pywikibot.config, pywikibot.__url__
+base_dir = pywikibot.config.base_dir
 
 try:
     console_encoding = sys.stdout.encoding
@@ -69,23 +68,23 @@ def change_base_dir():
             pywikibot.output('Using existing directory')
         else:
             try:
-                os.mkdir(new_base, pywikibot.config2.private_files_permission)
+                os.mkdir(new_base, pywikibot.config.private_files_permission)
             except Exception as e:
-                pywikibot.error('directory creation failed: {0}'.format(e))
+                pywikibot.error('directory creation failed: {}'.format(e))
                 continue
             pywikibot.output('Created new directory.')
         break
 
-    if new_base == pywikibot.config2.get_base_dir(new_base):
+    if new_base == pywikibot.config.get_base_dir(new_base):
         # config would find that file
         return new_base
 
     msg = fill("""WARNING: Your user files will be created in the directory
-'%(new_base)s' you have chosen. To access these files, you will either have
-to use the argument "-dir:%(new_base)s" every time you run the bot, or set
+'{new_base}' you have chosen. To access these files, you will either have
+to use the argument "-dir:{new_base}" every time you run the bot, or set
 the environment variable "PYWIKIBOT_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
-set environment variables.""" % {'new_base': new_base}, width=76)
+set environment variables.""".format(new_base=new_base), width=76)
     pywikibot.output(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
@@ -115,7 +114,7 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
     @return: The family, language and username
     @rtype: tuple of three str
     """
-    known_families = sorted(pywikibot.config2.family_files.keys())
+    known_families = sorted(pywikibot.config.family_files.keys())
     if default_family not in known_families:
         default_family = None
     fam = pywikibot.bot.input_list_choice(
@@ -141,7 +140,7 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
                          .format(fam.name))
         default_lang = None
     elif len(known_langs) == 1:
-        pywikibot.output('The only known language: {0}'.format(known_langs[0]))
+        pywikibot.output('The only known language: {}'.format(known_langs[0]))
         default_lang = known_langs[0]
     else:
         pywikibot.output('This is the list of known languages:')
@@ -163,7 +162,7 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
                     default=False, automatic_quit=False):
                 mycode = None
 
-    message = 'Username on {0}:{1}'.format(mycode, fam.name)
+    message = 'Username on {}:{}'.format(mycode, fam.name)
     username = pywikibot.input(message, default=default_username, force=force)
     # Escape ''s
     if username:
@@ -217,9 +216,9 @@ PASSFILE_CONFIG = """\
 
 
 def parse_sections():
-    """Parse sections from config2.py file.
+    """Parse sections from config.py file.
 
-    config2.py will be in the pywikibot/ directory relative to this
+    config.py will be in the pywikibot/ directory relative to this
     generate_user_files script.
 
     @return: a list of ConfigSection named tuples.
@@ -229,7 +228,7 @@ def parse_sections():
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
     install = os.path.dirname(os.path.abspath(__file__))
-    with codecs.open(os.path.join(install, 'pywikibot', 'config2.py'),
+    with codecs.open(os.path.join(install, 'pywikibot', 'config.py'),
                      'r', 'utf-8') as config_f:
         config_file = config_f.read()
 
@@ -342,7 +341,7 @@ def create_user_config(main_family, main_code, main_username, force=False):
                 botpasswords='password_file = ' + ('"{}"'.format(PASS_BASENAME)
                                                    if botpasswords
                                                    else 'None')))
-        pywikibot.output("'%s' written." % _fnc)
+        pywikibot.output("'{}' written.".format(_fnc))
     except BaseException:
         if os.path.exists(_fnc):
             os.remove(_fnc)
