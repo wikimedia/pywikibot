@@ -504,7 +504,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 ParseError = VersionParseError
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
+wrapper.add_deprecated_attr(
     'ParseError',
     replacement_name='pywikibot.exceptions.VersionParseError',
     since='20210423',

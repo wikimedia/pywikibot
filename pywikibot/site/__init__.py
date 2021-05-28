@@ -21,7 +21,7 @@ __all__ = ('APISite', 'BaseSite', 'ClosedSite', 'DataSite', 'RemovedSite',
 _logger = 'wiki.site'
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
+wrapper.add_deprecated_attr(
     'PageInUse',
     replacement_name='pywikibot.exceptions.PageInUseError',
     since='20210423',

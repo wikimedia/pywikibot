@@ -814,7 +814,7 @@ def input(twtitle: str,
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
+wrapper.add_deprecated_attr(
     'TranslationError',
     replacement_name='pywikibot.exceptions.TranslationError',
     since='20210423', future_warning=True)

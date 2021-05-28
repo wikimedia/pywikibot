@@ -1254,5 +1254,5 @@ def AutoFamily(name: str, url: str):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
-                             since='20190420')
+wrapper.add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
+                            since='20190420')

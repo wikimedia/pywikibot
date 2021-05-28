@@ -1098,5 +1098,5 @@ class IndexPage(pywikibot.Page):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Soup', _bs4_soup, replacement_name='_bs4_soup',
-                             since='20181128', future_warning=True)
+wrapper.add_deprecated_attr('Soup', _bs4_soup, replacement_name='_bs4_soup',
+                            since='20181128', future_warning=True)

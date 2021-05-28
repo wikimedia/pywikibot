@@ -226,7 +226,7 @@ def getFilename(page, extension: Optional[str] = None) -> str:
 GraphImpossible = ImportError
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
+wrapper.add_deprecated_attr(
     'GraphImpossible',
     replacement_name='ImportError',
     since='20210423',

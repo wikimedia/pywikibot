@@ -476,7 +476,7 @@ class OauthLoginManager(LoginManager):
 OAuthImpossible = ImportError
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr(
+wrapper.add_deprecated_attr(
     'OAuthImpossible',
     replacement_name='ImportError',
     since='20210423',
