@@ -39,7 +39,7 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import CurrentPageBot, MultipleSitesBot
+from pywikibot.bot import CurrentPageBot
 from pywikibot.exceptions import PageRelatedError
 
 
@@ -48,7 +48,7 @@ from pywikibot.exceptions import PageRelatedError
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class MovePagesBot(MultipleSitesBot, CurrentPageBot):
+class MovePagesBot(CurrentPageBot):
 
     """Page move bot."""
 

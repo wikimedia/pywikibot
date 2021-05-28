@@ -78,12 +78,7 @@ import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.bot import (
-    ExistingPageBot,
-    MultipleSitesBot,
-    OptionHandler,
-    RedirectPageBot,
-)
+from pywikibot.bot import ExistingPageBot, OptionHandler, RedirectPageBot
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
@@ -378,7 +373,7 @@ class RedirectGenerator(OptionHandler):
                 continue
 
 
-class RedirectRobot(MultipleSitesBot, ExistingPageBot, RedirectPageBot):
+class RedirectRobot(ExistingPageBot, RedirectPageBot):
 
     """Redirect bot."""
 
