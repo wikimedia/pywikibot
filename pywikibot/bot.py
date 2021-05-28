@@ -1699,11 +1699,11 @@ class ConfigParserBot(BaseBot):
         [shell] ; Shell options
         always: true
 
-    The option values are interpreted in this order::
+    The option values are interpreted in this order:
 
-    - `available_options` default setting
-    - `script.ini options` settings
-    - command line arguments
+    1. `available_options` default setting
+    2. `script.ini options` settings
+    3. command line arguments
 
     *New in version 3.0.*
     """
