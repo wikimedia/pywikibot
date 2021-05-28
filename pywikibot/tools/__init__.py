@@ -1886,7 +1886,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             warn(warning_message.format(self._module.__name__, attr, name),
                  FutureWarning if future else DeprecationWarning, 2)
 
-            if repl:
+            if repl is not None:
                 return repl
 
             if '.' in name:
