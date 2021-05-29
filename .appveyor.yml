@@ -81,6 +81,7 @@ install:
   - easy_install --version
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
+  - pip install wikitextparser
 
 build: off
 
