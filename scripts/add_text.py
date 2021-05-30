@@ -10,24 +10,22 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--talkpage         Put the text onto the talk page instead
--talk
-
 -text             Define what text to add. "\n" are interpreted as newlines.
 
 -textfile         Define a texfile name which contains the text to add
 
 -summary          Define the summary to use
 
--excepturl        Use the html page as text where you want to see if there's
-                  the text, not the wiki-page.
-
--newimages        Add text in the new images
+-up               If used, put the text at the top of the page
 
 -always           If used, the bot won't ask if it should add the specified
                   text
 
--up               If used, put the text at the top of the page
+-talkpage         Put the text onto the talk page instead
+-talk
+
+-excepturl        Use the html page as text where you want to see if there's
+                  the text, not the wiki-page.
 
 -noreorder        Avoid reordering cats and interwiki
 
@@ -57,6 +55,7 @@ Example
 # Distributed under the terms of the MIT license.
 #
 import codecs
+import collections
 import re
 import sys
 from typing import Optional, Union
@@ -77,6 +76,24 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools.formatter import color_format
+
+DEFAULT_ARGS = {
+    'text': None,
+    'text_file': None,
+    'summary': None,
+    'up': False,
+    'always': False,
+    'talk_page': False,
+    'reorder': True,
+    'regex_skip_url': None,
+}
+
+ARG_PROMPT = {
+    '-text': 'What text do you want to add?',
+    '-textfile': 'Which text file do you want to append to the page?',
+    '-summary': 'What summary do you want to use?',
+    '-excepturl': 'What url pattern should we skip?',
+}
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -274,76 +291,99 @@ def add_text(page: pywikibot.page.BasePage, addText: str,
         error_count += 1
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*argv: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
-    @param args: Command line arguments
+    @param argv: Command line arguments
     """
-    # If none, the var is set only for check purpose.
-    summary = None
-    addText = None
-    regexSkipUrl = None
-    always = False
-    textfile = None
-    talkPage = False
-    reorderEnabled = True
+    generator_factory = pagegenerators.GeneratorFactory()
 
-    # Put the text above or below the text?
-    up = False
-
-    # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
-
-    # Loading the arguments
-    for arg in local_args:
-        option, sep, value = arg.partition(':')
-        if option == '-textfile':
-            textfile = value or pywikibot.input(
-                'Which textfile do you want to add?')
-        elif option == '-text':
-            addText = value or pywikibot.input('What text do you want to add?')
-        elif option == '-summary':
-            summary = value or pywikibot.input(
-                'What summary do you want to use?')
-        elif option == '-excepturl':
-            regexSkipUrl = value or pywikibot.input('What text should I skip?')
-        elif option == '-except':
-            new_arg = ''.join(['-grepnot', sep, value])
-            issue_deprecation_warning(arg, new_arg,
-                                      2, ArgumentDeprecationWarning,
-                                      since='20201224')
-            genFactory.handle_arg(new_arg)
-        elif option == '-up':
-            up = True
-        elif option == '-noreorder':
-            reorderEnabled = False
-        elif option == '-always':
-            always = True
-        elif option in ('-talk', '-talkpage'):
-            talkPage = True
-        else:
-            genFactory.handle_arg(arg)
-
-    if textfile and not addText:
-        with codecs.open(textfile, 'r', config.textfile_encoding) as f:
-            addText = f.read()
-
-    generator = genFactory.getCombinedGenerator()
-    additional_text = '' if addText else "The text to add wasn't given."
-    if pywikibot.bot.suggest_help(missing_generator=not generator,
-                                  additional_text=additional_text):
+    try:
+        args = parse(argv, generator_factory)
+    except ValueError as exc:
+        pywikibot.bot.suggest_help(additional_text=str(exc))
         return
 
-    if talkPage:
+    text = args.text
+
+    if args.text_file:
+        with codecs.open(args.text_file, 'r', config.textfile_encoding) as f:
+            text = f.read()
+
+    generator = generator_factory.getCombinedGenerator()
+
+    if pywikibot.bot.suggest_help(missing_generator=not generator):
+        return
+
+    if args.talk_page:
         generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
+
     for page in generator:
-        add_text(page, addText, summary,
-                 regexSkipUrl=regexSkipUrl, always=always, up=up,
-                 reorderEnabled=reorderEnabled, create=talkPage)
+        add_text(page, text, args.summary,
+                 regexSkipUrl=args.regex_skip_url, always=args.always,
+                 up=args.up, reorderEnabled=args.reorder,
+                 create=args.talk_page)
+
+
+def parse(argv: Tuple[str, ...],
+          generator_factory: pagegenerators.GeneratorFactory
+          ) -> collections.namedtuple:
+    """
+    Parses our arguments and provide a named tuple with their values.
+
+    @param argv: input arguments to be parsed
+    @param generator_factory: factory that will determine the page to edit
+
+    @return: a namedtuple with our parsed arguments
+
+    @raise: ValueError if we receive invalid arguments
+    """
+    args = dict(DEFAULT_ARGS)
+    argv = pywikibot.handle_args(argv)
+    argv = generator_factory.handle_args(argv)
+
+    for arg in argv:
+        option, _, value = arg.partition(':')
+
+        if not value and option in ARG_PROMPT:
+            value = pywikibot.input(ARG_PROMPT[option])
+
+        if option == '-text':
+            args['text'] = value
+        elif option == '-textfile':
+            args['text_file'] = value
+        elif option == '-summary':
+            args['summary'] = value
+        elif option == '-up':
+            args['up'] = True
+        elif option == '-always':
+            args['always'] = True
+        elif option in ('-talk', '-talkpage'):
+            args['talk_page'] = True
+        elif option == '-noreorder':
+            args['reorder'] = False
+        elif option == '-except':
+            page_gen_arg = '-grepnot:{}'.format(value)
+            issue_deprecation_warning(arg, page_gen_arg,
+                                      2, ArgumentDeprecationWarning,
+                                      since='20201224')
+            generator_factory.handle_arg(page_gen_arg)
+        elif option == '-excepturl':
+            args['regex_skip_url'] = value
+        else:
+            raise ValueError("Argument '{}' is unrecognized".format(option))
+
+    if not args['text'] and not args['text_file']:
+        raise ValueError("Either the '-text' or '-textfile' is required")
+
+    if args['text'] and args['text_file']:
+        raise ValueError("'-text' and '-textfile' cannot both be used")
+
+    Args = collections.namedtuple('Args', args.keys())
+    return Args(**args)
 
 
 if __name__ == '__main__':
