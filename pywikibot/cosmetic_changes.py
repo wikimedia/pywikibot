@@ -56,6 +56,8 @@ or by adding a list to the given one::
 # Distributed under the terms of the MIT license.
 #
 import re
+
+from enum import IntEnum
 from typing import Optional
 
 import pywikibot
@@ -72,6 +74,7 @@ from pywikibot.tools import (
     first_lower,
     first_upper,
     issue_deprecation_warning,
+    ModuleDeprecationWrapper,
 )
 from pywikibot.tools.chars import url2string
 
@@ -173,10 +176,19 @@ deprecatedTemplates = {
     }
 }
 
-CANCEL_ALL = False
-CANCEL_PAGE = 1
-CANCEL_METHOD = 2
-CANCEL_MATCH = 3
+
+class CANCEL(IntEnum):
+
+    """Cancel level to ignore exceptions.
+
+    If an error occurred and either skips the page or the method
+    or a single match. ALL raises the exception.
+    """
+
+    ALL = 0
+    PAGE = 1
+    METHOD = 2
+    MATCH = 3
 
 
 def _format_isbn_match(match, strict=True):
@@ -215,7 +227,7 @@ class CosmeticChangesToolkit:
                  show_diff: bool = False,
                  namespace: Optional[int] = None,
                  pageTitle: Optional[str] = None,
-                 ignore: int = CANCEL_ALL):
+                 ignore: IntEnum = CANCEL.ALL):
         """Initializer.
 
         @param page: the Page object containing the text to be modified
@@ -295,7 +307,7 @@ class CosmeticChangesToolkit:
     @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
                 future_warning=True, since='20200415')
     @deprecated_args(diff='show_diff')
-    def from_page(cls, page, show_diff=False, ignore=CANCEL_ALL):
+    def from_page(cls, page, show_diff=False, ignore=CANCEL.ALL):
         """Create toolkit based on the page."""
         return cls(page, show_diff=show_diff, ignore=ignore)
 
@@ -305,7 +317,7 @@ class CosmeticChangesToolkit:
         try:
             result = method(text)
         except Exception as e:
-            if self.ignore == CANCEL_METHOD:
+            if self.ignore == CANCEL.METHOD:
                 pywikibot.warning('Unable to perform "{}" on "{}"!'
                                   .format(method.__name__, self.title))
                 pywikibot.exception(e)
@@ -324,7 +336,7 @@ class CosmeticChangesToolkit:
         try:
             new_text = self._change(text)
         except Exception as e:
-            if self.ignore == CANCEL_PAGE:
+            if self.ignore == CANCEL.PAGE:
                 pywikibot.warning('Skipped "{}", because an error occurred.'
                                   .format(self.title))
                 pywikibot.exception(e)
@@ -1094,4 +1106,24 @@ class CosmeticChangesToolkit:
 
     def fix_ISBN(self, text):
         """Hyphenate ISBN numbers."""
-        return _reformat_ISBNs(text, strict=self.ignore != CANCEL_MATCH)
+        return _reformat_ISBNs(text, strict=self.ignore != CANCEL.MATCH)
+
+
+_CANCEL_ALL = CANCEL.ALL
+_CANCEL_PAGE = CANCEL.PAGE
+_CANCEL_METHOD = CANCEL.METHOD
+_CANCEL_MATCH = CANCEL.MATCH
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr('CANCEL_ALL', _CANCEL_ALL,
+                            replacement_name='CANCEL.ALL',
+                            since='20210528', future_warning=True)
+wrapper.add_deprecated_attr('CANCEL_PAGE', _CANCEL_PAGE,
+                            replacement_name='CANCEL.PAGE',
+                            since='20210528', future_warning=True)
+wrapper.add_deprecated_attr('CANCEL_METHOD', _CANCEL_METHOD,
+                            replacement_name='CANCEL.METHOD',
+                            since='20210528', future_warning=True)
+wrapper.add_deprecated_attr('CANCEL_MATCH', _CANCEL_MATCH,
+                            replacement_name='CANCEL.MATCH',
+                            since='20210528', future_warning=True)
