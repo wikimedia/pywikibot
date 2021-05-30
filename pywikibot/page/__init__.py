@@ -30,7 +30,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, i18n, textlib
-from pywikibot.backports import Dict, Iterable, List, Tuple, cache
+from pywikibot.backports import Dict, Iterable, List, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     APIError,
@@ -440,6 +440,8 @@ class BasePage(ComparableMixin):
         """
         if force:
             del self.latest_revision_id
+            if hasattr(self, '_bot_may_edit'):
+                del self._bot_may_edit
         try:
             self._getInternals()
         except IsRedirectPageError:
@@ -1017,7 +1019,6 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
-    @cache
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -1033,6 +1034,12 @@ class BasePage(ComparableMixin):
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
         """
+        if not hasattr(self, '_bot_may_edit'):
+            self._bot_may_edit = self._check_bot_may_edit()
+        return self._bot_may_edit
+
+    def _check_bot_may_edit(self) -> bool:
+        """A botMayEdit helper method."""
         if not hasattr(self, 'templatesWithParams'):
             return True
 
