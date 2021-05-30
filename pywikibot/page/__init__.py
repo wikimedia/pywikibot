@@ -1047,6 +1047,7 @@ class BasePage(ComparableMixin):
             return True
 
         username = self.site.username()
+        module = pywikibot.calledModuleName()
         try:
             templates = self.templatesWithParams()
         except (NoPageError, IsRedirectPageError, SectionError):
@@ -1056,7 +1057,7 @@ class BasePage(ComparableMixin):
         restrictions = set(self.site.get_edit_restricted_templates())
 
         # also add archive templates for non-archive bots
-        if pywikibot.calledModuleName() != 'archivebot':
+        if module != 'archivebot':
             restrictions.update(self.site.get_archived_page_templates())
 
         # multiple bots/nobots templates are allowed
@@ -1095,9 +1096,7 @@ class BasePage(ComparableMixin):
                         'Edit declined' % key)
                     return False
 
-                if 'all' in names \
-                   or pywikibot.calledModuleName() in names \
-                   or username in names:
+                if 'all' in names or module in names or username in names:
                     return False
 
             if title == 'Bots':
@@ -1111,24 +1110,23 @@ class BasePage(ComparableMixin):
                         '{{bots|%s=}} is not valid. Ignoring.' % key)
                     continue
 
-                if key == 'allow' and not ('all' in names
-                                           or username in names):
-                    return False
+                if key == 'allow':
+                    if not ('all' in names or username in names):
+                        return False
 
-                if key == 'deny' and ('all' in names or username in names):
-                    return False
+                elif key == 'deny':
+                    if 'all' in names or username in names:
+                        return False
 
-                if key == 'allowscript' \
-                   and not ('all' in names
-                            or pywikibot.calledModuleName() in names):
-                    return False
+                elif key == 'allowscript':
+                    if not ('all' in names or module in names):
+                        return False
 
-                if key == 'denyscript' \
-                   and ('all' in names
-                        or pywikibot.calledModuleName() in names):
-                    return False
+                elif key == 'denyscript':
+                    if 'all' in names or module in names:
+                        return False
 
-                if key:  # ignore unrecognized keys with a warning
+                elif key:  # ignore unrecognized keys with a warning
                     pywikibot.warning(
                         '{{bots|%s}} is not valid. Ignoring.' % params[0])
 
