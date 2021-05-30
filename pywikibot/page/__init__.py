@@ -1038,8 +1038,12 @@ class BasePage(ComparableMixin):
             self._bot_may_edit = self._check_bot_may_edit()
         return self._bot_may_edit
 
-    def _check_bot_may_edit(self) -> bool:
-        """A botMayEdit helper method."""
+    def _check_bot_may_edit(self, module: Optional[str] = None) -> bool:
+        """A botMayEdit helper method.
+
+        @param module: The module name to be restricted. Defaults to
+            pywikibot.calledModuleName().
+        """
         if not hasattr(self, 'templatesWithParams'):
             return True
 
@@ -1047,7 +1051,6 @@ class BasePage(ComparableMixin):
             return True
 
         username = self.site.username()
-        module = pywikibot.calledModuleName()
         try:
             templates = self.templatesWithParams()
         except (NoPageError, IsRedirectPageError, SectionError):
@@ -1055,6 +1058,9 @@ class BasePage(ComparableMixin):
 
         # go through all templates and look for any restriction
         restrictions = set(self.site.get_edit_restricted_templates())
+
+        if module is None:
+            module = pywikibot.calledModuleName()
 
         # also add archive templates for non-archive bots
         if module != 'archivebot':
@@ -1222,6 +1228,8 @@ class BasePage(ComparableMixin):
         if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return summary
+
+        # check if cosmetic_changes is enabled for this page
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
             cc = ((family == config.family and self.site.lang == config.mylang)
@@ -1231,6 +1239,7 @@ class BasePage(ComparableMixin):
             cc = True
         cc = cc and self.site.lang not in config.cosmetic_changes_disable.get(
             family, [])
+        cc = cc and self._check_bot_may_edit('cosmetic_changes')
         if not cc:
             return summary
 
