@@ -706,47 +706,6 @@ class DataSite(APISite):
         req = self._simple_request(**params)
         return req.submit()
 
-    @need_right('edit')
-    @deprecated('ImagePage.fromPage()', since='20210325', future_warning=True)
-    def createNewItemFromPage(self, page, bot=True, **kwargs):
-        """
-        Create a new Wikibase item for a provided page.
-
-        @param page: page to fetch links from
-        @type page: pywikibot.Page
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @return: pywikibot.ItemPage of newly created item
-        @rtype: pywikibot.ItemPage
-        """
-        sitelinks = {
-            page.site.dbName(): {
-                'site': page.site.dbName(),
-                'title': page.title(),
-            }
-        }
-        labels = {
-            page.site.lang: {
-                'language': page.site.lang,
-                'value': page.title(),
-            }
-        }
-        for link in page.iterlanglinks():
-            sitelinks[link.site.dbName()] = {
-                'site': link.site.dbName(),
-                'title': link.title,
-            }
-            labels[link.site.lang] = {
-                'language': link.site.lang,
-                'value': link.title,
-            }
-        data = {
-            'sitelinks': sitelinks,
-            'labels': labels,
-        }
-        result = self.editEntity({}, data, bot=bot, **kwargs)
-        return pywikibot.ItemPage(self, result['entity']['id'])
-
     @deprecated_args(limit='total')
     def search_entities(self, search: str, language: str,
                         total: Optional[int] = None, **kwargs):

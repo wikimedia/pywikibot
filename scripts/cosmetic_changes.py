@@ -34,14 +34,8 @@ For further information see pywikibot/cosmetic_changes.py
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.bot import ExistingPageBot, MultipleSitesBot, NoRedirectPageBot
-from pywikibot.cosmetic_changes import (
-    CANCEL_ALL,
-    CANCEL_MATCH,
-    CANCEL_METHOD,
-    CANCEL_PAGE,
-    CosmeticChangesToolkit,
-)
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 
 
 warning = """
@@ -56,7 +50,7 @@ docuReplacements = {
 }
 
 
-class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
+class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
 
     """Cosmetic changes bot."""
 
@@ -65,7 +59,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
         self.available_options.update({
             'async': False,
             'summary': 'Robot: Cosmetic changes',
-            'ignore': CANCEL_ALL,
+            'ignore': CANCEL.ALL,
         })
         super().__init__(**kwargs)
 
@@ -106,11 +100,11 @@ def main(*args: Tuple[str, ...]) -> None:
         elif arg.startswith('-ignore:'):
             ignore_mode = arg[len('-ignore:'):].lower()
             if ignore_mode == 'method':
-                options['ignore'] = CANCEL_METHOD
+                options['ignore'] = CANCEL.METHOD
             elif ignore_mode == 'page':
-                options['ignore'] = CANCEL_PAGE
+                options['ignore'] = CANCEL.PAGE
             elif ignore_mode == 'match':
-                options['ignore'] = CANCEL_MATCH
+                options['ignore'] = CANCEL.MATCH
             else:
                 raise ValueError(
                     'Unknown ignore mode "{}"!'.format(ignore_mode))

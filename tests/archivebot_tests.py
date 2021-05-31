@@ -12,7 +12,6 @@ import pywikibot
 import pywikibot.page
 from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper
-from pywikibot.tools import suppress_warnings
 from scripts import archivebot
 from tests.aspects import TestCase
 
@@ -97,12 +96,12 @@ class TestArchiveBotFunctions(TestCase):
     def test_checkstr(self):
         """Test for extracting key and duration from shorthand notation."""
         self.assertEqual(archivebot.checkstr('400s'), ('s', '400'))
-        with suppress_warnings('Time period without qualifier', UserWarning):
-            self.assertEqual(archivebot.checkstr('3000'), ('s', '3000'))
         self.assertEqual(archivebot.checkstr('7d'), ('d', '7'))
         self.assertEqual(archivebot.checkstr('3y'), ('y', '3'))
-        # Should pass, because the key is verified in str2time
-        self.assertEqual(archivebot.checkstr('4000@'), ('@', '4000'))
+
+        for invalid_value in ('', '3000', '4000@'):
+            with self.assertRaises(archivebot.MalformedConfigError):
+                archivebot.checkstr(invalid_value)
 
     def test_str2size(self):
         """Test for parsing the shorthand notation of sizes."""

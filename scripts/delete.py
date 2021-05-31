@@ -60,7 +60,7 @@ import collections
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.backports import DefaultDict, Set, Tuple
-from pywikibot.bot import CurrentPageBot, MultipleSitesBot
+from pywikibot.bot import CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
 from pywikibot.tools import islice_with_ellipsis
@@ -123,7 +123,7 @@ class PageWithRefs(Page):
         return set(namespaces) & set(self.ref_table)
 
 
-class DeletionRobot(MultipleSitesBot, CurrentPageBot):
+class DeletionRobot(CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 

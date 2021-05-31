@@ -50,6 +50,7 @@ install:
   - pip install -U setuptools
   - pip install -r dev-requirements.txt
   - pip install -r requirements.txt
+  - pip install mwparserfromhell
 
 before_script:
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then

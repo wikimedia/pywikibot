@@ -37,8 +37,18 @@ try:
 except ImportError:
     try:
         import mwparserfromhell as wikitextparser
-    except ImportError as e:
-        wikitextparser = e
+    except ImportError:
+        # print required because pywikibot is not imported completely
+        raise ImportError("""
+Pywikibot is missing a MediaWiki markup parser which is necessary.
+Please update the required module with either
+
+    pip install "mwparserfromhell>=0.5.0"
+
+or
+
+    pip install "wikitextparser>=0.47.0"
+""") from None
 
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
@@ -1585,15 +1595,10 @@ def extract_templates_and_params(text: str,
     only the last value provided will be returned.
 
     This uses the package L{mwparserfromhell} or L{wikitextparser} as
-    MediaWiki markup parser. Otherwise it falls back on a regex based
-    implementation but it becomes mandatory that one of them is
+    MediaWiki markup parser. It is mandatory that one of them is
     installed.
 
     There are minor differences between the two implementations.
-
-    The two implementations return nested templates in a different
-    order, i.e. for `{{a|b={{c}}}}`, parsers returns `[a, c]`, whereas
-    regex returns `[c, a]`.
 
     The parser packages preserves whitespace in parameter names and
     values.
@@ -1613,51 +1618,15 @@ def extract_templates_and_params(text: str,
     *New in version 6.1:* *wikitextparser* package is supported; either
     *wikitextparser* or *mwparserfromhell* is strictly recommended.
     """
-    use_regex = isinstance(wikitextparser, ImportError)
-
-    if remove_disabled_parts:
-        text = removeDisabledParts(text)
-
-    if use_regex:
-        issue_deprecation_warning("""
-Pywikibot needs a MediaWiki markup parser.
-Please install the requested module with either
-
-    pip install "mwparserfromhell>=0.5.0"
-
-or
-
-    pip install "wikitextparser>=0.47.0"
-
-Using pywikibot without MediaWiki markup parser""",
-                                  warning_class=FutureWarning,
-                                  since='20210416')
-
-        return _extract_templates_and_params_regex(text, False, strip)
-    return _extract_templates_and_params_parser(text, strip)
-
-
-def _extract_templates_and_params_parser(text: str,
-                                         strip: bool = False) -> ETPType:
-    """
-    Extract templates with params using mwparserfromhell.
-
-    This function should not be called directly.
-
-    Use extract_templates_and_params, which will select this parser
-    implementation if the mwparserfromhell or wikitextparser package is
-    installed.
-
-    @param text: The wikitext from which templates are extracted
-    @param strip: if enabled, strip arguments and values of templates
-    @return: list of template name and params
-    """
     def explicit(param):
         try:
             attr = param.showkey
         except AttributeError:
             attr = not param.positional
         return attr
+
+    if remove_disabled_parts:
+        text = removeDisabledParts(text)
 
     parser_name = wikitextparser.__name__
     pywikibot.log('Using {!r} wikitext parser'.format(parser_name))
@@ -1701,7 +1670,7 @@ def extract_templates_and_params_mwpfh(text: str,
     global wikitextparser
     saved_parser = wikitextparser
     import mwparserfromhell as wikitextparser
-    result = _extract_templates_and_params_parser(text, strip)
+    result = extract_templates_and_params(text, strip=strip)
     wikitextparser = saved_parser
     return result
 
@@ -1723,14 +1692,6 @@ def extract_templates_and_params_regex(text: str,
     @param strip: if enabled, strip arguments and values of templates
     @return: list of template name and params
     """
-    return _extract_templates_and_params_regex(text, remove_disabled_parts,
-                                               strip)
-
-
-def _extract_templates_and_params_regex(text: str,
-                                        remove_disabled_parts: bool = True,
-                                        strip: bool = True) -> ETPType:
-    """DEPRECATED. Extract templates with params using a regex."""
     # remove commented-out stuff etc.
     if remove_disabled_parts:
         thistxt = removeDisabledParts(text)

@@ -30,7 +30,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, i18n, textlib
-from pywikibot.backports import Dict, Iterable, List, Tuple, cache
+from pywikibot.backports import Dict, Iterable, List, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     APIError,
@@ -440,6 +440,8 @@ class BasePage(ComparableMixin):
         """
         if force:
             del self.latest_revision_id
+            if hasattr(self, '_bot_may_edit'):
+                del self._bot_may_edit
         try:
             self._getInternals()
         except IsRedirectPageError:
@@ -1017,7 +1019,6 @@ class BasePage(ComparableMixin):
         """DEPRECATED. Determine whether the page may be edited."""
         return self.has_permission()
 
-    @cache
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -1032,6 +1033,16 @@ class BasePage(ComparableMixin):
         The framework enforces this restriction by default. It is possible
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
+        """
+        if not hasattr(self, '_bot_may_edit'):
+            self._bot_may_edit = self._check_bot_may_edit()
+        return self._bot_may_edit
+
+    def _check_bot_may_edit(self, module: Optional[str] = None) -> bool:
+        """A botMayEdit helper method.
+
+        @param module: The module name to be restricted. Defaults to
+            pywikibot.calledModuleName().
         """
         if not hasattr(self, 'templatesWithParams'):
             return True
@@ -1048,8 +1059,11 @@ class BasePage(ComparableMixin):
         # go through all templates and look for any restriction
         restrictions = set(self.site.get_edit_restricted_templates())
 
+        if module is None:
+            module = pywikibot.calledModuleName()
+
         # also add archive templates for non-archive bots
-        if pywikibot.calledModuleName() != 'archivebot':
+        if module != 'archivebot':
             restrictions.update(self.site.get_archived_page_templates())
 
         # multiple bots/nobots templates are allowed
@@ -1088,9 +1102,7 @@ class BasePage(ComparableMixin):
                         'Edit declined' % key)
                     return False
 
-                if 'all' in names \
-                   or pywikibot.calledModuleName() in names \
-                   or username in names:
+                if 'all' in names or module in names or username in names:
                     return False
 
             if title == 'Bots':
@@ -1104,24 +1116,23 @@ class BasePage(ComparableMixin):
                         '{{bots|%s=}} is not valid. Ignoring.' % key)
                     continue
 
-                if key == 'allow' and not ('all' in names
-                                           or username in names):
-                    return False
+                if key == 'allow':
+                    if not ('all' in names or username in names):
+                        return False
 
-                if key == 'deny' and ('all' in names or username in names):
-                    return False
+                elif key == 'deny':
+                    if 'all' in names or username in names:
+                        return False
 
-                if key == 'allowscript' \
-                   and not ('all' in names
-                            or pywikibot.calledModuleName() in names):
-                    return False
+                elif key == 'allowscript':
+                    if not ('all' in names or module in names):
+                        return False
 
-                if key == 'denyscript' \
-                   and ('all' in names
-                        or pywikibot.calledModuleName() in names):
-                    return False
+                elif key == 'denyscript':
+                    if 'all' in names or module in names:
+                        return False
 
-                if key:  # ignore unrecognized keys with a warning
+                elif key:  # ignore unrecognized keys with a warning
                     pywikibot.warning(
                         '{{bots|%s}} is not valid. Ignoring.' % params[0])
 
@@ -1217,6 +1228,8 @@ class BasePage(ComparableMixin):
         if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return summary
+
+        # check if cosmetic_changes is enabled for this page
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
             cc = ((family == config.family and self.site.lang == config.mylang)
@@ -1226,6 +1239,7 @@ class BasePage(ComparableMixin):
             cc = True
         cc = cc and self.site.lang not in config.cosmetic_changes_disable.get(
             family, [])
+        cc = cc and self._check_bot_may_edit('cosmetic_changes')
         if not cc:
             return summary
 

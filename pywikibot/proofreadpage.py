@@ -37,7 +37,6 @@ from pywikibot import textlib
 from pywikibot.comms import http
 from pywikibot.data.api import Request
 from pywikibot.exceptions import Error, OtherPageSaveError
-from pywikibot.tools import ModuleDeprecationWrapper
 
 
 try:
@@ -1095,8 +1094,3 @@ class IndexPage(pywikibot.Page):
             return self._numbers_from_page[page]
         except KeyError:
             raise KeyError('Invalid page: {}.'.format(page))
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('Soup', _bs4_soup, replacement_name='_bs4_soup',
-                            since='20181128', future_warning=True)
