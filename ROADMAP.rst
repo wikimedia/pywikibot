@@ -1,12 +1,7 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* Check bot/nobots templates for cosmetic_changes hook (T283989)
-* Remove outdated opt._option which is already dropped (T284005)
-* Use IntEnum with cosmetic_changes CANCEL
-* Remove lru_cahce from botMayEdit method and fix it's logic (T283957)
-* DataSite.createNewItemFromPage() method was removed in favour of ImagePage.fromPage() (T98663)
-* mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (T106763)
+* (no changes yet)
 
 Deprecations
 ^^^^^^^^^^^^
