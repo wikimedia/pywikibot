@@ -183,6 +183,8 @@ class CANCEL(IntEnum):
 
     If an error occurred and either skips the page or the method
     or a single match. ALL raises the exception.
+
+    *New in version 6.3.*
     """
 
     ALL = 0
