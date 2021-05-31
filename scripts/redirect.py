@@ -446,7 +446,13 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         return page
 
     def delete_redirect(self, page, summary_key) -> None:
-        """Delete the redirect page."""
+        """Delete the redirect page.
+
+        @param page: The page to delete
+        @type page: pywikibot.page.BasePage
+        @param summary_key: The message key for the deletion summary
+        @type summary_key: str
+        """
         assert page.site == self.current_page.site, (
             'target page is on different site {}'.format(page.site))
         reason = i18n.twtranslate(page.site, summary_key)
@@ -638,7 +644,11 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
             self.fix_1_double_redirect()
 
     def treat(self, page) -> None:
-        """Treat a page."""
+        """Treat a page.
+
+        @param page: Page to be treated.
+        @type page: pywikibot.page.BasePage
+        """
         if self._treat_counter >= self.opt.limit:
             pywikibot.output('\nNumber of pages reached the limit. '
                              'Script terminated.')
