@@ -1335,7 +1335,13 @@ class Request(MutableMapping):
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
-            return {action: {'result': 'Success', 'nochange': ''}}
+            return {
+                action: {'result': 'Success', 'nochange': ''},
+
+                # wikibase results
+                'pageinfo': {'lastrevid': -1},
+                'entity': {'lastrevid': -1},
+            }
         return None
 
     def _is_wikibase_error_retryable(self, error):
