@@ -65,7 +65,6 @@ from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Tuple
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.exceptions import (
-    ArgumentDeprecationWarning,
     EditConflictError,
     IsRedirectPageError,
     LockedPageError,
@@ -74,7 +73,6 @@ from pywikibot.exceptions import (
     ServerError,
     SpamblacklistError,
 )
-from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools.formatter import color_format
 
 DEFAULT_ARGS = {
@@ -365,12 +363,6 @@ def parse(argv: Tuple[str, ...],
             args['talk_page'] = True
         elif option == '-noreorder':
             args['reorder'] = False
-        elif option == '-except':
-            page_gen_arg = '-grepnot:{}'.format(value)
-            issue_deprecation_warning(arg, page_gen_arg,
-                                      2, ArgumentDeprecationWarning,
-                                      since='20201224')
-            generator_factory.handle_arg(page_gen_arg)
         elif option == '-excepturl':
             args['regex_skip_url'] = value
         else:

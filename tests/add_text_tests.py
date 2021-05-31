@@ -10,8 +10,6 @@ from unittest.mock import Mock, patch
 import pywikibot
 import pywikibot.pagegenerators
 
-from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import suppress_warnings
 from scripts.add_text import add_text, get_text, parse
 from tests.aspects import TestCase
 
@@ -70,18 +68,6 @@ class TestAdding(TestCase):
         with self.assertRaisesRegex(ValueError, expected_error):
             parse(['-text:hello', '-textfile:/some/path'],
                   self.generator_factory)
-
-    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_except_argument(self):
-        """Check the deprecated -except argument."""
-        generator_factory = Mock()
-        generator_factory.handle_args.side_effect = lambda args: args
-
-        with suppress_warnings('-except:stuff is deprecated',
-                               ArgumentDeprecationWarning):
-            parse(['-text:hello', '-except:stuff'], generator_factory)
-
-        generator_factory.handle_arg.assert_called_with('-grepnot:stuff')
 
     @patch('pywikibot.input')
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
