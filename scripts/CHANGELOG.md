@@ -1,5 +1,15 @@
 # Schripts Changelog
 
+## 6.3.0
+*31 May 2021
+
+### addtext
+* -except option was removed in favour of commonly used -grepnot
+
+### archivebot
+* Durations must to have a time unit
+
+
 ## 6.2.0
 *28 May 2021*
 
