@@ -1,6 +1,11 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* Check bot/nobots templates for cosmetic_changes hook (T283989)
+* Remove outdated opt._option which is already dropped (T284005)
+* Use IntEnum with cosmetic_changes CANCEL
+* Remove lru_cahce from botMayEdit method and fix it's logic (T283957)
+* DataSite.createNewItemFromPage() method was removed in favour of ImagePage.fromPage() (T98663)
 * mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (T106763)
 
 Deprecations
@@ -17,5 +22,4 @@ Deprecations
 * 6.1.0: textlib.unescape() function will be removed in favour of html.unescape()
 * 6.0.1: Site.undeletepage() and Site.undelete_file_versions() will be removed in favour of Site.undelete() method
 * 6.0.1: Site.deletepage() and Site.deleteoldimage() will be removed in favour of Site.delete() method
-* 6.0.1: DataSite.createNewItemFromPage() method will be removed in favour of ImagePage.fromPage() (T98663)
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
