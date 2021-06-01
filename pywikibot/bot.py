@@ -353,10 +353,13 @@ def init_handlers(strm=None):
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
-        # get PID
-        throttle = pywikibot.Site().throttle  # initialize a Throttle object
-        pid = throttle.get_pid(module_name)  # get the global PID if needed
-        pid = str(pid) + '-' if pid > 1 else ''
+        if pywikibot.Site.__doc__ == 'TEST':  # set by aspects.DisableSiteMixin
+            pid = ''
+        else:
+            # get PID
+            throttle = pywikibot.Site().throttle  # initialize a Throttle obj
+            pid = throttle.get_pid(module_name)  # get the global PID if needed
+            pid = str(pid) + '-' if pid > 1 else ''
 
         if config.logfilename:
             # keep config.logfilename unchanged
