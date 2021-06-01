@@ -981,6 +981,7 @@ class Request(MutableMapping):
             self.max_retries = pywikibot.config.max_retries
         else:
             self.max_retries = max_retries
+        self.current_retries = 0
         if retry_wait is None:
             self.retry_wait = pywikibot.config.retry_wait
         else:
@@ -1871,15 +1872,18 @@ The text message is:
 
     def wait(self, delay=None):
         """Determine how long to wait after a failed request."""
-        self.max_retries -= 1
-        if self.max_retries < 0:
+        self.current_retries += 1
+        if self.current_retries > self.max_retries:
             raise TimeoutError('Maximum retries attempted without success.')
+
+        # double the next wait, but do not exceed config.retry_max seconds
         delay = delay or self.retry_wait
+        delay *= 2 ** (self.current_retries - 1)
+        delay = min(delay, config.retry_max)
+
         pywikibot.warning('Waiting {:.1f} seconds before retrying.'
                           .format(delay))
         pywikibot.sleep(delay)
-        # double the next wait, but do not exceed config.retry_max seconds
-        self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
 
 class CachedRequest(Request):
