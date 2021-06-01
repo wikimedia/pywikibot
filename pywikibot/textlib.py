@@ -315,11 +315,17 @@ def _get_regexes(keys, site):
             # extensions
             _regex_cache[exc] = _tag_regex(exc)
             result.append(_regex_cache[exc])
-        # handle alias
+
+        # handle aliases
         if exc == 'source':
             result.append(_tag_regex('syntaxhighlight'))
         elif exc == 'syntaxhighlight':
             result.append(_tag_regex('source'))
+        elif exc == 'chem':
+            result.append(_tag_regex('ce'))
+        elif exc == 'math':
+            result.append(_tag_regex('chem'))
+            result.append(_tag_regex('ce'))
 
     return result
 
