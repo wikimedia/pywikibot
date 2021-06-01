@@ -154,6 +154,9 @@ matrix:
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.8'
       env: LANGUAGE=en FAMILY=portalwiki
+    - python: '3.11-dev'
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
+
   allow_failures:
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
@@ -161,6 +164,8 @@ matrix:
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.5'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
+    - python: '3.11-dev'
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
 
 notifications:
   email:
