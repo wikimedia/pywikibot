@@ -760,7 +760,7 @@ class TestPageBotMayEdit(TestCase):
 
     def tearDown(self):
         """Cleanup cache."""
-        self.page.botMayEdit.cache_clear()
+        del self.page._bot_may_edit
         super().tearDown()
 
     def _run_test(self, template, user, expected_result):
@@ -769,7 +769,7 @@ class TestPageBotMayEdit(TestCase):
         self.page._text = template % {'user': user}
         with self.subTest(template=template, user=user):
             self.assertEqual(self.page.botMayEdit(), expected_result)
-        self.page.botMayEdit.cache_clear()
+        del self.page._bot_may_edit
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_nobots_ok(self):
@@ -842,7 +842,7 @@ class TestPageBotMayEdit(TestCase):
             self.page._text = '{{bots|%s=}}' % param
             with self.subTest(template=self.page.text, user=user, param=param):
                 self.assertTrue(self.page.botMayEdit())
-            self.page.botMayEdit.cache_clear()
+            del self.page._bot_may_edit
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_bots_nok(self):
