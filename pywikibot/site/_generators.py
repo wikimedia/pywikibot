@@ -1867,8 +1867,7 @@ class GeneratorsMixin:
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        '', pageitem['user'], pageitem['comment'])
 
-    @deprecated('APISite.logevents(logtype="upload")', since='20170619',
-                future_warning=True)
+    @deprecated('APISite.logevents(logtype="upload")', since='20170619')
     @deprecated_args(lestart='start', leend='end', leuser='user', letitle=True,
                      repeat=True, number='total', step=True)
     def newfiles(self, user=None, start=None, end=None, reverse=False,

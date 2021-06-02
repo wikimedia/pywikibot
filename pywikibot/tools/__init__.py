@@ -1530,7 +1530,7 @@ def deprecated(*args, **kwargs):
         return wrapper
 
     since = kwargs.pop('since', None)
-    future_warning = kwargs.pop('future_warning', False)
+    future_warning = kwargs.pop('future_warning', True)
     without_parameters = len(args) == 1 and not kwargs and callable(args[0])
     if 'instead' in kwargs:
         instead = kwargs['instead']
@@ -1741,7 +1741,7 @@ def redirect_func(target, source_module: Optional[str] = None,
                   old_name: Optional[str] = None,
                   class_name: Optional[str] = None,
                   since: Optional[str] = None,
-                  future_warning=False):
+                  future_warning=True):
     """
     Return a function which can be used to redirect to 'target'.
 
@@ -1822,7 +1822,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
                             replacement_name: Optional[str] = None,
                             warning_message: Optional[str] = None,
                             since: Optional[str] = None,
-                            future_warning: bool = False):
+                            future_warning: bool = True):
         """
         Add the name to the local deprecated names dict.
 
@@ -1993,17 +1993,16 @@ def concat_options(message, line_length, options):
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('empty_iterator', replacement_name='iter(())',
-                            since='20220422', future_warning=True)
+                            since='20220422')
 wrapper.add_deprecated_attr('DotReadableDict', replacement_name='',
-                            since='20210416', future_warning=True)
+                            since='20210416')
 wrapper.add_deprecated_attr('frozenmap',
                             replacement_name='types.MappingProxyType',
-                            since='20210415',
-                            future_warning=True)
+                            since='20210415')
 wrapper.add_deprecated_attr('LazyRegex', replacement_name='',
-                            since='20210418', future_warning=True)
+                            since='20210418')
 wrapper.add_deprecated_attr('DeprecatedRegex', replacement_name='',
-                            since='20210418', future_warning=True)
+                            since='20210418')
 
 
 is_IP = redirect_func(is_ip_address, old_name='is_IP',  # noqa N816

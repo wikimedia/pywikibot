@@ -153,7 +153,7 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     return phrase
 
 
-@deprecated('html.unescape', since='20210405', future_warning=True)
+@deprecated('html.unescape', since='20210405')
 def unescape(s: str) -> str:
     """Replace escaped HTML-special characters by their originals."""
     return html.unescape(s)
@@ -677,8 +677,7 @@ def replace_links(text: str, replace, site=None) -> str:
             issue_deprecation_warning(
                 'site=None',
                 'a valid site for list or tuple parameter "replace"',
-                2, since='20190223',
-                future_warning=True)
+                2, since='20190223')
     elif site is None:
         raise ValueError('The "site" argument must be provided.')
 

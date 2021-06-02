@@ -87,13 +87,13 @@ class Throttle:
         self.setDelays()
 
     @property
-    @deprecated(since='6.2', future_warning=True)
+    @deprecated(since='6.2')
     def multiplydelay(self):
         """DEPRECATED attribute."""
         return True
 
     @multiplydelay.setter
-    @deprecated(since='6.2', future_warning=True)
+    @deprecated(since='6.2')
     def multiplydelay(self):
         """DEPRECATED attribute setter."""
 

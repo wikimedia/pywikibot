@@ -3177,10 +3177,10 @@ def update_page(page, pagedict: dict, props=None):
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'APIError', replacement_name='pywikibot.exceptions.APIError',
-    since='20210423', future_warning=True)
+    since='20210423')
 wrapper.add_deprecated_attr(
     'UploadWarning', replacement_name='pywikibot.exceptions.UploadError',
-    since='20210423', future_warning=True)
+    since='20210423')
 wrapper.add_deprecated_attr(
     'APIMWException', replacement_name='pywikibot.exceptions.APIMWError',
-    since='20210423', future_warning=True)
+    since='20210423')

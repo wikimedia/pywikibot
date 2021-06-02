@@ -1117,12 +1117,12 @@ class OptionHandler:
         self.set_options(**kwargs)
 
     @property
-    @deprecated('available_options', since='20201006', future_warning=True)
+    @deprecated('available_options', since='20201006')
     def availableOptions(self):
         """DEPRECATED. Available_options class property."""
         return self.available_options
 
-    @deprecated('set_options', since='20201006', future_warning=True)
+    @deprecated('set_options', since='20201006')
     def setOptions(self, **kwargs):  # pragma: no cover
         """DEPRECATED. Set the instance options."""
         self.set_options(**kwargs)
@@ -1136,7 +1136,7 @@ class OptionHandler:
         if old_options:  # old options were set and not updated
             self.available_options = self.availableOptions
             issue_deprecation_warning(warning, 'available_options',
-                                      since='20201006', future_warning=True)
+                                      since='20201006')
 
         valid_options = set(self.available_options)
         received_options = set(options)
@@ -1150,7 +1150,7 @@ class OptionHandler:
             pywikibot.warning('{} is not a valid option. It was ignored.'
                               .format(opt))
 
-    @deprecated(_DEPRECATION_MSG, since='20201006', future_warning=True)
+    @deprecated(_DEPRECATION_MSG, since='20201006')
     def getOption(self, option):  # pragma: no cover
         """DEPRECATED. Get the current value of an option.
 

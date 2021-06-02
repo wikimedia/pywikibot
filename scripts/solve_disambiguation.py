@@ -707,82 +707,82 @@ DisambiguationRobot""".format(options=added_keys,
     # Deprecated properties ---------------------------------------
 
     @property
-    @deprecated('opt.always', since='20210303', future_warning=True)
+    @deprecated('opt.always', since='20210303')
     def always(self):  # noqa: D102
         return self.opt.always
 
     @always.setter
-    @deprecated('opt.always', since='20210303', future_warning=True)
+    @deprecated('opt.always', since='20210303')
     def always(self, value):
         self.opt.always = value
 
     @property
-    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    @deprecated('opt.dnskip', since='20210303')
     def dnSkip(self):  # noqa: D102
         return self.opt.dnskip
 
     @dnSkip.setter
-    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    @deprecated('opt.dnskip', since='20210303')
     def dnSkip(self, value):
         self.opt.dnskip = value
 
     @property
-    @deprecated('opt.primary', since='20210303', future_warning=True)
+    @deprecated('opt.primary', since='20210303')
     def primary(self):  # noqa: D102
         return self.opt.primary
 
     @primary.setter
-    @deprecated('opt.primary', since='20210303', future_warning=True)
+    @deprecated('opt.primary', since='20210303')
     def primary(self, value):
         self.opt.primary = value
 
     @property
-    @deprecated('opt.main', since='20210303', future_warning=True)
+    @deprecated('opt.main', since='20210303')
     def main_only(self):  # noqa: D102
         return self.opt.main
 
     @main_only.setter
-    @deprecated('opt.main', since='20210303', future_warning=True)
+    @deprecated('opt.main', since='20210303')
     def main_only(self, value):
         self.opt.main = value
 
     @property
-    @deprecated('opt.first', since='20210303', future_warning=True)
+    @deprecated('opt.first', since='20210303')
     def first_only(self):  # noqa: D102
         return self.opt.first
 
     @first_only.setter
-    @deprecated('opt.first', since='20210303', future_warning=True)
+    @deprecated('opt.first', since='20210303')
     def first_only(self, value):
         self.opt.first = value
 
     @property
-    @deprecated('opt.min', since='20210303', future_warning=True)
+    @deprecated('opt.min', since='20210303')
     def minimum(self):  # noqa: D102
         return self.opt.min
 
     @minimum.setter
-    @deprecated('opt.min', since='20210303', future_warning=True)
+    @deprecated('opt.min', since='20210303')
     def minimum(self, value):
         self.opt.min = value
 
     @property
-    @deprecated('opt.pos', since='20210303', future_warning=True)
+    @deprecated('opt.pos', since='20210303')
     def alternatives(self):  # noqa: D102
         return self.opt.pos
 
     @alternatives.setter
-    @deprecated('opt.pos', since='20210303', future_warning=True)
+    @deprecated('opt.pos', since='20210303')
     def alternatives(self, value):
         self.opt.pos = value
 
     @property
-    @deprecated('opt.just', since='20210303', future_warning=True)
+    @deprecated('opt.just', since='20210303')
     def getAlternatives(self):  # noqa: D102
         return self.opt.just
 
     @getAlternatives.setter
-    @deprecated('opt.just', since='20210303', future_warning=True)
+    @deprecated('opt.just', since='20210303')
     def getAlternatives(self, value):
         self.opt.just = value
 

@@ -229,5 +229,4 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'GraphImpossible',
     replacement_name='ImportError',
-    since='20210423',
-    future_warning=True)
+    since='20210423')
