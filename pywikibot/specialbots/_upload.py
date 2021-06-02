@@ -49,7 +49,9 @@ class UploadRobot(BaseBot):
                  chunk_size: int = 0,
                  asynchronous: bool = False,
                  summary: Optional[str] = None,
-                 filename_prefix: Optional[str] = None, **kwargs):
+                 filename_prefix: Optional[str] = None,
+                 force_if_shared: bool = False,
+                 **kwargs):
         """Initializer.
 
         *Changed in version 6.2:* asynchronous upload is used if
@@ -82,6 +84,9 @@ class UploadRobot(BaseBot):
             asynchronous on the server side when possible.
         :param filename_prefix: Specify prefix for the title of every
             file's page.
+        :param force_if_shared: Upload the file even if it's currently
+            shared to the target site (e.g. when moving from Commons to another
+            wiki)
         :keyword always: Disables any input, requires that either
             ignore_warning or aborts are set to True and that the
             description is also set. It overwrites verify_description to
@@ -110,6 +115,7 @@ class UploadRobot(BaseBot):
         self.asynchronous = asynchronous
         self.summary = summary
         self.filename_prefix = filename_prefix
+        self.force_if_shared = force_if_shared
 
         if config.upload_to_commons:
             default_site = pywikibot.Site('commons:commons')
@@ -309,7 +315,8 @@ class UploadRobot(BaseBot):
                 continue
 
             with suppress(NoPageError):
-                if potential_file_page.file_is_shared():
+                if (not self.force_if_shared
+                        and potential_file_page.file_is_shared()):
                     pywikibot.output(
                         'File with name {} already exists in shared '
                         'repository and cannot be overwritten.'
