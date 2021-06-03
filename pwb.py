@@ -22,8 +22,10 @@ to set the default site (see T216825)::
 from __future__ import print_function
 
 import os
+import pkg_resources
 import sys
 import types
+
 from difflib import get_close_matches
 from importlib import import_module
 from time import sleep
@@ -31,6 +33,36 @@ from warnings import warn
 
 
 pwb = None
+
+
+def check_pwb_versions(package):
+    """Validate package version and scripts version.
+
+    Rules:
+        - Pywikibot version must not be older than scrips version
+        - Scripts version must not be older than previous Pyvikibot version
+          due to deprecation policy
+    """
+    version = pkg_resources.packaging.version
+    scripts_version = version.parse(getattr(package,
+                                            '__version__',
+                                            pwb.__version__))
+    wikibot_version = version.parse(pwb.__version__)
+    if scripts_version.release > wikibot_version.release:
+        print('WARNING: Pywikibot version {} is behind scripts package '
+              'version {}.\nYour Pywikibot may need an update or be '
+              'misconfigured.\n'.format(wikibot_version, scripts_version))
+
+    # calculate previous minor release
+    prev_wikibot = version.parse('{v.major}.{}.{v.micro}'
+                                 .format(wikibot_version.minor - 1,
+                                         v=wikibot_version,))
+    if scripts_version.release < prev_wikibot.release:
+        print('WARNING: Scripts package version {} is behind legacy Pywikibot '
+              'version {} and current version {}\nYour scripts may need an '
+              'update or be misconfigured.\n'
+              .format(scripts_version, prev_wikibot, wikibot_version, ))
+
 
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with Python 3 support [2] added later,
@@ -57,7 +89,10 @@ def run_python_file(filename, argv, argvu, package=None):
     main_mod.__file__ = filename
     main_mod.__builtins__ = sys.modules['builtins']
     if package:
-        main_mod.__package__ = package
+        main_mod.__package__ = package.__name__
+        check_pwb_versions(package)
+    global pkg_resources
+    del pkg_resources
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
@@ -141,7 +176,6 @@ def check_modules(script=None):
     :rtype: bool
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    import pkg_resources
     if script:
         from setup import script_deps
         dependencies = script_deps.get(Path(script).name, [])
@@ -162,7 +196,6 @@ def check_modules(script=None):
                 version_conflicts.append(requirement)
                 print(e)
 
-    del pkg_resources
     del dependencies
 
     _print_requirements(missing_requirements, script, 'missing')
@@ -344,9 +377,10 @@ def main():
                 relative_filename).replace(os.sep, '.')
             filename = os.path.join(os.curdir, relative_filename)
 
+    module = None
     if file_package and file_package not in sys.modules:
         try:
-            import_module(file_package)
+            module = import_module(file_package)
         except ImportError as e:
             warn('Parent module {} not found: {}'
                  .format(file_package, e), ImportWarning)
@@ -357,7 +391,7 @@ def main():
         run_python_file(filename,
                         [filename] + script_args,
                         [Path(filename).stem] + argvu[1:],
-                        file_package)
+                        module)
     return True
 
 
