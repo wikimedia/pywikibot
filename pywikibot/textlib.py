@@ -47,7 +47,7 @@ Please update the required module with either
 
 or
 
-    pip install "wikitextparser>=0.47.0"
+    pip install "wikitextparser>=0.47.5"
 """) from None
 
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]

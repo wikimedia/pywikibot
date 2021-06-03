@@ -63,7 +63,8 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'wikitextparser': ['wikitextparser>=0.47.0'],
+    'wikitextparser': ['wikitextparser>=0.47.5;python_version<"3.6"',
+                       'wikitextparser>=0.47.0'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
