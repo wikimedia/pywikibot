@@ -26,7 +26,7 @@ setuptools>=20.2 ; python_version >= '3.6'
 # MediaWiki markup parser
 # mwparserfromhell is default, wikitextparser can be used instead
 # mwparserfromhell is still required for commons_information.py and patrol.py
-# wikitextparser>=0.47.0
+# wikitextparser>=0.47.5
 mwparserfromhell>=0.5.0
 
 # OAuth support
