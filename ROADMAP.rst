@@ -1,7 +1,11 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (no changes yet)
+* Show a warning if pywikibot.__version__ is behind scripts.__version__ (T282766)
+* Handle <ce>/<chem> tags as <math> aliases within textlib.replaceExcept() (T283990)
+* Expand simulate query response for wikibase support (T76694)
+* Double the wait time if ratelimit exceeded (T270912)
+* Deprecated extract_templates_and_params_mwpfh and extract_templates_and_params_regex functions were removed
 
 Deprecations
 ^^^^^^^^^^^^
