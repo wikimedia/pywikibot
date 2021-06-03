@@ -95,7 +95,6 @@ Code cleanups
 * getSite() function was removed in favour of Site() constructor
 * Page.fileUrl() was removed in favour of Page.get_file_url()
 * Deprecated getuserinfo and getglobaluserinfo Site methods were removed
-* compat2core.py script was archived
 
 
 6.0.1

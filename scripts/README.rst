@@ -246,8 +246,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | colors.py              | Utility to show pywikibot colors.                       |
     +------------------------+---------------------------------------------------------+
-    | compat2core.py         | Helper script to convert compat 1.0 scripts to the core |
-    |                        | 3.0 framework. Also works for newer Pywikibot releases. |
+    | update_script.py       | Helper script to update scripts and replace deprecated  |
+    |                        | code parts.                                             |
     +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+

@@ -10,7 +10,7 @@ for further instructions.
 There is also a helper script which does a lot of changes automatically.
 Just call it::
 
-    pwb.py compat2core [<script to convert>]
+    pwb.py update_script [<script to convert>]
 
 and follow the instructions and hints.
 
