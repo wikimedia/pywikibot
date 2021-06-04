@@ -740,16 +740,17 @@ class DataSite(APISite):
                               total=total, parameters=parameters)
         return gen
 
+    @need_right('edit')
     def _wbset_action(self, itemdef, action, action_data, **kwargs):
         """
-        Execute wbset{action}' on a Wikibase entity.
+        Execute wbset{action} on a Wikibase entity.
 
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
 
         :param itemdef: Item to modify or create
-        :type itemdef: str, WikibasePage or Page coonected to such item
-        :param action: wbset{action] to perform:
+        :type itemdef: str, WikibaseEntity or Page connected to such item
+        :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
         :type action: str
         :param data: data to be used in API request, see API help
@@ -767,8 +768,10 @@ class DataSite(APISite):
             wbsetsitelink:
                 dict shall have keys 'linksite', 'linktitle' and
                 optionally 'badges'
-        @kwargs bot: Whether to mark the edit as a bot edit, default is False
+        @kwargs bot: Whether to mark the edit as a bot edit, default is True
         :type bot: bool
+        @kwargs tags: Change tags to apply with the edit
+        :type tags: list of str
         :return: query result
         :rtype: dict
         :raises AssertionError, TypeError
@@ -792,8 +795,10 @@ class DataSite(APISite):
                 res = data
                 keys = set(res)
                 assert keys < {'language', 'add', 'remove', 'set'}
-                assert keys & {'add', 'set'} == {}
-                assert keys & {'remove', 'set'} == {}
+                assert 'language' in keys
+                assert ({'add', 'remove', 'set'} & keys)
+                assert not ({'add', 'set'} < keys)
+                assert not ({'remove', 'set'} < keys)
             elif action in ('wbsetlabel', 'wbsetdescription'):
                 res = data
                 keys = set(res)
@@ -817,30 +822,29 @@ class DataSite(APISite):
         if isinstance(itemdef, str):
             itemdef = self.get_entity_for_entity_id(itemdef)
         elif isinstance(itemdef, pywikibot.Page):
-            try:
-                itemdef = itemdef.data_item()
-            except NoPageError:
-                itemdef = pywikibot.ItemPage(self)
-        if not isinstance(itemdef, pywikibot.page.WikibasePage):
-            raise TypeError('itemdef shall be str, WikibasePage or Page')
+            itemdef = pywikibot.ItemPage.fromPage(lazy_load=True)
+        elif not isinstance(itemdef, pywikibot.page.WikibaseEntity):
+            raise TypeError('itemdef shall be str, WikibaseEntity or Page')
 
         params = itemdef._defined_by(singular=True)
         # TODO: support 'new'
-        baserevid = kwargs.pop('baserevid', 0) or itemdef.latest_revision_id
+        baserevid = kwargs.pop(
+            'baserevid',
+            itemdef.latest_revision_id if 'id' in params else 0
+        )
         params.update(
-            {'id': itemdef.id,
-             'baserevid': baserevid,
+            {'baserevid': baserevid,
              'action': action,
              'token': self.tokens['edit'],
-             'bot': kwargs.pop('bot', False),
+             'bot': kwargs.pop('bot', True),
              })
         params.update(prepare_data(action, action_data))
 
         for arg in kwargs:
-            if arg in ['summary']:
+            if arg in ['summary', 'tags']:
                 params[arg] = kwargs[arg]
             else:
-                warn('Unknown parameter {} for action  {}, ignored'
+                warn('Unknown parameter {} for action {}, ignored'
                      .format(arg, action), UserWarning, 2)
 
         req = self._simple_request(**params)
