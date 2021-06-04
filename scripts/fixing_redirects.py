@@ -6,6 +6,10 @@ Can be used with:
 
 -featured         Run over featured pages (for some Wikimedia wikis only)
 
+-overwrite        Usually only the link is changed ([[Foo]] -> [[Bar|Foo]]).
+                  This parameters sets the script to completly overwrite the
+                  link text ([[Foo]] -> [[Bar]]).
+
 &params;
 """
 #
@@ -54,6 +58,14 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     ignore_save_related_errors = True
     ignore_server_errors = True
     summary_key = 'fixing_redirects-fixing'
+
+    def __init__(self, **kwargs) -> None:
+        """Initializer."""
+        self.available_options.update({
+            'overwrite': False,
+        })
+
+        super().__init__(**kwargs)
 
     def replace_links(self, text, linkedPage, targetPage):
         """Replace all source links by target."""
@@ -127,7 +139,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             if new_page_title[0] == ':':
                 new_page_title = new_page_title[1:]
 
-            if (new_page_title == link_text and not section):
+            if ((new_page_title == link_text and not section)
+                    or self.opt.overwrite):
                 newlink = '[[{}]]'.format(new_page_title)
             # check if we can create a link with trailing characters instead of
             # a pipelink
@@ -212,6 +225,7 @@ def main(*args):
     :type args: str
     """
     featured = False
+    options = {}
     gen = None
 
     # Process global args and prepare generator args parser
@@ -221,6 +235,8 @@ def main(*args):
     for arg in local_args:
         if arg == '-featured':
             featured = True
+        elif arg == '-overwrite':
+            options['overwrite'] = True
         elif genFactory.handle_arg(arg):
             pass
 
@@ -241,11 +257,9 @@ def main(*args):
                 additional_text='Option is not available for this site.')
             return
     else:
-        gen = genFactory.getCombinedGenerator()
-        if gen:
-            gen = mysite.preloadpages(gen)
+        gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        bot = FixingRedirectBot(generator=gen)
+        bot = FixingRedirectBot(generator=gen, **options)
         bot.run()
     else:
         suggest_help(missing_generator=True)
