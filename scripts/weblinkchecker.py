@@ -146,7 +146,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 ignorelist = [
     # Officially reserved for testing, documentation, etc. in
-    # https://tools.ietf.org/html/rfc2606#page-2
+    # https://datatracker.ietf.org/doc/html/rfc2606#page-2
     # top-level domains:
     re.compile(r'.*[\./@]test(/.*)?'),
     re.compile(r'.*[\./@]example(/.*)?'),
