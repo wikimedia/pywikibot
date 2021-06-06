@@ -1306,6 +1306,11 @@ def _flush(stop=True):
                             'Estimated time remaining: {}\nReally exit?'
                             .format(*remaining()),
                             default=False, automatic_quit=False):
+                    # delete the put queue
+                    with page_put_queue.mutex:
+                        page_put_queue.all_tasks_done.notify_all()
+                        page_put_queue.queue.clear()
+                        page_put_queue.not_full.notify_all()
                     break
 
     # only need one drop() call because all throttles use the same global pid
@@ -1333,12 +1338,8 @@ def async_manager():
 def async_request(request, *args, **kwargs):
     """Put a request on the queue, and start the daemon if necessary."""
     if not _putthread.is_alive():
-        try:
-            page_put_queue.mutex.acquire()
-            with suppress(AssertionError, RuntimeError):
-                _putthread.start()
-        finally:
-            page_put_queue.mutex.release()
+        with page_put_queue.mutex, suppress(AssertionError, RuntimeError):
+            _putthread.start()
     page_put_queue.put((request, args, kwargs))
 
 
