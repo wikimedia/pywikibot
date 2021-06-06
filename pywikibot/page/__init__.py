@@ -2263,7 +2263,7 @@ class FilePage(Page):
     def _load_file_revisions(self, imageinfo):
         for file_rev in imageinfo:
             # filemissing in API response indicates most fields are missing
-            # see https://gerrit.wikimedia.org/r/#/c/mediawiki/core/+/533482/
+            # see https://gerrit.wikimedia.org/r/c/mediawiki/core/+/533482/
             if 'filemissing' in file_rev:
                 pywikibot.warning("File '{}' contains missing revisions"
                                   .format(self.title()))
@@ -4532,7 +4532,7 @@ class Claim(Property):
         source = OrderedDict()
 
         # Before #84516 Wikibase did not implement snaks-order.
-        # https://gerrit.wikimedia.org/r/#/c/84516/
+        # https://gerrit.wikimedia.org/r/c/84516/
         if 'snaks-order' in data:
             prop_list = data['snaks-order']
         else:
