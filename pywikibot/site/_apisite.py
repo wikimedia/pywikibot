@@ -2951,7 +2951,7 @@ class APISite(
                             source_url=source_url, comment=comment,
                             text=text, watch=watch, ignore_warnings=True,
                             chunk_size=chunk_size, asynchronous=asynchronous,
-                            _file_key=_file_key, offset=result['offset'],
+                            _file_key=_file_key, _offset=result['offset'],
                             report_success=False)
                     return False
 
