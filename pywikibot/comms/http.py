@@ -196,7 +196,8 @@ def user_agent(site=None, format_string: str = None) -> str:
     return formatted
 
 
-@deprecated('pywikibot.comms.http.fake_user_agent', since='20161205')
+@deprecated('pywikibot.comms.http.fake_user_agent', since='20161205',
+            future_warning=True)
 def get_fake_user_agent():
     """
     Return a fake user agent depending on `fake_user_agent` option in config.

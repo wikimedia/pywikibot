@@ -650,7 +650,8 @@ class Family:
                     cr_set.add(newtitle)
         self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)
 
-    @deprecated('site.category_redirects()', since='20170608')
+    @deprecated('site.category_redirects()', since='20170608',
+                future_warning=True)
     def get_cr_templates(self, code, fallback):
         """DEPRECATED: Build list of category redirect templates."""
         self._get_cr_templates(code, fallback)
@@ -1256,4 +1257,5 @@ def AutoFamily(name: str, url: str):
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
-                            since='20190420')
+                            since='20190420',
+                            future_warning=True)

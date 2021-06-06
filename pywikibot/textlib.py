@@ -677,7 +677,8 @@ def replace_links(text: str, replace, site=None) -> str:
             issue_deprecation_warning(
                 'site=None',
                 'a valid site for list or tuple parameter "replace"',
-                2, since='20190223')
+                2, since='20190223',
+                future_warning=True)
     elif site is None:
         raise ValueError('The "site" argument must be provided.')
 

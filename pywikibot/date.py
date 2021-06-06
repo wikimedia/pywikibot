@@ -1935,7 +1935,7 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     return None, None
 
 
-@deprecated('date.format_date', since='20190526')
+@deprecated('date.format_date', since='20190526', future_warning=True)
 class FormatDate:
 
     """DEPRECATED. Format a date."""
