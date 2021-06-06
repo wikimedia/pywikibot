@@ -1248,10 +1248,10 @@ class BasePage(ComparableMixin):
                       .format(family, self.site.lang))
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
-            CANCEL_MATCH,
+            CANCEL,
             CosmeticChangesToolkit,
         )
-        cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL_MATCH)
+        cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
 
         if summary and old.strip().replace(
