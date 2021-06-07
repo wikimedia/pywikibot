@@ -145,7 +145,6 @@ class DataSite(APISite):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
             issue_deprecation_warning('claim without on_item set', depth=3,
-                                      warning_class=FutureWarning,
                                       since='20160309')
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',

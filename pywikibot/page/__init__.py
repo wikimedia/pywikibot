@@ -5766,7 +5766,6 @@ def url2unicode(title: str, encodings='utf-8') -> str:
             'Passing BaseSite object to encodings parameter',
             'BaseSite.endcodings()',
             depth=1,
-            warning_class=FutureWarning,
             since='6.2.0'
         )
 

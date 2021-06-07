@@ -300,8 +300,7 @@ class PageRelatedError(Error):
         elif re.search(r'%\(\w+\)s', self.message):
             issue_deprecation_warning("'%' style messages are deprecated, "
                                       'please use str.format() style instead',
-                                      since='20210504',
-                                      warning_class=FutureWarning)
+                                      since='20210504')
             msg = self.message % self.__dict__
         elif '%s' in self.message:
             msg = self.message % page

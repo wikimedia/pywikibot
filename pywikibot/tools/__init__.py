@@ -470,9 +470,7 @@ class DeprecatedRegex(LazyRegex):
 
     def __getattr__(self, attr):
         """Issue deprecation warning."""
-        issue_deprecation_warning(
-            self._name, self._instead, warning_class=FutureWarning,
-            since=self._since)
+        issue_deprecation_warning(self._name, self._instead, since=self._since)
         return super().__getattr__(attr)
 
 
@@ -1104,9 +1102,7 @@ class SelfCallMixin:
     def __call__(self):
         """Do nothing and just return itself."""
         issue_deprecation_warning('Referencing this attribute like a function',
-                                  'it directly',
-                                  warning_class=FutureWarning,
-                                  since='20210420')
+                                  'it directly', since='20210420')
 
         return self
 
@@ -1443,7 +1439,7 @@ def issue_deprecation_warning(name: str, instead=None, depth=2,
     :param depth: depth + 1 will be used as stacklevel for the warnings
     :type depth: int
     :param warning_class: a warning class (category) to be used, defaults to
-        DeprecationWarning
+        FutureWarning
     :type warning_class: type
     :param since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
@@ -1451,7 +1447,7 @@ def issue_deprecation_warning(name: str, instead=None, depth=2,
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
-        warning_class = (DeprecationWarning
+        warning_class = (FutureWarning
                          if instead else _NotImplementedWarning)
     warn(msg.format(name, instead), warning_class, depth + 1)
 
@@ -1466,7 +1462,7 @@ def deprecated(*args, **kwargs):
         deprecated (form 'YYYYMMDD') or a version string.
     :type since: str
     :keyword future_warning: if True a FutureWarning will be thrown,
-        otherwise it defaults to DeprecationWarning
+        otherwise it provides a DeprecationWarning
     :type future_warning: bool
     """
     def decorator(obj):
@@ -1489,7 +1485,7 @@ def deprecated(*args, **kwargs):
             depth = get_wrapper_depth(wrapper) + 1
             issue_deprecation_warning(
                 name, instead, depth, since=since,
-                warning_class=FutureWarning if future_warning else None)
+                warning_class=None if future_warning else DeprecationWarning)
             return obj(*args, **kwargs)
 
         def add_docstring(wrapper):
@@ -1763,7 +1759,7 @@ def redirect_func(target, source_module: Optional[str] = None,
     :param since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
     :param future_warning: if True a FutureWarning will be thrown,
-        otherwise it defaults to DeprecationWarning
+        otherwise it provides a DeprecationWarning
     :type future_warning: bool
     :return: A new function which adds a warning prior to each execution.
     :rtype: callable
@@ -1771,7 +1767,7 @@ def redirect_func(target, source_module: Optional[str] = None,
     def call(*a, **kw):
         issue_deprecation_warning(
             old_name, new_name, since=since,
-            warning_class=FutureWarning if future_warning else None)
+            warning_class=None if future_warning else DeprecationWarning)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
@@ -1840,7 +1836,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         :param since: a timestamp string of the date when the method was
             deprecated (form 'YYYYMMDD') or a version string.
         :param future_warning: if True a FutureWarning will be thrown,
-            otherwise it defaults to DeprecationWarning
+            otherwise it provides a DeprecationWarning
         """
         if '.' in name:
             raise ValueError('Deprecated name "{}" may not contain '

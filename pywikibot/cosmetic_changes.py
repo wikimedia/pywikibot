@@ -251,7 +251,6 @@ class CosmeticChangesToolkit:
             issue_deprecation_warning(
                 'site parameter of CosmeticChangesToolkit',
                 'a pywikibot.Page object as first parameter',
-                warning_class=FutureWarning,
                 since='20201102')
         else:
             if namespace is not None or pageTitle is not None:

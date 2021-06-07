@@ -249,7 +249,6 @@ def request(site,
     if old_validation is not None:
         issue_deprecation_warning('disable_ssl_certificate_validation',
                                   instead='verify',
-                                  warning_class=FutureWarning,
                                   since='20201220')
         kwargs.update(verify=not old_validation)
 
@@ -407,7 +406,6 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     if old_validation is not None:
         issue_deprecation_warning('disable_ssl_certificate_validation',
                                   instead='verify',
-                                  warning_class=FutureWarning,
                                   since='20201220')
         kwargs.update(verify=not old_validation)
 

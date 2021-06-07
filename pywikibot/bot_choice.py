@@ -183,7 +183,6 @@ class OutputProxyOption(OutputOption, StandardOption):
         if not hasattr(self._outputter, 'out'):
             issue_deprecation_warning('{} without "out" property'
                                       .format(self.__class__.__name__),
-                                      warning_class=FutureWarning,
                                       since='6.2.0')
             return self._outputter.output()
         return self._outputter.out

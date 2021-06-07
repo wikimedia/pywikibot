@@ -1365,7 +1365,6 @@ class GeneratorsMixin:
                 if where == 'titles':
                     issue_deprecation_warning("where='titles'",
                                               "where='title'",
-                                              warning_class=FutureWarning,
                                               since='20160224')
                 where = 'title'
         if not namespaces and namespaces != 0:
