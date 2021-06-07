@@ -10,18 +10,18 @@ To create a new distribution:
 
     python setup.py sdist
 
-- push the change to gerrit and merge it to the repository
-- upload the package to pypy by::
+- push the change to Gerrit and merge it to the repository
+- upload the package to PyPy by::
 
     twine upload dist/*
 
 - create a new tag with the version number of the final release
 - synchronize the local tags with the remote repositoy
 - merge current master branch to stable branch
-- push new stable branch to gerrit and merge it the stable repository
+- push new stable branch to Gerrit and merge it the stable repository
 - prepare the next master release by increasing the version number in
   ``pywikibot.__metadata__.py`` and adding developmental identifier
-- upload this patchset to gerrit and merge it.
+- upload this patchset to Gerrit and merge it.
 """
 #
 # (C) Pywikibot team, 2009-2021

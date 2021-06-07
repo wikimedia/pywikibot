@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/wikimedia/pywikibot.svg?branch=master
+.. image:: https://api.travis-ci.org/wikimedia/pywikibot.svg?branch=master
    :alt: Travis Build Status
    :target: https://travis-ci.org/wikimedia/pywikibot
 .. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master?svg=true
@@ -6,17 +6,17 @@
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graph/badge.svg
    :alt: Code coverage
-   :target: https://codecov.io/gh/wikimedia/pywikibot
+   :target: https://app.codecov.io/gh/wikimedia/pywikibot
 .. image:: https://api.codeclimate.com/v1/badges/de6ca4c66e7c7bee4156/maintainability
    :alt: Maintainability
-   :target: https://codeclimate.com/github/wikimedia/pywikibot/maintainability
+   :target: https://codeclimate.com/github/wikimedia/pywikibot
 .. image:: https://img.shields.io/pypi/pyversions/pywikibot.svg
    :alt: Python
    :target: https://www.python.org/downloads/
 .. image:: https://img.shields.io/pypi/v/pywikibot.svg
    :alt: Pywikibot release
    :target: https://pypi.org/project/pywikibot/
-.. image:: https://pepy.tech/badge/pywikibot
+.. image:: https://static.pepy.tech/badge/pywikibot
    :alt: Total downloads
    :target: https://pepy.tech/project/pywikibot
 .. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
