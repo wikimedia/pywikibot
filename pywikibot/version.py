@@ -507,5 +507,4 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'ParseError',
     replacement_name='pywikibot.exceptions.VersionParseError',
-    since='20210423',
-    future_warning=True)
+    since='20210423')

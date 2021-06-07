@@ -10,6 +10,9 @@ Current release changes
 Deprecations
 ^^^^^^^^^^^^
 
+* 6.4.0: Pywikibot `began using semantic versioning
+  <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,
+  all deprecated code will be removed in Pywikibot version 7.0.0.
 * 6.2.0: Bot's availableOptions will be removed in favour of available_options
 * 6.2.0: deprecated tools.is_IP will be removed
 * 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped

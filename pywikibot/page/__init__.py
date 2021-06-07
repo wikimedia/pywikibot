@@ -1281,7 +1281,7 @@ class BasePage(ComparableMixin):
                   **kwargs)
 
     @deprecated('put(asynchronous=True) or save(asynchronous=True)',
-                since='20180501', future_warning=True)
+                since='20180501')
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
@@ -4148,7 +4148,7 @@ class ItemPage(WikibasePage):
 # alias for backwards compatibility
 ItemPage.concept_url = redirect_func(
     ItemPage.concept_uri, old_name='concept_url', class_name='ItemPage',
-    since='20170222', future_warning=True)
+    since='20170222')
 
 
 class Property:
@@ -5746,8 +5746,7 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
 
 
 @deprecated_args(site='encodings')
-@deprecated('pywikibot.tools.chars.url2string', since='6.2.0',
-            future_warning=True)
+@deprecated('pywikibot.tools.chars.url2string', since='6.2.0')
 def url2unicode(title: str, encodings='utf-8') -> str:
     """
     DEPRECATED. Convert URL-encoded text to unicode using several encoding.
@@ -5778,8 +5777,8 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'UnicodeToAsciiHtml',
     replacement_name='pywikibot.tools.chars.string_to_ascii_html',
-    since='6.2.0', future_warning=True)
+    since='6.2.0')
 wrapper.add_deprecated_attr(
     'unicode2html',
     replacement_name='pywikibot.tools.chars.string2html',
-    since='6.2.0', future_warning=True)
+    since='6.2.0')

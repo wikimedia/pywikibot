@@ -51,7 +51,7 @@ class Notification:
         return notif
 
     @property
-    @deprecated('event_id', since='20190106', future_warning=True)
+    @deprecated('event_id', since='20190106')
     def id(self):
         """
         DEPRECATED: Return notification id as unicode.

@@ -26,7 +26,7 @@ class Family(family.FandomFamily):
     code_aliases = {'nn': 'no'}
 
     @classproperty
-    @deprecated('codes attribute', since='20190422', future_warning=True)
+    @deprecated('codes attribute', since='20190422')
     def languages_by_size(cls):
         """DEPRECATED. languages_by_size property for compatibility purpose."""
         return list(cls.codes)

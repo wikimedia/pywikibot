@@ -24,5 +24,4 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'PageInUse',
     replacement_name='pywikibot.exceptions.PageInUseError',
-    since='20210423',
-    future_warning=True)
+    since='20210423')

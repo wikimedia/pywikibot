@@ -72,8 +72,7 @@ for env_name in (
     if new_env_name not in environ:
         environ[new_env_name] = env_value
     issue_deprecation_warning(
-        env_name + ' environment variable', new_env_name, 0, since='20180803',
-        future_warning=True)
+        env_name + ' environment variable', new_env_name, 0, since='20180803')
 
 
 # This frozen set should contain all imported modules/variables, so it must

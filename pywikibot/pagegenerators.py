@@ -1270,7 +1270,7 @@ def _int_none(v):
     return v if (v is None or v == '') else int(v)
 
 
-@deprecated('Site.allpages()', since='20180512', future_warning=True)
+@deprecated('Site.allpages()', since='20180512')
 @deprecated_args(step=True)
 def AllpagesPageGenerator(start: str = '!', namespace=0,
                           includeredirects=True, site=None,
@@ -1417,7 +1417,7 @@ def RecentChangesPageGenerator(site=None, _filter_unique=None, **kwargs):
     return gen
 
 
-@deprecated('site.unconnected_pages()', since='20180512', future_warning=True)
+@deprecated('site.unconnected_pages()', since='20180512')
 @deprecated_args(step=True)
 def UnconnectedPageGenerator(site=None, total: Optional[int] = None):
     """
@@ -2029,8 +2029,7 @@ def UserEditFilterGenerator(generator, username: str, timestamp=None,
             pywikibot.output('Skipping {}'.format(page.title(as_link=True)))
 
 
-@deprecated('itertools.chain(*iterables)', since='20180513',
-            future_warning=True)
+@deprecated('itertools.chain(*iterables)', since='20180513')
 def CombinedPageGenerator(generators):
     """Yield from each iterable until exhausted, then proceed with the next."""
     return itertools.chain(*generators)  # pragma: no cover
@@ -2068,8 +2067,7 @@ def PageWithTalkPageGenerator(generator, return_talk_only=False):
             yield page.toggleTalkPage()
 
 
-@deprecated('LiveRCPageGenerator or EventStreams', since='20180415',
-            future_warning=True)
+@deprecated('LiveRCPageGenerator or EventStreams', since='20180415')
 def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                        total: Optional[int] = None, **kwargs):
     """Yield items in live time.
@@ -2394,7 +2392,7 @@ def page_with_property_generator(name: str, total: Optional[int] = None,
     return site.pages_with_property(name, total=total)
 
 
-@deprecated('Site.wantedpages', since='20180803', future_warning=True)
+@deprecated('Site.wantedpages', since='20180803')
 def WantedPagesPageGenerator(total: int = 100, site=None):  # pragma: no cover
     """
     Wanted page generator.
@@ -2964,11 +2962,10 @@ class PetScanPageGenerator:
 
 
 DuplicateFilterPageGenerator = redirect_func(
-    filter_unique, old_name='DuplicateFilterPageGenerator', since='20180715',
-    future_warning=True)
+    filter_unique, old_name='DuplicateFilterPageGenerator', since='20180715')
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         old_name='PreloadingItemGenerator',
-                                        since='20170314', future_warning=True)
+                                        since='20170314')
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '

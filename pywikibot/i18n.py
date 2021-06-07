@@ -817,4 +817,4 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'TranslationError',
     replacement_name='pywikibot.exceptions.TranslationError',
-    since='20210423', future_warning=True)
+    since='20210423')

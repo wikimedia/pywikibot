@@ -307,7 +307,7 @@ class CosmeticChangesToolkit:
 
     @classmethod
     @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
-                future_warning=True, since='20200415')
+                since='20200415')
     @deprecated_args(diff='show_diff')
     def from_page(cls, page, show_diff=False, ignore=CANCEL.ALL):
         """Create toolkit based on the page."""
@@ -1119,13 +1119,13 @@ _CANCEL_MATCH = CANCEL.MATCH
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('CANCEL_ALL', _CANCEL_ALL,
                             replacement_name='CANCEL.ALL',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_PAGE', _CANCEL_PAGE,
                             replacement_name='CANCEL.PAGE',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_METHOD', _CANCEL_METHOD,
                             replacement_name='CANCEL.METHOD',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_MATCH', _CANCEL_MATCH,
                             replacement_name='CANCEL.MATCH',
-                            since='20210528', future_warning=True)
+                            since='20210528')

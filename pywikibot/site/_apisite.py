@@ -823,7 +823,7 @@ class APISite(
         # return the magic word without the preceding '#' character
         return self.getmagicwords('redirect')[0].lstrip('#')
 
-    @deprecated('redirect_regex', since='20210103', future_warning=True)
+    @deprecated('redirect_regex', since='20210103')
     def redirectRegex(self):  # noqa: N802
         """Return a compiled regular expression matching on redirect pages."""
         return self.redirect_regex
@@ -1144,7 +1144,7 @@ class APISite(
                                 **args)
         self._update_page(page, query, verify_imageinfo=True)
 
-    @deprecated('page.exists()', since='20180218', future_warning=True)
+    @deprecated('page.exists()', since='20180218')
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         return page.pageid > 0
@@ -2112,7 +2112,7 @@ class APISite(
             self.unlock_page(page)
 
     @deprecate_arg('summary', 'reason')
-    @deprecated('delete()', since='20210330', future_warning=True)
+    @deprecated('delete()', since='20210330')
     def deletepage(self, page, reason: str):
         """Delete page from the wiki. Requires appropriate privilege level.
 
@@ -2127,8 +2127,7 @@ class APISite(
         """
         self.delete(page, reason)
 
-    @deprecated('delete() with oldimage keyword parameter', since='20210330',
-                future_warning=True)
+    @deprecated('delete() with oldimage keyword parameter', since='20210330')
     def deleteoldimage(self, page, oldimage: str, reason: str):
         """Delete a specific version of a file. Requires appropriate privileges.
 
@@ -2195,7 +2194,7 @@ class APISite(
             self.unlock_page(page)
 
     @deprecate_arg('summary', 'reason')
-    @deprecated('undelete()', since='20210330', future_warning=True)
+    @deprecated('undelete()', since='20210330')
     def undelete_page(self, page, reason: str, revisions=None):
         """DEPRECATED. Undelete page from the wiki.
 
@@ -2210,8 +2209,7 @@ class APISite(
         """
         self.undelete(page, reason, revisions=revisions)
 
-    @deprecated('undelete() with fileids parameter', since='20210330',
-                future_warning=True)
+    @deprecated('undelete() with fileids parameter', since='20210330')
     def undelete_file_versions(self, page, reason: str, fileids=None):
         """DEPRECATED. Undelete page from the wiki.
 
