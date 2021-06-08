@@ -279,10 +279,8 @@ def main(*args) -> None:
                              'you must give an even number of template names.')
             return
 
-    old_templates = []
-    for template_name in templates:
-        old_template = pywikibot.Page(site, template_name, ns=10)
-        old_templates.append(old_template)
+    old_templates = [pywikibot.Page(site, template_name, ns=10)
+                     for template_name in templates]
 
     if xmlfilename:
         builder = textlib.MultiTemplateMatchBuilder(site)
