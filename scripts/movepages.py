@@ -197,7 +197,7 @@ def main(*args) -> None:
             else:
                 filename = arg[len('-pairsfile:'):]
             oldName1 = None
-            for page in pagegenerators.TextfilePageGenerator(filename):
+            for page in pagegenerators.TextIOPageGenerator(filename):
                 if oldName1:
                     fromToPairs.append([oldName1, page.title()])
                     oldName1 = None

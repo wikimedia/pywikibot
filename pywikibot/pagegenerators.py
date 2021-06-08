@@ -20,6 +20,7 @@ These parameters are supported to specify which pages titles to print:
 import calendar
 import codecs
 import datetime
+import io
 import itertools
 import json
 import re
@@ -31,6 +32,7 @@ from functools import partial
 from http import HTTPStatus
 from itertools import zip_longest
 from typing import Optional, Union
+from urllib.parse import urlparse
 
 from requests.exceptions import ReadTimeout
 
@@ -313,6 +315,11 @@ GENERATOR OPTIONS
                     (tip: use -limit:n to fetch only n pages).
 
                     -querypage shows special pages available.
+
+-url                Read a list of pages to treat from the provided URL.
+                    The URL must return text in the same format as expected for
+                    the -file argument, e.g. page titles separated by newlines
+                    or enclosed in brackets.
 
 
 FILTER OPTIONS
@@ -812,6 +819,12 @@ class GeneratorFactory:
 
         return self.site.querypage(value)
 
+    def _handle_url(self, value):
+        """Handle `-url` argument."""
+        if not value:
+            value = pywikibot.input('Please enter the URL:')
+        return TextIOPageGenerator(value, site=self.site)
+
     def _handle_unusedfiles(self, value):
         """Handle `-unusedfiles` argument."""
         return self.site.unusedfiles(total=_int_none(value))
@@ -926,7 +939,7 @@ class GeneratorFactory:
         """Handle `-file` argument."""
         if not value:
             value = pywikibot.input('Please enter the local file name:')
-        return TextfilePageGenerator(value, site=self.site)
+        return TextIOPageGenerator(value, site=self.site)
 
     def _handle_namespaces(self, value):
         """Handle `-namespaces` argument."""
@@ -1532,43 +1545,68 @@ def LinkedPageGenerator(linkingPage, total: int = None, content: bool = False):
                                    content=content)  # pragma: no cover
 
 
-def TextfilePageGenerator(filename: Optional[str] = None, site=None):
-    """Iterate pages from a list in a text file.
+def _yield_titles(f: Union[codecs.StreamReaderWriter, io.StringIO],
+                  site: pywikibot.Site):
+    """Yield page titles from a text stream.
 
-    The file must contain page links between double-square-brackets or, in
-    alternative, separated by newlines. The generator will yield each
+    :param f: text stream object
+    :type f: codecs.StreamReaderWriter, io.StringIO, or any other stream-like
+        object
+    :param site: Site for generator results.
+    :type site: :py:obj:`pywikibot.site.BaseSite`
+    :return: a generator that yields Page objects of pages with titles in text
+        stream
+    :rtype: generator
+    """
+    linkmatch = None
+    for linkmatch in pywikibot.link_regex.finditer(f.read()):
+        # If the link is in interwiki format, the Page object may reside
+        # on a different Site than the default.
+        # This makes it possible to work on different wikis using a single
+        # text file, but also could be dangerous because you might
+        # inadvertently change pages on another wiki!
+        yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
+                                            site))
+    if linkmatch is not None:
+        return
+
+    f.seek(0)
+    for title in f:
+        title = title.strip()
+        if '|' in title:
+            title = title[:title.index('|')]
+        if title:
+            yield pywikibot.Page(site, title)
+
+
+def TextIOPageGenerator(source: Optional[str] = None,
+                        site: Optional[pywikibot.Site] = None):
+    """Iterate pages from a list in a text file or on a webpage.
+
+    The text source must contain page links between double-square-brackets or,
+    alternatively, separated by newlines. The generator will yield each
     corresponding Page object.
 
-    :param filename: the name of the file that should be read. If no name is
+    :param source: the file path or URL that should be read. If no name is
                      given, the generator prompts the user.
     :param site: Site for generator results.
     :type site: :py:obj:`pywikibot.site.BaseSite`
 
     """
-    if filename is None:
-        filename = pywikibot.input('Please enter the filename:')
+    if source is None:
+        source = pywikibot.input('Please enter the filename / URL:')
     if site is None:
         site = pywikibot.Site()
-    with codecs.open(filename, 'r', config.textfile_encoding) as f:
-        linkmatch = None
-        for linkmatch in pywikibot.link_regex.finditer(f.read()):
-            # If the link is in interwiki format, the Page object may reside
-            # on a different Site than the default.
-            # This makes it possible to work on different wikis using a single
-            # text file, but also could be dangerous because you might
-            # inadvertently change pages on another wiki!
-            yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
-                                                site))
-        if linkmatch is not None:
-            return
-
-        f.seek(0)
-        for title in f:
-            title = title.strip()
-            if '|' in title:
-                title = title[:title.index('|')]
-            if title:
-                yield pywikibot.Page(site, title)
+    # If source cannot be parsed as an HTTP URL, treat as local file
+    if not urlparse(source).scheme:
+        with codecs.open(source, 'r', config.textfile_encoding) as f:
+            yield from _yield_titles(f, site)
+    # Else, fetch page (page should return text in same format as that expected
+    # in filename, i.e. pages separated by newlines or pages enclosed in double
+    # brackets
+    else:
+        with io.StringIO(http.fetch(source).text) as f:
+            yield from _yield_titles(f, site)
 
 
 def PagesFromTitlesGenerator(iterable, site=None):
@@ -2966,6 +3004,8 @@ DuplicateFilterPageGenerator = redirect_func(
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         old_name='PreloadingItemGenerator',
                                         since='20170314')
+TextfilePageGenerator = redirect_func(
+    TextIOPageGenerator, old_name='TextfilePageGenerator', since='20210611')
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '
