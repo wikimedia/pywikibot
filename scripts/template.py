@@ -141,7 +141,7 @@ class TemplateRobot(ReplaceBot):
             'summary': None,
         })
 
-        SingleSiteBot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, **kwargs)
 
         self.templates = templates
 
