@@ -43,7 +43,7 @@ class TestNotification(DefaultDrySiteTestCase):
         notif = Notification.fromJSON(self.get_site(), self.data)
         self.assertIsInstance(notif, Notification)
         self.assertEqual(notif.site, self.get_site())
-        with suppress_warnings(category=DeprecationWarning):
+        with suppress_warnings(category=FutureWarning):
             notif_id = notif.id
         self.assertEqual(notif_id, self.data['id'])
         self.assertEqual(int(notif_id), notif.event_id)
