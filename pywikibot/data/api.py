@@ -25,7 +25,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.backports import Tuple, removeprefix
+from pywikibot.backports import Dict, Tuple, removeprefix
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Error,
@@ -2848,7 +2848,8 @@ class LoginManager(login.LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    def parameters(self, botpassword: bool) -> dict:
+    def _login_parameters(self, *, botpassword: bool = False
+                          ) -> Dict[str, str]:
         """Return login parameters."""
         # Since MW 1.27 only for bot passwords.
         self.action = 'login'
@@ -2896,7 +2897,7 @@ class LoginManager(login.LoginManager):
         # otherwise @ is not allowed in usernames.
         # @ in bot password is deprecated,
         # but we don't want to break bots using it.
-        parameters = self.parameters(
+        parameters = self._login_parameters(
             botpassword='@' in self.login_name or '@' in self.password)
 
         # base login request
@@ -2966,10 +2967,8 @@ class LoginManager(login.LoginManager):
 
         raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
 
-    def get_login_token(self) -> str:
-        """Fetch login token from action=query&meta=tokens.
-
-        Requires MediaWiki >= 1.27.
+    def get_login_token(self) -> Optional[str]:
+        """Fetch login token for MediaWiki 1.27+.
 
         :return: login token
         """
