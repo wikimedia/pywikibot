@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
-A helper script to convert compat 1.0 scripts to the new core 3.0 framework.
+A helper script to update scripts and replace deprecated parts.
+
+This also convert compat 1.0 scripts to the new core framework.
 
 NOTE: Please be aware that this script is not able to convert your codes
 completely. It may support you with some automatic replacements and it gives
@@ -9,7 +11,7 @@ README-conversion.txt in the core framework folder and check your codes
 finally.
 
 The scripts asks for the .py file and converts it to
-<scriptname>-core.py in the same directory. The following option is supported:
+<scriptname>-new.py in the same directory. The following option is supported:
 
 -warnonly  Do not convert the source but show warning messages. This is good
            to check already merged scripts.
@@ -18,11 +20,11 @@ usage
 
 to convert a script and show warnings about deprecated methods:
 
-    python pwb.py compat2core <scriptname>
+    python pwb.py update_script <scriptname>
 
 to show warnings about deprecated methods:
 
-    python pwb.py compat2core <scriptname> -warnonly
+    python pwb.py update_script <scriptname> -warnonly
 """
 #
 # (C) Pywikibot team, 2014-2021
@@ -39,10 +41,13 @@ import pywikibot
 
 # be careful with replacement order!
 replacements = (
+    #############################
+    # compat 2 core replacements
+    #############################
     # doc strings
     ('#\r?\n__version__.*\r?\n',
      '#\n'
-     '# Automatically ported from compat branch by compat2core.py script\n'),
+     '# Automatically ported from compat branch by update_script.py script\n'),
     ('Pywikipedia bot team', 'Pywikibot team'),
     # importing changes
     ('import wikipedia(?: as pywikibot)?', 'import pywikibot'),
@@ -88,6 +93,9 @@ replacements = (
 
 # some warnings which must be changed manually
 warnings = (
+    #############################
+    # compat 2 core warnings
+    #############################
     ('pywikibot.setAction(',
      'setAction() no longer works; you must pass an explicit edit summary\n'
      'message to save() or put()'),
@@ -171,7 +179,7 @@ class ConvertBot:
 
     def get_dest(self):
         """Ask for destination script name."""
-        self.dest = '{}-core.{}'.format(*self.source.rsplit('.', 1))
+        self.dest = '{}-new.{}'.format(*self.source.rsplit('.', 1))
         if not self.warnonly and not pywikibot.input_yn(
                 'Destination file is {}.'.format(self.dest),
                 default=True, automatic_quit=False):
