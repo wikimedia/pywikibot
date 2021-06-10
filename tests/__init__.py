@@ -148,7 +148,6 @@ script_test_modules = {
     'cache',
     'category_bot',
     'checkimages',
-    'compat2core',
     'deletionbot',
     'fixing_redirects',
     'generate_family_file',
@@ -163,6 +162,7 @@ script_test_modules = {
     'replacebot',
     'script',
     'template_bot',
+    'update_script',
     'uploadscript',
     'weblinkchecker'
 }
