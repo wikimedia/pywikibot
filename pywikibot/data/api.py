@@ -28,7 +28,6 @@ from pywikibot import config, login
 from pywikibot.backports import Tuple, removeprefix
 from pywikibot.comms import http
 from pywikibot.exceptions import (
-    CaptchaError,
     Error,
     FatalServerError,
     InvalidTitleError,
@@ -1240,8 +1239,9 @@ class Request(MutableMapping):
                     self['prop'] = sorted(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
-            # parameter. Querying siteinfo is save as it adds 'continue'.
-            if ('continue' not in self._params
+            # parameter. Querying siteinfo is save as it adds 'continue'
+            # except for 'tokens' (T284577)
+            if ('tokens' not in meta and 'continue' not in self._params
                     and self.site.mw_version >= '1.25wmf5'):
                 self._params.setdefault('rawcontinue', [''])
         elif self.action == 'help' and self.site.mw_version > '1.24':
@@ -2848,32 +2848,16 @@ class LoginManager(login.LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    def login_to_site(self) -> None:
-        """Login to the site.
-
-        Note, this doesn't do anything with cookies. The http module
-        takes care of all the cookie stuff. Throws exception on failure.
-        """
-        if hasattr(self, '_waituntil'):
-            if datetime.datetime.now() < self._waituntil:
-                diff = self._waituntil - datetime.datetime.now()
-                pywikibot.warning(
-                    'Too many tries, waiting {} seconds before retrying.'
-                    .format(diff.seconds))
-                pywikibot.sleep(diff.seconds)
-
-        below_mw_1_27 = self.site.mw_version < '1.27'
-
-        if '@' in self.login_name or '@' in self.password or below_mw_1_27:
-            # Since MW 1.27 only for bot passwords.
-            # Bot passwords username contains @,
-            # otherwise @ is not allowed in usernames.
-            # @ in bot password is deprecated,
-            # but we don't want to break bots using it.
-            self.action = 'login'
-        else:
-            # Standard login request since MW 1.27
-            self.action = 'clientlogin'
+    def parameters(self, botpassword: bool) -> dict:
+        """Return login parameters."""
+        # Since MW 1.27 only for bot passwords.
+        self.action = 'login'
+        if not botpassword:
+            # get token using meta=tokens if supported
+            token = self.get_login_token()
+            if token:
+                # Standard login request since MW 1.27
+                self.action = 'clientlogin'
 
         # prepare default login parameters
         parameters = {'action': self.action,
@@ -2884,20 +2868,41 @@ class LoginManager(login.LoginManager):
             # clientlogin requires non-empty loginreturnurl
             parameters['loginreturnurl'] = 'https://example.com'
             parameters['rememberMe'] = '1'
+            parameters['logintoken'] = token
+
+        if self.site.family.ldapDomain:
+            parameters[self.keyword('ldap')] = self.site.family.ldapDomain
+
+        return parameters
+
+    def login_to_site(self) -> None:
+        """Login to the site.
+
+        Note, this doesn't do anything with cookies. The http module
+        takes care of all the cookie stuff. Throws exception on failure.
+        """
+        self.below_mw_1_27 = False
+        if hasattr(self, '_waituntil'):
+            if datetime.datetime.now() < self._waituntil:
+                diff = self._waituntil - datetime.datetime.now()
+                pywikibot.warning(
+                    'Too many tries, waiting {} seconds before retrying.'
+                    .format(diff.seconds))
+                pywikibot.sleep(diff.seconds)
+
+        self.site._loginstatus = LoginStatus.IN_PROGRESS
+
+        # Bot passwords username contains @,
+        # otherwise @ is not allowed in usernames.
+        # @ in bot password is deprecated,
+        # but we don't want to break bots using it.
+        parameters = self.parameters(
+            botpassword='@' in self.login_name or '@' in self.password)
 
         # base login request
         login_request = self.site._request(use_get=False,
                                            parameters=parameters)
-
-        if self.site.family.ldapDomain:
-            login_request[self.keyword('ldap')] = self.site.family.ldapDomain
-
-        self.site._loginstatus = LoginStatus.IN_PROGRESS
         while True:
-            # get token using meta=tokens if supported
-            if not below_mw_1_27:
-                login_request[self.keyword('token')] = self.get_login_token()
-
             # try to login
             try:
                 login_result = login_request.submit()
@@ -2921,11 +2926,10 @@ class LoginManager(login.LoginManager):
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
-                if token and below_mw_1_27:
+                if token and self.below_mw_1_27:
                     # fetched token using action=login
                     login_request['lgtoken'] = token
-                    pywikibot.log('Received login token, '
-                                  'proceed with login.')
+                    pywikibot.log('Received login token, proceed with login.')
                 else:
                     # if incorrect login token was used,
                     # force relogin and generate fresh one
@@ -2933,22 +2937,13 @@ class LoginManager(login.LoginManager):
                                     'Forcing re-login.')
                     # invalidate superior wiki cookies (T224712)
                     _invalidate_superior_cookies(self.site.family)
+                    login_request[
+                        self.keyword('token')] = self.get_login_token()
                 continue
 
             # messagecode was introduced with 1.29.0-wmf.14
-            login_throttled = False
-            if self.site.mw_version >= '1.29.0-wmf.14':
-                try:
-                    login_throttled = \
-                        response['messagecode'] == 'login-throttled'
-                except KeyError:
-                    pywikibot.log(
-                        "Missing 'messagecode' key encountered\n"
-                        'Please file the following debug message to '
-                        'Phabricator task T261061:\n{}'
-                        .format(login_result))
-                    raise CaptchaError('Captcha encountered which cannot be '
-                                       'handled:\n{}'.format(response))
+            # but older wikis are still supported
+            login_throttled = response.get('messagecode') == 'login-throttled'
 
             if (status == 'Throttled' or status == self.keyword('fail')
                     and (login_throttled or 'wait' in fail_reason)):
@@ -2978,15 +2973,17 @@ class LoginManager(login.LoginManager):
 
         :return: login token
         """
-        if self.site.mw_version < '1.27':
-            raise NotImplementedError('The method get_login_token() requires '
-                                      'at least MediaWiki version 1.27.')
         login_token_request = self.site._request(
             use_get=False,
             parameters={'action': 'query', 'meta': 'tokens', 'type': 'login'},
         )
         login_token_result = login_token_request.submit()
-        return login_token_result['query']['tokens'].get('logintoken')
+        # check if we have to use old implementation of mw < 1.27
+        if 'query' in login_token_result:
+            return login_token_result['query']['tokens'].get('logintoken')
+
+        self.below_mw_1_27 = True
+        return None
 
 
 def encode_url(query) -> str:
