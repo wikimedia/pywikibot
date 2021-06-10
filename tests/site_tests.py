@@ -280,7 +280,7 @@ class TestSiteObject(DefaultSiteTestCase):
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         with suppress_warnings('pywikibot.site._apisite.APISite.page_exists',
-                               DeprecationWarning):
+                               FutureWarning):
             self.assertIsInstance(mysite.page_exists(mainpage), bool)
         self.assertIsInstance(mysite.page_restrictions(mainpage), dict)
         self.assertIsInstance(mysite.page_can_be_edited(mainpage), bool)
@@ -636,7 +636,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_newfiles(self):
         """Test the site.newfiles() method."""
         my_site = self.get_site()
-        with suppress_warnings(category=DeprecationWarning):
+        with suppress_warnings(category=FutureWarning):
             gen = my_site.newfiles(total=10)
         the_list = list(gen)
         self.assertLessEqual(len(the_list), 10)
@@ -1438,7 +1438,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
                               .format(mysite, e))
 
-    @suppress_warnings("where='title' is deprecated", DeprecationWarning)
+    @suppress_warnings("where='title' is deprecated", FutureWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
