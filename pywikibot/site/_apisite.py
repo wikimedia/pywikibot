@@ -19,6 +19,7 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
+from pywikibot.backports import List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -1292,7 +1293,7 @@ class APISite(
 
         return page._redirtarget
 
-    def validate_tokens(self, types):
+    def validate_tokens(self, types: List[str]):
         """Validate if requested tokens are acceptable.
 
         Valid tokens depend on mw version.
@@ -1315,7 +1316,7 @@ class APISite(
                     valid_types.append('csrf')
         return valid_types
 
-    def get_tokens(self, types, all: bool = False) -> dict:
+    def get_tokens(self, types: List[str], all: bool = False) -> dict:
         """Preload one or multiple tokens.
 
         For MediaWiki version 1.23, only one token can be retrieved at once.
@@ -1336,7 +1337,6 @@ class APISite(
 
         :param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
-        :type types: iterable
         :param all: load all available tokens, if None only if it can be done
             in one request.
 
