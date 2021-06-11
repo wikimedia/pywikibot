@@ -45,8 +45,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidTitleError
-
-from scripts.add_text import add_text
+from pywikibot.textlib import add_text
 
 
 docuReplacements = {
@@ -321,16 +320,14 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             commonscatLink = self.find_commons_category(page)
             if commonscatLink:
                 if commonscatLink == page.title():
-                    textToAdd = '{{%s}}' % primaryCommonscat
+                    text_to_add = '{{%s}}' % primaryCommonscat
                 else:
-                    textToAdd = '{{%s|%s}}' % (primaryCommonscat,
-                                               commonscatLink)
-                result, _, always = add_text(page, textToAdd,
-                                             self.opt.summary,
-                                             always=self.opt.always)
-                if result is True:
-                    self._save_counter += 1
-                self.opt.always = always
+                    text_to_add = '{{%s|%s}}' % (primaryCommonscat,
+                                                 commonscatLink)
+                summary = self.opt.summary or i18n.twtranslate(
+                    self.site, 'add_text-adding', {'adding': text_to_add})
+                self.put_current(add_text(page.text, text_to_add),
+                                 summary=summary)
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
