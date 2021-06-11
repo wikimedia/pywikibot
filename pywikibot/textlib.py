@@ -832,6 +832,36 @@ def replace_links(text: str, replace, site=None) -> str:
     return text
 
 
+def add_text(text: str, add: str, *, site=None) -> str:
+    """Add text to a page content above categories and interwiki.
+
+    :param text: The page content to add text to.
+    :param add: Text to add.
+    :param site: The site that the text is coming from. Required for
+        reorder of categories and interlanguage links. Te default site
+        is used otherwise.
+    :type site: pywikibot.Site
+    """
+    # Translating the \\n (e.g. from command line) into binary \n
+    add = add.replace('\\n', '\n')
+
+    # Getting the categories
+    categories_inside = getCategoryLinks(text, site)
+    # Deleting the categories
+    text = removeCategoryLinks(text, site)
+    # Getting the interwiki
+    interwiki_inside = getLanguageLinks(text, site)
+    # Removing the interwiki
+    text = removeLanguageLinks(text, site)
+
+    # Adding the text
+    text += '\n' + add
+    # Reputting the categories
+    text = replaceCategoryLinks(text, categories_inside, site, addOnly=True)
+    # Adding the interwiki
+    return replaceLanguageLinks(text, interwiki_inside, site)
+
+
 # -------------------------------
 # Functions dealing with sections
 # -------------------------------
