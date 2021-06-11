@@ -173,6 +173,18 @@ class TestFormatCategory(DefaultDrySiteTestCase):
                          textlib.categoryFormat(data, self.site))
 
 
+class TestAddText(DefaultDrySiteTestCase):
+
+    """Test add_text function."""
+
+    def test_add_text(self):
+        """Test adding text."""
+        self.assertEqual(
+            textlib.add_text('foo\n[[Category:Foo]]', 'bar', site=self.site),
+            'foo\nbar\n\n[[Category:Foo]]'
+        )
+
+
 class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
     """
