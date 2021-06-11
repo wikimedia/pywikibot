@@ -23,8 +23,15 @@
 import os
 import re
 import sys
+import warnings
+
 from os.path import abspath, dirname, join
 
+
+# Deprecated classes will generate warnings as Sphinx processes them. Ignoring
+# them.
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 docs_dir = dirname(__file__)
 repo_dir = abspath(join(docs_dir, '..'))
