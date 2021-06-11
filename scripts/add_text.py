@@ -74,6 +74,7 @@ from pywikibot.exceptions import (
     ServerError,
     SpamblacklistError,
 )
+from pywikibot.tools import deprecated
 from pywikibot.tools.formatter import color_format
 
 DEFAULT_ARGS = {
@@ -98,6 +99,8 @@ ARG_PROMPT = {
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
+@deprecated('Page.text, NoRedirectPageBot class and BaseBot.skip_page() '
+            '(see add_text.AddTextBot for example)', since='6.4.0')
 def get_text(page: pywikibot.page.BasePage, old: Optional[str],
              create: bool) -> str:
     """
@@ -126,6 +129,7 @@ def get_text(page: pywikibot.page.BasePage, old: Optional[str],
         return None
 
 
+@deprecated('BaseBot.userPut()', since='6.4.0')
 def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
              asynchronous: bool = False) -> Optional[bool]:
     """
@@ -165,6 +169,9 @@ def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
     return False
 
 
+@deprecated('Page.text, textlib.add_text, NoRedirectPageBot class, '
+            'BaseBot.skip_page() and CurrentPage.put_current() '
+            '(see add_text.AddTextBot for example)', since='6.4.0')
 def add_text(page: pywikibot.page.BasePage, addText: str,
              summary: Optional[str] = None,
              regexSkip: Optional[str] = None,
