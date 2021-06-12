@@ -16,7 +16,12 @@ The following parameters are supported:
                   inserted.
 
 -ignore:          Ignores if an error occurred and either skips the page or
-                  only that method. It can be set to 'page' or 'method'.
+                  only that method. It can be set to:
+                  all - dos not ignore errors
+                  match - ignores ISBN related errors (default)
+                  method - ignores fixing method errors
+                  page - ignores page related errors
+
 
 The following generators and filters are supported:
 
@@ -59,7 +64,7 @@ class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
         self.available_options.update({
             'async': False,
             'summary': 'Robot: Cosmetic changes',
-            'ignore': CANCEL.ALL,
+            'ignore': CANCEL.MATCH,
         })
         super().__init__(**kwargs)
 
@@ -91,23 +96,17 @@ def main(*args: Tuple[str, ...]) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-summary:'):
-            options['summary'] = arg[len('-summary:'):]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-async':
-            options['async'] = True
-        elif arg.startswith('-ignore:'):
-            ignore_mode = arg[len('-ignore:'):].lower()
-            if ignore_mode == 'method':
-                options['ignore'] = CANCEL.METHOD
-            elif ignore_mode == 'page':
-                options['ignore'] = CANCEL.PAGE
-            elif ignore_mode == 'match':
-                options['ignore'] = CANCEL.MATCH
-            else:
-                raise ValueError(
-                    'Unknown ignore mode "{}"!'.format(ignore_mode))
+        opt, _, value = arg.partition(':')
+        if opt == '-summary':
+            options['summary'] = value
+        elif opt in ('-always', '-async'):
+            options[opt[1:]] = True
+        elif opt == '-ignore':
+            value = value.upper()
+            try:
+                options['ignore'] = getattr(CANCEL, value)
+            except AttributeError:
+                raise ValueError('Unknown ignore mode {!r}!'.format(value))
         else:
             gen_factory.handle_arg(arg)
 
