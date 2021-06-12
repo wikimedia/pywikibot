@@ -1756,32 +1756,30 @@ class BasePage(ComparableMixin):
                     self.site._noDeletePrompt = True
             if answer == 'y':
                 self.site.delete(self, reason)
-                return
+            return
 
-        else:  # Otherwise mark it for deletion
-            if mark or hasattr(self.site, '_noMarkDeletePrompt'):
+        # Otherwise mark it for deletion
+        if mark or hasattr(self.site, '_noMarkDeletePrompt'):
+            answer = 'y'
+        else:
+            answer = pywikibot.input_choice(
+                "Can't delete {}; do you want to mark it for deletion instead?"
+                .format(self),
+                [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                'n', automatic_quit=False)
+            if answer == 'a':
                 answer = 'y'
+                self.site._noMarkDeletePrompt = True
+        if answer == 'y':
+            template = '{{delete|1=%s}}\n' % reason
+            # We can't add templates in a wikidata item, so let's use its
+            # talk page
+            if isinstance(self, pywikibot.ItemPage):
+                target = self.toggleTalkPage()
             else:
-                answer = pywikibot.input_choice(
-                    "Can't delete {}; do you want to mark it "
-                    'for deletion instead?'
-                    .format(self.title(as_link=True, force_interwiki=True)),
-                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
-                    'n', automatic_quit=False)
-                if answer == 'a':
-                    answer = 'y'
-                    self.site._noMarkDeletePrompt = True
-            if answer == 'y':
-                template = '{{delete|1=%s}}\n' % reason
-                # We can't add templates in a wikidata item, so let's use its
-                # talk page
-                if isinstance(self, pywikibot.ItemPage):
-                    talk = self.toggleTalkPage()
-                    talk.text = template + talk.text
-                    talk.save(summary=reason)
-                else:
-                    self.text = template + self.text
-                    self.save(summary=reason)
+                target = self
+            target.text = template + target.text
+            target.save(summary=reason)
 
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
