@@ -10,7 +10,8 @@ from unittest.mock import Mock, patch
 import pywikibot
 import pywikibot.pagegenerators
 
-from scripts.add_text import add_text, get_text, parse
+from scripts.add_text import parse
+
 from tests.aspects import TestCase
 
 
@@ -78,28 +79,6 @@ class TestAdding(TestCase):
         args = parse(['-text'], self.generator_factory)
         self.assertEqual('hello world', args['text'])
         input_mock.assert_called_with('What text do you want to add?')
-
-    def test_basic(self):
-        """Test adding text."""
-        (_, newtext, _) = add_text(
-            self.page, 'bar', putText=False,
-            oldTextGiven='foo\n{{linkfa}}')
-        self.assertEqual(
-            'foo\n{{linkfa}}\nbar',
-            newtext)
-
-    def test_with_category(self):
-        """Test adding text before categories."""
-        (_, newtext, _) = add_text(
-            self.page, 'bar', putText=False,
-            oldTextGiven='foo\n[[Category:Foo]]')
-        self.assertEqual(
-            'foo\nbar\n\n[[Category:Foo]]',
-            newtext)
-
-    def test_get_text(self):
-        """Test get_text with given text."""
-        self.assertEqual(get_text(self.page, 'foo', False), 'foo')
 
 
 if __name__ == '__main__':  # pragma: no cover
