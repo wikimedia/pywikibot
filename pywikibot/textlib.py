@@ -835,6 +835,8 @@ def replace_links(text: str, replace, site=None) -> str:
 def add_text(text: str, add: str, *, site=None) -> str:
     """Add text to a page content above categories and interwiki.
 
+    *New in version 6.4.*
+
     :param text: The page content to add text to.
     :param add: Text to add.
     :param site: The site that the text is coming from. Required for

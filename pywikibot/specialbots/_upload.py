@@ -57,6 +57,8 @@ class UploadRobot(BaseBot):
         *Changed in version 6.2:* asynchronous upload is used if
         *asynchronous* parameter is set.
 
+        *New in version 6.4:* force_if_shared parameter.
+
         :param url: path to url or local file, or list of urls or paths
             to local files.
         :param description: Description of file for its page. If multiple files
