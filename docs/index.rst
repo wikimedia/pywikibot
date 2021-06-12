@@ -85,4 +85,4 @@ Miscellaneous
    credits
 
 
-.. _CC-BY-SA 3.0: http://creativecommons.org/licenses/by-sa/3.0/
+.. _CC-BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/
