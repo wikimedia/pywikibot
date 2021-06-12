@@ -1,6 +1,10 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* add add_text function to textlib (T284388)
+* Require setuptools >= 49.4.0 (T284297)
+* Require wikitextparser>=0.47.5
+* Allow images to upload locally even they exist in the shared repository (T267535)
 * Show a warning if pywikibot.__version__ is behind scripts.__version__ (T282766)
 * Handle <ce>/<chem> tags as <math> aliases within textlib.replaceExcept() (T283990)
 * Expand simulate query response for wikibase support (T76694)
