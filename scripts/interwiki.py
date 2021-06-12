@@ -512,7 +512,7 @@ class InterwikiBotConfig:
             if value.isdigit():
                 self.needlimit = int(value)
         elif arg == 'skipfile':
-            skip_page_gen = pagegenerators.TextfilePageGenerator(value)
+            skip_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.skip.update(skip_page_gen)
             del skip_page_gen
         elif arg == 'neverlink':
@@ -521,7 +521,7 @@ class InterwikiBotConfig:
             self.ignore += [pywikibot.Page(pywikibot.Site(), p)
                             for p in value.split(',')]
         elif arg == 'ignorefile':
-            ignore_page_gen = pagegenerators.TextfilePageGenerator(value)
+            ignore_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.ignore.update(ignore_page_gen)
             del ignore_page_gen
         elif arg == 'showpage':
@@ -2298,7 +2298,7 @@ class InterwikiDumps(OptionHandler):
                 continue
 
             pywikibot.output('Retrieving pages from dump file ' + tail)
-            for page in pagegenerators.TextfilePageGenerator(filename, site):
+            for page in pagegenerators.TextIOPageGenerator(filename, site):
                 if site == self.site:
                     self._next_page = page.title(with_ns=False) + '!'
                     self._next_namespace = page.namespace()

@@ -424,7 +424,7 @@ class TestRepeatingGenerator(RecentChangesTestCase):
         self.assertLength({item['revid'] for item in items}, self.length)
 
 
-class TestTextfilePageGenerator(DefaultSiteTestCase):
+class TestTextIOPageGenerator(DefaultSiteTestCase):
 
     """Test loading pages from a textfile."""
 
@@ -444,10 +444,10 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
     )
 
     def test_brackets(self):
-        """Test TextfilePageGenerator with brackets."""
+        """Test TextIOPageGenerator with brackets."""
         filename = join_data_path('pagelist-brackets.txt')
         site = self.get_site()
-        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        titles = list(pagegenerators.TextIOPageGenerator(filename, site))
         self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
@@ -456,16 +456,29 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         self.assertPageTitlesEqual(titles, expected_titles)
 
     def test_lines(self):
-        """Test TextfilePageGenerator with newlines."""
+        """Test TextIOPageGenerator with newlines."""
         filename = join_data_path('pagelist-lines.txt')
         site = self.get_site()
-        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        titles = list(pagegenerators.TextIOPageGenerator(filename, site))
         self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
                                               .case]]
             for expected_title, page in zip(self.expected_titles, titles)]
         self.assertPageTitlesEqual(titles, expected_titles)
+
+    @unittest.mock.patch('pywikibot.comms.http.fetch', autospec=True)
+    def test_url(self, mock_fetch):
+        """Test TextIOPageGenerator with URL."""
+        # Mock return value of fetch()
+        fetch_return = unittest.mock.Mock()
+        fetch_return.text = '\n'.join(
+            [title[0] for title in self.expected_titles])
+        mock_fetch.return_value = fetch_return
+        site = self.get_site()
+        titles = list(
+            pagegenerators.TextIOPageGenerator('http://www.someurl.org', site))
+        self.assertLength(titles, self.expected_titles)
 
 
 class TestYearPageGenerator(DefaultSiteTestCase):
