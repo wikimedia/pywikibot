@@ -1,4 +1,4 @@
-"""Objects representing API interface to MediaWiki site."""
+"""Objects representing API interface to MediaWiki site extenstions."""
 #
 # (C) Pywikibot team, 2008-2021
 #
