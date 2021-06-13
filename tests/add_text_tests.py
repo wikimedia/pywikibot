@@ -5,12 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, mock_open, patch
 
 import pywikibot
 import pywikibot.pagegenerators
 
-from scripts.add_text import parse
+from scripts.add_text import AddTextBot, main, parse
 
 from tests.aspects import TestCase
 
@@ -27,7 +27,6 @@ class TestAdding(TestCase):
     def setUp(self):
         """Setup test."""
         super().setUp()
-        self.page = pywikibot.Page(self.site, 'foo')
         self.generator_factory = pywikibot.pagegenerators.GeneratorFactory()
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
@@ -79,6 +78,59 @@ class TestAdding(TestCase):
         args = parse(['-text'], self.generator_factory)
         self.assertEqual('hello world', args['text'])
         input_mock.assert_called_with('What text do you want to add?')
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_main_no_arguments(self):
+        """Invoke our main method without any arguments."""
+        main()
+
+        self.assertEqual([
+            "Either the '-text' or '-textfile' is required\n"
+            'Use -help for further information.'
+        ], pywikibot.bot.ui.pop_output())
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_main_unrecognized_argument(self):
+        """Invoke our main method with an invalid argument."""
+        main('no_such_arg')
+
+        self.assertEqual([
+            "Argument 'no_such_arg' is unrecognized\n"
+            'Use -help for further information.',
+        ], pywikibot.bot.ui.pop_output())
+
+    @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
+    def test_main_no_generator_found(self):
+        """Invoke main when our generator_factory can't provide a generator."""
+        main('-text:hello')
+
+        self.assertEqual([
+            'Unable to execute script because no generator was defined.\n'
+            'Use -help for further information.'
+        ], pywikibot.bot.ui.pop_output())
+
+    def test_setup_with_text(self):
+        """Exercise bot with a -text argument."""
+        bot = AddTextBot(text='hello\\nworld')
+
+        # setup unescapes any newlines
+
+        self.assertEqual('hello\\nworld', bot.opt.text)
+        bot.setup()
+        self.assertEqual('hello\nworld', bot.opt.text)
+
+    @patch('builtins.open', new_callable=mock_open, read_data=b'file data')
+    def test_setup_with_textfile(self, mock_file):
+        """Exercise both with a -textfile argument."""
+        bot = AddTextBot(textfile='/path/to/my/file.txt')
+
+        # setup reads the file content
+
+        self.assertEqual('', bot.opt.text)
+        bot.setup()
+        self.assertEqual('file data', bot.opt.text)
+
+        mock_file.assert_called_with('/path/to/my/file.txt', 'rb', ANY)
 
 
 if __name__ == '__main__':  # pragma: no cover
