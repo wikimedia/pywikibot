@@ -130,6 +130,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _revision.py               | Object representing page revision                    |
     +----------------------------+------------------------------------------------------+
+    | _toolforge.py              | BasePage interface to toolforge tools                |
+    +----------------------------+------------------------------------------------------+
     | _user.py                   | Object representing a wiki user                      |
     +----------------------------+------------------------------------------------------+
     | _wikibase.py               | Objects representing wikibase structures             |

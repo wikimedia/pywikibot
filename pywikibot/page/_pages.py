@@ -49,6 +49,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._links import BaseLink, Link
+from pywikibot.page._toolforge import WikiBlameMixin
 from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
@@ -2149,7 +2150,7 @@ class BasePage(ComparableMixin):
         return link
 
 
-class Page(BasePage):
+class Page(BasePage, WikiBlameMixin):
 
     """Page: A MediaWiki page."""
 
