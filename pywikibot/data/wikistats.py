@@ -72,7 +72,7 @@ class WikiStats:
 
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
 
-    def __init__(self, url='https://wikistats.wmflabs.org/') -> None:
+    def __init__(self, url='https://wikistats.wmcloud.org/') -> None:
         """Initializer."""
         self.url = url
         self._data = {}
