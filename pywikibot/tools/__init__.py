@@ -1625,7 +1625,7 @@ def deprecated_args(**arg_pairs):
                         warn('{old_arg} argument of {name} '
                              'is deprecated; use {new_arg} instead.'
                              .format_map(output_args),
-                             DeprecationWarning, depth)
+                             FutureWarning, depth)
                         __kw[new_arg] = __kw[old_arg]
                 elif new_arg == '':
                     pass
