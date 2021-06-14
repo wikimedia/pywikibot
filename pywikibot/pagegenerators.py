@@ -1598,7 +1598,7 @@ def TextIOPageGenerator(source: Optional[str] = None,
     if site is None:
         site = pywikibot.Site()
     # If source cannot be parsed as an HTTP URL, treat as local file
-    if not urlparse(source).scheme:
+    if not urlparse(source).netloc:
         with codecs.open(source, 'r', config.textfile_encoding) as f:
             yield from _yield_titles(f, site)
     # Else, fetch page (page should return text in same format as that expected
