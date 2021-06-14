@@ -42,7 +42,7 @@ import sys
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools.formatter import color_format
@@ -134,7 +134,7 @@ licenseTemplates = {
 }
 
 
-class ImageTransferBot(SingleSiteBot):
+class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
     """Image transfer bot."""
 
