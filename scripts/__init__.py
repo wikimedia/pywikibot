@@ -1,6 +1,6 @@
 """**Scripts** folder contains predefined scripts easy to use.
 
-Scripts are only available im Pywikibot ist instaled in directory mode
+Scripts are only available im Pywikibot if instaled in directory mode
 and not as side package. They can be run in command line using the pwb
 wrapper script::
 
@@ -8,8 +8,8 @@ wrapper script::
 
 
 Every script provides a ``-help`` option which shows all available
-options, their explanation and usage examples. Global options will be
-shown by ``-help:global`` or using::
+options, their explanation and usage examples. :ref:`Global options`
+will be shown by ``-help:global`` or using::
 
     python pwb.py -help
 
