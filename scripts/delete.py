@@ -127,12 +127,9 @@ class DeletionRobot(CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
-    def __init__(self, generator, summary: str, **kwargs) -> None:
-        """
-        Initializer.
+    def __init__(self, summary: str, **kwargs) -> None:
+        """Initializer.
 
-        :param generator: the pages to work on
-        :type generator: iterable
         :param summary: the reason for the (un)deletion
         """
         self.available_options.update({
@@ -140,7 +137,7 @@ class DeletionRobot(CurrentPageBot):
             'isorphan': 0,
             'orphansonly': [],
         })
-        super().__init__(generator=generator, **kwargs)
+        super().__init__(**kwargs)
 
         self.summary = summary
         # Upcast pages to PageWithRefs()
@@ -289,7 +286,7 @@ def main(*args: Tuple[str, ...]) -> None:
             summary = pywikibot.input('Enter a reason for the {}deletion:'
                                       .format(['', 'un'][options
                                               .get('undelete', False)]))
-        bot = DeletionRobot(generator, summary, **options)
+        bot = DeletionRobot(summary, generator=generator, **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

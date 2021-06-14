@@ -65,20 +65,16 @@ class ClaimRobot(WikidataBot):
 
     use_from_page = None
 
-    def __init__(self, generator, claims, exists_arg='') -> None:
-        """
-        Initializer.
+    def __init__(self, claims, exists_arg='', **kwargs) -> None:
+        """Initializer.
 
-        :param generator: A generator that yields Page objects.
-        :type generator: iterator
         :param claims: A list of wikidata claims
         :type claims: list
         :param exists_arg: String specifying how to handle duplicate claims
         :type exists_arg: str
         """
         self.available_options['always'] = True
-        super().__init__()
-        self.generator = generator
+        super().__init__(**kwargs)
         self.claims = claims
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
         self.cacheSources()
@@ -159,7 +155,7 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = ClaimRobot(generator, claims, exists_arg)
+    bot = ClaimRobot(claims, exists_arg, generator=generator)
     bot.run()
 
 

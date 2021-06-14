@@ -136,12 +136,9 @@ class HarvestRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
-    def __init__(self, generator, template_title, fields, **kwargs) -> None:
-        """
-        Initializer.
+    def __init__(self, template_title, fields, **kwargs) -> None:
+        """Initializer.
 
-        :param generator: A generator that yields Page objects
-        :type generator: iterator
         :param template_title: The template to work on
         :type template_title: str
         :param fields: A dictionary of fields that are of use to us
@@ -165,7 +162,6 @@ class HarvestRobot(WikidataBot):
             'multi': False,
         })
         super().__init__(**kwargs)
-        self.generator = generator
         # TODO: Make it a list including the redirects to the template
         self.fields = {}
         for key, value in fields.items():
@@ -421,7 +417,7 @@ def main(*args) -> None:
         gen.handle_arg('-transcludes:' + template_title)
         generator = gen.getCombinedGenerator(preload=True)
 
-    bot = HarvestRobot(generator, template_title, fields, **options)
+    bot = HarvestRobot(template_title, fields, generator=generator, **options)
     bot.run()
 
 

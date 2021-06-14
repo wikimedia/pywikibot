@@ -87,12 +87,12 @@ class BasicBot(
 
     summary_key = 'basic-changing'
 
-    def __init__(self, generator, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         """
         Initializer.
 
-        :param generator: the page generator that determines on which pages
-            to work
+        :keyword generator: the page generator that determines on which pages
+            to work. BasicBot assigns it to self.generator attribute.
         :type generator: generator
         """
         # Add your own options to the bot and set their defaults
@@ -105,9 +105,7 @@ class BasicBot(
         })
 
         # call initializer of the super class
-        super().__init__(site=True, **kwargs)
-        # assign the generator to the bot
-        self.generator = generator
+        super().__init__(**kwargs)
 
     def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
@@ -179,7 +177,7 @@ def main(*args: Tuple[str, ...]) -> None:
     gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         # pass generator and private options to the bot
-        bot = BasicBot(gen, **options)
+        bot = BasicBot(generator=gen, **options)
         bot.run()  # guess what it does
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

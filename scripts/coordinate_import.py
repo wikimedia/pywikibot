@@ -57,15 +57,10 @@ class CoordImportRobot(WikidataBot):
 
     use_from_page = None
 
-    def __init__(self, generator, **kwargs) -> None:
-        """
-        Initializer.
-
-        :param generator: A generator that yields Page objects.
-        """
+    def __init__(self, **kwargs) -> None:
+        """Initializer."""
         self.available_options['create'] = False
         super().__init__(**kwargs)
-        self.generator = generator
         self.cacheSources()
         self.prop = 'P625'
         self.create_missing_item = self.opt.create
@@ -172,7 +167,7 @@ def main(*args: Tuple[str, ...]) -> None:
     generator = generator_factory.getCombinedGenerator(preload=True)
 
     if generator:
-        coordbot = CoordImportRobot(generator, create=create_new)
+        coordbot = CoordImportRobot(generator=generator, create=create_new)
         coordbot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
