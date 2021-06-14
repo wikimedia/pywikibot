@@ -1319,11 +1319,11 @@ class BaseBot(OptionHandler):
         :param args: passed to the function
         :param kwargs: passed to the function
         :keyword ignore_server_errors: if True, server errors will be reported
-          and ignored (default: False)
-        @kwtype ignore_server_errors: bool
+            and ignored (default: False)
+        :kwtype ignore_server_errors: bool
         :keyword ignore_save_related_errors: if True, errors related to
-        page save will be reported and ignored (default: False)
-        @kwtype ignore_save_related_errors: bool
+            page save will be reported and ignored (default: False)
+        :kwtype ignore_save_related_errors: bool
         :return: whether the page was saved successfully
         :rtype: bool
         """
