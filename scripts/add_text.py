@@ -302,11 +302,7 @@ class AddTextBot(AutomaticTWSummaryBot, NoRedirectPageBot):
     """A bot which adds a text to a page."""
 
     summary_key = 'add_text-adding'
-
-    def __init__(self, **kwargs):
-        """Initializer."""
-        self.available_options.update(DEFAULT_ARGS)
-        super().__init__(**kwargs)
+    update_options = DEFAULT_ARGS
 
     @property
     def summary_parameters(self):

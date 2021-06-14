@@ -226,12 +226,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """Commons categorisation bot."""
 
-    def __init__(self, **kwargs):
-        """Initializer."""
-        self.available_options.update({
-            'summary': None,
-        })
-        super().__init__(**kwargs)
+    update_options = {'summary': None}
 
     def skip_page(self, page):
         """Skip category redirects or disambigs."""

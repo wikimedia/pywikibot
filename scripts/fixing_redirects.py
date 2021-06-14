@@ -58,14 +58,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     ignore_save_related_errors = True
     ignore_server_errors = True
     summary_key = 'fixing_redirects-fixing'
-
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        self.available_options.update({
-            'overwrite': False,
-        })
-
-        super().__init__(**kwargs)
+    update_options = {'overwrite': False}
 
     def replace_links(self, text, linkedPage, targetPage):
         """Replace all source links by target."""

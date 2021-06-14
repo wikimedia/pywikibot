@@ -87,25 +87,12 @@ class BasicBot(
 
     summary_key = 'basic-changing'
 
-    def __init__(self, **kwargs) -> None:
-        """
-        Initializer.
-
-        :keyword generator: the page generator that determines on which pages
-            to work. BasicBot assigns it to self.generator attribute.
-        :type generator: generator
-        """
-        # Add your own options to the bot and set their defaults
-        # -always option is predefined by BaseBot class
-        self.available_options.update({
-            'replace': False,  # delete old text and write the new text
-            'summary': None,  # your own bot summary
-            'text': 'Test',  # add this text from option. 'Test' is default
-            'top': False,  # append text on top of the page
-        })
-
-        # call initializer of the super class
-        super().__init__(**kwargs)
+    update_options = {
+        'replace': False,  # delete old text and write the new text
+        'summary': None,  # your own bot summary
+        'text': 'Test',  # add this text from option. 'Test' is default
+        'top': False,  # append text on top of the page
+    }
 
     def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""

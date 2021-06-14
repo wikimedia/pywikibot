@@ -66,15 +66,11 @@ class CosmeticChangesBot(AutomaticTWSummaryBot,
     """Cosmetic changes bot."""
 
     summary_key = 'cosmetic_changes-standalone'
-
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        self.available_options.update({
-            'async': False,
-            'summary': '',
-            'ignore': CANCEL.MATCH,
-        })
-        super().__init__(**kwargs)
+    update_options = {
+        'async': False,
+        'summary': '',
+        'ignore': CANCEL.MATCH,
+    }
 
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit."""

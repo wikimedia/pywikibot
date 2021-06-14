@@ -1192,6 +1192,9 @@ class BaseBot(OptionHandler):
         'always': False,  # By default ask for confirmation when putting a page
     }
 
+    # update_options can be used to update available_options
+    update_options = {}
+
     _current_page = None
 
     def __init__(self, **kwargs):
@@ -1207,6 +1210,7 @@ class BaseBot(OptionHandler):
             else:
                 self.generator = kwargs.pop('generator')
 
+        self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
         self._treat_counter = 0

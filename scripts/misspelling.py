@@ -54,13 +54,7 @@ class MisspellingRobot(BaseDisambigBot):
 
     # Optional: if there is a category, one can use the -start parameter
     misspelling_categories = ('Q8644265', 'Q9195708')
-
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        self.available_options.update({
-            'start': None,
-        })
-        super().__init__(**kwargs)
+    update_options = {'start': None}
 
     @property
     def generator(self) -> Generator[pywikibot.Page, None, None]:
