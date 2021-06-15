@@ -67,11 +67,6 @@ PYTHON_VERSION = sys.version_info[:3]
 _logger = 'tools'
 
 
-class _NotImplementedWarning(RuntimeWarning):
-
-    """Feature that is no longer implemented."""
-
-
 def is_ip_address(value: str) -> bool:
     """Check if a value is a valid IPv4 or IPv6 address.
 
@@ -1338,8 +1333,7 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
 # deprecated parts ############################################################
 
 
-@deprecated('bot_choice.Option and its subclasses', since='20181217',
-            future_warning=True)
+@deprecated('bot_choice.Option and its subclasses', since='20181217')
 def concat_options(message, line_length, options):
     """DEPRECATED. Concatenate options."""
     indent = len(message) + 2

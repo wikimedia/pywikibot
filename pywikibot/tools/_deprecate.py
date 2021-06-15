@@ -14,6 +14,8 @@ The follow deprecators may support both syntax, e.g. @deprecated and
 args[0] to see if it callable. Therefore, a decorator must not accept
 only one arg, and that arg be a callable, as it will be detected as
 a deprecator without any arguments.
+
+*Changed in version 6.4:* deprecation decorators moved to _deprecate module
 """
 #
 # (C) Pywikibot team, 2008-2021

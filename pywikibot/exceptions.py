@@ -144,7 +144,6 @@ fully deprecated, possibly because a replacement is not available
 RuntimeWarning: problems developers should have fixed, and users need to
 be aware of its status.
 
-  - tools._NotImplementedWarning: do not use
   - NotImplementedWarning: functionality not implemented
 
 UserWarning: warnings targeted at users
@@ -165,11 +164,8 @@ import re
 import sys
 from typing import Optional, Union
 
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    _NotImplementedWarning,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
+from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
