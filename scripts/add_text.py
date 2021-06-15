@@ -63,7 +63,11 @@ import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Dict, Tuple
-from pywikibot.bot import AutomaticTWSummaryBot, NoRedirectPageBot
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+)
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.exceptions import (
     EditConflictError,
@@ -333,14 +337,13 @@ class AddTextBot(AutomaticTWSummaryBot, NoRedirectPageBot):
 
     def skip_page(self, page):
         """Skip if -exceptUrl matches or page does not exists."""
-        if not page.exists():
-            if not page.isTalkPage():
-                pywikibot.warning('Page {page} does not exist on {page.site}.'
-                                  .format(page=page))
-                return True
-        elif self.opt.regex_skip_url:
+        if not page.isTalkPage() and ExistingPageBot.skip_page(self, page):
+            return True
+
+        if page.exists() and self.opt.regex_skip_url:
             url = page.full_url()
             result = re.findall(self.opt.regex_skip_url, page.site.getUrl(url))
+
             if result:
                 pywikibot.warning(
                     'Regex (or word) used with -exceptUrl is in the page. '
