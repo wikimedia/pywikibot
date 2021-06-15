@@ -1353,20 +1353,22 @@ class GeneratorsMixin:
         if where not in where_types:
             raise Error("search: unrecognized 'where' value: {}".format(where))
         if where in ('title', 'titles'):
-            if self.has_extension('CirrusSearch'):
+            if where == 'titles':
+                issue_deprecation_warning("where='titles'", "where='title'",
+                                          since='20160224')
+                where = 'title'
+
+            if self.has_extension('CirrusSearch') and \
+               isinstance(self.family, pywikibot.family.WikimediaFamily):
                 # 'title' search was disabled, use intitle instead
                 searchstring = 'intitle:' + searchstring
                 issue_deprecation_warning(
                     "where='{}'".format(where),
                     "searchstring='{}'".format(searchstring),
                     since='20160224')
+
                 where = None  # default
-            else:
-                if where == 'titles':
-                    issue_deprecation_warning("where='titles'",
-                                              "where='title'",
-                                              since='20160224')
-                where = 'title'
+
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         srgen = self._generator(api.PageGenerator, type_arg='search',
