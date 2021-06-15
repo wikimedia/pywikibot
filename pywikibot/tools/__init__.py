@@ -45,6 +45,7 @@ from pywikibot.tools._deprecate import (  # noqa: F401
 
 from pywikibot.tools._unidata import _first_upper_exception
 
+pkg_Version = pkg_resources.packaging.version.Version  # noqa: N816
 
 try:
     import bz2
@@ -509,6 +510,38 @@ def normalize_username(username) -> Optional[str]:
         return None
     username = re.sub('[_ ]+', ' ', username).strip()
     return first_upper(username)
+
+
+class Version(pkg_Version):
+
+    """Version from pkg_resouce vendor package.
+
+    This Version provides propreties of vendor package 20.4 shipped with
+    setuptools 49.4.0.
+    """
+
+    def __init__(self, version):
+        """Add additional properties of not provided by base class."""
+        super().__init__(version)
+
+    def __getattr__(self, name):
+        """Provides propreties of vendor package 20.4."""
+        if name in ('epoch', 'release', 'pre', ):
+            return getattr(self._version, name)
+        if name in ('post', 'dev'):
+            attr = getattr(self._version, name)
+            return attr[1] if attr else None
+        if name == 'is_devrelease':
+            return self.dev is not None
+
+        parts = ('major', 'minor', 'micro')
+        try:
+            index = parts.index(name)
+        except ValueError:
+            raise AttributeError('{!r} object has to attribute {!r}'
+                                 .format(type(self).__name__, name)) from None
+        release = self.release
+        return release[index] if len(release) >= index + 1 else 0
 
 
 @total_ordering
