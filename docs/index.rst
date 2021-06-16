@@ -51,6 +51,7 @@ For bot users:
    installation
    utilities/index
    scripts/index
+   global_options
    getting_help
 
 

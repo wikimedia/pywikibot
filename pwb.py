@@ -9,8 +9,8 @@ Run scripts with pywikibot in directory mode using::
 This wrapper script uses the package directory to store all user files,
 will fix up search paths so the package does not need to be installed, etc.
 
-Currently `<pwb options>` are global options. This can be used for tests
-to set the default site (see T216825)::
+Currently `<pwb options>` are :ref:`global options`. This can be used
+for tests to set the default site (see T216825)::
 
     python pwb.py -lang:de bot_tests -v
 """
