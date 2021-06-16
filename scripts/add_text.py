@@ -63,7 +63,11 @@ import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.backports import Dict, Tuple
-from pywikibot.bot import AutomaticTWSummaryBot, NoRedirectPageBot
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+)
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.exceptions import (
     EditConflictError,
@@ -297,7 +301,7 @@ def add_text(page: pywikibot.page.BasePage, addText: str,
         error_count += 1
 
 
-class AddTextBot(AutomaticTWSummaryBot, NoRedirectPageBot):
+class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
 
     """A bot which adds a text to a page."""
 
@@ -329,25 +333,21 @@ class AddTextBot(AutomaticTWSummaryBot, NoRedirectPageBot):
 
     def skip_page(self, page):
         """Skip if -exceptUrl matches or page does not exists."""
-        if not page.exists():
-            if not page.isTalkPage():
-                pywikibot.warning('Page {page} does not exist on {page.site}.'
-                                  .format(page=page))
-                return True
-        elif self.opt.regex_skip_url:
+        if page.exists() and self.opt.regex_skip_url:
             url = page.full_url()
             result = re.findall(self.opt.regex_skip_url, page.site.getUrl(url))
+
             if result:
                 pywikibot.warning(
-                    'Regex (or word) used with -exceptUrl is in the page. '
-                    'Skipping {page}\nMatch was: {result}'
+                    'Skipping {page} because -excepturl matches {result}.'
                     .format(page=page, result=result))
                 return True
 
-        skipping = super().skip_page(page)
-        if not skipping and not page.exists():
+        if page.isTalkPage() and not page.exists():
             pywikibot.output("{} doesn't exist, creating it!".format(page))
-        return skipping
+            return False
+
+        return super().skip_page(page)
 
     def treat_page(self):
         """Add text to the page."""

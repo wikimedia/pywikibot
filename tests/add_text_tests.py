@@ -5,7 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-from unittest.mock import ANY, Mock, mock_open, patch
+from unittest.mock import ANY, MagicMock, Mock, mock_open, patch
 
 import pywikibot
 import pywikibot.pagegenerators
@@ -13,6 +13,21 @@ import pywikibot.pagegenerators
 from scripts.add_text import AddTextBot, main, parse
 
 from tests.aspects import TestCase
+
+
+def _mock_page(exists=True, redirect=False, talk=False, url='wikipedia.org'):
+    """Provides a page with these attributes."""
+    page = MagicMock()
+
+    page.exists.return_value = exists
+    page.isRedirectPage.return_value = redirect
+    page.isTalkPage.return_value = talk
+    page.site.getUrl.return_value = url
+
+    page.__str__.return_value = 'mock_page'
+    page.site.__str__.return_value = 'mock_site'
+
+    return page
 
 
 class TestAdding(TestCase):
@@ -27,6 +42,7 @@ class TestAdding(TestCase):
     def setUp(self):
         """Setup test."""
         super().setUp()
+        pywikibot.bot.ui.clear()
         self.generator_factory = pywikibot.pagegenerators.GeneratorFactory()
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
@@ -131,6 +147,58 @@ class TestAdding(TestCase):
         self.assertEqual('file data', bot.opt.text)
 
         mock_file.assert_called_with('/path/to/my/file.txt', 'rb', ANY)
+
+    def test_not_skipped(self):
+        """Exercise skip_page() with a page we should accept."""
+        bot = AddTextBot()
+        page = _mock_page()
+
+        self.assertFalse(bot.skip_page(page))
+        self.assertEqual([], pywikibot.bot.ui.pop_output())
+
+    def test_skip_missing_standard(self):
+        """Exercise skip_page() with a non-talk page that doesn't exist."""
+        bot = AddTextBot()
+        page = _mock_page(exists=False)
+
+        self.assertTrue(bot.skip_page(page))
+        self.assertEqual([
+            'Page mock_page does not exist on mock_site.'
+        ], pywikibot.bot.ui.pop_output())
+
+    def test_skip_missing_talk(self):
+        """Exercise skip_page() with a talk page that doesn't exist."""
+        bot = AddTextBot()
+        page = _mock_page(exists=False, talk=True)
+
+        self.assertFalse(bot.skip_page(page))
+        self.assertEqual([
+            "mock_page doesn't exist, creating it!"
+        ], pywikibot.bot.ui.pop_output())
+
+    def test_skip_if_redirect(self):
+        """Exercise skip_page() with a page that is a redirect."""
+        bot = AddTextBot()
+        page = _mock_page(redirect=True)
+
+        self.assertTrue(bot.skip_page(page))
+        self.assertEqual([
+            'Page mock_page on mock_site is skipped because it is a redirect'
+        ], pywikibot.bot.ui.pop_output())
+
+    def test_skip_if_url_match(self):
+        """Exercise skip_page() with a '-excepturl' argument."""
+        bot = AddTextBot(regex_skip_url='.*\\.com')
+
+        page = _mock_page(url='wikipedia.org')
+        self.assertFalse(bot.skip_page(page))
+        self.assertEqual([], pywikibot.bot.ui.pop_output())
+
+        page = _mock_page(url='wikipedia.com')
+        self.assertTrue(bot.skip_page(page))
+        self.assertEqual([
+            "Skipping mock_page because -excepturl matches ['wikipedia.com']."
+        ], pywikibot.bot.ui.pop_output())
 
 
 if __name__ == '__main__':  # pragma: no cover
