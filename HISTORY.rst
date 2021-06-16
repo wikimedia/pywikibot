@@ -88,7 +88,7 @@ Dependencies
 Code cleanups
 ~~~~~~~~~~~~~
 
-* APISite.resolvemagicwords(), BaseSite.ns_index() and  remove BaseSite.getNamespaceIndex() were removed
+* APISite.resolvemagicwords(), BaseSite.ns_index() and remove BaseSite.getNamespaceIndex() were removed
 * Deprecated MoveEntry.new_ns() and new_title() methods were removed
 * Unused NoSuchSite and PageNotSaved exception were removed
 * Unused BadTitle exception was removed (T267768)
@@ -156,7 +156,7 @@ Other changes
 * Don't use mime parameter as boolean in api.Request (T274723)
 * textlib.removeDisabledPart is able to remove templates (T274138)
 * Create a SiteLink with __getitem__ method and implement lazy load (T273386, T245809, T238471, T226157)
-* Fix date.formats['MonthName'] behaviour  (T273573)
+* Fix date.formats['MonthName'] behaviour (T273573)
 * Implement pagegenerators.handle_args() to process all options at once
 * Add enabled_options, disabled_options to GeneratorFactory (T271320)
 * Move interwiki() interwiki_prefix() and local_interwiki() methods from BaseSite to APISite
