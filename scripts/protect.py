@@ -71,12 +71,10 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 
     """This bot allows protection of pages en masse."""
 
-    def __init__(self, generator, protections, **kwargs):
+    def __init__(self, protections, **kwargs):
         """
         Create a new ProtectionRobot.
 
-        :param generator: the page generator
-        :type generator: generator
         :param protections: protections as a dict with "type": "level"
         :type protections: dict
         :param kwargs: additional arguments directly feed to super().__init__()
@@ -86,7 +84,6 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
             'expiry': None,
         })
         super().__init__(**kwargs)
-        self.generator = generator
         self.protections = protections
 
     def treat_page(self):
@@ -234,7 +231,8 @@ def main(*args):
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
                 'Enter a reason for the protection change:')
-        bot = ProtectionRobot(generator, combined_protections, **options)
+        bot = ProtectionRobot(combined_protections, generator=generator,
+                              **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

@@ -45,12 +45,12 @@ class TouchBot(MultipleSitesBot):
 
     """Page touch bot."""
 
-    def __init__(self, generator, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         """Initialize a TouchBot instance with the options and generator."""
         self.available_options.update({
             'botflag': False,
         })
-        super().__init__(generator=generator, **kwargs)
+        super().__init__(**kwargs)
 
     def treat(self, page) -> None:
         """Touch the given page."""

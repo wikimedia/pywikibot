@@ -563,9 +563,9 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
-    def __init__(self, generator, HTTPignore=None, day=7, site=True):
+    def __init__(self, HTTPignore=None, day=7, **kwargs):
         """Initializer."""
-        super().__init__(generator=generator, site=site)
+        super().__init__(**kwargs)
 
         if config.report_dead_links_on_talk:
             pywikibot.log('Starting talk page thread')
@@ -683,7 +683,8 @@ def main(*args):
             pageNumber = max(240, config.max_external_links * 2)
             gen = pagegenerators.PreloadingGenerator(gen, groupsize=pageNumber)
         gen = pagegenerators.RedirectFilterPageGenerator(gen)
-        bot = WeblinkCheckerRobot(gen, HTTPignore, config.weblink_dead_days)
+        bot = WeblinkCheckerRobot(HTTPignore, config.weblink_dead_days,
+                                  generator=gen)
         try:
             bot.run()
         except ImportError:

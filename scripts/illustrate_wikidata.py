@@ -28,17 +28,13 @@ class IllustrateRobot(WikidataBot):
 
     """A bot to add Wikidata image claims."""
 
-    def __init__(self, generator, wdproperty='P18') -> None:
-        """
-        Initializer.
+    def __init__(self, wdproperty='P18', **kwargs) -> None:
+        """Initializer.
 
-        :param generator: A generator that yields Page objects
-        :type generator: generator
         :param wdproperty: The property to add. Should be of type commonsMedia
         :type wdproperty: str
         """
-        super().__init__()
-        self.generator = generator
+        super().__init__(**kwargs)
         self.wdproperty = wdproperty
         self.cacheSources()
 
@@ -109,7 +105,7 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = IllustrateRobot(generator, wdproperty)
+    bot = IllustrateRobot(wdproperty, generator=generator)
     bot.run()
 
 

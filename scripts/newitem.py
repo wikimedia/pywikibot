@@ -48,7 +48,7 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
 
     treat_missing_item = True
 
-    def __init__(self, generator, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         """Only accepts options defined in available_options."""
         self.available_options.update({
             'always': True,
@@ -59,7 +59,6 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         })
 
         super().__init__(**kwargs)
-        self.generator = generator
         self._skipping_templates = {}
 
     def setup(self) -> None:
@@ -215,7 +214,7 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = NewItemRobot(generator, **options)
+    bot = NewItemRobot(generator=generator, **options)
     if not bot.site.logged_in():
         bot.site.login()
     user = pywikibot.User(bot.site, bot.site.username())
