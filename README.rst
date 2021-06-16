@@ -101,11 +101,51 @@ A sample pywikibot script for getting data from Wikibase:
     item = pywikibot.ItemPage(repo, 'Q91')  # a repository item
     data = item.get()  # get all item data from repository for this item
 
+Script example
+--------------
+
+Pywikibot provides bot classes to develop your own script easily:
+
+::
+
+    import pywikibot
+    from pywikibot import pagegenerators
+    from pywikibot.bot import ExistingPageBot
+
+    class MyBot(ExistingPageBot):
+
+        update_options = {
+            'text': 'This is a test text',
+            'summary: 'Bot: a bot test edit with Pywikbot.'
+        }
+
+        def treat_page(self):
+            """Load the given page, do some changes, and save it."""
+            text = self.current_page.text
+            text += '\n' + self.opt.text
+            self.put_current(text, summary=self.opt.summary)
+
+    def main():
+        """Parse command line arguments and invoke bot."""
+        options = {}
+        gen_factory = pagegenerators.GeneratorFactory()
+        # Option parsing
+        local_args = pywikibot.handle_args(args)  # global options
+        local_args = gen_factory.handle_args(local_args)  # generators options
+        for arg in local_args:
+            opt, sep, value = arg.partition(':')
+            if opt in ('-summary', '-text'):
+                options[opt[1:]] = value
+        MyBot(generator=gen_factory.getCombinedGenerator(), **options).run()
+
+    if __name == '__main__':
+        main()
+
+
 -------------------------------------------------------------------------------------------
 
 For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
-.. include:: pywikibot/DIRECTORIES.rst
 
 Required external programs
 ---------------------------
