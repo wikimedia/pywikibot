@@ -16,13 +16,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
-        'hu', 'sd', 'th',
+        'bg', 'hu', 'sd', 'th', 'tr',
     ]
 
     languages_by_size = [
         'ru', 'sr', 'pt', 'fr', 'en', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
-        'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'li', 'fa', 'fi', 'ro', 'tr', 'ja',
-        'eo', 'sq', 'no', 'ko', 'bg', 'bs', 'he',
+        'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'li', 'fa', 'fi', 'ro', 'ja', 'eo',
+        'sq', 'no', 'ko', 'bs', 'he',
     ]
 
     category_redirect_templates = {
