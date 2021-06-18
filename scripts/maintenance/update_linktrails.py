@@ -57,7 +57,7 @@ def update_sites(fam):
             'Site wikipedia:[{}]+ instantiated using different code'
             .format(CODE_CHARACTERS),
             category=UserWarning,
-                filename=r'.+pywikibot.tools.__init__\.py'):
+                filename=r'.+pywikibot.tools._deprecate\.py'):
             site = pywikibot.Site(code, 'wikipedia')
 
         if isinstance(site, pywikibot.site.RemovedSite):
