@@ -882,7 +882,7 @@ class GeneratorFactory:
                 'pywikibot-enter-page-processing',
                 fallback_prompt='Which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return InterwikiPageGenerator(page)
+        return LanguageLinksPageGenerator(page)
 
     def _handle_randomredirect(self, value):
         """Handle `-randomredirect` argument."""
