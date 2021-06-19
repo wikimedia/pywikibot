@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Script to determine the Pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,16 +13,33 @@ import pywikibot
 from pywikibot.version import get_toolforge_hostname, getversion
 
 
+class DummyModule:
+
+    """Fake requests instance."""
+
+    __version__ = 'n/a'
+
+
+try:
+    import setuptools
+except ImportError:
+    setuptools = DummyModule()
+
+try:
+    import mwparserfromhell
+except ImportError:
+    mwparserfromhell = DummyModule()
+
+try:
+    import wikitextparser
+except ImportError:
+    wikitextparser = DummyModule()
+
 try:
     import requests
 except ImportError:
-    class DummyRequests:
+    requests = DummyModule()
 
-        """Fake requests instance."""
-
-        __version__ = 'n/a'
-
-    requests = DummyRequests()
 
 WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
@@ -31,6 +48,10 @@ def main(*args) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: ' + getversion())
     pywikibot.output('Release version: ' + pywikibot.__version__)
+    pywikibot.output('setuptools version: ' + setuptools.__version__)
+    pywikibot.output('mwparserfromhell version: '
+                     + mwparserfromhell.__version__)
+    pywikibot.output('wikitextparser version: ' + wikitextparser.__version__)
     pywikibot.output('requests version: ' + requests.__version__)
 
     has_wikimedia_cert = False
