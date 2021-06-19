@@ -3,15 +3,6 @@ Pywikibot Documentation
 
 Welcome! This is the documentation for Pywikibot |release|.
 
-.. note::
-
-    This documentation is incomplete, and needs quite some work.
-
-    If you are not familiar with Pywikibot, please start at the
-    documentation:
-
-    `Manual:Pywikibot on mediawiki.org <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
-
 **Pywikibot** is a Python library and collection of tools that automate work
 on `MediaWiki <https://mediawiki.org>`_ sites. Originally designed for 
 Wikipedia, it is now used throughout the Wikimedia Foundation's projects and
@@ -41,6 +32,9 @@ The documentation consists of four major parts:
 #. :doc:`scripts/index`
 #. :doc:`library_usage`
 #. :doc:`api_ref/index`
+
+See also: `Pywikibot Manual`_ at https://www.mediawiki.org
+
 
 For bot users:
 --------------
@@ -87,3 +81,4 @@ Miscellaneous
 
 
 .. _CC-BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/
+.. _Pywikibot Manual: https://www.mediawiki.org/wiki/Manual:Pywikibot
