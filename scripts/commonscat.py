@@ -43,7 +43,7 @@ import re
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import add_text
 
@@ -222,7 +222,7 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
+class CommonscatBot(ExistingPageBot, NoRedirectPageBot):
 
     """Commons categorisation bot."""
 
@@ -320,7 +320,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                     text_to_add = '{{%s|%s}}' % (primaryCommonscat,
                                                  commonscatLink)
                 summary = self.opt.summary or i18n.twtranslate(
-                    self.site, 'add_text-adding', {'adding': text_to_add})
+                    page.site, 'add_text-adding', {'adding': text_to_add})
                 self.put_current(add_text(page.text, text_to_add),
                                  summary=summary)
 
@@ -446,7 +446,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             return ''
 
         pywikibot.log('getCommonscat: ' + name)
-        commonsSite = self.site.image_repository()
+        commonsSite = self.current_page.site.image_repository()
         commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
 
         try:  # parse title (T26742)
