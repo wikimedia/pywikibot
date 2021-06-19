@@ -136,6 +136,14 @@ class HarvestRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
+    update_options = {
+        'always': True,
+        'create': False,
+        'exists': '',
+        'islink': False,
+        'multi': False,
+    }
+
     def __init__(self, template_title, fields, **kwargs) -> None:
         """Initializer.
 
@@ -154,13 +162,6 @@ class HarvestRobot(WikidataBot):
             single parameter
         :type multi: bool
         """
-        self.available_options.update({
-            'always': True,
-            'create': False,
-            'exists': '',
-            'islink': False,
-            'multi': False,
-        })
         super().__init__(**kwargs)
         # TODO: Make it a list including the redirects to the template
         self.fields = {}

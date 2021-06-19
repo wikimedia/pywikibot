@@ -377,15 +377,15 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
 
     """Redirect bot."""
 
+    update_options = {
+        'limit': float('inf'),
+        'delete': False,
+        'sdtemplate': '',
+    }
+
     def __init__(self, action, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'limit': float('inf'),
-            'delete': False,
-            'sdtemplate': None,
-        })
         super().__init__(**kwargs)
-
         # connect the action treat to treat_page method called by treat
         if action == 'double':
             self.treat_page = self.fix_1_double_redirect

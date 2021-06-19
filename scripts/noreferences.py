@@ -516,12 +516,13 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """References section bot."""
 
+    update_options = {
+        'verbose': True,
+    }
+
     @remove_last_args(['gen'])
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'verbose': True,
-        })
         super().__init__(**kwargs)
 
         self.refR = _ref_regex

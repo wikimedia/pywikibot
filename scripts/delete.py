@@ -127,16 +127,17 @@ class DeletionRobot(CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
+    update_options = {
+        'undelete': False,
+        'isorphan': 0,
+        'orphansonly': [],
+    }
+
     def __init__(self, summary: str, **kwargs) -> None:
         """Initializer.
 
         :param summary: the reason for the (un)deletion
         """
-        self.available_options.update({
-            'undelete': False,
-            'isorphan': 0,
-            'orphansonly': [],
-        })
         super().__init__(**kwargs)
 
         self.summary = summary

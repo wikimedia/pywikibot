@@ -60,14 +60,11 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
 
     """A basic bot unlinking a given link from the current page."""
 
-    def __init__(self, **kwargs):
-        """Redirect all parameters and add namespace as an available option."""
-        self.available_options.update({
-            'namespaces': [],
-            # Which namespaces should be processed?
-            # default to [] which means all namespaces will be processed
-        })
-        super().__init__(**kwargs)
+    update_options = {
+        'namespaces': [],
+        # Which namespaces should be processed?
+        # default to [] which means all namespaces will be processed
+    }
 
     def _create_callback(self):
         """Create a new callback instance for replace_links."""

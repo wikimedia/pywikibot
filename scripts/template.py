@@ -123,6 +123,13 @@ class TemplateRobot(ReplaceBot):
 
     """This bot will replace, remove or subst all occurrences of a template."""
 
+    update_options = {
+        'addcat': None,
+        'remove': False,
+        'subst': False,
+        'summary': '',
+    }
+
     def __init__(self, generator, templates: dict, **kwargs) -> None:
         """
         Initializer.
@@ -133,13 +140,6 @@ class TemplateRobot(ReplaceBot):
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
         """
-        self.available_options.update({
-            'addcat': None,
-            'remove': False,
-            'subst': False,
-            'summary': None,
-        })
-
         SingleSiteBot.__init__(self, **kwargs)
 
         self.templates = templates

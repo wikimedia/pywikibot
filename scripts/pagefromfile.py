@@ -93,20 +93,19 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
     """
 
+    update_options = {
+        'force': False,
+        'append': None,
+        'summary': '',
+        'minor': False,
+        'autosummary': False,
+        'nocontent': '',
+        'redirect': True,
+        'showdiff': False,
+    }
+
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'always': True,
-            'force': False,
-            'append': None,
-            'summary': None,
-            'minor': False,
-            'autosummary': False,
-            'nocontent': '',
-            'redirect': True,
-            'showdiff': False,
-        })
-
         super().__init__(**kwargs)
         self.available_options.update(
             {'always': not self.opt.showdiff})

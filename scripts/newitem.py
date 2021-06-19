@@ -47,17 +47,16 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     """A bot to create new items."""
 
     treat_missing_item = True
+    update_options = {
+        'always': True,
+        'lastedit': 7,
+        'pageage': 21,
+        'touch': 'newly',  # Can be False, newly (pages linked to newly
+                           # created items) or True (touch all pages)
+    }
 
     def __init__(self, **kwargs) -> None:
         """Only accepts options defined in available_options."""
-        self.available_options.update({
-            'always': True,
-            'lastedit': 7,
-            'pageage': 21,
-            'touch': 'newly',  # Can be False, newly (pages linked to newly
-                               # created items) or True (touch all pages)
-        })
-
         super().__init__(**kwargs)
         self._skipping_templates = {}
 

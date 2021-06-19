@@ -138,6 +138,14 @@ class ImageTransferBot(SingleSiteBot):
 
     """Image transfer bot."""
 
+    update_options = {
+        'ignore_warning': False,  # not implemented yet
+        'interwiki': False,
+        'keepname': False,
+        'target': None,
+        'force_if_shared': False,
+    }
+
     def __init__(self, **kwargs):
         """Initializer.
 
@@ -155,14 +163,6 @@ class ImageTransferBot(SingleSiteBot):
             wiki)
         :type force_if_shared: boolean
         """
-        self.available_options.update({
-            'ignore_warning': False,  # not implemented yet
-            'interwiki': False,
-            'keepname': False,
-            'target': None,
-            'force_if_shared': False,
-        })
-
         super().__init__(**kwargs)
         if self.opt.target is None:
             self.opt.target = self.site.image_repository()

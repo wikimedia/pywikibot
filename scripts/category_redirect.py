@@ -50,12 +50,13 @@ class CategoryRedirectBot(SingleSiteBot):
 
     """Page category update bot."""
 
+    update_options = {
+        'tiny': False,  # use Non-empty category redirects only
+        'delay': 7,  # cool down delay in days
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'tiny': False,  # use Non-empty category redirects only
-            'delay': 7,  # cool down delay in days
-        })
         super().__init__(**kwargs)
         self.catprefix = self.site.namespace(14) + ':'
         self.log_text = []

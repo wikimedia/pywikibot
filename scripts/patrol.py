@@ -74,6 +74,12 @@ class PatrolBot(BaseBot):
 
     """Bot marks the edits as patrolled based on info obtained by whitelist."""
 
+    update_options = {
+        'ask': False,
+        'whitelist': None,
+        'versionchecktime': 300,
+        'autopatroluserns': False,
+    }
     # Localised name of the whitelist page
     whitelist_subpage_name = {
         'en': 'patrol_whitelist',
@@ -88,12 +94,6 @@ class PatrolBot(BaseBot):
         :keyword autopatroluserns: Takes user consent to automatically patrol
         :keyword versionchecktime: Check versionchecktime lapse in sec
         """
-        self.available_options.update({
-            'ask': False,
-            'whitelist': None,
-            'versionchecktime': 300,
-            'autopatroluserns': False
-        })
         super().__init__(**kwargs)
         self.site = site or pywikibot.Site()
         self.recent_gen = True

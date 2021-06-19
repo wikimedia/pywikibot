@@ -52,17 +52,17 @@ class MovePagesBot(CurrentPageBot):
 
     """Page move bot."""
 
+    update_options = {
+        'prefix': '',
+        'noredirect': False,
+        'movetalkpage': True,
+        'skipredirects': False,
+        'summary': '',
+    }
+
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'prefix': None,
-            'noredirect': False,
-            'movetalkpage': True,
-            'skipredirects': False,
-            'summary': None,
-        })
         super().__init__(**kwargs)
-
         self.appendAll = False
         self.regexAll = False
         self.noNamespace = False

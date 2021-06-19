@@ -71,6 +71,11 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 
     """This bot allows protection of pages en masse."""
 
+    update_options = {
+        'summary': '',
+        'expiry': '',
+    }
+
     def __init__(self, protections, **kwargs):
         """
         Create a new ProtectionRobot.
@@ -79,10 +84,6 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
         :type protections: dict
         :param kwargs: additional arguments directly feed to super().__init__()
         """
-        self.available_options.update({
-            'summary': None,
-            'expiry': None,
-        })
         super().__init__(**kwargs)
         self.protections = protections
 

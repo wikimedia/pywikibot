@@ -36,15 +36,14 @@ class ChangeLangBot(SingleSiteBot):
 
     """Change page language bot."""
 
+    update_options = {
+        'never': False,
+        'setlang': '',
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'always': False,
-            'never': False,
-            'setlang': ''
-        })
         super().__init__(**kwargs)
-
         assert not (self.opt.always and self.opt.never), \
             'Either "always" or "never" must be set but not both'
 

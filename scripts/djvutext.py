@@ -51,6 +51,11 @@ class DjVuTextBot(SingleSiteBot):
     Works only on sites with Proofread Page extension installed.
     """
 
+    update_options = {
+        'force': False,
+        'summary': '',
+    }
+
     def __init__(self, djvu, index, pages: Optional[tuple] = None, **kwargs):
         """
         Initializer.
@@ -61,10 +66,6 @@ class DjVuTextBot(SingleSiteBot):
         :type index: Page object
         :param pages: page interval to upload (start, end)
         """
-        self.available_options.update({
-            'force': False,
-            'summary': None
-        })
         super().__init__(site=index.site, **kwargs)
         self._djvu = djvu
         self._index = index

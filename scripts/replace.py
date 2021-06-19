@@ -522,16 +522,17 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         about the missing site
     """
 
+    update_options = {
+        'addcat': None,
+        'allowoverlap': False,
+        'recursive': False,
+        'sleep': 0.0,
+        'summary': '',
+    }
+
     @deprecated_args(acceptall='always', addedCat='addcat')
     def __init__(self, generator, replacements, exceptions=None, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'addcat': None,
-            'allowoverlap': False,
-            'recursive': False,
-            'sleep': 0.0,
-            'summary': None,
-        })
         super().__init__(generator=generator, **kwargs)
 
         for i, replacement in enumerate(replacements):
