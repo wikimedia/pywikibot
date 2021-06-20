@@ -593,7 +593,7 @@ class GeneratorFactory:
                     '"-intersect" ignored as only one generator is specified.')
         elif self.intersect:
             # By definition no duplicates are possible.
-            dupfiltergen = intersect_generators(self.gens)
+            dupfiltergen = intersect_generators(*self.gens)
         else:
             dupfiltergen = _filter_unique_pages(itertools.chain(*self.gens))
 

@@ -49,7 +49,7 @@ class GeneratorIntersectTestCase(TestCase):
         # first otherwise the generator is empty the second time.
         datasets = [list(gen) for gen in gens]
         set_result = set(datasets[0]).intersection(*datasets[1:])
-        result = list(intersect_generators(datasets))
+        result = list(intersect_generators(*datasets))
 
         self.assertCountEqual(set(result), result)
         self.assertCountEqual(result, set_result)
@@ -63,7 +63,7 @@ class GeneratorIntersectTestCase(TestCase):
         for dataset in datasets[1:]:
             counter_result = counter_result & Counter(dataset)
         counter_result = list(counter_result.elements())
-        result = list(intersect_generators(datasets, allow_duplicates=True))
+        result = list(intersect_generators(*datasets, allow_duplicates=True))
         self.assertCountEqual(counter_result, result)
 
 
