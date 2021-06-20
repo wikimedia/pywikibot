@@ -110,8 +110,10 @@ dependencies = [
     'requests>=2.20.1,<2.26.0;python_version<"3.6"',
     'requests>=2.20.1;python_version>="3.6"',
     # PEP 440
-    'setuptools>=49.4.0, !=50.0.0, <50.2.0 ; python_version < "3.6"',
-    'setuptools>=49.4.0 ; python_version >= "3.6"',
+    'setuptools>=48.0.0 ; python_version >= "3.10"',
+    'setuptools>=38.5.2 ; python_version >= "3.7"',
+    'setuptools>=20.8.1 ; python_version >= "3.6"',
+    'setuptools>=20.8.1, !=50.0.0, <50.2.0 ; python_version < "3.6"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
 
