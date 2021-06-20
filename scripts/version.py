@@ -15,7 +15,7 @@ from pywikibot.version import get_toolforge_hostname, getversion
 
 class DummyModule:
 
-    """Fake requests instance."""
+    """Fake module instance."""
 
     __version__ = 'n/a'
 
