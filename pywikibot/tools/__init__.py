@@ -1029,9 +1029,11 @@ def roundrobin_generators(*iterables):
     :return: the combined generator of iterables
     :rtype: generator
     """
+    sentinel = object()
     return (item
-            for item in itertools.chain.from_iterable(zip_longest(*iterables))
-            if item is not None)
+            for item in itertools.chain.from_iterable(
+                zip_longest(*iterables, fillvalue=sentinel))
+            if item is not sentinel)
 
 
 def filter_unique(iterable, container=None, key=None, add=None):
