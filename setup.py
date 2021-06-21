@@ -63,8 +63,8 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'wikitextparser': ['wikitextparser>=0.47.5;python_version<"3.6"',
-                       'wikitextparser>=0.47.0'],
+    'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
+                       'wikitextparser>=0.47.0; python_version >= "3.6"'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
@@ -78,8 +78,8 @@ extra_deps = {
         'flake8-bugbear!=21.4.1',
         'flake8-coding',
         'flake8-colors>=0.1.9',
-        'flake8-comprehensions>=3.1.4;python_version>="3.8"',
-        'flake8-comprehensions>=2.2.0',
+        'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
+        'flake8-comprehensions>=2.2.0; python_version < "3.8"',
         'flake8-docstrings>=1.3.1',
         'flake8-future-import',
         'flake8-mock>=0.3',
@@ -111,8 +111,8 @@ dependencies = [
     'requests>=2.20.1;python_version>="3.6"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=38.5.2 ; python_version >= "3.7"',
-    'setuptools>=20.8.1 ; python_version >= "3.6"',
+    'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
+    'setuptools>=20.8.1 ; python_version >= "3.6" and python_version < "3.7"',
     'setuptools>=20.8.1, !=50.0.0, <50.2.0 ; python_version < "3.6"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
