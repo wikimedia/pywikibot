@@ -939,6 +939,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     there is no more chance of finding an item in all queues.
 
     Sample:
+
     >>> iterables = 'mississippi', 'missouri'
     >>> list(intersect_generators(*iterables))
     ['m', 'i', 's']
@@ -1046,6 +1047,7 @@ def roundrobin_generators(*iterables):
     """Yield simultaneous from each iterable.
 
     Sample:
+
     >>> tuple(roundrobin_generators('ABC', range(5)))
     ('A', 0, 'B', 1, 'C', 2, 3, 4)
 
