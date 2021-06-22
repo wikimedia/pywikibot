@@ -926,11 +926,10 @@ class ThreadList(list):
                   .format(thd, thd.queue.qsize()), self._logger)
 
 
-def intersect_generators(genlist, allow_duplicates=False):
-    """
-    Intersect generators listed in genlist.
+def intersect_generators(*iterables, allow_duplicates: bool = False):
+    """Intersect generators listed in iterables.
 
-    Yield items only if they are yielded by all generators in genlist.
+    Yield items only if they are yielded by all generators of iterables.
     Threads (via ThreadedGenerator) are used in order to run generators
     in parallel, so that items can be yielded before generators are
     exhausted.
@@ -939,13 +938,42 @@ def intersect_generators(genlist, allow_duplicates=False):
     Quitting before all generators are finished is attempted if
     there is no more chance of finding an item in all queues.
 
-    :param genlist: list of page generators
-    :type genlist: list
-    :param allow_duplicates: allow duplicates if present in all generators
-    :type allow_duplicates: bool
+    Sample:
+    >>> iterables = 'mississippi', 'missouri'
+    >>> list(intersect_generators(*iterables))
+    ['m', 'i', 's']
+    >>> list(intersect_generators(*iterables, allow_duplicates=True))
+    ['m', 'i', 's', 's', 'i']
+
+    :param iterables: page generators
+    :param allow_duplicates: optional keyword argument to allow duplicates
+        if present in all generators
     """
+    # 'allow_duplicates' must be given as keyword argument
+    if iterables and iterables[-1] in (True, False):
+        allow_duplicates = iterables[-1]
+        iterables = iterables[:-1]
+        issue_deprecation_warning("'allow_duplicates' as positional argument",
+                                  'keyword argument "allow_duplicates={}"'
+                                  .format(allow_duplicates),
+                                  since='6.4.0')
+
+    # iterables must not be given as tuple or list
+    if len(iterables) == 1 and isinstance(iterables[0], (list, tuple)):
+        iterables = iterables[0]
+        issue_deprecation_warning("'iterables' as list type",
+                                  "consecutive iterables or use '*' to unpack",
+                                  since='6.4.0')
+
+    if not iterables:
+        return
+
+    if len(iterables) == 1:
+        yield from iterables[0]
+        return
+
     # If any generator is empty, no pages are going to be returned
-    for source in genlist:
+    for source in iterables:
         if not source:
             debug('At least one generator ({!r}) is empty and execution was '
                   'skipped immediately.'.format(source), 'intersect')
@@ -953,20 +981,19 @@ def intersect_generators(genlist, allow_duplicates=False):
 
     # Item is cached to check that it is found n_gen
     # times before being yielded.
-    from collections import Counter
-    cache = collections.defaultdict(Counter)
-    n_gen = len(genlist)
+    cache = collections.defaultdict(collections.Counter)
+    n_gen = len(iterables)
 
     # Class to keep track of alive threads.
     # Start new threads and remove completed threads.
     thrlist = ThreadList()
 
-    for source in genlist:
+    for source in iterables:
         threaded_gen = ThreadedGenerator(name=repr(source), target=source)
         threaded_gen.daemon = True
         thrlist.append(threaded_gen)
 
-    ones = Counter(thrlist)
+    ones = collections.Counter(thrlist)
     seen = {}
 
     while True:
