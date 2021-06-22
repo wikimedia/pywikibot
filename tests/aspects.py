@@ -62,6 +62,7 @@ except ImportError:
         return f
 
 OSWIN32 = (sys.platform == 'win32')
+pywikibot.bot.set_interface('buffer')
 
 
 class TestCaseBase(unittest.TestCase):

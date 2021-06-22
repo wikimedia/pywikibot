@@ -472,7 +472,7 @@ transliteration_target = None
 # https://docs.python.org/3/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
-# currently terminal is the only userinterface supported
+# currently terminal and buffer are the only supported userinterfaces
 userinterface = 'terminal'
 
 # this can be used to pass variables to the UI init function

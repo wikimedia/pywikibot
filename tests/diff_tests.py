@@ -218,7 +218,7 @@ class TestCherryPick(TestCase):
             mock.assert_any_call(self.header_base.format(header))
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+    @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
     def test_accept(self, input, mock):
         """Check output of cherry_pick if changes accepted."""
@@ -227,7 +227,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+    @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='n')
     def test_reject(self, input, mock):
         """Check output of cherry_pick if changes rejected."""
@@ -237,7 +237,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.none_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+    @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
     def test_quit(self, input, mock):
         """Check output of cherry_pick if quit."""
@@ -247,7 +247,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.none_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+    @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
     def test_by_letter_accept(self, input, mock):
         """Check cherry_pick output.
@@ -260,7 +260,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_by_letter_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+    @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
     def test_by_letter_quit(self, input, mock):
         """Check cherry_pick output.
