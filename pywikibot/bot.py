@@ -1205,7 +1205,9 @@ class BaseBot(OptionHandler):
         'always': False,  # By default ask for confirmation when putting a page
     }
 
-    # update_options can be used to update available_options
+    # update_options can be used to update available_options;
+    # do not use it if the bot class is to be derived but use
+    # self.available_options.update(<dict>) initializer in such case
     update_options = {}
 
     _current_page = None

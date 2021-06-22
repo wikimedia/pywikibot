@@ -54,11 +54,6 @@ class ImageRobot(ReplaceBot):
 
     """This bot will replace or remove all occurrences of an old image."""
 
-    update_options = {
-        'summary': '',
-        'loose': False,
-    }
-
     def __init__(self, generator, old_image: str,
                  new_image: Optional[str] = None, **kwargs):
         """
@@ -70,6 +65,11 @@ class ImageRobot(ReplaceBot):
         :param new_image: the title of the new image (without namespace), or
                           None if you want to remove the image
         """
+        self.available_options.update({
+            'summary': None,
+            'loose': False,
+        })
+
         SingleSiteBot.__init__(self, generator=generator, **kwargs)
 
         self.old_image = old_image
