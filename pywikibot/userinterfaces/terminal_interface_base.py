@@ -415,7 +415,7 @@ class UI(ABUIC):
         if not force:
             line_template = '{{0: >{}}}: {{1}}'.format(len(str(len(answers))))
             for i, entry in enumerate(answers, start=1):
-                self.output(line_template.format(i, entry))
+                pywikibot.output(line_template.format(i, entry))
 
         while True:
             choice = self.input(question, default=default, force=force)
