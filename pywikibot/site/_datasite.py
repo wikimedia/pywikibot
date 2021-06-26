@@ -821,7 +821,7 @@ class DataSite(APISite):
         if isinstance(itemdef, str):
             itemdef = self.get_entity_for_entity_id(itemdef)
         elif isinstance(itemdef, pywikibot.Page):
-            itemdef = pywikibot.ItemPage.fromPage(lazy_load=True)
+            itemdef = pywikibot.ItemPage.fromPage(itemdef, lazy_load=True)
         elif not isinstance(itemdef, pywikibot.page.WikibaseEntity):
             raise TypeError('itemdef shall be str, WikibaseEntity or Page')
 
