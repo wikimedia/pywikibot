@@ -543,12 +543,12 @@ class AbuseFilterDisallowedError(PageSaveRelatedError):
     """Page save failed because the AbuseFilter disallowed it."""
 
     message = ('Edit to page %(title)s disallowed by the AbuseFilter.\n'
-               '%(info)s\n%(warning)s')
+               '%(info)s')
 
-    def __init__(self, page, info, warning):
+    def __init__(self, page, info, other):
         """Initializer."""
         self.info = info
-        self.warning = warning
+        self.other = other
         super().__init__(page)
 
 

@@ -1637,10 +1637,8 @@ class APISite(
                             'logged in'.format(err.code),
                             _logger)
                     if err.code == 'abusefilter-warning':
-                        pywikibot.warning('{info}\n{warning}\nRetrying.'
-                                          .format(info=err.info,
-                                                  warning=err.other['warning'],
-                                                  ))
+                        pywikibot.warning('{info}\nRetrying.'
+                                          .format(info=err.info))
                         continue
                     if err.code in self._ep_errors:
                         exception = self._ep_errors[err.code]
@@ -1655,7 +1653,7 @@ class APISite(
                         if issubclass(exception, AbuseFilterDisallowedError):
                             errdata = {
                                 'info': err.info,
-                                'warning': err.other['warning'],
+                                'other': err.other,
                             }
                             raise exception(page, **errdata) from None
                         if issubclass(exception, SpamblacklistError):
