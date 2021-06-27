@@ -289,6 +289,19 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(newstderr.getvalue(), self.input_choice_output * 2)
         self.assertEqual(returned, 'n')
 
+    def test_input_list_choice(self):
+        """Test input_list_choice function."""
+        options = ('answer 1', 'answer 2', 'answer 3')
+        rv = pywikibot.bot.input_list_choice('question', options, '2')
+
+        self.assertEqual(newstdout.getvalue(), '')
+        self.assertEqual(
+            newstderr.getvalue(),
+            ''.join('{}: {}\n'.format(num, items)
+                    for num, items in enumerate(options, start=1))
+            + 'question (default: 2): ')
+        self.assertEqual(rv, 'answer 2')
+
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
 class TestTerminalOutputColorUnix(UITestCase):
