@@ -237,7 +237,12 @@ def main(*args) -> None:
 
     if oldName:
         pywikibot.warning('-from:{} without -to:'.format(oldName))
+
     site = pywikibot.Site()
+
+    if not site.logged_in():
+        site.login()
+
     for pair in fromToPairs:
         page = pywikibot.Page(site, pair[0])
         bot = MovePagesBot(**options)
