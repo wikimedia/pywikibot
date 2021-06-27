@@ -26,10 +26,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
-        'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ko', 'ml', 'bn', 'sa',
+        'gu', 'mul', 'pt', 'sr', 'fa', 'hu', 'sv', 'ko', 'ml', 'sa', 'bn',
         'te', 'ta', 'sl', 'hy', 'el', 'tr', 'ro', 'fi', 'ja', 'vi', 'nap',
-        'az', 'la', 'ca', 'br', 'nl', 'kn', 'th', 'hr', 'no', 'eo', 'is',
-        'vec', 'pms', 'id', 'hi', 'be', 'lij', 'et', 'da', 'mk', 'yi', 'as',
+        'az', 'la', 'ca', 'br', 'nl', 'kn', 'hr', 'th', 'no', 'eo', 'is',
+        'vec', 'pms', 'id', 'hi', 'be', 'et', 'lij', 'da', 'mk', 'yi', 'as',
         'mr', 'bg', 'li', 'lt', 'wa', 'eu', 'or', 'pa', 'cy', 'gl', 'bs',
         'sah', 'sk', 'zh-min-nan', 'fo',
     ]
