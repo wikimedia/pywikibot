@@ -764,7 +764,7 @@ class ThreadedGenerator(threading.Thread):
         if not self.is_alive() and not self.finished.isSet():
             self.start()
         # if there is an item in the queue, yield it, otherwise wait
-        while not self.finished.isSet():
+        while not self.finished.is_set():
             try:
                 yield self.queue.get(True, 0.25)
             except queue.Empty:
@@ -786,7 +786,7 @@ class ThreadedGenerator(threading.Thread):
             self.__gen = self.generator(*self.args, **self.kwargs)
         for result in self.__gen:
             while True:
-                if self.finished.isSet():
+                if self.finished.is_set():
                     return
                 try:
                     self.queue.put_nowait(result)
@@ -795,7 +795,7 @@ class ThreadedGenerator(threading.Thread):
                     continue
                 break
         # wait for queue to be emptied, then kill the thread
-        while not self.finished.isSet() and not self.queue.empty():
+        while not self.finished.is_set() and not self.queue.empty():
             time.sleep(0.25)
         self.stop()
 
