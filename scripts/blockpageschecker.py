@@ -30,7 +30,7 @@ Furthermore, the following command line parameters are supported:
 -move            The bot will check if the page is blocked also for the move
                  option, not only for edit
 
-Examples:
+Examples::
 
     python pwb.py blockpageschecker -always
 

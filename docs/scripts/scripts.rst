@@ -8,7 +8,6 @@ Subpackages
 
 .. toctree::
 
-
     scripts.archive
     scripts.i18n
     scripts.maintenance
@@ -29,8 +28,8 @@ basic script
 
 .. automodule:: scripts.basic
 
-scripts.blockpageschecker script
---------------------------------
+blockpageschecker script
+------------------------
 
 .. automodule:: scripts.blockpageschecker
 

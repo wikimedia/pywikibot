@@ -16,5 +16,3 @@ Contents
    :glob:
 
    *
-
-

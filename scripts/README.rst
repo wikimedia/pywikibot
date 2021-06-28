@@ -24,6 +24,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | basic.py               | Is a template from which simple bots can be made.       |
     +------------------------+---------------------------------------------------------+
+    | blockpagechecker.py    | Deletes any protection templates that are on pages      |
+    |                        | which aren't actually protected.                        |
+    +------------------------+---------------------------------------------------------+
     | category.py            | Add a category link to all pages mentioned on a page,   |
     |                        | change or remove category tags.                         |
     +------------------------+---------------------------------------------------------+
@@ -155,9 +158,6 @@ The contents of the package
     | archive                | Scripts no longer maintained.                           |
     |                        | Please open a Phabricator task if you want to use one.  |
     +========================+=========================================================+
-    | blockpagechecker.py    | Deletes any protection templates that are on pages      |
-    |                        | which aren't actually protected.                        |
-    +------------------------+---------------------------------------------------------+
     | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
     +------------------------+---------------------------------------------------------+
     | casechecker.py         | Script to enumerate all pages in Wikipedia and          |
