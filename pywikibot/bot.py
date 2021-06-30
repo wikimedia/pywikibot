@@ -1991,16 +1991,15 @@ class WikidataBot(Bot, ExistingPageBot):
         :param property_name: property to find
         :type property_name: str
         """
-        ns = self.site.data_repository().property_namespace
-        for page in self.site.search(property_name, total=1, namespaces=ns):
-            page = pywikibot.PropertyPage(self.site.data_repository(),
-                                          page.title())
+        ns = self.repo.property_namespace
+        for page in self.repo.search(property_name, total=1, namespaces=ns):
+            page = pywikibot.PropertyPage(self.repo, page.title())
             pywikibot.output('Assuming that {} property is {}.'
                              .format(property_name, page.id))
             return page.id
         return pywikibot.input('Property {} was not found. Please enter the '
                                'property ID (e.g. P123) of it:'
-                               .format(property_name).upper())
+                               .format(property_name)).upper()
 
     def user_edit_entity(self, entity, data=None,
                          ignore_save_related_errors=None,
