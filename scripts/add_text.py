@@ -55,14 +55,19 @@ Example
 # Distributed under the terms of the MIT license.
 #
 import codecs
-import collections
 import re
 import sys
 from typing import Optional, Union
 
 import pywikibot
+
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Tuple
+from pywikibot.backports import Dict, Tuple
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+)
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.exceptions import (
     EditConflictError,
@@ -73,17 +78,18 @@ from pywikibot.exceptions import (
     ServerError,
     SpamblacklistError,
 )
+from pywikibot.tools import deprecated
 from pywikibot.tools.formatter import color_format
 
 DEFAULT_ARGS = {
-    'text': None,
-    'text_file': None,
-    'summary': None,
+    'text': '',
+    'textfile': '',
+    'summary': '',
     'up': False,
     'always': False,
     'talk_page': False,
     'reorder': True,
-    'regex_skip_url': None,
+    'regex_skip_url': '',
 }
 
 ARG_PROMPT = {
@@ -97,15 +103,17 @@ ARG_PROMPT = {
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
+@deprecated('Page.text, NoRedirectPageBot class and BaseBot.skip_page() '
+            '(see add_text.AddTextBot for example)', since='6.4.0')
 def get_text(page: pywikibot.page.BasePage, old: Optional[str],
              create: bool) -> str:
     """
     Get text on page. If old is not None, return old.
 
-    @param page: The page to get text from
-    @param old: If not None, return this rather than the page's text
-    @param create: Declare that the page will be created if it doesn't exist
-    @return: The page's text or the old parameter if not None
+    :param page: The page to get text from
+    :param old: If not None, return this rather than the page's text
+    :param create: Declare that the page will be created if it doesn't exist
+    :return: The page's text or the old parameter if not None
     """
     if old is not None:
         return old
@@ -125,17 +133,18 @@ def get_text(page: pywikibot.page.BasePage, old: Optional[str],
         return None
 
 
+@deprecated('BaseBot.userPut()', since='6.4.0')
 def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
              asynchronous: bool = False) -> Optional[bool]:
     """
     Save the new text.
 
-    @param page: The page to change the text of
-    @param new: The new text for the page
-    @param summary: Summary of the page change
-    @param count: Maximum number of attempts to reach the server
-    @param asynchronous: If True, saves the page asynchronously
-    @return: True if successful, False if unsuccessful, and None if
+    :param page: The page to change the text of
+    :param new: The new text for the page
+    :param summary: Summary of the page change
+    :param count: Maximum number of attempts to reach the server
+    :param asynchronous: If True, saves the page asynchronously
+    :return: True if successful, False if unsuccessful, and None if
         awaiting the server
     """
     page.text = new
@@ -164,6 +173,9 @@ def put_text(page: pywikibot.page.BasePage, new: str, summary: str, count: int,
     return False
 
 
+@deprecated('Page.text, textlib.add_text, NoRedirectPageBot class, '
+            'BaseBot.skip_page() and CurrentPage.put_current() '
+            '(see add_text.AddTextBot for example)', since='6.4.0')
 def add_text(page: pywikibot.page.BasePage, addText: str,
              summary: Optional[str] = None,
              regexSkip: Optional[str] = None,
@@ -175,21 +187,21 @@ def add_text(page: pywikibot.page.BasePage, addText: str,
     """
     Add text to a page.
 
-    @param page: The page to add text to
-    @param addText: Text to add
-    @param summary: Change summary, if None this uses the beginning of addText
-    @param regexSkip: Abort if the text on the page matches this
-    @param regexSkipUrl: Abort if the url matches this
-    @param always: Edit without user confirmation
-    @param up: Append text to the top of the page if True, otherwise the
+    :param page: The page to add text to
+    :param addText: Text to add
+    :param summary: Change summary, if None this uses the beginning of addText
+    :param regexSkip: Abort if the text on the page matches this
+    :param regexSkipUrl: Abort if the url matches this
+    :param always: Edit without user confirmation
+    :param up: Append text to the top of the page if True, otherwise the
         bottom
-    @param putText: Save changes to the page if True, otherwise return
+    :param putText: Save changes to the page if True, otherwise return
         (text, newtext, always)
-    @param oldTextGiven: If None fetch page text, else use this text
-    @param reorderEnabled: If True place text above categories and
+    :param oldTextGiven: If None fetch page text, else use this text
+    :param reorderEnabled: If True place text above categories and
         interwiki, else place at page bottom. No effect if up = False.
-    @param create: Create the page if it does not exist
-    @return: (success, success, always) if putText is True, otherwise
+    :param create: Create the page if it does not exist
+    :return: (success, success, always) if putText is True, otherwise
         (text, newtext, always)
     """
     site = page.site
@@ -289,53 +301,103 @@ def add_text(page: pywikibot.page.BasePage, addText: str,
         error_count += 1
 
 
+class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
+
+    """A bot which adds a text to a page."""
+
+    summary_key = 'add_text-adding'
+    update_options = DEFAULT_ARGS
+
+    @property
+    def summary_parameters(self):
+        """Return a dictionary of all parameters for i18n.
+
+        Line breaks are replaced by dash.
+        """
+        text = re.sub(r'\r?\n', ' - ', self.opt.text[:200])
+        return {'adding': text}
+
+    def setup(self):
+        """Read text to be added from file."""
+        if self.opt.textfile:
+            with codecs.open(self.opt.textfile, 'r',
+                             config.textfile_encoding) as f:
+                self.opt.text = f.read()
+        else:
+            # Translating the \\n into binary \n if given from command line
+            self.opt.text = self.opt.text.replace('\\n', '\n')
+
+        if self.opt.talk_page:
+            self.generator = pagegenerators.PageWithTalkPageGenerator(
+                self.generator, return_talk_only=True)
+
+    def skip_page(self, page):
+        """Skip if -exceptUrl matches or page does not exists."""
+        if page.exists() and self.opt.regex_skip_url:
+            url = page.full_url()
+            result = re.findall(self.opt.regex_skip_url, page.site.getUrl(url))
+
+            if result:
+                pywikibot.warning(
+                    'Skipping {page} because -excepturl matches {result}.'
+                    .format(page=page, result=result))
+                return True
+
+        if page.isTalkPage() and not page.exists():
+            pywikibot.output("{} doesn't exist, creating it!".format(page))
+            return False
+
+        return super().skip_page(page)
+
+    def treat_page(self):
+        """Add text to the page."""
+        text = self.current_page.text
+
+        if self.opt.up:
+            text = self.opt.text + '\n' + text
+        elif not self.opt.reorder:
+            text += '\n' + self.opt.text
+        else:
+            text = textlib.add_text(text, self.opt.text,
+                                    site=self.current_page.site)
+
+        self.put_current(text, summary=self.opt.summary)
+
+
 def main(*argv: Tuple[str, ...]) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
-    @param argv: Command line arguments
+    :param argv: Command line arguments
     """
     generator_factory = pagegenerators.GeneratorFactory()
 
     try:
-        args = parse(argv, generator_factory)
+        options = parse(argv, generator_factory)
     except ValueError as exc:
         pywikibot.bot.suggest_help(additional_text=str(exc))
         return
 
-    text = args.text
-
-    if args.text_file:
-        with codecs.open(args.text_file, 'r', config.textfile_encoding) as f:
-            text = f.read()
-
     generator = generator_factory.getCombinedGenerator()
-
     if pywikibot.bot.suggest_help(missing_generator=not generator):
         return
 
-    if args.talk_page:
-        generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
-
-    for page in generator:
-        add_text(page, text, args.summary,
-                 regexSkipUrl=args.regex_skip_url, always=args.always,
-                 up=args.up, reorderEnabled=args.reorder,
-                 create=args.talk_page)
+    bot = AddTextBot(generator=generator, **options)
+    bot.run()
 
 
 def parse(argv: Tuple[str, ...],
           generator_factory: pagegenerators.GeneratorFactory
-          ) -> collections.namedtuple:
+          ) -> Dict[str, str]:
     """
     Parses our arguments and provide a named tuple with their values.
 
-    @param argv: input arguments to be parsed
-    @param generator_factory: factory that will determine the page to edit
+    :param argv: input arguments to be parsed
+    :param generator_factory: factory that will determine the page to edit
 
-    @return: a namedtuple with our parsed arguments
+    :return: dictionary with our parsed arguments
 
     @raise: ValueError if we receive invalid arguments
     """
@@ -349,16 +411,10 @@ def parse(argv: Tuple[str, ...],
         if not value and option in ARG_PROMPT:
             value = pywikibot.input(ARG_PROMPT[option])
 
-        if option == '-text':
-            args['text'] = value
-        elif option == '-textfile':
-            args['text_file'] = value
-        elif option == '-summary':
-            args['summary'] = value
-        elif option == '-up':
-            args['up'] = True
-        elif option == '-always':
-            args['always'] = True
+        if option in ('-text', '-textfile', '-summary'):
+            args[option[1:]] = value
+        elif option in ('-up', '-always'):
+            args[option[1:]] = True
         elif option in ('-talk', '-talkpage'):
             args['talk_page'] = True
         elif option == '-noreorder':
@@ -368,14 +424,13 @@ def parse(argv: Tuple[str, ...],
         else:
             raise ValueError("Argument '{}' is unrecognized".format(option))
 
-    if not args['text'] and not args['text_file']:
+    if not args['text'] and not args['textfile']:
         raise ValueError("Either the '-text' or '-textfile' is required")
 
-    if args['text'] and args['text_file']:
+    if args['text'] and args['textfile']:
         raise ValueError("'-text' and '-textfile' cannot both be used")
 
-    Args = collections.namedtuple('Args', args.keys())
-    return Args(**args)
+    return args
 
 
 if __name__ == '__main__':

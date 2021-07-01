@@ -1281,8 +1281,8 @@ def addUncat(page):
     """
     Add the uncat template to the page.
 
-    @param page: Page to be modified
-    @type page: pywikibot.Page
+    :param page: Page to be modified
+    :type page: pywikibot.Page
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
@@ -1296,8 +1296,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     generator = None
 

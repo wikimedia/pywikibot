@@ -1,6 +1,18 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.3.0
+-----
+*31 May 2021*
+
+* Check bot/nobots templates for cosmetic_changes hook (T283989)
+* Remove outdated opt._option which is already dropped (T284005)
+* Use IntEnum with cosmetic_changes CANCEL
+* Remove lru_cahce from botMayEdit method and fix it's logic (T283957)
+* DataSite.createNewItemFromPage() method was removed in favour of ImagePage.fromPage() (T98663)
+* mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (T106763)
+
+
 6.2.0
 -----
 *28 May 2021*
@@ -76,14 +88,13 @@ Dependencies
 Code cleanups
 ~~~~~~~~~~~~~
 
-* APISite.resolvemagicwords(), BaseSite.ns_index() and  remove BaseSite.getNamespaceIndex() were removed
+* APISite.resolvemagicwords(), BaseSite.ns_index() and remove BaseSite.getNamespaceIndex() were removed
 * Deprecated MoveEntry.new_ns() and new_title() methods were removed
 * Unused NoSuchSite and PageNotSaved exception were removed
 * Unused BadTitle exception was removed (T267768)
 * getSite() function was removed in favour of Site() constructor
 * Page.fileUrl() was removed in favour of Page.get_file_url()
 * Deprecated getuserinfo and getglobaluserinfo Site methods were removed
-* compat2core.py script was archived
 
 
 6.0.1
@@ -145,7 +156,7 @@ Other changes
 * Don't use mime parameter as boolean in api.Request (T274723)
 * textlib.removeDisabledPart is able to remove templates (T274138)
 * Create a SiteLink with __getitem__ method and implement lazy load (T273386, T245809, T238471, T226157)
-* Fix date.formats['MonthName'] behaviour  (T273573)
+* Fix date.formats['MonthName'] behaviour (T273573)
 * Implement pagegenerators.handle_args() to process all options at once
 * Add enabled_options, disabled_options to GeneratorFactory (T271320)
 * Move interwiki() interwiki_prefix() and local_interwiki() methods from BaseSite to APISite

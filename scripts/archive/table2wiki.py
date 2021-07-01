@@ -84,9 +84,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """Bot to convert HTML tables to wiki syntax.
 
-    @param generator: the page generator that determines on which pages
+    :param generator: the page generator that determines on which pages
         to work
-    @type generator: generator
+    :type generator: generator
     """
 
     def __init__(self, **kwargs):
@@ -521,8 +521,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     gen = None

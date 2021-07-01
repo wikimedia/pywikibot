@@ -38,12 +38,12 @@ class BaseSite(ComparableMixin):
         """
         Initializer.
 
-        @param code: the site's language code
-        @type code: str
-        @param fam: wiki family name (optional)
-        @type fam: str or pywikibot.family.Family
-        @param user: bot user name (optional)
-        @type user: str
+        :param code: the site's language code
+        :type code: str
+        :param fam: wiki family name (optional)
+        :type fam: str or pywikibot.family.Family
+        :param user: bot user name (optional)
+        :type user: str
         """
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
@@ -133,7 +133,7 @@ class BaseSite(ComparableMixin):
         """
         Return the documentation subpage for this Site.
 
-        @rtype: tuple
+        :rtype: tuple
         """
         if not hasattr(self, '_doc_subpage'):
             try:
@@ -257,8 +257,8 @@ class BaseSite(ComparableMixin):
         """
         Return canonical local form of namespace name.
 
-        @param value: A namespace name
-        @type value: str
+        :param value: A namespace name
+        :type value: str
 
         """
         index = self.namespaces.lookup_name(value)
@@ -286,9 +286,9 @@ class BaseSite(ComparableMixin):
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
 
-        @param page: the page to be locked
-        @type page: pywikibot.Page
-        @param block: if true, wait until the page is available to be locked;
+        :param page: the page to be locked
+        :type page: pywikibot.Page
+        :param block: if true, wait until the page is available to be locked;
             otherwise, raise an exception if page can't be locked
 
         """
@@ -304,8 +304,8 @@ class BaseSite(ComparableMixin):
         """
         Unlock page. Call as soon as a write operation has completed.
 
-        @param page: the page to be locked
-        @type page: pywikibot.Page
+        :param page: the page to be locked
+        :type page: pywikibot.Page
 
         """
         with self._pagemutex:

@@ -40,8 +40,8 @@ class StatesRedirectBot(SingleSiteBot):
     def __init__(self, start: str, force: bool):
         """Initializer.
 
-        @param start:xxx Specify the place in the alphabet to start searching.
-        @param force: Don't ask whether to create pages, just create them.
+        :param start:xxx Specify the place in the alphabet to start searching.
+        :param force: Don't ask whether to create pages, just create them.
         """
         super().__init__()
         self.start = start
@@ -112,8 +112,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     local_args = pywikibot.handle_args(args)
     start = None

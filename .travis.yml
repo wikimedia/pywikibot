@@ -13,6 +13,12 @@ python:
 # OSX builds do not yet support Python
 os: linux
 
+# Partner Queue Solution
+arch:
+  - arm64
+  - ppc64le
+  - s390x
+
 dist: xenial  # required for Python >= 3.7
 
 addons:

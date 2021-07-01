@@ -37,8 +37,8 @@ class _InterwikiMap:
         """
         Create an empty uninitialized interwiki map for the given site.
 
-        @param site: Given site for which interwiki map is to be created
-        @type site: pywikibot.site.APISite
+        :param site: Given site for which interwiki map is to be created
+        :type site: pywikibot.site.APISite
         """
         super().__init__()
         self._site = site
@@ -64,11 +64,11 @@ class _InterwikiMap:
         """
         Return the site, locality and url for the requested prefix.
 
-        @param prefix: Interwiki prefix
-        @type prefix: Dictionary key
-        @rtype: _IWEntry
-        @raises KeyError: Prefix is not a key
-        @raises TypeError: Site for the prefix is of wrong type
+        :param prefix: Interwiki prefix
+        :type prefix: Dictionary key
+        :rtype: _IWEntry
+        :raises KeyError: Prefix is not a key
+        :raises TypeError: Site for the prefix is of wrong type
         """
         if prefix not in self._iw_sites:
             raise KeyError("'{}' is not an interwiki prefix.".format(prefix))
@@ -83,7 +83,7 @@ class _InterwikiMap:
         """
         Return a set of prefixes applying to the URL.
 
-        @param url: URL for the interwiki
+        :param url: URL for the interwiki
         """
         return {prefix for prefix, iw_entry in self._iw_sites.items()
                 if iw_entry.url == url}

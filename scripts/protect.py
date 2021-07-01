@@ -71,22 +71,20 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 
     """This bot allows protection of pages en masse."""
 
-    def __init__(self, generator, protections, **kwargs):
+    update_options = {
+        'summary': '',
+        'expiry': '',
+    }
+
+    def __init__(self, protections, **kwargs):
         """
         Create a new ProtectionRobot.
 
-        @param generator: the page generator
-        @type generator: generator
-        @param protections: protections as a dict with "type": "level"
-        @type protections: dict
-        @param kwargs: additional arguments directly feed to super().__init__()
+        :param protections: protections as a dict with "type": "level"
+        :type protections: dict
+        :param kwargs: additional arguments directly feed to super().__init__()
         """
-        self.available_options.update({
-            'summary': None,
-            'expiry': None,
-        })
         super().__init__(**kwargs)
-        self.generator = generator
         self.protections = protections
 
     def treat_page(self):
@@ -112,8 +110,8 @@ class ProtectionRobot(SingleSiteBot, CurrentPageBot):
 def check_protection_level(operation, level, levels, default=None):
     """Check if the protection level is valid or ask if necessary.
 
-    @return: a valid protection level
-    @rtype: str
+    :return: a valid protection level
+    :rtype: str
     """
     if level in levels:
         return level
@@ -148,8 +146,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     message_properties = {}
@@ -234,7 +232,8 @@ def main(*args):
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
                 'Enter a reason for the protection change:')
-        bot = ProtectionRobot(generator, combined_protections, **options)
+        bot = ProtectionRobot(combined_protections, generator=generator,
+                              **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

@@ -929,8 +929,8 @@ def handle_args(args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     mapping = {
         # option: (attribute, value),
@@ -990,8 +990,8 @@ def handle_args(args):
 def main(*args) -> None:
     """Invoke bot.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     handle_args(args)
     if globalvar.offset and globalvar.timeoffset:

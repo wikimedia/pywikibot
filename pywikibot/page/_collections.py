@@ -92,8 +92,8 @@ class LanguageDict(BaseDataDict):
     def normalizeData(cls, data: dict):
         """Helper function to expand data into the Wikibase API structure.
 
-        @param data: Data to normalize
-        @return: The dict with normalized data
+        :param data: Data to normalize
+        :return: The dict with normalized data
         """
         norm_data = {}
         for key, value in data.items():
@@ -109,7 +109,7 @@ class LanguageDict(BaseDataDict):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing entity data
+        :param diffto: JSON containing entity data
         """
         data = {}
         diffto = diffto or {}
@@ -143,8 +143,8 @@ class AliasesDict(BaseDataDict):
     def normalizeData(cls, data: dict) -> dict:
         """Helper function to expand data into the Wikibase API structure.
 
-        @param data: Data to normalize
-        @return: The dict with normalized data
+        :param data: Data to normalize
+        :return: The dict with normalized data
         """
         norm_data = {}
         for key, values in data.items():
@@ -164,7 +164,7 @@ class AliasesDict(BaseDataDict):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing entity data
+        :param diffto: JSON containing entity data
         """
         data = {}
         diffto = diffto or {}
@@ -230,8 +230,8 @@ class ClaimCollection(MutableMapping):
     def normalizeData(cls, data) -> dict:
         """Helper function to expand data into the Wikibase API structure.
 
-        @param data: Data to normalize
-        @return: The dict with normalized data
+        :param data: Data to normalize
+        :return: The dict with normalized data
         """
         # no normalization here, should there be?
         return data
@@ -242,7 +242,7 @@ class ClaimCollection(MutableMapping):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing entity data
+        :param diffto: JSON containing entity data
         """
         claims = {}
         for prop in self:
@@ -303,8 +303,8 @@ class SiteLinkCollection(MutableMapping):
         """
         Initializer.
 
-        @param repo: the Wikibase site on which badges are defined
-        @type repo: pywikibot.site.DataSite
+        :param repo: the Wikibase site on which badges are defined
+        :type repo: pywikibot.site.DataSite
         """
         super().__init__()
         self.repo = repo
@@ -327,8 +327,8 @@ class SiteLinkCollection(MutableMapping):
         """
         Helper function to obtain a dbName for a Site.
 
-        @param site: The site to look up.
-        @type site: pywikibot.site.BaseSite or str
+        :param site: The site to look up.
+        :type site: pywikibot.site.BaseSite or str
         """
         if isinstance(site, BaseSite):
             return site.dbName()
@@ -338,9 +338,9 @@ class SiteLinkCollection(MutableMapping):
         """
         Get the SiteLink with the given key.
 
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @rtype: pywikibot.page.SiteLink
+        :param key: site key as Site instance or db key
+        :type key: pywikibot.Site or str
+        :rtype: pywikibot.page.SiteLink
         """
         key = self.getdbName(key)
         val = self._data[key]
@@ -361,11 +361,11 @@ class SiteLinkCollection(MutableMapping):
         str or dict is given the SiteLink object is created later in
         __getitem__ method.
 
-        @param key: site key as Site instance or db key
-        @type key: pywikibot.Site or str
-        @param val: page name as a string or JSON containing SiteLink
+        :param key: site key as Site instance or db key
+        :type key: pywikibot.Site or str
+        :param val: page name as a string or JSON containing SiteLink
             data or a SiteLink object
-        @type val: Union[str, dict, SiteLink]
+        :type val: Union[str, dict, SiteLink]
         """
         key = self.getdbName(key)
         if isinstance(val, pywikibot.page.SiteLink):
@@ -403,10 +403,10 @@ class SiteLinkCollection(MutableMapping):
         """
         Helper function to expand data into the Wikibase API structure.
 
-        @param data: Data to normalize
-        @type data: list or dict
+        :param data: Data to normalize
+        :type data: list or dict
 
-        @return: The dict with normalized data
+        :return: The dict with normalized data
         """
         norm_data = {}
         if isinstance(data, dict):
@@ -438,7 +438,7 @@ class SiteLinkCollection(MutableMapping):
         When diffto is provided, JSON representing differences
         to the provided data is created.
 
-        @param diffto: JSON containing entity data
+        :param diffto: JSON containing entity data
         """
         data = {dbname: sitelink.toJSON()
                 for (dbname, sitelink) in self.items()}

@@ -756,7 +756,6 @@ class TestIsIpAddress(TestCase):
         """Check with valid IPv4 addresses."""
         valid_addresses = (
             '0.0.0.0',
-            '0.0.00.0',
             '1.2.3.4',
             '1.2.3.4',
             '192.168.0.1',

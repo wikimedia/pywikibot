@@ -47,19 +47,17 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     """A bot to create new items."""
 
     treat_missing_item = True
+    update_options = {
+        'always': True,
+        'lastedit': 7,
+        'pageage': 21,
+        'touch': 'newly',  # Can be False, newly (pages linked to newly
+                           # created items) or True (touch all pages)
+    }
 
-    def __init__(self, generator, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         """Only accepts options defined in available_options."""
-        self.available_options.update({
-            'always': True,
-            'lastedit': 7,
-            'pageage': 21,
-            'touch': 'newly',  # Can be False, newly (pages linked to newly
-                               # created items) or True (touch all pages)
-        })
-
         super().__init__(**kwargs)
-        self.generator = generator
         self._skipping_templates = {}
 
     def setup(self) -> None:
@@ -129,9 +127,9 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
     def skip_templates(self, page) -> str:
         """Check whether the page is to be skipped due to skipping template.
 
-        @param page: treated page
-        @type page: pywikibot.Page
-        @return: the template which leads to skip
+        :param page: treated page
+        :type page: pywikibot.Page
+        :return: the template which leads to skip
         """
         skipping_templates = self.get_skipping_templates(page.site)
         for template, _ in page.templatesWithParams():
@@ -193,8 +191,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -215,7 +213,7 @@ def main(*args) -> None:
         pywikibot.bot.suggest_help(missing_generator=True)
         return
 
-    bot = NewItemRobot(generator, **options)
+    bot = NewItemRobot(generator=generator, **options)
     if not bot.site.logged_in():
         bot.site.login()
     user = pywikibot.User(bot.site, bot.site.username())

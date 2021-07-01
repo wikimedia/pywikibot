@@ -54,13 +54,7 @@ class MisspellingRobot(BaseDisambigBot):
 
     # Optional: if there is a category, one can use the -start parameter
     misspelling_categories = ('Q8644265', 'Q9195708')
-
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        self.available_options.update({
-            'start': None,
-        })
-        super().__init__(**kwargs)
+    update_options = {'start': None}
 
     @property
     def generator(self) -> Generator[pywikibot.Page, None, None]:
@@ -109,7 +103,7 @@ class MisspellingRobot(BaseDisambigBot):
 
         Overrides the BaseDisambigBot method.
 
-        @return: True if alternate link was appended
+        :return: True if alternate link was appended
         """
         if page.isRedirectPage():
             self.opt.pos.append(page.getRedirectTarget().title())
@@ -158,7 +152,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
     for arg in pywikibot.handle_args(args):

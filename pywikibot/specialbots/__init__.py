@@ -24,5 +24,4 @@ wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr(
     'EditReplacement',
     replacement_name='pywikibot.exceptions.EditReplacementError',
-    since='20210423',
-    future_warning=True)
+    since='20210423')

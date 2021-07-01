@@ -87,9 +87,9 @@ class Namespace(Iterable, ComparableMixin):
                  **kwargs):
         """Initializer.
 
-        @param canonical_name: Canonical name
-        @param custom_name: Name defined in server LocalSettings.php
-        @param aliases: Aliases
+        :param canonical_name: Canonical name
+        :param custom_name: Name defined in server LocalSettings.php
+        :param aliases: Aliases
         """
         self.id = id
         canonical_name = canonical_name or self.canonical_namespaces.get(id)
@@ -123,7 +123,7 @@ class Namespace(Iterable, ComparableMixin):
     def _contains_lowercase_name(self, name):
         """Determine a lowercase normalised name is a name of this namespace.
 
-        @rtype: bool
+        :rtype: bool
         """
         return name in (x.lower() for x in self._distinct())
 
@@ -133,7 +133,7 @@ class Namespace(Iterable, ComparableMixin):
         The comparison is case insensitive, and item may have a single
         colon on one or both sides of the name.
 
-        @param item: name to check
+        :param item: name to check
         """
         if item == '' and self.id == 0:
             return True
@@ -327,7 +327,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         Get the namespace with the given key.
 
-        @param key: namespace key
+        :param key: namespace key
         """
         if isinstance(key, (Namespace, int)):
             try:
@@ -346,7 +346,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         Get the namespace with the given key.
 
-        @param attr: namespace key
+        :param attr: namespace key
         """
         # lookup_name access _namespaces
         if attr.isupper():
@@ -367,7 +367,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         Find the Namespace for a name also checking aliases.
 
-        @param name: Name of the namespace.
+        :param name: Name of the namespace.
         """
         name = Namespace.normalize_name(name)
         if name is False:
@@ -380,7 +380,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         The name has to be normalized and must be lower case.
 
-        @param name: Name of the namespace.
+        :param name: Name of the namespace.
         """
         return self._namespace_names.get(name)
 
@@ -392,13 +392,13 @@ class NamespacesDict(Mapping, SelfCallMixin):
         namespace id, except bool, or any string which Namespace.lookup_name
         successfully finds. A numerical string is resolved as an integer.
 
-        @param identifiers: namespace identifiers
-        @type identifiers: iterable of str or Namespace key,
+        :param identifiers: namespace identifiers
+        :type identifiers: iterable of str or Namespace key,
             or a single instance of those types
-        @return: list of Namespace objects in the same order as the
+        :return: list of Namespace objects in the same order as the
             identifiers
-        @raises KeyError: a namespace identifier was not resolved
-        @raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if isinstance(identifiers, (str, Namespace)):

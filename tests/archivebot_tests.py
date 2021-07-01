@@ -166,7 +166,7 @@ class TestArchiveBot(TestCase):
                 self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
 
-    expected_failures = ['ar', 'eo', 'pdc', 'th']
+    expected_failures = ['ar', 'eo', 'pdc', 'scn', 'th']
     # FIXME: see TestArchiveBotAfterDateUpdate()
     # 'ar': Uses Arabic acronym for TZ
     # 'eo': changed month name setting in wiki from Sep to sep

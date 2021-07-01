@@ -110,13 +110,12 @@ user talk pages (namespace #3):
 # Distributed under the terms of the MIT license.
 #
 import re
-from itertools import chain
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools import filter_unique
+from pywikibot.tools import filter_unique, roundrobin_generators
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -124,24 +123,24 @@ class TemplateRobot(ReplaceBot):
 
     """This bot will replace, remove or subst all occurrences of a template."""
 
+    update_options = {
+        'addcat': None,
+        'remove': False,
+        'subst': False,
+        'summary': '',
+    }
+
     def __init__(self, generator, templates: dict, **kwargs) -> None:
         """
         Initializer.
 
-        @param generator: the pages to work on
-        @type generator: iterable
-        @param templates: a dictionary which maps old template names to
+        :param generator: the pages to work on
+        :type generator: iterable
+        :param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
         """
-        self.available_options.update({
-            'addcat': None,
-            'remove': False,
-            'subst': False,
-            'summary': None,
-        })
-
-        SingleSiteBot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, **kwargs)
 
         self.templates = templates
 
@@ -213,8 +212,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     template_names = []
     templates = {}
@@ -279,10 +278,8 @@ def main(*args) -> None:
                              'you must give an even number of template names.')
             return
 
-    old_templates = []
-    for template_name in templates:
-        old_template = pywikibot.Page(site, template_name, ns=10)
-        old_templates.append(old_template)
+    old_templates = [pywikibot.Page(site, template_name, ns=10)
+                     for template_name in templates]
 
     if xmlfilename:
         builder = textlib.MultiTemplateMatchBuilder(site)
@@ -299,7 +296,7 @@ def main(*args) -> None:
                             follow_redirects=False)
             for t in old_templates
         )
-        gen = chain(*gens)
+        gen = roundrobin_generators(*gens)
         gen = filter_unique(gen, key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
     if user:
         gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp,

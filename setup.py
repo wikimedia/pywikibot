@@ -10,18 +10,18 @@ To create a new distribution:
 
     python setup.py sdist
 
-- push the change to gerrit and merge it to the repository
-- upload the package to pypy by::
+- push the change to Gerrit and merge it to the repository
+- upload the package to PyPy by::
 
     twine upload dist/*
 
 - create a new tag with the version number of the final release
 - synchronize the local tags with the remote repositoy
 - merge current master branch to stable branch
-- push new stable branch to gerrit and merge it the stable repository
+- push new stable branch to Gerrit and merge it the stable repository
 - prepare the next master release by increasing the version number in
   ``pywikibot.__metadata__.py`` and adding developmental identifier
-- upload this patchset to gerrit and merge it.
+- upload this patchset to Gerrit and merge it.
 """
 #
 # (C) Pywikibot team, 2009-2021
@@ -63,7 +63,8 @@ extra_deps = {
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'wikitextparser': ['wikitextparser>=0.47.0'],
+    'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
+                       'wikitextparser>=0.47.0; python_version >= "3.6"'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
@@ -77,8 +78,8 @@ extra_deps = {
         'flake8-bugbear!=21.4.1',
         'flake8-coding',
         'flake8-colors>=0.1.9',
-        'flake8-comprehensions>=3.1.4;python_version>="3.8"',
-        'flake8-comprehensions>=2.2.0',
+        'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
+        'flake8-comprehensions>=2.2.0; python_version < "3.8"',
         'flake8-docstrings>=1.3.1',
         'flake8-future-import',
         'flake8-mock>=0.3',
@@ -109,8 +110,10 @@ dependencies = [
     'requests>=2.20.1,<2.26.0;python_version<"3.6"',
     'requests>=2.20.1;python_version>="3.6"',
     # PEP 440
-    'setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < "3.6"',
-    'setuptools>=20.2 ; python_version >= "3.6"',
+    'setuptools>=48.0.0 ; python_version >= "3.10"',
+    'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
+    'setuptools>=20.8.1 ; python_version >= "3.6" and python_version < "3.7"',
+    'setuptools>=20.8.1, !=50.0.0, <50.2.0 ; python_version < "3.6"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
 
@@ -148,8 +151,8 @@ def get_validated_version():  # pragma: no cover
     Verify that the new release is higher than the last repository tag
     and is not a developmental release.
 
-    @return: pywikibot module version string
-    @rtype: str
+    :return: pywikibot module version string
+    :rtype: str
     """
     version = metadata.__version__
     if 'sdist' not in sys.argv:

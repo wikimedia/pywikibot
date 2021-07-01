@@ -87,13 +87,13 @@ class Throttle:
         self.setDelays()
 
     @property
-    @deprecated(since='6.2', future_warning=True)
+    @deprecated(since='6.2')
     def multiplydelay(self):
         """DEPRECATED attribute."""
         return True
 
     @multiplydelay.setter
-    @deprecated(since='6.2', future_warning=True)
+    @deprecated(since='6.2')
     def multiplydelay(self):
         """DEPRECATED attribute setter."""
 
@@ -310,7 +310,7 @@ class Throttle:
         This method is used by `api.request`. It will prevent any thread
         from accessing this site.
 
-        @param lagtime: The time to wait for the next request which is
+        :param lagtime: The time to wait for the next request which is
             the last `maxlag` time from api warning. This is only used
             as a fallback if `self.retry_after` isn't set.
         """

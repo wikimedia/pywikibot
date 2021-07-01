@@ -20,13 +20,15 @@
 # mandatory dependencies, others are optional
 requests>=2.20.1, < 2.26.0; python_version < '3.6'
 requests>=2.20.1 ; python_version >= '3.6'
-setuptools>=20.2, !=50.0.0, <50.2.0 ; python_version < '3.6'
-setuptools>=20.2 ; python_version >= '3.6'
+setuptools>=48.0.0 ; python_version >= '3.10'
+setuptools>=38.5.2 ; python_version >= '3.7' and python_version < '3.10'
+setuptools>=20.8.1 ; python_version >= '3.6' and python_version < '3.7'
+setuptools>=20.8.1, !=50.0.0, <50.2.0 ; python_version < '3.6'
 
 # MediaWiki markup parser
 # mwparserfromhell is default, wikitextparser can be used instead
 # mwparserfromhell is still required for commons_information.py and patrol.py
-# wikitextparser>=0.47.0
+# wikitextparser>=0.47.5
 mwparserfromhell>=0.5.0
 
 # OAuth support

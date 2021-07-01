@@ -14,8 +14,8 @@ from tests.aspects import TestCase
 def match(value: str = '') -> int:
     """Create a match object and call get_chunk_site.
 
-    @param value: a chunk size value
-    @return: chunk size in bytes
+    :param value: a chunk size value
+    :return: chunk size in bytes
     """
     option = '-chunked'
     if value:

@@ -46,14 +46,14 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
     """Unused files bot."""
 
     summary_key = 'unusedfiles-comment'
+    update_options = {
+        'nouserwarning': False,  # do not warn uploader
+        'filetemplate': '',
+        'usertemplate': '',
+    }
 
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'nouserwarning': False,  # do not warn uploader
-            'filetemplate': '',
-            'usertemplate': '',
-        })
         super().__init__(**kwargs)
 
         # handle the custom templates
@@ -132,8 +132,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     total = None

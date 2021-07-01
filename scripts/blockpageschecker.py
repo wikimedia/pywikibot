@@ -30,7 +30,7 @@ Furthermore, the following command line parameters are supported:
 -move            The bot will check if the page is blocked also for the move
                  option, not only for edit
 
-Examples:
+Examples::
 
     python pwb.py blockpageschecker -always
 
@@ -213,8 +213,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     # Loading the comments
     global categoryToCheck, project_inserted
@@ -340,9 +340,9 @@ def main(*args):
             else:
                 replaceToPerform = '|'.join(TTP + TSP)
             text, changes = re.subn('<noinclude>({})</noinclude>'
-                                    .format(replaceToPerform, '', text))
+                                    .format(replaceToPerform), '', text)
             if changes == 0:
-                text, changes = re.subn('({})'.format(replaceToPerform, '', text))
+                text, changes = re.subn('({})'.format(replaceToPerform), '', text)
             msg = 'The page is editable for all'
             if not moveBlockCheck:
                 msg += ', deleting the template..'
@@ -413,7 +413,7 @@ def main(*args):
                 else:
                     replaceToPerform = '|'.join(TSMP + TTMP)
                 text, changes = re.subn('<noinclude>({})</noinclude>'
-                                        .format(replaceToPerform, '', text))
+                                        .format(replaceToPerform), '', text)
                 if changes == 0:
                     text, changes = re.subn('({})'.format(replaceToPerform),
                                             '', text)

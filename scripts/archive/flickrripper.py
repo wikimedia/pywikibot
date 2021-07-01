@@ -118,11 +118,11 @@ def findDuplicateImages(photo, site=None):
 
     TODO: Add exception handling.
 
-    @param photo: Photo
-    @type photo: io.BytesIO
-    @param site: Site to search for duplicates.
+    :param photo: Photo
+    :type photo: io.BytesIO
+    :param site: Site to search for duplicates.
         Defaults to using Wikimedia Commons if not supplied.
-    @type site: pywikibot.site.APISite or None
+    :type site: pywikibot.site.APISite or None
     """
     if not site:
         site = pywikibot.Site('commons', 'commons')
@@ -134,7 +134,7 @@ def findDuplicateImages(photo, site=None):
 def getTags(photoInfo, raw: bool = False):
     """Get all the tags on a photo.
 
-    @param raw: use original tag name
+    :param raw: use original tag name
         see https://www.flickr.com/services/api/misc.tags.html
     """
     return [tag.attrib['raw'].lower() if raw else tag.text.lower()
@@ -416,8 +416,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     group_id = ''
     photoset_id = ''

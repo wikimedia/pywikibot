@@ -448,8 +448,8 @@ class imageFetcher(threading.Thread):
     def getNewFieldsFromInformation(self, imagepage):
         """Extract fields from current information template for new template.
 
-        @param imagepage: The file page to get the template.
-        @type imagepage: pywikibot.FilePage
+        :param imagepage: The file page to get the template.
+        :type imagepage: pywikibot.FilePage
         """
         # fields = ['location', 'description', 'source', 'date', 'author',
         #           'permission', 'other versions']
@@ -936,8 +936,8 @@ class uploader(threading.Thread):
     def getOriginalUploadLog(self, imagepage):
         """Get upload log to put at the bottom of the image description page.
 
-        @param imagepage: The file page to retrieve the log.
-        @type imagepage: pywikibot.FilePage
+        :param imagepage: The file page to retrieve the log.
+        :type imagepage: pywikibot.FilePage
         """
         filehistory = imagepage.get_file_history()
         filehistory.reverse()

@@ -31,12 +31,12 @@ class FlowPage(BasePage, abc.ABC):
     def __init__(self, source, title: str = ''):
         """Initializer.
 
-        @param source: A Flow-enabled site or a Link or Page on such a site
-        @type source: Site, pywikibot.page.Link, or pywikibot.page.Page
-        @param title: normalized title of the page
+        :param source: A Flow-enabled site or a Link or Page on such a site
+        :type source: Site, pywikibot.page.Link, or pywikibot.page.Page
+        :param title: normalized title of the page
 
-        @raises TypeError: incorrect use of parameters
-        @raises ValueError: use of non-Flow-enabled Site
+        :raises TypeError: incorrect use of parameters
+        :raises ValueError: use of non-Flow-enabled Site
         """
         super().__init__(source, title)
 
@@ -56,7 +56,7 @@ class FlowPage(BasePage, abc.ABC):
     def uuid(self) -> str:
         """Return the UUID of the page.
 
-        @return: UUID of the page
+        :return: UUID of the page
         """
         if not hasattr(self, '_uuid'):
             self._uuid = self._load()['workflowId']
@@ -80,7 +80,7 @@ class Board(FlowPage):
     def _load(self, force: bool = False):
         """Load and cache the Board's data, derived from its topic list.
 
-        @param force: Whether to force a reload if the data is already loaded
+        :param force: Whether to force a reload if the data is already loaded
         """
         if not hasattr(self, '_data') or force:
             self._data = self.site.load_board(self)
@@ -108,19 +108,19 @@ class Board(FlowPage):
                toc_only: bool = False):
         """Load this board's topics.
 
-        @param content_format: The content format to request the data in;
+        :param content_format: The content format to request the data in;
             must be either 'wikitext', 'html', or 'fixed-html'
-        @param limit: The number of topics to fetch in each request.
-        @param sort_by: Algorithm to sort topics by;
+        :param limit: The number of topics to fetch in each request.
+        :param sort_by: Algorithm to sort topics by;
             must be either 'newest' or 'updated'
-        @param offset: The timestamp to start at (when sortby is 'updated').
-        @type offset: Timestamp or equivalent str
-        @param offset_uuid: The UUID to start at (when sortby is 'newest').
-        @param reverse: Whether to reverse the topic ordering.
-        @param include_offset: Whether to include the offset topic.
-        @param toc_only: Whether to only include information for the TOC.
-        @return: A generator of this board's topics.
-        @rtype: generator of Topic objects
+        :param offset: The timestamp to start at (when sortby is 'updated').
+        :type offset: Timestamp or equivalent str
+        :param offset_uuid: The UUID to start at (when sortby is 'newest').
+        :param reverse: Whether to reverse the topic ordering.
+        :param include_offset: Whether to include the offset topic.
+        :param toc_only: Whether to only include information for the TOC.
+        :return: A generator of this board's topics.
+        :rtype: generator of Topic objects
         """
         data = self.site.load_topiclist(self, content_format=content_format,
                                         limit=limit, sortby=sort_by,
@@ -139,12 +139,12 @@ class Board(FlowPage):
                   content_format: str = 'wikitext'):
         """Create and return a Topic object for a new topic on this Board.
 
-        @param title: The title of the new topic (must be in plaintext)
-        @param content: The content of the topic's initial post
-        @param content_format: The content format of the supplied content;
+        :param title: The title of the new topic (must be in plaintext)
+        :param content: The content of the topic's initial post
+        :param content_format: The content format of the supplied content;
             either 'wikitext' or 'html'
-        @return: The new topic
-        @rtype: Topic
+        :return: The new topic
+        :rtype: Topic
         """
         return Topic.create_topic(self, title, content, content_format)
 
@@ -156,8 +156,8 @@ class Topic(FlowPage):
     def _load(self, force: bool = False, content_format: str = 'wikitext'):
         """Load and cache the Topic's data.
 
-        @param force: Whether to force a reload if the data is already loaded
-        @param content_format: The post format in which to load
+        :param force: Whether to force a reload if the data is already loaded
+        :param content_format: The post format in which to load
         """
         if not hasattr(self, '_data') or force:
             self._data = self.site.load_topic(self, content_format)
@@ -173,14 +173,14 @@ class Topic(FlowPage):
                      content_format: str = 'wikitext'):
         """Create and return a Topic object for a new topic on a Board.
 
-        @param board: The topic's parent board
-        @type board: Board
-        @param title: The title of the new topic (must be in plaintext)
-        @param content: The content of the topic's initial post
-        @param content_format: The content format of the supplied content;
+        :param board: The topic's parent board
+        :type board: Board
+        :param title: The title of the new topic (must be in plaintext)
+        :param content: The content of the topic's initial post
+        :param content_format: The content format of the supplied content;
             either 'wikitext' or 'html'
-        @return: The new topic
-        @rtype: Topic
+        :return: The new topic
+        :rtype: Topic
         """
         data = board.site.create_new_topic(board, title, content,
                                            content_format)
@@ -190,14 +190,14 @@ class Topic(FlowPage):
     def from_topiclist_data(cls, board, root_uuid: str, topiclist_data: dict):
         """Create a Topic object from API data.
 
-        @param board: The topic's parent Flow board
-        @type board: Board
-        @param root_uuid: The UUID of the topic and its root post
-        @param topiclist_data: The data returned by view-topiclist
-        @return: A Topic object derived from the supplied data
-        @rtype: Topic
-        @raises TypeError: any passed parameters have wrong types
-        @raises ValueError: the passed topiclist_data is missing required data
+        :param board: The topic's parent Flow board
+        :type board: Board
+        :param root_uuid: The UUID of the topic and its root post
+        :param topiclist_data: The data returned by view-topiclist
+        :return: A Topic object derived from the supplied data
+        :rtype: Topic
+        :raises TypeError: any passed parameters have wrong types
+        :raises ValueError: the passed topiclist_data is missing required data
         """
         if not isinstance(board, Board):
             raise TypeError('board must be a pywikibot.flow.Board object.')
@@ -230,11 +230,11 @@ class Topic(FlowPage):
     def replies(self, content_format: str = 'wikitext', force: bool = False):
         """A list of replies to this topic's root post.
 
-        @param content_format: Content format to return contents in;
+        :param content_format: Content format to return contents in;
             must be 'wikitext', 'html', or 'fixed-html'
-        @param force: Whether to reload from the API instead of using the cache
-        @return: The replies of this topic's root post
-        @rtype: list of Posts
+        :param force: Whether to reload from the API instead of using the cache
+        :return: The replies of this topic's root post
+        :rtype: list of Posts
         """
         return self.root.replies(content_format=content_format, force=force)
 
@@ -242,11 +242,11 @@ class Topic(FlowPage):
     def reply(self, content: str, content_format: str = 'wikitext'):
         """A convenience method to reply to this topic's root post.
 
-        @param content: The content of the new post
-        @param content_format: The format of the given content;
+        :param content: The content of the new post
+        :param content_format: The format of the given content;
             must be 'wikitext' or 'html')
-        @return: The new reply to this topic's root post
-        @rtype: Post
+        :return: The new reply to this topic's root post
+        :rtype: Post
         """
         return self.root.reply(content, content_format)
 
@@ -254,7 +254,7 @@ class Topic(FlowPage):
     def lock(self, reason: str):
         """Lock this topic.
 
-        @param reason: The reason for locking this topic
+        :param reason: The reason for locking this topic
         """
         self.site.lock_topic(self, True, reason)
         self._reload()
@@ -262,7 +262,7 @@ class Topic(FlowPage):
     def unlock(self, reason: str):
         """Unlock this topic.
 
-        @param reason: The reason for unlocking this topic
+        :param reason: The reason for unlocking this topic
         """
         self.site.lock_topic(self, False, reason)
         self._reload()
@@ -270,7 +270,7 @@ class Topic(FlowPage):
     def delete_mod(self, reason: str):
         """Delete this topic through the Flow moderation system.
 
-        @param reason: The reason for deleting this topic.
+        :param reason: The reason for deleting this topic.
         """
         self.site.delete_topic(self, reason)
         self._reload()
@@ -278,7 +278,7 @@ class Topic(FlowPage):
     def hide(self, reason: str):
         """Hide this topic.
 
-        @param reason: The reason for hiding this topic.
+        :param reason: The reason for hiding this topic.
         """
         self.site.hide_topic(self, reason)
         self._reload()
@@ -286,7 +286,7 @@ class Topic(FlowPage):
     def suppress(self, reason: str):
         """Suppress this topic.
 
-        @param reason: The reason for suppressing this topic.
+        :param reason: The reason for suppressing this topic.
         """
         self.site.suppress_topic(self, reason)
         self._reload()
@@ -294,7 +294,7 @@ class Topic(FlowPage):
     def restore(self, reason: str):
         """Restore this topic.
 
-        @param reason: The reason for restoring this topic.
+        :param reason: The reason for restoring this topic.
         """
         self.site.restore_topic(self, reason)
         self._reload()
@@ -309,11 +309,11 @@ class Post:
         """
         Initializer.
 
-        @param page: Flow topic
-        @type page: Topic
-        @param uuid: UUID of a Flow post
+        :param page: Flow topic
+        :type page: Topic
+        :param uuid: UUID of a Flow post
 
-        @raises TypeError: incorrect types of parameters
+        :raises TypeError: incorrect types of parameters
         """
         if not isinstance(page, Topic):
             raise TypeError('Page must be a Topic object')
@@ -332,14 +332,14 @@ class Post:
         """
         Create a Post object using the data returned from the API call.
 
-        @param page: A Flow topic
-        @type page: Topic
-        @param post_uuid: The UUID of the post
-        @param data: The JSON data returned from the API
+        :param page: A Flow topic
+        :type page: Topic
+        :param post_uuid: The UUID of the post
+        :param data: The JSON data returned from the API
 
-        @return: A Post object
-        @raises TypeError: data is not a dict
-        @raises ValueError: data is missing required entries
+        :return: A Post object
+        :raises TypeError: data is not a dict
+        :raises ValueError: data is missing required entries
         """
         post = cls(page, post_uuid)
         post._set_data(data)
@@ -349,9 +349,9 @@ class Post:
     def _set_data(self, data: dict):
         """Set internal data and cache content.
 
-        @param data: The data to store internally
-        @raises TypeError: data is not a dict
-        @raises ValueError: missing data entries or post/revision not found
+        :param data: The data to store internally
+        :raises TypeError: data is not a dict
+        :raises ValueError: missing data entries or post/revision not found
         """
         if not isinstance(data, dict):
             raise TypeError('Illegal post data (must be a dictionary).')
@@ -376,7 +376,7 @@ class Post:
               load_from_topic: bool = False):
         """Load and cache the Post's data using the given content format.
 
-        @param load_from_topic: Whether to load the post from the whole topic
+        :param load_from_topic: Whether to load the post from the whole topic
         """
         if load_from_topic:
             data = self.page._load(force=force, content_format=content_format)
@@ -390,7 +390,7 @@ class Post:
     def uuid(self) -> str:
         """Return the UUID of the post.
 
-        @return: UUID of the post
+        :return: UUID of the post
         """
         return self._uuid
 
@@ -398,8 +398,8 @@ class Post:
     def site(self):
         """Return the site associated with the post.
 
-        @return: Site associated with the post
-        @rtype: Site
+        :return: Site associated with the post
+        :rtype: Site
         """
         return self._page.site
 
@@ -407,8 +407,8 @@ class Post:
     def page(self):
         """Return the page associated with the post.
 
-        @return: Page associated with the post
-        @rtype: Topic
+        :return: Page associated with the post
+        :rtype: Topic
         """
         return self._page
 
@@ -434,9 +434,9 @@ class Post:
             force: bool = False) -> str:
         """Return the contents of the post in the given format.
 
-        @param force: Whether to reload from the API instead of using the cache
-        @param content_format: Content format to return contents in
-        @return: The contents of the post in the given content format
+        :param force: Whether to reload from the API instead of using the cache
+        :param content_format: Content format to return contents in
+        :return: The contents of the post in the given content format
         """
         if content_format not in self._content or force:
             self._load(content_format=content_format)
@@ -446,11 +446,11 @@ class Post:
     def replies(self, content_format: str = 'wikitext', force: bool = False):
         """Return this post's replies.
 
-        @param content_format: Content format to return contents in;
+        :param content_format: Content format to return contents in;
             must be 'wikitext', 'html', or 'fixed-html'
-        @param force: Whether to reload from the API instead of using the cache
-        @return: This post's replies
-        @rtype: list of Posts
+        :param force: Whether to reload from the API instead of using the cache
+        :return: This post's replies
+        :rtype: list of Posts
         """
         if content_format not in ('wikitext', 'html', 'fixed-html'):
             raise ValueError('Invalid content format.')
@@ -472,11 +472,11 @@ class Post:
     def reply(self, content: str, content_format: str = 'wikitext'):
         """Reply to this post.
 
-        @param content: The content of the new post
-        @param content_format: The format of the given content;
+        :param content: The content of the new post
+        :param content_format: The format of the given content;
             must be 'wikitext' or 'html'
-        @return: The new reply post
-        @rtype: Post
+        :return: The new reply post
+        :rtype: Post
         """
         self._load()
         if self.page.is_locked:
@@ -498,7 +498,7 @@ class Post:
     def delete(self, reason: str):
         """Delete this post through the Flow moderation system.
 
-        @param reason: The reason for deleting this post.
+        :param reason: The reason for deleting this post.
         """
         self.site.delete_post(self, reason)
         self._load()
@@ -506,7 +506,7 @@ class Post:
     def hide(self, reason: str):
         """Hide this post.
 
-        @param reason: The reason for hiding this post.
+        :param reason: The reason for hiding this post.
         """
         self.site.hide_post(self, reason)
         self._load()
@@ -514,7 +514,7 @@ class Post:
     def suppress(self, reason: str):
         """Suppress this post.
 
-        @param reason: The reason for suppressing this post.
+        :param reason: The reason for suppressing this post.
         """
         self.site.suppress_post(self, reason)
         self._load()
@@ -522,7 +522,7 @@ class Post:
     def restore(self, reason: str):
         """Restore this post.
 
-        @param reason: The reason for restoring this post.
+        :param reason: The reason for restoring this post.
         """
         self.site.restore_post(self, reason)
         self._load()

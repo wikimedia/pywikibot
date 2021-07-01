@@ -23,12 +23,12 @@ def daemonize(close_fd=True, chdir=True, redirect_std=None):
     Only works on POSIX compatible operating systems.
     The process will fork to the background and return control to terminal.
 
-    @param close_fd: Close the standard streams and replace them by /dev/null
-    @type close_fd: bool
-    @param chdir: Change the current working directory to /
-    @type chdir: bool
-    @param redirect_std: Filename to redirect stdout and stdin to
-    @type redirect_std: str
+    :param close_fd: Close the standard streams and replace them by /dev/null
+    :type close_fd: bool
+    :param chdir: Change the current working directory to /
+    :type chdir: bool
+    :param redirect_std: Filename to redirect stdout and stdin to
+    :type redirect_std: str
     """
     # Fork away
     if not os.fork():

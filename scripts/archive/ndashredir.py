@@ -52,9 +52,9 @@ class DashRedirectBot(
         """
         Initializer.
 
-        @param generator: the page generator that determines which pages
+        :param generator: the page generator that determines which pages
             to work on
-        @type generator: generator
+        :type generator: generator
         """
         # -always option is predefined by BaseBot class
         self.available_options.update({
@@ -115,8 +115,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     # Process global arguments to determine desired site

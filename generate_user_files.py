@@ -107,12 +107,12 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
     """
     Ask the user for the family, language and username.
 
-    @param default_family: The default family which should be chosen.
-    @param default_lang: The default language which should be chosen, if the
+    :param default_family: The default family which should be chosen.
+    :param default_lang: The default language which should be chosen, if the
         family supports this language.
-    @param default_username: The default username which should be chosen.
-    @return: The family, language and username
-    @rtype: tuple of three str
+    :param default_username: The default username which should be chosen.
+    :return: The family, language and username
+    :rtype: tuple of three str
     """
     known_families = sorted(pywikibot.config.family_files.keys())
     if default_family not in known_families:
@@ -221,8 +221,8 @@ def parse_sections():
     config.py will be in the pywikibot/ directory relative to this
     generate_user_files script.
 
-    @return: a list of ConfigSection named tuples.
-    @rtype: list
+    :return: a list of ConfigSection named tuples.
+    :rtype: list
     """
     data = []
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
@@ -249,8 +249,8 @@ def parse_sections():
 def copy_sections():
     """Take config sections and copy them to user-config.py.
 
-    @return: config text of all selected sections.
-    @rtype: str
+    :return: config text of all selected sections.
+    :rtype: str
     """
     result = []
     sections = parse_sections()
@@ -379,10 +379,10 @@ def ask_for_dir_change(force):
     already exists in the directory. This will repeat if user-config.py also
     exists in the requested directory.
 
-    @param force: Skip asking for directory change
-    @type force: bool
-    @return: whether user file or password file exists already
-    @rtype: tuple of bool
+    :param force: Skip asking for directory change
+    :type force: bool
+    :return: whether user file or password file exists already
+    :rtype: tuple of bool
     """
     global base_dir
 
@@ -410,7 +410,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     # set the config family and mylang values to an invalid state so that
     # the script can detect that the command line arguments -family & -lang

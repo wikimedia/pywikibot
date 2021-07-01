@@ -205,12 +205,12 @@ def pageTextPost(url, parameters):
     """
     Get data from commons helper page.
 
-    @param url: This parameter is not used here, we keep it here to avoid user
+    :param url: This parameter is not used here, we keep it here to avoid user
                 scripts from breaking.
-    @param parameters: Data that will be submitted to CommonsHelper.
-    @type parameters: dict
-    @return: A CommonHelper description message.
-    @rtype: str
+    :param parameters: Data that will be submitted to CommonsHelper.
+    :type parameters: dict
+    :return: A CommonHelper description message.
+    :rtype: str
     """
     while True:
         try:
@@ -448,8 +448,8 @@ class TkdialogIC(Tkdialog):
         """
         Activate dialog.
 
-        @return: new name and if the image is skipped
-        @rtype: tuple
+        :return: new name and if the image is skipped
+        :rtype: tuple
         """
         self.root.mainloop()
         return (self.changename, self.skip)

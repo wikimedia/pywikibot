@@ -757,9 +757,9 @@ class checkImagesBot:
         """
         Get tuples of image and time, return the most used or oldest image.
 
-        @param listGiven: a list of tuples which hold seconds and FilePage
-        @type listGiven: list
-        @return: the most used or oldest image
+        :param listGiven: a list of tuples which hold seconds and FilePage
+        :type listGiven: list
+        :return: the most used or oldest image
         """
         # find the most used image
         inx_found = None  # index of found image
@@ -1541,8 +1541,8 @@ def main(*args) -> bool:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     # Command line configurable parameters
     repeat = True  # Restart after having check all the images?

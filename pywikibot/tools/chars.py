@@ -62,8 +62,8 @@ def string2html(string: str, encoding: str) -> str:
     return it unchanged. Otherwise encode the non-ASCII characters into
     HTML &#; entities.
 
-    @param string: String to update
-    @param encoding: Encoding to use
+    :param string: String to update
+    :param encoding: Encoding to use
     """
     with suppress(UnicodeError):
         string.encode(encoding)
@@ -80,10 +80,10 @@ def url2string(
 
     Uses the first encoding that doesn't cause an error.
 
-    @param title: URL-encoded character data to convert
-    @param encodings: Encodings to attempt to use during conversion.
+    :param title: URL-encoded character data to convert
+    :param encodings: Encodings to attempt to use during conversion.
 
-    @raise UnicodeError: Could not convert using any encoding.
+    :raise UnicodeError: Could not convert using any encoding.
     """
     if isinstance(encodings, str):
         encodings = [encodings]

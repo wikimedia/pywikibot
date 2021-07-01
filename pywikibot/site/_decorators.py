@@ -11,12 +11,12 @@ from pywikibot.tools import MediaWikiVersion, manage_wrapping
 def must_be(group=None):
     """Decorator to require a certain user status when method is called.
 
-    @param group: The group the logged in user should belong to.
+    :param group: The group the logged in user should belong to.
                   This parameter can be overridden by
                   keyword argument 'as_group'.
-    @type group: str or None
-    @return: method decorator
-    @raises UserRightsError: user is not part of the required user group.
+    :type group: str or None
+    :return: method decorator
+    :raises UserRightsError: user is not part of the required user group.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
@@ -47,8 +47,8 @@ def must_be(group=None):
 def need_extension(extension: str):
     """Decorator to require a certain MediaWiki extension.
 
-    @param extension: the MediaWiki extension required
-    @return: a decorator to make sure the requirement is satisfied when
+    :param extension: the MediaWiki extension required
+    :return: a decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
     def decorator(fn):
@@ -71,10 +71,10 @@ def need_extension(extension: str):
 def need_right(right=None):
     """Decorator to require a certain user right when method is called.
 
-    @param right: The right the logged in user should have.
-    @type right: str or None
-    @return: method decorator
-    @raises UserRightsError: user has insufficient rights.
+    :param right: The right the logged in user should have.
+    :type right: str or None
+    :return: method decorator
+    :raises UserRightsError: user has insufficient rights.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
@@ -103,8 +103,8 @@ def need_right(right=None):
 def need_version(version: str):
     """Decorator to require a certain MediaWiki version number.
 
-    @param version: the mw version number required
-    @return: a decorator to make sure the requirement is satisfied when
+    :param version: the mw version number required
+    :return: a decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
     def decorator(fn):

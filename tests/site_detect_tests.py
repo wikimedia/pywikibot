@@ -29,8 +29,8 @@ class SiteDetectionTestCase(TestCase):
         """
         Assert a MediaWiki site can be loaded from the url.
 
-        @param url: Url of tested site
-        @raises AssertionError: Site under url is not MediaWiki powered
+        :param url: Url of tested site
+        :raises AssertionError: Site under url is not MediaWiki powered
         """
         try:
             self.assertIsInstance(MWSite(url), MWSite)
@@ -41,8 +41,8 @@ class SiteDetectionTestCase(TestCase):
         """
         Assert a url is not a MediaWiki site.
 
-        @param url: Url of tested site
-        @raises AssertionError: Site under url is MediaWiki powered
+        :param url: Url of tested site
+        :raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError,
                                 RuntimeError,

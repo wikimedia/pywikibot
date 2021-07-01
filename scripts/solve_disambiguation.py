@@ -382,10 +382,10 @@ ignore_title = {
 def correctcap(link, text: str) -> str:
     """Return the link capitalized/uncapitalized according to the text.
 
-    @param link: link page
-    @type link: pywikibot.Page
-    @param text: the wikitext that is supposed to refer to the link
-    @return: uncapitalized title of the link if the text links to the link
+    :param link: link page
+    :type link: pywikibot.Page
+    :param text: the wikitext that is supposed to refer to the link
+    :return: uncapitalized title of the link if the text links to the link
         with an uncapitalized title, else capitalized
     """
     linkupper = link.title()
@@ -403,10 +403,10 @@ class ReferringPageGeneratorWithIgnore:
                  ) -> None:
         """Initializer.
 
-        @type page: pywikibot.Page
-        @type primary: bool
-        @type minimum: int
-        @type main_only: bool
+        :type page: pywikibot.Page
+        :type primary: bool
+        :type minimum: int
+        :type main_only: bool
         """
         self.page = page
         # if run with the -primary argument, enable the ignore manager
@@ -454,9 +454,9 @@ class PrimaryIgnoreManager:
     def __init__(self, disamb_page, enabled=False) -> None:
         """Initializer.
 
-        @type disamb_page: pywikibot.Page
-        @type enabled: bool
-        @rtype: None
+        :type disamb_page: pywikibot.Page
+        :type enabled: bool
+        :rtype: None
 
         """
         self.disamb_page = disamb_page
@@ -470,7 +470,7 @@ class PrimaryIgnoreManager:
     def _read_ignorelist(self, folder) -> None:
         """Read pages to be ignored from file.
 
-        @type folder: str
+        :type folder: str
         """
         filename = os.path.join(
             folder, self.disamb_page.title(as_filename=True) + '.txt')
@@ -488,15 +488,15 @@ class PrimaryIgnoreManager:
     def isIgnored(self, ref_page) -> bool:  # noqa: N802
         """Return if ref_page is to be ignored.
 
-        @type ref_page: pywikibot.Page
+        :type ref_page: pywikibot.Page
         """
         return self.enabled and ref_page.title(as_url=True) in self.ignorelist
 
     def ignore(self, page_titles) -> None:
         """Write pages to ignorelist.
 
-        @param page_titles: page titles to be ignored
-        @type page_titles: iterable
+        :param page_titles: page titles to be ignored
+        :type page_titles: iterable
         """
         # backward compatibility
         if isinstance(page_titles, pywikibot.Page):
@@ -530,11 +530,11 @@ class EditOption(StandardOption):
     def __init__(self, option, shortcut, text, start, title) -> None:
         """Initializer.
 
-        @type option: str
-        @type shortcut: str
-        @type text: str
-        @type start: int
-        @type title: str
+        :type option: str
+        :type shortcut: str
+        :type text: str
+        :type start: int
+        :type title: str
         """
         super().__init__(option, shortcut)
         self._text = text
@@ -707,82 +707,82 @@ DisambiguationRobot""".format(options=added_keys,
     # Deprecated properties ---------------------------------------
 
     @property
-    @deprecated('opt.always', since='20210303', future_warning=True)
+    @deprecated('opt.always', since='20210303')
     def always(self):  # noqa: D102
         return self.opt.always
 
     @always.setter
-    @deprecated('opt.always', since='20210303', future_warning=True)
+    @deprecated('opt.always', since='20210303')
     def always(self, value):
         self.opt.always = value
 
     @property
-    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    @deprecated('opt.dnskip', since='20210303')
     def dnSkip(self):  # noqa: D102
         return self.opt.dnskip
 
     @dnSkip.setter
-    @deprecated('opt.dnskip', since='20210303', future_warning=True)
+    @deprecated('opt.dnskip', since='20210303')
     def dnSkip(self, value):
         self.opt.dnskip = value
 
     @property
-    @deprecated('opt.primary', since='20210303', future_warning=True)
+    @deprecated('opt.primary', since='20210303')
     def primary(self):  # noqa: D102
         return self.opt.primary
 
     @primary.setter
-    @deprecated('opt.primary', since='20210303', future_warning=True)
+    @deprecated('opt.primary', since='20210303')
     def primary(self, value):
         self.opt.primary = value
 
     @property
-    @deprecated('opt.main', since='20210303', future_warning=True)
+    @deprecated('opt.main', since='20210303')
     def main_only(self):  # noqa: D102
         return self.opt.main
 
     @main_only.setter
-    @deprecated('opt.main', since='20210303', future_warning=True)
+    @deprecated('opt.main', since='20210303')
     def main_only(self, value):
         self.opt.main = value
 
     @property
-    @deprecated('opt.first', since='20210303', future_warning=True)
+    @deprecated('opt.first', since='20210303')
     def first_only(self):  # noqa: D102
         return self.opt.first
 
     @first_only.setter
-    @deprecated('opt.first', since='20210303', future_warning=True)
+    @deprecated('opt.first', since='20210303')
     def first_only(self, value):
         self.opt.first = value
 
     @property
-    @deprecated('opt.min', since='20210303', future_warning=True)
+    @deprecated('opt.min', since='20210303')
     def minimum(self):  # noqa: D102
         return self.opt.min
 
     @minimum.setter
-    @deprecated('opt.min', since='20210303', future_warning=True)
+    @deprecated('opt.min', since='20210303')
     def minimum(self, value):
         self.opt.min = value
 
     @property
-    @deprecated('opt.pos', since='20210303', future_warning=True)
+    @deprecated('opt.pos', since='20210303')
     def alternatives(self):  # noqa: D102
         return self.opt.pos
 
     @alternatives.setter
-    @deprecated('opt.pos', since='20210303', future_warning=True)
+    @deprecated('opt.pos', since='20210303')
     def alternatives(self, value):
         self.opt.pos = value
 
     @property
-    @deprecated('opt.just', since='20210303', future_warning=True)
+    @deprecated('opt.just', since='20210303')
     def getAlternatives(self):  # noqa: D102
         return self.opt.just
 
     @getAlternatives.setter
-    @deprecated('opt.just', since='20210303', future_warning=True)
+    @deprecated('opt.just', since='20210303')
     def getAlternatives(self, value):
         self.opt.just = value
 
@@ -792,8 +792,8 @@ DisambiguationRobot""".format(options=added_keys,
         """
         Check if the text matches any of the ignore regexes.
 
-        @param text: wikitext of a page
-        @return: None if none of the regular expressions
+        :param text: wikitext of a page
+        :return: None if none of the regular expressions
             given in the dictionary at the top of this class matches
             a substring of the text, otherwise the matched substring
         """
@@ -872,12 +872,12 @@ DisambiguationRobot""".format(options=added_keys,
     def treat_links(self, ref_page, disamb_page) -> bool:
         """Resolve the links to disamb_page or its redirects.
 
-        @param disamb_page: the disambiguation page or redirect we don't want
+        :param disamb_page: the disambiguation page or redirect we don't want
             anything to link to
-        @type disamb_page: pywikibot.Page
-        @param ref_page: a page linking to disamb_page
-        @type ref_page: pywikibot.Page
-        @return: Return whether continue with next page (True)
+        :type disamb_page: pywikibot.Page
+        :param ref_page: a page linking to disamb_page
+        :type ref_page: pywikibot.Page
+        :return: Return whether continue with next page (True)
             or next disambig (False)
         """
         nochange = True
@@ -900,12 +900,12 @@ DisambiguationRobot""".format(options=added_keys,
     def treat_disamb_only(self, ref_page, disamb_page) -> str:
         """Resolve the links to disamb_page but don't look for its redirects.
 
-        @param disamb_page: the disambiguation page or redirect we don't want
+        :param disamb_page: the disambiguation page or redirect we don't want
             anything to link to
-        @type disamb_page: pywikibot.Page
-        @param ref_page: a page linking to disamb_page
-        @type ref_page: pywikibot.Page
-        @return: "nextpage" if the user enters "n" to skip this page,
+        :type disamb_page: pywikibot.Page
+        :param ref_page: a page linking to disamb_page
+        :type ref_page: pywikibot.Page
+        :return: "nextpage" if the user enters "n" to skip this page,
             "nochange" if the page needs no change, and
             "done" if the page is processed successfully
         """
@@ -1191,9 +1191,9 @@ DisambiguationRobot""".format(options=added_keys,
     def findAlternatives(self, page) -> bool:  # noqa: N802
         """Extend self.opt.pos using correctcap of disambPage.linkedPages.
 
-        @param page: the disambiguation page
-        @type page: pywikibot.Page
-        @return: True if everything goes fine, False otherwise
+        :param page: the disambiguation page
+        :type page: pywikibot.Page
+        :return: True if everything goes fine, False otherwise
         """
         if page.isRedirectPage() and not self.opt.primary:
             primary = i18n.translate(page.site,
@@ -1388,7 +1388,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
     alternatives = []

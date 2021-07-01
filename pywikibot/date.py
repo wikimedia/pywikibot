@@ -235,9 +235,9 @@ def alwaysTrue(x):
 
     Used for multiple value selection function to accept all other values.
 
-    @param x: not used
-    @return: True
-    @rtype: bool
+    :param x: not used
+    :return: True
+    :rtype: bool
     """
     return True
 
@@ -419,7 +419,7 @@ def dh(value: int, pattern, encf, decf, filter=None):
 
         lambda v: dh(v, 'pattern string', encf, decf)
 
-    @param encf:
+    :param encf:
         Converts from an integer parameter to another integer or a tuple of
         integers. Depending on the pattern, each integer will be converted to a
         proper string representation, and will be passed as a format argument
@@ -429,7 +429,7 @@ def dh(value: int, pattern, encf, decf, filter=None):
 
         This function is a complement of decf.
 
-    @param decf:
+    :param decf:
         Converts a tuple/list of non-negative integers found in the original
         value string
         into a normalized value. The normalized value can be passed right back
@@ -610,10 +610,10 @@ class MonthFormat(MutableMapping):
     def __init__(self, index, format_key):
         """Initializer of MonthFormat mapping.
 
-        @param index: month number
-        @type index: int
-        @param format_key: formats key like Day_January or Year_December
-        @type format_key: str
+        :param index: month number
+        :type index: int
+        :param format_key: formats key like Day_January or Year_December
+        :type format_key: str
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
@@ -1636,7 +1636,7 @@ def addFmt1(lang: str, isMnthOfYear, patterns):
     conversions, just like everywhere else in the formats map.
     The patterns parameter is a list of 12 elements to be used for each month.
 
-    @param lang: language code
+    :param lang: language code
     """
     assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
 
@@ -1913,10 +1913,10 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     """
     Return first matching formatted date value.
 
-    @param lang: language code
-    @param title: value to format
-    @return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
-    @rtype: tuple
+    :param lang: language code
+    :param title: value to format
+    :return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
+    :rtype: tuple
     """
     for dict_name, dictionary in formats.items():
         with suppress(Exception):
@@ -1952,18 +1952,18 @@ class FormatDate:
 def format_date(month, day, lang=None, year=2000):
     """Format a date localized to given lang.
 
-    @param month: month in range of 1..12
-    @param day: day of month in range of 1..31
-    @type day: int
-    @param lang: a site object or language key. Defaults to current site.
-    @type lang: BaseSite or string
-    @param year: year for which the date is to be formatted. always 29 will be
+    :param month: month in range of 1..12
+    :param day: day of month in range of 1..31
+    :type day: int
+    :param lang: a site object or language key. Defaults to current site.
+    :type lang: BaseSite or string
+    :param year: year for which the date is to be formatted. always 29 will be
         given For February except the year is given. Default is leap year 2000.
-    @type year: int
-    @return: localized date like "January 11"
-    @rtype: str
-    @raises ValueError: Wrong day value; must be 1-28/29/30/31
-    @raises IllegalMonthError: bad month number; must be 1-12
+    :type year: int
+    :return: localized date like "January 11"
+    :rtype: str
+    :raises ValueError: Wrong day value; must be 1-28/29/30/31
+    :raises IllegalMonthError: bad month number; must be 1-12
     """
     if not lang:
         lang = Site().lang
@@ -1998,15 +1998,15 @@ def apply_month_delta(date, month_delta=1, add_overlap=False):
     It does only work on calendars with 12 months per year, and where the
     months are numbered consecutively beginning by 1.
 
-    @param date: The starting date
-    @type date: date
-    @param month_delta: The amount of months added or subtracted.
-    @type month_delta: int
-    @param add_overlap: Add any missing days to the date, increasing the month
+    :param date: The starting date
+    :type date: date
+    :param month_delta: The amount of months added or subtracted.
+    :type month_delta: int
+    :param add_overlap: Add any missing days to the date, increasing the month
         once more.
-    @type add_overlap: bool
-    @return: The end date
-    @rtype: type of date
+    :type add_overlap: bool
+    :return: The end date
+    :rtype: type of date
     """
     if not isinstance(month_delta, int):
         raise ValueError('Month delta must be an integer')

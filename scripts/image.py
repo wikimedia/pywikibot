@@ -59,10 +59,10 @@ class ImageRobot(ReplaceBot):
         """
         Initializer.
 
-        @param generator: the pages to work on
-        @type generator: iterable
-        @param old_image: the title of the old image (without namespace)
-        @param new_image: the title of the new image (without namespace), or
+        :param generator: the pages to work on
+        :type generator: iterable
+        :param old_image: the title of the old image (without namespace)
+        :param new_image: the title of the new image (without namespace), or
                           None if you want to remove the image
         """
         self.available_options.update({
@@ -126,8 +126,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     old_image = None
     new_image = None

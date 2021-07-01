@@ -1,7 +1,45 @@
 # Schripts Changelog
 
+## 6.4.0
+*01 July 2021*
+
+### general
+* show a warning if pywikibot.__version__ is behind scripts.__version__
+
+### addtext
+* Deprecate get_text, put_text and add_text functions (T284388)
+* Use AutomaticTWSummaryBot and NoRedirectPageBot bot class instead of functions (T196851)
+
+### blockpageschecker
+* Script was unarchived
+
+### commonscat
+* Enable multiple sites (T57083)
+* Use new textlib.add_text function
+
+### cosmetic_changeds
+* set -ignore option to CANCEL.MATCH by default (T108446)
+
+### fixing_redirects
+* Add -overwrite option (T235219)
+
+### imagetransfer
+* Skip pages which does not exist on source site (T284414)
+* Use roundrobin_generators to combine multiple template inclusions
+* Allow images existing in the shared repo (T267535)
+
+### template
+* Do not try to initialze generator twice in TemplateRobot (T284534)
+
+### update_script
+* compat2core script was restored and renamed to update_script
+
+### version
+* Show all mandatory dependecies 
+
+
 ## 6.3.0
-*31 May 2021
+*31 May 2021* 
 
 ### addtext
 * -except option was removed in favour of commonly used -grepnot

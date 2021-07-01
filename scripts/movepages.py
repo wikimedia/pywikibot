@@ -52,17 +52,17 @@ class MovePagesBot(CurrentPageBot):
 
     """Page move bot."""
 
+    update_options = {
+        'prefix': '',
+        'noredirect': False,
+        'movetalkpage': True,
+        'skipredirects': False,
+        'summary': '',
+    }
+
     def __init__(self, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'prefix': None,
-            'noredirect': False,
-            'movetalkpage': True,
-            'skipredirects': False,
-            'summary': None,
-        })
         super().__init__(**kwargs)
-
         self.appendAll = False
         self.regexAll = False
         self.noNamespace = False
@@ -177,8 +177,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     oldName = None
     options = {}
@@ -197,7 +197,7 @@ def main(*args) -> None:
             else:
                 filename = arg[len('-pairsfile:'):]
             oldName1 = None
-            for page in pagegenerators.TextfilePageGenerator(filename):
+            for page in pagegenerators.TextIOPageGenerator(filename):
                 if oldName1:
                     fromToPairs.append([oldName1, page.title()])
                     oldName1 = None

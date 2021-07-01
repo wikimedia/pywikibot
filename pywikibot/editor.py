@@ -75,10 +75,10 @@ class TextEditor:
 
         Halts the thread's operation until the editor is closed.
 
-        @param text: the text to be edited
-        @param jumpIndex: position at which to put the caret
-        @param highlight: each occurrence of this substring will be highlighted
-        @return: the modified text, or None if the user didn't save the text
+        :param text: the text to be edited
+        :param jumpIndex: position at which to put the caret
+        :param highlight: each occurrence of this substring will be highlighted
+        :return: the modified text, or None if the user didn't save the text
             file in his text editor
         """
         if config.editor:

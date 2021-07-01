@@ -16,7 +16,7 @@ class WikiStatsTestCase(TestCase):
 
     """Test WikiStats dump."""
 
-    hostname = 'https://wikistats.wmflabs.org/api.php'
+    net = True
 
     def test_sort_numeric(self):
         """Test sorted results."""

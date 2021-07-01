@@ -146,7 +146,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 ignorelist = [
     # Officially reserved for testing, documentation, etc. in
-    # https://tools.ietf.org/html/rfc2606#page-2
+    # https://datatracker.ietf.org/doc/html/rfc2606#page-2
     # top-level domains:
     re.compile(r'.*[\./@]test(/.*)?'),
     re.compile(r'.*[\./@]example(/.*)?'),
@@ -444,7 +444,7 @@ class History:
 
         If link was previously found dead, remove it from the .dat file.
 
-        @return: True if previously found dead, else returns False.
+        :return: True if previously found dead, else returns False.
         """
         if url in self.historyDict:
             with self.semaphore, suppress(KeyError):
@@ -563,9 +563,9 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
-    def __init__(self, generator, HTTPignore=None, day=7, site=True):
+    def __init__(self, HTTPignore=None, day=7, **kwargs):
         """Initializer."""
-        super().__init__(generator=generator, site=site)
+        super().__init__(**kwargs)
 
         if config.report_dead_links_on_talk:
             pywikibot.log('Starting talk page thread')
@@ -615,7 +615,7 @@ def countLinkCheckThreads() -> int:
     """
     Count LinkCheckThread threads.
 
-    @return: number of LinkCheckThread threads
+    :return: number of LinkCheckThread threads
     """
     i = 0
     for thread in threading.enumerate():
@@ -630,8 +630,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     gen = None
     xmlFilename = None
@@ -683,7 +683,8 @@ def main(*args):
             pageNumber = max(240, config.max_external_links * 2)
             gen = pagegenerators.PreloadingGenerator(gen, groupsize=pageNumber)
         gen = pagegenerators.RedirectFilterPageGenerator(gen)
-        bot = WeblinkCheckerRobot(gen, HTTPignore, config.weblink_dead_days)
+        bot = WeblinkCheckerRobot(HTTPignore, config.weblink_dead_days,
+                                  generator=gen)
         try:
             bot.run()
         except ImportError:

@@ -9,8 +9,8 @@ Run scripts with pywikibot in directory mode using::
 This wrapper script uses the package directory to store all user files,
 will fix up search paths so the package does not need to be installed, etc.
 
-Currently `<pwb options>` are global options. This can be used for tests
-to set the default site (see T216825)::
+Currently `<pwb options>` are :ref:`global options`. This can be used
+for tests to set the default site (see T216825)::
 
     python pwb.py -lang:de bot_tests -v
 """
@@ -24,6 +24,7 @@ from __future__ import print_function
 import os
 import sys
 import types
+
 from difflib import get_close_matches
 from importlib import import_module
 from time import sleep
@@ -31,6 +32,37 @@ from warnings import warn
 
 
 pwb = None
+
+
+def check_pwb_versions(package):
+    """Validate package version and scripts version.
+
+    Rules:
+        - Pywikibot version must not be older than scrips version
+        - Scripts version must not be older than previous Pyvikibot version
+          due to deprecation policy
+    """
+    from pywikibot.tools import Version
+    scripts_version = Version(getattr(package, '__version__', pwb.__version__))
+    wikibot_version = Version(pwb.__version__)
+
+    if scripts_version.release > wikibot_version.release:
+        print('WARNING: Pywikibot version {} is behind scripts package '
+              'version {}.\nYour Pywikibot may need an update or be '
+              'misconfigured.\n'.format(wikibot_version, scripts_version))
+
+    # calculate previous minor release
+    prev_wikibot = Version('{v.major}.{}.{v.micro}'
+                           .format(wikibot_version.minor - 1,
+                                   v=wikibot_version,))
+
+    if scripts_version.release < prev_wikibot.release:
+        print('WARNING: Scripts package version {} is behind legacy Pywikibot '
+              'version {} and current version {}\nYour scripts may need an '
+              'update or be misconfigured.\n'
+              .format(scripts_version, prev_wikibot, wikibot_version, ))
+    del Version
+
 
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with Python 3 support [2] added later,
@@ -57,7 +89,8 @@ def run_python_file(filename, argv, argvu, package=None):
     main_mod.__file__ = filename
     main_mod.__builtins__ = sys.modules['builtins']
     if package:
-        main_mod.__package__ = package
+        main_mod.__package__ = package.__name__
+        check_pwb_versions(package)
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
@@ -96,8 +129,8 @@ def abspath(path):
 def handle_args(pwb_py, *args):
     """Handle args and get filename.
 
-    @return: filename, script args, local args for pwb.py
-    @rtype: tuple
+    :return: filename, script args, local args for pwb.py
+    :rtype: tuple
     """
     fname = None
     index = 0
@@ -135,11 +168,11 @@ def check_modules(script=None):
 
     This also checks Python version when importing deptendencies from setup.py
 
-    @param script: The script name to be checked for dependencies
-    @type script: str or None
-    @return: True if all dependencies are installed
-    @rtype: bool
-    @raise RuntimeError: wrong Python version found in setup.py
+    :param script: The script name to be checked for dependencies
+    :type script: str or None
+    :return: True if all dependencies are installed
+    :rtype: bool
+    :raise RuntimeError: wrong Python version found in setup.py
     """
     import pkg_resources
     if script:
@@ -344,9 +377,10 @@ def main():
                 relative_filename).replace(os.sep, '.')
             filename = os.path.join(os.curdir, relative_filename)
 
+    module = None
     if file_package and file_package not in sys.modules:
         try:
-            import_module(file_package)
+            module = import_module(file_package)
         except ImportError as e:
             warn('Parent module {} not found: {}'
                  .format(file_package, e), ImportWarning)
@@ -357,7 +391,7 @@ def main():
         run_python_file(filename,
                         [filename] + script_args,
                         [Path(filename).stem] + argvu[1:],
-                        file_package)
+                        module)
     return True
 
 

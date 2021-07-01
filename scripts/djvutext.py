@@ -51,20 +51,21 @@ class DjVuTextBot(SingleSiteBot):
     Works only on sites with Proofread Page extension installed.
     """
 
+    update_options = {
+        'force': False,
+        'summary': '',
+    }
+
     def __init__(self, djvu, index, pages: Optional[tuple] = None, **kwargs):
         """
         Initializer.
 
-        @param djvu: djvu from where to fetch the text layer
-        @type djvu: DjVuFile object
-        @param index: index page in the Index: namespace
-        @type index: Page object
-        @param pages: page interval to upload (start, end)
+        :param djvu: djvu from where to fetch the text layer
+        :type djvu: DjVuFile object
+        :param index: index page in the Index: namespace
+        :type index: Page object
+        :param pages: page interval to upload (start, end)
         """
-        self.available_options.update({
-            'force': False,
-            'summary': None
-        })
         super().__init__(site=index.site, **kwargs)
         self._djvu = djvu
         self._index = index
@@ -124,7 +125,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     index = None
     djvu_path = '.'  # default djvu file directory

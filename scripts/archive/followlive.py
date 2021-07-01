@@ -564,14 +564,14 @@ What is it? """
         """Init the page tuple before processing and return a page object.
 
         Set newpages generator result as instance properties.
-        @ivar page: new page
-        @type page: pywikibot.Page
-        @ivar date: creation date
-        @type date: str in ISO8601 format
-        @ivar length: content length
-        @type length: int
-        @ivar user: creator of page
-        @type user: pywikibot.User
+        :ivar page: new page
+        :type page: pywikibot.Page
+        :ivar date: creation date
+        :type date: str in ISO8601 format
+        :ivar length: content length
+        :type length: int
+        :ivar user: creator of page
+        :type user: pywikibot.User
         """
         self.page, self.date, self.length, _, user, comment = item
         self.user = pywikibot.User(self.site, user)
@@ -592,8 +592,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     # Generate the question text
     pywikibot.handle_args(*args)

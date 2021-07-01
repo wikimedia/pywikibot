@@ -45,12 +45,9 @@ class TouchBot(MultipleSitesBot):
 
     """Page touch bot."""
 
-    def __init__(self, generator, **kwargs) -> None:
-        """Initialize a TouchBot instance with the options and generator."""
-        self.available_options.update({
-            'botflag': False,
-        })
-        super().__init__(generator=generator, **kwargs)
+    update_options = {
+        'botflag': False,
+    }
 
     def treat(self, page) -> None:
         """Touch the given page."""
@@ -91,8 +88,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
 

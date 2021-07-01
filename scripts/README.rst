@@ -24,6 +24,9 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | basic.py               | Is a template from which simple bots can be made.       |
     +------------------------+---------------------------------------------------------+
+    | blockpagechecker.py    | Deletes any protection templates that are on pages      |
+    |                        | which aren't actually protected.                        |
+    +------------------------+---------------------------------------------------------+
     | category.py            | Add a category link to all pages mentioned on a page,   |
     |                        | change or remove category tags.                         |
     +------------------------+---------------------------------------------------------+
@@ -138,7 +141,7 @@ The contents of the package
     | unusedfiles.py         | Bot appends some text to all unused images and other    |
     |                        | text to the respective uploaders.                       |
     +------------------------+---------------------------------------------------------+
-    | upload.py              | upload an image to a wiki.                              |
+    | upload.py              | Upload an image to a wiki.                              |
     +------------------------+---------------------------------------------------------+
     | version.py             | Outputs Pywikibot's revision number, Python's version   |
     |                        | and OS used.                                            |
@@ -155,9 +158,6 @@ The contents of the package
     | archive                | Scripts no longer maintained.                           |
     |                        | Please open a Phabricator task if you want to use one.  |
     +========================+=========================================================+
-    | blockpagechecker.py    | Deletes any protection templates that are on pages      |
-    |                        | which aren't actually protected.                        |
-    +------------------------+---------------------------------------------------------+
     | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
     +------------------------+---------------------------------------------------------+
     | casechecker.py         | Script to enumerate all pages in Wikipedia and          |
@@ -246,8 +246,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | colors.py              | Utility to show pywikibot colors.                       |
     +------------------------+---------------------------------------------------------+
-    | compat2core.py         | Helper script to convert compat 1.0 scripts to the core |
-    |                        | 3.0 framework. Also works for newer Pywikibot releases. |
+    | update_script.py       | Helper script to update scripts and replace deprecated  |
+    |                        | code parts.                                             |
     +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+

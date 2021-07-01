@@ -447,7 +447,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertEqual(p3.is_categorypage(), False)
 
     def testIsFile(self):
-        """Test C{Page.is_filepage} check."""
+        """Test ``Page.is_filepage`` check."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'First page')
         p2 = pywikibot.Page(site, 'File:Second page')
@@ -595,7 +595,7 @@ class TestPageObject(DefaultSiteTestCase):
 
     def test_page_image(self):
         """
-        Test C{Page.page_image} function.
+        Test ``Page.page_image`` function.
 
         Since we are not sure what the wiki will return, we mainly test types
         """
@@ -627,7 +627,7 @@ class TestPageCoordinates(TestCase):
     cached = True
 
     def test_coordinates(self):
-        """Test C{Page.coodinates} method."""
+        """Test ``Page.coodinates`` method."""
         page = pywikibot.Page(self.site, 'Berlin')
         with self.subTest(primary_only=False):
             coords = page.coordinates()
@@ -760,7 +760,8 @@ class TestPageBotMayEdit(TestCase):
 
     def tearDown(self):
         """Cleanup cache."""
-        self.page.botMayEdit.cache_clear()
+        if hasattr(self.page, '_bot_may_edit'):
+            del self.page._bot_may_edit
         super().tearDown()
 
     def _run_test(self, template, user, expected_result):
@@ -769,7 +770,8 @@ class TestPageBotMayEdit(TestCase):
         self.page._text = template % {'user': user}
         with self.subTest(template=template, user=user):
             self.assertEqual(self.page.botMayEdit(), expected_result)
-        self.page.botMayEdit.cache_clear()
+        if hasattr(self.page, '_bot_may_edit'):
+            del self.page._bot_may_edit
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_nobots_ok(self):
@@ -842,7 +844,8 @@ class TestPageBotMayEdit(TestCase):
             self.page._text = '{{bots|%s=}}' % param
             with self.subTest(template=self.page.text, user=user, param=param):
                 self.assertTrue(self.page.botMayEdit())
-            self.page.botMayEdit.cache_clear()
+            if hasattr(self.page, '_bot_may_edit'):
+                del self.page._bot_may_edit
 
     @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_bots_nok(self):
@@ -964,7 +967,7 @@ class TestPageRedirects(TestCase):
     cached = True
 
     def testIsRedirect(self):
-        """Test C{Page.isRedirectPage()} and C{Page.getRedirectTarget}."""
+        """Test ``Page.isRedirectPage()`` and ``Page.getRedirectTarget``."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Legoktm/R1')
         p2 = pywikibot.Page(site, 'User:Legoktm/R2')
@@ -974,7 +977,7 @@ class TestPageRedirects(TestCase):
         self.assertIsInstance(p3, pywikibot.User)
 
     def testPageGet(self):
-        """Test C{Page.get()} on different types of pages."""
+        """Test ``Page.get()`` on different types of pages."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')

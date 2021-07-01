@@ -53,15 +53,16 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
     """The bot for interwiki."""
 
+    update_options = {
+        'clean': False,
+        'create': False,
+        'merge': False,
+        'summary': '',
+        'ignore_ns': False,  # used by interwikidata_tests only
+    }
+
     def __init__(self, **kwargs) -> None:
         """Initialize the bot."""
-        self.available_options.update({
-            'clean': False,
-            'create': False,
-            'merge': False,
-            'summary': None,
-            'ignore_ns': False,  # used by interwikidata_tests only
-        })
         super().__init__(**kwargs)
         if not self.site.has_data_repository:
             raise ValueError('{site} does not have a data repository, use '
@@ -218,8 +219,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()

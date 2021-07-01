@@ -62,6 +62,7 @@ except ImportError:
         return f
 
 OSWIN32 = (sys.platform == 'win32')
+pywikibot.bot.set_interface('buffer')
 
 
 class TestCaseBase(unittest.TestCase):
@@ -106,10 +107,10 @@ class TestCaseBase(unittest.TestCase):
         """
         Assert that Pages is in namespaces.
 
-        @param page: Page
-        @type page: pywikibot.BasePage
-        @param namespaces: expected namespaces
-        @type namespaces: int or set of int
+        :param page: Page
+        :type page: pywikibot.BasePage
+        :param namespaces: expected namespaces
+        :type namespaces: int or set of int
         """
         if isinstance(namespaces, int):
             namespaces = {namespaces}
@@ -125,12 +126,12 @@ class TestCaseBase(unittest.TestCase):
         Page after count if it exists, and then a Page with title '...'
         if additional items are in the iterator.
 
-        @param gen: Page generator
-        @type gen: typing.Iterable[pywikibot.Page]
-        @param count: number of pages to get
-        @type count: int
-        @param site: Site of expected pages
-        @type site: pywikibot.site.APISite
+        :param gen: Page generator
+        :type gen: typing.Iterable[pywikibot.Page]
+        :param count: number of pages to get
+        :type count: int
+        :param site: Site of expected pages
+        :type site: pywikibot.site.APISite
         """
         original_iter = iter(gen)
 
@@ -169,10 +170,10 @@ class TestCaseBase(unittest.TestCase):
         """
         Assert that generator returns Pages all in namespaces.
 
-        @param gen: generator to iterate
-        @type gen: generator
-        @param namespaces: expected namespaces
-        @type namespaces: int or set of int
+        :param gen: generator to iterate
+        :type gen: generator
+        :param namespaces: expected namespaces
+        :type namespaces: int or set of int
         """
         if isinstance(namespaces, int):
             namespaces = {namespaces}
@@ -184,12 +185,12 @@ class TestCaseBase(unittest.TestCase):
         """
         Try to confirm that generator returns Pages for all namespaces.
 
-        @param gen: generator to iterate
-        @type gen: generator
-        @param namespaces: expected namespaces
-        @type namespaces: int or set of int
-        @param skip: skip test if not all namespaces found
-        @param skip: bool
+        :param gen: generator to iterate
+        :type gen: generator
+        :param namespaces: expected namespaces
+        :type namespaces: int or set of int
+        :param skip: skip test if not all namespaces found
+        :param skip: bool
         """
         if isinstance(namespaces, int):
             namespaces = {namespaces}
@@ -211,12 +212,12 @@ class TestCaseBase(unittest.TestCase):
 
         Only iterates to the length of titles plus two.
 
-        @param gen: Page generator
-        @type gen: typing.Iterable[pywikibot.Page]
-        @param titles: Expected titles
-        @type titles: iterator
-        @param site: Site of expected pages
-        @type site: pywikibot.site.APISite
+        :param gen: Page generator
+        :type gen: typing.Iterable[pywikibot.Page]
+        :param titles: Expected titles
+        :type titles: iterator
+        :param site: Site of expected pages
+        :type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -228,12 +229,12 @@ class TestCaseBase(unittest.TestCase):
 
         Only iterates to the length of titles plus two.
 
-        @param gen: Page generator
-        @type gen: typing.Iterable[pywikibot.Page]
-        @param titles: Expected titles
-        @type titles: iterator
-        @param site: Site of expected pages
-        @type site: pywikibot.site.APISite
+        :param gen: Page generator
+        :type gen: typing.Iterable[pywikibot.Page]
+        :param titles: Expected titles
+        :type titles: iterator
+        :param site: Site of expected pages
+        :type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -242,25 +243,25 @@ class TestCaseBase(unittest.TestCase):
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
                        **kwargs):
         """
-        Assert that a specific APIError wrapped around L{assertRaises}.
+        Assert that a specific APIError wrapped around :py:obj:`assertRaises`.
 
         If no callable object is defined and it returns a context manager, that
         context manager will return the underlying context manager used by
-        L{assertRaises}. So it's possible to access the APIError by using it's
-        C{exception} attribute.
+        :py:obj:`assertRaises`. So it's possible to access the APIError by
+        using it's ``exception`` attribute.
 
-        @param code: The code of the error which must have happened.
-        @type code: str
-        @param info: The info string of the error or None if no it shouldn't be
+        :param code: The code of the error which must have happened.
+        :type code: str
+        :param info: The info string of the error or None if no it shouldn't be
             checked.
-        @type info: str or None
-        @param callable_obj: The object that will be tested. If None it returns
-            a context manager like L{assertRaises}.
-        @type callable_obj: callable
-        @param args: The positional arguments forwarded to the callable object.
-        @param kwargs: The keyword arguments forwarded to the callable object.
-        @return: Context manager if callable_obj is None and None otherwise.
-        @rtype: None or context manager
+        :type info: str or None
+        :param callable_obj: The object that will be tested. If None it returns
+            a context manager like :py:obj:`assertRaises`.
+        :type callable_obj: callable
+        :param args: The positional arguments forwarded to the callable object.
+        :param kwargs: The keyword arguments forwarded to the callable object.
+        :return: Context manager if callable_obj is None and None otherwise.
+        :rtype: None or context manager
         """
         msg = kwargs.pop('msg', None)
         return AssertAPIErrorContextManager(
@@ -327,6 +328,7 @@ class DisableSiteMixin(TestCaseBase):
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
             '{}: Site() not permitted'.format(self.__class__.__name__))
+        pywikibot.Site.__doc__ = 'TEST'
 
         super().setUp()
 
@@ -946,11 +948,11 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
     def get_mainpage(self, site=None, force=False):
         """Create a Page object for the sites main page.
 
-        @param site: Override current site, obtained using L{get_site}.
-        @type site: pywikibot.site.APISite or None
-        @param force: Get an unused Page object
-        @type force: bool
-        @rtype: pywikibot.Page
+        :param site: Override current site, obtained using :py:obj:`get_site`.
+        :type site: pywikibot.site.APISite or None
+        :param force: Get an unused Page object
+        :type force: bool
+        :rtype: pywikibot.Page
         """
         if not site:
             site = self.get_site()
@@ -977,8 +979,8 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
     def get_missing_article(self, site=None):
         """Get a Page which refers to a missing page on the site.
 
-        @type site: pywikibot.Site or None
-        @rtype: pywikibot.Page
+        :type site: pywikibot.Site or None
+        :rtype: pywikibot.Page
         """
         if not site:
             site = self.get_site()
@@ -996,11 +998,11 @@ class CapturingTestCase(TestCase):
     Capture assertion calls to do additional calls around them.
 
     All assertions done which start with "assert" are patched in such a way
-    that after the assertion it calls C{process_assertion} with the assertion
+    that after the assertion it calls ``process_assertion`` with the assertion
     and the arguments.
 
     To avoid that it patches the assertion it's possible to put the call in an
-    C{disable_assert_capture} with-statement.
+    ``disable_assert_capture`` with-statement.
 
     """
 
@@ -1072,7 +1074,7 @@ class PatchingTestCase(TestCase):
         """
         Patch the obj's attribute with the replacement.
 
-        It will be reset after each C{tearDown}.
+        It will be reset after each ``tearDown``.
         """
         self._patched_instances += [(obj, attr_name, getattr(obj, attr_name))]
         setattr(obj, attr_name, replacement)
@@ -1119,8 +1121,8 @@ class DefaultSiteTestCase(TestCase):
         """
         Override the default site.
 
-        @param site: site tests should use
-        @type site: BaseSite
+        :param site: site tests should use
+        :type site: BaseSite
         """
         unittest_print(
             '{cls.__name__} using {site} instead of {cls.family}:{cls.code}.'
@@ -1461,17 +1463,17 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         Assert that a deprecation warning happened.
 
         To simplify deprecation tests it just requires the to separated parts
-        and forwards the result to L{assertDeprecation}.
+        and forwards the result to :py:obj:`assertDeprecation`.
 
-        @param deprecated: The deprecated string. If None it uses a generic
+        :param deprecated: The deprecated string. If None it uses a generic
             match depending on instead.
-        @type deprecated: str or None
-        @param instead: The instead string unless deprecated is None. If it's
+        :type deprecated: str or None
+        :param instead: The instead string unless deprecated is None. If it's
             None it allows any generic deprecation string, on True only those
             where instead string is present and on False only those where it's
             missing. If the deprecation string is not None, no instead string
             is expected when instead evaluates to False.
-        @type instead: str or None or True or False
+        :type instead: str or None or True or False
         """
         self.assertDeprecation(self._build_message(deprecated, instead))
 
@@ -1479,10 +1481,10 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         """
         Assert that a deprecation warning happened.
 
-        @param msg: Either the specific message or None to allow any generic
-            message. When set to C{INSTEAD} it only counts those supplying an
-            alternative and when C{NO_INSTEAD} only those not supplying one.
-        @type msg: str or None or INSTEAD or NO_INSTEAD
+        :param msg: Either the specific message or None to allow any generic
+            message. When set to ``INSTEAD`` it only counts those supplying an
+            alternative and when ``NO_INSTEAD`` only those not supplying one.
+        :type msg: str or None or INSTEAD or NO_INSTEAD
         """
         if msg is None or msg is self.INSTEAD or msg is self.NO_INSTEAD:
             deprecation_messages = self.deprecation_messages
@@ -1511,7 +1513,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         """
         Assert that exactly one deprecation message happened and reset.
 
-        It uses the same arguments as L{assertDeprecationParts}.
+        It uses the same arguments as :py:obj:`assertDeprecationParts`.
         """
         self.assertOneDeprecation(self._build_message(deprecated, instead),
                                   count)
@@ -1571,12 +1573,12 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
     """
     A test case capturing asserts and asserting a deprecation afterwards.
 
-    For example C{assertEqual} will do first C{assertEqual} and then
-    C{assertOneDeprecation}.
+    For example ``assertEqual`` will do first ``assertEqual`` and then
+    ``assertOneDeprecation``.
     """
 
     def after_assert(self, assertion, *args, **kwargs):
-        """Handle assertion and call C{assertOneDeprecation} after it."""
+        """Handle assertion and call ``assertOneDeprecation`` after it."""
         super().after_assert(
             assertion, *args, **kwargs)
         self.assertOneDeprecation()

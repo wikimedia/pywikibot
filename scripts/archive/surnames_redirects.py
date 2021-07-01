@@ -39,9 +39,9 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
         """Initializer.
 
         Parameters:
-            @param generator: The page generator that determines on
+            :param generator: The page generator that determines on
                               which pages to work.
-            @kwarg surnames-last: Redirect "Surnames, Given Names" to
+            :keyword surnames-last: Redirect "Surnames, Given Names" to
                                   "Given Names Surnames".
         """
         self.available_options.update({
@@ -105,8 +105,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
 

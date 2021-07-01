@@ -92,8 +92,8 @@ class UploadTextBot(SingleSiteBot):
         A PriorityQueue is used to process pages in the same order as
         they are generated.
 
-        @param generator: page generator
-        @type generator: generator
+        :param generator: page generator
+        :type generator: generator
         """
         self.available_options.update({
             'showdiff': False,
@@ -164,9 +164,9 @@ class UploadTextBot(SingleSiteBot):
     def treat(self, page):
         """Process one ProofreadPage page.
 
-        @param page: page to be treated.
-        @type page: ProofreadPage
-        @raises pywikibot.exceptions.Error: Page must be a ProofreadPage object
+        :param page: page to be treated.
+        :type page: ProofreadPage
+        :raises pywikibot.exceptions.Error: Page must be a ProofreadPage object
         """
         if not isinstance(page, ProofreadPage):
             raise Error('Page {} must be a ProofreadPage object.'
@@ -196,8 +196,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     index = None
     pages = '1-'

@@ -28,6 +28,11 @@ basic script
 
 .. automodule:: scripts.basic
 
+blockpageschecker script
+------------------------
+
+.. automodule:: scripts.blockpageschecker
+
 category script
 ---------------
 

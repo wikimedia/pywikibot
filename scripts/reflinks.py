@@ -406,14 +406,14 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """References bot."""
 
+    update_options = {
+        'ignorepdf': False,
+        'limit': 0,  # stop after n modified pages
+        'summary': '',
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'ignorepdf': False,  # boolean
-            'limit': 0,  # int, stop after n modified pages
-            'summary': '',
-        })
-
         super().__init__(**kwargs)
         self._use_fake_user_agent = config.fake_user_agent_default.get(
             'reflinks', False)
@@ -730,8 +730,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     xml_filename = None
     xml_start = None

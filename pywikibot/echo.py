@@ -21,7 +21,7 @@ class Notification:
         """
         Construct a Notification object from JSON data returned by the API.
 
-        @rtype: Notification
+        :rtype: Notification
         """
         notif = cls(site)
 
@@ -56,7 +56,7 @@ class Notification:
         """
         DEPRECATED: Return notification id as unicode.
 
-        @rtype: str
+        :rtype: str
         """
         return str(self.event_id)
 

@@ -43,10 +43,9 @@ import re
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
 from pywikibot.exceptions import InvalidTitleError
-
-from scripts.add_text import add_text
+from pywikibot.textlib import add_text
 
 
 docuReplacements = {
@@ -223,16 +222,11 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
+class CommonscatBot(ExistingPageBot, NoRedirectPageBot):
 
     """Commons categorisation bot."""
 
-    def __init__(self, **kwargs):
-        """Initializer."""
-        self.available_options.update({
-            'summary': None,
-        })
-        super().__init__(**kwargs)
+    update_options = {'summary': None}
 
     def skip_page(self, page):
         """Skip category redirects or disambigs."""
@@ -321,16 +315,14 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             commonscatLink = self.find_commons_category(page)
             if commonscatLink:
                 if commonscatLink == page.title():
-                    textToAdd = '{{%s}}' % primaryCommonscat
+                    text_to_add = '{{%s}}' % primaryCommonscat
                 else:
-                    textToAdd = '{{%s|%s}}' % (primaryCommonscat,
-                                               commonscatLink)
-                result, _, always = add_text(page, textToAdd,
-                                             self.opt.summary,
-                                             always=self.opt.always)
-                if result is True:
-                    self._save_counter += 1
-                self.opt.always = always
+                    text_to_add = '{{%s|%s}}' % (primaryCommonscat,
+                                                 commonscatLink)
+                summary = self.opt.summary or i18n.twtranslate(
+                    page.site, 'add_text-adding', {'adding': text_to_add})
+                self.put_current(add_text(page.text, text_to_add),
+                                 summary=summary)
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
@@ -372,7 +364,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def findCommonscatLink(self, page) -> str:
         """Find CommonsCat template on interwiki pages.
 
-        @return: name of a valid commons category
+        :return: name of a valid commons category
         """
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
@@ -400,7 +392,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Use Wikibase property to get the category if possible.
         Otherwise check all langlinks to find it.
 
-        @return: name of a valid commons category
+        :return: name of a valid commons category
         """
         data_repo = page.site.data_repository()
         cat_property = wikibase_property.get(data_repo.sitename)
@@ -418,7 +410,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     def getCommonscatLink(page):  # noqa N802, N803
         """Find CommonsCat template on page.
 
-        @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
+        :rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
         """
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             page.site.code, commonscatTemplates,
@@ -454,7 +446,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             return ''
 
         pywikibot.log('getCommonscat: ' + name)
-        commonsSite = self.site.image_repository()
+        commonsSite = self.current_page.site.image_repository()
         commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
 
         try:  # parse title (T26742)
@@ -519,8 +511,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
     checkcurrent = False

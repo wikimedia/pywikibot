@@ -54,12 +54,12 @@ class FamilyFileGenerator:
         """
         Parameters are optional. If not given the script asks for the values.
 
-        @param url: an url from where the family settings are loaded
-        @param name: the family name without "_family.py" tail.
-        @param dointerwiki: Predefined answer to add multiple language
+        :param url: an url from where the family settings are loaded
+        :param name: the family name without "_family.py" tail.
+        :param dointerwiki: Predefined answer to add multiple language
             codes. Pass `Y` or `y` for yes `N` or `n` for no and
             `E` or `e` if you want to edit the collection of sites.
-        @param verify: If a certificate verification failes, you may
+        :param verify: If a certificate verification failes, you may
             pass `Y` or `y` to disable certificate validaton `N` or `n`
             to keep it enabled.
         """

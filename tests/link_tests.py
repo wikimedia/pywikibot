@@ -23,7 +23,7 @@ from tests.aspects import (
 
 class TestCreateSeparated(DefaultDrySiteTestCase):
 
-    """Test C{Link.create_separated}."""
+    """Test ``Link.create_separated``."""
 
     def _test_link(self, link, page, section, label):
         """Test the separate contents of the link."""

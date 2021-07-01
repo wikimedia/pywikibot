@@ -114,8 +114,8 @@ class PageWithRefs(Page):
         If namespaces is None, all namespaces are checked.
         Returns a set with namespaces where a ref to page is present.
 
-        @param namespaces: Namespace to check
-        @type namespaces: iterable of Namespace objects
+        :param namespaces: Namespace to check
+        :type namespaces: iterable of Namespace objects
         """
         if namespaces is None:
             namespaces = self.site.namespaces()
@@ -127,20 +127,18 @@ class DeletionRobot(CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
-    def __init__(self, generator, summary: str, **kwargs) -> None:
-        """
-        Initializer.
+    update_options = {
+        'undelete': False,
+        'isorphan': 0,
+        'orphansonly': [],
+    }
 
-        @param generator: the pages to work on
-        @type generator: iterable
-        @param summary: the reason for the (un)deletion
+    def __init__(self, summary: str, **kwargs) -> None:
+        """Initializer.
+
+        :param summary: the reason for the (un)deletion
         """
-        self.available_options.update({
-            'undelete': False,
-            'isorphan': 0,
-            'orphansonly': [],
-        })
-        super().__init__(generator=generator, **kwargs)
+        super().__init__(**kwargs)
 
         self.summary = summary
         # Upcast pages to PageWithRefs()
@@ -224,7 +222,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     page_name = ''
     summary = None
@@ -289,7 +287,7 @@ def main(*args: Tuple[str, ...]) -> None:
             summary = pywikibot.input('Enter a reason for the {}deletion:'
                                       .format(['', 'un'][options
                                               .get('undelete', False)]))
-        bot = DeletionRobot(generator, summary, **options)
+        bot = DeletionRobot(summary, generator=generator, **options)
         bot.run()
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

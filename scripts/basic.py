@@ -77,37 +77,22 @@ class BasicBot(
     """
     An incomplete sample bot.
 
-    @ivar summary_key: Edit summary message key. The message that should be
+    :ivar summary_key: Edit summary message key. The message that should be
         used is placed on /i18n subdirectory. The file containing these
         messages should have the same name as the caller script (i.e. basic.py
         in this case). Use summary_key to set a default edit summary message.
 
-    @type summary_key: str
+    :type summary_key: str
     """
 
     summary_key = 'basic-changing'
 
-    def __init__(self, generator, **kwargs) -> None:
-        """
-        Initializer.
-
-        @param generator: the page generator that determines on which pages
-            to work
-        @type generator: generator
-        """
-        # Add your own options to the bot and set their defaults
-        # -always option is predefined by BaseBot class
-        self.available_options.update({
-            'replace': False,  # delete old text and write the new text
-            'summary': None,  # your own bot summary
-            'text': 'Test',  # add this text from option. 'Test' is default
-            'top': False,  # append text on top of the page
-        })
-
-        # call initializer of the super class
-        super().__init__(site=True, **kwargs)
-        # assign the generator to the bot
-        self.generator = generator
+    update_options = {
+        'replace': False,  # delete old text and write the new text
+        'summary': None,  # your own bot summary
+        'text': 'Test',  # add this text from option. 'Test' is default
+        'top': False,  # append text on top of the page
+    }
 
     def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
@@ -147,7 +132,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
     # Process global arguments to determine desired site
@@ -179,7 +164,7 @@ def main(*args: Tuple[str, ...]) -> None:
     gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         # pass generator and private options to the bot
-        bot = BasicBot(gen, **options)
+        bot = BasicBot(generator=gen, **options)
         bot.run()  # guess what it does
     else:
         pywikibot.bot.suggest_help(missing_generator=True)

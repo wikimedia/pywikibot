@@ -29,13 +29,13 @@ class Option(ABC):
     * result(value)
     * test(value)
 
-    The methods C{test} and C{handled} are in such a relationship that
-    when C{handled} returns itself that C{test} must return True for
-    that value. So if C{test} returns False C{handled} may not return
+    The methods ``test`` and ``handled`` are in such a relationship that
+    when ``handled`` returns itself that ``test`` must return True for
+    that value. So if ``test`` returns False ``handled`` may not return
     itself but it may return not None.
 
-    Also C{result} only returns a sensible value when C{test} returns True for
-    the same value.
+    Also ``result`` only returns a sensible value when ``test`` returns
+    True for the same value.
     """
 
     def __init__(self, stop=True) -> None:
@@ -47,10 +47,10 @@ class Option(ABC):
         """
         Create a text with the options formatted into it.
 
-        @param text: Text into which options are to be formatted
-        @param options: Option instances to be formatted
-        @type options: Iterable
-        @return: Text with the options formatted into it
+        :param text: Text into which options are to be formatted
+        :param options: Option instances to be formatted
+        :type options: Iterable
+        :return: Text with the options formatted into it
         """
         formatted_options = []
         for option in options:
@@ -139,8 +139,8 @@ class StandardOption(Option):
         """
         Initializer.
 
-        @param option: option string
-        @param shortcut: Shortcut of the option
+        :param option: option string
+        :param shortcut: Shortcut of the option
         """
         super().__init__(**kwargs)
         self.option = option
@@ -183,7 +183,6 @@ class OutputProxyOption(OutputOption, StandardOption):
         if not hasattr(self._outputter, 'out'):
             issue_deprecation_warning('{} without "out" property'
                                       .format(self.__class__.__name__),
-                                      warning_class=FutureWarning,
                                       since='6.2.0')
             return self._outputter.output()
         return self._outputter.out
@@ -252,8 +251,7 @@ class ContextOption(OutputOption, StandardOption):
         return self.text[start:end]
 
     @deprecated_args(start_context='start', end_context='end')
-    @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0',
-                future_warning=True)
+    @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0')
     def output_range(self, start, end):
         """DEPRECATED. Output a section from the text."""
         pywikibot.output(self.text[start:end])
@@ -478,8 +476,8 @@ class ShowingListOption(ListOption, OutputOption):
                  post: Optional[str] = None, **kwargs):
         """Initializer.
 
-        @param pre: Additional comment printed before the list.
-        @param post: Additional comment printed after the list.
+        :param pre: Additional comment printed before the list.
+        :param post: Additional comment printed after the list.
         """
         super().__init__(sequence, prefix, **kwargs)
         self.pre = pre
@@ -562,7 +560,7 @@ class HighlightContextOption(ContextOption):
                             self.text[self.end:end])
 
     @deprecated('pywikibot.output(HighlightContextOption.out)',
-                since='6.2.0', future_warning=True)
+                since='6.2.0')
     def output_range(self, start, end):
         """DEPRECATED. Show normal context with a highlighted center region."""
         color_format = pywikibot.tools.formatter.color_format

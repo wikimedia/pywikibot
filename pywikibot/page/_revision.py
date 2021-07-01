@@ -109,8 +109,8 @@ class Revision(Mapping):
 
         Returns 0 if there is no previous revision
 
-        @return: id of parent/previous revision
-        @raises AssertionError: parent id not supplied to the constructor
+        :return: id of parent/previous revision
+        :raises AssertionError: parent id not supplied to the constructor
         """
         return self.parentid
 
@@ -123,6 +123,6 @@ class Revision(Mapping):
         didn't support revisions with slots. For newer MW versions,
         this returns the content model of the main slot.
 
-        @return: content model
+        :return: content model
         """
         return self.contentmodel

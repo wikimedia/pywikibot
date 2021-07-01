@@ -218,7 +218,7 @@ class TestPagesFromPageidGenerator(BasetitleTestCase):
                                                             self.site)
         pageids = [page.pageid for page in gen_pages]
 
-        with suppress_warnings(PAGES_ID_GEN_MSG, category=DeprecationWarning):
+        with suppress_warnings(PAGES_ID_GEN_MSG, category=FutureWarning):
             gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
             self.assertPageTitlesEqual(gen, self.titles)
 
@@ -407,7 +407,7 @@ class TestRepeatingGenerator(RecentChangesTestCase):
 
     def test_RepeatingGenerator(self):
         """Test RepeatingGenerator."""
-        with suppress_warnings(category=DeprecationWarning):
+        with suppress_warnings(category=FutureWarning):
             gen = pagegenerators.RepeatingGenerator(
                 self.site.recentchanges,
                 key_func=lambda x: x['revid'],
@@ -424,7 +424,7 @@ class TestRepeatingGenerator(RecentChangesTestCase):
         self.assertLength({item['revid'] for item in items}, self.length)
 
 
-class TestTextfilePageGenerator(DefaultSiteTestCase):
+class TestTextIOPageGenerator(DefaultSiteTestCase):
 
     """Test loading pages from a textfile."""
 
@@ -444,10 +444,10 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
     )
 
     def test_brackets(self):
-        """Test TextfilePageGenerator with brackets."""
+        """Test TextIOPageGenerator with brackets."""
         filename = join_data_path('pagelist-brackets.txt')
         site = self.get_site()
-        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        titles = list(pagegenerators.TextIOPageGenerator(filename, site))
         self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
@@ -456,16 +456,29 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         self.assertPageTitlesEqual(titles, expected_titles)
 
     def test_lines(self):
-        """Test TextfilePageGenerator with newlines."""
+        """Test TextIOPageGenerator with newlines."""
         filename = join_data_path('pagelist-lines.txt')
         site = self.get_site()
-        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        titles = list(pagegenerators.TextIOPageGenerator(filename, site))
         self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
                                               .case]]
             for expected_title, page in zip(self.expected_titles, titles)]
         self.assertPageTitlesEqual(titles, expected_titles)
+
+    @unittest.mock.patch('pywikibot.comms.http.fetch', autospec=True)
+    def test_url(self, mock_fetch):
+        """Test TextIOPageGenerator with URL."""
+        # Mock return value of fetch()
+        fetch_return = unittest.mock.Mock()
+        fetch_return.text = '\n'.join(
+            [title[0] for title in self.expected_titles])
+        mock_fetch.return_value = fetch_return
+        site = self.get_site()
+        titles = list(
+            pagegenerators.TextIOPageGenerator('http://www.someurl.org', site))
+        self.assertLength(titles, self.expected_titles)
 
 
 class TestYearPageGenerator(DefaultSiteTestCase):
@@ -792,12 +805,12 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         """
         Test given claim on sample (India) page.
 
-        @param prop: the property to check
-        @param claim: the claim the property should contain
-        @param qualifiers: qualifiers to check or None
-        @param valid: true if the page should be yielded by the generator,
+        :param prop: the property to check
+        :param claim: the claim the property should contain
+        :param qualifiers: qualifiers to check or None
+        :param valid: true if the page should be yielded by the generator,
             false otherwise
-        @param negate: true to swap the filters' behavior
+        :param negate: true to swap the filters' behavior
         """
         item = pywikibot.ItemPage(self.get_repo(), 'Q668')
         gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop, claim,
@@ -1643,7 +1656,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
             self.skipTest('Site is not using a Wikibase repository')
         with suppress_warnings(
                 'pywikibot.pagegenerators.UnconnectedPageGenerator is '
-                'deprecated', DeprecationWarning):
+                'deprecated', FutureWarning):
             upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
         self.assertDictEqual(
             upgen.request._params, {
@@ -1698,7 +1711,7 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_opposite_protocols(self):
         """Test LinksearchPageGenerator with two opposite protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=DeprecationWarning):
+        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
             with self.assertRaises(ValueError):
                 pagegenerators.LinksearchPageGenerator(
                     'http://w.wiki',
@@ -1707,7 +1720,7 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_same_protocols(self):
         """Test LinksearchPageGenerator with two same protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=DeprecationWarning):
+        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
             gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
                                                          protocol='https',
                                                          site=self.site,

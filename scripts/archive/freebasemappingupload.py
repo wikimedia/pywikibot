@@ -106,8 +106,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     filename = 'fb2w.nt.gz'  # Default filename
     for arg in pywikibot.handle_args(args):

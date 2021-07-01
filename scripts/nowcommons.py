@@ -179,16 +179,16 @@ class NowCommonsDeleteBot(Bot):
 
     """Bot to delete migrated files."""
 
+    update_options = {
+        'replace': False,
+        'replacealways': False,
+        'replaceloose': False,
+        'replaceonly': False,
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'replace': False,
-            'replacealways': False,
-            'replaceloose': False,
-            'replaceonly': False,
-        })
         super().__init__(**kwargs)
-
         self.site = pywikibot.Site()
         if not self.site.has_image_repository:
             sys.exit('There must be a file repository to run this script')
@@ -375,8 +375,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}
 

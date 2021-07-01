@@ -73,11 +73,11 @@ class Siteinfo(Container):
          - 'semiprotectedlevels': 'autoconfirmed'
          - 'levels': '' (everybody), 'autoconfirmed', 'sysop'
          - 'types': 'create', 'edit', 'move', 'upload'
-        Otherwise it returns L{pywikibot.tools.EMPTY_DEFAULT}.
+        Otherwise it returns :py:obj:`pywikibot.tools.EMPTY_DEFAULT`.
 
-        @param key: The property name
-        @return: The default value
-        @rtype: dict or L{pywikibot.tools.EmptyDefault}
+        :param key: The property name
+        :return: The default value
+        :rtype: dict or :py:obj:`pywikibot.tools.EmptyDefault`
         """
         if key == 'restrictions':
             # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
@@ -123,14 +123,14 @@ class Siteinfo(Container):
         returned when a property doesn't exists, it queries each property
         independetly if a property is invalid.
 
-        @param prop: The property names of the siteinfo.
-        @type prop: str or iterable
-        @param expiry: The expiry date of the cached request.
-        @type expiry: int (days), L{datetime.timedelta}, False (config)
-        @return: A dictionary with the properties of the site. Each entry in
+        :param prop: The property names of the siteinfo.
+        :type prop: str or iterable
+        :param expiry: The expiry date of the cached request.
+        :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)
+        :return: A dictionary with the properties of the site. Each entry in
             the dictionary is a tuple of the value and a boolean to save if it
             is the default value.
-        @see: U{https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si}
+        :see: https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si
         """
         def warn_handler(mod, message):
             """Return True if the warning is handled."""
@@ -212,13 +212,13 @@ class Siteinfo(Container):
         multiple default properties are queried with one request. It'll cache
         always all results.
 
-        @param key: The key to search for.
-        @param expiry: If the cache is older than the expiry it ignores the
+        :param key: The key to search for.
+        :param expiry: If the cache is older than the expiry it ignores the
             cache and queries the server to get the newest value.
-        @type expiry: int (days), L{datetime.timedelta}, False (never)
-        @return: If that property was retrieved via this method. Returns None
+        :type expiry: int (days), :py:obj:`datetime.timedelta`, False (never)
+        :return: If that property was retrieved via this method. Returns None
             if the key was not in the retrieved values.
-        @rtype: various (the value), bool (if the default value is used)
+        :rtype: various (the value), bool (if the default value is used)
         """
         if 'general' not in self._cache:
             pywikibot.debug('general siteinfo not loaded yet.', _logger)
@@ -255,19 +255,19 @@ class Siteinfo(Container):
         It will never throw an APIError if it only stated, that the siteinfo
         property doesn't exist. Instead it will use the default value.
 
-        @param key: The name of the siteinfo property.
-        @param get_default: Whether to throw an KeyError if the key is invalid.
-        @param cache: Caches the result internally so that future accesses via
+        :param key: The name of the siteinfo property.
+        :param get_default: Whether to throw an KeyError if the key is invalid.
+        :param cache: Caches the result internally so that future accesses via
             this method won't query the server.
-        @param expiry: If the cache is older than the expiry it ignores the
+        :param expiry: If the cache is older than the expiry it ignores the
             cache and queries the server to get the newest value.
-        @type expiry: int/float (days), L{datetime.timedelta},
+        :type expiry: int/float (days), :py:obj:`datetime.timedelta`,
             False (never expired), True (always expired)
-        @return: The gathered property
-        @rtype: various
-        @raises KeyError: If the key is not a valid siteinfo property and the
+        :return: The gathered property
+        :rtype: various
+        :raises KeyError: If the key is not a valid siteinfo property and the
             get_default option is set to False.
-        @see: L{_get_siteinfo}
+        :see: :py:obj:`_get_siteinfo`
         """
         # If expiry is True, convert it to 0 to be coherent with
         # _get_siteinfo() and _get_general() docstring.
@@ -337,9 +337,10 @@ class Siteinfo(Container):
         If the property is actually in the siprop 'general' it returns the
         last request from the 'general' siprop.
 
-        @param key: The siprop value or a property of 'general'.
-        @return: The last time the siprop of 'key' was requested.
-        @rtype: None (never), False (default), L{datetime.datetime} (cached)
+        :param key: The siprop value or a property of 'general'.
+        :return: The last time the siprop of 'key' was requested.
+        :rtype: None (never), False (default),
+            :py:obj:`datetime.datetime` (cached)
         """
         with suppress(KeyError):
             return self._get_cached(key)[1]

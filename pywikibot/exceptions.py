@@ -144,7 +144,6 @@ fully deprecated, possibly because a replacement is not available
 RuntimeWarning: problems developers should have fixed, and users need to
 be aware of its status.
 
-  - tools._NotImplementedWarning: do not use
   - NotImplementedWarning: functionality not implemented
 
 UserWarning: warnings targeted at users
@@ -165,11 +164,8 @@ import re
 import sys
 from typing import Optional, Union
 
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    _NotImplementedWarning,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
+from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -250,9 +246,9 @@ class UploadError(APIError):
         """
         Create a new UploadError instance.
 
-        @param file_key: The file_key of the uploaded file to reuse it later.
+        :param file_key: The file_key of the uploaded file to reuse it later.
             If no key is known or it is an incomplete file it may be None.
-        @param offset: The starting offset for a chunked upload. Is False when
+        :param offset: The starting offset for a chunked upload. Is False when
             there is no offset.
         """
         super().__init__(code, message)
@@ -282,8 +278,8 @@ class PageRelatedError(Error):
         """
         Initializer.
 
-        @param page: Page that caused the exception
-        @type page: Page object
+        :param page: Page that caused the exception
+        :type page: Page object
         """
         if message:
             self.message = message
@@ -300,8 +296,7 @@ class PageRelatedError(Error):
         elif re.search(r'%\(\w+\)s', self.message):
             issue_deprecation_warning("'%' style messages are deprecated, "
                                       'please use str.format() style instead',
-                                      since='20210504',
-                                      warning_class=FutureWarning)
+                                      since='20210504')
             msg = self.message % self.__dict__
         elif '%s' in self.message:
             msg = self.message % page
@@ -327,7 +322,7 @@ class OtherPageSaveError(PageSaveRelatedError):
     def __init__(self, page, reason: Union[str, Exception]):
         """Initializer.
 
-        @param reason: Details of the problem
+        :param reason: Details of the problem
         """
         self.reason = reason
         super().__init__(page)
@@ -379,9 +374,9 @@ class InconsistentTitleError(PageLoadRelatedError):
     def __init__(self, page, actual: str):
         """Initializer.
 
-        @param page: Page that caused the exception
-        @type page: Page object
-        @param actual: title obtained by query
+        :param page: Page that caused the exception
+        :type page: Page object
+        :param actual: title obtained by query
 
         """
         self.message = "Query on {{}} returned data on '{}'".format(actual)
@@ -456,8 +451,8 @@ class InterwikiRedirectPageError(PageRelatedError):
     def __init__(self, page, target_page):
         """Initializer.
 
-        @param target_page: Target page of the redirect.
-        @type target_page: Page
+        :param target_page: Target page of the redirect.
+        :type target_page: Page
         """
         self.target_page = target_page
         self.target_site = target_page.site
@@ -548,12 +543,12 @@ class AbuseFilterDisallowedError(PageSaveRelatedError):
     """Page save failed because the AbuseFilter disallowed it."""
 
     message = ('Edit to page %(title)s disallowed by the AbuseFilter.\n'
-               '%(info)s\n%(warning)s')
+               '%(info)s')
 
-    def __init__(self, page, info, warning):
+    def __init__(self, page, info, other):
         """Initializer."""
         self.info = info
-        self.warning = warning
+        self.other = other
         super().__init__(page)
 
 
@@ -657,8 +652,8 @@ class NoWikibaseEntityError(WikiBaseError):
         """
         Initializer.
 
-        @param entity: Wikibase entity
-        @type entity: WikibaseEntity
+        :param entity: Wikibase entity
+        :type entity: WikibaseEntity
         """
         super().__init__("Entity '{}' doesn't exist on {}"
                          .format(entity.id, entity.repo))
@@ -718,4 +713,4 @@ module = sys.modules[__name__]
 for old_name, new_name in DEPRECATED_EXCEPTIONS.items():
     setattr(module, old_name, getattr(module, new_name))
     wrapper.add_deprecated_attr(old_name, replacement_name=new_name,
-                                since='20210423', future_warning=True)
+                                since='20210423')

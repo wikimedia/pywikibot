@@ -74,6 +74,7 @@ script_input = {
 }
 
 auto_run_script_list = [
+    'blockpageschecker',
     'category_redirect',
     'checkimages',
     'clean_sandbox',

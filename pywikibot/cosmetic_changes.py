@@ -214,7 +214,7 @@ def _format_isbn_match(match, strict=True):
 def _reformat_ISBNs(text, strict=True):
     """Helper function to normalise ISBNs in text.
 
-    @raises Exception: Invalid ISBN encountered when strict enabled
+    :raises Exception: Invalid ISBN encountered when strict enabled
     """
     return textlib.reformat_ISBNs(
         text, lambda match: _format_isbn_match(match, strict=strict))
@@ -232,12 +232,12 @@ class CosmeticChangesToolkit:
                  ignore: IntEnum = CANCEL.ALL):
         """Initializer.
 
-        @param page: the Page object containing the text to be modified
-        @type page: pywikibot.Page
-        @param show_diff: show difference after replacements (default: False)
-        @param namespace: DEPRECATED namespace parameter
-        @param pageTitle: DEPRECATED page title parameter
-        @param ignore: ignores if an error occurred and either skips the page
+        :param page: the Page object containing the text to be modified
+        :type page: pywikibot.Page
+        :param show_diff: show difference after replacements (default: False)
+        :param namespace: DEPRECATED namespace parameter
+        :param pageTitle: DEPRECATED page title parameter
+        :param ignore: ignores if an error occurred and either skips the page
             or only that method. It can be set one of the CANCEL constants
         """
         if isinstance(page, pywikibot.BaseSite):
@@ -251,7 +251,6 @@ class CosmeticChangesToolkit:
             issue_deprecation_warning(
                 'site parameter of CosmeticChangesToolkit',
                 'a pywikibot.Page object as first parameter',
-                warning_class=FutureWarning,
                 since='20201102')
         else:
             if namespace is not None or pageTitle is not None:
@@ -307,7 +306,7 @@ class CosmeticChangesToolkit:
 
     @classmethod
     @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
-                future_warning=True, since='20200415')
+                since='20200415')
     @deprecated_args(diff='show_diff')
     def from_page(cls, page, show_diff=False, ignore=CANCEL.ALL):
         """Create toolkit based on the page."""
@@ -544,8 +543,8 @@ class CosmeticChangesToolkit:
 
         * Capitalize the article title of the link, if appropriate
 
-        @param text: string to perform the clean-up on
-        @return: text with tidied wikilinks
+        :param text: string to perform the clean-up on
+        :return: text with tidied wikilinks
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
@@ -1119,13 +1118,13 @@ _CANCEL_MATCH = CANCEL.MATCH
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('CANCEL_ALL', _CANCEL_ALL,
                             replacement_name='CANCEL.ALL',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_PAGE', _CANCEL_PAGE,
                             replacement_name='CANCEL.PAGE',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_METHOD', _CANCEL_METHOD,
                             replacement_name='CANCEL.METHOD',
-                            since='20210528', future_warning=True)
+                            since='20210528')
 wrapper.add_deprecated_attr('CANCEL_MATCH', _CANCEL_MATCH,
                             replacement_name='CANCEL.MATCH',
-                            since='20210528', future_warning=True)
+                            since='20210528')

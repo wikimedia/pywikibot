@@ -74,6 +74,12 @@ class PatrolBot(BaseBot):
 
     """Bot marks the edits as patrolled based on info obtained by whitelist."""
 
+    update_options = {
+        'ask': False,
+        'whitelist': None,
+        'versionchecktime': 300,
+        'autopatroluserns': False,
+    }
     # Localised name of the whitelist page
     whitelist_subpage_name = {
         'en': 'patrol_whitelist',
@@ -83,17 +89,11 @@ class PatrolBot(BaseBot):
         """
         Initializer.
 
-        @kwarg ask: If True, confirm each patrol action
-        @kwarg whitelist: page title for whitelist (optional)
-        @kwarg autopatroluserns: Takes user consent to automatically patrol
-        @kwarg versionchecktime: Check versionchecktime lapse in sec
+        :keyword ask: If True, confirm each patrol action
+        :keyword whitelist: page title for whitelist (optional)
+        :keyword autopatroluserns: Takes user consent to automatically patrol
+        :keyword versionchecktime: Check versionchecktime lapse in sec
         """
-        self.available_options.update({
-            'ask': False,
-            'whitelist': None,
-            'versionchecktime': 300,
-            'autopatroluserns': False
-        })
         super().__init__(**kwargs)
         self.site = site or pywikibot.Site()
         self.recent_gen = True
@@ -338,7 +338,7 @@ class LinkedPagesRule:
     def __init__(self, page_title: str):
         """Initializer.
 
-        @param page_title: The page title for this rule
+        :param page_title: The page title for this rule
         """
         self.site = pywikibot.Site()
         self.page_title = page_title

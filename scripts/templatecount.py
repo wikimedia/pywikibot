@@ -56,10 +56,10 @@ class TemplateCountRobot:
         Displays the number of transcluded page in the given 'namespaces' for
         each template given by 'templates' list.
 
-        @param templates: list of template names
-        @type templates: list
-        @param namespaces: list of namespace numbers
-        @type namespaces: list
+        :param templates: list of template names
+        :type templates: list
+        :param namespaces: list of namespace numbers
+        :type namespaces: list
         """
         formatstr = '{0:<10}: {1:>5}'
         template_dict = cls.template_dict(templates, namespaces)
@@ -82,10 +82,10 @@ class TemplateCountRobot:
         Displays each transcluded page in the given 'namespaces' for
         each template given by 'templates' list.
 
-        @param templates: list of template names
-        @type templates: list
-        @param namespaces: list of namespace numbers
-        @type namespaces: list
+        :param templates: list of template names
+        :type templates: list
+        :param namespaces: list of namespace numbers
+        :type namespaces: list
         """
         template_dict = cls.template_dict(templates, namespaces)
         pywikibot.stdout('\nList of pages transcluding templates:')
@@ -110,10 +110,10 @@ class TemplateCountRobot:
         The names of the templates are the keys, and lists of pages
         transcluding templates in the given namespaces are the values.
 
-        @param templates: list of template names
-        @type templates: list
-        @param namespaces: list of namespace numbers
-        @type namespaces: list
+        :param templates: list of template names
+        :type templates: list
+        :param namespaces: list of namespace numbers
+        :type namespaces: list
         """
         return dict(cls.template_dict_generator(templates, namespaces))
 
@@ -127,10 +127,10 @@ class TemplateCountRobot:
         (template, transclusions), where 'transclusions' is a list of all pages
         in 'namespaces' where the template has been transcluded.
 
-        @param templates: list of template names
-        @type templates: list
-        @param namespaces: list of namespace numbers
-        @type namespaces: list
+        :param templates: list of template names
+        :type templates: list
+        :param namespaces: list of namespace numbers
+        :type namespaces: list
         """
         mysite = pywikibot.Site()
         mytpl = mysite.namespaces.TEMPLATE
@@ -146,8 +146,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     operation = None
     args_list = []

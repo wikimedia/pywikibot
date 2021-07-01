@@ -67,18 +67,18 @@ class ParserFunctionCountBot(SingleSiteBot,
 
     """Bot class used for obtaining Parser function Count."""
 
+    update_options = {
+        'atleast': None,
+        'first': None,
+        'nosort': False,
+        'save': None,
+        'start': '!',
+        'upload': None,
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'atleast': None,
-            'first': None,
-            'nosort': False,
-            'save': None,
-            'start': '!',
-            'upload': None,
-        })
         super().__init__(**kwargs)
-
         editcomment = {
             # This will be used for uploading the list to your wiki.
             'en':

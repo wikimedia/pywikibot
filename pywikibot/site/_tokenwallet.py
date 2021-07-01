@@ -14,7 +14,7 @@ class TokenWallet:
     def __init__(self, site):
         """Initializer.
 
-        @type site: pywikibot.site.APISite
+        :type site: pywikibot.site.APISite
         """
         self.site = site
         self._tokens = {}
@@ -24,11 +24,11 @@ class TokenWallet:
         """
         Preload one or multiple tokens.
 
-        @param types: the types of token.
-        @type types: iterable
-        @param all: load all available tokens, if None only if it can be done
+        :param types: the types of token.
+        :type types: iterable
+        :param all: load all available tokens, if None only if it can be done
             in one request.
-        @type all: bool
+        :type all: bool
         """
         if self.site.user() is None:
             self.site.login()

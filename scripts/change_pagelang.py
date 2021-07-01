@@ -36,23 +36,22 @@ class ChangeLangBot(SingleSiteBot):
 
     """Change page language bot."""
 
+    update_options = {
+        'never': False,
+        'setlang': '',
+    }
+
     def __init__(self, **kwargs):
         """Initializer."""
-        self.available_options.update({
-            'always': False,
-            'never': False,
-            'setlang': ''
-        })
         super().__init__(**kwargs)
-
         assert not (self.opt.always and self.opt.never), \
             'Either "always" or "never" must be set but not both'
 
     def changelang(self, page):
         """Set page language.
 
-        @param page: The page to update and save
-        @type page: pywikibot.page.BasePage
+        :param page: The page to update and save
+        :type page: pywikibot.page.BasePage
         """
         token = self.site.get_tokens(['csrf']).get('csrf')
         parameters = {'action': 'setpagelanguage',
@@ -69,8 +68,8 @@ class ChangeLangBot(SingleSiteBot):
     def treat(self, page):
         """Treat a page.
 
-        @param page: The page to treat
-        @type page: pywikibot.page.BasePage
+        :param page: The page to treat
+        :type page: pywikibot.page.BasePage
         """
         # Current content language of the page and site language
         parameters = {'action': 'query',
@@ -123,8 +122,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: unicode
+    :param args: command line arguments
+    :type args: unicode
     """
     options = {}
 

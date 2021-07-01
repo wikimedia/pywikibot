@@ -162,6 +162,7 @@ script_test_modules = {
     'replacebot',
     'script',
     'template_bot',
+    'update_script',
     'uploadscript',
     'weblinkchecker'
 }

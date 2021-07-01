@@ -16,7 +16,12 @@ The following parameters are supported:
                   inserted.
 
 -ignore:          Ignores if an error occurred and either skips the page or
-                  only that method. It can be set to 'page' or 'method'.
+                  only that method. It can be set to:
+                  all - dos not ignore errors
+                  match - ignores ISBN related errors (default)
+                  method - ignores fixing method errors
+                  page - ignores page related errors
+
 
 The following generators and filters are supported:
 
@@ -32,9 +37,13 @@ For further information see pywikibot/cosmetic_changes.py
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import config, i18n, pagegenerators
+from pywikibot import config, pagegenerators
 from pywikibot.backports import Tuple
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+)
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 
 
@@ -50,26 +59,24 @@ docuReplacements = {
 }
 
 
-class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
+class CosmeticChangesBot(AutomaticTWSummaryBot,
+                         ExistingPageBot,
+                         NoRedirectPageBot):
 
     """Cosmetic changes bot."""
 
-    def __init__(self, generator, **kwargs) -> None:
-        """Initializer."""
-        self.available_options.update({
-            'async': False,
-            'summary': 'Robot: Cosmetic changes',
-            'ignore': CANCEL.ALL,
-        })
-        super().__init__(**kwargs)
-
-        self.generator = generator
+    summary_key = 'cosmetic_changes-standalone'
+    update_options = {
+        'async': False,
+        'summary': '',
+        'ignore': CANCEL.MATCH,
+    }
 
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit."""
         cc_toolkit = CosmeticChangesToolkit(self.current_page,
                                             ignore=self.opt.ignore)
-        changed_text = cc_toolkit.change(self.current_page.get())
+        changed_text = cc_toolkit.change(self.current_page.text)
         if changed_text is not False:
             self.put_current(new_text=changed_text,
                              summary=self.opt.summary,
@@ -82,52 +89,37 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
+    local_args = pywikibot.handle_args(args)
+    local_args = gen_factory.handle_args(local_args)
 
     for arg in local_args:
-        if arg.startswith('-summary:'):
-            options['summary'] = arg[len('-summary:'):]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-async':
-            options['async'] = True
-        elif arg.startswith('-ignore:'):
-            ignore_mode = arg[len('-ignore:'):].lower()
-            if ignore_mode == 'method':
-                options['ignore'] = CANCEL.METHOD
-            elif ignore_mode == 'page':
-                options['ignore'] = CANCEL.PAGE
-            elif ignore_mode == 'match':
-                options['ignore'] = CANCEL.MATCH
-            else:
-                raise ValueError(
-                    'Unknown ignore mode "{}"!'.format(ignore_mode))
-        else:
-            gen_factory.handle_arg(arg)
-
-    site = pywikibot.Site()
-
-    if not options.get('summary'):
-        # Load default summary message.
-        options['summary'] = i18n.twtranslate(site,
-                                              'cosmetic_changes-standalone')
+        opt, _, value = arg.partition(':')
+        if opt == '-summary':
+            options['summary'] = value
+        elif opt in ('-always', '-async'):
+            options[opt[1:]] = True
+        elif opt == '-ignore':
+            value = value.upper()
+            try:
+                options['ignore'] = getattr(CANCEL, value)
+            except AttributeError:
+                raise ValueError('Unknown ignore mode {!r}!'.format(value))
 
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        if options.get('always') or config.simulate or pywikibot.input_yn(
+    if not pywikibot.bot.suggest_help(missing_generator=not gen) \
+       and (options.get('always')
+            or config.simulate
+            or pywikibot.input_yn(
                 warning + '\nDo you really want to continue?',
-                default=False, automatic_quit=False):
-            site.login()
-            bot = CosmeticChangesBot(gen, **options)
-            bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+                default=False, automatic_quit=False)):
+        bot = CosmeticChangesBot(generator=gen, **options)
+        bot.run()
 
 
 if __name__ == '__main__':

@@ -20,7 +20,7 @@ If you have the messages as instance constants you may call the bot as follows:
 ...   '<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
 
 It's also possible to make json files too by using to_json method after
-instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
+instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
@@ -109,8 +109,8 @@ class i18nBot:  # noqa: N801
         """
         Run the bot, read the messages from source and print the dict.
 
-        @param quiet: print the result if False
-        @type quiet: bool
+        :param quiet: print the result if False
+        :type quiet: bool
         """
         for item in self.messages.items():
             self.read(*item)
@@ -121,8 +121,8 @@ class i18nBot:  # noqa: N801
         """
         Run the bot and create json files.
 
-        @param quiet: Print the result if False
-        @type quiet: bool
+        :param quiet: Print the result if False
+        :type quiet: bool
         """
         indent = 4
 

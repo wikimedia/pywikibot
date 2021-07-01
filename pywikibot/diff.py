@@ -31,9 +31,9 @@ class Hunk:
         """
         Initializer.
 
-        @param a: sequence of lines
-        @param b: sequence of lines
-        @param grouped_opcode: list of 5-tuples describing how to turn a into
+        :param a: sequence of lines
+        :param b: sequence of lines
+        :param grouped_opcode: list of 5-tuples describing how to turn a into
             b. It has the same format as returned by difflib.get_opcodes().
         """
         self.a = a
@@ -242,16 +242,16 @@ class PatchManager:
                  replace_invisible=False) -> None:
         """Initializer.
 
-        @param text_a: base text
-        @param text_b: target text
-        @param context: number of lines which are context
-        @type context: int
-        @param by_letter: if text_a and text_b are single lines, comparison can
+        :param text_a: base text
+        :param text_b: target text
+        :param context: number of lines which are context
+        :type context: int
+        :param by_letter: if text_a and text_b are single lines, comparison can
             be done letter by letter.
-        @type by_letter: bool
-        @param replace_invisible: Replace invisible characters like U+200e with
+        :type by_letter: bool
+        :param replace_invisible: Replace invisible characters like U+200e with
             the charnumber in brackets (e.g. <200e>).
-        @type replace_invisible: bool
+        :type replace_invisible: bool
         """
         self.a = text_a.splitlines(True)
         self.b = text_b.splitlines(True)
@@ -584,8 +584,8 @@ def html_comparator(compare_string: str) -> dict:
     Site.compare() returns HTML that is useful for displaying on a page.
     Here we use BeautifulSoup to get the un-HTML-ify the context of changes.
     Finally we present the added and deleted contexts.
-    @param compare_string: HTML string from MediaWiki API
-    @return: deleted and added list of contexts
+    :param compare_string: HTML string from MediaWiki API
+    :return: deleted and added list of contexts
     """
     from bs4 import BeautifulSoup
 

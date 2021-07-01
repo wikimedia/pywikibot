@@ -67,8 +67,8 @@ class DataSite(APISite):
         """
         Return namespace for given entity type.
 
-        @return: corresponding namespace
-        @rtype: Namespace
+        :return: corresponding namespace
+        :rtype: Namespace
         """
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
@@ -83,8 +83,8 @@ class DataSite(APISite):
         """
         Return namespace for items.
 
-        @return: item namespace
-        @rtype: Namespace
+        :return: item namespace
+        :rtype: Namespace
         """
         if self._item_namespace is None:
             self._item_namespace = self.get_namespace_for_entity_type('item')
@@ -95,8 +95,8 @@ class DataSite(APISite):
         """
         Return namespace for properties.
 
-        @return: property namespace
-        @rtype: Namespace
+        :return: property namespace
+        :rtype: Namespace
         """
         if self._property_namespace is None:
             self._property_namespace = self.get_namespace_for_entity_type(
@@ -107,10 +107,10 @@ class DataSite(APISite):
         """
         Return a new instance for given entity id.
 
-        @raises pywikibot.exceptions.NoWikibaseEntityError: there is no entity
+        :raises pywikibot.exceptions.NoWikibaseEntityError: there is no entity
             with the id
-        @return: a WikibaseEntity subclass
-        @rtype: WikibaseEntity
+        :return: a WikibaseEntity subclass
+        :rtype: WikibaseEntity
         """
         for cls in self._type_to_class.values():
             if cls.is_valid_id(entity_id):
@@ -125,8 +125,8 @@ class DataSite(APISite):
         """
         Return the sparql endpoint url, if any has been set.
 
-        @return: sparql endpoint url
-        @rtype: str|None
+        :return: sparql endpoint url
+        :rtype: str|None
         """
         return self.siteinfo['general'].get('wikibase-sparql')
 
@@ -136,8 +136,8 @@ class DataSite(APISite):
         """
         Return the base uri for concepts/entities.
 
-        @return: concept base uri
-        @rtype: str
+        :return: concept base uri
+        :rtype: str
         """
         return self.siteinfo['general']['wikibase-conceptbaseuri']
 
@@ -145,7 +145,6 @@ class DataSite(APISite):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
             issue_deprecation_warning('claim without on_item set', depth=3,
-                                      warning_class=FutureWarning,
                                       since='20160309')
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',
@@ -172,8 +171,8 @@ class DataSite(APISite):
         This avoids pointless API queries since the data repository
         is this site by definition.
 
-        @return: this Site object
-        @rtype: pywikibot.site.DataSite
+        :return: this Site object
+        :rtype: pywikibot.site.DataSite
         """
         return self
 
@@ -203,9 +202,9 @@ class DataSite(APISite):
         revisions. Eventually this will get replaced by
         an actual loadrevisions.
 
-        @param identification: Parameters used to identify the page(s)
-        @type identification: dict
-        @param props: the optional properties to fetch.
+        :param identification: Parameters used to identify the page(s)
+        :type identification: dict
+        :param props: the optional properties to fetch.
         """
         params = merge_unique_dicts(identification, action='wbgetentities',
                                     # TODO: When props is empty it results in
@@ -225,10 +224,10 @@ class DataSite(APISite):
         Note that pages will be iterated in a different order
         than in the underlying pagelist.
 
-        @param pagelist: an iterable that yields either WikibasePage objects,
+        :param pagelist: an iterable that yields either WikibasePage objects,
                          or Page objects linked to an ItemPage.
-        @param groupsize: how many pages to query at a time
-        @type groupsize: int
+        :param groupsize: how many pages to query at a time
+        :type groupsize: int
         """
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
@@ -299,15 +298,15 @@ class DataSite(APISite):
         Note: This method is unable to create entities other than 'item'
         if dict with API parameters was passed to 'entity' parameter.
 
-        @param entity: Page to edit, or dict with API parameters
+        :param entity: Page to edit, or dict with API parameters
             to use for entity identification
-        @type entity: WikibasePage or dict
-        @param data: data updates
-        @type data: dict
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @return: New entity data
-        @rtype: dict
+        :type entity: WikibasePage or dict
+        :param data: data updates
+        :type data: dict
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :return: New entity data
+        :rtype: dict
         """
         # this changes the reference to a new object
         data = dict(data)
@@ -349,14 +348,14 @@ class DataSite(APISite):
         """
         Add a claim.
 
-        @param entity: Entity to modify
-        @type entity: WikibasePage
-        @param claim: Claim to be added
-        @type claim: pywikibot.Claim
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
+        :param entity: Entity to modify
+        :type entity: WikibasePage
+        :param claim: Claim to be added
+        :type claim: pywikibot.Claim
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
         """
         claim.snak = entity.getID() + '$' + str(uuid.uuid4())
         params = {'action': 'wbsetclaim',
@@ -381,14 +380,14 @@ class DataSite(APISite):
         """
         Set the claim target to the value of the provided claim target.
 
-        @param claim: The source of the claim target value
-        @type claim: pywikibot.Claim
-        @param snaktype: An optional snaktype. Default: 'value'
-        @type snaktype: str ('value', 'novalue' or 'somevalue')
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
+        :param claim: The source of the claim target value
+        :type claim: pywikibot.Claim
+        :param snaktype: An optional snaktype. Default: 'value'
+        :type snaktype: str ('value', 'novalue' or 'somevalue')
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -411,12 +410,12 @@ class DataSite(APISite):
         """
         Save the whole claim to the wikibase site.
 
-        @param claim: The claim to save
-        @type claim: pywikibot.Claim
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
+        :param claim: The claim to save
+        :type claim: pywikibot.Claim
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -442,19 +441,19 @@ class DataSite(APISite):
         """
         Create/Edit a source.
 
-        @param claim: A Claim object to add the source to
-        @type claim: pywikibot.Claim
-        @param source: A Claim object to be used as a source
-        @type source: pywikibot.Claim
-        @param new: Whether to create a new one if the "source" already exists
-        @type new: bool
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
-        @param baserevid: Base revision id override, used to detect conflicts.
+        :param claim: A Claim object to add the source to
+        :type claim: pywikibot.Claim
+        :param source: A Claim object to be used as a source
+        :type source: pywikibot.Claim
+        :param new: Whether to create a new one if the "source" already exists
+        :type new: bool
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
+        :param baserevid: Base revision id override, used to detect conflicts.
             When omitted, revision of claim.on_item is used. DEPRECATED.
-        @type baserevid: long
+        :type baserevid: long
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError('The claim cannot have a source.')
@@ -496,17 +495,17 @@ class DataSite(APISite):
         """
         Create/Edit a qualifier.
 
-        @param claim: A Claim object to add the qualifier to
-        @type claim: pywikibot.Claim
-        @param qualifier: A Claim object to be used as a qualifier
-        @type qualifier: pywikibot.Claim
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
-        @param baserevid: Base revision id override, used to detect conflicts.
+        :param claim: A Claim object to add the qualifier to
+        :type claim: pywikibot.Claim
+        :param qualifier: A Claim object to be used as a qualifier
+        :type qualifier: pywikibot.Claim
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
+        :param baserevid: Base revision id override, used to detect conflicts.
             When omitted, revision of claim.on_item is used. DEPRECATED.
-        @type baserevid: long
+        :type baserevid: long
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError('The claim cannot have a qualifier.')
@@ -532,15 +531,15 @@ class DataSite(APISite):
         """
         Remove claims.
 
-        @param claims: Claims to be removed
-        @type claims: List[pywikibot.Claim]
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
-        @param baserevid: Base revision id override, used to detect conflicts.
+        :param claims: Claims to be removed
+        :type claims: List[pywikibot.Claim]
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
+        :param baserevid: Base revision id override, used to detect conflicts.
             When omitted, revision of claim.on_item is used. DEPRECATED.
-        @type baserevid: long
+        :type baserevid: long
         """
         # Check on_item vs baserevid for all additional claims
         for claim in claims:
@@ -566,17 +565,17 @@ class DataSite(APISite):
         """
         Remove sources.
 
-        @param claim: A Claim object to remove the sources from
-        @type claim: pywikibot.Claim
-        @param sources: A list of Claim objects that are sources
-        @type sources: list
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
-        @param baserevid: Base revision id override, used to detect conflicts.
+        :param claim: A Claim object to remove the sources from
+        :type claim: pywikibot.Claim
+        :param sources: A list of Claim objects that are sources
+        :type sources: list
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
+        :param baserevid: Base revision id override, used to detect conflicts.
             When omitted, revision of claim.on_item is used. DEPRECATED.
-        @type baserevid: long
+        :type baserevid: long
         """
         params = {
             'action': 'wbremovereferences',
@@ -596,17 +595,17 @@ class DataSite(APISite):
         """
         Remove qualifiers.
 
-        @param claim: A Claim object to remove the qualifier from
-        @type claim: pywikibot.Claim
-        @param qualifiers: Claim objects currently used as a qualifiers
-        @type qualifiers: List[pywikibot.Claim]
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @param summary: Edit summary
-        @type summary: str
-        @param baserevid: Base revision id override, used to detect conflicts.
+        :param claim: A Claim object to remove the qualifier from
+        :type claim: pywikibot.Claim
+        :param qualifiers: Claim objects currently used as a qualifiers
+        :type qualifiers: List[pywikibot.Claim]
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :param summary: Edit summary
+        :type summary: str
+        :param baserevid: Base revision id override, used to detect conflicts.
             When omitted, revision of claim.on_item is used. DEPRECATED.
-        @type baserevid: long
+        :type baserevid: long
         """
         params = {
             'action': 'wbremovequalifiers',
@@ -626,14 +625,14 @@ class DataSite(APISite):
         """
         Link two pages together.
 
-        @param page1: First page to link
-        @type page1: pywikibot.Page
-        @param page2: Second page to link
-        @type page2: pywikibot.Page
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @return: dict API output
-        @rtype: dict
+        :param page1: First page to link
+        :type page1: pywikibot.Page
+        :param page2: Second page to link
+        :type page2: pywikibot.Page
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :return: dict API output
+        :rtype: dict
         """
         params = {
             'action': 'wblinktitles',
@@ -656,20 +655,20 @@ class DataSite(APISite):
         """
         Merge two items together.
 
-        @param from_item: Item to merge from
-        @type from_item: pywikibot.ItemPage
-        @param to_item: Item to merge into
-        @type to_item: pywikibot.ItemPage
-        @param ignore_conflicts: Which type of conflicts
+        :param from_item: Item to merge from
+        :type from_item: pywikibot.ItemPage
+        :param to_item: Item to merge into
+        :type to_item: pywikibot.ItemPage
+        :param ignore_conflicts: Which type of conflicts
             ('description', 'sitelink', and 'statement')
             should be ignored
-        @type ignore_conflicts: list of str
-        @param summary: Edit summary
-        @type summary: str
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
-        @return: dict API output
-        @rtype: dict
+        :type ignore_conflicts: list of str
+        :param summary: Edit summary
+        :type summary: str
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
+        :return: dict API output
+        :rtype: dict
         """
         params = {
             'action': 'wbmergeitems',
@@ -689,12 +688,12 @@ class DataSite(APISite):
         """
         Make a redirect to another item.
 
-        @param to_item: title of target item.
-        @type to_item: pywikibot.ItemPage
-        @param from_item: Title of the item to be redirected.
-        @type from_item: pywikibot.ItemPage
-        @param bot: Whether to mark the edit as a bot edit
-        @type bot: bool
+        :param to_item: title of target item.
+        :type to_item: pywikibot.ItemPage
+        :param from_item: Title of the item to be redirected.
+        :type from_item: pywikibot.ItemPage
+        :param bot: Whether to mark the edit as a bot edit
+        :type bot: bool
         """
         params = {
             'action': 'wbcreateredirect',
@@ -712,12 +711,12 @@ class DataSite(APISite):
         """
         Search for pages or properties that contain the given text.
 
-        @param search: Text to find.
-        @param language: Language to search in.
-        @param total: Maximum number of pages to retrieve in total, or
+        :param search: Text to find.
+        :param language: Language to search in.
+        :param total: Maximum number of pages to retrieve in total, or
             None in case of no limit.
-        @return: 'search' list from API output.
-        @rtype: Generator
+        :return: 'search' list from API output.
+        :rtype: Generator
         """
         lang_codes = self._paraminfo.parameter('wbsearchentities',
                                                'language')['type']
@@ -740,20 +739,21 @@ class DataSite(APISite):
                               total=total, parameters=parameters)
         return gen
 
+    @need_right('edit')
     def _wbset_action(self, itemdef, action, action_data, **kwargs):
         """
-        Execute wbset{action}' on a Wikibase entity.
+        Execute wbset{action} on a Wikibase entity.
 
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
 
-        @param itemdef: Item to modify or create
-        @type itemdef: str, WikibasePage or Page coonected to such item
-        @param action: wbset{action] to perform:
+        :param itemdef: Item to modify or create
+        :type itemdef: str, WikibaseEntity or Page connected to such item
+        :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
-        @type action: str
-        @param data: data to be used in API request, see API help
-        @type data: SiteLink or dict
+        :type action: str
+        :param data: data to be used in API request, see API help
+        :type data: SiteLink or dict
             wbsetaliases:
                 dict shall have the following structure:
                 {'language': value (str),
@@ -767,11 +767,13 @@ class DataSite(APISite):
             wbsetsitelink:
                 dict shall have keys 'linksite', 'linktitle' and
                 optionally 'badges'
-        @kwargs bot: Whether to mark the edit as a bot edit, default is False
-        @type bot: bool
-        @return: query result
-        @rtype: dict
-        @raises AssertionError, TypeError
+        @kwargs bot: Whether to mark the edit as a bot edit, default is True
+        :type bot: bool
+        @kwargs tags: Change tags to apply with the edit
+        :type tags: list of str
+        :return: query result
+        :rtype: dict
+        :raises AssertionError, TypeError
         """
         def format_sitelink(sitelink):
             """Convert SiteLink to a dict accepted by wbsetsitelink API."""
@@ -792,8 +794,10 @@ class DataSite(APISite):
                 res = data
                 keys = set(res)
                 assert keys < {'language', 'add', 'remove', 'set'}
-                assert keys & {'add', 'set'} == {}
-                assert keys & {'remove', 'set'} == {}
+                assert 'language' in keys
+                assert ({'add', 'remove', 'set'} & keys)
+                assert not ({'add', 'set'} < keys)
+                assert not ({'remove', 'set'} < keys)
             elif action in ('wbsetlabel', 'wbsetdescription'):
                 res = data
                 keys = set(res)
@@ -817,30 +821,29 @@ class DataSite(APISite):
         if isinstance(itemdef, str):
             itemdef = self.get_entity_for_entity_id(itemdef)
         elif isinstance(itemdef, pywikibot.Page):
-            try:
-                itemdef = itemdef.data_item()
-            except NoPageError:
-                itemdef = pywikibot.ItemPage(self)
-        if not isinstance(itemdef, pywikibot.page.WikibasePage):
-            raise TypeError('itemdef shall be str, WikibasePage or Page')
+            itemdef = pywikibot.ItemPage.fromPage(itemdef, lazy_load=True)
+        elif not isinstance(itemdef, pywikibot.page.WikibaseEntity):
+            raise TypeError('itemdef shall be str, WikibaseEntity or Page')
 
         params = itemdef._defined_by(singular=True)
         # TODO: support 'new'
-        baserevid = kwargs.pop('baserevid', 0) or itemdef.latest_revision_id
+        baserevid = kwargs.pop(
+            'baserevid',
+            itemdef.latest_revision_id if 'id' in params else 0
+        )
         params.update(
-            {'id': itemdef.id,
-             'baserevid': baserevid,
+            {'baserevid': baserevid,
              'action': action,
              'token': self.tokens['edit'],
-             'bot': kwargs.pop('bot', False),
+             'bot': kwargs.pop('bot', True),
              })
         params.update(prepare_data(action, action_data))
 
         for arg in kwargs:
-            if arg in ['summary']:
+            if arg in ['summary', 'tags']:
                 params[arg] = kwargs[arg]
             else:
-                warn('Unknown parameter {} for action  {}, ignored'
+                warn('Unknown parameter {} for action {}, ignored'
                      .format(arg, action), UserWarning, 2)
 
         req = self._simple_request(**params)

@@ -124,11 +124,11 @@ class Photo(pywikibot.FilePage):
         """
         Initializer.
 
-        @param URL: URL of photo
-        @param metadata: metadata about the photo that can be referred to
+        :param URL: URL of photo
+        :param metadata: metadata about the photo that can be referred to
             from the title & template
-        @param site: target site
-        @type site: pywikibot.site.APISite
+        :param site: target site
+        :type site: pywikibot.site.APISite
 
         """
         self.URL = URL
@@ -181,8 +181,8 @@ class Photo(pywikibot.FilePage):
         Note: this does not clean the title, so it may be unusable as
         a MediaWiki page title, and cause an API exception when used.
 
-        @param fmt: format string
-        @return: formatted string
+        :param fmt: format string
+        :return: formatted string
         """
         # FIXME: normalise the title so it is usable as a MediaWiki title.
         return fmt % self.metadata
@@ -223,15 +223,15 @@ class DataIngestionBot(pywikibot.Bot):
         """
         Initializer.
 
-        @param reader: Generator of Photos to process.
-        @type reader: Photo page generator
-        @param titlefmt: Title format
-        @param pagefmt: Page format
-        @param site: Target site for image upload.
+        :param reader: Generator of Photos to process.
+        :type reader: Photo page generator
+        :param titlefmt: Title format
+        :param pagefmt: Page format
+        :param site: Target site for image upload.
             Use None to determine the site from the pages treated.
             Defaults to 'deprecated_default_commons' to use Wikimedia Commons
             for backwards compatibility reasons. Deprecated.
-        @type site: pywikibot.site.APISite, 'deprecated_default_commons' or
+        :type site: pywikibot.site.APISite, 'deprecated_default_commons' or
             None
         """
         if site == 'deprecated_default_commons':
@@ -278,8 +278,8 @@ class DataIngestionBot(pywikibot.Bot):
         """
         Parse a Page which contains the configuration.
 
-        @param configurationPage: page with configuration
-        @type configurationPage: L{pywikibot.Page}
+        :param configurationPage: page with configuration
+        :type configurationPage: :py:obj:`pywikibot.Page`
         """
         configuration = {}
         # Set a bunch of defaults
@@ -309,7 +309,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

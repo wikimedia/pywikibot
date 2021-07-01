@@ -8,18 +8,22 @@ Syntax:
 
 The following parameters are supported:
 
-  -interwiki   Look for images in pages found through interwiki links.
+  -interwiki        Look for images in pages found through interwiki links.
 
-  -keepname    Keep the filename and do not verify description while replacing
+  -keepname         Keep the filename and do not verify description while
+                    replacing
 
-  -tolang:x    Copy the image to the wiki in code x
+  -tolang:x         Copy the image to the wiki in code x
 
-  -tofamily:y  Copy the image to a wiki in the family y
+  -tofamily:y       Copy the image to a wiki in the family y
 
-  -tosite:s    Copy the image to the given site like wikipedia:test
+  -tosite:s         Copy the image to the given site like wikipedia:test
 
-  -file:z      Upload many files from textfile: [[Image:x]]
-                                                [[Image:y]]
+  -force_if_shared  Upload the file to the target, even if it exists on that
+                    wiki's shared repo
+
+  -file:z           Upload many files from textfile: [[Image:x]]
+                                                     [[Image:y]]
 
 If pagename is an image description page, offers to copy the image to the
 target site. If it is a normal page, it will offer to copy any of the images
@@ -38,7 +42,7 @@ import sys
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.specialbots import UploadRobot
 from pywikibot.tools.formatter import color_format
@@ -130,30 +134,35 @@ licenseTemplates = {
 }
 
 
-class ImageTransferBot(SingleSiteBot):
+class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
     """Image transfer bot."""
+
+    update_options = {
+        'ignore_warning': False,  # not implemented yet
+        'interwiki': False,
+        'keepname': False,
+        'target': None,
+        'force_if_shared': False,
+    }
 
     def __init__(self, **kwargs):
         """Initializer.
 
-        @keyword generator: the pages to work on
-        @type generator: iterable
-        @keyword target_site: Site to send image to, default none
-        @type target_site: pywikibot.site.APISite
-        @keyword interwiki: Look for images in interwiki links, default false
-        @type interwiki: boolean
-        @keyword keep_name: Keep the filename and do not verify description
+        :keyword generator: the pages to work on
+        :type generator: iterable
+        :keyword target_site: Site to send image to, default none
+        :type target_site: pywikibot.site.APISite
+        :keyword interwiki: Look for images in interwiki links, default false
+        :type interwiki: boolean
+        :keyword keepname: Keep the filename and do not verify description
             while replacing, default false
-        @type keep_name: boolean
+        :type keepname: boolean
+        :keyword force_if_shared: Upload the file even if it's currently
+            shared to the target site (e.g. when moving from Commons to another
+            wiki)
+        :type force_if_shared: boolean
         """
-        self.available_options.update({
-            'ignore_warning': False,  # not implemented yet
-            'interwiki': False,
-            'keepname': False,
-            'target': None,
-        })
-
         super().__init__(**kwargs)
         if self.opt.target is None:
             self.opt.target = self.site.image_repository()
@@ -164,7 +173,7 @@ class ImageTransferBot(SingleSiteBot):
         """
         Download image and its description, and upload it to another site.
 
-        @return: the filename which was used to upload the image
+        :return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
         pywikibot.output(
@@ -207,7 +216,8 @@ class ImageTransferBot(SingleSiteBot):
                               url_encoding=sourceSite.encoding(),
                               keep_filename=self.opt.keepname,
                               verify_description=not self.opt.keepname,
-                              ignore_warning=self.opt.ignore_warning)
+                              ignore_warning=self.opt.ignore_warning,
+                              force_if_shared=self.opt.force_if_shared)
 
             # try to upload
             if bot.skip_run():
@@ -307,7 +317,9 @@ class ImageTransferBot(SingleSiteBot):
     def transfer_allowed(self, image):
         """Check whether transfer is allowed."""
         target_repo = self.opt.target.image_repository()
-        if image.file_is_shared() \
+
+        if not self.opt.force_if_shared \
+           and image.file_is_shared() \
            and image.site.image_repository() == target_repo:
             pywikibot.output(color_format(
                 '{yellow}The image is already shared on {}.{default}',
@@ -322,8 +334,8 @@ def main(*args):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     target_code = None
     target_family = None
@@ -335,7 +347,8 @@ def main(*args):
 
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        if opt in ('-ignore_warning', '-interwiki', '-keepname'):
+        if opt in ('-ignore_warning', '-interwiki', '-keepname',
+                   '-force_if_shared'):
             options[opt[1:]] = True
         elif opt == '-tolang':
             target_code = value

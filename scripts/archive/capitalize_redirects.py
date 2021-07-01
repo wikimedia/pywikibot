@@ -50,9 +50,9 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
         """Initializer.
 
         Parameters:
-            @param generator: The page generator that determines on which pages
+            :param generator: The page generator that determines on which pages
                               to work.
-            @kwarg titlecase: create a titlecased redirect page instead a
+            :keyword titlecase: create a titlecased redirect page instead a
                               capitalized one.
         """
         self.available_options.update({
@@ -90,7 +90,7 @@ def main(*args: Tuple[str, ...]):
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     options = {}
 

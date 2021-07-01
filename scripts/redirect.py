@@ -377,15 +377,15 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
 
     """Redirect bot."""
 
+    update_options = {
+        'limit': float('inf'),
+        'delete': False,
+        'sdtemplate': '',
+    }
+
     def __init__(self, action, **kwargs) -> None:
         """Initializer."""
-        self.available_options.update({
-            'limit': float('inf'),
-            'delete': False,
-            'sdtemplate': None,
-        })
         super().__init__(**kwargs)
-
         # connect the action treat to treat_page method called by treat
         if action == 'double':
             self.treat_page = self.fix_1_double_redirect
@@ -400,9 +400,9 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
     def get_sd_template(self, site=None) -> Optional[str]:
         """Look for speedy deletion template and return it.
 
-        @param site: site for which the template has to be given
-        @type site: pywikibot.BaseSite
-        @return: A valid speedy deletion template.
+        :param site: site for which the template has to be given
+        :type site: pywikibot.BaseSite
+        :return: A valid speedy deletion template.
         """
         title = None
         if site:
@@ -446,7 +446,13 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         return page
 
     def delete_redirect(self, page, summary_key) -> None:
-        """Delete the redirect page."""
+        """Delete the redirect page.
+
+        @param page: The page to delete
+        @type page: pywikibot.page.BasePage
+        @param summary_key: The message key for the deletion summary
+        @type summary_key: str
+        """
         assert page.site == self.current_page.site, (
             'target page is on different site {}'.format(page.site))
         reason = i18n.twtranslate(page.site, summary_key)
@@ -638,7 +644,11 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
             self.fix_1_double_redirect()
 
     def treat(self, page) -> None:
-        """Treat a page."""
+        """Treat a page.
+
+        @param page: Page to be treated.
+        @type page: pywikibot.page.BasePage
+        """
         if self._treat_counter >= self.opt.limit:
             pywikibot.output('\nNumber of pages reached the limit. '
                              'Script terminated.')
@@ -652,8 +662,8 @@ def main(*args) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
-    @type args: str
+    :param args: command line arguments
+    :type args: str
     """
     options = {}  # type: Dict[str, Any]
     gen_options = {}  # type: Dict[str, Any]
