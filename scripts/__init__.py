@@ -29,4 +29,4 @@ The advantages of pwb.py wrapper script are:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '6.4.0'
+__version__ = '6.4.1'
