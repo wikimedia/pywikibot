@@ -142,8 +142,6 @@ Pywikibot provides bot classes to develop your own script easily:
         main()
 
 
--------------------------------------------------------------------------------------------
-
 For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
 
