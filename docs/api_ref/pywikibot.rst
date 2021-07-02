@@ -35,10 +35,7 @@ pywikibot.bot\_choice module
 
 .. automodule:: pywikibot.bot_choice
 
-pywikibot.config module
------------------------
-
-.. automodule:: pywikibot.config
+.. include:: pywikibot.config.rst
 
 pywikibot.cosmetic\_changes module
 ----------------------------------
