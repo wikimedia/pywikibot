@@ -48,6 +48,7 @@ class DataSite(APISite):
         self._type_to_class = {
             'item': pywikibot.ItemPage,
             'property': pywikibot.PropertyPage,
+            'mediainfo': pywikibot.MediaInfo,
         }
 
     def _cache_entity_namespaces(self):
@@ -164,18 +165,6 @@ class DataSite(APISite):
 
         return baserevid
 
-    def data_repository(self):
-        """
-        Override parent method.
-
-        This avoids pointless API queries since the data repository
-        is this site by definition.
-
-        :return: this Site object
-        :rtype: pywikibot.site.DataSite
-        """
-        return self
-
     def geo_shape_repository(self):
         """Return Site object for the geo-shapes repository e.g. commons."""
         url = self.siteinfo['general'].get('wikibase-geoshapestoragebaseurl')
@@ -219,12 +208,12 @@ class DataSite(APISite):
 
     def preload_entities(self, pagelist, groupsize=50):
         """
-        Yield subclasses of WikibasePage's with content prefilled.
+        Yield subclasses of WikibaseEntity's with content prefilled.
 
         Note that pages will be iterated in a different order
         than in the underlying pagelist.
 
-        :param pagelist: an iterable that yields either WikibasePage objects,
+        :param pagelist: an iterable that yields either WikibaseEntity objects,
                          or Page objects linked to an ItemPage.
         :param groupsize: how many pages to query at a time
         :type groupsize: int
@@ -234,7 +223,7 @@ class DataSite(APISite):
         for sublist in itergroup(pagelist, groupsize):
             req = {'ids': [], 'titles': [], 'sites': []}
             for p in sublist:
-                if isinstance(p, pywikibot.page.WikibasePage):
+                if isinstance(p, pywikibot.page.WikibaseEntity):
                     ident = p._defined_by()
                     for key in ident:
                         req[key].append(ident[key])
@@ -300,7 +289,7 @@ class DataSite(APISite):
 
         :param entity: Page to edit, or dict with API parameters
             to use for entity identification
-        :type entity: WikibasePage or dict
+        :type entity: WikibaseEntity or dict
         :param data: data updates
         :type data: dict
         :param bot: Whether to mark the edit as a bot edit
@@ -310,7 +299,7 @@ class DataSite(APISite):
         """
         # this changes the reference to a new object
         data = dict(data)
-        if isinstance(entity, pywikibot.page.WikibasePage):
+        if isinstance(entity, pywikibot.page.WikibaseEntity):
             params = entity._defined_by(singular=True)
             if 'id' in params and params['id'] == '-1':
                 del params['id']
@@ -349,7 +338,7 @@ class DataSite(APISite):
         Add a claim.
 
         :param entity: Entity to modify
-        :type entity: WikibasePage
+        :type entity: WikibaseEntity
         :param claim: Claim to be added
         :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
@@ -747,7 +736,7 @@ class DataSite(APISite):
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
 
-        :param itemdef: Item to modify or create
+        :param itemdef: Entity to modify or create
         :type itemdef: str, WikibaseEntity or Page connected to such item
         :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'

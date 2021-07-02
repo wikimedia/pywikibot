@@ -1009,7 +1009,8 @@ class APISite(
 
     def is_data_repository(self):
         """Return True if its data repository is itself."""
-        return self is self.data_repository()
+        # fixme: this was an identity check
+        return self == self.data_repository()
 
     def page_from_repository(self, item):
         """
