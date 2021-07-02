@@ -123,8 +123,7 @@ class UploadTextBot(SingleSiteBot):
     def _spawn_ocr_threads(self):
         """Spawn threads for _ocr_worker workers."""
         for i in range(self._num_threads):
-            worker = threading.Thread(target=self._ocr_worker)
-            worker.setDaemon(True)
+            worker = threading.Thread(target=self._ocr_worker, daemon=True)
             worker.start()
 
         self._pages = collections.OrderedDict()

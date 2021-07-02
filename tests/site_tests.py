@@ -928,15 +928,14 @@ class TestLockingPage(DefaultSiteTestCase):
         # Start few threads
         threads = []
         for _ in range(5):
-            thread = threading.Thread(target=self.worker)
-            thread.setDaemon(True)
+            thread = threading.Thread(target=self.worker, daemon=True)
             thread.start()
             threads.append(thread)
 
         for thread in threads:
             thread.join(15)  # maximum wait time for all threads
 
-            with self.subTest(name=thread.getName()):
+            with self.subTest(name=thread.name):
                 # Check whether a timeout happened.
                 # In that case is_alive() is True
                 self.assertFalse(thread.is_alive(),

@@ -574,10 +574,10 @@ def main(*args):
             imageTransfer(imagepage, newname, category,
                           delete_after_done).start()
 
-    pywikibot.output('Still ' + str(threading.activeCount())
+    pywikibot.output('Still ' + str(threading.active_count())
                      + ' active threads, lets wait')
     for openthread in threading.enumerate():
-        if openthread != threading.currentThread():
+        if openthread != threading.current_thread():
             openthread.join()
     pywikibot.output('All threads are done')
 
