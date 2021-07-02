@@ -13,10 +13,6 @@ python:
 # OSX builds do not yet support Python
 os: linux
 
-# Partner Queue Solution
-arch:
-  - s390x
-
 dist: xenial  # required for Python >= 3.7
 
 addons:
@@ -130,6 +126,9 @@ env:
     - LANGUAGE=zh FAMILY=wikisource PYSETUP_TEST_EXTRAS=1 PYWIKIBOT_TEST_PROD_ONLY=1 PYWIKIBOT_TEST_NO_RC=1
 
 matrix:
+  # Partner Queue Solution
+  arch:
+  - s390x
   include:
     - python: '3.5_with_system_site_packages'
       env: LANGUAGE=nb FAMILY=wikipedia PYSETUP_TEST_EXTRAS=1 PYWIKIBOT_TEST_NO_RC=1
