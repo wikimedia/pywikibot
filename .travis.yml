@@ -138,14 +138,17 @@ matrix:
           packages:
             - djvulibre-bin
             - graphviz
+      arch: amd64
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
     - python: '3.6'
       env: LANGUAGE=zh FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '3.5'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
     - python: '3.5'
       env: LANGUAGE=en FAMILY=musicbrainz PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
     - python: '3.7'
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
     - python: '3.7'
@@ -165,6 +168,7 @@ matrix:
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
     - python: '3.5'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
 
 notifications:
   email:
