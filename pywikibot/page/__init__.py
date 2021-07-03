@@ -2518,6 +2518,8 @@ class FilePage(Page):
         the method returns the associated mediainfo entity. Otherwise,
         it falls back to behavior of BasePage.data_item.
 
+        *New in version 6.5.*
+
         :rtype: pywikibot.page.WikibaseEntity
         """
         if self.site.has_extension('WikibaseMediaInfo'):
@@ -3464,6 +3466,11 @@ class WikibaseEntity:
 
 
 class MediaInfo(WikibaseEntity):
+
+    """Interface for MediaInfo entities on Commons.
+
+    *New in version 6.5.*
+    """
 
     title_pattern = r'M[1-9]\d*'
     DATA_ATTRIBUTES = {
