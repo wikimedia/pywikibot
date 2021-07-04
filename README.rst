@@ -1,6 +1,6 @@
-.. image:: https://api.travis-ci.org/wikimedia/pywikibot.svg?branch=master
+.. image:: https://api.travis-ci.com/wikimedia/pywikibot.svg?branch=master
    :alt: Travis Build Status
-   :target: https://travis-ci.org/wikimedia/pywikibot
+   :target: https://travis-ci.com/github/wikimedia/pywikibot
 .. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master?svg=true
    :alt: AppVeyor Build Status
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
