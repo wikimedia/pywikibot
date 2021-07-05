@@ -758,8 +758,18 @@ class BasePage(ComparableMixin):
                 if template.title(with_ns=False) in catredirs:
                     if args:
                         # Get target (first template argument)
+                        target_title = args[0].strip()
                         p = pywikibot.Page(
-                            self.site, args[0].strip(), Namespace.CATEGORY)
+                            self.site, target_title, Namespace.CATEGORY)
+                        try:
+                            p.title()
+                        except pywikibot.exceptions.InvalidTitleError:
+                            target_title = self.site.expand_text(
+                                text=target_title,
+                                title=self.title(),
+                            )
+                            p = pywikibot.Page(self.site, target_title,
+                                               Namespace.CATEGORY)
                         if p.namespace() == Namespace.CATEGORY:
                             self._catredirect = p.title()
                         else:
