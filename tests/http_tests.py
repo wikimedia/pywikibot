@@ -516,18 +516,17 @@ class BinaryTestCase(TestCase):
 
     def test_requests(self):
         """Test with requests, underlying package."""
-        s = requests.Session()
-        r = s.get(self.url)
+        with requests.Session() as s:
+            r = s.get(self.url)
 
-        self.assertEqual(r.headers['content-type'], 'image/png')
-        self.assertEqual(r.content, self.png)
-
-        s.close()
+            self.assertEqual(r.headers['content-type'], 'image/png')
+            self.assertEqual(r.content, self.png)
 
     def test_http(self):
         """Test with http, standard http interface for pywikibot."""
         r = http.fetch(self.url)
 
+        self.assertEqual(r.headers['content-type'], 'image/png')
         self.assertEqual(r.content, self.png)
 
 
