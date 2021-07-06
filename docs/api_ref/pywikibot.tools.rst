@@ -17,3 +17,8 @@ tools.formatter module
 ----------------------
 
 .. automodule:: pywikibot.tools.formatter
+
+tools.\_logging module
+----------------------
+
+.. automodule:: pywikibot.tools._logging
