@@ -1113,6 +1113,7 @@ class WikimediaFamily(Family):
     other_content_families = [
         'wikidata',
         'mediawiki',
+        'lingualibre',
     ]
 
     content_families = set(
