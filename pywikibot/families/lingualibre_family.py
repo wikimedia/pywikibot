@@ -10,7 +10,10 @@ from pywikibot import family
 # The Lingua Libre family
 class Family(family.WikimediaFamily):
 
-    """Family class for Lingua Libre."""
+    """Family class for Lingua Libre.
+
+    *New in version 6.5.*
+    """
 
     name = 'lingualibre'
 
