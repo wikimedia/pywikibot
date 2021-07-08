@@ -572,7 +572,7 @@ class HighlightContextOption(ContextOption):
         pywikibot.output(text)
 
 
-class UnhandledAnswer(Exception):
+class UnhandledAnswer(Exception):  # noqa: N818
 
     """The given answer didn't suffice."""
 
@@ -581,7 +581,7 @@ class UnhandledAnswer(Exception):
         self.stop = stop
 
 
-class ChoiceException(StandardOption, Exception):
+class ChoiceException(StandardOption, Exception):  # noqa: N818
 
     """A choice for input_choice which result in this exception."""
 
@@ -590,7 +590,7 @@ class ChoiceException(StandardOption, Exception):
         return self
 
 
-class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):
+class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):  # noqa: N818
 
     """The user has cancelled processing at a prompt."""
 
