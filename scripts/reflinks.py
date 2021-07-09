@@ -370,7 +370,7 @@ class DuplicateReferences:
 
         # Fix references
         for groupname, references in found_refs.items():
-            group = 'group="{}" '.format(group) if groupname else ''
+            group = 'group="{}" '.format(groupname) if groupname else ''
 
             for ref, v in references.items():
                 if len(v[IX.reflist]) == 1 and not v[IX.change_needed]:
