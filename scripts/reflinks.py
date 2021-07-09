@@ -111,7 +111,7 @@ deadLinkTag = {
     'it': '{{Collegamento interrotto|%s}}',
     'en': '[%s] {{dead link}}',
     'pl': '[%s] {{Martwy link}}',
-    'ru': '[%s] {{subst:dead}}',
+    'ru': '[%s] {{subst:deadlink2}}',
     'sr': '[%s] {{dead link}}',
     'ur': '[%s] {{مردہ ربط}}',
 }
