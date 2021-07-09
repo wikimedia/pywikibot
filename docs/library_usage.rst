@@ -84,5 +84,4 @@ with the scripts folder. Here is the content:
    :language: python
 
 .. note::
-   Please also see the documentation at
-   `Manual:Pywikibot/Create your own script <https://www.mediawiki.org/wiki/Manual:Pywikibot/Create_your_own_script>`_
+   Please also see the documentation at :manpage:`Create your own script`

@@ -18,5 +18,4 @@ the site-package. For more settings use :mod:`generate_user_files` script
 (not available with site-package) or refer :mod:`pywikibot.config`.
 
 .. note::
-   Please also see the documentation at
-   `Manual:Pywikibot/Installation <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
+   Please also see the documentation at :manpage:`Installation`

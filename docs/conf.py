@@ -318,6 +318,7 @@ man_pages = [
      ['Pywikibot team'], 1)
 ]
 
+manpages_url = 'https://www.mediawiki.org/wiki/Manual:Pywikibot/{path}'
 # If true, show URL addresses after external links.
 #
 # man_show_urls = False
