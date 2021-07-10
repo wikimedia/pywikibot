@@ -2261,3 +2261,9 @@ class WikidataBot(Bot, ExistingPageBot):
 
 
 set_interface(config.userinterface)
+
+# NOTE: (T286348)
+# Do not use ModuleDeprecationWrapper with this module.
+# pywikibot.bot.ui would be wrapped through the ModuleDeprecationWrapper
+# and a cannot be changed later. Use another depecation method instead
+# (until T286348 has been solved somehow different).
