@@ -58,6 +58,7 @@ For bot developers:
 
    installation
    library_usage
+   recipes
    getting_help
    api_ref/index
 
