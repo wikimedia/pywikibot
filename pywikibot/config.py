@@ -273,6 +273,11 @@ ignore_file_security_warnings = False
 # not just MediaWiki API calls.
 extra_headers = {}
 
+# Set to True to override the {{bots}} exclusion protocol (at your own risk!)
+ignore_bot_templates = False
+
+# #############################################
+
 
 def user_home_path(path):
     """Return a file path to a file in the user home."""
@@ -438,8 +443,6 @@ def register_families_folder(folder_path: str):
 # ‘families/’ is a subdirectory of the directory in which config.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
 
-# Set to True to override the {{bots}} exclusion protocol (at your own risk!)
-ignore_bot_templates = False
 
 # ############# USER INTERFACE SETTINGS ##############
 
