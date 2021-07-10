@@ -46,6 +46,7 @@ For bot users:
    utilities/index
    scripts/index
    global_options
+   faq
    getting_help
 
 
