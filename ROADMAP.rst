@@ -1,6 +1,9 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* Add support for Lingua Libre family (T286303)
+* Catch invalid titles in Category.isCategoryRedirect()
+* L10N updates
 * Provide structured data on Commons (T213904, T223820)
 
 
