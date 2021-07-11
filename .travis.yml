@@ -2,8 +2,8 @@
 
 language: python
 
+# Python 3.5 does not work on sponsored s390x arch
 python:
-  - '3.5'
   - '3.6'
   - '3.7'
   - '3.8'
@@ -12,6 +12,10 @@ python:
 
 # OSX builds do not yet support Python
 os: linux
+
+# Partner Queue Solution
+arch:
+  - s390x
 
 dist: xenial  # required for Python >= 3.7
 
@@ -127,9 +131,6 @@ env:
 
 # use Partner Queue Solution for Python > 3.5 to not consume credits
 matrix:
-  # Partner Queue Solution
-  arch:
-  - s390x
   include:
     - python: '3.5_with_system_site_packages'
       env: LANGUAGE=nb FAMILY=wikipedia PYSETUP_TEST_EXTRAS=1 PYWIKIBOT_TEST_NO_RC=1
@@ -138,43 +139,43 @@ matrix:
           packages:
             - djvulibre-bin
             - graphviz
+      arch: amd64
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
-      arch: s390x
     - python: '3.6'
       env: LANGUAGE=zh FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
-      arch: s390x
     - python: '3.5'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
     - python: '3.5'
       env: LANGUAGE=en FAMILY=musicbrainz PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
     - python: '3.7'
       env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
-      arch: s390x
     - python: '3.7'
       env: LANGUAGE=test FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
-      arch: s390x
     - python: '3.9'
       env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT_TEST_NO_RC=1
-      arch: s390x
     - python: '3.6'
       env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
-      arch: s390x
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
-      arch: s390x
     - python: '3.8'
       env: LANGUAGE=en FAMILY=portalwiki
-      arch: s390x
+    - python: '3.5'
+      env: LANGUAGE=en FAMILY=wikipedia PYWIKIBOT_TEST_PROD_ONLY=1
+      arch: amd64
+    - python: '3.5'
+      env: LANGUAGE=zh FAMILY=wikisource PYSETUP_TEST_EXTRAS=1 PYWIKIBOT_TEST_PROD_ONLY=1 PYWIKIBOT_TEST_NO_RC=1
+      arch: amd64
   allow_failures:
     - python: '3.6'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
-      arch: s390x
     - python: '3.8'
       env: LANGUAGE=uk FAMILY=wowwiki PYWIKIBOT_TEST_NO_RC=1
-      arch: s390x
     - python: '3.5'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1
+      arch: amd64
 
 notifications:
   email:
