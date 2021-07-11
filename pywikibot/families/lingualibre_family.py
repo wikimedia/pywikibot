@@ -26,3 +26,7 @@ class Family(family.WikimediaFamily):
     def scriptpath(self, code):
         """Return the script path for this family."""
         return ''
+
+    def interface(self, code):
+        """Return 'DataSite'."""
+        return 'DataSite'
