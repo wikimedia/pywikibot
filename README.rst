@@ -1,6 +1,3 @@
-.. image:: https://api.travis-ci.com/wikimedia/pywikibot.svg?branch=master
-   :alt: Travis Build Status
-   :target: https://travis-ci.com/github/wikimedia/pywikibot
 .. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master?svg=true
    :alt: AppVeyor Build Status
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
@@ -21,9 +18,6 @@
    :target: https://pepy.tech/project/pywikibot
 .. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
    :alt: Monthly downloads
-   :target: https://pepy.tech/project/pywikibot
-.. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=week&units=international_system&left_color=black&right_color=blue&left_text=weekly
-   :alt: Weekly downloads
    :target: https://pepy.tech/project/pywikibot
 
 Pywikibot
