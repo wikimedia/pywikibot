@@ -4,7 +4,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import os
 import unittest
 from contextlib import suppress
 
@@ -119,12 +118,6 @@ class TestSites(TestCase):
                     self.assertIn(key, languages,
                                   "json key '{}' is not a site language"
                                   .format(key))
-
-
-def setUpModule():  # noqa: N802
-    """Skip Travis tests if PYWIKIBOT_NO_L10N_TESTS variable is set."""
-    if os.environ.get('PYWIKIBOT_NO_L10N_TESTS', '0') == '1':
-        raise unittest.SkipTest('L10N tests disabled.')
 
 
 if __name__ == '__main__':  # pragma: no cover
