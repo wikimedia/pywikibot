@@ -182,12 +182,13 @@ class OutputProxyOption(OutputOption, StandardOption):
 
     @property
     def out(self) -> str:
-        """Return te contents."""
+        """Return the contents."""
         if not hasattr(self._outputter, 'out'):
             issue_deprecation_warning('{} without "out" property'
                                       .format(self.__class__.__name__),
                                       since='6.2.0')
-            return self._outputter.output()
+            self._outputter.output()
+            return ''
         return self._outputter.out
 
 
