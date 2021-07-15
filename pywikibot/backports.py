@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Any
+
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -22,13 +24,13 @@ if PYTHON_VERSION < (3, 7):
 
         """Dummy context manager for Python 3.5/3.6 that does nothing."""
 
-        def __init__(self, result=None):  # noqa: D107
+        def __init__(self, result: Any = None) -> None:  # noqa: D107
             self.result = result
 
-        def __enter__(self):
+        def __enter__(self) -> Any:
             return self.result
 
-        def __exit__(self, *args):
+        def __exit__(self, *args) -> None:
             pass
 else:
     from contextlib import nullcontext
@@ -77,17 +79,17 @@ else:
     def removeprefix(string: str, prefix: str) -> str:
         """Remove prefix from a string or return a copy otherwise.
 
-        *New in version 5.4.*
+        .. versionadded:: 5.4
         """
         if string.startswith(prefix):
             return string[len(prefix):]
-        return string[:]
+        return string
 
     def removesuffix(string: str, suffix: str) -> str:
         """Remove prefix from a string or return a copy otherwise.
 
-        *New in version 5.4.*
+        .. versionadded:: 5.4
         """
         if string.endswith(suffix):
             return string[:-len(suffix)]
-        return string[:]
+        return string
