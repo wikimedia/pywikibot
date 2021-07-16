@@ -9,6 +9,7 @@ import datetime
 import inspect
 import math
 import re
+import sys
 import threading
 import time
 from contextlib import suppress
@@ -32,7 +33,7 @@ from pywikibot.__metadata__ import (
     __version__,
 )
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
-from pywikibot.backports import cache, removesuffix
+from pywikibot.backports import cache, removesuffix, List
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -62,7 +63,7 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
-from pywikibot.site import APISite, BaseSite, ClosedSite, DataSite
+from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
 )
@@ -95,6 +96,11 @@ __all__ = (
     'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
     'WikiBaseError', 'WikidataBot',
 )
+
+# argvu is set by pywikibot.bot when it's imported
+
+if not hasattr(sys.modules[__name__], 'argvu'):
+    argvu = []  # type: List[str]
 
 
 class Timestamp(datetime.datetime):
@@ -1091,7 +1097,7 @@ def _code_fam_from_url(url: str, name: Optional[str] = None):
 @_deprecate_arg('sysop', True)
 def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
          interface=None,
-         url: Optional[str] = None) -> Union[APISite, DataSite, ClosedSite]:
+         url: Optional[str] = None) -> APISite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
