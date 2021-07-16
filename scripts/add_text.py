@@ -396,10 +396,8 @@ def parse(argv: Tuple[str, ...],
 
     :param argv: input arguments to be parsed
     :param generator_factory: factory that will determine the page to edit
-
     :return: dictionary with our parsed arguments
-
-    @raise: ValueError if we receive invalid arguments
+    :raise ValueError: invalid arguments received
     """
     args = dict(DEFAULT_ARGS)
     argv = pywikibot.handle_args(argv)
