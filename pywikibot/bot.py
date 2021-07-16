@@ -520,8 +520,8 @@ def input_choice(question: str, answers, default: Optional[str] = None,
     :param question: The question asked without trailing spaces.
     :param answers: The valid answers each containing a full length answer and
         a shortcut. Each value must be unique.
-    :type answers: iterable containing a sequence of length two or instances of
-        ChoiceException
+    :type answers: iterable containing a sequence of length two or
+        instances of :py:class:`pywikibot.bot.Option`
     :param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None. If it should
         be linked with the valid answers it must be its shortcut.

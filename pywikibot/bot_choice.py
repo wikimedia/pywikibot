@@ -27,9 +27,10 @@ class Option(ABC):
     A basic option for input_choice.
 
     The following methods need to be implemented:
-    * format(default=None)
-    * result(value)
-    * test(value)
+
+    - format(default=None)
+    - result(value)
+    - test(value)
 
     The methods ``test`` and ``handled`` are in such a relationship that
     when ``handled`` returns itself that ``test`` must return True for
