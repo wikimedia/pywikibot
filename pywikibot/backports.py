@@ -60,15 +60,25 @@ else:
     from collections import OrderedDict
 
 
-if PYTHON_VERSION >= (3, 9):
-    from collections.abc import Iterable, Sequence
+if PYTHON_VERSION < (3, 9):
+    from typing import (
+        Callable,
+        Dict,
+        FrozenSet,
+        Iterable,
+        List,
+        Mapping,
+        Sequence,
+        Set,
+        Tuple,
+    )
+else:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
     Dict = dict
     FrozenSet = frozenset
     List = list
     Set = set
     Tuple = tuple
-else:
-    from typing import Dict, FrozenSet, Iterable, List, Sequence, Set, Tuple
 
 
 # PEP 616 string methods
