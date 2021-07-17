@@ -814,7 +814,7 @@ class Family:
         """
         Return whether this family matches the given url.
 
-        It is first checking if a domain of this family is in the the domain of
+        It is first checking if a domain of this family is in the domain of
         the URL. If that is the case it's checking all codes and verifies that
         a path generated via :py:obj:`APISite.article_path` and
         :py:obj:`Family.path` matches the path of the URL together with

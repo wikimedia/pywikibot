@@ -832,7 +832,7 @@ class BasePage(ComparableMixin):
         """
         Return True if this is a disambiguation page, False otherwise.
 
-        By default, it uses the the Disambiguator extension's result. The
+        By default, it uses the Disambiguator extension's result. The
         identification relies on the presence of the __DISAMBIG__ magic word
         which may also be transcluded.
 
