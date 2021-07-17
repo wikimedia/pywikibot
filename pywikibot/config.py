@@ -44,14 +44,19 @@ from locale import getdefaultlocale
 from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
-from typing import Optional, Union
+from typing import Optional, TypeVar, Union
 from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import Dict, List, Tuple, removesuffix
+from pywikibot.backports import (DefaultDict, Dict, FrozenSet, List, Mapping,
+                                 Tuple, removesuffix)
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import deprecated, issue_deprecation_warning
+
+
+_DabComDict = DefaultDict[str, Dict[str, str]]
+_ValueType = TypeVar('_ValueType')
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -143,7 +148,7 @@ mylang = 'language'
 # You may use '*' for family name in a similar manner.
 #
 usernames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
-disambiguation_comment = collections.defaultdict(dict)
+disambiguation_comment = collections.defaultdict(dict)  # type: _DabComDict
 
 # User agent format.
 # For the meaning and more help in customization see:
@@ -168,7 +173,7 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # True for enabling, False for disabling, str to hardcode a UA.
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
-fake_user_agent_exceptions = {}
+fake_user_agent_exceptions = {}  # type: Dict[str, Union[bool, str]]
 # This following option is deprecated in favour of finer control options above.
 fake_user_agent = False
 
@@ -218,7 +223,7 @@ solve_captcha = True
 #                                    'access_key', 'access_secret')
 #
 # Note: the target wiki site must install OAuth extension
-authenticate = {}
+authenticate = {}  # type: Dict[str, Tuple[str, ...]]
 
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = '.passwd'
@@ -271,7 +276,7 @@ ignore_file_security_warnings = False
 #
 # Note that these headers will be sent with all requests,
 # not just MediaWiki API calls.
-extra_headers = {}
+extra_headers = {}  # type: Mapping[str, str]
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
@@ -279,7 +284,7 @@ ignore_bot_templates = False
 # #############################################
 
 
-def user_home_path(path):
+def user_home_path(path: str) -> str:
     """Return a file path to a file in the user home."""
     return os.path.join(os.path.expanduser('~'), path)
 
@@ -308,7 +313,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
     """
-    def exists(directory):
+    def exists(directory: str) -> bool:
         directory = os.path.abspath(directory)
         if directory == test_directory:
             return True
@@ -342,20 +347,22 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
                 elif win_version in (6, 10):
                     sub_dir = ['AppData', 'Roaming']
                 else:
-                    raise WindowsError('Windows version {} not supported yet.'
-                                       .format(win_version))
+                    raise WindowsError(  # type: ignore[name-defined]
+                        'Windows version {} not supported yet.'
+                        .format(win_version)
+                    )
                 base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
                                      [home] + sub_dir + ['pywikibot']])
             else:
                 base_dir_cand.append([home, '.pywikibot'])
 
-            for dir in base_dir_cand:
-                dir = os.path.join(*dir)
+            for dir_ in base_dir_cand:
+                dir_s = os.path.join(*dir_)
                 try:
-                    os.makedirs(dir, mode=private_files_permission)
+                    os.makedirs(dir_s, mode=private_files_permission)
                 except OSError:  # PermissionError or already exists
-                    if exists(dir):
-                        base_dir = dir
+                    if exists(dir_s):
+                        base_dir = dir_s
                         break
 
     if not os.path.isabs(base_dir):
@@ -369,6 +376,7 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
             base_dir)
 
         if __no_user_config is None:
+            assert get_base_dir.__doc__ is not None
             exc_text += (
                 '  Please check that user-config.py is stored in the correct '
                 'location.\n'
@@ -393,7 +401,7 @@ family_files = {}
 
 
 @deprecated('family_files[family_name] = file_path', since='20210305')
-def register_family_file(family_name, file_path):
+def register_family_file(family_name: str, file_path: str) -> None:
     """Register a single family class file.
 
     Parameter file_path may be a path or an url.
@@ -402,7 +410,7 @@ def register_family_file(family_name, file_path):
     family_files[family_name] = file_path
 
 
-def register_families_folder(folder_path: str):
+def register_families_folder(folder_path: str) -> None:
     """Register all family class files contained in a directory.
 
     :param folder_path: The path of a folder containing family files.
@@ -554,9 +562,9 @@ editor_filename_extension = 'wiki'
 #     log = []
 # Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = []
+log = []  # type: List[str]
 # filename defaults to modulename-bot.log
-logfilename = None
+logfilename = None  # type: Optional[str]
 # maximal size of a logfile in kilobytes. If the size reached that limit the
 # logfile will be renamed (if logfilecount is not 0) and the old file is filled
 # again. logfilesize must be an integer value
@@ -574,7 +582,7 @@ verbose_output = 0
 log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
-debug_log = []
+debug_log = []  # type: List[str]
 
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
@@ -815,7 +823,7 @@ actions_to_block = []  # type: List[str]
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
-simulate = False
+simulate = False  # type: Union[bool, str]
 
 # How many pages should be put to a queue in asynchronous mode.
 # If maxsize is <= 0, the queue size is infinite.
@@ -840,7 +848,7 @@ pickle_protocol = 2
 # #############################################
 
 
-def makepath(path: str, create: bool = True):
+def makepath(path: str, create: bool = True) -> str:
     """Return a normalized absolute version of the path argument.
 
     If the given path already exists in the filesystem or create is False
@@ -861,7 +869,7 @@ def makepath(path: str, create: bool = True):
     return os.path.normpath(os.path.abspath(path))
 
 
-def datafilepath(*filename, **kwargs):
+def datafilepath(*filename: str, create: bool = True) -> str:
     """Return an absolute path to a data file in a standard location.
 
     Argument(s) are zero or more directory names, optionally followed by a
@@ -869,24 +877,21 @@ def datafilepath(*filename, **kwargs):
     directories in the path that do not already exist are created if create
     is True, otherwise the filesystem keeps unchanged.
 
-    :param path: path in the filesystem
-    :type path: str
-    :keyword create: create the directory if it is True. Otherwise don't change
+    :param filename: path in the filesystem
+    :param create: create the directory if it is True. Otherwise don't change
         the filesystem. Default is True.
-    :type create: bool
     """
-    create = kwargs.get('create', True)
     return makepath(os.path.join(base_dir, *filename), create=create)
 
 
-def shortpath(path):
+def shortpath(path: str) -> str:
     """Return a file path relative to config.base_dir."""
     if path.startswith(base_dir):
         return path[len(base_dir) + len(os.path.sep):]
     return path
 
 
-def _win32_extension_command(extension):
+def _win32_extension_command(extension: str) -> Optional[str]:
     """Get the command from the Win32 registry for an extension."""
     fileexts_key = \
         r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
@@ -896,7 +901,7 @@ def _win32_extension_command(extension):
         _prog_id = winreg.EnumValue(key1, 0)[0]
         _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
                                r'{}\shell\open\command'.format(_prog_id))
-        _cmd = winreg.QueryValueEx(_key2, None)[0]
+        _cmd = winreg.QueryValueEx(_key2, '')[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
         if cmd.find('%1'):
@@ -904,13 +909,14 @@ def _win32_extension_command(extension):
             # Remove any trailing character, which should be a quote or space
             # and then remove all whitespace.
             return cmd[:-1].strip()
-    except WindowsError as e:
+    except WindowsError as e:  # type: ignore[name-defined]
         # Catch any key lookup errors
         output('Unable to detect program for file extension "{}": {!r}'
                .format(extension, e))
+    return None
 
 
-def _detect_win32_editor():
+def _detect_win32_editor() -> Optional[str]:
     """Detect the best Win32 editor."""
     # Notepad is even worse than our Tkinter editor.
     unusable_exes = ['notepad.exe',
@@ -962,7 +968,12 @@ class _DifferentTypeError(UserWarning, TypeError):
 
     """An error when the required type doesn't match the actual type."""
 
-    def __init__(self, name, actual_type, allowed_types):
+    def __init__(
+        self,
+        name: str,
+        actual_type: type,
+        allowed_types: Tuple[type, ...],
+    ) -> None:
         super().__init__(
             'Configuration variable "{}" is defined as "{}" in '
             'your user-config.py but expected "{}".'
@@ -970,17 +981,25 @@ class _DifferentTypeError(UserWarning, TypeError):
                     '", "'.join(t.__name__ for t in allowed_types)))
 
 
-def _assert_default_type(name, value, default_value):
+def _assert_default_type(
+    name: str,
+    value: _ValueType,
+    default_value: object,
+) -> Union[_ValueType, float, None]:
     """Return the value if the old or new is None or both same type."""
     if (value is None or default_value is None
             or isinstance(value, type(default_value))):
         return value
     if isinstance(value, int) and isinstance(default_value, float):
         return float(value)
-    raise _DifferentTypeError(name, type(value), [type(default_value)])
+    raise _DifferentTypeError(name, type(value), (type(default_value),))
 
 
-def _assert_types(name, value, types):
+def _assert_types(
+    name: str,
+    value: _ValueType,
+    types: Tuple[type, ...],
+) -> _ValueType:
     """Return the value if it's one of the types."""
     if isinstance(value, types):
         return value
@@ -993,7 +1012,11 @@ DEPRECATED_VARIABLE = (
     'maintainers if you depend on it.')
 
 
-def _check_user_config_types(user_config, default_values, skipped):
+def _check_user_config_types(
+    user_config: Dict[str, object],
+    default_values: Dict[str, object],
+    skipped: FrozenSet[str],
+) -> None:
     """Check the types compared to the default values."""
     for name, value in user_config.items():
         if name in default_values:
