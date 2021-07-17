@@ -68,12 +68,15 @@ if PYTHON_VERSION < (3, 9):
         Iterable,
         List,
         Mapping,
+        Match,
+        Pattern,
         Sequence,
         Set,
         Tuple,
     )
 else:
     from collections.abc import Callable, Iterable, Mapping, Sequence
+    from re import Match, Pattern
     Dict = dict
     FrozenSet = frozenset
     List = list
