@@ -1148,6 +1148,8 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         URL. Still requires that the family supporting that URL exists.
     :raises ValueError: URL and pair of code and family given
     :raises ValueError: Invalid interface name
+    :raises ValueError: Missing Site code
+    :raises ValueError: Missing Site family
     """
     _logger = 'wiki'
 
@@ -1168,6 +1170,10 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         # Fallback to config defaults
         code = code or _config.mylang
         fam = fam or _config.family
+
+    if not (code and fam):
+        raise ValueError('Missing Site {}'
+                         .format('code' if not code else 'family'))
 
     if not isinstance(fam, Family):
         fam = Family.load(fam)
