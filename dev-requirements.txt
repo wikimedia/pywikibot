@@ -1,10 +1,6 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
 
-# cffi 1.14.6 fails (T286457)
-cffi >= 1.0.0, != 1.14.6; python_version=="3.5" and platform_system=="Windows"
-cffi >= 1.0.0; python_version!="3.5" or platform_system!="Windows"
-
 pytest >= 5.3
 pytest-cov >= 2.6.1
 pytest-timeout
