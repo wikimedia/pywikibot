@@ -243,9 +243,9 @@ class ContextOption(OutputOption, StandardOption):
         self.end = end
 
     def result(self, value: str) -> Any:
-        """Add the delta to the context and output it."""
+        """Add the delta to the context."""
         self.context += self.delta
-        super().result(value)
+        return None
 
     @property
     def out(self) -> str:
