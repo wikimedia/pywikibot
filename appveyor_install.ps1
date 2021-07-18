@@ -126,7 +126,7 @@ function RunCommand ($command, $command_args) {
 
 
 function main () {
-    if ($env:PYTHON_VERSION -eq "3.5.0") {
+    if ($env:PYTHON_VERSION -eq "3.5.2") {
         InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     }
 }
