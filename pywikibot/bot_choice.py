@@ -126,10 +126,14 @@ class OutputOption(Option):
         """
         return ''
 
+    @deprecated('pywikibot.output(OutputOption.out)', since='6.5')
     def output(self) -> None:
-        """Output string when selected and possibly before the question.
+        """Output string.
 
-        :Note: This method should never be overridden.
+        .. deprecated:: 6.5
+           This method was replaced by :py:obj:`out` property and is no
+           no longer used by the
+           :py:mod:`userinterfaces <pywikibot.userinterfaces>` system.
         """
         pywikibot.output(self.out)
 
