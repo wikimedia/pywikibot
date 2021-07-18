@@ -15,8 +15,8 @@ environment:
 
     # Test the lowest supported release of each major Python version
 
-    - PYTHON: "C:\\Python351-x64"
-      PYTHON_VERSION: "3.5.1"
+    - PYTHON: "C:\\Python352-x64"
+      PYTHON_VERSION: "3.5.2"
       PYTHON_ARCH: "64"
 
     # Appveyor pre-installs these versions onto build machines
