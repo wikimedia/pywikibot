@@ -171,15 +171,17 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
 
 
 EXTENDED_CONFIG = """\
-# This is an automatically generated file. You can find more configuration
-# parameters in 'config.py' file.
+# This is an automatically generated file. You can find more
+# configuration parameters in 'config.py' file or refer
+# https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.config.html
 
-# The family of sites we are working on. wikipedia.py will import
-# families/xxx_family.py so if you want to change this variable,
-# you need to write such a file.
+# The family of sites to be working on.
+# Pywikibot will import families/xxx_family.py so if you want to change
+# this variable, you have to ensure that such a file exists. You may use
+# generate_family_file to create one.
 family = '{main_family}'
 
-# The language code of the site we're working on.
+# The language code of the site to be working on.
 mylang = '{main_code}'
 
 # The dictionary usernames should contain a username for each site where you
