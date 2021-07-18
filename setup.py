@@ -65,6 +65,8 @@ extra_deps = {
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
                        'wikitextparser>=0.47.0; python_version >= "3.6"'],
+    'mysql': ['PyMySQL >= 0.6.7, < 1.0.0 ; python_version < "3.6"',
+              'PyMySQL >= 1.0.0 ; python_version >= "3.6"'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
