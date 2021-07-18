@@ -130,6 +130,7 @@ from pywikibot.bot_choice import (
     UnhandledAnswer,
 )
 from pywikibot.exceptions import (
+    ArgumentDeprecationWarning,
     EditConflictError,
     Error,
     LockedPageError,
@@ -167,9 +168,10 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
+    redirect_func,
     suppress_warnings,
 )
-from pywikibot.tools._logging import LoggingFormatter, RotatingFileHandler
+from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
 
 
@@ -291,6 +293,13 @@ def set_interface(module_name):
 _handlers_initialized = False
 
 
+def handler_namer(name: str) -> str:
+    """Modify the filename of a log file when rotating."""
+    path, qualifier = name.rsplit('.', 1)
+    root, ext = os.path.splitext(path)
+    return '{}.{}{}'.format(root, qualifier, ext)
+
+
 def init_handlers(strm=None):
     """Initialize logging system for terminal-based bots.
 
@@ -384,10 +393,23 @@ def init_handlers(strm=None):
             logfile = config.datafilepath('logs', '{}-{}bot.log'
                                           .format(module_name, pid))
 
-        file_handler = RotatingFileHandler(filename=logfile,
-                                           maxBytes=1024 * config.logfilesize,
-                                           backupCount=config.logfilecount,
-                                           encoding='utf-8')
+        # give up infinite rotating file handler with logfilecount of -1;
+        # set it to 999 and use the standard implementation
+        max_count = config.logfilecount
+        if max_count == -1:
+            max_count = 999
+            issue_deprecation_warning('config.logfilecount with value -1',
+                                      'any positive number',
+                                      warning_class=ArgumentDeprecationWarning,
+                                      since='6.5.0')
+
+        file_handler = logging.handlers.RotatingFileHandler(
+            filename=logfile,
+            maxBytes=config.logfilesize << 10,
+            backupCount=max_count,
+            encoding='utf-8'
+        )
+        file_handler.namer = handler_namer
 
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
@@ -2263,6 +2285,10 @@ class WikidataBot(Bot, ExistingPageBot):
 
 
 set_interface(config.userinterface)
+
+# Deprecate RotatingFileHandler
+RotatingFileHandler = redirect_func(logging.handlers.RotatingFileHandler,
+                                    since='6.5.0')
 
 # NOTE: (T286348)
 # Do not use ModuleDeprecationWrapper with this module.

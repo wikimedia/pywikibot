@@ -7,11 +7,16 @@
 import logging
 import os
 
+from pywikibot.tools import ModuleDeprecationWrapper
 
-# Logging module configuration
-class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
-    """Modified RotatingFileHandler supporting unlimited amount of backups."""
+class _RotatingFileHandler(logging.handlers.RotatingFileHandler):
+
+    """DEPRECATED Modified RotatingFileHandler.
+
+    Use namer instead. See:
+    https://docs.python.org/3/howto/logging-cookbook.html#cookbook-rotator-namer
+    """
 
     def doRollover(self):
         """Modified naming system for logging files.
@@ -93,3 +98,11 @@ class LoggingFormatter(logging.Formatter):
             record.args = (msg,)
 
         return super().format(record).rstrip()
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'RotatingFileHandler', _RotatingFileHandler,
+    replacement_name=('logging.handlers.RotatingFileHandler '
+                      'with your own namer'),
+    since='6.5.0')
