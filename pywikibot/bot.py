@@ -169,6 +169,7 @@ from pywikibot.tools import (
     deprecated_args,
     issue_deprecation_warning,
     redirect_func,
+    remove_last_args,
     suppress_warnings,
 )
 from pywikibot.tools._logging import LoggingFormatter
@@ -300,7 +301,8 @@ def handler_namer(name: str) -> str:
     return '{}.{}{}'.format(root, qualifier, ext)
 
 
-def init_handlers(strm=None):
+@remove_last_args(['strm'])
+def init_handlers():
     """Initialize logging system for terminal-based bots.
 
     This function must be called before using pywikibot.output(); and must
@@ -329,12 +331,9 @@ def init_handlers(strm=None):
     Accordingly, do **not** use print statements in bot code; instead,
     use pywikibot.output function.
 
-    *New in version 6.2:* different logfiles are uses if multiple
-    processes of the same script are are running.
-
-    :param strm: Output stream. If None, re-uses the last stream if one
-        was defined, otherwise uses sys.stderr
-
+    ..versionchanged:: 6.2
+      Different logfiles are used if multiple processes of the same
+      script are running.
     """
     global _handlers_initialized
 
