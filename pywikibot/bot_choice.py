@@ -1,4 +1,4 @@
-"""Choices for input_choice."""
+"""Options and Choices for :py:meth:`pywikibot.input_choice`."""
 #
 # (C) Pywikibot team, 2015-2021
 #
@@ -51,6 +51,10 @@ class Option(ABC):
         """
         Create a text with the options formatted into it.
 
+        This static method is used by :py:meth:`pywikibot.input_choice`.
+        It calls :py:obj:`format` for all *options* to combine the
+        question for :py:meth:`pywikibot.input`.
+
         :param text: Text into which options are to be formatted
         :param options: Option instances to be formatted
         :param default: filler for any option's 'default' placeholder
@@ -101,11 +105,18 @@ class OutputOption(Option):
 
     """An option that never stops and can output on each question.
 
-    :Note: OutputOption must have a an "out" property which returns a
-        string for output method.
+    :py:meth:`pywikibot.input_choice` uses before_question attribute to
+    decide whether to output before or after the question.
+
+    .. note:: OutputOption must have an :py:obj:`out` property which
+       returns a string for
+       :py:meth:`userinterface output()
+       <pywikibot.userinterfaces._interface_base.ABUIC.output>`
+       method.
     """
 
-    before_question = False
+    #: Place output before or after the question
+    before_question = False  # type: bool
 
     @property
     def stop(self) -> bool:
@@ -118,11 +129,11 @@ class OutputOption(Option):
 
     @property
     def out(self) -> str:
-        """String to be used when selected and possibly before the question.
+        """String to be used when selected before or after the question.
 
         :Note: This method is used by ui.input_choice instead of output().
 
-        *New in version 6.2.*
+        .. versionadded:: 6.2
         """
         return ''
 
