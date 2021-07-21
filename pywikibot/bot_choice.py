@@ -281,15 +281,13 @@ class Choice(StandardOption):
 
     """A simple choice consisting of an option, shortcut and handler."""
 
-    def __init__(self, option: str, shortcut: str,
-                 replacer: Optional['pywikibot.bot.InteractiveReplace']
-                 ) -> None:
+    def __init__(self, option: str, shortcut: str, replacer) -> None:
         """Initializer."""
         super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
-    def replacer(self) -> Optional['pywikibot.bot.InteractiveReplace']:
+    def replacer(self):
         """The replacer."""
         return self._replacer
 
@@ -321,8 +319,7 @@ class LinkChoice(Choice):
 
     """A choice returning a mix of the link new and current link."""
 
-    def __init__(self, option: str, shortcut: str,
-                 replacer: Optional['pywikibot.bot.InteractiveReplace'],
+    def __init__(self, option: str, shortcut: str, replacer,
                  replace_section: bool,
                  replace_label: bool) -> None:
         """Initializer."""
@@ -364,7 +361,7 @@ class AlwaysChoice(Choice):
 
     """Add an option to always apply the default."""
 
-    def __init__(self, replacer: Optional['pywikibot.bot.InteractiveReplace'],
+    def __init__(self, replacer,
                  option: str = 'always', shortcut: str = 'a') -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
