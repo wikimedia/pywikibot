@@ -1650,7 +1650,9 @@ class APISite(
                                 'user': self.user(),
                                 'info': err.info
                             }
-                            raise Error(exception.format_map(errdata))
+                            raise Error(
+                                exception.format_map(errdata)
+                            ) from None
                         if issubclass(exception, AbuseFilterDisallowedError):
                             errdata = {
                                 'info': err.info,
@@ -1660,7 +1662,7 @@ class APISite(
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
-                        raise exception(page)
+                        raise exception(page) from None
                     pywikibot.debug(
                         "editpage: Unexpected error code '{}' received."
                         .format(err.code),
