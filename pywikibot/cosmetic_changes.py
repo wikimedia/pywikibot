@@ -234,7 +234,7 @@ class CosmeticChangesToolkit:
         """Initializer.
 
         :param page: the Page object containing the text to be modified
-        :param show_diff: show difference after replacements (default: False)
+        :param show_diff: show difference after replacements
         :param namespace: DEPRECATED namespace parameter
         :param pageTitle: DEPRECATED page title parameter
         :param ignore: ignores if an error occurred and either skips the page
@@ -243,13 +243,18 @@ class CosmeticChangesToolkit:
         if isinstance(page, pywikibot.BaseSite):
             self.site = page
             self.title = pageTitle
+
+            class_name = type(self).__name__
+            if self.title is None:
+                raise ValueError('Page title required for ' + class_name)
+
             try:
                 self.namespace = self.site.namespaces.resolve(namespace).pop(0)
             except (KeyError, TypeError, IndexError):
                 raise ValueError('{} needs a valid namespace'
-                                 .format(self.__class__.__name__))
+                                 .format(class_name))
             issue_deprecation_warning(
-                'site parameter of CosmeticChangesToolkit',
+                'site parameter of ' + class_name,
                 'a pywikibot.Page object as first parameter',
                 since='20201102')
         else:
@@ -383,9 +388,6 @@ class CosmeticChangesToolkit:
         # get categories
         if not self.template:
             categories = textlib.getCategoryLinks(text, site=self.site)
-
-        if self.title is None:
-            raise ValueError('Page title required to standardize footer')
 
         if not self.talkpage:
             subpage = False
