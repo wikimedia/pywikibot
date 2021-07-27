@@ -160,7 +160,7 @@ class TestCategoryObject(TestCase):
         # Invalid title case
         cat3 = pywikibot.Category(site, '2021 establishments in Orissa')
         cat4 = pywikibot.Category(site, '2021 establishments in Odisha')
-        self.assertTrue('{{title year}}' in cat3.text)
+        self.assertIn('{{title year}}', cat3.text)
         self.assertTrue(cat3.isCategoryRedirect())
         self.assertFalse(cat4.isCategoryRedirect())
         tgt = cat3.getCategoryRedirectTarget()
