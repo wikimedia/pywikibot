@@ -76,7 +76,6 @@ extra_deps = {
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.9.1',
         'pydocstyle>=4.0.0',
-        'hacking',
         'flake8-bugbear!=21.4.1',
         'flake8-coding',
         'flake8-colors>=0.1.9',
@@ -93,6 +92,7 @@ extra_deps = {
         'pep8-naming>=0.7',
         'pyflakes>=2.1.0',
     ],
+    'hacking': ['hacking'],
 }
 
 
