@@ -382,8 +382,10 @@ class CosmeticChangesToolkit:
         2. additional information depending on the local site policy
         3. interwiki
         """
+        assert self.title is not None
+
         categories = []
-        interwiki_links = []
+        interwiki_links = {}
 
         # get categories
         if not self.template:

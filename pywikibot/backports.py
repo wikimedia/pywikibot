@@ -11,7 +11,7 @@ from pywikibot.tools import PYTHON_VERSION
 
 # functools.cache
 if PYTHON_VERSION >= (3, 9):
-    from functools import cache
+    from functools import cache  # type: ignore[attr-defined]
 else:
     from functools import lru_cache as _lru_cache
     cache = _lru_cache(None)
@@ -30,26 +30,28 @@ if PYTHON_VERSION < (3, 7):
         def __enter__(self) -> Any:
             return self.result
 
-        def __exit__(self, *args) -> None:
+        def __exit__(self, *args: Any) -> None:
             pass
 else:
-    from contextlib import nullcontext
+    from contextlib import nullcontext  # type: ignore[misc]
 
 
 # queue
 if PYTHON_VERSION < (3, 7):
     from queue import Queue as SimpleQueue
 else:
-    from queue import SimpleQueue
+    from queue import SimpleQueue  # type: ignore[misc]
 
 
 # typing
 if PYTHON_VERSION < (3, 5, 2):
     from typing import Dict as DefaultDict
 elif PYTHON_VERSION < (3, 9):
-    from typing import DefaultDict
+    from typing import DefaultDict  # type: ignore[misc]
 else:
-    from collections import defaultdict as DefaultDict  # noqa: N812
+    from collections import (  # type: ignore[misc] # noqa: N812
+        defaultdict as DefaultDict
+    )
 
 
 if PYTHON_VERSION < (3, 7, 2):
@@ -58,7 +60,6 @@ elif PYTHON_VERSION < (3, 9):
     from typing import OrderedDict
 else:
     from collections import OrderedDict
-
 
 if PYTHON_VERSION < (3, 9):
     from typing import (
@@ -77,17 +78,17 @@ if PYTHON_VERSION < (3, 9):
 else:
     from collections.abc import Callable, Iterable, Mapping, Sequence
     from re import Match, Pattern
-    Dict = dict
-    FrozenSet = frozenset
-    List = list
-    Set = set
-    Tuple = tuple
+    Dict = dict  # type: ignore[misc]
+    FrozenSet = frozenset  # type: ignore[misc]
+    List = list  # type: ignore[misc]
+    Set = set  # type: ignore[misc]
+    Tuple = tuple  # type: ignore[assignment]
 
 
 # PEP 616 string methods
 if PYTHON_VERSION >= (3, 9):
-    removeprefix = str.removeprefix
-    removesuffix = str.removesuffix
+    removeprefix = str.removeprefix  # type: ignore[attr-defined]
+    removesuffix = str.removesuffix  # type: ignore[attr-defined]
 else:
     def removeprefix(string: str, prefix: str) -> str:
         """Remove prefix from a string or return a copy otherwise.
