@@ -1604,22 +1604,25 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
     def setUpClass(cls):
         """Skip test if necessary."""
         super().setUpClass()
-        if cls.site.mw_version < '1.34':
-            cls.skipTest(cls, 'site.alldeletedrevisions() needs mw 1.34')
+        if cls.site.mw_version < '1.25':
+            cls.skipTest(cls, 'site.alldeletedrevisions() needs mw 1.25')
 
     def test_basic(self):
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
         drev = list(mysite.alldeletedrevisions(user=mysite.user(), total=10))
-        self.assertTrue(all(isinstance(data, dict)
-                            for data in drev))
-        self.assertTrue(all('revisions' in data
-                            and isinstance(data['revisions'], dict)
-                            for data in drev))
-        self.assertTrue(all('user' in rev
-                            and rev['user'] == mysite.user()
-                            for data in drev
-                            for rev in data))
+
+        if not drev:
+            self.skipTest('No deleted revisions available')
+
+        for data in drev:
+            with self.subTest(data=data):
+                self.assertIsInstance(data, dict)
+                self.assertIn('revisions', data)
+                self.assertIsInstance(data['revisions'], list)
+
+                for rev in data['revisions']:
+                    self.assertEqual(mysite.user(), rev.get('user'))
 
     def test_namespaces(self):
         """Test the site.alldeletedrevisions() method using namespaces."""
@@ -1763,8 +1766,8 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
     def test_prefix(self):
         """Test the site.alldeletedrevisions() method with prefix."""
         mysite = self.get_site()
-        if mysite.mw_version < '1.34':
-            self.skipTest('site.alldeletedrevisions() needs mw 1.34')
+        if mysite.mw_version < '1.25':
+            self.skipTest('site.alldeletedrevisions() needs mw 1.25')
 
         for data in mysite.alldeletedrevisions(prefix='John', total=5):
             self.assertIsInstance(data, dict)
