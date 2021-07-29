@@ -67,6 +67,7 @@ if PYTHON_VERSION < (3, 9):
         Dict,
         FrozenSet,
         Iterable,
+        Iterator,
         List,
         Mapping,
         Match,
@@ -76,7 +77,7 @@ if PYTHON_VERSION < (3, 9):
         Tuple,
     )
 else:
-    from collections.abc import Callable, Iterable, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
     FrozenSet = frozenset  # type: ignore[misc]

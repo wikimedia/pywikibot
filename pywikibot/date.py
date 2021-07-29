@@ -8,16 +8,28 @@ import calendar
 import datetime
 import re
 from collections import defaultdict
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
+from typing import Optional, Union
 
+import pywikibot.site
 from pywikibot import Site
-from pywikibot.backports import Tuple
 from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import deprecated, first_lower, first_upper
 
+from pywikibot.backports import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Pattern,
+    Sequence,
+    Tuple,
+)
 
 #
 # Different collections of well known formats
@@ -42,10 +54,22 @@ centuryFormats = ['CenturyAD', 'CenturyBC']
 yearFormats = ['YearAD', 'YearBC']
 millFormats = ['MillenniumAD', 'MillenniumBC']
 snglValsFormats = ['CurrEvents']
+tuplst_type = List[Tuple[Callable[[Union[int, str]], Any],
+                         Callable[[Union[int, str]], bool]]]
+encf_type = Callable[[int], Union[int, Sequence[int]]]
+decf_type = Callable[[Sequence[int]], int]
+
+# decoders are three value tuples, with an optional fourth to represent a
+# required number of digits
+
+decoder_type = Union[
+    Tuple[str, Callable[[int], str], Callable[[str], int]],
+    Tuple[str, Callable[[int], str], Callable[[str], int], int]
+]
 
 
 @singledispatch
-def multi(value: int, tuplst):
+def multi(value: int, tuplst: tuplst_type) -> Any:
     """
     Run multiple pattern checks for the same entry.
 
@@ -65,7 +89,7 @@ def multi(value: int, tuplst):
 
 
 @multi.register(str)
-def _(value: str, tuplst):
+def _(value: str, tuplst: tuplst_type) -> Any:
     # Try all functions, and test result against predicates
     for func, pred in tuplst:
         try:
@@ -81,12 +105,12 @@ def _(value: str, tuplst):
 # Helper functions that aid with single value no corrections encoding/decoding.
 # Various filters are item dependent.
 #
-def dh_noConv(value, pattern, limit):
+def dh_noConv(value: int, pattern: str, limit: Callable[[int], bool]) -> str:
     """Helper for decoding an integer value, no conversion, no rounding."""
     return dh(value, pattern, lambda i: i, decSinglVal, limit)
 
 
-def dh_dayOfMnth(value, pattern):
+def dh_dayOfMnth(value: int, pattern: str) -> str:
     """
     Helper for decoding a single integer value.
 
@@ -97,7 +121,7 @@ def dh_dayOfMnth(value, pattern):
     return dh_noConv(value, pattern, formatLimits[dayMnthFmts[0]][0])
 
 
-def dh_mnthOfYear(value, pattern):
+def dh_mnthOfYear(value: int, pattern: str) -> str:
     """
     Helper for decoding a single integer value.
 
@@ -107,7 +131,7 @@ def dh_mnthOfYear(value, pattern):
     return dh_noConv(value, pattern, _formatLimit_MonthOfYear[0])
 
 
-def dh_decAD(value, pattern):
+def dh_decAD(value: int, pattern: str) -> str:
     """
     Helper for decoding a single integer value.
 
@@ -117,7 +141,7 @@ def dh_decAD(value, pattern):
               formatLimits['DecadeAD'][0])
 
 
-def dh_decBC(value, pattern):
+def dh_decBC(value: int, pattern: str) -> str:
     """
     Helper for decoding a single integer value.
 
@@ -127,7 +151,7 @@ def dh_decBC(value, pattern):
               formatLimits['DecadeBC'][0])
 
 
-def dh_yearBC(value, pattern):
+def dh_yearBC(value: int, pattern: str) -> str:
     """Helper for decoding a year value.
 
     The value should have no conversion, no rounding, limits to 3000.
@@ -135,7 +159,7 @@ def dh_yearBC(value, pattern):
     return dh_noConv(value, pattern, formatLimits['YearBC'][0])
 
 
-def dh_yearAD(value, pattern):
+def dh_yearAD(value: int, pattern: str) -> str:
     """Helper for decoding a year value.
 
     The value should have no conversion, no rounding, limits to 3000.
@@ -143,7 +167,7 @@ def dh_yearAD(value, pattern):
     return dh_noConv(value, pattern, formatLimits['YearAD'][0])
 
 
-def dh_simpleYearAD(value):
+def dh_simpleYearAD(value: int) -> str:
     """Helper for decoding a single integer value.
 
     This value should be representing a year with no extra symbols.
@@ -151,47 +175,48 @@ def dh_simpleYearAD(value):
     return dh_yearAD(value, '%d')
 
 
-def dh_number(value, pattern):
+def dh_number(value: int, pattern: str) -> str:
     """Helper for decoding a number."""
     return dh_noConv(value, pattern, formatLimits['Number'][0])
 
 
-def dh_centuryAD(value, pattern):
+def dh_centuryAD(value: int, pattern: str) -> str:
     """Helper for decoding an AD century."""
     return dh_noConv(value, pattern, formatLimits['CenturyAD'][0])
 
 
-def dh_centuryBC(value, pattern):
+def dh_centuryBC(value: int, pattern: str) -> str:
     """Helper for decoding an BC century."""
     return dh_noConv(value, pattern, formatLimits['CenturyBC'][0])
 
 
-def dh_millenniumAD(value, pattern):
+def dh_millenniumAD(value: int, pattern: str) -> str:
     """Helper for decoding an AD millennium."""
     return dh_noConv(value, pattern, formatLimits['MillenniumAD'][0])
 
 
-def dh_millenniumBC(value, pattern):
+def dh_millenniumBC(value: int, pattern: str) -> str:
     """Helper for decoding an BC millennium."""
     return dh_noConv(value, pattern, formatLimits['MillenniumBC'][0])
 
 
-def decSinglVal(v):
+def decSinglVal(v: Sequence[Any]) -> Any:
     """Return first item in list v."""
     return v[0]
 
 
-def encDec0(i):
+def encDec0(i: int) -> int:
     """Round to the nearest decade, decade starts with a '0'-ending year."""
     return (i // 10) * 10
 
 
-def encDec1(i):
+def encDec1(i: int) -> int:
     """Round to the nearest decade, decade starts with a '1'-ending year."""
     return encDec0(i) + 1
 
 
-def slh(value, lst):
+@singledispatch
+def slh(value: int, lst: Sequence[str]) -> str:
     """Helper function for simple list value matching.
 
     !!!!! The index starts at 1, so 1st element has index 1, not 0 !!!!!
@@ -207,29 +232,45 @@ def slh(value, lst):
         formats['MonthName']['en']('anything else') => raise ValueError
 
     """
-    return lst.index(value) + 1 if isinstance(value, str) else lst[value - 1]
+    return lst[value - 1]
 
 
-def dh_singVal(value, match):
+@slh.register(str)  # type: ignore
+def _(value: str, lst: Sequence[str]) -> int:
+    return lst.index(value) + 1
+
+
+@singledispatch
+def dh_singVal(value: int, match: str) -> str:
     """Helper function to match a single value to a constant."""
     return dh_constVal(value, 0, match)
 
 
-def dh_constVal(value, ind, match):
+@dh_singVal.register(str)  # type: ignore
+def _(value: str, match: str) -> int:
+    return dh_constVal(value, 0, match)  # type: ignore[return-value]
+
+
+@singledispatch
+def dh_constVal(value: int, ind: int, match: str) -> str:
     """Helper function to match a single value to a constant.
 
     formats['CurrEvents']['en'](ind) => 'Current Events'
     formats['CurrEvents']['en']('Current Events') => ind
     """
-    if isinstance(value, str):
-        if value == match:
-            return ind
-    elif value == ind:
+    if value == ind:
         return match
     raise ValueError('unknown value {}'.format(value))
 
 
-def alwaysTrue(x):
+@dh_constVal.register(str)  # type: ignore
+def _(value: str, ind: int, match: str) -> int:
+    if value == match:
+        return ind
+    raise ValueError('unknown value {}'.format(value))
+
+
+def alwaysTrue(x: Any) -> bool:
     """
     Return True, always.
 
@@ -237,12 +278,11 @@ def alwaysTrue(x):
 
     :param x: not used
     :return: True
-    :rtype: bool
     """
     return True
 
 
-def monthName(lang, ind):
+def monthName(lang: str, ind: int) -> str:
     """Return the month name for a language."""
     return formats['MonthName'][lang](ind)
 
@@ -273,12 +313,14 @@ _guDigitsToLocal = {ord(str(i)): _guDigits[i] for i in range(10)}
 _guLocalToDigits = {ord(_guDigits[i]): str(i) for i in range(10)}
 
 
-def intToLocalDigitsStr(value, digitsToLocalDict):
+def intToLocalDigitsStr(value: int, digitsToLocalDict: Mapping[int, str]
+                        ) -> str:
     """Encode an integer value into a textual form."""
     return str(value).translate(digitsToLocalDict)
 
 
-def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
+def localDigitsStrToInt(value: str, digitsToLocalDict: Mapping[int, str],
+                        localToDigitsDict: Mapping[int, str]) -> int:
     """Convert digits to integer."""
     # First make sure there are no real digits in the string
     tmp = value.translate(digitsToLocalDict)         # Test
@@ -294,14 +336,14 @@ _romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
                  'XXVII', 'XXVIII', 'XXIX', 'XXX']
 
 
-def intToRomanNum(i):
+def intToRomanNum(i: int) -> str:
     """Convert integer to roman numeral."""
     if i >= len(_romanNumbers):
         raise IndexError('Roman value {} is not defined'.format(i))
     return _romanNumbers[i]
 
 
-def romanNumToInt(v):
+def romanNumToInt(v: str) -> int:
     """Convert roman numeral to integer."""
     return _romanNumbers.index(v)
 
@@ -310,7 +352,7 @@ def romanNumToInt(v):
 # (from int to a str) and decoder (from str to an int)
 _digitDecoders = {
     # %% is a %
-    '%': '%',
+    '%': '%',  # type: ignore
     # %d is a decimal
     'd': (_decimalDigits, str, int),
     # %R is a roman numeral. This allows for only the simplest linear
@@ -339,7 +381,7 @@ _digitDecoders = {
     # %T is a year in TH: -- all years are shifted: 2005 => 'พ.ศ. 2548'
     'T': (_decimalDigits, lambda v: str(v + 543),
           lambda v: int(v) - 543),
-}
+}  # type: Dict[str, decoder_type]
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
 # the size of zero-padding for numbers
@@ -350,7 +392,9 @@ _reParameters = re.compile('|'.join('(%[1-9]?{})'.format(s)
 _escPtrnCache2 = {}
 
 
-def escapePattern2(pattern):
+def escapePattern2(pattern: str
+                   ) -> Tuple[Pattern[str], str,
+                              List[Union[decoder_type, decoder_type]]]:
     """
     Convert a string pattern into a regex expression and cache.
 
@@ -358,7 +402,7 @@ def escapePattern2(pattern):
     Returns a compiled regex object and a list of digit decoders.
     """
     @singledispatch
-    def decode(dec: tuple, subpattern: str, newpattern: str,
+    def decode(dec: decoder_type, subpattern: str, newpattern: str,
                strpattern: str) -> Tuple[str, str]:
 
         if len(subpattern) == 3:
@@ -366,7 +410,7 @@ def escapePattern2(pattern):
             newpattern += '([%s]{%s})' % (dec[0], subpattern[1])
             # add the number of required digits as the last (4th)
             # part of the tuple
-            decoders.append(dec + (int(s[1]),))
+            decoders.append(dec + (int(s[1]),))  # type: ignore
         else:
             newpattern += '([{}]+)'.format(dec[0])
             decoders.append(dec)
@@ -390,7 +434,7 @@ def escapePattern2(pattern):
     if pattern not in _escPtrnCache2:
         newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
-        decoders = []
+        decoders = []  # type: List[decoder_type]
         for s in _reParameters.split(pattern):
             if s is None:
                 continue
@@ -412,7 +456,8 @@ def escapePattern2(pattern):
 
 
 @singledispatch
-def dh(value: int, pattern, encf, decf, filter=None):
+def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
+       filter: Optional[Callable[[int], bool]] = None) -> str:
     """Function to help with year parsing.
 
     Usually it will be used as a lambda call in a map::
@@ -452,18 +497,20 @@ def dh(value: int, pattern, encf, decf, filter=None):
             'parameter count ({}) does not match decoder count ({})'
             .format(len(params), len(decoders)))
         # convert integer parameters into their textual representation
-        params = tuple(_make_parameter(decoders[i], param)
-                       for i, param in enumerate(params))
-        return strPattern % params
+        str_params = tuple(_make_parameter(decoders[i], param)
+                           for i, param in enumerate(params))
+        return strPattern % str_params
     assert len(decoders) == 1, (
         'A single parameter does not match {} decoders.'
         .format(len(decoders)))
     # convert integer parameter into its textual representation
+    assert isinstance(params, int)
     return strPattern % _make_parameter(decoders[0], params)
 
 
-@dh.register(str)
-def _(value: str, pattern, encf, decf, filter=None):
+@dh.register(str)  # type: ignore
+def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
+      filter: Optional[Callable[[int], bool]] = None) -> int:
     compPattern, strPattern, decoders = escapePattern2(pattern)
     m = compPattern.match(value)
     if m:
@@ -483,13 +530,14 @@ def _(value: str, pattern, encf, decf, filter=None):
     raise ValueError("reverse encoding didn't match")
 
 
-def _make_parameter(decoder, param):
+def _make_parameter(decoder: decoder_type, param: int) -> str:
     newValue = decoder[1](param)
-    if len(decoder) == 4 and len(newValue) < decoder[3]:
+    required_digits = decoder[3] if len(decoder) == 4 else None  # type: ignore
+    if required_digits is not None and len(newValue) < required_digits:
         # force parameter length by taking the first digit in the list and
         # repeating it required number of times
         # This converts "205" into "0205" for "%4d"
-        newValue = decoder[0][0] * (decoder[3] - len(newValue)) + newValue
+        newValue = decoder[0][0] * (required_digits - len(newValue)) + newValue
     return newValue
 
 
@@ -505,7 +553,7 @@ def _make_parameter(decoder, param):
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-class MonthNames(Mapping):
+class MonthNames(Mapping[str, Callable[[int], str]]):
 
     """A Mapping which reads month names from MediaWiki messages."""
 
@@ -521,7 +569,8 @@ class MonthNames(Mapping):
         'zh': lambda v: slh(v, makeMonthList('%d月')),
     }
 
-    def __getitem__(self, lang):
+    def __getitem__(self, lang: str
+                    ) -> Callable[[int], str]:
         if lang not in self.months:
             site = Site()
             # may_long differs
@@ -533,15 +582,15 @@ class MonthNames(Mapping):
 
         return self.months[lang]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.months)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Length of preloaded languages with all month names."""
         return len(self.months)
 
 
-class MonthFormat(MutableMapping):
+class MonthFormat(MutableMapping):  # type: ignore[type-arg]
 
     """A Mapping which creates months formats."""
 
@@ -607,19 +656,17 @@ class MonthFormat(MutableMapping):
         'tl': ('{} %d', None),
     }
 
-    def __init__(self, index, format_key):
+    def __init__(self, index: int, format_key: str) -> None:
         """Initializer of MonthFormat mapping.
 
         :param index: month number
-        :type index: int
         :param format_key: formats key like Day_January or Year_December
-        :type format_key: str
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
-        self.data = {}
+        self.data = {}  # type: Dict[str, Callable[[int], str]]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Callable[[int], str]:
         if key not in self.data:
             if self.variant == 'Day':
                 pattern, ucase = self.day_formats.get(key, ('%d. {}', False))
@@ -635,24 +682,24 @@ class MonthFormat(MutableMapping):
             elif ucase is False:
                 f = first_lower
             else:
-                f = str
+                f = str  # type: ignore
 
             month_pattern = pattern.format(f(monthName(key, self.index)))
             expression = "lambda v: {}(v, '{}')".format(func, month_pattern)
             self.data[key] = eval(expression)
         return self.data[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Callable[[int], str]) -> None:
         self.data[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         raise NotImplementedError("Deleting of key '{}' is not implemented"
                                   .format(key))
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
 
@@ -1617,19 +1664,22 @@ formats = {
         'yo': lambda v: dh_singVal(v, 'Current events'),
         'zh': lambda v: dh_singVal(v, '新闻动态'),
     },
-}
+}  # type: Dict[str, Dict[str, Callable[[int], str]]]
 
-formats['MonthName'] = MonthNames()
+formats['MonthName'] = MonthNames()  # type: ignore[assignment]
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles
 #
 for index, day_of_month in enumerate(dayMnthFmts, 1):
-    formats[day_of_month] = MonthFormat(index, day_of_month)
+    val = MonthFormat(index, day_of_month)
+    formats[day_of_month] = val  # type: ignore[assignment]
 for index, month_of_year in enumerate(yrMnthFmts, 1):
-    formats[month_of_year] = MonthFormat(index, month_of_year)
+    val = MonthFormat(index, month_of_year)
+    formats[month_of_year] = val  # type: ignore[assignment]
 
 
-def addFmt1(lang: str, isMnthOfYear, patterns):
+def addFmt1(lang: str, isMnthOfYear: bool,
+            patterns: Sequence[Optional[str]]) -> None:
     """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
@@ -1650,12 +1700,13 @@ def addFmt1(lang: str, isMnthOfYear, patterns):
                     'lambda v: dh_dayOfMnth(v, "{}")'.format(patterns[i]))
 
 
-def makeMonthList(pattern):
+def makeMonthList(pattern: str) -> List[str]:
     """Return a list of 12 elements based on the number of the month."""
     return [pattern % m for m in range(1, 13)]
 
 
-def makeMonthNamedList(lang, pattern, makeUpperCase=None):
+def makeMonthNamedList(lang: str, pattern: str,
+                       makeUpperCase: Optional[bool] = None) -> List[str]:
     """Create a list of 12 elements based on the name of the month.
 
     The language-dependent month name is used as a formatting argument to the
@@ -1891,7 +1942,7 @@ for month in yrMnthFmts:
     formatLimits[month] = _formatLimit_MonthOfYear
 
 
-def _format_limit_dom(days):
+def _format_limit_dom(days: int) -> Tuple[Callable[[int], bool], int, int]:
     """Return day of month format limit."""
     assert 29 <= days <= 31
     return lambda v: 1 <= v <= days, 1, days + 1
@@ -1909,18 +1960,18 @@ for monthId in range(12):
         formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(30)
 
 
-def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
+def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
+                  ) -> Tuple[Optional[str], Optional[str]]:
     """
     Return first matching formatted date value.
 
     :param lang: language code
     :param title: value to format
     :return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
-    :rtype: tuple
     """
     for dict_name, dictionary in formats.items():
         with suppress(Exception):
-            year = dictionary[lang](title)
+            year = dictionary[lang](title)  # type: ignore
             return dict_name, year
     # sometimes the title may begin with an upper case while its listed as
     # lower case, or the other way around
@@ -1940,51 +1991,51 @@ class FormatDate:
 
     """DEPRECATED. Format a date."""
 
-    def __init__(self, site):
+    def __init__(self, site: Union[str, 'pywikibot.site.BaseSite']) -> None:
         """Initializer."""
         self.site = site
 
-    def __call__(self, m, d):
+    def __call__(self, m: int, d: int) -> str:
         """Return a formatted month and day."""
         return format_date(m, d, self.site)
 
 
-def format_date(month, day, lang=None, year=2000):
+def format_date(month: int, day: int,
+                lang: Union[None, str, 'pywikibot.site.BaseSite'] = None,
+                year: int = 2000) -> str:
     """Format a date localized to given lang.
 
     :param month: month in range of 1..12
     :param day: day of month in range of 1..31
-    :type day: int
     :param lang: a site object or language key. Defaults to current site.
-    :type lang: BaseSite or string
     :param year: year for which the date is to be formatted. always 29 will be
         given For February except the year is given. Default is leap year 2000.
-    :type year: int
     :return: localized date like "January 11"
-    :rtype: str
     :raises ValueError: Wrong day value; must be 1-28/29/30/31
     :raises IllegalMonthError: bad month number; must be 1-12
     """
     if not lang:
         lang = Site().lang
     elif hasattr(lang, 'lang'):
-        lang = lang.lang
+        lang = lang.lang  # type: ignore[union-attr]
     max_day = calendar.monthrange(year, month)[1]
     if not 1 <= day <= max_day:
         raise ValueError(
             'Wrong day value {day}; must be 1-{max_day}'
             .format(day=day, max_day=max_day))
+    assert isinstance(lang, str)
     return formats[dayMnthFmts[month - 1]][lang](day)
 
 
-def formatYear(lang, year):
+def formatYear(lang: str, year: int) -> str:
     """Return year name in a language."""
     if year < 0:
         return formats['YearBC'][lang](-year)
     return formats['YearAD'][lang](year)
 
 
-def apply_month_delta(date, month_delta=1, add_overlap=False):
+def apply_month_delta(date: datetime.date, month_delta: int = 1,
+                      add_overlap: bool = False) -> datetime.date:
     """
     Add or subtract months from the date.
 
@@ -1999,14 +2050,10 @@ def apply_month_delta(date, month_delta=1, add_overlap=False):
     months are numbered consecutively beginning by 1.
 
     :param date: The starting date
-    :type date: date
     :param month_delta: The amount of months added or subtracted.
-    :type month_delta: int
     :param add_overlap: Add any missing days to the date, increasing the month
         once more.
-    :type add_overlap: bool
     :return: The end date
-    :rtype: type of date
     """
     if not isinstance(month_delta, int):
         raise ValueError('Month delta must be an integer')
@@ -2021,9 +2068,9 @@ def apply_month_delta(date, month_delta=1, add_overlap=False):
     return new_date
 
 
-def get_month_delta(date1, date2):
+def get_month_delta(date1: datetime.date, date2: datetime.date) -> int:
     """
-    Return the difference between to dates in months.
+    Return the difference between two dates in months.
 
     It does only work on calendars with 12 months per year, and where the
     months are consecutive and non-negative numbers.
