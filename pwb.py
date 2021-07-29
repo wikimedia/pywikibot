@@ -175,14 +175,27 @@ def check_modules(script=None):
     :raise RuntimeError: wrong Python version found in setup.py
     """
     import pkg_resources
-    if script:
-        from setup import script_deps
-        dependencies = script_deps.get(Path(script).name, [])
-    else:
-        from setup import dependencies
+
+    from setup import dependencies, script_deps
 
     missing_requirements = []
     version_conflicts = []
+
+    try:
+        requirement = next(pkg_resources.parse_requirements(dependencies))
+    except ValueError as e:
+        # T286980: setuptools is too old and requirement parsing fails
+        import setuptools
+        setupversion = tuple(int(num)
+                             for num in setuptools.__version__.split('.'))
+        if setupversion < (20, 8, 1):
+            # print the minimal requirement
+            _print_requirements(['setuptools==20.8.1'], None, 'outdated')
+            return
+        raise e
+
+    if script:
+        dependencies = script_deps.get(Path(script).name, [])
     for requirement in pkg_resources.parse_requirements(dependencies):
         if requirement.marker is None \
            or pkg_resources.evaluate_marker(str(requirement.marker)):
@@ -197,6 +210,7 @@ def check_modules(script=None):
 
     del pkg_resources
     del dependencies
+    del script_deps
 
     _print_requirements(missing_requirements, script, 'missing')
     _print_requirements(version_conflicts, script, 'outdated')
