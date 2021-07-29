@@ -153,7 +153,7 @@ class StandardOption(Option):
 
     """An option with a description and shortcut and returning the shortcut."""
 
-    def __init__(self, option: str, shortcut: str, **kwargs) -> None:
+    def __init__(self, option: str, shortcut: str, **kwargs: Any) -> None:
         """
         Initializer.
 
@@ -191,7 +191,7 @@ class OutputProxyOption(OutputOption, StandardOption):
     """An option which calls out property of the given output class."""
 
     def __init__(self, option: str, shortcut: str, output: OutputOption,
-                 **kwargs) -> None:
+                 **kwargs: Any) -> None:
         """Create a new option for the given sequence."""
         super().__init__(option, shortcut, **kwargs)
         self._outputter = output
@@ -390,7 +390,7 @@ class IntegerOption(Option):
     """An option allowing a range of integers."""
 
     def __init__(self, minimum: int = 1, maximum: Optional[int] = None,
-                 prefix: str = '', **kwargs) -> None:
+                 prefix: str = '', **kwargs: Any) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         if not ((minimum is None or isinstance(minimum, int))
@@ -468,7 +468,8 @@ class ListOption(IntegerOption):
 
     """An option to select something from a list."""
 
-    def __init__(self, sequence: Sequence[str], prefix='', **kwargs) -> None:
+    def __init__(self, sequence: Sequence[str], prefix='',
+                 **kwargs: Any) -> None:
         """Initializer."""
         self._list = sequence
         try:
@@ -505,7 +506,7 @@ class ShowingListOption(ListOption, OutputOption):
 
     def __init__(self, sequence: Sequence[str], prefix: str = '',
                  pre: Optional[str] = None, post: Optional[str] = None,
-                 **kwargs) -> None:
+                 **kwargs: Any) -> None:
         """Initializer.
 
         :param pre: Additional comment printed before the list.
