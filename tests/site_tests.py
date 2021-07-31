@@ -1610,19 +1610,21 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
     def test_basic(self):
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
-        drev = list(mysite.alldeletedrevisions(user=mysite.user(), total=10))
+        result = list(mysite.alldeletedrevisions(user=mysite.user(), total=10))
 
-        if not drev:
+        if not result:
             self.skipTest('No deleted revisions available')
 
-        for data in drev:
+        for data in result:
             with self.subTest(data=data):
                 self.assertIsInstance(data, dict)
                 self.assertIn('revisions', data)
                 self.assertIsInstance(data['revisions'], list)
 
-                for rev in data['revisions']:
-                    self.assertEqual(mysite.user(), rev.get('user'))
+                for drev in data['revisions']:
+                    self.assertIsInstance(drev, dict)
+                    self.assertIn('user', drev)
+                    self.assertEqual(drev['user'], mysite.user())
 
     def test_namespaces(self):
         """Test the site.alldeletedrevisions() method using namespaces."""
