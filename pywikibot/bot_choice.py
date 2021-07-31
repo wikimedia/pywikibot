@@ -20,6 +20,10 @@ from pywikibot.tools import (
     issue_deprecation_warning,
 )
 
+# TODO: replace these after T286867
+
+OPT_REPLACE_TYPE = Any  # Optional['pywikibot.bot.InteractiveReplace']
+
 
 class Option(ABC):
 
@@ -281,13 +285,14 @@ class Choice(StandardOption):
 
     """A simple choice consisting of an option, shortcut and handler."""
 
-    def __init__(self, option: str, shortcut: str, replacer) -> None:
+    def __init__(self, option: str, shortcut: str,
+                 replacer: OPT_REPLACE_TYPE) -> None:
         """Initializer."""
         super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
-    def replacer(self):
+    def replacer(self) -> OPT_REPLACE_TYPE:
         """The replacer."""
         return self._replacer
 
@@ -319,9 +324,8 @@ class LinkChoice(Choice):
 
     """A choice returning a mix of the link new and current link."""
 
-    def __init__(self, option: str, shortcut: str, replacer,
-                 replace_section: bool,
-                 replace_label: bool) -> None:
+    def __init__(self, option: str, shortcut: str, replacer: OPT_REPLACE_TYPE,
+                 replace_section: bool, replace_label: bool) -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
         self._section = replace_section
@@ -361,7 +365,7 @@ class AlwaysChoice(Choice):
 
     """Add an option to always apply the default."""
 
-    def __init__(self, replacer,
+    def __init__(self, replacer: OPT_REPLACE_TYPE,
                  option: str = 'always', shortcut: str = 'a') -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
@@ -468,7 +472,7 @@ class ListOption(IntegerOption):
 
     """An option to select something from a list."""
 
-    def __init__(self, sequence: Sequence[str], prefix='',
+    def __init__(self, sequence: Sequence[str], prefix: str = '',
                  **kwargs: Any) -> None:
         """Initializer."""
         self._list = sequence

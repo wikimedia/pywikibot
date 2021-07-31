@@ -6,11 +6,15 @@
 #
 import difflib
 import math
-from collections.abc import Sequence
-from difflib import _format_range_unified as format_range_unified
+from collections import abc
+from difflib import (  # type: ignore[attr-defined]
+    _format_range_unified as format_range_unified
+)
 from itertools import zip_longest
+from typing import Optional, Union
 
 import pywikibot
+from pywikibot.backports import Dict, Iterable, List, Sequence, Tuple
 from pywikibot.tools import chars, deprecated_args
 from pywikibot.tools.formatter import color_format
 
@@ -27,7 +31,10 @@ class Hunk:
     NOT_APPR = -1
     PENDING = 0
 
-    def __init__(self, a, b, grouped_opcode):
+    def __init__(self, a: Union[str, Sequence[str]],
+                 b: Union[str, Sequence[str]],
+                 grouped_opcode: Sequence[Tuple[str, int, int, int, int]]
+                 ) -> None:
         """
         Initializer.
 
@@ -64,22 +71,26 @@ class Hunk:
 
         self.reviewed = self.PENDING
 
-    def get_header(self):
+        self.pre_context = 0
+        self.post_context = 0
+
+    def get_header(self) -> str:
         """Provide header of unified diff."""
         return self.get_header_text(self.a_rng, self.b_rng) + '\n'
 
     @staticmethod
-    def get_header_text(a_rng, b_rng, affix='@@'):
+    def get_header_text(a_rng: Tuple[int, int], b_rng: Tuple[int, int],
+                        affix: str = '@@') -> str:
         """Provide header for any ranges."""
         a_rng = format_range_unified(*a_rng)
         b_rng = format_range_unified(*b_rng)
         return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
 
-    def create_diff(self):
+    def create_diff(self) -> Iterable[str]:
         """Generator of diff text for this hunk, without formatting."""
         # make sure each line ends with '\n' to prevent
         # behaviour like https://bugs.python.org/issue2142
-        def check_line(line):
+        def check_line(line: str) -> str:
             return line if line.endswith('\n') else line + '\n'
 
         for tag, i1, i2, j1, j2 in self.group:
@@ -98,11 +109,12 @@ class Hunk:
                 for line in difflib.ndiff(self.a[i1:i2], self.b[j1:j2]):
                     yield check_line(line)
 
-    def format_diff(self):
+    def format_diff(self) -> Iterable[str]:
         """Color diff lines."""
         diff = iter(self.diff)
 
-        fmt, line1, line2 = '', '', next(diff)
+        fmt = ''  # type: Optional[str]
+        line1, line2 = '', next(diff)
         for line in diff:
             fmt, line1, line2 = line1, line2, line
             # do not show lines starting with '?'.
@@ -142,7 +154,7 @@ class Hunk:
             fmt = fmt if fmt else None
             yield self.color_line(line2, fmt)
 
-    def color_line(self, line: str, line_ref=None):
+    def color_line(self, line: str, line_ref: Optional[str] = None) -> str:
         """Color line characters.
 
         If line_ref is None, the whole line is colored.
@@ -186,46 +198,46 @@ class Hunk:
 
         return colored_line
 
-    def apply(self):
+    def apply(self) -> Sequence[str]:
         """Turn a into b for this hunk."""
         return self.b[self.b_rng[0]:self.b_rng[1]]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the diff as plain text."""
         return ''.join(self.diff_plain_text)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a reconstructable representation."""
         # TODO
         return '{}(a, b, {})'.format(self.__class__.__name__, self.group)
 
 
-class _SuperHunk(Sequence):
+class _SuperHunk(abc.Sequence):
 
-    def __init__(self, hunks):
+    def __init__(self, hunks: Sequence[Hunk]) -> None:
         self._hunks = hunks
         self.a_rng = (self._hunks[0].a_rng[0], self._hunks[-1].a_rng[1])
         self.b_rng = (self._hunks[0].b_rng[0], self._hunks[-1].b_rng[1])
         self.pre_context = self._hunks[0].pre_context
         self.post_context = self._hunks[0].post_context
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Hunk:  # type: ignore[override]
         return self._hunks[idx]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._hunks)
 
-    def split(self):
+    def split(self) -> List['_SuperHunk']:
         return [_SuperHunk([hunk]) for hunk in self._hunks]
 
     @property
-    def reviewed(self):
+    def reviewed(self) -> int:
         assert len({hunk.reviewed for hunk in self._hunks}) == 1, \
             'All hunks should have the same review status'
         return self._hunks[0].reviewed
 
     @reviewed.setter
-    def reviewed(self, reviewed):
+    def reviewed(self, reviewed: int) -> None:
         for hunk in self._hunks:
             hunk.reviewed = reviewed
 
@@ -238,23 +250,21 @@ class PatchManager:
     """
 
     @deprecated_args(n='context')
-    def __init__(self, text_a: str, text_b: str, context=0, by_letter=False,
-                 replace_invisible=False) -> None:
+    def __init__(self, text_a: str, text_b: str, context: int = 0,
+                 by_letter: bool = False,
+                 replace_invisible: bool = False) -> None:
         """Initializer.
 
         :param text_a: base text
         :param text_b: target text
         :param context: number of lines which are context
-        :type context: int
         :param by_letter: if text_a and text_b are single lines, comparison can
             be done letter by letter.
-        :type by_letter: bool
         :param replace_invisible: Replace invisible characters like U+200e with
             the charnumber in brackets (e.g. <200e>).
-        :type replace_invisible: bool
         """
-        self.a = text_a.splitlines(True)
-        self.b = text_b.splitlines(True)
+        self.a = text_a.splitlines(True)  # type: Union[str, List[str]]
+        self.b = text_b.splitlines(True)  # type: Union[str, List[str]]
         if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
             self.a = text_a
             self.b = text_b
@@ -281,7 +291,7 @@ class PatchManager:
         self._super_hunks = self._generate_super_hunks()
         self._replace_invisible = replace_invisible
 
-    def get_blocks(self):
+    def get_blocks(self) -> List[Tuple[int, Tuple[int, int], Tuple[int, int]]]:
         """Return list with blocks of indexes.
 
         Format of each block::
@@ -312,13 +322,14 @@ class PatchManager:
 
         return blocks
 
-    def print_hunks(self):
+    def print_hunks(self) -> None:
         """Print the headers and diff texts of all hunks to the output."""
         if self.hunks:
             pywikibot.output('\n'.join(self._generate_diff(super_hunk)
                                        for super_hunk in self._super_hunks))
 
-    def _generate_super_hunks(self, hunks=None):
+    def _generate_super_hunks(self, hunks: Optional[Iterable[Hunk]] = None
+                              ) -> List[_SuperHunk]:
         if hunks is None:
             hunks = self.hunks
 
@@ -327,7 +338,7 @@ class PatchManager:
 
         if self.context:
             # Determine if two hunks are connected by self.context
-            super_hunk = []
+            super_hunk = []  # type: List[Hunk]
             super_hunks = [super_hunk]
             for hunk in hunks:
                 # self.context * 2, because if self.context is 2 the hunks
@@ -345,7 +356,8 @@ class PatchManager:
             super_hunks = [[hunk] for hunk in hunks]
         return [_SuperHunk(sh) for sh in super_hunks]
 
-    def _get_context_range(self, super_hunk):
+    def _get_context_range(self, super_hunk: _SuperHunk
+                           ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
         """Dynamically determine context range for a super hunk."""
         a0, a1 = super_hunk.a_rng
         b0, b1 = super_hunk.b_rng
@@ -354,9 +366,9 @@ class PatchManager:
                 (b0 - min(super_hunk.pre_context, self.context),
                  b1 + min(super_hunk.post_context, self.context)))
 
-    def _generate_diff(self, hunks):
+    def _generate_diff(self, hunks: _SuperHunk) -> str:
         """Generate a diff text for the given hunks."""
-        def extend_context(start, end):
+        def extend_context(start: int, end: int) -> str:
             """Add context lines."""
             return ''.join('  {}\n'.format(line.rstrip())
                            for line in self.a[start:end])
@@ -378,9 +390,9 @@ class PatchManager:
             output = chars.replace_invisible(output)
         return output
 
-    def review_hunks(self):
+    def review_hunks(self) -> None:
         """Review hunks."""
-        def find_pending(start, end):
+        def find_pending(start: int, end: int) -> Optional[int]:
             step = -1 if start > end else +1
             for pending in range(start, end, step):
                 if super_hunks[pending].reviewed == Hunk.PENDING:
@@ -406,11 +418,12 @@ class PatchManager:
 
         super_hunks = self._generate_super_hunks(
             h for h in self.hunks if h.reviewed == Hunk.PENDING)
-        position = 0
+        position = 0  # type: Optional[int]
 
         while any(any(hunk.reviewed == Hunk.PENDING for hunk in super_hunk)
                   for super_hunk in super_hunks):
 
+            assert position is not None
             super_hunk = super_hunks[position]
 
             next_pending = find_pending(position + 1, len(super_hunks))
@@ -480,14 +493,14 @@ class PatchManager:
                 # the last entry is the first changed line which usually ends
                 # with a \n (only the last may not, which is covered by the
                 # if-condition following this block)
-                hunk_list = ''.join(
+                hunk_list_str = ''.join(
                     line_template.format(
                         '*' if hunk_entry[1] == position + 1 else
                         ' ', *hunk_entry)
                     for hunk_entry in hunk_list)
-                if hunk_list.endswith('\n'):
-                    hunk_list = hunk_list[:-1]
-                pywikibot.output(hunk_list)
+                if hunk_list_str.endswith('\n'):
+                    hunk_list_str = hunk_list_str[:-1]
+                pywikibot.output(hunk_list_str)
                 next_hunk = pywikibot.input('Go to which hunk?')
                 try:
                     next_hunk_position = int(next_hunk) - 1
@@ -500,10 +513,12 @@ class PatchManager:
                     pywikibot.error(
                         'Invalid hunk number "{}"'.format(next_hunk))
             elif choice == 'j':
+                assert next_pending is not None
                 position = next_pending
             elif choice == 'J':
                 position += 1
             elif choice == 'k':
+                assert prev_pending is not None
                 position = prev_pending
             elif choice == 'K':
                 position -= 1
@@ -519,14 +534,14 @@ class PatchManager:
                         '{0} -> {1}'.format(answer, help_msg[answer])
                         for answer in answers)))
 
-    def apply(self):
+    def apply(self) -> List[str]:
         """Apply changes. If there are undecided changes, ask to review."""
         if any(h.reviewed == h.PENDING for h in self.hunks):
             pywikibot.output('There are unreviewed hunks.\n'
                              'Please review them before proceeding.\n')
             self.review_hunks()
 
-        l_text = []
+        l_text = []  # type: List[str]
         for hunk_idx, (i1, i2), (j1, j2) in self.blocks:
             # unchanged text.
             if hunk_idx < 0:
@@ -545,7 +560,8 @@ class PatchManager:
         return l_text
 
 
-def cherry_pick(oldtext, newtext, n=0, by_letter=False):
+def cherry_pick(oldtext: str, newtext: str, n: int = 0,
+                by_letter: bool = False) -> str:
     """Propose a list of changes for approval.
 
     Text with approved changes will be returned.
@@ -577,7 +593,7 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     return text
 
 
-def html_comparator(compare_string: str) -> dict:
+def html_comparator(compare_string: str) -> Dict[str, List[str]]:
     """List of added and deleted contexts from 'action=compare' html string.
 
     This function is useful when combineds with site.py's "compare" method.
@@ -589,7 +605,8 @@ def html_comparator(compare_string: str) -> dict:
     """
     from bs4 import BeautifulSoup
 
-    comparands = {'deleted-context': [], 'added-context': []}
+    comparands = {'deleted-context': [],
+                  'added-context': []}  # type: Dict[str, List[str]]
     soup = BeautifulSoup(compare_string, 'html.parser')
     for change_type, css_class in (('deleted-context', 'diff-deletedline'),
                                    ('added-context', 'diff-addedline')):
