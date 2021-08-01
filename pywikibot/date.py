@@ -7,8 +7,8 @@
 import calendar
 import datetime
 import re
-from collections import defaultdict
-from collections.abc import MutableMapping
+
+from collections import abc, defaultdict
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
@@ -553,7 +553,7 @@ def _make_parameter(decoder: decoder_type, param: int) -> str:
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-class MonthNames(Mapping[str, Callable[[int], str]]):
+class MonthNames(abc.Mapping):
 
     """A Mapping which reads month names from MediaWiki messages."""
 
@@ -590,7 +590,7 @@ class MonthNames(Mapping[str, Callable[[int], str]]):
         return len(self.months)
 
 
-class MonthFormat(MutableMapping):  # type: ignore[type-arg]
+class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 
     """A Mapping which creates months formats."""
 
