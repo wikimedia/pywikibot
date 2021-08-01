@@ -2048,7 +2048,8 @@ class APISite(
             'Could not delete [[{title}]]. Maybe it was deleted already.',
         'cantundelete': 'Could not undelete [[{title}]]. '
                         'Revision may not exist or was already undeleted.',
-        'nodeleteablefile': 'No such old version of file'
+        'nodeleteablefile': 'No such old version of file',
+        'missingtitle': "[[{title}]] doesn't exist.",
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
