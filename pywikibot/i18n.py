@@ -23,21 +23,32 @@ import json
 import os
 import pkgutil
 import re
-from collections import defaultdict
-from collections.abc import Mapping
+
+from collections import abc, defaultdict
 from contextlib import suppress
 from textwrap import fill
 from typing import Optional, Union
 
 import pywikibot
+
 from pywikibot import __url__, config
-from pywikibot.backports import List, cache
+from pywikibot.backports import (
+    cache,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Match,
+    Sequence,
+)
 from pywikibot.plural import plural_rule
 from pywikibot.tools import (
     ModuleDeprecationWrapper,
     deprecated_args,
 )
 
+STR_OR_SITE_TYPE = Union[str, 'pywikibot.site.BaseSite']
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -349,10 +360,11 @@ _GROUP_NAME_TO_FALLBACKS = {
     'yi': ['he', 'de'],
     'zh-classical': ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh'],
     'zh-min-nan': [
-        'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']}
+        'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
+}  # type: Dict[str, List[str]]
 
 
-def set_messages_package(package_name: str):
+def set_messages_package(package_name: str) -> None:
     """Set the package name where i18n messages are located."""
     global _messages_package_name
     global _messages_available
@@ -413,8 +425,9 @@ def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     message_bundle = twtitle.split('-')[0]
     filename = '{}/{}.json'.format(message_bundle, lang)
     try:
-        trans_text = pkgutil.get_data(
-            _messages_package_name, filename).decode('utf-8')
+        data = pkgutil.get_data(_messages_package_name, filename)
+        assert data is not None
+        trans_text = data.decode('utf-8')
     except OSError:  # file open can cause several exceptions
         return None
 
@@ -422,18 +435,20 @@ def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     return transdict.get(twtitle)
 
 
-def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
+def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
+                    ) -> str:
     """Check for the plural variants in message and replace them.
 
     :param message: the message to be replaced
     :param parameters: plural parameters passed from other methods
-    :type parameters: Mapping of str to int
     :return: The message with the plural instances replaced
     """
-    def static_plural_value(n):
-        return rule['plural']
+    def static_plural_value(n: int) -> int:
+        plural_rule = rule['plural']
+        assert not callable(plural_rule)
+        return plural_rule
 
-    def replace_plural(match):
+    def replace_plural(match: Match[str]) -> str:
         selector = match.group(1)
         variants = match.group(2)
         num = parameters[selector]
@@ -459,6 +474,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
         if num in specific_entries:
             return specific_entries[num]
 
+        assert callable(plural_value)
+
         index = plural_value(num)
         needed = rule['nplurals']
         if needed == 1:
@@ -474,15 +491,17 @@ def _extract_plural(lang: str, message: str, parameters: Mapping) -> str:
         'parameters is not Mapping but {}'.format(type(parameters))
 
     rule = plural_rule(lang)
-    plural_value = rule['plural']
-    if not callable(plural_value):
+
+    if callable(rule['plural']):
+        plural_value = rule['plural']
+    else:
         assert rule['nplurals'] == 1
         plural_value = static_plural_value
 
     return re.sub(PLURAL_PATTERN, replace_plural, message)
 
 
-class _PluralMappingAlias(Mapping):
+class _PluralMappingAlias(abc.Mapping):
 
     """
     Aliasing class to allow non mappings in _extract_plural.
@@ -490,15 +509,16 @@ class _PluralMappingAlias(Mapping):
     That function only uses __getitem__ so this is only implemented here.
     """
 
-    def __init__(self, source):
+    def __init__(self, source: Union[int, str, Sequence[int],
+                 Mapping[str, int]]) -> None:
+        self.source = source
         if isinstance(source, str):
             self.source = int(source)
-        else:
-            self.source = source
+
         self.index = -1
         super().__init__()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> int:
         self.index += 1
         if isinstance(self.source, dict):
             return int(self.source[key])
@@ -508,22 +528,23 @@ class _PluralMappingAlias(Mapping):
                 return int(self.source[self.index])
             raise ValueError('Length of parameter does not match PLURAL '
                              'occurrences.')
+        assert isinstance(self.source, int)
         return self.source
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[int]:
         raise NotImplementedError  # pragma: no cover
 
-    def __len__(self):
+    def __len__(self) -> int:
         raise NotImplementedError  # pragma: no cover
 
 
 DEFAULT_FALLBACK = ('_default', )
 
 
-def translate(code,
-              xdict: Union[dict, str],
-              parameters: Optional[Mapping] = None,
-              fallback=False) -> str:
+def translate(code: STR_OR_SITE_TYPE,
+              xdict: Union[str, Mapping[str, str]],
+              parameters: Optional[Mapping[str, int]] = None,
+              fallback: Union[bool, Iterable[str]] = False) -> Optional[str]:
     """Return the most appropriate localization from a localization dict.
 
     Given a site code and a dictionary, returns the dictionary's value for
@@ -542,7 +563,6 @@ def translate(code,
         extended dictionary the Site object should be used in favour of the
         code string. Otherwise localizations from a wrong family might be
         used.
-    :type code: str or Site object
     :param xdict: dictionary with language codes as keys or extended
         dictionary with family names as keys containing code dictionaries
         or a single string. May contain PLURAL tags as described in
@@ -550,7 +570,6 @@ def translate(code,
     :param parameters: For passing (plural) parameters
     :param fallback: Try an alternate language code. If it's iterable it'll
         also try those entries and choose the first match.
-    :type fallback: boolean or iterable
     :return: the localized string
     :raise IndexError: If the language supports and requires more plurals
         than defined for the given PLURAL pattern.
@@ -561,6 +580,7 @@ def translate(code,
     if hasattr(code, 'code'):
         family = code.family.name
         code = code.code
+    assert isinstance(code, str)
 
     try:
         lookup = xdict[code]
@@ -581,6 +601,7 @@ def translate(code,
         if fallback is True:
             codes += _altlang(code) + ['_default', 'en']
         elif fallback is not False:
+            assert not isinstance(fallback, bool)
             codes.extend(fallback)
         for code in codes:
             if code in lookup:
@@ -593,7 +614,7 @@ def translate(code,
             trans = None
 
     if trans is None:
-        if 'wikipedia' in xdict:
+        if isinstance(xdict, dict) and 'wikipedia' in xdict:
             # fallback to wikipedia family
             return translate(code, xdict['wikipedia'],
                              parameters=parameters, fallback=fallback)
@@ -617,9 +638,11 @@ def translate(code,
 
 
 @deprecated_args(code='source')
-def twtranslate(source,
+def twtranslate(source: STR_OR_SITE_TYPE,
                 twtitle: str,
-                parameters: Optional[Mapping] = None, *,
+                parameters: Union[Sequence[str], Mapping[str, int],
+                                  None] = None,
+                *,
                 fallback: bool = True,
                 fallback_prompt: Optional[str] = None,
                 only_plural: bool = False) -> Optional[str]:
@@ -676,7 +699,6 @@ def twtranslate(source,
 
     :param source: When it's a site it's using the lang attribute and otherwise
         it is using the value directly.
-    :type source: BaseSite or str
     :param twtitle: The TranslateWiki string title, in <package>-<key> format
     :param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
@@ -742,7 +764,7 @@ def twtranslate(source,
 
 
 @deprecated_args(code='source')
-def twhas_key(source, twtitle: str) -> bool:
+def twhas_key(source: STR_OR_SITE_TYPE, twtitle: str) -> bool:
     """
     Check if a message has a translation in the specified language code.
 
@@ -753,7 +775,6 @@ def twhas_key(source, twtitle: str) -> bool:
 
     :param source: When it's a site it's using the lang attribute and otherwise
         it is using the value directly.
-    :type source: BaseSite or str
     :param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     # If a site is given instead of a code, use its language
@@ -787,7 +808,7 @@ def twget_keys(twtitle: str) -> List[str]:
 
 
 def input(twtitle: str,
-          parameters: Optional[Mapping] = None,
+          parameters: Optional[Mapping[str, int]] = None,
           password: bool = False,
           fallback_prompt: Optional[str] = None) -> str:
     """
