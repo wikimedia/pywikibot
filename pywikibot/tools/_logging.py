@@ -1,17 +1,22 @@
 """Logging tools."""
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
 import logging
 import os
 
+from pywikibot.tools import ModuleDeprecationWrapper
 
-# Logging module configuration
-class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
-    """Modified RotatingFileHandler supporting unlimited amount of backups."""
+class _RotatingFileHandler(logging.handlers.RotatingFileHandler):
+
+    """DEPRECATED Modified RotatingFileHandler.
+
+    Use namer instead. See:
+    https://docs.python.org/3/howto/logging-cookbook.html#cookbook-rotator-namer
+    """
 
     def doRollover(self):
         """Modified naming system for logging files.
@@ -71,6 +76,11 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         if not self.delay:
             self.stream = self._open()
 
+
+class LoggingFormatter(logging.Formatter):
+
+    """Format LogRecords for output to file."""
+
     def format(self, record):
         """Strip trailing newlines before outputting text to file."""
         # Warnings captured from the warnings system are not processed by
@@ -90,15 +100,9 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         return super().format(record).rstrip()
 
 
-class LoggingFormatter(logging.Formatter):
-
-    """Format LogRecords for output to file.
-
-    This formatter *ignores* the 'newline' key of the LogRecord, because
-    every record written to a file must end with a newline, regardless of
-    whether the output to the user's console does.
-    """
-
-    def formatException(self, ei):
-        """Format and return the specified exception with newline."""
-        return super().formatException(ei) + '\n'
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'RotatingFileHandler', _RotatingFileHandler,
+    replacement_name=('logging.handlers.RotatingFileHandler '
+                      'with your own namer'),
+    since='6.5.0')

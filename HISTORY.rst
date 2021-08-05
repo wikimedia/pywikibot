@@ -1,6 +1,34 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.4.0
+-----
+*01 July 2021*
+
+* Add support for dagwiki, shiwiki and banwikisource
+* Fix and clean up DataSite.get_property_by_name
+* Update handling of abusefilter-{disallow,warning} codes (T285317)
+* Fix terminal_interface_base.input_list_choice (T285597)
+* Fix ItemPage.fromPage call
+* Use \*iterables instead of genlist in intersect_generators
+* Use a sentinel variable to determine the end of an iterable in roundrobin_generators
+* Require setuptools 20.8.1 (T284297)
+* Add setter and deleter for summary_parameters of AutomaticTWSummaryBot
+* L10N updates
+* Add update_options attribute to BaseBot class to update available_options
+* Clear put_queue when canceling page save (T284396)
+* Add -url option to pagegenerators (T239436)
+* Add add_text function to textlib (T284388)
+* Require setuptools >= 49.4.0 (T284297)
+* Require wikitextparser>=0.47.5
+* Allow images to upload locally even they exist in the shared repository (T267535)
+* Show a warning if pywikibot.__version__ is behind scripts.__version__ (T282766)
+* Handle <ce>/<chem> tags as <math> aliases within textlib.replaceExcept() (T283990)
+* Expand simulate query response for wikibase support (T76694)
+* Double the wait time if ratelimit exceeded (T270912)
+* Deprecated extract_templates_and_params_mwpfh and extract_templates_and_params_regex functions were removed
+
+
 6.3.0
 -----
 *31 May 2021*

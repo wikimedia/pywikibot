@@ -60,7 +60,7 @@ a parameter -appendtop:foo would add 'foo' between them. A new line
 can be added between them by specifying '\n' as a value.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,7 +75,7 @@ from pywikibot.backports import Tuple
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 
 
-class NoTitle(Exception):
+class NoTitleError(Exception):
 
     """No title found."""
 
@@ -234,7 +234,7 @@ class PageFromFileReader(OptionHandler):
                 else:
                     pywikibot.output('End of file.')
                 break
-            except NoTitle as err:
+            except NoTitleError as err:
                 pywikibot.output('\nNo title found - skipping a page.')
                 position += err.offset
                 continue
@@ -268,7 +268,7 @@ class PageFromFileReader(OptionHandler):
                     # Remove title (to allow creation of redirects)
                     contents = title_regex.sub('', contents, count=1)
             except AttributeError:
-                raise NoTitle(location.end())
+                raise NoTitleError(location.end())
 
         return location.end(), title, contents
 

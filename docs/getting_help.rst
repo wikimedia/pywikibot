@@ -2,7 +2,7 @@ Getting help
 ------------
 
 .. note::
-   Please see `Manual:Pywikibot/Communication <https://www.mediawiki.org/wiki/Manual:Pywikibot/Communication>`_.
+   Please see :manpage:`Communication`.
 
 .. tip::
    Please report bugs at `Phabricator <https://phabricator.wikimedia.org/>`_.

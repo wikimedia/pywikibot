@@ -4,12 +4,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Any
+
 from pywikibot.tools import PYTHON_VERSION
 
 
 # functools.cache
 if PYTHON_VERSION >= (3, 9):
-    from functools import cache
+    from functools import cache  # type: ignore[attr-defined]
 else:
     from functools import lru_cache as _lru_cache
     cache = _lru_cache(None)
@@ -22,32 +24,34 @@ if PYTHON_VERSION < (3, 7):
 
         """Dummy context manager for Python 3.5/3.6 that does nothing."""
 
-        def __init__(self, result=None):  # noqa: D107
+        def __init__(self, result: Any = None) -> None:  # noqa: D107
             self.result = result
 
-        def __enter__(self):
+        def __enter__(self) -> Any:
             return self.result
 
-        def __exit__(self, *args):
+        def __exit__(self, *args: Any) -> None:
             pass
 else:
-    from contextlib import nullcontext
+    from contextlib import nullcontext  # type: ignore[misc]
 
 
 # queue
 if PYTHON_VERSION < (3, 7):
     from queue import Queue as SimpleQueue
 else:
-    from queue import SimpleQueue
+    from queue import SimpleQueue  # type: ignore[misc]
 
 
 # typing
 if PYTHON_VERSION < (3, 5, 2):
     from typing import Dict as DefaultDict
 elif PYTHON_VERSION < (3, 9):
-    from typing import DefaultDict
+    from typing import DefaultDict  # type: ignore[misc]
 else:
-    from collections import defaultdict as DefaultDict  # noqa: N812
+    from collections import (  # type: ignore[misc] # noqa: N812
+        defaultdict as DefaultDict
+    )
 
 
 if PYTHON_VERSION < (3, 7, 2):
@@ -57,37 +61,55 @@ elif PYTHON_VERSION < (3, 9):
 else:
     from collections import OrderedDict
 
-
-if PYTHON_VERSION >= (3, 9):
-    from collections.abc import Iterable, Sequence
-    Dict = dict
-    FrozenSet = frozenset
-    List = list
-    Set = set
-    Tuple = tuple
+if PYTHON_VERSION < (3, 9):
+    from typing import (
+        Dict,
+        FrozenSet,
+        Iterable,
+        Iterator,
+        List,
+        Mapping,
+        Match,
+        Pattern,
+        Sequence,
+        Set,
+        Tuple,
+    )
 else:
-    from typing import Dict, FrozenSet, Iterable, List, Sequence, Set, Tuple
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from re import Match, Pattern
+    Dict = dict  # type: ignore[misc]
+    FrozenSet = frozenset  # type: ignore[misc]
+    List = list  # type: ignore[misc]
+    Set = set  # type: ignore[misc]
+    Tuple = tuple  # type: ignore[assignment]
+
+
+if PYTHON_VERSION < (3, 9, 2):
+    from typing import Callable
+else:
+    from collections.abc import Callable
 
 
 # PEP 616 string methods
 if PYTHON_VERSION >= (3, 9):
-    removeprefix = str.removeprefix
-    removesuffix = str.removesuffix
+    removeprefix = str.removeprefix  # type: ignore[attr-defined]
+    removesuffix = str.removesuffix  # type: ignore[attr-defined]
 else:
     def removeprefix(string: str, prefix: str) -> str:
         """Remove prefix from a string or return a copy otherwise.
 
-        *New in version 5.4.*
+        .. versionadded:: 5.4
         """
         if string.startswith(prefix):
             return string[len(prefix):]
-        return string[:]
+        return string
 
     def removesuffix(string: str, suffix: str) -> str:
         """Remove prefix from a string or return a copy otherwise.
 
-        *New in version 5.4.*
+        .. versionadded:: 5.4
         """
         if string.endswith(suffix):
             return string[:-len(suffix)]
-        return string[:]
+        return string

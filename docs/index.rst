@@ -46,6 +46,7 @@ For bot users:
    utilities/index
    scripts/index
    global_options
+   faq
    getting_help
 
 
@@ -57,6 +58,7 @@ For bot developers:
 
    installation
    library_usage
+   recipes
    getting_help
    api_ref/index
 

@@ -288,7 +288,6 @@ class LinkCheckThread(threading.Thread):
 
     def __init__(self, page, url, history, HTTPignore, day):
         """Initializer."""
-        super().__init__()
         self.page = page
         self.url = url
         self.history = history
@@ -301,12 +300,13 @@ class LinkCheckThread(threading.Thread):
             'Connection': 'keep-alive',
         }
         # identification for debugging purposes
-        self.setName(('{} - {}'.format(page.title(),
-                                       url.encode('utf-8', 'replace'))))
         self.HTTPignore = HTTPignore
         self._use_fake_user_agent = config.fake_user_agent_default.get(
             'weblinkchecker', False)
         self.day = day
+
+        name = '{} - {}'.format(page.title(), url.encode('utf-8', 'replace'))
+        super().__init__(name=name)
 
     def run(self):
         """Run the bot."""
@@ -570,8 +570,6 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
         if config.report_dead_links_on_talk:
             pywikibot.log('Starting talk page thread')
             reportThread = DeadLinkReportThread()
-            # thread dies when program terminates
-            # reportThread.setDaemon(True)
             reportThread.start()
         else:
             reportThread = None
@@ -595,7 +593,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                 thread = LinkCheckThread(page, url, self.history,
                                          self.HTTPignore, self.day)
                 # thread dies when program terminates
-                thread.setDaemon(True)
+                thread.daemon = True
                 self.threads.append(thread)
 
 

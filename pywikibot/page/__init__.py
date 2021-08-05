@@ -15,6 +15,7 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
+import json as jsonlib
 import logging
 import os.path
 import re
@@ -757,8 +758,18 @@ class BasePage(ComparableMixin):
                 if template.title(with_ns=False) in catredirs:
                     if args:
                         # Get target (first template argument)
+                        target_title = args[0].strip()
                         p = pywikibot.Page(
-                            self.site, args[0].strip(), Namespace.CATEGORY)
+                            self.site, target_title, Namespace.CATEGORY)
+                        try:
+                            p.title()
+                        except pywikibot.exceptions.InvalidTitleError:
+                            target_title = self.site.expand_text(
+                                text=target_title,
+                                title=self.title(),
+                            )
+                            p = pywikibot.Page(self.site, target_title,
+                                               Namespace.CATEGORY)
                         if p.namespace() == Namespace.CATEGORY:
                             self._catredirect = p.title()
                         else:
@@ -821,7 +832,7 @@ class BasePage(ComparableMixin):
         """
         Return True if this is a disambiguation page, False otherwise.
 
-        By default, it uses the the Disambiguator extension's result. The
+        By default, it uses the Disambiguator extension's result. The
         identification relies on the presence of the __DISAMBIG__ magic word
         which may also be transcluded.
 
@@ -2509,6 +2520,26 @@ class FilePage(Page):
         """
         return self.site.globalusage(self, total=total)
 
+    def data_item(self):
+        """
+        Convenience function to get the associated Wikibase item of the file.
+
+        If WikibaseMediaInfo extension is available (e.g. on Commons),
+        the method returns the associated mediainfo entity. Otherwise,
+        it falls back to behavior of BasePage.data_item.
+
+        *New in version 6.5.*
+
+        :rtype: pywikibot.page.WikibaseEntity
+        """
+        if self.site.has_extension('WikibaseMediaInfo'):
+            if not hasattr(self, '_item'):
+                self._item = MediaInfo(self.site)
+                self._item._file = self
+            return self._item
+
+        return super().data_item()
+
 
 class Category(Page):
 
@@ -3442,6 +3473,78 @@ class WikibaseEntity:
         if entity_id == '-1':
             raise NoWikibaseEntityError(self)
         return '{}{}'.format(self.repo.concept_base_uri, entity_id)
+
+
+class MediaInfo(WikibaseEntity):
+
+    """Interface for MediaInfo entities on Commons.
+
+    *New in version 6.5.*
+    """
+
+    title_pattern = r'M[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'labels': LanguageDict,
+        # TODO: 'statements': ClaimCollection,
+    }
+
+    @property
+    def file(self) -> FilePage:
+        """Get the file associated with the mediainfo."""
+        if not hasattr(self, '_file'):
+            if self.id == '-1':
+                # if the above doesn't apply, this entity is in an invalid
+                # state which needs to be raised as an exception, but also
+                # logged in case an exception handler is catching
+                # the generic Error
+                pywikibot.error('{} is in invalid state'
+                                .format(self.__class__.__name__))
+                raise Error('{} is in invalid state'
+                            .format(self.__class__.__name__))
+
+            page_id = self.getID(numeric=True)
+            result = list(self.repo.load_pages_from_pageids([page_id]))
+            if not result:
+                raise Error('There is no existing page with id "{}"'
+                            .format(page_id))
+
+            page = result.pop()
+            if page.namespace() != page.site.namespaces.FILE:
+                raise Error('Page with id "{}" is not a file'.format(page_id))
+
+            self._file = FilePage(page)
+
+        return self._file
+
+    def get(self, force: bool = False) -> dict:
+        if self.id == '-1':
+            if force:
+                if not self.file.exists():
+                    exc = NoPageError(self.file)
+                    raise NoWikibaseEntityError(self) from exc
+                # get just the id for Wikibase API call
+                self.id = 'M' + str(self.file.pageid)
+            else:
+                try:
+                    data = self.file.latest_revision.slots['mediainfo']['*']
+                except NoPageError as exc:
+                    raise NoWikibaseEntityError(self) from exc
+
+                self._content = jsonlib.loads(data)
+                self.id = self._content['id']
+
+        return super().get(force=force)
+
+    def getID(self, numeric=False):
+        """
+        Get the entity identifier.
+
+        :param numeric: Strip the first letter and return an int
+        :type numeric: bool
+        """
+        if self.id == '-1':
+            self.get()
+        return super().getID(numeric=numeric)
 
 
 class WikibasePage(BasePage, WikibaseEntity):

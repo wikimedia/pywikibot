@@ -58,10 +58,11 @@ or by adding a list to the given one::
 import re
 
 from enum import IntEnum
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import textlib
+from pywikibot.backports import Callable, Dict, List, Match, Pattern
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
@@ -184,7 +185,7 @@ class CANCEL(IntEnum):
     If an error occurred and either skips the page or the method
     or a single match. ALL raises the exception.
 
-    *New in version 6.3.*
+    .. versionadded:: 6.3
     """
 
     ALL = 0
@@ -193,7 +194,7 @@ class CANCEL(IntEnum):
     MATCH = 3
 
 
-def _format_isbn_match(match, strict=True):
+def _format_isbn_match(match: Match[str], strict: bool = True) -> str:
     """Helper function to validate and format a single matched ISBN."""
     if not stdnum_isbn:
         raise NotImplementedError(
@@ -211,7 +212,7 @@ def _format_isbn_match(match, strict=True):
     return stdnum_isbn.format(isbn)
 
 
-def _reformat_ISBNs(text, strict=True):
+def _reformat_ISBNs(text: str, strict: bool = True) -> str:
     """Helper function to normalise ISBNs in text.
 
     :raises Exception: Invalid ISBN encountered when strict enabled
@@ -225,16 +226,15 @@ class CosmeticChangesToolkit:
     """Cosmetic changes toolkit."""
 
     @deprecated_args(redirect=True, diff='show_diff', site='page')
-    def __init__(self, page, *,
+    def __init__(self, page: 'pywikibot.page.BasePage', *,
                  show_diff: bool = False,
                  namespace: Optional[int] = None,
                  pageTitle: Optional[str] = None,
-                 ignore: IntEnum = CANCEL.ALL):
+                 ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
 
         :param page: the Page object containing the text to be modified
-        :type page: pywikibot.Page
-        :param show_diff: show difference after replacements (default: False)
+        :param show_diff: show difference after replacements
         :param namespace: DEPRECATED namespace parameter
         :param pageTitle: DEPRECATED page title parameter
         :param ignore: ignores if an error occurred and either skips the page
@@ -243,13 +243,18 @@ class CosmeticChangesToolkit:
         if isinstance(page, pywikibot.BaseSite):
             self.site = page
             self.title = pageTitle
+
+            class_name = type(self).__name__
+            if self.title is None:
+                raise ValueError('Page title required for ' + class_name)
+
             try:
                 self.namespace = self.site.namespaces.resolve(namespace).pop(0)
             except (KeyError, TypeError, IndexError):
                 raise ValueError('{} needs a valid namespace'
-                                 .format(self.__class__.__name__))
+                                 .format(class_name))
             issue_deprecation_warning(
-                'site parameter of CosmeticChangesToolkit',
+                'site parameter of ' + class_name,
                 'a pywikibot.Page object as first parameter',
                 since='20201102')
         else:
@@ -292,15 +297,15 @@ class CosmeticChangesToolkit:
         if stdnum_isbn:
             self.common_methods.append(self.fix_ISBN)
 
-    @property
+    @property  # type: ignore[misc]
     @deprecated('show_diff', since='20200415')
-    def diff(self):
+    def diff(self) -> bool:
         """CosmeticChangesToolkit.diff attribute getter."""
         return self.show_diff
 
-    @diff.setter
+    @diff.setter  # type: ignore[misc]
     @deprecated('show_diff', since='20200415')
-    def diff(self, value):
+    def diff(self, value: bool) -> None:
         """CosmeticChangesToolkit.diff attribute setter."""
         self.show_diff = bool(value)
 
@@ -308,11 +313,13 @@ class CosmeticChangesToolkit:
     @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
                 since='20200415')
     @deprecated_args(diff='show_diff')
-    def from_page(cls, page, show_diff=False, ignore=CANCEL.ALL):
+    def from_page(cls, page: 'pywikibot.page.BasePage',
+                  show_diff: bool = False,
+                  ignore: IntEnum = CANCEL.ALL) -> 'CosmeticChangesToolkit':
         """Create toolkit based on the page."""
         return cls(page, show_diff=show_diff, ignore=ignore)
 
-    def safe_execute(self, method, text):
+    def safe_execute(self, method: Callable[[str], str], text: str) -> str:
         """Execute the method and catch exceptions if enabled."""
         result = None
         try:
@@ -326,13 +333,13 @@ class CosmeticChangesToolkit:
                 raise
         return text if result is None else result
 
-    def _change(self, text):
+    def _change(self, text: str) -> str:
         """Execute all clean up methods."""
         for method in self.common_methods:
             text = self.safe_execute(method, text)
         return text
 
-    def change(self, text):
+    def change(self, text: str) -> Union[bool, str]:
         """Execute all clean up methods and catch errors if activated."""
         try:
             new_text = self._change(text)
@@ -348,7 +355,7 @@ class CosmeticChangesToolkit:
                 pywikibot.showDiff(text, new_text)
             return new_text
 
-    def fixSelfInterwiki(self, text):
+    def fixSelfInterwiki(self, text: str) -> str:
         """
         Interwiki links to the site itself are displayed like local links.
 
@@ -360,7 +367,7 @@ class CosmeticChangesToolkit:
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
-    def standardizePageFooter(self, text):
+    def standardizePageFooter(self, text: str) -> str:
         """
         Standardize page footer.
 
@@ -375,8 +382,10 @@ class CosmeticChangesToolkit:
         2. additional information depending on the local site policy
         3. interwiki
         """
+        assert self.title is not None
+
         categories = []
-        interwiki_links = []
+        interwiki_links = {}
 
         # get categories
         if not self.template:
@@ -422,7 +431,7 @@ class CosmeticChangesToolkit:
 
         return text
 
-    def translateAndCapitalizeNamespaces(self, text):
+    def translateAndCapitalizeNamespaces(self, text: str) -> str:
         """Use localized namespace names."""
         # arz uses English stylish codes
         if self.site.sitename == 'wikipedia:arz':
@@ -482,7 +491,7 @@ class CosmeticChangesToolkit:
                         exceptions)
         return text
 
-    def translateMagicWords(self, text):
+    def translateMagicWords(self, text: str) -> str:
         """Use localized magic words."""
         # not wanted at ru
         # arz uses English stylish codes
@@ -490,7 +499,7 @@ class CosmeticChangesToolkit:
         if self.site.code in ['arz', 'en', 'ru']:
             return text
 
-        def init_cache():
+        def init_cache() -> None:
             for magicword in ('img_thumbnail', 'img_left', 'img_center',
                               'img_right', 'img_none', 'img_framed',
                               'img_frameless', 'img_border', 'img_upright',
@@ -504,7 +513,7 @@ class CosmeticChangesToolkit:
             if not cache:
                 cache[False] = True  # signal there is nothing to replace
 
-        def replace_magicword(match):
+        def replace_magicword(match: Match[str]) -> str:
             if cache.get(False):
                 return match.group()
             split = match.group().split('|')
@@ -519,7 +528,7 @@ class CosmeticChangesToolkit:
             return '{}|{}]]'.format(
                 split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
 
-        cache = {}
+        cache = {}  # type: Dict[Union[bool, str], Any]
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
@@ -548,7 +557,7 @@ class CosmeticChangesToolkit:
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
-        def handleOneLink(match):
+        def handleOneLink(match: Match[str]) -> str:
             titleWithSection = match.group('titleWithSection')
             label = match.group('label')
             trailingChars = match.group('linktrail')
@@ -681,7 +690,7 @@ class CosmeticChangesToolkit:
                                       'startspace'])
         return text
 
-    def resolveHtmlEntities(self, text):
+    def resolveHtmlEntities(self, text: str) -> str:
         """Replace HTML entities with string."""
         ignore = [
             38,     # Ampersand (&amp;)
@@ -709,7 +718,7 @@ class CosmeticChangesToolkit:
             text, ignore=ignore, exceptions=['comment', 'syntaxhighlight'])
         return text
 
-    def removeEmptySections(self, text):
+    def removeEmptySections(self, text: str) -> str:
         """Cleanup empty sections."""
         # userspace contains article stubs without nobots/in use templates
         if self.namespace == 2:
@@ -753,7 +762,7 @@ class CosmeticChangesToolkit:
                 new_body.extend(sections[i])
         return header + ''.join(new_body) + footer
 
-    def removeUselessSpaces(self, text):
+    def removeUselessSpaces(self, text: str) -> str:
         """Cleanup multiple or trailing spaces."""
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight',
                       'startspace', 'table']
@@ -763,7 +772,7 @@ class CosmeticChangesToolkit:
                                      exceptions, site=self.site)
         return text
 
-    def removeNonBreakingSpaceBeforePercent(self, text):
+    def removeNonBreakingSpaceBeforePercent(self, text: str) -> str:
         """
         Remove a non-breaking space between number and percent sign.
 
@@ -775,7 +784,7 @@ class CosmeticChangesToolkit:
             text, r'(\d)&(?:nbsp|#160|#x[Aa]0);%', r'\1 %', ['timeline'])
         return text
 
-    def cleanUpSectionHeaders(self, text):
+    def cleanUpSectionHeaders(self, text: str) -> str:
         """
         Add a space between the equal signs and the section title.
 
@@ -801,7 +810,7 @@ class CosmeticChangesToolkit:
             r'\1 \g<title> \1\n',
             ['comment', 'math', 'nowiki', 'pre'])
 
-    def putSpacesInLists(self, text):
+    def putSpacesInLists(self, text: str) -> str:
         """
         Add a space between the * or # and the text.
 
@@ -822,7 +831,7 @@ class CosmeticChangesToolkit:
                 exceptions)
         return text
 
-    def replaceDeprecatedTemplates(self, text):
+    def replaceDeprecatedTemplates(self, text: str) -> str:
         """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         builder = MultiTemplateMatchBuilder(self.site)
@@ -845,9 +854,9 @@ class CosmeticChangesToolkit:
         return text
 
     # from fixes.py
-    def fixSyntaxSave(self, text):
+    def fixSyntaxSave(self, text: str) -> str:
         """Convert weblinks to wikilink, fix link syntax."""
-        def replace_link(match):
+        def replace_link(match: Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
             if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6])
@@ -913,9 +922,9 @@ class CosmeticChangesToolkit:
             r'[\g<url> \g<label>]', exceptions)
         return text
 
-    def fixHtml(self, text):
+    def fixHtml(self, text: str) -> str:
         """Relace html markups with wikitext markups."""
-        def replace_header(match):
+        def replace_header(match: Match[str]) -> str:
             """Create a header string for replacing."""
             depth = int(match.group(1))
             return r'{0} {1} {0}'.format('=' * depth, match.group(2))
@@ -945,7 +954,7 @@ class CosmeticChangesToolkit:
         # TODO: maybe we can make the bot replace <p> tags with \r\n's.
         return text
 
-    def fixReferences(self, text):
+    def fixReferences(self, text: str) -> str:
         """Fix references tags."""
         # See also
         # https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
@@ -963,7 +972,7 @@ class CosmeticChangesToolkit:
                                      r'<ref \1/>', exceptions)
         return text
 
-    def fixStyle(self, text):
+    def fixStyle(self, text: str) -> str:
         """Convert prettytable to wikitable class."""
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
                       'syntaxhighlight']
@@ -973,10 +982,21 @@ class CosmeticChangesToolkit:
                                          r'\1wikitable\2', exceptions)
         return text
 
-    def fixTypo(self, text):
+    def fixTypo(self, text: str) -> str:
         """Fix units."""
-        exceptions = ['comment', 'gallery', 'hyperlink', 'interwiki', 'link',
-                      'nowiki', 'math', 'pre', 'startspace', 'syntaxhighlight']
+        exceptions = [
+            'comment',
+            'gallery',
+            'hyperlink',
+            'interwiki',
+            'link',
+            'nowiki',
+            'math',
+            'pre',
+            'startspace',
+            'syntaxhighlight',
+        ]  # type: List[Union[str, Pattern[str]]]
+
         # change <number> ccm -> <number> cm³
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?ccm',
                                      r'\1&nbsp;cm³', exceptions,
@@ -993,7 +1013,7 @@ class CosmeticChangesToolkit:
                                      site=self.site)
         return text
 
-    def fixArabicLetters(self, text):
+    def fixArabicLetters(self, text: str) -> str:
         """Fix Arabic and Persian letters."""
         if self.site.code not in ['ckb', 'fa']:
             return text
@@ -1013,7 +1033,7 @@ class CosmeticChangesToolkit:
             'ref',
             'startspace',
             'syntaxhighlight',
-        ]
+        ]  # type: List[Union[str, Pattern[str]]]
 
         digits = textlib.NON_LATIN_DIGITS
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
@@ -1039,7 +1059,7 @@ class CosmeticChangesToolkit:
 
         return text
 
-    def commonsfiledesc(self, text):
+    def commonsfiledesc(self, text: str) -> str:
         """
         Clean up file descriptions on Wikimedia Commons.
 
@@ -1105,7 +1125,7 @@ class CosmeticChangesToolkit:
             r'\1== {{int:license-header}} ==', exceptions, True)
         return text
 
-    def fix_ISBN(self, text):
+    def fix_ISBN(self, text: str) -> str:
         """Hyphenate ISBN numbers."""
         return _reformat_ISBNs(text, strict=self.ignore != CANCEL.MATCH)
 

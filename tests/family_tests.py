@@ -157,10 +157,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
         self.assertEqual(code, self.current_code)
-        if self.current_family == 'test':
-            self.assertEqual(fam, 'wikipedia')
-        else:
-            self.assertEqual(fam, self.current_family)
+        self.assertEqual(fam, self.current_family)
         site = DrySite(code, fam, None)
         site._siteinfo._cache['general'] = ({'articlepath': self.article_path},
                                             True)

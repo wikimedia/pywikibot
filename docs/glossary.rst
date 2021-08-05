@@ -67,8 +67,8 @@ Glossary
       is a Jupyter notebooks deployment hosted by Wikimedia. It has 
       preinstalled the :term:`stable` release of Pywikibot. Refer:
 
+      - :manpage:`PAWS`
       - https://wikitech.wikimedia.org/wiki/PAWS
-      - https://www.mediawiki.org/wiki/Manual:Pywikibot/PAWS
 
    PyPI
       The Python Package Index (PyPI), a repository of software for the 

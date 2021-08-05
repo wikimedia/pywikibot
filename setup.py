@@ -65,6 +65,8 @@ extra_deps = {
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
                        'wikitextparser>=0.47.0; python_version >= "3.6"'],
+    'mysql': ['PyMySQL >= 0.6.7, < 1.0.0 ; python_version < "3.6"',
+              'PyMySQL >= 1.0.0 ; python_version >= "3.6"'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
     ],
@@ -72,9 +74,8 @@ extra_deps = {
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8>=3.7.5',
+        'flake8>=3.9.1',
         'pydocstyle>=4.0.0',
-        'hacking',
         'flake8-bugbear!=21.4.1',
         'flake8-coding',
         'flake8-colors>=0.1.9',
@@ -91,6 +92,7 @@ extra_deps = {
         'pep8-naming>=0.7',
         'pyflakes>=2.1.0',
     ],
+    'hacking': ['hacking'],
 }
 
 

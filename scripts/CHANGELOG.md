@@ -1,5 +1,12 @@
 # Schripts Changelog
 
+## 6.5.0
+*05 August 2021*
+
+### reflinks
+* Don't ignore identical references with newline in ref content (T286369)
+* L10N updates
+
 ## 6.4.0
 *01 July 2021*
 

@@ -8,6 +8,7 @@ import codecs
 import os
 import stat
 import sys
+from typing import Optional
 
 from pywikibot.tools import deprecated_args
 
@@ -16,7 +17,8 @@ is_daemon = False
 
 
 @deprecated_args(write_pid=True)
-def daemonize(close_fd=True, chdir=True, redirect_std=None):
+def daemonize(close_fd: bool = True, chdir: bool = True,
+              redirect_std: Optional[str] = None) -> None:
     """
     Daemonize the current process.
 
@@ -24,11 +26,8 @@ def daemonize(close_fd=True, chdir=True, redirect_std=None):
     The process will fork to the background and return control to terminal.
 
     :param close_fd: Close the standard streams and replace them by /dev/null
-    :type close_fd: bool
     :param chdir: Change the current working directory to /
-    :type chdir: bool
     :param redirect_std: Filename to redirect stdout and stdin to
-    :type redirect_std: str
     """
     # Fork away
     if not os.fork():

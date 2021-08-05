@@ -123,6 +123,11 @@ class UITestCase(TestCaseBase):
         return strin._stream.readline().strip()
 
 
+class TestExceptionError(Exception):
+
+    """Test exception."""
+
+
 class TestTerminalOutput(UITestCase):
 
     """Terminal output tests."""
@@ -187,34 +192,26 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstderr.getvalue(), '')
 
     def test_exception(self):
-        class TestException(Exception):
-
-            """Test exception."""
-
         try:
-            raise TestException('Testing Exception')
-        except TestException:
+            raise TestExceptionError('Testing Exception')
+        except TestExceptionError:
             pywikibot.exception('exception')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(newstderr.getvalue(),
-                         'ERROR: TestException: Testing Exception\n')
+                         'ERROR: TestExceptionError: Testing Exception\n')
 
     def test_exception_tb(self):
-        class TestException(Exception):
-
-            """Test exception."""
-
         try:
-            raise TestException('Testing Exception')
-        except TestException:
+            raise TestExceptionError('Testing Exception')
+        except TestExceptionError:
             pywikibot.exception('exception', tb=True)
         self.assertEqual(newstdout.getvalue(), '')
         stderrlines = newstderr.getvalue().split('\n')
         self.assertEqual(stderrlines[0],
-                         'ERROR: TestException: Testing Exception')
+                         'ERROR: TestExceptionError: Testing Exception')
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
-                         "    raise TestException('Testing Exception')")
+                         "    raise TestExceptionError('Testing Exception')")
         self.assertTrue(stderrlines[4].endswith(': Testing Exception'))
 
         self.assertNotEqual(stderrlines[-1], '\n')

@@ -9,6 +9,7 @@ import datetime
 import inspect
 import math
 import re
+import sys
 import threading
 import time
 from contextlib import suppress
@@ -32,7 +33,7 @@ from pywikibot.__metadata__ import (
     __version__,
 )
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
-from pywikibot.backports import cache, removesuffix
+from pywikibot.backports import cache, removesuffix, List
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -62,7 +63,7 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
-from pywikibot.site import APISite, BaseSite, ClosedSite, DataSite
+from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
 )
@@ -83,7 +84,7 @@ __all__ = (
     'FilePage', 'handle_args', 'html2unicode', 'input', 'input_choice',
     'input_yn', 'InterwikiRedirectPage', 'InvalidTitle', 'IsNotRedirectPage',
     'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage', 'LockedPage', 'log',
-    'NoCreateError', 'NoMoveTarget', 'NoPage', 'NoUsername',
+    'MediaInfo', 'NoCreateError', 'NoMoveTarget', 'NoPage', 'NoUsername',
     'NoWikibaseEntity', 'OtherPageSaveError', 'output', 'Page',
     'PageCreatedConflict', 'PageDeletedConflict', 'PageRelatedError',
     'PageSaveRelatedError', 'PropertyPage', 'SectionError', 'Server414Error',
@@ -95,6 +96,11 @@ __all__ = (
     'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
     'WikiBaseError', 'WikidataBot',
 )
+
+# argvu is set by pywikibot.bot when it's imported
+
+if not hasattr(sys.modules[__name__], 'argvu'):
+    argvu = []  # type: List[str]
 
 
 class Timestamp(datetime.datetime):
@@ -1091,7 +1097,7 @@ def _code_fam_from_url(url: str, name: Optional[str] = None):
 @_deprecate_arg('sysop', True)
 def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
          interface=None,
-         url: Optional[str] = None) -> Union[APISite, DataSite, ClosedSite]:
+         url: Optional[str] = None) -> APISite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
@@ -1148,6 +1154,8 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         URL. Still requires that the family supporting that URL exists.
     :raises ValueError: URL and pair of code and family given
     :raises ValueError: Invalid interface name
+    :raises ValueError: Missing Site code
+    :raises ValueError: Missing Site family
     """
     _logger = 'wiki'
 
@@ -1168,6 +1176,10 @@ def Site(code: Optional[str] = None, fam=None, user: Optional[str] = None, *,
         # Fallback to config defaults
         code = code or _config.mylang
         fam = fam or _config.family
+
+    if not (code and fam):
+        raise ValueError('Missing Site {}'
+                         .format('code' if not code else 'family'))
 
     if not isinstance(fam, Family):
         fam = Family.load(fam)
@@ -1216,6 +1228,7 @@ from pywikibot.page import (  # noqa: E402
     FilePage,
     ItemPage,
     Link,
+    MediaInfo,
     Page,
     PropertyPage,
     SiteLink,
@@ -1348,10 +1361,9 @@ page_put_queue = Queue(_config.max_queue_size)
 # queue to signal that async_manager is working on a request. See T147178.
 page_put_queue_busy = Queue(_config.max_queue_size)
 # set up the background thread
-_putthread = threading.Thread(target=async_manager)
-# identification for debugging purposes
-_putthread.setName('Put-Thread')
-_putthread.setDaemon(True)
+_putthread = threading.Thread(target=async_manager,
+                              name='Put-Thread',  # for debugging purposes
+                              daemon=True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('config2', replacement_name='pywikibot.config',

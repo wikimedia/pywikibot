@@ -11,6 +11,11 @@ pywikibot.families.commons\_family module
 
 .. automodule:: pywikibot.families.commons_family
 
+pywikibot.families.foundation\_family module
+--------------------------------------------
+
+.. automodule:: pywikibot.families.foundation_family
+
 pywikibot.families.i18n\_family module
 --------------------------------------
 
@@ -20,6 +25,11 @@ pywikibot.families.incubator\_family module
 -------------------------------------------
 
 .. automodule:: pywikibot.families.incubator_family
+
+pywikibot.families.lingualibre\_family module
+---------------------------------------------
+
+.. automodule:: pywikibot.families.lingualibre_family
 
 pywikibot.families.mediawiki\_family module
 -------------------------------------------
@@ -66,6 +76,11 @@ pywikibot.families.wikidata\_family module
 
 .. automodule:: pywikibot.families.wikidata_family
 
+pywikibot.families.wikihow\_family module
+-----------------------------------------
+
+.. automodule:: pywikibot.families.wikihow_family
+
 pywikibot.families.wikimania\_family module
 -------------------------------------------
 
@@ -96,6 +111,11 @@ pywikibot.families.wikisource\_family module
 
 .. automodule:: pywikibot.families.wikisource_family
 
+pywikibot.families.wikisopore\_family module
+--------------------------------------------
+
+.. automodule:: pywikibot.families.wikispore_family
+
 pywikibot.families.wikitech\_family module
 ------------------------------------------
 
@@ -120,5 +140,4 @@ pywikibot.families.wowwiki\_family module
 -----------------------------------------
 
 .. automodule:: pywikibot.families.wowwiki_family
-
 

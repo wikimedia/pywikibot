@@ -1009,7 +1009,8 @@ class APISite(
 
     def is_data_repository(self):
         """Return True if its data repository is itself."""
-        return self is self.data_repository()
+        # fixme: this was an identity check
+        return self == self.data_repository()
 
     def page_from_repository(self, item):
         """
@@ -1477,7 +1478,9 @@ class APISite(
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code].format_map(errdata))
+                raise Error(
+                    self._dl_errors[err.code].format_map(errdata)
+                ) from None
             pywikibot.debug("revdelete: Unexpected error code '{}' received."
                             .format(err.code),
                             _logger)
@@ -1649,7 +1652,9 @@ class APISite(
                                 'user': self.user(),
                                 'info': err.info
                             }
-                            raise Error(exception.format_map(errdata))
+                            raise Error(
+                                exception.format_map(errdata)
+                            ) from None
                         if issubclass(exception, AbuseFilterDisallowedError):
                             errdata = {
                                 'info': err.info,
@@ -1659,7 +1664,7 @@ class APISite(
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
-                        raise exception(page)
+                        raise exception(page) from None
                     pywikibot.debug(
                         "editpage: Unexpected error code '{}' received."
                         .format(err.code),
@@ -1711,7 +1716,7 @@ class APISite(
 
                     if 'spamblacklist' in result['edit']:
                         raise SpamblacklistError(
-                            page, result['edit']['spamblacklist'])
+                            page, result['edit']['spamblacklist']) from None
 
                     if 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(
@@ -1823,7 +1828,7 @@ class APISite(
         except APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
-                raise Error(on_error.format_map(errdata))
+                raise Error(on_error.format_map(errdata)) from None
 
             pywikibot.debug(
                 "mergehistory: Unexpected error code '{code}' received"
@@ -1868,6 +1873,7 @@ class APISite(
         'filetypemismatch':
             '[[{newtitle}]] file extension does not match content of '
             '[[{oldtitle}]]',
+        'missingtitle': "{oldtitle} doesn't exist",
     }
 
     @need_right('move')
@@ -1937,7 +1943,7 @@ class APISite(
                                     break
                     else:
                         failed_page = newpage if on_error.on_new_page else page
-                    raise on_error.exception(failed_page)
+                    raise on_error.exception(failed_page) from None
 
                 errdata = {
                     'site': self,
@@ -1948,7 +1954,7 @@ class APISite(
                     'user': self.user(),
                 }
 
-                raise Error(on_error.format_map(errdata))
+                raise Error(on_error.format_map(errdata)) from None
 
             pywikibot.debug("movepage: Unexpected error code '{}' received."
                             .format(err.code),
@@ -2022,7 +2028,9 @@ class APISite(
                 'user': self.user(),
             }
             if err.code in self._rb_errors:
-                raise Error(self._rb_errors[err.code].format_map(errdata))
+                raise Error(
+                    self._rb_errors[err.code].format_map(errdata)
+                ) from None
             pywikibot.debug("rollback: Unexpected error code '{}' received."
                             .format(err.code),
                             _logger)
@@ -2040,7 +2048,8 @@ class APISite(
             'Could not delete [[{title}]]. Maybe it was deleted already.',
         'cantundelete': 'Could not undelete [[{title}]]. '
                         'Revision may not exist or was already undeleted.',
-        'nodeleteablefile': 'No such old version of file'
+        'nodeleteablefile': 'No such old version of file',
+        'missingtitle': "[[{title}]] doesn't exist.",
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
@@ -2099,7 +2108,9 @@ class APISite(
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code].format_map(errdata))
+                raise Error(
+                    self._dl_errors[err.code].format_map(errdata)
+                ) from None
             pywikibot.debug('delete: Unexpected error code {!r} received.'
                             .format(err.code),
                             _logger)
@@ -2183,7 +2194,9 @@ class APISite(
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
-                raise Error(self._dl_errors[err.code].format_map(errdata))
+                raise Error(
+                    self._dl_errors[err.code].format_map(errdata)
+                ) from None
             pywikibot.debug('undelete: Unexpected error code {!r} received.'
                             .format(err.code),
                             _logger)
@@ -2293,7 +2306,9 @@ class APISite(
                 'user': self.user(),
             }
             if err.code in self._protect_errors:
-                raise Error(self._protect_errors[err.code].format_map(errdata))
+                raise Error(
+                    self._protect_errors[err.code].format_map(errdata)
+                ) from None
             pywikibot.debug("protect: Unexpected error code '{}' received."
                             .format(err.code),
                             _logger)

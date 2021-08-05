@@ -1,6 +1,6 @@
 """Family module for Wikimedia Commons."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,3 +38,10 @@ class Family(family.WikimediaFamily):
     doc_subpages = {
         '_default': (('/doc', ), ['commons']),
     }
+
+    def interface(self, code):
+        """Return 'DataSite' to enable structured data.
+
+        *New in version 6.5.*
+        """
+        return 'DataSite'
