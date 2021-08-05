@@ -1103,7 +1103,7 @@ def open_webbrowser(page: 'pywikibot.page.BasePage') -> None:
                fallback_prompt='Press Enter when finished in browser.')
 
 
-class _OptionDict(Dict[str, Any]):
+class _OptionDict(dict):
 
     """The option dict which holds the options of OptionHandler.
 
