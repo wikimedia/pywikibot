@@ -1,6 +1,14 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* Add support for jvwikisource (T286247)
+* Handle missingtitle error code when deleting
+* Check for outdated setuptools in pwb.py wrapper (T286980)
+* Remove traceback for original exception for known API error codes
+* Unused strm parameter of init_handlers was removed
+* Ignore throttle.pid if a Site object cannot be created (T286848)
+* Explicitly return an empty string with OutputProxyOption.out property (T286403)
+* Explicitly return None from ContextOption.result() (T286403)
 * Add support for Lingua Libre family (T286303)
 * Catch invalid titles in Category.isCategoryRedirect()
 * L10N updates
@@ -10,6 +18,8 @@ Current release changes
 Deprecations
 ^^^^^^^^^^^^
 
+* 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
+* 6.5.0: tools.RotatingFileHandler will be removed in favour of logging.handlers.RotatingFileHandler
 * 6.4.0: Pywikibot `began using semantic versioning
   <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,
   all deprecated code will be removed in Pywikibot version 7.0.0.
