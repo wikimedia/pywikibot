@@ -1,6 +1,24 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.5.0
+-----
+*05 August 2021*
+
+* Add support for jvwikisource (T286247)
+* Handle missingtitle error code when deleting
+* Check for outdated setuptools in pwb.py wrapper (T286980)
+* Remove traceback for original exception for known API error codes
+* Unused strm parameter of init_handlers was removed
+* Ignore throttle.pid if a Site object cannot be created (T286848)
+* Explicitly return an empty string with OutputProxyOption.out property (T286403)
+* Explicitly return None from ContextOption.result() (T286403)
+* Add support for Lingua Libre family (T286303)
+* Catch invalid titles in Category.isCategoryRedirect()
+* L10N updates
+* Provide structured data on Commons (T213904, T223820)
+
+
 6.4.0
 -----
 *01 July 2021*
