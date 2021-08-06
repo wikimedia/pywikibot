@@ -6,14 +6,23 @@
 #
 from collections import UserDict
 from contextlib import suppress
-from typing import Optional
+import datetime
+from typing import Any, Optional
 
 import pywikibot
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import Error, HiddenKeyError
 
 
 _logger = 'wiki'
+
+# TODO: replace these after T286867
+
+PAGE_OR_INT_TYPE = Any  # Union[int, 'pywikibot.page.Page']
+OPT_TIMESTAMP_TYPE = Any  # Optional['pywikibot.Timestamp']
+
+LOG_ENTRY_CLASS = Any  # Type['LogEntry']
+LOG_ENTRY_FACTORY_CLASS = Any  # Type['LogEntryFactory']
 
 
 class LogEntry(UserDict):
@@ -33,7 +42,8 @@ class LogEntry(UserDict):
     # Overridden in subclasses.
     _expected_type = None  # type: Optional[str]
 
-    def __init__(self, apidata, site):
+    def __init__(self, apidata: Dict[str, Any],
+                 site: 'pywikibot.site.BaseSite') -> None:
         """Initialize object from a logevent dict returned by MW API."""
         super().__init__(apidata)
         self.site = site
@@ -42,7 +52,7 @@ class LogEntry(UserDict):
             raise Error('Wrong log type! Expecting {}, received {} instead.'
                         .format(expected_type, self.type()))
 
-    def __missing__(self, key: str):
+    def __missing__(self, key: str) -> None:
         """Debug when the key is missing.
 
         HiddenKeyError is raised when the user does not have permission.
@@ -68,11 +78,11 @@ class LogEntry(UserDict):
         return '<{}({}, logid={})>'.format(type(self).__name__,
                                            self.site.sitename, self.logid())
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Combine site and logid as the hash."""
         return self.logid() ^ hash(self.site)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
             pywikibot.debug("'{}' cannot be compared with '{}'"
@@ -81,7 +91,7 @@ class LogEntry(UserDict):
             return False
         return self.logid() == other.logid() and self.site == other.site
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         """Return several items from dict used as methods."""
         if item in ('action', 'comment', 'logid', 'ns', 'pageid', 'type',
                     'user'):  # TODO use specific User class for 'user'?
@@ -90,29 +100,24 @@ class LogEntry(UserDict):
         return super().__getattribute__(item)
 
     @property
-    def _params(self):
-        """
-        Additional data for some log entry types.
-
-        :rtype: dict or None
-        """
+    def _params(self) -> Dict[str, Any]:
+        """Additional data for some log entry types."""
         with suppress(KeyError):
             return self['params']
 
         return self[self._expected_type]
 
-    def page(self):
+    def page(self) -> PAGE_OR_INT_TYPE:
         """
         Page on which action was performed.
 
         :return: page on action was performed
-        :rtype: pywikibot.Page
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.Page(self.site, self['title'])
         return self._page
 
-    def timestamp(self):
+    def timestamp(self) -> 'pywikibot.Timestamp':
         """Timestamp object corresponding to event timestamp."""
         if not hasattr(self, '_timestamp'):
             self._timestamp = pywikibot.Timestamp.fromISOformat(
@@ -129,14 +134,13 @@ class UserTargetLogEntry(LogEntry):
 
     """A log entry whose target is a user page."""
 
-    def page(self):
+    def page(self) -> 'pywikibot.page.User':
         """Return the target user.
 
         This returns a User object instead of the Page object returned by the
         superclass method.
 
         :return: target user
-        :rtype: pywikibot.User
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.User(self.site, self['title'])
@@ -154,7 +158,8 @@ class BlockEntry(LogEntry):
 
     _expected_type = 'block'
 
-    def __init__(self, apidata, site):
+    def __init__(self, apidata: Dict[str, Any],
+                 site: 'pywikibot.site.BaseSite') -> None:
         """Initializer."""
         super().__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
@@ -164,14 +169,13 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             self._blockid = int(self['title'][pos + 1:])
 
-    def page(self):
+    def page(self) -> PAGE_OR_INT_TYPE:
         """
         Return the blocked account or IP.
 
         :return: the Page object of username or IP if this block action
             targets a username or IP, or the blockid if this log reflects
             the removal of an autoblock
-        :rtype: pywikibot.Page or int
         """
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
@@ -199,7 +203,7 @@ class BlockEntry(LogEntry):
                     self._flags = []
         return self._flags
 
-    def duration(self):
+    def duration(self) -> Optional[datetime.timedelta]:
         """
         Return a datetime.timedelta representing the block duration.
 
@@ -213,12 +217,8 @@ class BlockEntry(LogEntry):
                 self._duration = self.expiry() - self.timestamp()
         return self._duration
 
-    def expiry(self):
-        """
-        Return a Timestamp representing the block expiry date.
-
-        :rtype: pywikibot.Timestamp or None
-        """
+    def expiry(self) -> OPT_TIMESTAMP_TYPE:
+        """Return a Timestamp representing the block expiry date."""
         if not hasattr(self, '_expiry'):
             details = self._params.get('expiry')
             if details:
@@ -235,7 +235,7 @@ class RightsEntry(LogEntry):
     _expected_type = 'rights'
 
     @property
-    def oldgroups(self):
+    def oldgroups(self) -> List[str]:
         """Return old rights groups."""
         params = self._params
         if 'old' in params:  # old mw style (mw < 1.25)
@@ -244,7 +244,7 @@ class RightsEntry(LogEntry):
         return params['oldgroups']
 
     @property
-    def newgroups(self):
+    def newgroups(self) -> List[str]:
         """Return new rights groups."""
         params = self._params
         if 'new' in params:  # old mw style (mw < 1.25)
@@ -259,12 +259,8 @@ class UploadEntry(LogEntry):
 
     _expected_type = 'upload'
 
-    def page(self):
-        """
-        Return FilePage on which action was performed.
-
-        :rtype: pywikibot.FilePage
-        """
+    def page(self) -> 'pywikibot.page.FilePage':
+        """Return FilePage on which action was performed."""
         if not hasattr(self, '_page'):
             self._page = pywikibot.FilePage(self.site, self['title'])
         return self._page
@@ -277,7 +273,7 @@ class MoveEntry(LogEntry):
     _expected_type = 'move'
 
     @property
-    def target_ns(self):
+    def target_ns(self) -> 'pywikibot.site._namespace.Namespace':
         """Return namespace object of target page."""
         # key has been changed in mw 1.25 to 'target_ns'
         return self.site.namespaces[self._params['target_ns']
@@ -285,7 +281,7 @@ class MoveEntry(LogEntry):
                                     else self._params['new_ns']]
 
     @property
-    def target_title(self):
+    def target_title(self) -> str:
         """Return the target title."""
         # key has been changed in mw 1.25 to 'target_title'
         return (self._params['target_title']
@@ -293,12 +289,8 @@ class MoveEntry(LogEntry):
                 else self._params['new_title'])
 
     @property
-    def target_page(self):
-        """
-        Return target page object.
-
-        :rtype: pywikibot.Page
-        """
+    def target_page(self) -> 'pywikibot.page.Page':
+        """Return target page object."""
         if not hasattr(self, '_target_page'):
             self._target_page = pywikibot.Page(self.site, self.target_title)
         return self._target_page
@@ -353,16 +345,15 @@ class LogEntryFactory:
         'patrol': PatrolEntry,
     }
 
-    def __init__(self, site, logtype=None):
+    def __init__(self, site: 'pywikibot.site.BaseSite',
+                 logtype: Optional[str] = None) -> None:
         """
         Initializer.
 
         :param site: The site on which the log entries are created.
-        :type site: BaseSite
         :param logtype: The log type of the log entries, if known in advance.
                         If None, the Factory will fetch the log entry from
                         the data to create each object.
-        :type logtype: (letype) str : move/block/patrol/etc...
         """
         self._site = site
         if logtype is None:
@@ -373,23 +364,21 @@ class LogEntryFactory:
             logclass = self.get_valid_entry_class(logtype)
             self._creator = lambda data: logclass(data, self._site)
 
-    def create(self, logdata):
+    def create(self, logdata: Dict[str, Any]) -> LogEntry:
         """
         Instantiate the LogEntry object representing logdata.
 
         :param logdata: <item> returned by the api
-        :type logdata: dict
 
         :return: LogEntry object representing logdata
         """
         return self._creator(logdata)
 
-    def get_valid_entry_class(self, logtype):
+    def get_valid_entry_class(self, logtype: str) -> LOG_ENTRY_CLASS:
         """
         Return the class corresponding to the @logtype string parameter.
 
         :return: specified subclass of LogEntry
-        :rtype: LogEntry
         :raise KeyError: logtype is not valid
         """
         if logtype not in self._site.logtypes:
@@ -398,21 +387,21 @@ class LogEntryFactory:
         return LogEntryFactory.get_entry_class(logtype)
 
     @classmethod
-    def get_entry_class(cls, logtype):
+    def get_entry_class(cls: LOG_ENTRY_FACTORY_CLASS,
+                        logtype: str) -> LOG_ENTRY_CLASS:
         """
         Return the class corresponding to the @logtype string parameter.
 
         :return: specified subclass of LogEntry
-        :rtype: LogEntry
         :note: this class method cannot verify whether the given logtype
             already exits for a given site; to verify use Site.logtypes
             or use the get_valid_entry_class instance method instead.
         """
         if logtype not in cls._logtypes:
+            bases = (OtherLogEntry, )  # type: Tuple[LOG_ENTRY_CLASS, ...]
             if logtype in ('newusers', 'thanks'):
                 bases = (UserTargetLogEntry, OtherLogEntry)
-            else:
-                bases = (OtherLogEntry, )
+
             classname = str(logtype.capitalize() + 'Entry'
                             if logtype is not None
                             else OtherLogEntry.__name__)
@@ -420,12 +409,11 @@ class LogEntryFactory:
                 classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
-    def _create_from_data(self, logdata: dict):
+    def _create_from_data(self, logdata: Dict[str, Any]) -> LogEntry:
         """
         Check for logtype from data, and creates the correct LogEntry.
 
         :param logdata: log entry data
-        :rtype: LogEntry
         """
         try:
             logtype = logdata['type']
