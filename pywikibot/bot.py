@@ -2303,7 +2303,7 @@ class WikidataBot(Bot, ExistingPageBot):
                                         'must be an item.'.format(page))
                         return
 
-        assert page is not None
+        assert not (page is None and item is None)
 
         if not item and self.create_missing_item:
             item = self.create_item_for_page(page, asynchronous=False)
