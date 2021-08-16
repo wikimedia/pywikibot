@@ -5,6 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+from typing import Any, Optional, Type
+from pywikibot.backports import Dict
 from pywikibot.tools import deprecated
 
 
@@ -12,17 +14,25 @@ class Notification:
 
     """A notification issued by the Echo extension."""
 
-    def __init__(self, site):
+    def __init__(self, site: 'pywikibot.site.BaseSite') -> None:
         """Initialize an empty Notification object."""
         self.site = site
 
-    @classmethod
-    def fromJSON(cls, site, data):  # noqa: N802
-        """
-        Construct a Notification object from JSON data returned by the API.
+        self.event_id = None  # type: Optional[int]
+        self.type = None
+        self.category = None
+        self.timestamp = None
+        self.page = None
+        self.agent = None
+        self.read = None  # type: Optional[bool]
+        self.content = None
+        self.revid = None
 
-        :rtype: Notification
-        """
+    @classmethod
+    def fromJSON(cls: Type['Notification'],  # noqa: N802
+                 site: 'pywikibot.site.BaseSite',
+                 data: Dict[str, Any]) -> 'Notification':
+        """Construct a Notification object from our API's JSON data."""
         notif = cls(site)
 
         notif.event_id = int(data['id'])
@@ -50,16 +60,12 @@ class Notification:
         notif.revid = data.get('revid', None)
         return notif
 
-    @property
+    @property  # type: ignore[misc]
     @deprecated('event_id', since='20190106')
-    def id(self):
-        """
-        DEPRECATED: Return notification id as unicode.
-
-        :rtype: str
-        """
+    def id(self) -> str:
+        """DEPRECATED: Return notification id as unicode."""
         return str(self.event_id)
 
-    def mark_as_read(self):
+    def mark_as_read(self) -> bool:
         """Mark the notification as read."""
         return self.site.notifications_mark_read(list=self.id)
