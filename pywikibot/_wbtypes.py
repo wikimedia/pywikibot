@@ -6,6 +6,13 @@
 #
 import abc
 import json
+from typing import Any
+
+from pywikibot.backports import Dict
+
+# TODO: replace these after T286867
+
+OPT_SITE = Any  # Optional['pywikibot.site.DataSite']
 
 
 class WbRepresentation(abc.ABC):
@@ -24,7 +31,8 @@ class WbRepresentation(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def fromWikibase(cls, json):
+    def fromWikibase(cls, data: Dict[str, Any], site: OPT_SITE = None
+                     ) -> 'WbRepresentation':
         """Create a representation object based on JSON from Wikibase API."""
         raise NotImplementedError
 
