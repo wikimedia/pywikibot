@@ -5,9 +5,13 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from typing import Any, Optional, Type
+from typing import Any, Optional
 from pywikibot.backports import Dict
 from pywikibot.tools import deprecated
+
+# TODO: replace these after T286867
+
+NOTIFICATION_CLASS_TYPE = Any  # Type['Notification']
 
 
 class Notification:
@@ -29,7 +33,7 @@ class Notification:
         self.revid = None
 
     @classmethod
-    def fromJSON(cls: Type['Notification'],  # noqa: N802
+    def fromJSON(cls: NOTIFICATION_CLASS_TYPE,  # noqa: N802
                  site: 'pywikibot.site.BaseSite',
                  data: Dict[str, Any]) -> 'Notification':
         """Construct a Notification object from our API's JSON data."""
