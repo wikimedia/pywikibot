@@ -182,9 +182,11 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
 
-ANSWER_TYPE = Iterable[Union[
+ANSWER = Union[
     Tuple[str, str],
-    'pywikibot.bot_choice.Option']]
+    'pywikibot.bot_choice.Option']
+
+ANSWER_TYPE = Union[Iterable[ANSWER], 'pywikibot.bot_choice.Option']
 
 # TODO: We should change this to the following after T286867...
 
@@ -561,7 +563,7 @@ def input_choice(question: str,
                  default: Optional[str] = None,
                  return_shortcut: bool = True,
                  automatic_quit: bool = True,
-                 force: bool = False) -> Union[int, str]:
+                 force: bool = False) -> Any:
     """
     Ask the user the question and return one of the valid answers.
 
