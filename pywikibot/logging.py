@@ -7,26 +7,29 @@
 import logging
 import os
 import sys
+from typing import Any
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import Optional
+from typing import AnyStr, Optional
+
+from pywikibot.backports import Callable, List
 
 
 STDOUT = 16
 VERBOSE = 18
 INPUT = 25
 
-_init_routines = []
+_init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
 
 
-def add_init_routine(routine):
+def add_init_routine(routine: Callable[[], Any]) -> None:
     """Add a routine to be run as soon as possible."""
     _init_routines.append(routine)
 
 
-def _init():
+def _init() -> None:
     """Init any routines which have not already been called."""
     for init_routine in _init_routines:
         found = init_routine in _inited_routines  # prevent infinite loop
@@ -59,12 +62,12 @@ def _init():
 # string indicating the debugging layer.
 
 
-def logoutput(text, decoder=None, newline=True, _level=INFO, _logger='',
-              **kwargs):
+def logoutput(text: Any, decoder: Optional[str] = None,
+              newline: bool = True, _level: int = INFO, _logger: str = '',
+              **kwargs: Any) -> None:
     """Format output and send to the logging module.
 
     Helper function used by all the user-output convenience functions.
-
     """
     if _logger:
         logger = logging.getLogger('pywiki.' + _logger)
@@ -86,23 +89,27 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger='',
                'caller_line': frame.f_lineno,
                'newline': ('\n' if newline else '')}
 
-    if decoder:
-        text = text.decode(decoder)
+    if isinstance(text, str):
+        decoded_text = text
     elif isinstance(text, bytes):
-        try:
-            text = text.decode('utf-8')
-        except UnicodeDecodeError:
-            text = text.decode('iso8859-1')
+        if decoder:
+            decoded_text = text.decode(decoder)
+        else:
+            try:
+                decoded_text = text.decode('utf-8')
+            except UnicodeDecodeError:
+                decoded_text = text.decode('iso8859-1')
     else:
         # looks like text is a non-text object.
         # Maybe it has a __str__ builtin ?
         # (allows to print Page, Site...)
-        text = str(text)
+        decoded_text = str(text)
 
-    logger.log(_level, text, extra=context, **kwargs)
+    logger.log(_level, decoded_text, extra=context, **kwargs)
 
 
-def output(text, decoder=None, newline=True, **kwargs):
+def output(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+           **kwargs: Any) -> None:
     r"""Output a message to the user via the userinterface.
 
     Works like print, but uses the encoding used by the user's console
@@ -126,7 +133,8 @@ def output(text, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, INFO, **kwargs)
 
 
-def stdout(text, decoder=None, newline=True, **kwargs):
+def stdout(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+           **kwargs: Any) -> None:
     """Output script results to the user via the userinterface.
 
     The text will be sent to standard output, so that it can be piped to
@@ -143,8 +151,8 @@ def stdout(text, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
 
-def warning(text: str, decoder: Optional[str] = None,
-            newline: bool = True, **kwargs):
+def warning(text: AnyStr, decoder: Optional[str] = None,
+            newline: bool = True, **kwargs: Any) -> None:
     """Output a warning message to the user via the userinterface.
 
     :param text: the message the user wants to display.
@@ -157,7 +165,8 @@ def warning(text: str, decoder: Optional[str] = None,
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
 
-def error(text, decoder=None, newline=True, **kwargs):
+def error(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+          **kwargs: Any) -> None:
     """Output an error message to the user via the userinterface.
 
     :param text: the message containing the error which occurred.
@@ -170,7 +179,8 @@ def error(text, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
 
-def log(text, decoder=None, newline=True, **kwargs):
+def log(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+        **kwargs: Any) -> None:
     """Output a record to the log file.
 
     :param text: the message which is to be logged to the log file.
@@ -183,7 +193,8 @@ def log(text, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
 
-def critical(text, decoder=None, newline=True, **kwargs):
+def critical(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+             **kwargs: Any) -> None:
     """Output a critical record to the user via the userinterface.
 
     :param text: the critical message which is to be displayed to the user.
@@ -196,10 +207,12 @@ def critical(text, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
 
-def debug(text, layer, decoder=None, newline=True, **kwargs):
+def debug(text: AnyStr, layer: str, decoder: Optional[str] = None,
+          newline: bool = True, **kwargs: Any) -> None:
     """Output a debug record to the log file.
 
     :param text: the message of the debug record to be logged to the log file.
+    :param layer: logger to record this message upon
     :param decoder: If None, text should be a unicode string else it should
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
@@ -210,7 +223,8 @@ def debug(text, layer, decoder=None, newline=True, **kwargs):
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
 
 
-def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
+def exception(msg: Optional[Exception] = None, decoder: Optional[str] = None,
+              newline: bool = True, tb: bool = False, **kwargs: Any) -> None:
     """Output an error traceback to the user via the userinterface.
 
     Use directly after an 'except' statement::
@@ -229,7 +243,8 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
 
     This function should only be called from an Exception handler.
 
-    :param msg: If not None,contains the description of the exception occurred.
+    :param msg: If not None, contains the description of the exception
+        that occurred.
     :param decoder: If None, text should be a unicode string else it should
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
@@ -238,11 +253,12 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     :param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):
-        exc_info = 1
+        exc_info = 1  # type: Any
     else:
         exc_info = sys.exc_info()
-        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],
+        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],  # type: ignore
                               str(exc_info[1]).strip())
     if tb:
         kwargs['exc_info'] = exc_info
+    assert msg is not None
     logoutput(msg, decoder, newline, ERROR, **kwargs)
