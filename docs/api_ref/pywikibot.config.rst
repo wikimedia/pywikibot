@@ -39,6 +39,8 @@ Logfile Settings
    :start-at: # ############# LOGFILE SETTINGS
    :end-before: # #############
 
+.. _external-script-path-settings:
+
 External Script Path Settings
 +++++++++++++++++++++++++++++
 

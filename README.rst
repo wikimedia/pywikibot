@@ -50,6 +50,7 @@ Or to install using PyPI (excluding scripts)
 
     pip install -U setuptools
     pip install pywikibot
+    pwb <scriptname>
 
 In addition a MediaWiki markup parser is required. Please install one of them:
 

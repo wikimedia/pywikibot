@@ -256,6 +256,11 @@ def main():
         download_url=metadata.__download_url__,
         test_suite='tests.collector',
         tests_require=test_deps,
+        entry_points={
+            'console_scripts': [
+                'pwb = pywikibot.scripts.pwb:run',
+            ],
+        },
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: Console',

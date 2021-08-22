@@ -113,6 +113,16 @@ The contents of the package
 
 
     +----------------------------+------------------------------------------------------+
+    | scripts                    | Framework helper scripts and entry points            |
+    +============================+======================================================+
+    | pwb.py                     | code entry wrapper script (site-package only)        |
+    +----------------------------+------------------------------------------------------+
+    | version.py                 | Outputs Pywikibot's revision number, Python's        |
+    |                            | version and OS used.                                 |
+    +----------------------------+------------------------------------------------------+
+
+
+    +----------------------------+------------------------------------------------------+
     | site                       | Module with classes for MediaWiki sites              |
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |

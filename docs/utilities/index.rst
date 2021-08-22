@@ -6,6 +6,11 @@ pwb wrapper script
 
 .. automodule:: pwb
 
+version script
+--------------
+
+.. automodule:: pywikibot.scripts.version
+
 generate\_family\_file script
 -----------------------------
 
