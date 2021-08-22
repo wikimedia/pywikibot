@@ -398,6 +398,8 @@ def init_handlers() -> None:
         if pywikibot.Site.__doc__ != 'TEST':  # set by aspects.DisableSiteMixin
             try:  # T286848
                 site = pywikibot.Site()
+                if site is None:  # T289427
+                    raise ValueError('Running script_test with net=False')
             except ValueError:
                 pass
             else:  # get PID
