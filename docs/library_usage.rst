@@ -1,7 +1,7 @@
 Using pywikibot as library
 --------------------------
 
-Pywikibot provides bot classes to develop your own script easily. Here 
+Pywikibot provides bot classes to develop your own script easily. Here
 is a minimal example script which shows their usage:
 
 ..  code-block:: python
@@ -40,25 +40,25 @@ is a minimal example script which shows their usage:
 
     if __name == '__main__':
         main()
-        
+
 The script can be invoked from commandline like::
 
     python mybot -site:wikipedia:test -page:Sandbox -text:"A text added to the sandbox"
-    
+
 **Explanations:**
 
 :1-3: Import necessary framework code parts
-:5:   The bot is derived from ExistingPageBot. All pages from generator 
+:5:   The bot is derived from ExistingPageBot. All pages from generator
       which does not exists are skipped.
 :7:   Every Bot has an *always* option which autoconfirms any changes if
       set to True. To expand all available options of a bot and set the
       default values of them, use `update_options` attribute or update
-      `available_options` like it is shown in BasicBot below. 
+      `available_options` like it is shown in BasicBot below.
 :12:  All changes for each page are made in this method.
 :14:  `currentpage` is the current :py:obj:`pywikibot.Page` object from
       generator.
-:15:  All bot options which are passed to the bot class when 
-      instantiating it are accessable via opt attribute. `opt.always`, 
+:15:  All bot options which are passed to the bot class when
+      instantiating it are accessable via opt attribute. `opt.always`,
       `opt.text` and `opt.summary` are all available options for this
       bot class.
 :16:  Save the changes to the live wiki.
