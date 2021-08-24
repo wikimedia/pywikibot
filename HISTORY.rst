@@ -475,6 +475,7 @@ Other changes
 * Bugfixes and improvements
 * Localisation updates
 
+.. _python2:
 
 3.0.20200703
 ------------
