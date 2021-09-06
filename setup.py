@@ -276,7 +276,6 @@ def main():
             'Topic :: Software Development :: Libraries :: Python Modules',
             'Topic :: Utilities',
         ],
-        use_2to3=False
     )
 
     # Finally show distribution version before uploading
