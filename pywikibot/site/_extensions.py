@@ -103,8 +103,7 @@ class ProofreadPageMixin:
             pirequest = self._request(
                 expiry=pywikibot.config.API_config_expiry
                 if expiry is False else expiry,
-                parameters={'action': 'query', 'meta': 'proofreadinfo',
-                            'piprop': 'namespaces|qualitylevels'}
+                parameters={'action': 'query', 'meta': 'proofreadinfo'}
             )
 
             pidata = pirequest.submit()
