@@ -1804,7 +1804,7 @@ The text message is:
                 self.site.throttle.lag(lag * retries)
                 continue
 
-            elif code == 'help' and self.action == 'help':
+            if code == 'help' and self.action == 'help':
                 # The help module returns an error result with the complete
                 # API information. As this data was requested, return the
                 # data instead of raising an exception.
