@@ -73,6 +73,9 @@ import pywikibot
 from pywikibot import config, i18n
 from pywikibot.backports import Tuple
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
+from pywikibot.pagegenerators import PreloadingGenerator
+
+CTX_ATTR = '_content_ctx'
 
 
 class NoTitleError(Exception):
@@ -104,21 +107,12 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         'showdiff': False,
     }
 
-    def init_page(self, item) -> pywikibot.Page:
-        """Get the tuple and return the page object to be processed."""
-        title, content = item
-        page = pywikibot.Page(self.site, title)
-        page.text = content.strip()
-        return super().init_page(page)
-
     def treat_page(self) -> None:
         """Upload page content."""
         page = self.current_page
         title = page.title()
         # save the content retrieved from generator
-        contents = page.text
-        # delete page's text to get it from live wiki
-        del page.text
+        contents = getattr(page, CTX_ATTR)
 
         if self.opt.summary:
             comment = self.opt.summary
@@ -195,7 +189,7 @@ class PageFromFileReader(OptionHandler):
         'title': None,
     }
 
-    def __init__(self, filename, **kwargs) -> None:
+    def __init__(self, filename, site=None, **kwargs) -> None:
         """Initializer.
 
         Check if self.file name exists. If not, ask for a new filename.
@@ -204,8 +198,9 @@ class PageFromFileReader(OptionHandler):
         """
         super().__init__(**kwargs)
         self.filename = filename
+        self.site = site or pywikibot.Site()
 
-    def __iter__(self) -> Generator[Tuple[str, str], None, None]:
+    def __iter__(self) -> Generator[pywikibot.Page, None, None]:
         """Read file and yield a tuple of page title and content."""
         pywikibot.output("\n\nReading '{}'...".format(self.filename))
         try:
@@ -235,7 +230,10 @@ class PageFromFileReader(OptionHandler):
             if length == 0:
                 break
             position += length
-            yield title, contents
+
+            page = pywikibot.Page(self.site, title)
+            setattr(page, CTX_ATTR, contents.strip())
+            yield page
 
     def findpage(self, text) -> Tuple[int, str, str]:
         """Find page to work on."""
@@ -320,8 +318,10 @@ def main(*args: str) -> None:
     if failed_filename:
         pywikibot.bot.suggest_help(missing_parameters=['-file'])
     else:
-        reader = PageFromFileReader(filename, **r_options)
-        bot = PageFromFileRobot(generator=reader, **options)
+        site = pywikibot.Site()
+        reader = PageFromFileReader(filename, site=site, **r_options)
+        reader = PreloadingGenerator(reader)
+        bot = PageFromFileRobot(generator=reader, site=site, **options)
         bot.run()
 
 
