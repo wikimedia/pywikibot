@@ -1,7 +1,10 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (no changes yet)
+* Drop piprop from meta=proofreadinfo API call (T290585)
+* Remove use_2to3 with setup.py (T290451)
+* Unify WbRepresentation's abstract method signature
+* L10N updates
 
 
 Deprecations
