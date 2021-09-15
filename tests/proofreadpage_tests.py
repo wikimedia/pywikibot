@@ -599,7 +599,7 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
             references='<references/>', div_end=div)
 
 
-@unittest.skip('T193637 and T114318')
+@unittest.skip('T181913 and T114318')
 class TestIndexPageMappings(BS4TestCase):
 
     """Test IndexPage class."""

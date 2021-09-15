@@ -4,10 +4,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import sys
 from typing import Any
 
-from pywikibot.tools import PYTHON_VERSION
-
+PYTHON_VERSION = sys.version_info[:3]
 
 # functools.cache
 if PYTHON_VERSION >= (3, 9):

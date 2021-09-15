@@ -15,7 +15,7 @@ import time
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -33,7 +33,7 @@ from pywikibot.__metadata__ import (
     __version__,
 )
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
-from pywikibot.backports import cache, removesuffix, List
+from pywikibot.backports import cache, removesuffix, Dict, List
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -69,7 +69,7 @@ from pywikibot.tools import (
 )
 from pywikibot.tools import classproperty
 from pywikibot.tools import deprecate_arg as _deprecate_arg
-from pywikibot.tools import normalize_username
+from pywikibot.tools import normalize_username, PYTHON_VERSION
 from pywikibot.tools.formatter import color_format
 
 
@@ -101,6 +101,15 @@ __all__ = (
 
 if not hasattr(sys.modules[__name__], 'argvu'):
     argvu = []  # type: List[str]
+
+
+if PYTHON_VERSION < (3, 5, 3):
+    warn("""
+Python {version} will be dropped with release 7.0 soon.
+It is recommended to use Python 3.5.3 or above.
+See T286867 for further information.
+""".format(version=sys.version.split(maxsplit=1)[0]),
+         FutureWarning)  # probably adjust the line no in utils.execute()
 
 
 class Timestamp(datetime.datetime):
@@ -288,14 +297,17 @@ class Coordinate(_WbRepresentation):
                 }
 
     @classmethod
-    def fromWikibase(cls, data: dict, site: DataSite):
+    def fromWikibase(cls, data: Dict[str, Any],
+                     site: Optional[DataSite] = None) -> 'Coordinate':
         """
         Constructor to create an object from Wikibase's JSON output.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site
-        :rtype: Coordinate
         """
+        if site is None:
+            site = Site().data_repository()
+
         globe = None
 
         if data['globe']:
@@ -634,17 +646,18 @@ class WbTime(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, wb: dict, site: Optional[DataSite] = None):
+    @_deprecate_arg('wb', 'data')
+    def fromWikibase(cls, data: Dict[str, Any],
+                     site: Optional[DataSite] = None) -> 'WbTime':
         """
         Create a WbTime from the JSON data given by the Wikibase API.
 
-        :param wb: Wikibase JSON
+        :param data: Wikibase JSON
         :param site: The Wikibase site
-        :rtype: pywikibot.WbTime
         """
-        return cls.fromTimestr(wb['time'], wb['precision'],
-                               wb['before'], wb['after'],
-                               wb['timezone'], wb['calendarmodel'], site)
+        return cls.fromTimestr(data['time'], data['precision'],
+                               data['before'], data['after'],
+                               data['timezone'], data['calendarmodel'], site)
 
 
 class WbQuantity(_WbRepresentation):
@@ -783,25 +796,26 @@ class WbQuantity(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, wb: dict, site: Optional[DataSite] = None):
+    @_deprecate_arg('wb', 'data')
+    def fromWikibase(cls, data: Dict[str, Any],
+                     site: Optional[DataSite] = None) -> 'WbQuantity':
         """
         Create a WbQuantity from the JSON data given by the Wikibase API.
 
-        :param wb: Wikibase JSON
+        :param data: Wikibase JSON
         :param site: The Wikibase site
-        :rtype: pywikibot.WbQuantity
         """
-        amount = cls._todecimal(wb['amount'])
-        upperBound = cls._todecimal(wb.get('upperBound'))
-        lowerBound = cls._todecimal(wb.get('lowerBound'))
+        amount = cls._todecimal(data['amount'])
+        upperBound = cls._todecimal(data.get('upperBound'))
+        lowerBound = cls._todecimal(data.get('lowerBound'))
         bounds_provided = (upperBound is not None and lowerBound is not None)
         error = None
         if bounds_provided or cls._require_errors(site):
             error = (upperBound - amount, amount - lowerBound)
-        if wb['unit'] == '1':
+        if data['unit'] == '1':
             unit = None
         else:
-            unit = wb['unit']
+            unit = data['unit']
         return cls(amount, unit, error, site)
 
 
@@ -834,14 +848,16 @@ class WbMonolingualText(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, wb: dict):
+    @_deprecate_arg('wb', 'data')
+    def fromWikibase(cls, data: Dict[str, Any],
+                     site: Optional[DataSite] = None) -> 'WbMonolingualText':
         """
         Create a WbMonolingualText from the JSON data given by Wikibase API.
 
-        :param wb: Wikibase JSON
-        :rtype: pywikibot.WbMonolingualText
+        :param data: Wikibase JSON
+        :param site: The Wikibase site
         """
-        return cls(wb['text'], wb['language'])
+        return cls(data['text'], data['language'])
 
 
 class _WbDataPage(_WbRepresentation):
@@ -961,6 +977,10 @@ class _WbDataPage(_WbRepresentation):
         :param site: The Wikibase site
         :rtype: pywikibot._WbDataPage
         """
+        # TODO: This method signature does not match our parent class (which
+        # takes a dictionary argument rather than a string). We should either
+        # change this method's signature or rename this method.
+
         data_site = cls._get_data_site(site)
         page = Page(data_site, page_name)
         return cls(page, site)
@@ -1051,14 +1071,16 @@ class WbUnknown(_WbRepresentation):
         return self.json
 
     @classmethod
-    def fromWikibase(cls, json: dict):
+    @_deprecate_arg('json', 'data')
+    def fromWikibase(cls, data: Dict[str, Any],
+                     site: Optional[DataSite] = None) -> 'WbUnknown':
         """
         Create a WbUnknown from the JSON data given by the Wikibase API.
 
-        :param json: Wikibase JSON
-        :rtype: pywikibot.WbUnknown
+        :param data: Wikibase JSON
+        :param site: The Wikibase site
         """
-        return cls(json)
+        return cls(data)
 
 
 _sites = {}

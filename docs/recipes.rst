@@ -10,7 +10,7 @@ Page content
   >>> page.put(new_content, summary='Bot: Test edit')
 
   See :doc:`library_usage` for more advanced samples.
-  
+
 **How to get links from summary section of page**
   >>> import pywikibot
   >>> from pwikibot import textlib

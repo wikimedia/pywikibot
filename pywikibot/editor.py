@@ -15,19 +15,22 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import List, Sequence
 
 
 try:
-    from pywikibot.userinterfaces import gui
+    from pywikibot.userinterfaces import gui  # noqa
+    GUI_ERROR = None
 except ImportError as e:
-    gui = e
+    GUI_ERROR = e
 
 
 class TextEditor:
 
     """Text editor."""
 
-    def _command(self, file_name, text, jump_index=None):
+    def _command(self, file_name: str, text: str,
+                 jump_index: Optional[int] = None) -> List[str]:
         """Return editor selected in user-config.py."""
         if jump_index:
             # Some editors make it possible to mark occurrences of substrings,
@@ -40,6 +43,7 @@ class TextEditor:
             line = column = 0
         # Linux editors. We use startswith() because some users might use
         # parameters.
+        assert config.editor is not None
         if config.editor.startswith('kate'):
             command = ['-l', str(line + 1), '-c', str(column + 1)]
         elif config.editor.startswith('gedit'):
@@ -64,7 +68,7 @@ class TextEditor:
         return command
 
     @staticmethod
-    def _concat(command):
+    def _concat(command: Sequence[str]) -> str:
         return ' '.join("'{}'".format(part) if ' ' in part else part
                         for part in command)
 
@@ -105,13 +109,15 @@ class TextEditor:
                 os.close(handle)
                 os.unlink(tempFilename)
 
-        if isinstance(gui, ImportError):
+        if GUI_ERROR:
             raise ImportError(fill(
                 'Could not load GUI modules: {}. No editor available. '
                 'Set your favourite editor in user-config.py "editor", '
                 'or install python packages tkinter and idlelib, which '
                 'are typically part of Python but may be packaged separately '
-                'on your platform.'.format(gui)) + '\n')
+                'on your platform.'.format(GUI_ERROR)) + '\n')
+
+        assert pywikibot.ui is not None
 
         return pywikibot.ui.editText(text, jumpIndex=jumpIndex,
                                      highlight=highlight)

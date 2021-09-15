@@ -2,4 +2,3 @@ Credits
 =======
 
 .. include:: ../CREDITS.rst
-

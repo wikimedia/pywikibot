@@ -7,17 +7,24 @@
 import itertools
 import threading
 from collections import Counter
-from typing import Optional
+from typing import Any, Optional
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import Dict, List, Set
 from pywikibot.tools import ModuleDeprecationWrapper
 
+FOUND_IN_TYPE = Dict['pywikibot.page.Page', List['pywikibot.page.Page']]
+
+# TODO: replace these after T286867
+
+OPT_PAGE_TYPE = Any  # Optional['pywikibot.page.Page']
 
 try:
     import pydot
+    PYDOT_ERROR = None
 except ImportError as e:
-    pydot = e
+    PYDOT_ERROR = e
 
 
 class GraphSavingThread(threading.Thread):
@@ -33,13 +40,14 @@ class GraphSavingThread(threading.Thread):
     mechanism to kill a thread if it takes too long.
     """
 
-    def __init__(self, graph, origin):
+    def __init__(self, graph: 'pydot.Dot',
+                 origin: 'pywikibot.page.Page') -> None:
         """Initializer."""
         super().__init__()
         self.graph = graph
         self.origin = origin
 
-    def run(self):
+    def run(self) -> None:
         """Write graphs to the data directory."""
         for fmt in config.interwiki_graph_formats:
             filename = config.datafilepath(
@@ -54,11 +62,10 @@ class Subject:
 
     """Data about a page with translations on multiple wikis."""
 
-    def __init__(self, origin=None):
+    def __init__(self, origin: OPT_PAGE_TYPE = None) -> None:
         """Initializer.
 
         :param origin: the page on the 'origin' wiki
-        :type origin: pywikibot.page.Page
         """
         # Remember the "origin page"
         self._origin = origin
@@ -67,17 +74,17 @@ class Subject:
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.found_in = {}
+        self.found_in = {}  # type: FOUND_IN_TYPE
         if origin:
             self.found_in = {origin: []}
 
     @property
-    def origin(self):
+    def origin(self) -> OPT_PAGE_TYPE:
         """Page on the origin wiki."""
         return self._origin
 
     @origin.setter
-    def origin(self, value):
+    def origin(self, value: OPT_PAGE_TYPE) -> None:
         self._origin = value
 
 
@@ -85,24 +92,24 @@ class GraphDrawer:
 
     """Graphviz (dot) code creator."""
 
-    def __init__(self, subject):
+    def __init__(self, subject: 'pywikibot.interwiki_graph.Subject') -> None:
         """Initializer.
 
         :param subject: page data to graph
-        :type subject: pywikibot.interwiki_graph.Subject
 
         :raises ImportError if pydot is not installed
         """
-        if isinstance(pydot, ImportError):
-            raise ImportError('pydot is not installed: {}.'.format(pydot))
-        self.graph = None
+        if PYDOT_ERROR:
+            msg = 'pydot is not installed: {}.'.format(PYDOT_ERROR)
+            raise ImportError(msg)
+        self.graph = None  # type: Optional[pydot.Dot]
         self.subject = subject
 
-    def getLabel(self, page):
+    def getLabel(self, page: 'pywikibot.page.Page') -> str:
         """Get label for page."""
         return '"{}:{}"'.format(page.site.code, page.title())
 
-    def _octagon_site_set(self):
+    def _octagon_site_set(self) -> Set['pywikibot.site.BaseSite']:
         """Build a list of sites with more than one valid page."""
         page_list = self.subject.found_in.keys()
 
@@ -114,8 +121,9 @@ class GraphDrawer:
             lambda x: x[1] > 1,
             Counter(each_site).most_common())}
 
-    def addNode(self, page):
+    def addNode(self, page: 'pywikibot.page.Page') -> None:
         """Add a node for page."""
+        assert self.graph is not None
         node = pydot.Node(self.getLabel(page), shape='rectangle')
         node.set_URL('"http://{}{}"'
                      .format(page.site.hostname(),
@@ -137,8 +145,10 @@ class GraphDrawer:
             node.set_shape('octagon')
         self.graph.add_node(node)
 
-    def addDirectedEdge(self, page, refPage):
+    def addDirectedEdge(self, page: 'pywikibot.page.Page',
+                        refPage: 'pywikibot.page.Page') -> None:
         """Add a directed edge from refPage to page."""
+        assert self.graph is not None
         # if page was given as a hint, referrers would be [None]
         if refPage is not None:
             sourceLabel = self.getLabel(refPage)
@@ -174,12 +184,13 @@ class GraphDrawer:
                     edge.set_color('green')
                 self.graph.add_edge(edge)
 
-    def saveGraphFile(self):
+    def saveGraphFile(self) -> None:
         """Write graphs to the data directory."""
+        assert self.graph is not None
         thread = GraphSavingThread(self.graph, self.subject.origin)
         thread.start()
 
-    def createGraph(self):
+    def createGraph(self) -> None:
         """
         Create graph of the interwiki links.
 
@@ -206,12 +217,12 @@ class GraphDrawer:
         self.saveGraphFile()
 
 
-def getFilename(page, extension: Optional[str] = None) -> str:
+def getFilename(page: 'pywikibot.page.Page',
+                extension: Optional[str] = None) -> str:
     """
     Create a filename that is unique for the page.
 
     :param page: page used to create the new filename
-    :type page: pywikibot.page.Page
     :param extension: file extension
     :return: filename of <family>-<lang>-<page>.<ext>
     """

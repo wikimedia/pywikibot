@@ -4,18 +4,18 @@ Pywikibot Documentation
 Welcome! This is the documentation for Pywikibot |release|.
 
 **Pywikibot** is a Python library and collection of tools that automate work
-on `MediaWiki <https://mediawiki.org>`_ sites. Originally designed for 
+on `MediaWiki <https://mediawiki.org>`_ sites. Originally designed for
 Wikipedia, it is now used throughout the Wikimedia Foundation's projects and
 on many other MediaWiki wikis.
 
 The project started in 2003 and is currently on core version |version|.
 It features full API usage and is up-to-date with new MediaWiki features and
-a Pythonic package layout. But it also works with older installations of 
+a Pythonic package layout. But it also works with older installations of
 MediaWiki 1.23 or higher.
 
-Pywikibot supports Microsoft Windows, macOS and Linux when used with a 
+Pywikibot supports Microsoft Windows, macOS and Linux when used with a
 compatible version of Python. It should also work on any other operating
-system that has a compatible version of Python installed. To check 
+system that has a compatible version of Python installed. To check
 whether you have Python installed and to find its version, just type
 ``python`` at the CMD or shell prompt.
 

@@ -1,6 +1,6 @@
 tools package
 =============
- 
+
 .. automodule:: pywikibot.tools
 
 tools.chars module

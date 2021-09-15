@@ -1,5 +1,12 @@
 # Schripts Changelog
 
+## 6.6.0
+*15 September 2021*
+
+
+### add_text
+* Add -major flag to disable minor edit flag when saving
+
 ## 6.5.0
 *05 August 2021*
 

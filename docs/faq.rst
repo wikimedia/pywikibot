@@ -10,13 +10,13 @@ Frequent Asked Questions
      for wikibase entities and :py:mod:`DequePreloadingGenerator
      <pywikibot.pagegenerators.DequePreloadingGenerator>` for a
      :py:mod:`DequeGenerator <pywikibot.tools.DequeGenerator>`.
-  3. If you use :py:mod:`GeneratorFactory 
+  3. If you use :py:mod:`GeneratorFactory
      <pywikibot.pagegenerators.GeneratorFactory>` with your bot and use its
      :py:mod:`getCombinedGenerator
      <pywikibot.pagegenerators.GeneratorFactory.getCombinedGenerator>` method
      you can set ``preload=True`` to preload page content. This is an alternate
      to the ``PreloadingGenerator`` function mentioned above.
-  4. Use :py:mod:`MySQLPageGenerator 
+  4. Use :py:mod:`MySQLPageGenerator
      <pywikibot.pagegenerators.MySQLPageGenerator >` if direct DB access is
      available and appropriate. See also: `MySQL`_
 

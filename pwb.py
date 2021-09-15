@@ -190,8 +190,9 @@ def check_modules(script=None):
                              for num in setuptools.__version__.split('.'))
         if setupversion < (20, 8, 1):
             # print the minimal requirement
-            _print_requirements(['setuptools==20.8.1'], None, 'outdated')
-            return
+            _print_requirements(['setuptools==20.8.1'], None,
+                                'outdated ({})'.format(setuptools.__version__))
+            return False
         raise e
 
     if script:

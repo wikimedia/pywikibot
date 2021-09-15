@@ -21,6 +21,8 @@ Furthermore, the following command line parameters are supported:
 -always           If used, the bot won't ask if it should add the specified
                   text
 
+-major            If used, the edit will be saved without the "minor edit" flag
+
 -talkpage         Put the text onto the talk page instead
 -talk
 
@@ -87,6 +89,7 @@ DEFAULT_ARGS = {
     'summary': '',
     'up': False,
     'always': False,
+    'minor': True,
     'talk_page': False,
     'reorder': True,
     'regex_skip_url': '',
@@ -361,7 +364,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
             text = textlib.add_text(text, self.opt.text,
                                     site=self.current_page.site)
 
-        self.put_current(text, summary=self.opt.summary)
+        self.put_current(text, summary=self.opt.summary, minor=self.opt.minor)
 
 
 def main(*argv: Tuple[str, ...]) -> None:
@@ -419,6 +422,8 @@ def parse(argv: Tuple[str, ...],
             args['reorder'] = False
         elif option == '-excepturl':
             args['regex_skip_url'] = value
+        elif option == '-major':
+            args['minor'] = False
         else:
             raise ValueError("Argument '{}' is unrecognized".format(option))
 
