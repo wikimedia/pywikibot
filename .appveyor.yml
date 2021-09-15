@@ -15,8 +15,8 @@ environment:
 
     # Test the lowest supported release of each major Python version
 
-    - PYTHON: "C:\\Python350-x64"
-      PYTHON_VERSION: "3.5.0"
+    - PYTHON: "C:\\Python353-x64"
+      PYTHON_VERSION: "3.5.3"
       PYTHON_ARCH: "64"
 
     # Appveyor pre-installs these versions onto build machines
@@ -72,7 +72,7 @@ install:
   - git submodule update --init
   # Download the Appveyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
-  # Download Python 3.5.0 which isn't pre-installed
+  # Download Python 3.5.3 which isn't pre-installed
   - ps: ./appveyor_install.ps1
   - python --version
   - python -c "import struct; print('PYTHON_ARCH' + chr(58), struct.calcsize('P') << 3)"
