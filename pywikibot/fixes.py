@@ -678,7 +678,7 @@ fixes = {
 }
 
 
-def _load_file(filename):
+def _load_file(filename: str) -> bool:
     """Load the fixes from the given filename."""
     if os.path.exists(filename):
         # load binary, to let compile decode it according to the file header
