@@ -11,7 +11,6 @@ and return a unicode string.
 # Distributed under the terms of the MIT license.
 #
 import datetime
-import html
 import re
 from collections import OrderedDict, namedtuple
 from collections.abc import Sequence
@@ -25,11 +24,7 @@ from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import (
-    deprecate_arg,
-    deprecated,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecate_arg, issue_deprecation_warning
 
 
 try:
@@ -153,12 +148,6 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
         for i, digit in enumerate(digits):
             phrase = phrase.replace(str(i), digit)
     return phrase
-
-
-@deprecated('html.unescape', since='20210405')
-def unescape(s: str) -> str:
-    """Replace escaped HTML-special characters by their originals."""
-    return html.unescape(s)
 
 
 class MultiTemplateMatchBuilder:
