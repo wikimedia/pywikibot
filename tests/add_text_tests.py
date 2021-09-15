@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Test add_text bot module."""
+"""Test add_text script."""
 #
 # (C) Pywikibot team, 2016-2022
 #
@@ -29,9 +29,9 @@ def _mock_page(exists=True, redirect=False, talk=False, url='wikipedia.org'):
     return page
 
 
-class TestAdding(TestCase):
+class TestAddTextScript(TestCase):
 
-    """Test adding text."""
+    """Test add_text script."""
 
     family = 'wikipedia'
     code = 'en'
