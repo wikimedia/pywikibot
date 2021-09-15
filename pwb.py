@@ -52,15 +52,21 @@ def check_pwb_versions(package):
               'misconfigured.\n'.format(wikibot_version, scripts_version))
 
     # calculate previous minor release
-    prev_wikibot = Version('{v.major}.{}.{v.micro}'
-                           .format(wikibot_version.minor - 1,
-                                   v=wikibot_version,))
+    if wikibot_version.minor > 0:
+        prev_wikibot = Version('{v.major}.{}.{v.micro}'
+                               .format(wikibot_version.minor - 1,
+                                       v=wikibot_version))
 
-    if scripts_version.release < prev_wikibot.release:
-        print('WARNING: Scripts package version {} is behind legacy Pywikibot '
-              'version {} and current version {}\nYour scripts may need an '
-              'update or be misconfigured.\n'
-              .format(scripts_version, prev_wikibot, wikibot_version, ))
+        if scripts_version.release < prev_wikibot.release:
+            print('WARNING: Scripts package version {} is behind legacy '
+                  'Pywikibot version {} and current version {}\nYour scripts '
+                  'may need an update or be misconfigured.\n'
+                  .format(scripts_version, prev_wikibot, wikibot_version))
+    elif scripts_version.release < wikibot_version.release:
+        print('WARNING: Scripts package version {} is behind current version '
+              '{}\nYour scripts may need an update or be misconfigured.\n'
+              .format(scripts_version, wikibot_version))
+
     del Version
 
 

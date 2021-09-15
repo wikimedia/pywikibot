@@ -1,6 +1,16 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.6.0
+-----
+*15 September 2021*
+
+* Drop piprop from meta=proofreadinfo API call (T290585)
+* Remove use_2to3 with setup.py (T290451)
+* Unify WbRepresentation's abstract method signature
+* L10N updates
+
+
 6.5.0
 -----
 *05 August 2021*
