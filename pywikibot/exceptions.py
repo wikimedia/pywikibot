@@ -153,7 +153,8 @@ UserWarning: warnings targeted at users
   - ArgumentDeprecationWarning: command line argument problems
   - FamilyMaintenanceWarning: missing information in family definition
 
-*Changed in version 6.0:* exceptions were renamed and are ending with "Error".
+.. versionchanged:: 6.0
+   exceptions were renamed and are ending with "Error".
 """
 #
 # (C) Pywikibot team, 2008-2021
@@ -161,11 +162,10 @@ UserWarning: warnings targeted at users
 # Distributed under the terms of the MIT license.
 #
 import re
-import sys
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -680,39 +680,3 @@ class TimeoutError(Error):
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
-
-
-DEPRECATED_EXCEPTIONS = {
-    'NoUsername': 'NoUsernameError',
-    'NoPage': 'NoPageError',
-    'UnsupportedPage': 'UnsupportedPageError',
-    'NoMoveTarget': 'NoMoveTargetError',
-    'InconsistentTitleReceived': 'InconsistentTitleError',
-    'UnknownSite': 'UnknownSiteError',
-    'UnknownFamily': 'UnknownFamilyError',
-    'UnknownExtension': 'UnknownExtensionError',
-    'IsRedirectPage': 'IsRedirectPageError',
-    'IsNotRedirectPage': 'IsNotRedirectPageError',
-    'CircularRedirect': 'CircularRedirectError',
-    'InterwikiRedirectPage': 'InterwikiRedirectPageError',
-    'InvalidTitle': 'InvalidTitleError',
-    'LockedPage': 'LockedPageError',
-    'LockedNoPage': 'LockedNoPageError',
-    'CascadeLockedPage': 'CascadeLockedPageError',
-    'EditConflict': 'EditConflictError',
-    'PageDeletedConflict': 'PageDeletedConflictError',
-    'PageCreatedConflict': 'PageCreatedConflictError',
-    'ArticleExistsConflict': 'ArticleExistsConflictError',
-    'AutoblockUser': 'AutoblockUserError',
-    'NoWikibaseEntity': 'NoWikibaseEntityError',
-    'CoordinateGlobeUnknownException': 'CoordinateGlobeUnknownError',
-    'EntityTypeUnknownException': 'EntityTypeUnknownError',
-}
-
-wrapper = ModuleDeprecationWrapper(__name__)
-module = sys.modules[__name__]
-
-for old_name, new_name in DEPRECATED_EXCEPTIONS.items():
-    setattr(module, old_name, getattr(module, new_name))
-    wrapper.add_deprecated_attr(old_name, replacement_name=new_name,
-                                since='20210423')
