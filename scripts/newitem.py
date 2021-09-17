@@ -20,7 +20,7 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -88,9 +88,8 @@ class NewItemRobot(WikidataBot, NoRedirectPageBot):
         except LockedPageError:
             pywikibot.error('Page {} is locked.'.format(
                 page.title(as_link=True)))
-        except PageSaveRelatedError:
-            pywikibot.error('Page {} not saved.'.format(
-                page.title(as_link=True)))
+        except PageSaveRelatedError as e:
+            pywikibot.error('Page {} not saved:\n{}'.format(page, e.args))
 
     def _callback(self, page, exc) -> None:
         if exc is None and self.opt.touch:
