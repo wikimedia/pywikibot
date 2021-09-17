@@ -7,6 +7,7 @@
 from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
+from pywikibot.tools import MediaWikiVersion
 from pywikibot.site import TokenWallet
 from tests.aspects import DefaultSiteTestCase, TestCase, TestCaseBase, unittest
 
@@ -45,31 +46,36 @@ class TestSiteTokens(DefaultSiteTestCase):
                 .format(self.mysite, self._version))
 
         self.mysite.version = lambda: test_version
+        del self.mysite._mw_version_time  # remove cached mw_version
 
-        for ttype in ('edit', 'move', 'delete', 'patrol', additional_token):
-            tokentype = self.mysite.validate_tokens([ttype])
+        redirected_tokens = ['edit', 'move', 'delete']
+        for ttype in redirected_tokens + ['patrol', additional_token]:
             try:
                 token = self.mysite.tokens[ttype]
             except Error as error_msg:
-                if tokentype:
-                    self.assertRegex(
-                        str(error_msg),
-                        "Action '[a-z]+' is not allowed "
-                        'for user .* on .* wiki.')
-                    # test __contains__
-                    self.assertNotIn(tokentype[0], self.mysite.tokens)
+                if self.mysite.validate_tokens([ttype]):
+                    pattern = ("Action '[a-z]+' is not allowed "
+                               'for user .* on .* wiki.')
                 else:
-                    self.assertRegex(
-                        str(error_msg),
-                        "Requested token '[a-z]+' is invalid on .* wiki.")
+                    pattern = "Requested token '[a-z]+' is invalid on .* wiki."
+
+                self.assertRegex(str(error_msg), pattern)
+
             else:
                 self.assertIsInstance(token, str)
                 self.assertEqual(token, self.mysite.tokens[ttype])
                 # test __contains__
-                self.assertIn(tokentype[0], self.mysite.tokens)
+                if test_version < '1.24wmf19':
+                    self.assertIn(ttype, self.mysite.tokens)
+                elif ttype in redirected_tokens:
+                    self.assertEqual(self.mysite.tokens[ttype],
+                                     self.mysite.tokens['csrf'])
 
     def test_tokens_in_mw_123_124wmf18(self):
         """Test ability to get page tokens."""
+        if MediaWikiVersion(self.orig_version()) >= '1.37wmf24':
+            self.skipTest('Site {} version {} is too new for this tests.'
+                          .format(self.mysite, self._version))
         self._test_tokens('1.23', '1.24wmf18', 'deleteglobalaccount')
 
     def test_tokens_in_mw_124wmf19(self):
