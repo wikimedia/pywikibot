@@ -207,14 +207,13 @@ def showQuest(page):
         editor.edit(page.text)
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and perform task.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     # Loading the comments
     global categoryToCheck, project_inserted

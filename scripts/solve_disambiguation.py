@@ -84,7 +84,7 @@ import os
 import re
 from contextlib import suppress
 from itertools import chain
-from typing import Generator, Optional, Tuple
+from typing import Generator, Optional
 
 import pywikibot
 from pywikibot import config
@@ -1382,7 +1382,7 @@ or press enter to quit:""")
         self.opt.pos = []
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

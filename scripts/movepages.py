@@ -171,7 +171,7 @@ class MovePagesBot(CurrentPageBot):
                 self.moveOne(page, newPageTitle)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

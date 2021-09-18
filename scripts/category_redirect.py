@@ -36,7 +36,6 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import (
     CircularRedirectError,
@@ -493,7 +492,7 @@ class CategoryRedirectBot(SingleSiteBot):
             edit_request_page.save(comment)
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

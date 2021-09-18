@@ -9,7 +9,6 @@ import copy
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.tools.formatter import color_format
 
@@ -157,7 +156,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             self.put_current(text, summary=summary)
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

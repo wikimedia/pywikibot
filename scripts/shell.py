@@ -13,7 +13,7 @@ Usage:
 
 If no arguments are given, the pywikibot library will not be loaded.
 """
-# (C) Pywikibot team, 2014-2020
+# (C) Pywikibot team, 2014-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,7 +21,7 @@ import code
 import sys
 
 
-def main(*args):
+def main(*args: str) -> None:
     """Script entry point."""
     args = list(args)
     if '-noimport' in args:

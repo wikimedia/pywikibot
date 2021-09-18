@@ -656,14 +656,13 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         super().treat(page)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     options = {}  # type: Dict[str, Any]
     gen_options = {}  # type: Dict[str, Any]

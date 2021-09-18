@@ -52,7 +52,7 @@ The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -95,14 +95,13 @@ def get_chunk_size(match) -> int:
     return chunk_size
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     url = ''
     description = []

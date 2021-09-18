@@ -346,14 +346,13 @@ class HarvestRobot(WikidataBot):
                     item, claim, exists_arg, page.site, pywikibot.output)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     template_title = None
 

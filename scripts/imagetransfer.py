@@ -328,14 +328,13 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         return True
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     target_code = None
     target_family = None

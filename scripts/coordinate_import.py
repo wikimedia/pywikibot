@@ -44,7 +44,6 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.exceptions import CoordinateGlobeUnknownError
 
 
@@ -142,7 +141,7 @@ class CoordImportRobot(WikidataBot):
             return True
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

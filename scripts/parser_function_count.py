@@ -43,7 +43,7 @@ Should you specify neither first nor atleast, all templates using parser
 functions will be listed.
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -176,7 +176,7 @@ class ParserFunctionCountBot(SingleSiteBot,
                          summary=self.summary)
 
 
-def main(*args):
+def main(*args: str) -> None:
     """Process command line arguments and invoke ParserFunctionCountBot."""
     local_args = pywikibot.handle_args(*args)
     options = {}

@@ -20,7 +20,7 @@ Options:
 -onlynew : Only run on pages that do not yet have a category.
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -89,7 +89,7 @@ def make_categories(page, list: list, site=None):
              summary=i18n.twtranslate(site, 'catall-changing'))
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and perform task.
 

@@ -36,7 +36,6 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Tuple
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
@@ -119,7 +118,7 @@ class DjVuTextBot(SingleSiteBot):
             self.userPut(page, old_text, new_text, summary=self.opt.summary)
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

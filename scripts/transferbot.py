@@ -58,14 +58,13 @@ from pywikibot.i18n import twtranslate
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     local_args = pywikibot.handle_args(args)
 

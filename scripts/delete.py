@@ -59,7 +59,7 @@ import collections
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import DefaultDict, Set, Tuple
+from pywikibot.backports import DefaultDict, Set
 from pywikibot.bot import CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
@@ -216,7 +216,7 @@ class DeletionRobot(CurrentPageBot):
                                      automatic_quit=True)
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

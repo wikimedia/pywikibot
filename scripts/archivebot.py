@@ -819,14 +819,13 @@ class PageArchiver:
             self.page.update(comment)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     filename = None
     pagename = None

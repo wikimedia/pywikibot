@@ -53,7 +53,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -140,14 +140,13 @@ def check_protection_level(operation, level, levels, default=None):
     return levels[first_char.index(choice)]
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     options = {}
     message_properties = {}

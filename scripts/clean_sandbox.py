@@ -47,7 +47,6 @@ import time
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot.exceptions import EditConflictError, NoPageError
 
@@ -261,7 +260,7 @@ class SandboxBot(Bot, ConfigParserBot):
                 pywikibot.sleep(self.opt.hours * 60 * 60)
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
