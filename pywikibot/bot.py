@@ -178,7 +178,6 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     redirect_func,
     remove_last_args,
-    suppress_warnings,
 )
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
@@ -1193,12 +1192,6 @@ class OptionHandler:
         """
         self.set_options(**kwargs)
 
-    @property  # type: ignore[misc]
-    @deprecated('available_options', since='20201006')
-    def availableOptions(self) -> Dict[str, Any]:
-        """DEPRECATED. Options that are available."""
-        return self.available_options
-
     @deprecated('set_options', since='20201006')
     def setOptions(self, **options: Any) -> None:  # pragma: no cover
         """DEPRECATED. Set the instance options."""
@@ -1206,15 +1199,6 @@ class OptionHandler:
 
     def set_options(self, **options: Any) -> None:
         """Set the instance options."""
-        warning = 'pywikibot.bot.OptionHandler.availableOptions'
-        with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
-                               category=FutureWarning):
-            old_options = self.availableOptions is not self.available_options
-        if old_options:  # old options were set and not updated
-            self.available_options = self.availableOptions
-            issue_deprecation_warning(warning, 'available_options',
-                                      since='20201006')
-
         valid_options = set(self.available_options)
         received_options = set(options)
 
