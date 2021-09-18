@@ -1383,7 +1383,7 @@ def main(*args: str) -> None:
             showimages = True
         elif option == 'summary':
             summary = value
-        elif option == '-match':
+        elif option == 'match':
             title_regex = value or pywikibot.input(
                 'Which regular expression should affected objects match?')
         elif option == 'talkpages':
