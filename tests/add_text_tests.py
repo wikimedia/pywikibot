@@ -176,6 +176,16 @@ class TestAdding(TestCase):
             "mock_page doesn't exist, creating it!"
         ], pywikibot.bot.ui.pop_output())
 
+    def test_skip_missing_standard_with_create(self):
+        """Exercise skip_page() with -create option for a non-talk page."""
+        bot = AddTextBot(create=True)
+        for exists in (True, False):
+            with self.subTest(exists=exists):
+                page = _mock_page(exists=exists)
+
+                self.assertFalse(bot.skip_page(page))
+                self.assertIsEmpty(pywikibot.bot.ui.pop_output())
+
     def test_skip_if_redirect(self):
         """Exercise skip_page() with a page that is a redirect."""
         bot = AddTextBot()
