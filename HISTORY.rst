@@ -1,6 +1,15 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.6.1
+-----
+*21 September 2021*
+
+* Fix for removed action API token parameters of MediaWiki 1.37 (T291202)
+* APISite.validate_tokens() no longer replaces outdated tokens (T291202)
+* L10N updates
+
+
 6.6.0
 -----
 *15 September 2021*
