@@ -113,7 +113,6 @@ from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import NoPageError
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated_args
 
 
 class Photo(pywikibot.FilePage):
@@ -158,7 +157,6 @@ class Photo(pywikibot.FilePage):
             self.contents = io.BytesIO(imageFile)
         return self.contents
 
-    @deprecated_args(site=True)
     def findDuplicateImages(self):
         """
         Find duplicates of the photo.
@@ -218,8 +216,7 @@ class DataIngestionBot(pywikibot.Bot):
 
     """Data ingestion bot."""
 
-    def __init__(self, reader, titlefmt: str, pagefmt: str,
-                 site='deprecated_default_commons'):
+    def __init__(self, titlefmt: str, pagefmt: str, **kwargs):
         """
         Initializer.
 
@@ -227,19 +224,8 @@ class DataIngestionBot(pywikibot.Bot):
         :type reader: Photo page generator
         :param titlefmt: Title format
         :param pagefmt: Page format
-        :param site: Target site for image upload.
-            Use None to determine the site from the pages treated.
-            Defaults to 'deprecated_default_commons' to use Wikimedia Commons
-            for backwards compatibility reasons. Deprecated.
-        :type site: pywikibot.site.APISite, 'deprecated_default_commons' or
-            None
         """
-        if site == 'deprecated_default_commons':
-            warn("site='deprecated_default_commons' is deprecated; "
-                 'please specify a site or use site=None',
-                 DeprecationWarning, 2)
-            site = pywikibot.Site('commons', 'commons')
-        super().__init__(generator=reader, site=site)
+        super().__init__(**kwargs)
 
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
@@ -354,10 +340,9 @@ def main(*args: str):
                                   dialect=configuration['csvDialect'],
                                   delimiter=str(configuration['csvDelimiter']))
 
-                bot = DataIngestionBot(files,
-                                       configuration['titleFormat'],
+                bot = DataIngestionBot(configuration['titleFormat'],
                                        configuration['formattingTemplate'],
-                                       site=None)
+                                       generator=files)
                 bot.run()
 
 
