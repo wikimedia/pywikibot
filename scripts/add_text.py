@@ -69,13 +69,14 @@ from typing import Union
 import pywikibot
 
 from pywikibot import config, pagegenerators, textlib
-from pywikibot.backports import Dict, Tuple
+from pywikibot.backports import Dict, Sequence
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
     NoRedirectPageBot,
 )
 
+ARGS_TYPE = Dict[str, Union[bool, str]]
 DEFAULT_ARGS = {
     'text': '',
     'textfile': '',
@@ -88,7 +89,7 @@ DEFAULT_ARGS = {
     'talk_page': False,
     'reorder': True,
     'regex_skip_url': '',
-}
+}  # type: ARGS_TYPE
 
 ARG_PROMPT = {
     '-text': 'What text do you want to add?',
@@ -198,9 +199,9 @@ def main(*argv: str) -> None:
     bot.run()
 
 
-def parse(argv: Tuple[str, ...],
+def parse(argv: Sequence[str],
           generator_factory: pagegenerators.GeneratorFactory
-          ) -> Dict[str, Union[bool, str]]:
+          ) -> ARGS_TYPE:
     """
     Parses our arguments and provide a named tuple with their values.
 
