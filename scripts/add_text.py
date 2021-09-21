@@ -18,6 +18,11 @@ Furthermore, the following command line parameters are supported:
 
 -up               If used, put the text at the top of the page
 
+-create           Create the page if necessary. Note that talk pages are
+                  created already without of this option.
+
+-createonly       Only create the page but do not edit existing ones
+
 -always           If used, the bot won't ask if it should add the specified
                   text
 
@@ -88,6 +93,8 @@ DEFAULT_ARGS = {
     'textfile': '',
     'summary': '',
     'up': False,
+    'create': False,
+    'createonly': False,
     'always': False,
     'minor': True,
     'talk_page': False,
@@ -109,7 +116,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 @deprecated('Page.text, NoRedirectPageBot class and BaseBot.skip_page() '
             '(see add_text.AddTextBot for example)', since='6.4.0')
 def get_text(page: pywikibot.page.BasePage, old: Optional[str],
-             create: bool) -> str:
+             create: bool) -> Optional[str]:
     """
     Get text on page. If old is not None, return old.
 
@@ -336,18 +343,28 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
 
     def skip_page(self, page):
         """Skip if -exceptUrl matches or page does not exists."""
-        if page.exists() and self.opt.regex_skip_url:
-            url = page.full_url()
-            result = re.findall(self.opt.regex_skip_url, page.site.getUrl(url))
-
-            if result:
-                pywikibot.warning(
-                    'Skipping {page} because -excepturl matches {result}.'
-                    .format(page=page, result=result))
+        if page.exists():
+            if self.opt.createonly:
+                pywikibot.warning('Skipping because {page} already exists'
+                                  .format(page=page))
                 return True
 
-        if page.isTalkPage() and not page.exists():
+            if self.opt.regex_skip_url:
+                url = page.full_url()
+                result = re.findall(self.opt.regex_skip_url,
+                                    page.site.getUrl(url))
+
+                if result:
+                    pywikibot.warning(
+                        'Skipping {page} because -excepturl matches {result}.'
+                        .format(page=page, result=result))
+                    return True
+
+        elif page.isTalkPage():
             pywikibot.output("{} doesn't exist, creating it!".format(page))
+            return False
+
+        elif self.opt.create:
             return False
 
         return super().skip_page(page)
@@ -393,7 +410,7 @@ def main(*argv: str) -> None:
 
 def parse(argv: Tuple[str, ...],
           generator_factory: pagegenerators.GeneratorFactory
-          ) -> Dict[str, str]:
+          ) -> Dict[str, Union[bool, str]]:
     """
     Parses our arguments and provide a named tuple with their values.
 
@@ -414,7 +431,7 @@ def parse(argv: Tuple[str, ...],
 
         if option in ('-text', '-textfile', '-summary'):
             args[option[1:]] = value
-        elif option in ('-up', '-always'):
+        elif option in ('-up', '-always', '-create', 'createonly'):
             args[option[1:]] = True
         elif option in ('-talk', '-talkpage'):
             args['talk_page'] = True

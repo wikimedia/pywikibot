@@ -1895,7 +1895,8 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     parameters for the translated message.
     """
 
-    summary_key = None  # must be defined in subclasses
+    #: Must be defined in subclasses.
+    summary_key = None  # type: Optional[str]
 
     @property
     def summary_parameters(self) -> Dict[str, str]:
