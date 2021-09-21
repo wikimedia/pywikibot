@@ -1294,28 +1294,14 @@ class APISite(
 
         return page._redirtarget
 
-    def validate_tokens(self, types: List[str]):
+    def validate_tokens(self, types: List[str]) -> List[str]:
         """Validate if requested tokens are acceptable.
 
         Valid tokens depend on mw version.
         """
-        mw_ver = self.mw_version
-        if mw_ver < '1.24wmf19':
-            types_wiki = self._paraminfo.parameter('tokens', 'type')['type']
-            valid_types = [token for token in types if token in types_wiki]
-        else:
-            types_wiki_old = self._paraminfo.parameter('query+info',
-                                                       'token')['type']
-            types_wiki_action = self._paraminfo.parameter('tokens',
-                                                          'type')['type']
-            types_wiki = self._paraminfo.parameter('query+tokens',
-                                                   'type')['type']
-            valid_types = [token for token in types if token in types_wiki]
-            for token in types:
-                if (token in types_wiki_old or token in types_wiki_action) \
-                   and token not in valid_types:
-                    valid_types.append('csrf')
-        return valid_types
+        query = 'tokens' if self.mw_version < '1.24wmf19' else 'query+tokens'
+        token_types = self._paraminfo.parameter(query, 'type')['type']
+        return [token for token in types if token in token_types]
 
     def get_tokens(self, types: List[str], all: bool = False) -> dict:
         """Preload one or multiple tokens.
@@ -1327,7 +1313,9 @@ class APISite(
         the parameter is not known it will default to the 'csrf' token.
 
         The other token types available are:
+         - createaccount
          - deleteglobalaccount
+         - login
          - patrol
          - rollback
          - setglobalaccountstatus
