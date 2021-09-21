@@ -303,7 +303,7 @@ class DataIngestionBot(pywikibot.Bot):
         return configuration
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and invoke bot.
 

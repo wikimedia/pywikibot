@@ -206,14 +206,13 @@ class TemplateRobot(ReplaceBot):
             summary=self.opt.summary)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     template_names = []
     templates = {}

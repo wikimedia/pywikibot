@@ -20,7 +20,7 @@ Command line options:
              user-config.py
 """
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -99,14 +99,13 @@ def refresh_new():
             refresh(site)
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     opt_all = False
     opt_new = False

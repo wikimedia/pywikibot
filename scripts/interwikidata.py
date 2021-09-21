@@ -213,14 +213,13 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return target_item
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()

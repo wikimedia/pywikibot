@@ -26,7 +26,7 @@ Command line options:
 # Distributed under the terms of the MIT license.
 #
 from itertools import chain
-from typing import Generator, Tuple
+from typing import Generator
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -146,7 +146,7 @@ class MisspellingRobot(BaseDisambigBot):
                                         {'page': page.title()})
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

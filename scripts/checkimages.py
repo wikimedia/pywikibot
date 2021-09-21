@@ -1535,14 +1535,13 @@ class checkImagesBot:
         self.report(self.unvertext, self.imageName, notification, head, smwl)
 
 
-def main(*args) -> bool:
+def main(*args: str) -> bool:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     # Command line configurable parameters
     repeat = True  # Restart after having check all the images?

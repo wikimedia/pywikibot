@@ -20,7 +20,7 @@ Example:
     python pwb.py capitalize_redirects -start:B -always
 """
 #
-# (C) Pywikibot team, 2006-2020
+# (C) Pywikibot team, 2006-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -84,7 +84,7 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
                                              summary=comment)
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and invoke bot.
 

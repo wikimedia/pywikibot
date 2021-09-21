@@ -391,7 +391,7 @@ def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
             break
 
 
-def main(*args):
+def main(*args: str) -> None:
     """Process command line arguments and invoke PatrolBot."""
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages

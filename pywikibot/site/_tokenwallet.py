@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from pywikibot import log
 from pywikibot.exceptions import Error
 
 
@@ -53,6 +54,14 @@ class TokenWallet:
         user_tokens = self._tokens.setdefault(self.site.user(), {})
         # always preload all for users without tokens
         failed_cache_key = (self.site.user(), key)
+
+        # redirect old tokens to be compatible with older MW version
+        # https://www.mediawiki.org/wiki/MediaWiki_1.37/Deprecation_of_legacy_API_token_parameters
+        if self.site.mw_version >= '1.24wmf19' \
+           and key in {'edit', 'delete', 'protect', 'move', 'block', 'unblock',
+                       'email', 'import', 'options'}:
+            log('Token {!r} was replaced by {!r}'.format(key, 'csrf'))
+            key = 'csrf'
 
         try:
             key = self.site.validate_tokens([key])[0]

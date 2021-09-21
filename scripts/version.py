@@ -44,7 +44,7 @@ except ImportError:
 WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: ' + getversion())
     pywikibot.output('Release version: ' + pywikibot.__version__)

@@ -128,7 +128,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Set, Tuple
+from pywikibot.backports import Set
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -1304,7 +1304,7 @@ class CategoryTreeRobot:
             pywikibot.stdout(tree)
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
@@ -1383,7 +1383,7 @@ def main(*args: Tuple[str, ...]) -> None:
             showimages = True
         elif option == 'summary':
             summary = value
-        elif option == '-match':
+        elif option == 'match':
             title_regex = value or pywikibot.input(
                 'Which regular expression should affected objects match?')
         elif option == 'talkpages':

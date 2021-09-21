@@ -92,7 +92,7 @@ class CreateCategoriesBot(SingleSiteBot, AutomaticTWSummaryBot):
         return super().skip_page(page)
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and invoke bot.
 

@@ -72,6 +72,7 @@ docuReplacements = {
 # PREFERENCES
 
 templateSemiProtection = {
+    'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(حماية\sجزئية)\}\}'],
     'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]p|[Pp])'
            r'olozamčeno(|[^\}]*)\}\}\s*'],
     'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Ss]emi[- ]?'
@@ -86,6 +87,7 @@ templateSemiProtection = {
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
+    'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(حماية\sكاملة)\}\}'],
     'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]z|[Zz])'
            r'amčeno(|[^\}]*)\}\}\s*'],
     'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Pp]rotection(|[^\}]*)\}\}',
@@ -122,12 +124,14 @@ templateTotalMoveProtection = {
 # You may use only one template or an unique template and some other "old"
 # template that the script should still check (as on it.wikipedia)
 templateUnique = {
+    'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(محمية)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Pp]rotetta\}\}'],
 }
 
 # Array: 0 => Semi-block, 1 => Total Block, 2 => Semi-Move, 3 => Total-Move,
 #        4 => template-unique
 templateNoRegex = {
+    'ar': ['{{حماية جزئية}}', '{{حماية كاملة}}', None, None, '{{محمية}}'],
     'cs': ['{{Polozamčeno}}', '{{Zamčeno}}', None, None, None],
     'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
     'it': ['{{Avvisobloccoparziale}}', '{{Avvisoblocco}}', None, None,
@@ -163,7 +167,7 @@ categoryToCheck = {
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
+project_inserted = ['ar', 'cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 
 # END PREFERENCES
 
@@ -207,14 +211,13 @@ def showQuest(page):
         editor.edit(page.text)
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and perform task.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     # Loading the comments
     global categoryToCheck, project_inserted

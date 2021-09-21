@@ -505,14 +505,13 @@ class CommonscatBot(ExistingPageBot, NoRedirectPageBot):
         return commonsPage.title(with_ns=False)
 
 
-def main(*args):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     options = {}
     checkcurrent = False

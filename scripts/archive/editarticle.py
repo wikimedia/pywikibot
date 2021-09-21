@@ -23,7 +23,7 @@ The following parameters are supported:
 --watch
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -108,7 +108,7 @@ class ArticleEditor:
             pywikibot.output('Nothing changed')
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and invoke bot.
 

@@ -367,7 +367,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
         self.put_current(text, summary=self.opt.summary, minor=self.opt.minor)
 
 
-def main(*argv: Tuple[str, ...]) -> None:
+def main(*argv: str) -> None:
     """
     Process command line arguments and invoke bot.
 

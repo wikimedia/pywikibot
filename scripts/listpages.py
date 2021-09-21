@@ -87,7 +87,7 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -166,14 +166,13 @@ class Formatter:
         return fmt.format(num=num, page=self)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     notitle = False
     fmt = '1'

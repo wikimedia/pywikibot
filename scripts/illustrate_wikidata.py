@@ -75,14 +75,13 @@ class IllustrateRobot(WikidataBot):
         self.user_add_claim(item, newclaim, page.site)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

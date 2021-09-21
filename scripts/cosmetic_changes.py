@@ -38,7 +38,6 @@ For further information see pywikibot/cosmetic_changes.py
 #
 import pywikibot
 from pywikibot import config, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
@@ -83,7 +82,7 @@ class CosmeticChangesBot(AutomaticTWSummaryBot,
                              asynchronous=self.opt['async'])
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

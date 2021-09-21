@@ -24,7 +24,6 @@ from os import remove, replace, symlink, urandom
 
 import pywikibot
 from pywikibot import Bot
-from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
 
 
@@ -179,7 +178,7 @@ class DownloadDumpBot(Bot):
         pywikibot.output('Done! File stored as ' + file_final_storepath)
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

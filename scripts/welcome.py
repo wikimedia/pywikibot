@@ -987,11 +987,10 @@ def handle_args(args):
             pywikibot.warning('Unknown option "{}"'.format(arg))
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """Invoke bot.
 
     :param args: command line arguments
-    :type args: str
     """
     handle_args(args)
     if globalvar.offset and globalvar.timeoffset:

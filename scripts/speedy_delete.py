@@ -20,7 +20,7 @@ article.  The onus is on you to avoid making these mistakes.
 NOTE: This script currently only works for the Wikipedia project.
 """
 #
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2007-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -475,7 +475,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         self.saved_progress = None
 
 
-def main(*args):
+def main(*args: str) -> None:
     """Script entry point."""
     pywikibot.handle_args(args)  # No local args yet
     site = pywikibot.Site()

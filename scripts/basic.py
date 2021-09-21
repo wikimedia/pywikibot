@@ -48,7 +48,6 @@ cannot be set by settings file:
 #
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ConfigParserBot,
@@ -126,7 +125,7 @@ class BasicBot(
         self.put_current(text, summary=self.opt.summary)
 
 
-def main(*args: Tuple[str, ...]) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

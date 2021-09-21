@@ -97,14 +97,13 @@ class ClaimRobot(WikidataBot):
                 item, claim.copy(), self.exists_arg, site)
 
 
-def main(*args) -> None:
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     exists_arg = ''
     commandline_claims = []

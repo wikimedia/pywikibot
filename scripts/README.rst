@@ -67,7 +67,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | illustrate_wikidata.py | Bot to add images to Wikidata items.                    |
     +------------------------+---------------------------------------------------------+
-    | image.py               | Script to replace transclusions of files                |
+    | image.py               | Script to replace transclusions of files.               |
     +------------------------+---------------------------------------------------------+
     | imagetransfer.py       | Given a wiki page, check the interwiki links for        |
     |                        | images, and let the user choose among them for          |
@@ -103,6 +103,8 @@ The contents of the package
     +------------------------+--+------------------------------------------------------+
     | patrol.py              | Obtains a list pages and marks the edits as patrolled   |
     |                        | based on a whitelist.                                   |
+    +------------------------+---------------------------------------------------------+
+    | protect.py             | Protect and unprotect pages en masse.                   |
     +------------------------+---------------------------------------------------------+
     | redirect.py            | Fix double redirects and broken redirects. Note:        |
     |                        | solve_disambiguation also has functions which treat     |
@@ -183,7 +185,7 @@ The contents of the package
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
     | freebasemappingupload.py| Script to upload the mappings of Freebase to Wikidata. |
-    +------------------------+---------------------------------------------------------+
+    +------------------------++--------------------------------------------------------+
     | imagecopy.py           | Copies images from a Wikimedia wiki to Commons.         |
     +------------------------+---------------------------------------------------------+
     | imagecopy_self.py      | Copy self published files from the English Wikipedia to |
@@ -213,8 +215,6 @@ The contents of the package
     | piper.py               | Pipes article text through external program(s) on       |
     |                        | STDIN and collects its STDOUT which is used as the      |
     |                        | new article text if it differs from the original.       |
-    +------------------------+---------------------------------------------------------+
-    | protect.py             | Protect and unprotect pages en masse.                   |
     +------------------------+---------------------------------------------------------+
     | selflink.py            | This bot goes over multiple pages of the home wiki,     |
     |                        | searches for selflinks, and allows removing them.       |

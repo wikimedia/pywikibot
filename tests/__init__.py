@@ -304,30 +304,21 @@ class TestRequest(CachedRequest):
         """Never invalidate cached data."""
         return False
 
-    def _load_cache(self):
+    def _load_cache(self) -> bool:
         """Return whether the cache can be used."""
         if not super()._load_cache():
             return False
 
-        # tokens need careful management in the cache
-        # and can't be aggressively cached.
-        # FIXME: remove once 'badtoken' is reliably handled in api.py
-        for desc in ('intoken', 'lgpassword'):
-            if desc in self._uniquedescriptionstr():
-                self._data = None
-                return False
+        if 'lgpassword' in self._uniquedescriptionstr():
+            self._data = None
+            return False
 
         return True
 
-    def _write_cache(self, data):
+    def _write_cache(self, data) -> None:
         """Write data except login details."""
-        if 'intoken' in self._uniquedescriptionstr():
-            return None
-
-        if 'lgpassword' in self._uniquedescriptionstr():
-            return None
-
-        return super()._write_cache(data)
+        if 'lgpassword' not in self._uniquedescriptionstr():
+            super()._write_cache(data)
 
 
 original_expired = None

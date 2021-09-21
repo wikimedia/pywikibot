@@ -1,9 +1,8 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* Drop piprop from meta=proofreadinfo API call (T290585)
-* Remove use_2to3 with setup.py (T290451)
-* Unify WbRepresentation's abstract method signature
+* Fix for removed action API token parameters of MediaWiki 1.37 (T291202)
+* APISite.validate_tokens() no longer replaces outdated tokens (T291202)
 * L10N updates
 
 
