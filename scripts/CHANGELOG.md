@@ -1,11 +1,18 @@
 # Schripts Changelog
 
+## 6.6.1
+*21 September 2021*
+
+## category
+* Fix -match option
+
+
 ## 6.6.0
 *15 September 2021*
 
-
 ### add_text
 * Add -major flag to disable minor edit flag when saving
+
 
 ## 6.5.0
 *05 August 2021*
@@ -13,6 +20,7 @@
 ### reflinks
 * Don't ignore identical references with newline in ref content (T286369)
 * L10N updates
+
 
 ## 6.4.0
 *01 July 2021*
