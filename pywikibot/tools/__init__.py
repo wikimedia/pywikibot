@@ -104,13 +104,6 @@ def has_module(module, version=None):
     return True
 
 
-def empty_iterator():
-    # http://stackoverflow.com/a/13243870/473890
-    """DEPRECATED. An iterator which does nothing."""
-    return
-    yield
-
-
 class classproperty:  # noqa: N801
 
     """
@@ -227,61 +220,6 @@ class ComparableMixin:
         return other != self._cmpkey()
 
 
-class DotReadableDict:
-
-    """DEPRECATED. Lecacy class of Revision() and FileInfo().
-
-    Provide: __getitem__() and __repr__().
-    """
-
-    def __getitem__(self, key):
-        """Give access to class values by key.
-
-        Revision class may also give access to its values by keys
-        e.g. revid parameter may be assigned by revision['revid']
-        as well as revision.revid. This makes formatting strings with
-        % operator easier.
-
-        """
-        return getattr(self, key)
-
-    def __repr__(self):
-        """Return a more complete string representation."""
-        return repr(self.__dict__)
-
-
-class frozenmap(Mapping):  # noqa:  N801
-
-    """DEPRECATED. Frozen mapping, preventing write after initialisation."""
-
-    def __init__(self, data=(), **kwargs):
-        """Initialize data in same ways like a dict."""
-        self.__data = {}
-        if isinstance(data, Mapping):
-            for key in data:
-                self.__data[key] = data[key]
-        elif hasattr(data, 'keys'):
-            for key in data.keys():
-                self.__data[key] = data[key]
-        else:
-            for key, value in data:
-                self.__data[key] = value
-        for key, value in kwargs.items():
-            self.__data[key] = value
-
-    def __getitem__(self, key):
-        return self.__data[key]
-
-    def __iter__(self):
-        return iter(self.__data)
-
-    def __len__(self):
-        return len(self.__data)
-
-    def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self.__data)
-
-
 # Collection is not provided with Python 3.5; use Container, Iterable, Sized
 class SizedKeyCollection(Container, Iterable, Sized):
 
@@ -391,94 +329,6 @@ class SizedKeyCollection(Container, Iterable, Sized):
         """Yield key, len(values) pairs."""
         for key, values in self.data.items():
             yield key, len(values)
-
-
-class LazyRegex:
-
-    """
-    DEPRECATED. Regex object that obtains and compiles the regex on usage.
-
-    Instances behave like the object created using :py:obj:`re.compile`.
-    """
-
-    def __init__(self, pattern, flags=0):
-        """
-        Initializer.
-
-        :param pattern: :py:obj:`re` regex pattern
-        :type pattern: str or callable
-        :param flags: :py:obj:`re.compile` flags
-        :type flags: int
-        """
-        self.raw = pattern
-        self.flags = flags
-        super().__init__()
-
-    @property
-    def raw(self):
-        """The raw property."""
-        if callable(self._raw):
-            self._raw = self._raw()
-
-        return self._raw
-
-    @raw.setter
-    def raw(self, value):
-        self._raw = value
-        self._compiled = None
-
-    @property
-    def flags(self):
-        """The flags property."""
-        return self._flags
-
-    @flags.setter
-    def flags(self, value):
-        self._flags = value
-        self._compiled = None
-
-    def __getattr__(self, attr):
-        """Compile the regex and delegate all attribute to the regex."""
-        if not self._raw:
-            raise AttributeError('{}.raw not set'
-                                 .format(self.__class__.__name__))
-
-        if not self._compiled:
-            self._compiled = re.compile(self.raw, self.flags)
-
-        if hasattr(self._compiled, attr):
-            return getattr(self._compiled, attr)
-
-        raise AttributeError('{}: attr {} not recognised'
-                             .format(self.__class__.__name__, attr))
-
-
-class DeprecatedRegex(LazyRegex):
-
-    """Regex object that issues a deprecation notice."""
-
-    def __init__(self, pattern, flags=0, name=None, instead=None, since=None):
-        """
-        DEPRECATED. Deprecate a give regex.
-
-        If name is None, the regex pattern will be used as part of
-        the deprecation warning.
-
-        :param name: name of the object that is deprecated
-        :type name: str or None
-        :param instead: if provided, will be used to specify the replacement
-            of the deprecated name
-        :type instead: str
-        """
-        super().__init__(pattern, flags)
-        self._name = name or self.raw
-        self._instead = instead
-        self._since = since
-
-    def __getattr__(self, attr):
-        """Issue deprecation warning."""
-        issue_deprecation_warning(self._name, self._instead, since=self._since)
-        return super().__getattr__(attr)
 
 
 def first_lower(string: str) -> str:
@@ -1393,47 +1243,3 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
             bytes_to_read -= len(read_bytes)
             sha.update(read_bytes)
     return sha.hexdigest()
-
-# deprecated parts ############################################################
-
-
-@deprecated('bot_choice.Option and its subclasses', since='20181217')
-def concat_options(message, line_length, options):
-    """DEPRECATED. Concatenate options."""
-    indent = len(message) + 2
-    line_length -= indent
-    option_msg = ''
-    option_line = ''
-    for option in options:
-        if option_line:
-            option_line += ', '
-        # +1 for ','
-        if len(option_line) + len(option) + 1 > line_length:
-            if option_msg:
-                option_msg += '\n' + ' ' * indent
-            option_msg += option_line[:-1]  # remove space
-            option_line = ''
-        option_line += option
-    if option_line:
-        if option_msg:
-            option_msg += '\n' + ' ' * indent
-        option_msg += option_line
-    return '{} ({}):'.format(message, option_msg)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('empty_iterator', replacement_name='iter(())',
-                            since='20220422')
-wrapper.add_deprecated_attr('DotReadableDict', replacement_name='',
-                            since='20210416')
-wrapper.add_deprecated_attr('frozenmap',
-                            replacement_name='types.MappingProxyType',
-                            since='20210415')
-wrapper.add_deprecated_attr('LazyRegex', replacement_name='',
-                            since='20210418')
-wrapper.add_deprecated_attr('DeprecatedRegex', replacement_name='',
-                            since='20210418')
-
-
-is_IP = redirect_func(is_ip_address, old_name='is_IP',  # noqa N816
-                      since='20210418')
