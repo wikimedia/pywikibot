@@ -64,7 +64,7 @@ Additionally there is the :py:obj:`AutomaticTWSummaryBot` which subclasses
 __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
-    'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
+    'output', 'stdout', 'LoggingFormatter',
     'init_handlers', 'writelogheader',
     'input', 'input_choice', 'input_yn', 'input_list_choice', 'ui',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
@@ -176,7 +176,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    redirect_func,
     remove_last_args,
     suppress_warnings,
 )
@@ -2330,10 +2329,6 @@ class WikidataBot(Bot, ExistingPageBot):
 
 
 set_interface(config.userinterface)
-
-# Deprecate RotatingFileHandler
-RotatingFileHandler = redirect_func(logging.handlers.RotatingFileHandler,
-                                    since='6.5.0')
 
 # NOTE: (T286348)
 # Do not use ModuleDeprecationWrapper with this module.
