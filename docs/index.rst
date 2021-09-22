@@ -19,7 +19,7 @@ system that has a compatible version of Python installed. To check
 whether you have Python installed and to find its version, just type
 ``python`` at the CMD or shell prompt.
 
-Python 3.5 or higher is currently required to run the bot, but Python 3.6
+Python 3.5.3 or higher is currently required to run the bot, but Python 3.6
 or higher is recommended.
 
 Pywikibot and this documentation are licensed under the

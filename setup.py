@@ -42,13 +42,13 @@ VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.5+.
+This version of Pywikibot only supports Python 3.5.3+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
-    return PYTHON_VERSION >= (3, 5, 0)
+    return PYTHON_VERSION >= (3, 5, 3)
 
 
 if not python_is_supported():  # pragma: no cover
@@ -248,7 +248,7 @@ def main():
         maintainer_email=metadata.__maintainer_email__,
         license=metadata.__license__,
         packages=get_packages(name),
-        python_requires='>=3.5.0',
+        python_requires='>=3.5.3',
         install_requires=dependencies,
         extras_require=extra_deps,
         url=metadata.__url__,

@@ -1,13 +1,12 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (No changes yet)
+* Support of Python 3.5.0 - 3.5.2 has been dropped (T286867)
 
 
 Deprecations
 ^^^^^^^^^^^^
 
-* 6.6.0: Support of Python 3.5.0 - 3.5.2 will be dropped with Pywikibot 7 (T286867)
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.5.0: tools.RotatingFileHandler will be removed in favour of logging.handlers.RotatingFileHandler
 * 6.4.0: Pywikibot `began using semantic versioning

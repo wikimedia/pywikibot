@@ -20,7 +20,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
 
 from tests import _pwb_py
 
@@ -446,8 +445,6 @@ def execute(command, data_in=None, timeout=None, error=None):
     :param command: executable to run and arguments to use
     :type command: list of str
     """
-    if PYTHON_VERSION < (3, 5, 3):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:112')
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
 

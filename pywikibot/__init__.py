@@ -76,7 +76,7 @@ from pywikibot.tools import (
 )
 from pywikibot.tools import classproperty
 from pywikibot.tools import deprecate_arg as _deprecate_arg
-from pywikibot.tools import normalize_username, PYTHON_VERSION
+from pywikibot.tools import normalize_username
 from pywikibot.tools.formatter import color_format
 
 TO_DECIMAL_TYPE = Union[int, float, str, 'Decimal', None]
@@ -126,15 +126,6 @@ __all__ = (
 
 if not hasattr(sys.modules[__name__], 'argvu'):
     argvu = []  # type: List[str]
-
-
-if PYTHON_VERSION < (3, 5, 3):
-    warn("""
-Python {version} will be dropped with release 7.0 soon.
-It is recommended to use Python 3.5.3 or above.
-See T286867 for further information.
-""".format(version=sys.version.split(maxsplit=1)[0]),
-         FutureWarning)  # probably adjust the line no in utils.execute()
 
 
 class Timestamp(datetime.datetime):

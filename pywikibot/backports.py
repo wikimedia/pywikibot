@@ -44,9 +44,7 @@ else:
 
 
 # typing
-if PYTHON_VERSION < (3, 5, 2):
-    from typing import Dict as DefaultDict
-elif PYTHON_VERSION < (3, 9):
+if PYTHON_VERSION < (3, 9):
     from typing import DefaultDict  # type: ignore[misc]
 else:
     from collections import (  # type: ignore[misc] # noqa: N812
