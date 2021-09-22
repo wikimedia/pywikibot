@@ -409,7 +409,7 @@ class MediaWikiVersion:
 
     Two versions are equal if their normal version and dev version are equal. A
     version is greater if the normal version or dev version is greater. For
-    example:
+    example::
 
         1.34 < 1.34.1 < 1.35wmf1 < 1.35alpha < 1.35beta1 < 1.35beta2
         < 1.35-rc-1 < 1.35-rc.2 < 1.35
