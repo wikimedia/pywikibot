@@ -2108,38 +2108,6 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    @deprecate_arg('summary', 'reason')
-    @deprecated('delete()', since='20210330')
-    def deletepage(self, page, reason: str):
-        """Delete page from the wiki. Requires appropriate privilege level.
-
-        :see: https://www.mediawiki.org/wiki/API:Delete
-        Page to be deleted can be given either as Page object or as pageid.
-
-        :param page: Page to be deleted or its pageid.
-        :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
-            int or str
-        :param reason: Deletion reason.
-        :raises TypeError, ValueError: page has wrong type/value.
-        """
-        self.delete(page, reason)
-
-    @deprecated('delete() with oldimage keyword parameter', since='20210330')
-    def deleteoldimage(self, page, oldimage: str, reason: str):
-        """Delete a specific version of a file. Requires appropriate privileges.
-
-        :see: https://www.mediawiki.org/wiki/API:Delete
-        The oldimage identifier for the specific version of the image must be
-        provided.
-
-        :param page: Page to be deleted or its pageid
-        :type page: FilePage or, in case of pageid, int or str
-        :param oldimage: oldimageid of the file version to be deleted.
-        :param reason: Deletion reason.
-        :raises TypeError, ValueError: page has wrong type/value.
-        """
-        self.delete(page, reason, oldimage=oldimage)
-
     @need_right('undelete')
     def undelete(self, page, reason: str, *, revisions=None, fileids=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
@@ -2191,36 +2159,6 @@ class APISite(
             raise
         finally:
             self.unlock_page(page)
-
-    @deprecate_arg('summary', 'reason')
-    @deprecated('undelete()', since='20210330')
-    def undelete_page(self, page, reason: str, revisions=None):
-        """DEPRECATED. Undelete page from the wiki.
-
-        :see: https://www.mediawiki.org/wiki/API:Undelete
-
-        :param page: Page to be deleted.
-        :type page: pywikibot.BasePage
-        :param revisions: List of timestamps to restore.
-            If None, restores all revisions.
-        :type revisions: list
-        :param reason: Undeletion reason.
-        """
-        self.undelete(page, reason, revisions=revisions)
-
-    @deprecated('undelete() with fileids parameter', since='20210330')
-    def undelete_file_versions(self, page, reason: str, fileids=None):
-        """DEPRECATED. Undelete page from the wiki.
-
-        :see: https://www.mediawiki.org/wiki/API:Undelete
-
-        :param page: Page to be deleted.
-        :type page: pywikibot.BasePage
-        :param reason: Undeletion reason.
-        :param fileids: List of fileids to restore.
-        :type fileids: list
-        """
-        self.undelete(page, reason, fileids=fileids)
 
     _protect_errors = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
