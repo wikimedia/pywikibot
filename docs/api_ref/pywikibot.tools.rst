@@ -8,6 +8,11 @@ tools.chars module
 
 .. automodule:: pywikibot.tools.chars
 
+tools.deprecate module
+----------------------
+
+.. automodule:: pywikibot.tools._deprecate
+
 tools.djvu module
 -----------------
 
