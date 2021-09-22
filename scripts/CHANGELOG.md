@@ -1,9 +1,25 @@
 # Schripts Changelog
 
+## 7.0.0
+*In development*
+
+### add_text
+* Provide -create and -createonly options (T291354)
+* Deprecated function get_text() was removed in favour of Page.text and BaseBot.skip_page()
+* Deprecated function put_text() was removed in favour of BaseBot.userPut() method
+* Deprecated function add_text() were remove in favour of textlib.add_text()
+
+### newitem
+* Do not pass OtherPageSaveRelatedError silently
+
+### touch
+*Do not pass OtherPageSaveRelatedError silently
+
+
 ## 6.6.1
 *21 September 2021*
 
-## category
+### category
 * Fix -match option
 
 
