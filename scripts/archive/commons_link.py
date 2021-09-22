@@ -33,7 +33,6 @@ import re
 
 import pywikibot
 from pywikibot import Bot, i18n, pagegenerators, textlib
-from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     EditConflictError,
     IsRedirectPageError,

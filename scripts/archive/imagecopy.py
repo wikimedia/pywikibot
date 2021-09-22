@@ -225,7 +225,7 @@ def pageTextPost(url, parameters):
     return data
 
 
-class imageTransfer(threading.Thread):
+class imageTransfer(threading.Thread):  # noqa: N801
 
     """Facilitate transfer of image/file to commons."""
 

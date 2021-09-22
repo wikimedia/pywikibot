@@ -10,20 +10,15 @@ the site commons should be given and not a Wikipedia or similar.
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
-from datetime import timedelta
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.exceptions import (
-    ArgumentDeprecationWarning,
-    EditConflictError,
-    LockedPageError,
-)
+from pywikibot.exceptions import EditConflictError, LockedPageError
 
 
 docuReplacements = {

@@ -31,7 +31,7 @@ Use -nochecktemplate if you don't want to add the check template. Be sure to
 check it yourself.
 """
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -358,7 +358,7 @@ def supportedSite():
     return all(site.code in elem for elem in l10n_dicts)
 
 
-class imageFetcher(threading.Thread):
+class imageFetcher(threading.Thread):  # noqa: N801
 
     """Tries to fetch information for all images in the generator."""
 
@@ -633,7 +633,7 @@ class imageFetcher(threading.Thread):
         return result
 
 
-class userInteraction(threading.Thread):
+class userInteraction(threading.Thread):  # noqa: N801
 
     """Prompt all images to the user."""
 
@@ -867,7 +867,7 @@ class TkdialogICS(Tkdialog):
         webbrowser.open(self.url)
 
 
-class uploader(threading.Thread):
+class uploader(threading.Thread):  # noqa: N801
 
     """Upload all images."""
 
@@ -919,7 +919,7 @@ class uploader(threading.Thread):
                     '|year={{subst:CURRENTYEAR}}'
                     '|month={{subst:CURRENTMONTHNAME}}'
                     '|day={{subst:CURRENTDAY}}}}\n'
-                    % {'lang': lang, 'family': family}
+                    % {'lang': lang, 'family': family})
         cid += '== {{int:filedesc}} ==\n'
         cid += CID_INFO.format_map(fields)
         cid += '== {{int:license}} ==\n'

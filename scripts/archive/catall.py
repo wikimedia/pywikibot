@@ -26,7 +26,7 @@ Options:
 #
 import pywikibot
 from pywikibot import i18n, textlib
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import List
 from pywikibot.bot import QuitKeyboardInterrupt
 from pywikibot.exceptions import IsRedirectPageError
 

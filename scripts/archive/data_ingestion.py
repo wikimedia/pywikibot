@@ -105,11 +105,9 @@ import io
 import os
 import posixpath
 from urllib.parse import urlparse
-from warnings import warn
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import NoPageError
 from pywikibot.specialbots import UploadRobot
@@ -331,7 +329,7 @@ def main(*args: str):
         filename = os.path.join(csv_dir, configuration['csvFile'])
         try:
             f = codecs.open(filename, 'r', configuration['csvEncoding'])
-        except (IOError, OSError) as e:
+        except OSError as e:
             pywikibot.error('{} could not be opened: {}'.format(filename, e))
         else:
             with f:

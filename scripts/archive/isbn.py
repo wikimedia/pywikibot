@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -201,7 +201,7 @@ class IsbnBot(Bot):
                                  .format(page.title()))
             except SpamblacklistError as e:
                 pywikibot.output(
-                    'Cannot change {} because of blacklist entry {1}'
+                    'Cannot change {} because of blacklist entry {}'
                     .format(page.title(), e.url))
             except LockedPageError:
                 pywikibot.output('Skipping {} (locked page)'
