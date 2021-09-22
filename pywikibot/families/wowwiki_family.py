@@ -1,11 +1,11 @@
 """Family module for WOW Wiki."""
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import classproperty, deprecated
+from pywikibot.tools import classproperty
 
 
 class Family(family.FandomFamily):
@@ -24,12 +24,6 @@ class Family(family.FandomFamily):
     removed_wikis = ['hr', 'ro', 'sr']
 
     code_aliases = {'nn': 'no'}
-
-    @classproperty
-    @deprecated('codes attribute', since='20190422')
-    def languages_by_size(cls):
-        """DEPRECATED. languages_by_size property for compatibility purpose."""
-        return list(cls.codes)
 
     @classproperty
     def langs(cls):
