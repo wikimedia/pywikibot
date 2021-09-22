@@ -151,7 +151,7 @@ import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
-from pywikibot.tools import chars, deprecated_args
+from pywikibot.tools import chars
 
 
 # This is required for the text that is shown when you run this script
@@ -522,7 +522,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         about the missing site
     """
 
-    @deprecated_args(acceptall='always', addedCat='addcat')
     def __init__(self, generator, replacements, exceptions=None, **kwargs):
         """Initializer."""
         self.available_options.update({
