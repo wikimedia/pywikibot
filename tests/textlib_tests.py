@@ -18,7 +18,7 @@ from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
-from pywikibot.tools import has_module, suppress_warnings
+from pywikibot.tools import has_module
 from tests import mock
 from tests.aspects import (
     DefaultDrySiteTestCase,
@@ -1503,23 +1503,6 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         self.assertEqual({page.title() for page in lang_links.values()},
                          {'Site'})
         self.assertEqual(set(lang_links), self.sites_set - {self.site})
-
-
-UNESCAPE_WARNING_MSG = (r'.*pywikibot\.textlib\.unescape .*'
-                        r'is deprecated for .*; use html.unescape')
-
-
-class TestUnescape(TestCase):
-
-    """Test to verify that unescaping HTML chars are correctly done."""
-
-    net = False
-
-    def test_unescape(self):
-        """Test unescaping HTML chars."""
-        with suppress_warnings(UNESCAPE_WARNING_MSG, category=FutureWarning):
-            self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
-                             '!23<>\'"&&')
 
 
 class TestExtractSections(DefaultDrySiteTestCase):
