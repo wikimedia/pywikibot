@@ -1405,8 +1405,6 @@ _putthread = threading.Thread(target=async_manager,
                               daemon=True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('config2', replacement_name='pywikibot.config',
-                            since='20210426')
 wrapper.add_deprecated_attr('__release__', __version__,
                             replacement_name='pywikibot.__version__',
                             since='20200707')
