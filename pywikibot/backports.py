@@ -72,6 +72,7 @@ if PYTHON_VERSION < (3, 9):
         Sequence,
         Set,
         Tuple,
+        Type,
     )
 else:
     from collections.abc import Iterable, Iterator, Mapping, Sequence
@@ -81,6 +82,7 @@ else:
     List = list  # type: ignore[misc]
     Set = set  # type: ignore[misc]
     Tuple = tuple  # type: ignore[assignment]
+    Type = type
 
 
 if PYTHON_VERSION < (3, 9, 2):

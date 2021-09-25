@@ -1135,10 +1135,11 @@ def _code_fam_from_url(url: str, name: Optional[str] = None
 
 
 @_deprecate_arg('sysop', True)
-def Site(code: Optional[str] = None, fam: OPT_STR_OR_FAMILY = None,
+def Site(code: Optional[str] = None,
+         fam: OPT_STR_OR_FAMILY = None,
          user: Optional[str] = None, *,
          interface: OPT_STR_OR_SITE = None,
-         url: Optional[str] = None) -> APISite:
+         url: Optional[str] = None) -> BaseSite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
