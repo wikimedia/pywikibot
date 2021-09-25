@@ -104,12 +104,6 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         'showdiff': False,
     }
 
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        super().__init__(**kwargs)
-        self.available_options.update(
-            {'always': not self.opt.showdiff})
-
     def init_page(self, item) -> pywikibot.Page:
         """Get the tuple and return the page object to be processed."""
         title, content = item
@@ -308,6 +302,8 @@ def main(*args: str) -> None:
             options[option] = value
         else:
             pywikibot.output('Disregarding unknown argument {}.'.format(arg))
+
+    options['always'] = 'showdiff' not in options
 
     failed_filename = False
     while not os.path.isfile(filename):
