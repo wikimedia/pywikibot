@@ -2287,6 +2287,8 @@ def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
     for page in generator:
         site = page.site
         sites.setdefault(site, []).append(page)
+
+        groupsize = min(groupsize, site.maxlimit)
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)

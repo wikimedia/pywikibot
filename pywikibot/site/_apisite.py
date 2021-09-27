@@ -438,6 +438,18 @@ class APISite(
         api._invalidate_superior_cookies(self.family)
 
     @property
+    def maxlimit(self):
+        """Get the maximum limit of pages to be retrieved.
+
+        .. versionadded:: 7.0
+        """
+        parameter = self._paraminfo.parameter('query+info', 'prop')
+        if self.logged_in() and self.has_right('apihighlimits'):
+            return int(parameter['highlimit'])
+
+        return int(parameter['limit'])  # T78333, T161783
+
+    @property
     def userinfo(self):
         """Retrieve userinfo from site and store in _userinfo attribute.
 
