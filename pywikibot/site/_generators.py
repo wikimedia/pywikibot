@@ -66,14 +66,7 @@ class GeneratorsMixin:
         # Validate pageids.
         gen = (str(int(p)) for p in pageids if int(p) > 0)
 
-        # Find out how many pages can be specified at a time.
-        parameter = self._paraminfo.parameter('query+info', 'prop')
-        if self.logged_in() and self.has_right('apihighlimits'):
-            groupsize = int(parameter['highlimit'])
-        else:
-            groupsize = int(parameter['limit'])
-
-        for sublist in itergroup(filter_unique(gen), groupsize):
+        for sublist in itergroup(filter_unique(gen), self.maxlimit):
             # Store the order of the input data.
             priority_dict = dict(zip(sublist, range(len(sublist))))
 
@@ -131,13 +124,7 @@ class GeneratorsMixin:
         if pageprops:
             props += '|pageprops'
 
-        parameter = self._paraminfo.parameter('query+info', 'prop')
-        if self.logged_in() and self.has_right('apihighlimits'):
-            max_ids = int(parameter['highlimit'])
-        else:
-            max_ids = int(parameter['limit'])  # T78333, T161783
-
-        for sublist in itergroup(pagelist, min(groupsize, max_ids)):
+        for sublist in itergroup(pagelist, min(groupsize, self.maxlimit)):
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, '_pageid') and p._pageid > 0]
@@ -155,7 +142,8 @@ class GeneratorsMixin:
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
-            if len(pageids) == len(sublist) and len(set(pageids)) <= max_ids:
+            if len(pageids) == len(sublist) \
+               and len(set(pageids)) <= self.maxlimit:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:
