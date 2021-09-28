@@ -537,8 +537,10 @@ add_init_routine(init_handlers)
 # User input functions
 
 
-def input(question: str, password: bool = False,
-          default: str = '', force: bool = False) -> str:
+def input(question: str,
+          password: bool = False,
+          default: Optional[str] = '',
+          force: bool = False) -> str:
     """Ask the user a question, return the user's answer.
 
     :param question: a string that will be shown to the user. Don't add a

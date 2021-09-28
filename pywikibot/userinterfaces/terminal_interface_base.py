@@ -13,7 +13,7 @@ from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Sequence
+from pywikibot.backports import Iterable, Sequence, Tuple
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -245,8 +245,10 @@ class UI(ABUIC):
         # May be overridden by subclass
         return input()
 
-    def input(self, question: str, password: bool = False,
-              default: str = '', force: bool = False) -> str:
+    def input(self, question: str,
+              password: bool = False,
+              default: Optional[str] = '',
+              force: bool = False) -> str:
         """
         Ask the user a question and return the answer.
 
@@ -313,9 +315,15 @@ class UI(ABUIC):
             return None  # wrong terminal encoding, T258143
         return text
 
-    def input_choice(self, question: str, options, default: str = None,
+    def input_choice(self, question: str,
+                     options: Union[
+                         Iterable[Union[Tuple[str, str],
+                                        'pywikibot.bot_choice.Option']],
+                         'pywikibot.bot_choice.Option'],
+                     default: Optional[str] = None,
                      return_shortcut: bool = True,
-                     automatic_quit: bool = True, force: bool = False):
+                     automatic_quit: bool = True,
+                     force: bool = False) -> Any:
         """
         Ask the user and returns a value from the options.
 
@@ -329,9 +337,6 @@ class UI(ABUIC):
             Alternatively they may be Option (or subclass) instances or
             ChoiceException instances which have a full option and shortcut
             and will be raised if selected.
-        :type options: iterable containing sequences of length 2 or
-            iterable containing Option instances or ChoiceException as well.
-            Singletons of Option and its subclasses are also accepted.
         :param default: The default answer if no was entered. None to require
             an answer.
         :param return_shortcut: Whether the shortcut or the index in the option
@@ -342,7 +347,6 @@ class UI(ABUIC):
         :return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
-        :rtype: int (if not return_shortcut), lowercased str (otherwise)
         """
         def output_option(option, before_question):
             """Print an OutputOption before or after question."""

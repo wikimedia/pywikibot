@@ -121,14 +121,15 @@ import math
 import os
 import pickle
 import re
+
 from contextlib import suppress
 from operator import methodcaller
 from textwrap import fill
-from typing import Optional
+from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Set
+from pywikibot.backports import Sequence, Set
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -144,7 +145,7 @@ from pywikibot.exceptions import (
     NoUsernameError,
     PageSaveRelatedError,
 )
-from pywikibot.tools import deprecated_args, open_archive
+from pywikibot.tools import open_archive
 from pywikibot.tools.formatter import color_format
 
 
@@ -253,10 +254,9 @@ class CategoryPreprocess(BaseBot):
             self.includeonly = []
             return page
 
-        try:
+        tmpl = []  # type: Sequence
+        with suppress(KeyError):
             tmpl, loc = moved_links[page.site.code]
-        except KeyError:
-            tmpl = []
 
         if not isinstance(tmpl, list):
             tmpl = [tmpl]
@@ -406,9 +406,11 @@ class CategoryAddBot(CategoryPreprocess):
 
     """A robot to mass-add a category to a list of pages."""
 
-    @deprecated_args(editSummary='comment', dry=True)
-    def __init__(self, generator, newcat=None, sort_by_last_name=False,
-                 create=False, comment='', follow_redirects=False) -> None:
+    def __init__(self, generator, newcat=None,
+                 sort_by_last_name: bool = False,
+                 create: bool = False,
+                 comment: str = '',
+                 follow_redirects: bool = False) -> None:
         """Initializer."""
         super().__init__()
         self.generator = generator
@@ -529,17 +531,22 @@ class CategoryMoveRobot(CategoryPreprocess):
     DELETION_COMMENT_AUTOMATIC = 0
     DELETION_COMMENT_SAME_AS_EDIT_COMMENT = 1
 
-    @deprecated_args(oldCatTitle='oldcat', newCatTitle='newcat',
-                     batchMode='batch', editSummary='comment',
-                     inPlace='inplace', moveCatPage='move_oldcat',
-                     deleteEmptySourceCat='delete_oldcat',
-                     titleRegex='title_regex', withHistory='history')
-    def __init__(self, oldcat, newcat=None, batch=False, comment='',
-                 inplace=False, move_oldcat=True, delete_oldcat=True,
-                 title_regex=None, history=False, pagesonly=False,
-                 deletion_comment=DELETION_COMMENT_AUTOMATIC,
+    def __init__(self, oldcat,
+                 newcat=None,
+                 batch: bool = False,
+                 comment: str = '',
+                 inplace: bool = False,
+                 move_oldcat: bool = True,
+                 delete_oldcat: bool = True,
+                 title_regex=None,
+                 history: bool = False,
+                 pagesonly: bool = False,
+                 deletion_comment: Union[int,
+                                         str] = DELETION_COMMENT_AUTOMATIC,
                  move_comment=None,
-                 wikibase=True, allow_split=False, move_together=False,
+                 wikibase: bool = True,
+                 allow_split: bool = False,
+                 move_together: bool = False,
                  keep_sortkey=None) -> None:
         """Store all given parameters in the objects attributes.
 
@@ -581,12 +588,14 @@ class CategoryMoveRobot(CategoryPreprocess):
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()
+
         if newcat:
             self.newcat = self._makecat(newcat)
             self.newtalk = self.newcat.toggleTalkPage()
         else:
-            self.newcat = None
+            self.newcat = None  # type: ignore
             self.newtalk = None
+
         # Set boolean settings.
         self.inplace = inplace
         self.move_oldcat = move_oldcat
@@ -893,10 +902,14 @@ class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
 
-    @deprecated_args(subCats=True)
-    def __init__(self, catTitle, listTitle, editSummary, append=False,
-                 overwrite=False, showImages=False, *, talkPages=False,
-                 recurse=False, prefix='*', namespaces=None) -> None:
+    def __init__(self, catTitle: str, listTitle: str, editSummary: str,
+                 append: bool = False,
+                 overwrite: bool = False,
+                 showImages: bool = False, *,
+                 talkPages: bool = False,
+                 recurse: bool = False,
+                 prefix: str = '*',
+                 namespaces=None) -> None:
         """Initializer."""
         self.editSummary = editSummary
         self.append = append
@@ -990,23 +1003,22 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         super().__init__(generator=pagegenerators.PreloadingGenerator(
             self.cat.articles(namespaces=namespaces)))
 
-    @deprecated_args(article='member')
-    def move_to_category(self, member, original_cat, current_cat) -> None:
+    def move_to_category(self,
+                         member: pywikibot.Page,
+                         original_cat: pywikibot.Category,
+                         current_cat: pywikibot.Category) -> None:
         """
         Ask whether to move it to one of the sub- or super-categories.
 
         Given a page in the original_cat category, ask the user whether
         to move it to one of original_cat's sub- or super-categories.
         Recursively run through subcategories' subcategories.
-        NOTE: current_cat is only used for internal recursion. You
-        should always use current_cat = original_cat.
 
+        :note: current_cat is only used for internal recursion. You
+            should always use ``current_cat = original_cat``.
         :param member: a page to process.
-        :type member: pywikibot.Page
         :param original_cat: original category to replace.
-        :type original_cat: pywikibot.Category
         :param current_cat: a category which is questioned.
-        :type current_cat: pywikibot.Category
         """
         class CatContextOption(ContextOption):
             """An option to show more and more context and categories."""
@@ -1413,7 +1425,7 @@ def main(*args: str) -> None:
         else:
             gen_factory.handle_arg(arg)
 
-    bot = None
+    bot = None  # type: Optional[BaseBot]
 
     cat_db = CategoryDatabase(rebuild=rebuild)
     gen = gen_factory.getCombinedGenerator()
