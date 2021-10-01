@@ -182,27 +182,30 @@ def check_modules(script=None):
     """
     import pkg_resources
 
-    from setup import dependencies, script_deps
+    from setup import script_deps
 
     missing_requirements = []
     version_conflicts = []
 
-    try:
-        requirement = next(pkg_resources.parse_requirements(dependencies))
-    except ValueError as e:
-        # T286980: setuptools is too old and requirement parsing fails
-        import setuptools
-        setupversion = tuple(int(num)
-                             for num in setuptools.__version__.split('.'))
-        if setupversion < (20, 8, 1):
-            # print the minimal requirement
-            _print_requirements(['setuptools==20.8.1'], None,
-                                'outdated ({})'.format(setuptools.__version__))
-            return False
-        raise e
-
     if script:
         dependencies = script_deps.get(Path(script).name, [])
+    else:
+        from setup import dependencies
+        try:
+            next(pkg_resources.parse_requirements(dependencies))
+        except ValueError as e:
+            # T286980: setuptools is too old and requirement parsing fails
+            import setuptools
+            setupversion = tuple(int(num)
+                                 for num in setuptools.__version__.split('.'))
+            if setupversion < (20, 8, 1):
+                # print the minimal requirement
+                _print_requirements(
+                    ['setuptools>=20.8.1'], None,
+                    'outdated ({})'.format(setuptools.__version__))
+                return False
+            raise e
+
     for requirement in pkg_resources.parse_requirements(dependencies):
         if requirement.marker is None \
            or pkg_resources.evaluate_marker(str(requirement.marker)):
