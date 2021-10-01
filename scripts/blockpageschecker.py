@@ -55,7 +55,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.editor import TextEditor
-from pywikibot.exceptions import Error
+from pywikibot.exceptions import Error, TranslationError
 
 
 # This is required for the text that is shown when you run this script
@@ -210,7 +210,13 @@ class CheckerBot(ExistingPageBot, SingleSiteBot):
         newtext = self.parse_tempates.send((page.text, page.protection()))
         next(self.parse_tempates)
 
-        commentUsed = i18n.twtranslate(self.site, 'blockpageschecker-summary')
+        try:
+            commentUsed = i18n.twtranslate(self.site,
+                                           'blockpageschecker-deleting')
+        except TranslationError:
+            commentUsed = i18n.twtranslate(self.site,
+                                           'blockpageschecker-summary')
+
         self.userPut(page, page.text, newtext, summary=commentUsed)
 
     def skip_page(self, page):
