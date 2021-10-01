@@ -46,7 +46,6 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot.bot import OptionHandler
 from pywikibot.exceptions import APIError, Error
-from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
 
 
@@ -69,8 +68,7 @@ class BaseRevertBot(OptionHandler):
         self.user = kwargs.pop('user', self.site.username())
         super().__init__(**kwargs)
 
-    @deprecate_arg('max', 'total')
-    def get_contributions(self, total=500, ns=None):
+    def get_contributions(self, total: int = 500, ns=None):
         """Get contributions."""
         return self.site.usercontribs(user=self.user, namespaces=ns,
                                       total=total)
