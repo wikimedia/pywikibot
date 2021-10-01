@@ -10,7 +10,7 @@ omitted if there is no successor parameter. The parameters are::
 
     <url>:         an url from where the family settings are loaded
     <name>:        the family name without "_family.py" tail.
-    <dointerwiki>: predefined answer (y|n) to add multiple language
+    <dointerwiki>: predefined answer (y|n) to add multiple site codes
     <verify>:      disable certificate validaton `(y|n)
 
 Example::
@@ -56,7 +56,7 @@ class FamilyFileGenerator:
 
         :param url: an url from where the family settings are loaded
         :param name: the family name without "_family.py" tail.
-        :param dointerwiki: Predefined answer to add multiple language
+        :param dointerwiki: Predefined answer to add multiple site
             codes. Pass `Y` or `y` for yes `N` or `n` for no and
             `E` or `e` if you want to edit the collection of sites.
         :param verify: If a certificate verification failes, you may
@@ -138,8 +138,8 @@ class FamilyFileGenerator:
         self.writefile(verify)
 
     def getlangs(self, w):
-        """Determine language of a site."""
-        print('Determining other languages...', end='')
+        """Determine site code of a family."""
+        print('Determining other sites...', end='')
         try:
             self.langs = w.langs
             print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
@@ -159,7 +159,7 @@ class FamilyFileGenerator:
         if code_len > 1:
             if self.dointerwiki is None:
                 makeiw = input(
-                    '\nThere are {} languages available.'
+                    '\nThere are {} sites available.'
                     '\nDo you want to generate interwiki links? '
                     'This might take a long time. ([y]es/[N]o/[e]dit)'
                     .format(code_len)).lower()
@@ -172,7 +172,7 @@ class FamilyFileGenerator:
             elif makeiw == 'e':
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
-                do_langs = input('Which languages do you want: ')
+                do_langs = input('Which sites do you want: ')
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
@@ -184,7 +184,7 @@ class FamilyFileGenerator:
                 .format(self.name, wiki['prefix'])
 
     def getapis(self):
-        """Load other language pages."""
+        """Load other site pages."""
         print('Loading wikis... ')
         for lang in self.langs:
             key = lang['prefix']
