@@ -17,7 +17,7 @@ from typing import Optional, Union
 import pywikibot.site
 from pywikibot import Site
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import deprecated, first_lower, first_upper
+from pywikibot.tools import first_lower, first_upper
 
 from pywikibot.backports import (
     Any,
@@ -1984,20 +1984,6 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
                 title = first_upper(title)
             return getAutoFormat(lang, title, ignoreFirstLetterCase=False)
     return None, None
-
-
-@deprecated('date.format_date', since='20190526')
-class FormatDate:
-
-    """DEPRECATED. Format a date."""
-
-    def __init__(self, site: Union[str, 'pywikibot.site.BaseSite']) -> None:
-        """Initializer."""
-        self.site = site
-
-    def __call__(self, m: int, d: int) -> str:
-        """Return a formatted month and day."""
-        return format_date(m, d, self.site)
 
 
 def format_date(month: int, day: int,
