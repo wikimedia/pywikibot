@@ -100,7 +100,7 @@ travis-ci.com according to the configuration in .travis.yml .
 
 When changes are merged into the main repository, they are replicated to
 https://github.com/wikimedia/pywikibot , and Travis tests are run and
-published at https://travis-ci.com/github/wikimedia/pywikibot/builds .  These tests
+published at https://app.travis-ci.com/github/wikimedia/pywikibot/builds .  These tests
 use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
 securely stored in .travis.yml file. See section env:global:secure.
 
