@@ -69,7 +69,6 @@ from pywikibot.site import DataSite, Namespace
 from pywikibot.tools import (
     ComparableMixin,
     compute_file_hash,
-    deprecate_arg,
     deprecated,
     deprecated_args,
     first_upper,
@@ -648,7 +647,6 @@ class BasePage(ComparableMixin):
         """
         return self.properties(force=force).get('defaultsort')
 
-    @deprecate_arg('refresh', 'force')
     def expand_text(self, force=False, includecomments=False) -> str:
         """Return the page text with all templates and parser words expanded.
 
@@ -1150,7 +1148,6 @@ class BasePage(ComparableMixin):
         # no restricting template found
         return True
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
     @deprecated_args(comment='summary')
     def save(self,
              summary: Optional[str] = None,
@@ -1271,7 +1268,6 @@ class BasePage(ComparableMixin):
                                         fallback_prompt='; cosmetic changes')
         return summary
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put(self, newtext, summary=None, watch=None, minor=True, botflag=None,
@@ -1731,7 +1727,6 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    @deprecate_arg('quit', 'automatic_quit')
     def delete(self,
                reason: Optional[str] = None,
                prompt: bool = True,
@@ -3190,7 +3185,6 @@ class User(Page):
             for contrib in data['revisions']:
                 yield page, Revision(**contrib)
 
-    @deprecate_arg('number', 'total')
     def uploadedImages(self, total=10):
         """
         Yield tuples describing files uploaded by this user.

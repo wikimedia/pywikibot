@@ -24,7 +24,7 @@ from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import deprecate_arg, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 
 
 try:
@@ -969,7 +969,6 @@ def extract_sections(
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Artículo]]".
 
-@deprecate_arg('pageLink', True)
 def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
     """
     Return a dict of inter-language links found in text.

@@ -1,6 +1,6 @@
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,6 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.page import BasePage, User
-from pywikibot.tools import deprecate_arg
 
 
 logger = logging.getLogger('pywiki.wiki.flow')
@@ -114,7 +113,6 @@ class Board(FlowPage):
                     new_params[key] = value
         return new_params
 
-    @deprecate_arg('format', 'content_format')
     def topics(self, content_format: str = 'wikitext', limit: int = 100,
                sort_by: str = 'newest',
                offset: Union[str, datetime.datetime, None] = None,
@@ -147,7 +145,6 @@ class Board(FlowPage):
             cont_args = self._parse_url(data['links']['pagination'])
             data = self.site.load_topiclist(self, **cont_args)
 
-    @deprecate_arg('format', 'content_format')
     def new_topic(self, title: str, content: str,
                   content_format: str = 'wikitext') -> 'Topic':
         """Create and return a Topic object for a new topic on this Board.
@@ -181,7 +178,6 @@ class Topic(FlowPage):
         self.root._load(load_from_topic=True)
 
     @classmethod
-    @deprecate_arg('format', 'content_format')
     def create_topic(cls: TOPIC_CLASS_TYPE, board: 'Board', title: str,
                      content: str, content_format: str = 'wikitext'
                      ) -> 'Topic':
@@ -238,7 +234,6 @@ class Topic(FlowPage):
         """Whether this topic is moderated."""
         return self.root._current_revision['isModerated']
 
-    @deprecate_arg('format', 'content_format')
     def replies(self, content_format: str = 'wikitext', force: bool = False
                 ) -> List['Post']:
         """A list of replies to this topic's root post.
@@ -250,7 +245,6 @@ class Topic(FlowPage):
         """
         return self.root.replies(content_format=content_format, force=force)
 
-    @deprecate_arg('format', 'content_format')
     def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
         """A convenience method to reply to this topic's root post.
 
@@ -437,7 +431,6 @@ class Post:
                                  self._current_revision['creator']['name'])
         return self._creator
 
-    @deprecate_arg('format', 'content_format')
     def get(self, content_format: str = 'wikitext',
             force: bool = False) -> str:
         """Return the contents of the post in the given format.
@@ -450,7 +443,6 @@ class Post:
             self._load(content_format=content_format)
         return self._content[content_format]
 
-    @deprecate_arg('format', 'content_format')
     def replies(self, content_format: str = 'wikitext', force: bool = False
                 ) -> List['Post']:
         """Return this post's replies.
@@ -476,7 +468,6 @@ class Post:
 
         return self._replies
 
-    @deprecate_arg('format', 'content_format')
     def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
         """Reply to this post.
 

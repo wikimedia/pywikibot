@@ -172,7 +172,6 @@ from pywikibot.logging import (
 )
 from pywikibot.tools import (
     PYTHON_VERSION,
-    deprecate_arg,
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
@@ -1338,7 +1337,6 @@ class BaseBot(OptionHandler):
 
         return True
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
     @deprecated_args(comment='summary')
     def userPut(self, page: 'pywikibot.page.BasePage', oldtext: str,
                 newtext: str, **kwargs: Any) -> bool:
