@@ -10,7 +10,6 @@ import pkg_resources
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import deprecated_args
 
 
 try:
@@ -19,7 +18,6 @@ except ImportError:
     raise ImportError('MySQL python module not found. Please install PyMySQL.')
 
 
-@deprecated_args(encoding=True)
 def mysql_query(query: str, params=None,
                 dbname: Optional[str] = None,
                 verbose: Optional[bool] = None):

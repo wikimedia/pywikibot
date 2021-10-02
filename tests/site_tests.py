@@ -2687,12 +2687,6 @@ class TestFileArchive(DeprecationTestCase):
             self.assertEqual('File:' + item['name'].replace('_', ' '),
                              item['title'])
 
-    def test_filearchive_limit(self):
-        """Test deprecated limit parameter."""
-        fa = list(self.site.filearchive(limit=10))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(fa), 10)
-
     def test_filearchive_prefix(self):
         """Test prefix parameter."""
         gen = self.site.filearchive(prefix='py')

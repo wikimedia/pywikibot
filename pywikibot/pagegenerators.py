@@ -62,7 +62,6 @@ from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
     DequeGenerator,
     deprecated,
-    deprecated_args,
     filter_unique,
     intersect_generators,
     itergroup,
@@ -679,7 +678,6 @@ class GeneratorFactory:
 
         return dupfiltergen
 
-    @deprecated_args(arg='category')
     def getCategory(self, category: str
                     ) -> Tuple['pywikibot.Category', Optional[str]]:
         """
@@ -711,7 +709,6 @@ class GeneratorFactory:
                                                 default_namespace=14))
         return cat, startfrom
 
-    @deprecated_args(arg='category')
     def getCategoryGen(self, category: str,
                        recurse: bool = False,
                        content: bool = False,
@@ -1339,7 +1336,6 @@ def _int_none(v: Optional[str]) -> Optional[int]:
 
 
 @deprecated('Site.allpages()', since='20180512')
-@deprecated_args(step=True)
 def AllpagesPageGenerator(
     start: str = '!',
     namespace: int = 0,
@@ -1370,7 +1366,6 @@ def AllpagesPageGenerator(
                          filterredir=filterredir, total=total, content=content)
 
 
-@deprecated_args(step=True)
 def PrefixingPageGenerator(prefix: str,
                            namespace: NAMESPACE_OR_INT_TYPE = None,
                            includeredirects: Union[None, bool, str] = True,
@@ -1410,7 +1405,6 @@ def PrefixingPageGenerator(prefix: str,
                          filterredir=filterredir, total=total, content=content)
 
 
-@deprecated_args(number='total', mode='logtype', repeat=True)
 def LogeventsPageGenerator(logtype: Optional[str] = None,
                            user: Optional[str] = None,
                            site: OPT_SITE_TYPE = None,
@@ -1446,8 +1440,6 @@ def LogeventsPageGenerator(logtype: Optional[str] = None,
             pywikibot.exception(e)
 
 
-@deprecated_args(number='total', step=True, namespace='namespaces',
-                 repeat=True, get_redirect=True)
 def NewpagesPageGenerator(site: OPT_SITE_TYPE = None,
                           namespaces: Tuple[int] = (0, ),
                           total: Optional[int] = None
@@ -1495,7 +1487,6 @@ def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
 
 
 @deprecated('site.unconnected_pages()', since='20180512')
-@deprecated_args(step=True)
 def UnconnectedPageGenerator(site: OPT_SITE_TYPE = None,
                              total: Optional[int] = None
                              ) -> Iterable['pywikibot.page.Page']:
@@ -1513,7 +1504,6 @@ def UnconnectedPageGenerator(site: OPT_SITE_TYPE = None,
 
 
 @deprecated('File.usingPages()', since='20200515')
-@deprecated_args(referredImagePage='referredFilePage', step=True)
 def FileLinksGenerator(referredFilePage: 'pywikibot.page.FilePage',
                        total: Optional[int] = None,
                        content: bool = False
@@ -1524,7 +1514,6 @@ def FileLinksGenerator(referredFilePage: 'pywikibot.page.FilePage',
 
 
 @deprecated('Page.imagelinks()', since='20200515')
-@deprecated_args(step=True)
 def ImagesPageGenerator(pageWithImages: 'pywikibot.page.Page',
                         total: Optional[int] = None,
                         content: bool = False
@@ -1540,7 +1529,6 @@ def InterwikiPageGenerator(page: 'pywikibot.page.Page'
     return (pywikibot.Page(link) for link in page.interwiki())
 
 
-@deprecated_args(step=True)
 def LanguageLinksPageGenerator(page: 'pywikibot.page.Page',
                                total: Optional[int] = None
                                ) -> Iterable['pywikibot.page.Page']:
@@ -1548,7 +1536,6 @@ def LanguageLinksPageGenerator(page: 'pywikibot.page.Page',
     return (pywikibot.Page(link) for link in page.iterlanglinks(total=total))
 
 
-@deprecated_args(step=True)
 def CategorizedPageGenerator(category: pywikibot.page.Category,
                              recurse: bool = False,
                              start: Optional[int] = None,
@@ -1580,7 +1567,6 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
     yield from category.articles(**kwargs)
 
 
-@deprecated_args(step=True)
 def SubCategoriesPageGenerator(category: 'pywikibot.page.Category',
                                recurse: bool = False,
                                start: Optional[int] = None,
@@ -1608,7 +1594,6 @@ def SubCategoriesPageGenerator(category: 'pywikibot.page.Category',
 
 
 @deprecated('Page.linkedPages()', since='20200515')
-@deprecated_args(step=True)
 def LinkedPageGenerator(linkingPage: 'pywikibot.page.Page',
                         total: Optional[int] = None,
                         content: bool = False
@@ -1724,7 +1709,6 @@ def PagesFromPageidGenerator(pageids: Iterable[str],
     return site.load_pages_from_pageids(pageids)
 
 
-@deprecated_args(number='total', step=True)
 def UserContributionsGenerator(username: str,
                                namespaces: Optional[List[int]] = None,
                                site: OPT_SITE_TYPE = None,
@@ -1795,7 +1779,6 @@ def NamespaceFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
     return (page for page in generator if page.namespace() in namespaces)
 
 
-@deprecated_args(ignoreList='ignore_list')
 def PageTitleFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
                                  ignore_list: Dict[str, Dict[str, str]]
                                  ) -> Iterable['pywikibot.page.Page']:
@@ -1979,7 +1962,6 @@ class RegexFilter:
         return regex_list
 
     @classmethod
-    @deprecated_args(inverse='quantifier')
     def titlefilter(cls: REGEX_FILTER_CLASS,
                     generator: Iterable['pywikibot.page.Page'],
                     regex: PATTERN_STR_OR_SEQ_TYPE,
@@ -2052,7 +2034,6 @@ def QualityFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
             yield page
 
 
-@deprecated_args(site=True)
 def CategoryFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
                                 category_list:
                                     Sequence['pywikibot.page.Category']
@@ -2073,7 +2054,6 @@ RegexFilterPageGenerator = RegexFilter.titlefilter
 RegexBodyFilterPageGenerator = RegexFilter.contentfilter
 
 
-@deprecated_args(begintime='last_edit_start', endtime='last_edit_end')
 def EdittimeFilterPageGenerator(
     generator: Iterable['pywikibot.page.Page'],
     last_edit_start: Optional[datetime.datetime] = None,
@@ -2270,7 +2250,6 @@ def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
         yield from reversed(list(filtered_generator()))
 
 
-@deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=True)
 def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
                         groupsize: int = 50
                         ) -> Iterable['pywikibot.page.Page']:
@@ -2299,7 +2278,6 @@ def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         yield from site.preloadpages(pages, groupsize=groupsize)
 
 
-@deprecated_args(step='groupsize')
 def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
                              groupsize: int = 50
                              ) -> Iterable['pywikibot.page.Page']:
@@ -2315,7 +2293,6 @@ def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         yield from PreloadingGenerator(generator, page_count)
 
 
-@deprecated_args(step='groupsize')
 def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],
                               groupsize: int = 50
                               ) -> Iterable['pywikibot.page.Page']:
@@ -2343,7 +2320,6 @@ def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],
         yield from repo.preload_entities(pages, groupsize)
 
 
-@deprecated_args(number='total', step=True, repeat=True)
 def NewimagesPageGenerator(total: Optional[int] = None,
                            site: OPT_SITE_TYPE = None
                            ) -> Iterable['pywikibot.page.Page']:
@@ -2410,7 +2386,6 @@ def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
 
 
 @deprecated('Site.unusedfiles()', since='20200515')
-@deprecated_args(extension=True, number='total', repeat=True)
 def UnusedFilesGenerator(total: Optional[int] = None,  # pragma: no cover
                          site: OPT_SITE_TYPE = None
                          ) -> Iterable['pywikibot.page.FilePage']:
@@ -2426,7 +2401,6 @@ def UnusedFilesGenerator(total: Optional[int] = None,  # pragma: no cover
 
 
 @deprecated('Site.withoutinterwiki()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def WithoutInterwikiPageGenerator(total: Optional[int] = None,
                                   site: OPT_SITE_TYPE = None
                                   ) -> Iterable['pywikibot.page.Page']:
@@ -2442,7 +2416,6 @@ def WithoutInterwikiPageGenerator(total: Optional[int] = None,
 
 
 @deprecated('Site.uncategorizedcategories()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
                                    site: OPT_SITE_TYPE = None
                                    ) -> Iterable['pywikibot.Category']:
@@ -2458,7 +2431,6 @@ def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
 
 
 @deprecated('Site.uncategorizedimages()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def UnCategorizedImageGenerator(total: int = 100,  # pragma: no cover
                                 site: OPT_SITE_TYPE = None
                                 ) -> Iterable['pywikibot.page.FilePage']:
@@ -2474,7 +2446,6 @@ def UnCategorizedImageGenerator(total: int = 100,  # pragma: no cover
 
 
 @deprecated('Site.uncategorizedpages()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def UnCategorizedPageGenerator(total: int = 100,  # pragma: no cover
                                site: OPT_SITE_TYPE = None
                                ) -> Iterable['pywikibot.page.Page']:
@@ -2490,7 +2461,6 @@ def UnCategorizedPageGenerator(total: int = 100,  # pragma: no cover
 
 
 @deprecated('Site.uncategorizedtemplates()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def UnCategorizedTemplateGenerator(total: int = 100,  # pragma: no cover
                                    site: OPT_SITE_TYPE = None
                                    ) -> Iterable['pywikibot.page.Page']:
@@ -2506,7 +2476,6 @@ def UnCategorizedTemplateGenerator(total: int = 100,  # pragma: no cover
 
 
 @deprecated('Site.lonelypages()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def LonelyPagesPageGenerator(total: Optional[int] = None,  # pragma: no cover
                              site: OPT_SITE_TYPE = None
                              ) -> Iterable['pywikibot.page.Page']:
@@ -2522,7 +2491,6 @@ def LonelyPagesPageGenerator(total: Optional[int] = None,  # pragma: no cover
 
 
 @deprecated('Site.unwatchedpages()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def UnwatchedPagesPageGenerator(total: Optional[int] = None,
                                 site: OPT_SITE_TYPE = None
                                 ) -> Iterable['pywikibot.page.Page']:
@@ -2569,7 +2537,6 @@ def WantedPagesPageGenerator(total: int = 100,  # pragma: no cover
     return site.wantedpages(total=total)
 
 
-@deprecated_args(number='total', repeat=True)
 def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
                               site: OPT_SITE_TYPE = None
                               ) -> Iterable['pywikibot.page.Page']:
@@ -2585,7 +2552,6 @@ def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
 
 
 @deprecated('Site.deadendpages()', since='20200515')
-@deprecated_args(number='total', repeat=True)
 def DeadendPagesPageGenerator(total: int = 100,  # pragma: no cover
                               site: OPT_SITE_TYPE = None
                               ) -> Iterable['pywikibot.page.Page']:
@@ -2600,7 +2566,6 @@ def DeadendPagesPageGenerator(total: int = 100,  # pragma: no cover
     return site.deadendpages(total=total)
 
 
-@deprecated_args(number='total', repeat=True)
 def LongPagesPageGenerator(total: int = 100,
                            site: OPT_SITE_TYPE = None
                            ) -> Iterable['pywikibot.page.Page']:
@@ -2615,7 +2580,6 @@ def LongPagesPageGenerator(total: int = 100,
     return (page for page, _ in site.longpages(total=total))
 
 
-@deprecated_args(number='total', repeat=True)
 def ShortPagesPageGenerator(total: int = 100,
                             site: OPT_SITE_TYPE = None
                             ) -> Iterable['pywikibot.page.Page']:
@@ -2631,7 +2595,6 @@ def ShortPagesPageGenerator(total: int = 100,
 
 
 @deprecated('Site.randompages()', since='20200515')
-@deprecated_args(number='total')
 def RandomPageGenerator(total: Optional[int] = None,  # pragma: no cover
                         site: OPT_SITE_TYPE = None,
                         namespaces: Optional[
@@ -2649,7 +2612,6 @@ def RandomPageGenerator(total: Optional[int] = None,  # pragma: no cover
 
 
 @deprecated('Site.randompages()', since='20200515')
-@deprecated_args(number='total')
 def RandomRedirectPageGenerator(total: Optional[int] = None,
                                 site: OPT_SITE_TYPE = None,
                                 namespaces: Optional[
@@ -2668,7 +2630,6 @@ def RandomRedirectPageGenerator(total: Optional[int] = None,
 
 
 @deprecated('Site.exturlusage()', since='20200515')
-@deprecated_args(link='url', euprotocol='protocol', step=True)
 def LinksearchPageGenerator(url: str,
                             namespaces: Optional[List[int]] = None,
                             total: Optional[int] = None,
@@ -2693,7 +2654,6 @@ def LinksearchPageGenerator(url: str,
 
 
 @deprecated('Site.search()', since='20200515')
-@deprecated_args(number='total', step=True)
 def SearchPageGenerator(query: str,  # pragma: no cover
                         total: Optional[int] = None,
                         namespaces: Optional[
@@ -2872,7 +2832,6 @@ class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
     :ivar parser: holds the xmlreader.XmlDump parse method
     """
 
-    @deprecated_args(xmlFilename='filename')
     def __init__(self, filename: str, start: Optional[str] = None,
                  namespaces: Union[
                      None, NAMESPACE_OR_STR_TYPE,
@@ -2945,7 +2904,6 @@ def YearPageGenerator(start: int = 1, end: int = 2050,
             yield pywikibot.Page(pywikibot.Link(current_year, site))
 
 
-@deprecated_args(startMonth='start_month', endMonth='end_month')
 def DayPageGenerator(start_month: int = 1, end_month: int = 12,
                      site: OPT_SITE_TYPE = None, year: int = 2000
                      ) -> Iterable['pywikibot.page.Page']:

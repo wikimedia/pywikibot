@@ -17,7 +17,7 @@ import pywikibot
 
 from pywikibot import config
 
-from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
+from pywikibot.tools import deprecated, PYTHON_VERSION
 
 if PYTHON_VERSION < (3, 6):
     from hashlib import md5
@@ -51,7 +51,6 @@ class Throttle:
 
     """
 
-    @deprecated_args(multiplydelay=True)
     def __init__(self, site, *,
                  mindelay: Optional[int] = None,
                  maxdelay: Optional[int] = None,

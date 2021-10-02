@@ -24,6 +24,7 @@ Code cleanups
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.4.0: Pywikibot `began using semantic versioning
   <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,

@@ -14,7 +14,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
 )
 from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.tools import deprecated_args, merge_unique_dicts
+from pywikibot.tools import merge_unique_dicts
 
 
 class EchoMixin:
@@ -232,7 +232,6 @@ class WikibaseClientMixin:
 
     """APISite mixin for WikibaseClient extension."""
 
-    @deprecated_args(step=True)
     @need_extension('WikibaseClient')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.

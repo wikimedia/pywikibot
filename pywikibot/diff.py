@@ -15,7 +15,7 @@ from typing import Optional, Union
 
 import pywikibot
 from pywikibot.backports import Dict, Iterable, List, Sequence, Tuple
-from pywikibot.tools import chars, deprecated_args
+from pywikibot.tools import chars
 from pywikibot.tools.formatter import color_format
 
 
@@ -249,7 +249,6 @@ class PatchManager:
     If all hunks are approved, text_b will be obtained.
     """
 
-    @deprecated_args(n='context')
     def __init__(self, text_a: str, text_b: str, context: int = 0,
                  by_letter: bool = False,
                  replace_invisible: bool = False) -> None:

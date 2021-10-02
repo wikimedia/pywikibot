@@ -14,11 +14,7 @@ import pywikibot
 
 from pywikibot.backports import Iterable, Sequence
 
-from pywikibot.tools import (
-    deprecated,
-    deprecated_args,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecated, issue_deprecation_warning
 
 # TODO: replace these after T286867
 
@@ -274,7 +270,6 @@ class ContextOption(OutputOption, StandardOption):
         end = min(len(self.text), self.end + self.context)
         return self.text[start:end]
 
-    @deprecated_args(start_context='start', end_context='end')
     @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
         """DEPRECATED. Output a section from the text."""

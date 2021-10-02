@@ -22,7 +22,6 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import deprecated_args
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
@@ -481,7 +480,6 @@ class TerminalHandler(logging.StreamHandler):
     # create a class-level lock that can be shared by all instances
     sharedlock = threading.RLock()
 
-    @deprecated_args(strm='stream')
     def __init__(self, UI, stream=None):
         """Initialize the handler.
 

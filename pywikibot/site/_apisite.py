@@ -74,7 +74,6 @@ from pywikibot.tools import (
     MediaWikiVersion,
     compute_file_hash,
     deprecated,
-    deprecated_args,
     issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
@@ -212,7 +211,6 @@ class APISite(
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of {}.'.format(dbname))
 
-    @deprecated_args(step=True)
     def _generator(self, gen_class, type_arg: Optional[str] = None,
                    namespaces=None, total: Optional[int] = None, **args):
         """Convenience method that returns an API generator.
@@ -662,7 +660,6 @@ class APISite(
 
         return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
-    @deprecated_args(forceReload=True)
     def mediawiki_message(self, key, lang=None) -> str:
         """Fetch the text for a MediaWiki message.
 
@@ -754,7 +751,6 @@ class APISite(
         return msgs['comma-separator'].join(
             args[:-2] + [concat.join(args[-2:])])
 
-    @deprecated_args(string='text')
     def expand_text(self, text: str, title=None, includecomments=None) -> str:
         """Parse the given text for preprocessing and rendering.
 

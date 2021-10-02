@@ -21,12 +21,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    classproperty,
-    deprecated,
-    deprecated_args,
-)
+from pywikibot.tools import classproperty, deprecated, ModuleDeprecationWrapper
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -546,7 +541,6 @@ class Family:
     _families = {}
 
     @staticmethod
-    @deprecated_args(fatal=True)
     def load(fam: Optional[str] = None):
         """Import the named family.
 
@@ -788,7 +782,6 @@ class Family:
         """
         raise NotImplementedError('This family does not support EventStreams')
 
-    @deprecated_args(name='title')
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
         return '{}?title={}&redirect=no'.format(self.path(code), title)
@@ -1227,7 +1220,6 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return '{}.wikimedia.org'.format(cls.name)
 
 
-@deprecated_args(site=True)
 def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.

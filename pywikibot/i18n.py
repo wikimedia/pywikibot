@@ -43,10 +43,7 @@ from pywikibot.backports import (
     Sequence,
 )
 from pywikibot.plural import plural_rule
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    deprecated_args,
-)
+from pywikibot.tools import ModuleDeprecationWrapper
 
 STR_OR_SITE_TYPE = Union[str, 'pywikibot.site.BaseSite']
 
@@ -637,7 +634,6 @@ def translate(code: STR_OR_SITE_TYPE,
     return trans
 
 
-@deprecated_args(code='source')
 def twtranslate(source: STR_OR_SITE_TYPE,
                 twtitle: str,
                 parameters: Union[Sequence[str], Mapping[str, int],
@@ -763,7 +759,6 @@ def twtranslate(source: STR_OR_SITE_TYPE,
     return trans
 
 
-@deprecated_args(code='source')
 def twhas_key(source: STR_OR_SITE_TYPE, twtitle: str) -> bool:
     """
     Check if a message has a translation in the specified language code.

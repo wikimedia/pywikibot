@@ -70,7 +70,6 @@ from pywikibot.tools import (
     ComparableMixin,
     compute_file_hash,
     deprecated,
-    deprecated_args,
     first_upper,
     is_ip_address,
     issue_deprecation_warning,
@@ -259,10 +258,6 @@ class BasePage(ComparableMixin):
             self.site.loadpageinfo(self)
         return self._pageid
 
-    @deprecated_args(
-        savetitle='as_url', withNamespace='with_ns',
-        withSection='with_section', forceInterwiki='force_interwiki',
-        asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
     def title(self, *, underscore=False, with_ns=True,
               with_section=True, as_url=False, as_link=False,
               allow_interwiki=True, force_interwiki=False, textlink=False,
@@ -878,9 +873,6 @@ class BasePage(ComparableMixin):
         disambig_in_page = disambigs.intersection(templates)
         return self.namespace() != 10 and bool(disambig_in_page)
 
-    @deprecated_args(withTemplateInclusion='with_template_inclusion',
-                     onlyTemplateInclusion='only_template_inclusion',
-                     redirectsOnly='filter_redirects')
     def getReferences(self,
                       follow_redirects: bool = True,
                       with_template_inclusion: bool = True,
@@ -924,8 +916,6 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(followRedirects='follow_redirects',
-                     filterRedirects='filter_redirects')
     def backlinks(self,
                   follow_redirects: bool = True,
                   filter_redirects: Optional[bool] = None,
@@ -1142,7 +1132,6 @@ class BasePage(ComparableMixin):
         # no restricting template found
         return True
 
-    @deprecated_args(comment='summary')
     def save(self,
              summary: Optional[str] = None,
              watch: Union[str, bool, None] = None,
@@ -1262,8 +1251,6 @@ class BasePage(ComparableMixin):
                                         fallback_prompt='; cosmetic changes')
         return summary
 
-    @deprecated_args(comment='summary', watchArticle='watch',
-                     minorEdit='minor')
     def put(self, newtext, summary=None, watch=None, minor=True, botflag=None,
             force=False, asynchronous=False, callback=None, **kwargs):
         """
@@ -1283,8 +1270,6 @@ class BasePage(ComparableMixin):
 
     @deprecated('put(asynchronous=True) or save(asynchronous=True)',
                 since='20180501')
-    @deprecated_args(comment='summary', watchArticle='watch',
-                     minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
                   botflag=None, force=False, callback=None,
                   **kwargs):  # pragma: no cover
@@ -1517,7 +1502,6 @@ class BasePage(ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(withSortKey='with_sort_key')
     def categories(self,
                    with_sort_key: bool = False,
                    total: Optional[int] = None,
@@ -1613,7 +1597,6 @@ class BasePage(ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse')
     def revisions(self,
                   reverse: bool = False,
                   total: Optional[int] = None,
@@ -1627,7 +1610,6 @@ class BasePage(ComparableMixin):
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
-    @deprecated_args(reverseOrder='reverse')
     def getVersionHistoryTable(self,
                                reverse: bool = False,
                                total: Optional[int] = None):
@@ -1697,7 +1679,6 @@ class BasePage(ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
-    @deprecated_args(deleteAndMove='noredirect', movetalkpage='movetalk')
     def move(self,
              newtitle: str,
              reason: Optional[str] = None,
@@ -1808,7 +1789,6 @@ class BasePage(ComparableMixin):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
 
-    @deprecated_args(retrieveText='content')
     def getDeletedRevision(self, timestamp, content=False, **kwargs) -> List:
         """
         Return a particular deleted revision by timestamp.
@@ -1847,7 +1827,6 @@ class BasePage(ComparableMixin):
                 .format(timestamp))
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecated_args(comment='reason')
     def undelete(self, reason: Optional[str] = None):
         """
         Undelete revisions based on the markers set by previous calls.
@@ -1915,9 +1894,6 @@ class BasePage(ComparableMixin):
 
         self.site.protect(self, protections, reason, **kwargs)
 
-    @deprecated_args(
-        comment='summary', oldCat='old_cat', newCat='new_cat',
-        sortKey='sort_key', inPlace='in_place')
     def change_category(
         self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
         include=None
@@ -2048,7 +2024,6 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecated_args(defaultNamespace='ns')
     def __init__(self, source, title: str = '', ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
@@ -2533,7 +2508,6 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecated_args(sortKey='sort_key')
     def __init__(self, source, title: str = '', sort_key=None):
         """
         Initializer.
@@ -2546,7 +2520,6 @@ class Category(Page):
             raise ValueError("'{}' is not in the category namespace!"
                              .format(self.title()))
 
-    @deprecated_args(sortKey='sort_key')
     def aslink(self, sort_key: Optional[str] = None) -> str:
         """
         Return a link to place a page in this Category.
@@ -2617,7 +2590,6 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', startsort=True, endsort=True)
     def articles(self,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,
@@ -2832,7 +2804,6 @@ class User(Page):
     This class also represents the Wiki page User:<username>
     """
 
-    @deprecated_args(site='source', name='title')
     def __init__(self, source, title=''):
         """
         Initializer for a User object.
@@ -3107,7 +3078,6 @@ class User(Page):
         """
         return next(iter(self.logevents(total=1)), None)
 
-    @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total: int = 500, **kwargs) -> tuple:
         """
         Yield tuples describing this user edits.
@@ -4446,7 +4416,6 @@ class Claim(Property):
 
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
-    @deprecated_args(isReference='is_reference', isQualifier='is_qualifier')
     def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
                  is_qualifier=False, rank='normal', **kwargs):
         """
@@ -5248,7 +5217,6 @@ class Link(BaseLink):
         '|&#x[0-9A-Fa-f]+;'
     )
 
-    @deprecated_args(defaultNamespace='default_namespace')
     def __init__(self, text, source=None, default_namespace=0):
         """
         Initializer.
@@ -5833,7 +5801,6 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
     return _ENTITY_SUB(handle_entity, text)
 
 
-@deprecated_args(site='encodings')
 @deprecated('pywikibot.tools.chars.url2string', since='6.2.0')
 def url2unicode(title: str, encodings='utf-8') -> str:
     """

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,6 @@ import subprocess
 from collections import Counter
 
 import pywikibot
-from pywikibot.tools import deprecated_args
 
 
 def _call_cmd(args, lib='djvulibre') -> tuple:
@@ -58,7 +57,6 @@ class DjVuFile:
 
     """
 
-    @deprecated_args(file_djvu='file')
     def __init__(self, file: str):
         """
         Initializer.

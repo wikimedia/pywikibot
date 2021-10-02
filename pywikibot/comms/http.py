@@ -50,7 +50,6 @@ from pywikibot.exceptions import (
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
-    deprecated_args,
     file_mode_checker,
     issue_deprecation_warning,
 )
@@ -222,7 +221,6 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-@deprecated_args(body='data')
 def request(site,
             uri: Optional[str] = None,
             headers: Optional[dict] = None,
@@ -323,7 +321,6 @@ def error_handling_callback(response):
         warning('Http response status {}'.format(response.status_code))
 
 
-@deprecated_args(body='data')
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False, **kwargs):

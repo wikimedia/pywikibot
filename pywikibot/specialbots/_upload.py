@@ -25,7 +25,6 @@ from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
-from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
 
 
@@ -33,10 +32,6 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    @deprecated_args(urlEncoding='url_encoding', useFilename='use_filename',
-                     keepFilename='keep_filename',
-                     verifyDescription='verify_description',
-                     ignoreWarning='ignore_warning', targetSite='target_site')
     def __init__(self, url: Union[List[str], str], *,
                  url_encoding=None,
                  description: str = '',

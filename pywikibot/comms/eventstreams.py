@@ -25,7 +25,6 @@ from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
-from pywikibot.tools import deprecated_args
 
 
 try:
@@ -76,7 +75,6 @@ class EventStreams:
     >>> del stream
     """
 
-    @deprecated_args(stream='streams')
     def __init__(self, **kwargs):
         """Initializer.
 

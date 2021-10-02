@@ -71,7 +71,6 @@ from pywikibot.textlib import (
 )
 from pywikibot.tools import (
     deprecated,
-    deprecated_args,
     first_lower,
     first_upper,
     issue_deprecation_warning,
@@ -225,7 +224,6 @@ class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
-    @deprecated_args(redirect=True, diff='show_diff', site='page')
     def __init__(self, page: 'pywikibot.page.BasePage', *,
                  show_diff: bool = False,
                  namespace: Optional[int] = None,
@@ -312,7 +310,6 @@ class CosmeticChangesToolkit:
     @classmethod
     @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
                 since='20200415')
-    @deprecated_args(diff='show_diff')
     def from_page(cls, page: 'pywikibot.page.BasePage',
                   show_diff: bool = False,
                   ignore: IntEnum = CANCEL.ALL) -> 'CosmeticChangesToolkit':

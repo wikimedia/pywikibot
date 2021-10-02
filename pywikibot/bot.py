@@ -173,7 +173,6 @@ from pywikibot.logging import (
 from pywikibot.tools import (
     PYTHON_VERSION,
     deprecated,
-    deprecated_args,
     issue_deprecation_warning,
 )
 from pywikibot.tools._logging import LoggingFormatter
@@ -1335,7 +1334,6 @@ class BaseBot(OptionHandler):
 
         return True
 
-    @deprecated_args(comment='summary')
     def userPut(self, page: 'pywikibot.page.BasePage', oldtext: str,
                 newtext: str, **kwargs: Any) -> bool:
         """
@@ -1837,7 +1835,6 @@ class CurrentPageBot(BaseBot):
         self.current_page = page
         self.treat_page()
 
-    @deprecated_args(comment='summary')
     def put_current(self, new_text: str,
                     ignore_save_related_errors: Optional[bool] = None,
                     ignore_server_errors: Optional[bool] = None,
@@ -2009,7 +2006,6 @@ class WikidataBot(Bot, ExistingPageBot):
     use_from_page = True
     treat_missing_item = False
 
-    @deprecated_args(use_from_page=True)
     def __init__(self, **kwargs: Any) -> None:
         """Initializer of the WikidataBot."""
         self.create_missing_item = False

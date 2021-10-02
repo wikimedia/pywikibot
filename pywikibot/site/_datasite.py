@@ -25,7 +25,6 @@ from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.tools import (
     deprecated,
-    deprecated_args,
     issue_deprecation_warning,
     itergroup,
     merge_unique_dicts,
@@ -278,7 +277,6 @@ class DataSite(APISite):
 
         return dtype
 
-    @deprecated_args(identification='entity')
     @need_right('edit')
     def editEntity(self, entity, data, bot=True, **kwargs):
         """
@@ -637,8 +635,6 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('item-merge')
-    @deprecated_args(ignoreconflicts='ignore_conflicts', fromItem='from_item',
-                     toItem='to_item')
     def mergeItems(self, from_item, to_item, ignore_conflicts=None,
                    summary=None, bot=True):
         """
@@ -694,7 +690,6 @@ class DataSite(APISite):
         req = self._simple_request(**params)
         return req.submit()
 
-    @deprecated_args(limit='total')
     def search_entities(self, search: str, language: str,
                         total: Optional[int] = None, **kwargs):
         """
