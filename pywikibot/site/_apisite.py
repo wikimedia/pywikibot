@@ -79,7 +79,6 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
-    remove_last_args,
 )
 
 
@@ -109,7 +108,6 @@ class APISite(
     Do not instantiate directly; use :py:obj:`pywikibot.Site` function.
     """
 
-    @remove_last_args(['sysop'])
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
         super().__init__(code, fam, user)
@@ -284,7 +282,6 @@ class APISite(
         return self._request_class({'parameters': kwargs}).create_simple(
             self, **kwargs)
 
-    @remove_last_args(['sysop'])
     def logged_in(self):
         """Verify the bot is logged into the site as the expected user.
 
@@ -521,7 +518,6 @@ class APISite(
             self._globaluserinfo['registration'] = iso_ts
         return self._globaluserinfo
 
-    @remove_last_args(['sysop'])
     def is_blocked(self):
         """
         Return True when logged in user is blocked.
@@ -605,7 +601,6 @@ class APISite(
                                            start=start, end=end,
                                            reverse=reverse, is_ts=is_ts))
 
-    @remove_last_args(['sysop'])
     def has_right(self, right):
         """Return true if and only if the user has a specific right.
 
@@ -617,7 +612,6 @@ class APISite(
         """
         return right.lower() in self.userinfo['rights']
 
-    @remove_last_args(['sysop'])
     def has_group(self, group):
         """Return true if and only if the user is a member of specified group.
 
@@ -627,7 +621,6 @@ class APISite(
         """
         return group.lower() in self.userinfo['groups']
 
-    @remove_last_args(['sysop'])
     def messages(self):
         """Return true if the user has new messages, and false otherwise."""
         return 'messages' in self.userinfo
@@ -830,7 +823,6 @@ class APISite(
             return self._magicwords[word]
         return [word]
 
-    @remove_last_args(('default', ))
     def redirect(self):
         """Return the localized #REDIRECT keyword."""
         # return the magic word without the preceding '#' character
@@ -858,12 +850,10 @@ class APISite(
             pattern = None
         return super().redirectRegex(pattern)
 
-    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return self.getmagicwords('pagename')
 
-    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords('pagenamee')

@@ -25,7 +25,6 @@ from pywikibot.tools import (
     deprecated,
     first_upper,
     normalize_username,
-    remove_last_args,
 )
 
 
@@ -33,7 +32,6 @@ class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
 
-    @remove_last_args(['sysop'])
     def __init__(self, code: str, fam=None, user=None) -> None:
         """
         Initializer.
@@ -186,7 +184,6 @@ class BaseSite(ComparableMixin):
             return self.username()
         return None
 
-    @remove_last_args(['sysop'])
     def username(self):
         """Return the username used for the site."""
         return self._username
@@ -264,17 +261,14 @@ class BaseSite(ComparableMixin):
         index = self.namespaces.lookup_name(value)
         return self.namespace(index)
 
-    @remove_last_args(('default', ))
     def redirect(self):
         """Return list of localized redirect tags for the site."""
         return ['REDIRECT']
 
-    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return ['PAGENAME']
 
-    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']

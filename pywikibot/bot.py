@@ -176,7 +176,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
-    remove_last_args,
 )
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
@@ -320,7 +319,6 @@ def handler_namer(name: str) -> str:
     return '{}.{}{}'.format(root, qualifier, ext)
 
 
-@remove_last_args(['strm'])
 def init_handlers() -> None:
     """Initialize logging system for terminal-based bots.
 

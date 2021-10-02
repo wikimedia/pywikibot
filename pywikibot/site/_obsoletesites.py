@@ -8,7 +8,6 @@ import pywikibot
 from pywikibot.exceptions import NoPageError
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
-from pywikibot.tools import remove_last_args
 
 
 class RemovedSite(BaseSite):
@@ -21,7 +20,6 @@ class RemovedSite(BaseSite):
 class ClosedSite(APISite):
     """Site closed to read-only mode."""
 
-    @remove_last_args(['sysop'])
     def __init__(self, code, fam, user=None):
         """Initializer."""
         super().__init__(code, fam, user)
