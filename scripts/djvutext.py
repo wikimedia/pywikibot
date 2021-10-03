@@ -65,7 +65,7 @@ class DjVuTextBot(SingleSiteBot):
         :type index: Page object
         :param pages: page interval to upload (start, end)
         """
-        super().__init__(site=index.site, **kwargs)
+        super().__init__(**kwargs)
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(with_ns=False)
