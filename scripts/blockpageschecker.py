@@ -56,7 +56,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.editor import TextEditor
-from pywikibot.exceptions import Error, TranslationError
+from pywikibot.exceptions import Error
 
 
 # This is required for the text that is shown when you run this script
@@ -214,14 +214,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         if not key:
             return
 
-        try:
-            commentUsed = i18n.twtranslate(self.site,
-                                           'blockpageschecker-' + key)
-        except TranslationError:
-            commentUsed = i18n.twtranslate(self.site,
-                                           'blockpageschecker-summary')
-
-        self.userPut(page, page.text, newtext, summary=commentUsed)
+        summary = i18n.twtranslate(self.site, 'blockpageschecker-' + key)
+        self.userPut(page, page.text, newtext, summary=summary)
 
     def skip_page(self, page):
         """Skip if the user has not permission to edit."""
