@@ -6,12 +6,12 @@
 #
 import atexit
 import datetime
-import inspect
 import math
 import re
 import sys
 import threading
 import time
+
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
@@ -54,10 +54,6 @@ from pywikibot.bot import (
     ui,
 )
 from pywikibot.diff import PatchManager
-from pywikibot.exceptions import (
-    DEPRECATED_EXCEPTIONS,
-    CoordinateGlobeUnknownError,
-)
 from pywikibot.family import AutoFamily, Family
 from pywikibot.i18n import translate
 from pywikibot.logging import (
@@ -100,26 +96,16 @@ WB_UNKNOWN_CLASS = Any  # Type['WbUnknown']
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
-    '__maintainer__', '__maintainer_email__', '__name__',
-    '__url__', '__version__',
-    'Bot', 'calledModuleName', 'CaptchaError', 'CascadeLockedPage',
-    'Category', 'CircularRedirect', 'Claim', 'Coordinate',
-    'CoordinateGlobeUnknownException', 'critical', 'CurrentPageBot', 'debug',
-    'EditConflict', 'error', 'Error', 'exception', 'FatalServerError',
-    'FilePage', 'handle_args', 'html2unicode', 'input', 'input_choice',
-    'input_yn', 'InterwikiRedirectPage', 'InvalidTitle', 'IsNotRedirectPage',
-    'IsRedirectPage', 'ItemPage', 'Link', 'LockedNoPage', 'LockedPage', 'log',
-    'MediaInfo', 'NoCreateError', 'NoMoveTarget', 'NoPage', 'NoUsername',
-    'NoWikibaseEntity', 'OtherPageSaveError', 'output', 'Page',
-    'PageCreatedConflict', 'PageDeletedConflict', 'PageRelatedError',
-    'PageSaveRelatedError', 'PropertyPage', 'SectionError', 'Server414Error',
-    'Server504Error', 'ServerError', 'showDiff', 'show_help', 'Site',
-    'SiteDefinitionError', 'SiteLink', 'SpamblacklistError', 'stdout',
-    'Timestamp', 'TitleblacklistError', 'translate', 'ui', 'unicode2html',
-    'UnknownExtension', 'UnknownFamily', 'UnknownSite', 'UnsupportedPage',
-    'UploadWarning', 'url2unicode', 'User', 'warning', 'WbGeoShape',
-    'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown',
-    'WikiBaseError', 'WikidataBot',
+    '__maintainer__', '__maintainer_email__', '__name__', '__url__',
+    '__version__',
+    'Bot', 'calledModuleName', 'Category', 'Claim', 'Coordinate', 'critical',
+    'CurrentPageBot', 'debug', 'error', 'exception', 'FilePage', 'handle_args',
+    'html2unicode', 'input', 'input_choice', 'input_yn', 'ItemPage', 'Link',
+    'log', 'MediaInfo', 'output', 'Page', 'PropertyPage', 'showDiff',
+    'show_help', 'Site', 'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui',
+    'unicode2html', 'UploadWarning', 'url2unicode', 'User', 'warning',
+    'WbGeoShape', 'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime',
+    'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
@@ -288,7 +274,7 @@ class Coordinate(_WbRepresentation):
         """Return the entity uri of the globe."""
         if not self._entity:
             if self.globe not in self.site.globes():
-                raise CoordinateGlobeUnknownError(
+                raise exceptions.CoordinateGlobeUnknownError(
                     '{} is not supported in Wikibase yet.'
                     .format(self.globe))
             return self.site.globes()[self.globe]
@@ -1414,29 +1400,3 @@ wrapper.add_deprecated_attr('showHelp', show_help,
 wrapper.add_deprecated_attr(
     'unicode2html', replacement_name='pywikibot.tools.chars.string2html',
     since='6.2.0')
-
-# This module aliases many (but not all) pywikibot.exception classes and one
-# from pywikibot.data.api. Use of these aliases is deprecated. When removed
-# we can drop them from both our import and __all__ listing.
-
-EXCEPTION_CLASSES = {
-    n for n, _ in inspect.getmembers(exceptions, inspect.isclass)
-}
-
-EXCEPTION_CLASSES.add('UploadWarning')
-EXCEPTION_CLASSES.update(DEPRECATED_EXCEPTIONS.keys())
-
-for name in __all__:
-    if name in EXCEPTION_CLASSES:
-        if name in DEPRECATED_EXCEPTIONS:
-            replacement = DEPRECATED_EXCEPTIONS[name]
-        elif name == 'UploadWarning':
-            replacement = 'UploadError'
-        else:
-            replacement = name
-
-        wrapper.add_deprecated_attr(
-            name,
-            replacement_name='pywikibot.exceptions.{}'.format(replacement),
-            since='20210424'
-        )
