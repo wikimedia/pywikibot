@@ -53,7 +53,7 @@ from itertools import chain
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.editor import TextEditor
 from pywikibot.exceptions import Error, TranslationError
 
@@ -168,7 +168,7 @@ project_inserted = ['ar', 'cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 ParsedTemplate = namedtuple('ParsedTemplate', 'blocktype, regex')
 
 
-class CheckerBot(ExistingPageBot, SingleSiteBot):
+class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     """Bot to remove stale protection templates from unprotected pages."""
 
