@@ -49,6 +49,7 @@ import webbrowser
 
 from collections import namedtuple
 from itertools import chain
+from typing import Optional
 
 import pywikibot
 
@@ -165,7 +166,7 @@ categoryToCheck = {
 project_inserted = ['ar', 'cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 
 # END PREFERENCES
-ParsedTemplate = namedtuple('ParsedTemplate', 'blocktype, regex')
+ParsedTemplate = namedtuple('ParsedTemplate', 'blocktype, regex, msgtype')
 
 
 class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
@@ -207,12 +208,15 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 self.invoke_editor(page)
             return
 
-        newtext = self.parse_tempates.send((page.text, page.protection()))
+        newtext, key = self.parse_tempates.send((page.text, page.protection()))
         next(self.parse_tempates)
+
+        if not key:
+            return
 
         try:
             commentUsed = i18n.twtranslate(self.site,
-                                           'blockpageschecker-deleting')
+                                           'blockpageschecker-' + key)
         except TranslationError:
             commentUsed = i18n.twtranslate(self.site,
                                            'blockpageschecker-summary')
@@ -251,22 +255,25 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 for catchRegex in template:
                     resultCatch = re.findall(catchRegex, text)
                     if resultCatch:
-                        return ParsedTemplate(results[index], catchRegex)
+                        return ParsedTemplate(
+                            results[index], catchRegex, 'modifying')
 
             if TSMP and TTMP and TTP != TTMP and TSP != TSMP:
                 for catchRegex in TTMP:
                     resultCatch = re.findall(catchRegex, text)
                     if resultCatch:
-                        return ParsedTemplate('sysop-move', catchRegex)
+                        return ParsedTemplate(
+                            'sysop-move', catchRegex, 'modifying')
 
                 for catchRegex in TSMP:
                     resultCatch = re.findall(catchRegex, text)
                     if resultCatch:
-                        return ParsedTemplate('autoconfirmed-move', catchRegex)
+                        return ParsedTemplate(
+                            'autoconfirmed-move', catchRegex, 'modifying')
 
             # If editable means that we have no regex, won't change anything
             # with this regex
-            return ParsedTemplate('editable', r'\A\n')
+            return ParsedTemplate('editable', r'\A', 'adding')
 
         TSP = i18n.translate(self.site, templateSemiProtection)
         TTP = i18n.translate(self.site, templateTotalProtection)
@@ -289,6 +296,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             # keep track of the changes for each step (edit then move)
             changes = -1
 
+            msg_type = None  # type: Optional[str]
             editRestr = restrictions.get('edit')
             if not editRestr:
                 # page is not edit-protected
@@ -313,6 +321,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 if not self.opt.move:
                     msg += ', deleting the template..'
                 pywikibot.output(msg + '.')
+                msg_type = 'deleting'
 
             elif editRestr[0] == 'sysop':
                 # total edit protection
@@ -338,6 +347,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     else:
                         text, changes = re.subn(
                             TemplateInThePage.regex, TNR[1], text)
+                    msg_type = TemplateInThePage.msgtype
 
             elif TSP or TU:
                 # implicitly
@@ -364,6 +374,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     else:
                         text, changes = re.subn(
                             TemplateInThePage.regex, TNR[0], text)
+                    msg_type = TemplateInThePage.msgtype
 
             if not changes:
                 # We tried to fix edit-protection templates, but it did
@@ -389,6 +400,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     if not changes:
                         text, changes = re.subn(
                             '({})'.format(replaceToPerform), '', text)
+                    msg_type = 'deleting'
                 elif moveRestr[0] == 'sysop':
                     # move-total-protection
                     if TemplateInThePage.blocktype == 'sysop-move' and TTMP \
@@ -408,6 +420,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         else:
                             text, changes = re.subn(
                                 TemplateInThePage.regex, TNR[3], text)
+                        msg_type = TemplateInThePage.msgtype
 
                 elif TSMP or TU:
                     # implicitly
@@ -430,6 +443,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         else:
                             text, changes = re.subn(
                                 TemplateInThePage.regex, TNR[2], text)
+                        msg_type = TemplateInThePage.msgtype
 
                 if not changes:
                     # We tried to fix move-protection templates
@@ -437,7 +451,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.warning(
                         'No move-protection template could be found')
 
-            yield text
+            yield text, msg_type
 
 
 def main(*args: str) -> None:
