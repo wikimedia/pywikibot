@@ -66,7 +66,6 @@ from pywikibot.tools import (
     filter_unique,
     intersect_generators,
     itergroup,
-    redirect_func,
 )
 
 
@@ -3139,14 +3138,6 @@ class PetScanPageGenerator:
                                   int(raw_page['namespace']))
             yield page
 
-
-DuplicateFilterPageGenerator = redirect_func(
-    filter_unique, old_name='DuplicateFilterPageGenerator', since='20180715')
-PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
-                                        old_name='PreloadingItemGenerator',
-                                        since='20170314')
-TextfilePageGenerator = redirect_func(
-    TextIOPageGenerator, old_name='TextfilePageGenerator', since='20210611')
 
 if __name__ == '__main__':  # pragma: no cover
     pywikibot.output('Pagegenerators cannot be run as script - are you '
