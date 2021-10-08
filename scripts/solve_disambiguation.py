@@ -106,12 +106,7 @@ from pywikibot.exceptions import (
     NoPageError,
     PageSaveRelatedError,
 )
-from pywikibot.tools import (
-    deprecated,
-    first_lower,
-    first_upper,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import first_lower, first_upper, issue_deprecation_warning
 from pywikibot.tools.formatter import SequenceOutputter
 
 
@@ -703,90 +698,6 @@ Either add them to available_options setting of {classname}
 bot class or use available_options.update() to use default settings from
 DisambiguationRobot""".format(options=added_keys,
                               classname=self.__class__.__name__))
-
-    # Deprecated properties ---------------------------------------
-
-    @property
-    @deprecated('opt.always', since='20210303')
-    def always(self):  # noqa: D102
-        return self.opt.always
-
-    @always.setter
-    @deprecated('opt.always', since='20210303')
-    def always(self, value):
-        self.opt.always = value
-
-    @property
-    @deprecated('opt.dnskip', since='20210303')
-    def dnSkip(self):  # noqa: D102
-        return self.opt.dnskip
-
-    @dnSkip.setter
-    @deprecated('opt.dnskip', since='20210303')
-    def dnSkip(self, value):
-        self.opt.dnskip = value
-
-    @property
-    @deprecated('opt.primary', since='20210303')
-    def primary(self):  # noqa: D102
-        return self.opt.primary
-
-    @primary.setter
-    @deprecated('opt.primary', since='20210303')
-    def primary(self, value):
-        self.opt.primary = value
-
-    @property
-    @deprecated('opt.main', since='20210303')
-    def main_only(self):  # noqa: D102
-        return self.opt.main
-
-    @main_only.setter
-    @deprecated('opt.main', since='20210303')
-    def main_only(self, value):
-        self.opt.main = value
-
-    @property
-    @deprecated('opt.first', since='20210303')
-    def first_only(self):  # noqa: D102
-        return self.opt.first
-
-    @first_only.setter
-    @deprecated('opt.first', since='20210303')
-    def first_only(self, value):
-        self.opt.first = value
-
-    @property
-    @deprecated('opt.min', since='20210303')
-    def minimum(self):  # noqa: D102
-        return self.opt.min
-
-    @minimum.setter
-    @deprecated('opt.min', since='20210303')
-    def minimum(self, value):
-        self.opt.min = value
-
-    @property
-    @deprecated('opt.pos', since='20210303')
-    def alternatives(self):  # noqa: D102
-        return self.opt.pos
-
-    @alternatives.setter
-    @deprecated('opt.pos', since='20210303')
-    def alternatives(self, value):
-        self.opt.pos = value
-
-    @property
-    @deprecated('opt.just', since='20210303')
-    def getAlternatives(self):  # noqa: D102
-        return self.opt.just
-
-    @getAlternatives.setter
-    @deprecated('opt.just', since='20210303')
-    def getAlternatives(self, value):
-        self.opt.just = value
-
-    # -------------------------------------------------------------
 
     def checkContents(self, text: str) -> Optional[str]:  # noqa: N802
         """
