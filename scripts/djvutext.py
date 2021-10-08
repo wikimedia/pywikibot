@@ -172,8 +172,8 @@ def main(*args: str) -> None:
 
     # Parse pages param.
     pages = pages.split(',')
-    for i, page in enumerate(pages):
-        start, sep, end = page.partition('-')
+    for i, page_interval in enumerate(pages):
+        start, sep, end = page_interval.partition('-')
         start = 1 if not start else int(start)
         if not sep:
             end = start
