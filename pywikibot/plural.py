@@ -9,7 +9,7 @@ from typing import Callable, Union
 from pywikibot.backports import Dict
 
 
-PluralRule = Dict[str, Union[int, Callable]]
+PluralRule = Dict[str, Union[int, Callable[[int], Union[bool, int]]]]
 
 plural_rules = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},
