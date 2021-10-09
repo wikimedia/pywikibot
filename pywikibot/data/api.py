@@ -42,7 +42,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeHTMLParts
-from pywikibot.tools import PYTHON_VERSION, ModuleDeprecationWrapper, itergroup
+from pywikibot.tools import PYTHON_VERSION, itergroup
 from pywikibot.tools.formatter import color_format
 
 
@@ -3168,15 +3168,3 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('pageid')
         page._lintinfo.pop('title')
         page._lintinfo.pop('ns')
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'APIError', replacement_name='pywikibot.exceptions.APIError',
-    since='20210423')
-wrapper.add_deprecated_attr(
-    'UploadWarning', replacement_name='pywikibot.exceptions.UploadError',
-    since='20210423')
-wrapper.add_deprecated_attr(
-    'APIMWException', replacement_name='pywikibot.exceptions.APIMWError',
-    since='20210423')

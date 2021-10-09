@@ -74,7 +74,6 @@ from pywikibot.tools import (
     first_lower,
     first_upper,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
 )
 from pywikibot.tools.chars import url2string
 
@@ -1125,23 +1124,3 @@ class CosmeticChangesToolkit:
     def fix_ISBN(self, text: str) -> str:
         """Hyphenate ISBN numbers."""
         return _reformat_ISBNs(text, strict=self.ignore != CANCEL.MATCH)
-
-
-_CANCEL_ALL = CANCEL.ALL
-_CANCEL_PAGE = CANCEL.PAGE
-_CANCEL_METHOD = CANCEL.METHOD
-_CANCEL_MATCH = CANCEL.MATCH
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('CANCEL_ALL', _CANCEL_ALL,
-                            replacement_name='CANCEL.ALL',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_PAGE', _CANCEL_PAGE,
-                            replacement_name='CANCEL.PAGE',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_METHOD', _CANCEL_METHOD,
-                            replacement_name='CANCEL.METHOD',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_MATCH', _CANCEL_MATCH,
-                            replacement_name='CANCEL.MATCH',
-                            since='20210528')

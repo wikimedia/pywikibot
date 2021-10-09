@@ -73,7 +73,6 @@ from pywikibot.tools import (
     first_upper,
     is_ip_address,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
 )
 
 
@@ -5818,14 +5817,3 @@ def url2unicode(title: str, encodings='utf-8') -> str:
         )
 
     return pywikibot.tools.chars.url2string(title, encodings)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'UnicodeToAsciiHtml',
-    replacement_name='pywikibot.tools.chars.string_to_ascii_html',
-    since='6.2.0')
-wrapper.add_deprecated_attr(
-    'unicode2html',
-    replacement_name='pywikibot.tools.chars.string2html',
-    since='6.2.0')
