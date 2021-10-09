@@ -73,7 +73,6 @@ from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
     MediaWikiVersion,
     compute_file_hash,
-    deprecate_arg,
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
@@ -2195,7 +2194,6 @@ class APISite(
         return set(self.siteinfo.get('restrictions')['levels'])
 
     @need_right('protect')
-    @deprecate_arg('summary', 'reason')
     def protect(self, page, protections: dict,
                 reason: str, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
@@ -2446,7 +2444,6 @@ class APISite(
             siiprop=props)
         return req.submit()['query']['stashimageinfo'][0]
 
-    @deprecate_arg('imagepage', 'filepage')
     @need_right('upload')
     def upload(self, filepage, *,
                source_filename: Optional[str] = None,
