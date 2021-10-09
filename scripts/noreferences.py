@@ -41,7 +41,6 @@ from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
 from pywikibot.exceptions import LockedPageError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools import remove_last_args
 
 
 # This is required for the text that is shown when you run this script
@@ -516,7 +515,6 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """References section bot."""
 
-    @remove_last_args(['gen'])
     def __init__(self, **kwargs) -> None:
         """Initializer."""
         self.available_options.update({

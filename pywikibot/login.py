@@ -23,7 +23,6 @@ from pywikibot.tools import (
     deprecated_args,
     file_mode_checker,
     normalize_username,
-    remove_last_args,
 )
 
 
@@ -190,7 +189,6 @@ class LoginManager:
         # THIS IS OVERRIDDEN IN data/api.py
         raise NotImplementedError
 
-    @remove_last_args(['data'])
     def storecookiedata(self) -> None:
         """Store cookie data."""
         http.cookie_jar.save(ignore_discard=True)

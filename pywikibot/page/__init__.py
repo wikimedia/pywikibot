@@ -77,7 +77,6 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     ModuleDeprecationWrapper,
     redirect_func,
-    remove_last_args,
 )
 
 
@@ -351,7 +350,6 @@ class BasePage(ComparableMixin):
                 title = title.replace(forbidden, '_')
         return title
 
-    @remove_last_args(('decode', 'underscore'))
     def section(self) -> Optional[str]:
         """
         Return the name of the section this Page refers to.
@@ -420,7 +418,6 @@ class BasePage(ComparableMixin):
         """Return True if title of this Page is in the autoFormat dict."""
         return self.autoFormat()[0] is not None
 
-    @remove_last_args(['sysop'])
     def get(self, force: bool = False, get_redirect: bool = False) -> str:
         """Return the wiki-text of the page.
 
@@ -483,7 +480,6 @@ class BasePage(ComparableMixin):
             self._getexception = IsRedirectPageError(self)
             raise self._getexception
 
-    @remove_last_args(['sysop'])
     def getOldVersion(self, oldid,
                       force: bool = False, get_redirect: bool = False) -> str:
         """
@@ -698,7 +694,6 @@ class BasePage(ComparableMixin):
 
         return self._lastNonBotUser
 
-    @remove_last_args(('datetime', ))
     def editTime(self):
         """Return timestamp of last revision to page.
 
@@ -827,7 +822,6 @@ class BasePage(ComparableMixin):
         """Return True if this is a file description page, False otherwise."""
         return self.namespace() == 6
 
-    @remove_last_args(['get_Index'])
     def isDisambig(self) -> bool:
         """
         Return True if this is a disambiguation page, False otherwise.
@@ -1708,7 +1702,6 @@ class BasePage(ComparableMixin):
         self.site.merge_history(self, dest, timestamp, reason)
 
     @deprecated_args(deleteAndMove='noredirect', movetalkpage='movetalk')
-    @remove_last_args(['safe'])
     def move(self,
              newtitle: str,
              reason: Optional[str] = None,

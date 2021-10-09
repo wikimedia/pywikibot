@@ -32,7 +32,6 @@ from pywikibot.tools import (
     is_ip_address,
     issue_deprecation_warning,
     itergroup,
-    remove_last_args,
 )
 
 
@@ -589,7 +588,6 @@ class GeneratorsMixin:
         return props
 
     @deprecated_args(getText='content', sysop=True)
-    @remove_last_args(['rollback'])
     def loadrevisions(self, page, *, content=False, section=None, **kwargs):
         """Retrieve revision information and store it in page object.
 
