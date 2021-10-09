@@ -71,7 +71,6 @@ from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
 )
 from pywikibot.tools import classproperty
-from pywikibot.tools import deprecate_arg as _deprecate_arg
 from pywikibot.tools import normalize_username
 from pywikibot.tools.formatter import color_format
 
@@ -227,7 +226,6 @@ class Coordinate(_WbRepresentation):
 
     _items = ('lat', 'lon', 'entity')
 
-    @_deprecate_arg('entity', 'globe_item')
     def __init__(self, lat: float, lon: float, alt: Optional[float] = None,
                  precision: Optional[float] = None,
                  globe: Optional[str] = None, typ: str = '',
@@ -648,7 +646,6 @@ class WbTime(_WbRepresentation):
         return json
 
     @classmethod
-    @_deprecate_arg('wb', 'data')
     def fromWikibase(cls: WB_TIME_CLASS, data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbTime':
         """
@@ -797,7 +794,6 @@ class WbQuantity(_WbRepresentation):
         return json
 
     @classmethod
-    @_deprecate_arg('wb', 'data')
     def fromWikibase(cls: WB_QUANTITY_CLASS, data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbQuantity':
         """
@@ -849,7 +845,6 @@ class WbMonolingualText(_WbRepresentation):
         return json
 
     @classmethod
-    @_deprecate_arg('wb', 'data')
     def fromWikibase(cls: WB_MONOLINGUAL_TEXT_CLASS, data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbMonolingualText':
         """
@@ -1074,7 +1069,6 @@ class WbUnknown(_WbRepresentation):
         return self.json
 
     @classmethod
-    @_deprecate_arg('json', 'data')
     def fromWikibase(cls: WB_UNKNOWN_CLASS, data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbUnknown':
         """
@@ -1120,7 +1114,6 @@ def _code_fam_from_url(url: str, name: Optional[str] = None
     return matched_sites[0]
 
 
-@_deprecate_arg('sysop', True)
 def Site(code: Optional[str] = None,
          fam: OPT_STR_OR_FAMILY = None,
          user: Optional[str] = None, *,
