@@ -155,6 +155,11 @@ UserWarning: warnings targeted at users
 
 .. versionchanged:: 6.0
    exceptions were renamed and are ending with "Error".
+
+.. versionchanged:: 7.0
+   All Pywikibot Error exceptions must be imported from
+   ``pywikibot.exceptions``. Deprecated exceptions identifiers were
+   removed.
 """
 #
 # (C) Pywikibot team, 2008-2021

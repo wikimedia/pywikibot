@@ -9,8 +9,35 @@
 * Deprecated function put_text() was removed in favour of BaseBot.userPut() method
 * Deprecated function add_text() were remove in favour of textlib.add_text()
 
+### blockpageschecker
+* Use different edit comments when adding, changeing or removing templates (T291345)
+* Derive CheckerBot from ConfigParserBot (T57106)
+* Derive CheckerBot from CurrentPageBot (T196851, T171713)
+
+### category
+* Deprecated code parts were removed
+
+### djvutext
+* pass site arg only once (T292367)
+
 ### newitem
 * Do not pass OtherPageSaveRelatedError silently
+
+### pagefromfile
+* Preload pages instead of reading them one by one before putting changes
+* Don't ask for confirmation by default (T291757)
+
+### reflinks
+* L10N updates
+
+### replace
+* Deprecated "acceptall" and "addedCat" parameters were replaced by "always" and "addcat"
+
+### revertbot
+* Deprecated "max" parameter was replaced by "total"
+
+### solve_disambiguation
+* Remove deprecated properties in favour of DisambiguationRobot.opt options
 
 ### touch
 *Do not pass OtherPageSaveRelatedError silently

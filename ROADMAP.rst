@@ -1,6 +1,14 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+Improvements and Bugfixes
+-------------------------
+
+* Adjust groupsize within pagegenerators.PreloadingGenerator (T291770)
+* New "maxlimit" property was added to APISite (T291770)
+
+
+
 Breaking changes
 ----------------
 
@@ -10,6 +18,13 @@ Breaking changes
 Code cleanups
 -------------
 
+* Outdated parameter names has been dropped
+* Deprecated pywikibot.Error exception were removed in favour of pywikibot.exceptions.Error classes (T280227)
+* Deprecated exception identifiers were removed (T280227)
+* Deprecated date.FormatDate class was removed in favour of date.format_date function
+* language_by_size property of wowwiki Family was removed in favour of codes attribute
+* availableOptions was removed in favour of available_options
+* config2 was removed in favour of config
 * tools.RotatingFileHandler was removed in favour of logging.handlers.RotatingFileHandler
 * tools.DotReadableDict, tools.LazyRegex and tools.DeprecatedRegex classes were removed
 * tools.frozenmap was removed in favour of types.MappingProxyType
@@ -29,8 +44,4 @@ Deprecations
 * 6.4.0: Pywikibot `began using semantic versioning
   <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,
   all deprecated code will be removed in Pywikibot version 7.0.0.
-* 6.2.0: Bot's availableOptions will be removed in favour of available_options
-* 6.2.0: Usage of pywikibot.config2 is deprecated and will be dropped
-* 6.2.0: Exceptions must be imported from exceptions namespace (T280227)
-* 6.2.0: Deprecated exception identifiers will be removed (T280227)
 * 5.0.0: Methods deprecated for 5 years or longer will be removed
