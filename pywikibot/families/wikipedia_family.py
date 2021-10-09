@@ -198,6 +198,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'fr': ('En cours',),
         'he': ('בעבודה',),
         'hr': ('Radovi',),
+        'hy': ('Խմբագրում եմ',),
         'sr': ('Радови у току', 'Рут',),
         'test': ('In use',),
         'ur': ('زیر ترمیم',),
