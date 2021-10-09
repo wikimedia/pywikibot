@@ -4,9 +4,9 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* The cached output functionality from compat release was re-implemented (T151727, T73646, T74942, T132135, T144698, T196039, T280466)
 * Adjust groupsize within pagegenerators.PreloadingGenerator (T291770)
 * New "maxlimit" property was added to APISite (T291770)
-
 
 
 Breaking changes
