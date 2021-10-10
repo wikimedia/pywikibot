@@ -71,6 +71,9 @@ _logger = 'tools'
 def is_ip_address(value: str) -> bool:
     """Check if a value is a valid IPv4 or IPv6 address.
 
+    .. versionadded:: 6.1
+       Was renamed from ``is_IP()``.
+
     :param value: value to check
     """
     with suppress(ValueError):
@@ -83,7 +86,11 @@ def is_ip_address(value: str) -> bool:
 def has_module(module, version=None):
     """Check if a module can be imported.
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
+
+    .. versionchanged:: 6.1
+       Dependency of distutils was dropped because the package will be
+       removed with Python 3.12.
     """
     try:
         m = import_module(module)
@@ -120,6 +127,8 @@ class classproperty:  # noqa: N801
                 return cls._bar
 
     Foo.bar gives 'baz'.
+
+    .. versionadded:: 3.0
     """
 
     def __init__(self, cls_method):
@@ -139,7 +148,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     Those suppressed warnings that do not match the parameters will be raised
     shown upon exit.
 
-    *New in vesion 3.0.*
+    .. versionadded:: 3.0
     """
 
     def __init__(self, message='', category=Warning, filename=''):
@@ -193,7 +202,10 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 # From http://python3porting.com/preparing.html
 class ComparableMixin:
 
-    """Mixin class to allow comparing to other objects which are comparable."""
+    """Mixin class to allow comparing to other objects which are comparable.
+
+    .. versionadded:: 3.0
+    """
 
     def __lt__(self, other):
         """Compare if self is less than other."""
@@ -255,7 +267,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
         >>> list(data)
         []
 
-    *New in version 6.1.*
+    .. versionadded:: 6.1
     """
 
     def __init__(self, keyattr: str):
@@ -336,6 +348,8 @@ def first_lower(string: str) -> str:
     Return a string with the first character uncapitalized.
 
     Empty strings are supported. The original string is not changed.
+
+    .. versionadded:: 3.0
     """
     return string[:1].lower() + string[1:]
 
@@ -346,6 +360,8 @@ def first_upper(string: str) -> str:
 
     Empty strings are supported. The original string is not changed.
 
+    .. versionadded:: 3.0
+
     :note: MediaWiki doesn't capitalize some characters the same way as Python.
         This function tries to be close to MediaWiki's capitalize function in
         title.php. See T179115 and T200357.
@@ -355,7 +371,10 @@ def first_upper(string: str) -> str:
 
 
 def normalize_username(username) -> Optional[str]:
-    """Normalize the username."""
+    """Normalize the username.
+
+    .. versionadded:: 3.0
+    """
     if not username:
         return None
     username = re.sub('[_ ]+', ' ', username).strip()
@@ -368,11 +387,9 @@ class Version(pkg_Version):
 
     This Version provides propreties of vendor package 20.4 shipped with
     setuptools 49.4.0.
-    """
 
-    def __init__(self, version):
-        """Add additional properties of not provided by base class."""
-        super().__init__(version)
+    .. versionadded:: 6.4
+    """
 
     def __getattr__(self, name):
         """Provides propreties of vendor package 20.4."""
@@ -415,6 +432,12 @@ class MediaWikiVersion:
         < 1.35-rc-1 < 1.35-rc.2 < 1.35
 
     Any other suffixes are considered invalid.
+
+    .. versionadded:: 3.0
+
+    .. versionchanged:: 6.1
+       Dependency of distutils was dropped because the package will be
+       removed with Python 3.12.
     """
 
     MEDIAWIKI_VERSION = re.compile(
@@ -521,7 +544,7 @@ class RLock:
     >>> lock.locked()
     False
 
-    *New in version 6.2*
+    .. versionadded:: 6.2
     """
 
     def __init__(self, *args, **kwargs):
@@ -584,6 +607,7 @@ class ThreadedGenerator(threading.Thread):
     >>> data
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
+    ..versionadded:: 3.0
     """
 
     def __init__(self, group=None, target=None, name='GeneratorThread',
@@ -796,6 +820,20 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     >>> list(intersect_generators(*iterables, allow_duplicates=True))
     ['m', 'i', 's', 's', 'i']
 
+
+    .. versionadded:: 3.0
+
+    .. versionchanged:: 5.0
+       Avoid duplicates (T263947).
+
+    .. versionchanged:: 6.4
+       ``genlist`` was renamed to ``iterables``; consecutive iterables
+       are to be used as iterables parameters or '*' to unpack a list
+
+    .. deprecated:: 6.4
+       ``allow_duplicates`` as positional argument,
+       ``iterables`` as list type
+
     :param iterables: page generators
     :param allow_duplicates: optional keyword argument to allow duplicates
         if present in all generators
@@ -901,7 +939,10 @@ def roundrobin_generators(*iterables):
     >>> tuple(roundrobin_generators('ABC', range(5)))
     ('A', 0, 'B', 1, 'C', 2, 3, 4)
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
+    .. versionchanged:: 6.4
+       A sentinel variable is used to determine the end of an iterable
+       instead of None.
 
     :param iterables: any iterable to combine in roundrobin way
     :type iterables: iterable
@@ -942,6 +983,8 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     Note: This is not thread safe.
 
+    .. versionadded: 3.0
+
     :param iterable: the source iterable
     :type iterable: collections.abc.Iterable
     :param container: storage of seen items
@@ -978,7 +1021,10 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
 class CombinedError(KeyError, IndexError):
 
-    """An error that gets caught by both KeyError and IndexError."""
+    """An error that gets caught by both KeyError and IndexError.
+
+    .. versionadded:: 3.0
+    """
 
 
 class EmptyDefault(str, Mapping):
@@ -992,6 +1038,10 @@ class EmptyDefault(str, Mapping):
 
     Accessing a value via __getitem__ will result in a combined KeyError and
     IndexError.
+
+    .. versionadded:: 3.0
+    .. versionchanged:: 6.2
+       ``empty_iterator()`` was removed in favour of ``iter()``.
     """
 
     def __init__(self):
@@ -1017,29 +1067,45 @@ class SelfCallMixin:
 
     When '_own_desc' is defined it'll also issue a deprecation warning using
     issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
+
+    .. versionadded:: 3.0
+    .. deprecated:: 6.2
     """
 
     def __call__(self):
         """Do nothing and just return itself."""
         issue_deprecation_warning('Referencing this attribute like a function',
-                                  'it directly', since='20210420')
+                                  'it directly', since='6.2')
 
         return self
 
 
 class SelfCallDict(SelfCallMixin, dict):
 
-    """Dict with SelfCallMixin."""
+    """Dict with SelfCallMixin.
+
+    .. versionadded:: 3.0
+    .. deprecated:: 6.2
+    """
 
 
 class SelfCallString(SelfCallMixin, str):
 
-    """String with SelfCallMixin."""
+    """String with SelfCallMixin.
+
+    .. versionadded:: 3.0
+    .. deprecated:: 6.2
+    """
 
 
 class DequeGenerator(Iterator, collections.deque):
 
-    """A generator that allows items to be added during generating."""
+    """A generator that allows items to be added during generating.
+
+    .. versionadded:: 3.0
+    .. versionchanged:: 6.1
+       Provide a representation string.
+    """
 
     def __next__(self):
         """Iterator method."""
@@ -1066,6 +1132,8 @@ def open_archive(filename, mode='rb', use_extension=True):
     from it.
 
     The compression is either selected via the magic number or file ending.
+
+    .. versionadded:: 3.0
 
     :param filename: The filename.
     :type filename: str
@@ -1168,6 +1236,8 @@ def merge_unique_dicts(*args, **kwargs):
 
     The positional arguments are the dictionaries to be merged. It is also
     possible to define an additional dict using the keyword arguments.
+
+    .. versionadded: 3.0
     """
     args = list(args) + [dict(kwargs)]
     conflicts = set()
@@ -1184,6 +1254,8 @@ def merge_unique_dicts(*args, **kwargs):
 
 def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
     """Check file mode and update it, if needed.
+
+    .. versionadded: 3.0
 
     :param filename: filename path
     :param mode: requested file mode
@@ -1214,6 +1286,8 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
     """Compute file hash.
 
     Result is expressed as hexdigest().
+
+    .. versionadded: 3.0
 
     :param filename: filename path
     :param sha: hashing function among the following in hashlib:

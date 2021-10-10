@@ -15,7 +15,8 @@ args[0] to see if it callable. Therefore, a decorator must not accept
 only one arg, and that arg be a callable, as it will be detected as
 a deprecator without any arguments.
 
-*Changed in version 6.4:* deprecation decorators moved to _deprecate module
+.. versionchanged 6.4:
+   deprecation decorators moved to _deprecate module
 """
 #
 # (C) Pywikibot team, 2008-2021
@@ -37,7 +38,10 @@ from warnings import warn
 
 class _NotImplementedWarning(RuntimeWarning):
 
-    """Feature that is no longer implemented."""
+    """Feature that is no longer implemented.
+
+    .. versionadded:: 3.0
+    """
 
 
 def add_decorated_full_name(obj, stacklevel=1):
@@ -66,7 +70,10 @@ def add_decorated_full_name(obj, stacklevel=1):
 
 
 def manage_wrapping(wrapper, obj):
-    """Add attributes to wrapper and wrapped functions."""
+    """Add attributes to wrapper and wrapped functions.
+
+    .. versionadded:: 3.0
+    """
     wrapper.__doc__ = obj.__doc__
     wrapper.__name__ = obj.__name__
     wrapper.__module__ = obj.__module__
@@ -91,7 +98,10 @@ def manage_wrapping(wrapper, obj):
 
 
 def get_wrapper_depth(wrapper):
-    """Return depth of wrapper function."""
+    """Return depth of wrapper function.
+
+    .. versionadded:: 3.0
+    """
     return wrapper.__wrapped__.__wrappers__ + (1 - wrapper.__depth__)
 
 
@@ -155,7 +165,10 @@ def add_full_name(obj):
 
 
 def _build_msg_string(instead, since):
-    """Build a deprecation warning message format string."""
+    """Build a deprecation warning message format string.
+
+    .. versionadded:: 3.0
+    """
     if not since:
         since = ''
     elif '.' in since:
