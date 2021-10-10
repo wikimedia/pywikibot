@@ -369,7 +369,13 @@ class CommonscatBot(ExistingPageBot, NoRedirectPageBot):
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
             pywikibot.log('Looking for template on ' + ipage.title())
-            if (not ipage.exists() or ipage.isRedirectPage()
+            try:  # T291783
+                ipage_exists = ipage.exists()
+            except InvalidTitleError:
+                pywikibot.exception()
+                continue
+
+            if (not ipage_exists or ipage.isRedirectPage()
                     or ipage.isDisambig()):
                 continue
 
