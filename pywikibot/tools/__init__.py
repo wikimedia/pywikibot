@@ -801,16 +801,15 @@ class ThreadList(list):
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
-    """Intersect generators listed in iterables.
+    """Generator of intersect iterables.
 
-    Yield items only if they are yielded by all generators of iterables.
-    Threads (via ThreadedGenerator) are used in order to run generators
-    in parallel, so that items can be yielded before generators are
-    exhausted.
+    Yield items only if they are yielded by all iterables. zip_longest
+    is used to retrieve items from all iterables in parallel, so that
+    items can be yielded before iterables are exhausted.
 
-    Threads are stopped when they are either exhausted or Ctrl-C is pressed.
-    Quitting before all generators are finished is attempted if
-    there is no more chance of finding an item in all queues.
+    Generator is stopped when all iterables are exhausted. Quitting
+    before all iterables are finished is attempted if there is no more
+    chance of finding an item in all of them.
 
     Sample:
 
@@ -833,6 +832,9 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     .. deprecated:: 6.4
        ``allow_duplicates`` as positional argument,
        ``iterables`` as list type
+
+    .. versionchanged:: 7.0
+       Reimplemented without threads which is up to 10'000 times faster
 
     :param iterables: page generators
     :param allow_duplicates: optional keyword argument to allow duplicates
@@ -861,73 +863,55 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
         yield from iterables[0]
         return
 
-    # If any generator is empty, no pages are going to be returned
+    # If any iterable is empty, no pages are going to be returned
     for source in iterables:
         if not source:
-            debug('At least one generator ({!r}) is empty and execution was '
+            debug('At least one iterable ({!r}) is empty and execution was '
                   'skipped immediately.'.format(source), 'intersect')
             return
 
-    # Item is cached to check that it is found n_gen
-    # times before being yielded.
+    # Item is cached to check that it is found n_gen times
+    # before being yielded.
     cache = collections.defaultdict(collections.Counter)
     n_gen = len(iterables)
 
-    # Class to keep track of alive threads.
-    # Start new threads and remove completed threads.
-    thrlist = ThreadList()
+    ones = collections.Counter(range(n_gen))
+    active_iterables = set(range(n_gen))
+    seen = set()
 
-    for source in iterables:
-        threaded_gen = ThreadedGenerator(name=repr(source), target=source)
-        threaded_gen.daemon = True
-        thrlist.append(threaded_gen)
+    # Get items from iterables in a round-robin way.
+    sentinel = object()
+    for items in zip_longest(*iterables, fillvalue=sentinel):
+        for index, item in enumerate(items):
 
-    ones = collections.Counter(thrlist)
-    seen = {}
+            if item is sentinel:
+                active_iterables.discard(index)
+                continue
 
-    while True:
-        # Get items from queues in a round-robin way.
-        for t in thrlist:
-            try:
-                # TODO: evaluate if True and timeout is necessary.
-                item = t.queue.get(True, 0.1)
+            if not allow_duplicates and hash(item) in seen:
+                continue
 
-                if not allow_duplicates and hash(item) in seen:
-                    continue
+            # Each cache entry is a Counter of iterables' index
+            cache[item][index] += 1
 
-                # Cache entry is a Counter of ThreadedGenerator objects.
-                cache[item].update([t])
-                if len(cache[item]) == n_gen:
-                    if allow_duplicates:
-                        yield item
-                        # Remove item from cache if possible.
-                        if all(el == 1 for el in cache[item].values()):
-                            cache.pop(item)
-                        else:
-                            cache[item] -= ones
-                    else:
-                        yield item
-                        cache.pop(item)
-                        seen[hash(item)] = True
+            if len(cache[item]) == n_gen:
+                yield item
 
-                active = thrlist.active_count()
-                max_cache = n_gen
-                if cache.values():
-                    max_cache = max(len(v) for v in cache.values())
-                # No. of active threads is not enough to reach n_gen.
-                # We can quit even if some thread is still active.
-                # There could be an item in all generators which has not yet
-                # appeared from any generator. Only when we have lost one
-                # generator, then we can bail out early based on seen items.
-                if active < n_gen and n_gen - max_cache > active:
-                    thrlist.stop_all()
-                    return
-            except queue.Empty:
-                pass
-            except KeyboardInterrupt:
-                thrlist.stop_all()
-            # All threads are done.
-            if thrlist.active_count() == 0:
+                # Remove item from cache if possible or decrease Counter entry
+                if not allow_duplicates:
+                    del cache[item]
+                    seen.add(hash(item))
+                elif cache[item] == ones:
+                    del cache[item]
+                else:
+                    cache[item] -= ones
+
+        # We can quit if an iterable is exceeded and cached iterables is
+        # a subset of active iterables.
+        if len(active_iterables) < n_gen:
+            cached_iterables = set(
+                chain.from_iterable(v.keys() for v in cache.values()))
+            if cached_iterables <= active_iterables:
                 return
 
 
