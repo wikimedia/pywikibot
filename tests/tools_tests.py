@@ -576,7 +576,7 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
         self.assertEqual(deduped, {2, 4})
 
-    def test_stop(self):
+    def test_stop_contains(self):
         """Test filter_unique with an ignoring container."""
         deduped = ContainsStopList()
         deduped.stop_list = [2]
@@ -589,6 +589,8 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(deduper)
 
+    def test_stop_add(self):
+        """Test filter_unique with an ignoring container during add call."""
         deduped = AddStopList()
         deduped.stop_list = [4]
         deduper = tools.filter_unique(self.ints, container=deduped)
