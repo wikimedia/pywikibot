@@ -22,6 +22,7 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
+from pywikibot.tools import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
@@ -75,6 +76,8 @@ class UI(ABUIC):
         self.argv = sys.argv
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
+        self.cache = []
+        self.lock = RLock()
 
     def init_handlers(self, root_logger, default_stream='stderr'):
         """Initialize the handlers for user output.
@@ -184,12 +187,46 @@ class UI(ABUIC):
                 self.encounter_color(color_stack[-1], target_stream)
 
     def output(self, text, targetStream=None):
+        """Forward text to cache and flush if output is not locked.
+
+        All input methods locks the output to a stream but collect them
+        in cache. They will be printed with next unlocked output call or
+        at termination time.
+
+        .. versionchanged:: 7.0
+           Forward text to cache and flush if output is not locked.
         """
-        Output text to a stream.
+        self.cache_output(text, targetStream=targetStream)
+        if not self.lock.locked():
+            self.flush()
+
+    def flush(self):
+        """Output cached text.
+
+        .. versionadded:: 7.0
+        """
+        with self.lock:
+            for args, kwargs in self.cache:
+                self.stream_output(*args, **kwargs)
+            self.cache.clear()
+
+    def cache_output(self, *args, **kwargs):
+        """Put text to cache.
+
+        .. versionadded:: 7.0
+        """
+        with self.lock:
+            self.cache.append((args, kwargs))
+
+    def stream_output(self, text, targetStream=None):
+        """Output text to a stream.
 
         If a character can't be displayed in the encoding used by the user's
         terminal, it will be replaced with a question mark or by a
         transliteration.
+
+        .. versionadded:: 7.0
+           ``UI.output()`` was renamed to ``UI.stream_output()``
         """
         if config.transliterate:
             # Encode our unicode string in the encoding used by the user's
@@ -277,26 +314,28 @@ class UI(ABUIC):
         question += end_marker
 
         # lock stream output
-        # with self.lock: (T282962)
-        if force:
-            self.output(question + '\n')
-            return default
-        # sound the terminal bell to notify the user
-        if config.ring_bell:
-            sys.stdout.write('\07')
-        # TODO: make sure this is logged as well
-        while True:
-            self.output(question + ' ')
-            text = self._input_reraise_cntl_c(password)
-
-            if text is None:
-                continue
-
-            if text:
-                return text
-
-            if default is not None:
+        with self.lock:
+            if force:
+                self.stream_output(question + '\n')
                 return default
+
+            # sound the terminal bell to notify the user
+            if config.ring_bell:
+                sys.stdout.write('\07')
+
+            # TODO: make sure this is logged as well
+            while True:
+                self.stream_output(question + ' ')
+                text = self._input_reraise_cntl_c(password)
+
+                if text is None:
+                    continue
+
+                if text:
+                    return text
+
+                if default is not None:
+                    return default
 
     def _input_reraise_cntl_c(self, password):
         """Input and decode, and re-raise Control-C."""
@@ -351,7 +390,7 @@ class UI(ABUIC):
             """Print an OutputOption before or after question."""
             if isinstance(option, OutputOption) \
                and option.before_question is before_question:
-                self.output(option.out + '\n')
+                self.stream_output(option.out + '\n')
 
         if force and default is None:
             raise ValueError('With no default option it cannot be forced')
@@ -376,24 +415,24 @@ class UI(ABUIC):
         handled = False
 
         # lock stream output
-        # with self.lock: (T282962)
-        while not handled:
-            for option in options:
-                output_option(option, before_question=True)
-            output = Option.formatted(question, options, default)
-            if force:
-                self.output(output + '\n')
-                answer = default
-            else:
-                answer = self.input(output) or default
-            # something entered or default is defined
-            if answer:
-                for index, option in enumerate(options):
-                    if option.handled(answer):
-                        answer = option.result(answer)
-                        output_option(option, before_question=False)
-                        handled = option.stop
-                        break
+        with self.lock:
+            while not handled:
+                for option in options:
+                    output_option(option, before_question=True)
+                output = Option.formatted(question, options, default)
+                if force:
+                    self.stream_output(output + '\n')
+                    answer = default
+                else:
+                    answer = self.input(output) or default
+                # something entered or default is defined
+                if answer:
+                    for index, option in enumerate(options):
+                        if option.handled(answer):
+                            answer = option.result(answer)
+                            output_option(option, before_question=False)
+                            handled = option.stop
+                            break
 
         if isinstance(answer, ChoiceException):
             raise answer
@@ -414,31 +453,33 @@ class UI(ABUIC):
         :return: Return a single Sequence entry.
         """
         # lock stream output
-        # with self.lock: (T282962)
-        if not force:
-            line_template = '{{0: >{}}}: {{1}}'.format(len(str(len(answers))))
-            for i, entry in enumerate(answers, start=1):
-                pywikibot.output(line_template.format(i, entry))
+        with self.lock:
+            if not force:
+                line_template = '{{0: >{}}}: {{1}}\n'.format(
+                    len(str(len(answers))))
+                for i, entry in enumerate(answers, start=1):
+                    self.stream_output(line_template.format(i, entry))
 
-        while True:
-            choice = self.input(question, default=default, force=force)
+            while True:
+                choice = self.input(question, default=default, force=force)
 
-            try:
-                choice = int(choice) - 1
-            except (TypeError, ValueError):
-                if choice in answers:
-                    return choice
-                choice = -1
+                try:
+                    choice = int(choice) - 1
+                except (TypeError, ValueError):
+                    if choice in answers:
+                        return choice
+                    choice = -1
 
-            # User typed choice number
-            if 0 <= choice < len(answers):
-                return answers[choice]
+                # User typed choice number
+                if 0 <= choice < len(answers):
+                    return answers[choice]
 
-            if force:
-                raise ValueError('Invalid value "{}" for default during force.'
-                                 .format(default))
+                if force:
+                    raise ValueError(
+                        'Invalid value "{}" for default during force.'
+                        .format(default))
 
-            pywikibot.error('Invalid response')
+                pywikibot.error('Invalid response')
 
     def editText(self, text: str, jumpIndex: Optional[int] = None,
                  highlight: Optional[str] = None):
