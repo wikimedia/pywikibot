@@ -92,7 +92,7 @@ These arguments control miscellaneous bot behaviour:
                    (note: without ending colon)
 
     -async         Put page on queue to be saved to wiki asynchronously. This
-                   enables loading pages during saving throtteling and gives a
+                   enables loading pages during saving throttling and gives a
                    better performance.
                    NOTE: For post-processing it always assumes that saving the
                    the pages was successful.
