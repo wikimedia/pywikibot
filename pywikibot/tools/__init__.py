@@ -237,7 +237,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
 
     """Structure to hold values where the key is given by the value itself.
 
-    A stucture like a defaultdict but the key is given by the value
+    A structure like a defaultdict but the key is given by the value
     itselfvand cannot be assigned directly. It returns the number of all
     items with len() but not the number of keys.
 

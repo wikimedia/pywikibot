@@ -24,7 +24,7 @@ This script understands the following command-line arguments:
 -duplicatesreport   Report the duplicates in a log *AND* put the template in
                     the images.
 
--maxusernotify      Maximum nofitications added to a user talk page in a single
+-maxusernotify      Maximum notifications added to a user talk page in a single
                     check, to avoid email spamming.
 
 -sendemail          Send an email after tagging.
