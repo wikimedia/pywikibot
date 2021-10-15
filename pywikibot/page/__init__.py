@@ -74,7 +74,6 @@ from pywikibot.tools import (
     is_ip_address,
     issue_deprecation_warning,
     ModuleDeprecationWrapper,
-    redirect_func,
 )
 
 
@@ -4201,12 +4200,6 @@ class ItemPage(WikibasePage):
             self._isredir = self.id != self._content.get('id', self.id)
             return self._isredir
         return super().isRedirectPage()
-
-
-# alias for backwards compatibility
-ItemPage.concept_url = redirect_func(
-    ItemPage.concept_uri, old_name='concept_url', class_name='ItemPage',
-    since='20170222')
 
 
 class Property:
