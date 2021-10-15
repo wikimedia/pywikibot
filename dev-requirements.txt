@@ -11,6 +11,10 @@ pytest-attrib>=0.1.3
 # Python 3.8 needs werkzeug >= 0.15.5
 # GitHub vulnerable dependency suggests werkzeug >= 0.15.3
 werkzeug>=0.15.5
+
+# T293440: pytest-httpbin needs cffi >=1.0.0
+# but Python 3.5 needs cffi < 1.15 which is not taken into account
+cffi >= 1.0.0, < 1.15.0 ;python_version=="3.5"
 pytest-httpbin
 
 pep257>=0.6
