@@ -17,6 +17,9 @@
 ### category
 * Deprecated code parts were removed
 
+### commonscat
+* Ignore InvalidTitleError in CommonscatBot.findCommonscatLink (T291783)
+
 ### djvutext
 * pass site arg only once (T292367)
 

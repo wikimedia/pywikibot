@@ -4,7 +4,9 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (T85623, T293276)
 * The cached output functionality from compat release was re-implemented (T151727, T73646, T74942, T132135, T144698, T196039, T280466)
+* L10N updates
 * Adjust groupsize within pagegenerators.PreloadingGenerator (T291770)
 * New "maxlimit" property was added to APISite (T291770)
 
@@ -18,6 +20,10 @@ Breaking changes
 Code cleanups
 -------------
 
+* TextfilePageGenerator was replaced by TextIOPageGenerator
+* PreloadingItemGenerator was replaced by PreloadingEntityGenerator
+* DuplicateFilterPageGenerator was replaced by tools.filter_unique
+* ItemPage.concept_url method was replaced by ItemPage.concept_uri
 * Outdated parameter names has been dropped
 * Deprecated pywikibot.Error exception were removed in favour of pywikibot.exceptions.Error classes (T280227)
 * Deprecated exception identifiers were removed (T280227)
