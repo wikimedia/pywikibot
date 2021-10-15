@@ -30,7 +30,7 @@ from tests.aspects import (
     TestCase,
     WikidataTestCase,
 )
-from tests.thread_tests import GeneratorIntersectTestCase
+from tests.tools_tests import GeneratorIntersectTestCase
 
 
 LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
@@ -894,12 +894,39 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertEqual(tuple(gen), ('A', 'B', 'C'))
 
     def test_intersect_generator(self):
-        """Test getCombinedGenerator with generator parameter."""
+        """Test getCombinedGenerator with -intersect option."""
         gf = pagegenerators.GeneratorFactory()
         gf.handle_arg('-intersect')
-        gf.gens = ['Python 3.7-dev']
-        gen = gf.getCombinedGenerator(gen='Pywikibot 3.0.dev')
-        self.assertEqual(''.join(gen), 'Pyot 3.dev')
+
+        # check wether the generator works for both directions
+        patterns = ['Python 3.7-dev', 'Pywikibot 7.0.dev']
+        for index in range(2):
+            with self.subTest(index=index):
+                gf.gens = [patterns[index]]
+                gen = gf.getCombinedGenerator(gen=patterns[index - 1])
+                self.assertEqual(''.join(gen), 'Pyot 7.dev')
+
+        # check wether the generator works for a very long text
+        patterns.append('PWB 7+ unittest developed with a very long text.')
+        with self.subTest(patterns=patterns):
+            gf.gens = patterns
+            gen = gf.getCombinedGenerator()
+            self.assertEqual(''.join(gen), 'P 7tedvoy.')
+
+        # check whether an early stop fits
+        with self.subTest(comment='Early stop'):
+            gf.gens = 'ABC', 'A Big City'
+            gen = gf.getCombinedGenerator()
+            self.assertEqual(''.join(gen), 'ABC')
+
+        with self.subTest(comment='Commutative'):
+            gf.gens = 'ABB', 'BB'
+            gen1 = gf.getCombinedGenerator()
+            gf2 = pagegenerators.GeneratorFactory()
+            gf2.handle_arg('-intersect')
+            gf2.gens = 'BB', 'ABB'
+            gen2 = gf2.getCombinedGenerator()
+            self.assertEqual(list(gen1), list(gen2))
 
     def test_ns(self):
         """Test namespace option."""
