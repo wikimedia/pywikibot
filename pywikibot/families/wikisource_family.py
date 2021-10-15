@@ -26,11 +26,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'uk', 'ar', 'cs',
-        'gu', 'mul', 'pt', 'sr', 'fa', 'sv', 'hu', 'ko', 'ml', 'sa', 'bn',
-        'ta', 'te', 'sl', 'hy', 'el', 'tr', 'vi', 'ro', 'fi', 'ja', 'nap',
-        'la', 'az', 'ca', 'nl', 'br', 'kn', 'hr', 'no', 'th', 'eo', 'is',
-        'vec', 'hi', 'be', 'id', 'pms', 'ban', 'et', 'da', 'lij', 'mk', 'yi',
-        'as', 'mr', 'bg', 'li', 'lt', 'wa', 'pa', 'or', 'eu', 'jv', 'cy', 'gl',
+        'mul', 'gu', 'pt', 'sr', 'fa', 'sv', 'hu', 'ko', 'ml', 'sa', 'bn',
+        'ta', 'te', 'sl', 'hy', 'el', 'tr', 'vi', 'ro', 'fi', 'ja', 'la',
+        'nap', 'az', 'nl', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'eo', 'is',
+        'vec', 'be', 'hi', 'id', 'pms', 'ban', 'da', 'et', 'lij', 'mk', 'yi',
+        'as', 'mr', 'bg', 'li', 'lt', 'wa', 'jv', 'pa', 'or', 'eu', 'cy', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
