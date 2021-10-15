@@ -470,7 +470,7 @@ class InvalidPageError(PageLoadRelatedError):
 
     """Missing page history.
 
-    *New in version 6.2.*
+    .. versionadded:: 6.2
     """
 
     message = 'Page %s is invalid.'

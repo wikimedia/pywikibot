@@ -1,18 +1,21 @@
 """Family module for Wikispore.
 
-*New in version 4.1.*
+.. versionadded:: 4.1
 """
 #
-# (C) Pywikibot team, 2020
+# (C) Pywikibot team, 2020-2021
 #
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
 
 
-class Family(family.Family):  # noqa: D101
+class Family(family.Family):
 
-    """Family class for Wikispore."""
+    """Family class for Wikispore.
+
+    .. versionadded:: 4.1
+    """
 
     name = 'wikispore'
     langs = {

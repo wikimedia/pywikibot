@@ -25,7 +25,8 @@ build paths relative to base_dir:
  - datafilepath
  - shortpath
 
-*Renamed in version 6.2*
+.. versionchanged 6.2::
+   config2 was renamed to config
 """
 #
 # (C) Pywikibot team, 2003-2021

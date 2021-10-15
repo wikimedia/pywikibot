@@ -656,14 +656,14 @@ class Family:
     def get_edit_restricted_templates(self, code):
         """Return tuple of edit restricted templates.
 
-        *New in version 3.0.*
+        .. versionadded:: 3.0
         """
         return self.edit_restricted_templates.get(code, ())
 
     def get_archived_page_templates(self, code):
         """Return tuple of archived page templates.
 
-        *New in version 3.0.*
+        .. versionadded:: 3.0
         """
         return self.archived_page_templates.get(code, ())
 
@@ -695,7 +695,8 @@ class Family:
         """
         Return whether a HTTPS certificate should be verified.
 
-        *Renamed in version 5.3.*
+        .. versionadded:: 5.3
+           renamed from ignore_certificate_error
 
         :param code: language code
         :return: flag to verify the SSL certificate;
@@ -773,14 +774,14 @@ class Family:
     def eventstreams_host(self, code):
         """Hostname for EventStreams.
 
-        *New in version 3.0.*
+        .. versionadded:: 3.0
         """
         raise NotImplementedError('This family does not support EventStreams')
 
     def eventstreams_path(self, code):
         """Return path for EventStreams.
 
-        *New in version 3.0.*
+        .. versionadded:: 3.0
         """
         raise NotImplementedError('This family does not support EventStreams')
 
@@ -1059,7 +1060,8 @@ class FandomFamily(Family):
 
     """Common features of Fandom families.
 
-    *Renamed in version 3.0.*
+    .. versionadded:: 3.0
+       renamed from WikiaFamily
     """
 
     @classproperty

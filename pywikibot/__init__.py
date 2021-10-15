@@ -1052,7 +1052,7 @@ class WbUnknown(_WbRepresentation):
 
     This data type is just a json container
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
     """
 
     _items = ('json',)

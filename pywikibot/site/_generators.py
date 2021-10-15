@@ -706,7 +706,8 @@ class GeneratorsMixin:
                       include_empty_titles: bool = False):
         """Iterate all interlanguage links on page, yielding Link objects.
 
-        *New in version 6.2:* *include_empty_titles* parameter was added.
+        .. versionchanged:: 6.2:
+           *include_empty_titles* parameter was added.
 
         :see: https://www.mediawiki.org/wiki/API:Langlinks
 

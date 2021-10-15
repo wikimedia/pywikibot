@@ -49,10 +49,11 @@ class UploadRobot(BaseBot):
                  **kwargs):
         """Initializer.
 
-        *Changed in version 6.2:* asynchronous upload is used if
-        *asynchronous* parameter is set.
+        .. versionchanged:: 6.2
+           asynchronous upload is used if *asynchronous* parameter is set
 
-        *New in version 6.4:* force_if_shared parameter.
+        .. versionchanged:: 6.4
+           *force_if_shared* parameter was added
 
         :param url: path to url or local file, or list of urls or paths
             to local files.

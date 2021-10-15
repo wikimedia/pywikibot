@@ -40,7 +40,7 @@ def _get_program_dir():
 def get_toolforge_hostname() -> Optional[str]:
     """Get hostname of the current Toolforge host.
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
 
     :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.

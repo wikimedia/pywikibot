@@ -275,7 +275,7 @@ class WikiHTMLPageParser(HTMLParser):
 def check_response(response):
     """Raise ServerError if the response indicates a server error.
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
     """
     if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
         raise ServerError(HTTPStatus(response.status_code).phrase)

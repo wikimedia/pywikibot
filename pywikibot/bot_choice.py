@@ -95,8 +95,9 @@ class Option(ABC):
     def result(self, value: str) -> Any:
         """Return the actual value which is associated by the given one.
 
-        *New in version 6.2:* *result()* is an abstract method and must
-        be defined in subclasses
+        .. versionadded:: 6.2
+           *result()* is an abstract method and must be defined in
+           subclasses
         """
         raise NotImplementedError()
 
@@ -498,7 +499,7 @@ class ShowingListOption(ListOption, OutputOption):
 
     """An option to show a list and select an item.
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
     """
 
     before_question = True
@@ -538,7 +539,7 @@ class MultipleChoiceList(ListOption):
 
     """An option to select multiple items from a list.
 
-    *New in version 3.0.*
+    .. versionadded 3.0
     """
 
     def test(self, value: str) -> bool:
@@ -569,7 +570,7 @@ class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
     """An option to show a list and select multiple items.
 
-    *New in version 3.0.*
+    .. versionadded 3.0
     """
 
 

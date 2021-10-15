@@ -1417,7 +1417,7 @@ class APISite(
         If more than one target id is provided, the same action is taken for
         all of them.
 
-        *New in version 6.0.*
+        .. versionadded:: 6.0
 
         :param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
@@ -2048,9 +2048,11 @@ class APISite(
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
-        *Renamed in version 6.1.*
+        .. versionadded:: 6.1
+           renamed from *deletepage*
 
-        *New in version 6.1:* keyword only parameter *oldimage* was added.
+        .. versionchanged:: 6.1
+           keyword only parameter *oldimage* was added.
 
         :param page: Page to be deleted or its pageid.
         :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
@@ -2111,11 +2113,12 @@ class APISite(
 
         :see: https://www.mediawiki.org/wiki/API:Undelete
 
-        *Renamed in version 6.1.*
+        .. versionadded:: 6.1
+           renamed from *undelete_page*
 
-        *New in version 6.1:* *fileids* parameter was added.
-
-        *Changed in verson 6.1:* keyword argument required for *revisions*.
+        .. versionchanged:: 6.1
+           *fileids* parameter was added,
+           keyword argument required for *revisions*.
 
         :param page: Page to be deleted.
         :type page: pywikibot.BasePage
@@ -2461,11 +2464,11 @@ class APISite(
 
         Either source_filename or source_url, but not both, must be provided.
 
-        *Changed in version 6.0:* keyword arguments required for all
-        parameters except *filepage*.
+        .. versionchanged:: 6.0
+           keyword arguments required for all parameters except *filepage*
 
-        *Changed in version 6.2:* asynchronous upload is used if
-        *asynchronous* parameter is set.
+        .. versionchanged:: 6.2:
+           asynchronous upload is used if *asynchronous* parameter is set.
 
         :param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.

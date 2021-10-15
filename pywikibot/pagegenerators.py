@@ -1279,7 +1279,7 @@ class GeneratorFactory:
     def handle_args(self, args: Iterable[str]) -> List[str]:
         """Handle command line arguments and return the rest as a list.
 
-        *New in version 6.0.*
+        .. versionadded:: 6.0
         """
         return [arg for arg in args if not self.handle_arg(arg)]
 
@@ -1292,7 +1292,8 @@ class GeneratorFactory:
         can try parsing the argument. Call getCombinedGenerator() after all
         arguments have been parsed to get the final output generator.
 
-        *Renamed in version 6.0.*
+        .. versionadded:: 6.0
+           renamed from ``handleArg``
 
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory

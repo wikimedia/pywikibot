@@ -826,7 +826,7 @@ def replace_links(text: str, replace, site=None) -> str:
 def add_text(text: str, add: str, *, site=None) -> str:
     """Add text to a page content above categories and interwiki.
 
-    *New in version 6.4.*
+    .. versionadded:: 6.4
 
     :param text: The page content to add text to.
     :param add: Text to add.
@@ -925,7 +925,7 @@ def extract_sections(
                            ('== Usage of A ==', 'Some usage...')]
             result.footer = '[[Category:Things starting with A]]'
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
     """
     headings = _extract_headings(text, site)
     sections = _extract_sections(text, headings)
@@ -1636,8 +1636,9 @@ def extract_templates_and_params(text: str,
     :param strip: If enabled, strip arguments and values of templates.
     :return: list of template name and params
 
-    *New in version 6.1:* *wikitextparser* package is supported; either
-    *wikitextparser* or *mwparserfromhell* is strictly recommended.
+    .. versionchanged:: 6.1
+       *wikitextparser* package is supported; either *wikitextparser* or
+       *mwparserfromhell* is strictly recommended.
     """
     def explicit(param):
         try:
