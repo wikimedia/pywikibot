@@ -5,6 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 import json
+import re
+
 from contextlib import suppress
 from html.parser import HTMLParser
 from http import HTTPStatus
@@ -276,9 +278,22 @@ def check_response(response):
     """Raise ServerError if the response indicates a server error.
 
     .. versionadded:: 3.0
+    .. versionchanged:: 7.0
+       Raise a generic ServerError if http status code is not
+       IANA-registered but unofficial code
+
+
     """
     if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
-        raise ServerError(HTTPStatus(response.status_code).phrase)
+        try:
+            msg = HTTPStatus(response.status_code).phrase
+        except ValueError as err:
+            m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
+            if not m:
+                raise err
+            msg = 'Generic Server Error ({})'.format(m.group())
+
+        raise ServerError(msg)
 
     if response.status_code == HTTPStatus.OK \
        and SERVER_DB_ERROR_MSG in response.text:
