@@ -25,7 +25,7 @@ from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import ModuleDeprecationWrapper, deprecated
+from pywikibot.tools import deprecated
 
 
 _logger = 'version'
@@ -499,12 +499,3 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             del data[name]
 
     return data
-
-
-ParseError = VersionParseError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'ParseError',
-    replacement_name='pywikibot.exceptions.VersionParseError',
-    since='20210423')

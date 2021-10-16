@@ -19,7 +19,6 @@ from pywikibot.bot import (
 from pywikibot.editor import TextEditor
 from pywikibot.bot_choice import UnhandledAnswer
 from pywikibot.textlib import replace_links
-from pywikibot.tools import ModuleDeprecationWrapper
 
 
 class EditReplacementError(ChoiceException, UnhandledAnswer):
@@ -93,12 +92,3 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
                 break
 
         self.put_current(text)
-
-
-EditReplacement = EditReplacementError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'EditReplacement',
-    replacement_name='EditReplacementError',
-    since='20210423')

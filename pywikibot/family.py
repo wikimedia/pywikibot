@@ -21,7 +21,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
-from pywikibot.tools import classproperty, deprecated, ModuleDeprecationWrapper
+from pywikibot.tools import classproperty, deprecated
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -1251,8 +1251,3 @@ def AutoFamily(name: str, url: str):
 
     AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
-                            since='20190420')

@@ -67,9 +67,6 @@ from pywikibot.logging import (
     warning,
 )
 from pywikibot.site import APISite, BaseSite, DataSite
-from pywikibot.tools import (
-    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-)
 from pywikibot.tools import classproperty
 from pywikibot.tools import normalize_username
 from pywikibot.tools.formatter import color_format
@@ -1383,13 +1380,3 @@ page_put_queue_busy = Queue(_config.max_queue_size)  # type: Queue
 _putthread = threading.Thread(target=async_manager,
                               name='Put-Thread',  # for debugging purposes
                               daemon=True)
-
-wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('__release__', __version__,
-                            replacement_name='pywikibot.__version__',
-                            since='20200707')
-wrapper.add_deprecated_attr('showHelp', show_help,
-                            since='20200705')
-wrapper.add_deprecated_attr(
-    'unicode2html', replacement_name='pywikibot.tools.chars.string2html',
-    since='6.2.0')

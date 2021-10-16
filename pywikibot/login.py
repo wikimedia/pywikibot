@@ -20,7 +20,6 @@ from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.tools import (
     file_mode_checker,
-    ModuleDeprecationWrapper,
     normalize_username,
 )
 
@@ -467,12 +466,3 @@ class OauthLoginManager(LoginManager):
         except Exception as e:
             pywikibot.error(e)
             return None
-
-
-OAuthImpossible = ImportError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'OAuthImpossible',
-    replacement_name='ImportError',
-    since='20210423')

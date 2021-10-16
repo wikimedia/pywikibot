@@ -12,7 +12,6 @@ from typing import Any, Optional
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Set
-from pywikibot.tools import ModuleDeprecationWrapper
 
 FOUND_IN_TYPE = Dict['pywikibot.page.Page', List['pywikibot.page.Page']]
 
@@ -232,12 +231,3 @@ def getFilename(page: 'pywikibot.page.Page',
     if extension:
         filename += '.{}'.format(extension)
     return filename
-
-
-GraphImpossible = ImportError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'GraphImpossible',
-    replacement_name='ImportError',
-    since='20210423')

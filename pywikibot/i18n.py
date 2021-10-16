@@ -43,7 +43,6 @@ from pywikibot.backports import (
     Sequence,
 )
 from pywikibot.plural import plural_rule
-from pywikibot.tools import ModuleDeprecationWrapper
 
 STR_OR_SITE_TYPE = Union[str, 'pywikibot.site.BaseSite']
 
@@ -827,10 +826,3 @@ def input(twtitle: str,
             'Unable to load messages package {} for bundle {}'
             .format(_messages_package_name, twtitle))
     return pywikibot.input(prompt, password)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'TranslationError',
-    replacement_name='pywikibot.exceptions.TranslationError',
-    since='20210423')
