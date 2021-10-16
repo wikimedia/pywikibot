@@ -13,6 +13,9 @@ OCR support of page scans via:
 - https://phetools.toolforge.org/ocr.php
 - inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 
+- Wikimedia OCR
+- see: https://www.mediawiki.org/wiki/Help:Extension:Wikisource/Wikimedia_OCR
+
 - https://ws-google-ocr.toolforge.org/
 - inspired by https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 - see also: https://wikisource.org/wiki/Wikisource:Google_OCR
@@ -176,6 +179,10 @@ class ProofreadPage(pywikibot.Page):
     _OCR_CMD = ('https://phetools.toolforge.org/ocr.php?'
                 'cmd=ocr&url={url_image}&lang={lang}&user={user}')
 
+    # Wikimedia OCR utility
+    _WMFOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=tesseract&'
+                   'langs[]={lang}&image={url_image}&uselang={lang}')
+
     # googleOCR ocr utility
     _GOCR_CMD = ('https://ws-google-ocr.toolforge.org/api.php?'
                  'image={url_image}&lang={lang}')
@@ -183,8 +190,10 @@ class ProofreadPage(pywikibot.Page):
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
     _PHETOOLS = 'phetools'
+    _WMFOCR = 'wmfOCR'
     _GOOGLE_OCR = 'googleOCR'
     _OCR_CMDS = {_PHETOOLS: _OCR_CMD,
+                 _WMFOCR: _WMFOCR_CMD,
                  _GOOGLE_OCR: _GOCR_CMD,
                  }
     _OCR_METHODS = list(_OCR_CMDS.keys())

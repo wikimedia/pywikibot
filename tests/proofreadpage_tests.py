@@ -371,6 +371,11 @@ class TestPageOCR(BS4TestCase):
                            'year 1872,\nBy D. APPLETON & CO.,\nIn the '
                            'Office of the Librarian of Congress, at '
                            'Washington.\n\u000c'),
+            'wmfOCR': (False, 'Estee, according to Act of Congress, in the '
+                              'year 1872,\n'
+                              'By D. APPLETON & CO.,\n'
+                              'In the Office of the Librarian of Congress, '
+                              'at Washington.'),
             'googleOCR': (False, 'ENTERED, according to Act of Congress, in '
                                  'the year 1572,\nBY D. APPLETON & CO.\n'
                                  'In the Office of the Librarian of '
@@ -409,6 +414,16 @@ class TestPageOCR(BS4TestCase):
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
+    def test_do_ocr_wmfocr(self):
+        """Test page._do_ocr(ocr_tool='wmfOCR')."""
+        error, text = self.page._do_ocr(ocr_tool='wmfOCR')
+        if error:
+            self.skipTest(text)
+        ref_error, ref_text = self.data['wmfOCR']
+        self.assertEqual(error, ref_error)
+        s = difflib.SequenceMatcher(None, text, ref_text)
+        self.assertGreater(s.ratio(), 0.9)
+
     def test_do_ocr_googleocr(self):
         """Test page._do_ocr(ocr_tool='googleOCR')."""
         error, text = self.page._do_ocr(ocr_tool='googleOCR')
@@ -419,14 +434,14 @@ class TestPageOCR(BS4TestCase):
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
-    def test_ocr_googleocr(self):
-        """Test page.ocr(ocr_tool='googleOCR')."""
+    def test_ocr_wmfocr(self):
+        """Test page.ocr(ocr_tool='wmfOCR')."""
         try:
-            text = self.page.ocr(ocr_tool='googleOCR')
+            text = self.page.ocr(ocr_tool='wmfOCR')
         except Exception as exc:
             self.assertIsInstance(exc, ValueError)
         else:
-            ref_error, ref_text = self.data['googleOCR']
+            ref_error, ref_text = self.data['wmfOCR']
             s = difflib.SequenceMatcher(None, text, ref_text)
             self.assertGreater(s.ratio(), 0.9)
 
