@@ -22,10 +22,12 @@ The following parameters are supported:
 
 -summary:         Set the action summary message for the edit.
 
-All settings can be made either by giving option with the command line
-or with a settings file which is scripts.ini by default. If you don't
-want the default values you can add any option you want to change to
-that settings file below the [basic] section like:
+This sample script is a
+:py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All settings can be
+made either by giving option with the command line or with a settings file
+which is scripts.ini by default. If you don't want the default values you can
+add any option you want to change to that settings file below the [basic]
+section like:
 
     [basic] ; inline comments starts with colon
     # This is a commend line. Assignments may be done with '=' or ':'

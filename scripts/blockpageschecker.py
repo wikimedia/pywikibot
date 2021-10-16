@@ -19,6 +19,10 @@ Furthermore, the following command line parameters are supported:
 
 -moveprotected   Same as -protectedpages, for moveprotected pages
 
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
 -always          Doesn't ask every time whether the bot should make the change.
                  Do it always.
 

@@ -23,6 +23,7 @@ Furthermore, the following command line parameters are supported:
     -summary       Summary of the edit made by bot. Overrides the default
                    from i18n.
 
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
 All local parameters can be given inside a scripts.ini file. Options
 passed to the script are priorized over options read from ini file. See:
 https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
@@ -152,12 +153,10 @@ class SandboxBot(Bot, ConfigParserBot):
     """Sandbox reset bot."""
 
     available_options = {
-        'hours': 1.0,
-        'no_repeat': True,
+        'hours': -1.0,  # do not repeat if hours < 0
         'delay': -1,
         'text': '',
         'summary': '',
-        'delay_td': None,  # not a real option but __init__ sets it
     }
 
     def __init__(self, **kwargs) -> None:
@@ -165,10 +164,10 @@ class SandboxBot(Bot, ConfigParserBot):
         super().__init__(**kwargs)
         if self.opt.delay < 0:
             d = min(15, max(5, int(self.opt.hours * 60)))
-            self.opt.delay_td = datetime.timedelta(minutes=d)
+            self.delay_td = datetime.timedelta(minutes=d)
         else:
             d = max(5, self.opt.delay)
-            self.opt.delay_td = datetime.timedelta(minutes=d)
+            self.delay_td = datetime.timedelta(minutes=d)
 
         self.site = pywikibot.Site()
         self.translated_content = self.opt.text or i18n.translate(
@@ -224,7 +223,7 @@ class SandboxBot(Bot, ConfigParserBot):
                     else:
                         edit_delta = (datetime.datetime.utcnow()
                                       - sandbox_page.editTime())
-                        delta = self.opt.delay_td - edit_delta
+                        delta = self.delay_td - edit_delta
                         # Is the last edit more than 'delay' minutes ago?
                         if delta <= datetime.timedelta(0):
                             sandbox_page.put(
@@ -247,9 +246,11 @@ class SandboxBot(Bot, ConfigParserBot):
                     pywikibot.output(
                         '*** The sandbox is not existent, skipping.')
                     continue
-            if self.opt.no_repeat:
+
+            if self.opt.hours < 0:
                 pywikibot.output('\nDone.')
                 return
+
             if not wait:
                 if self.opt.hours < 1.0:
                     pywikibot.output('\nSleeping {} minutes, now {}'.format(
@@ -279,7 +280,6 @@ def main(*args: str) -> None:
             continue
         if opt == 'hours':
             opts[opt] = float(value)
-            opts['no_repeat'] = False
         elif opt == 'delay':
             opts[opt] = int(value)
         elif opt == 'text':
