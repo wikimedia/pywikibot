@@ -98,8 +98,10 @@ import sys
 import time
 import warnings
 import webbrowser
+
 from collections.abc import Generator
 from contextlib import closing
+from functools import wraps
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
@@ -320,11 +322,11 @@ def handler_namer(name: str) -> str:
 def init_handlers() -> None:
     """Initialize logging system for terminal-based bots.
 
-    This function must be called before using pywikibot.output(); and must
-    be called again if the destination stream is changed.
+    This function must be called before using any input/output methods;
+    and must be called again if ui handler is changed..
 
-    Note: this function is called by handle_args(), so it should normally
-    not need to be called explicitly
+    Note: this function is called by any user input and output function,
+    so it should normally not need to be called explicitly.
 
     All user output is routed through the logging module.
     Each type of output is handled by an appropriate handler object.
@@ -532,7 +534,19 @@ add_init_routine(init_handlers)
 
 # User input functions
 
+def initialize_handlers(function):
+    """Make sure logging system has been initialized.
 
+    .. versionadded:: 7.0
+    """
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        init_handlers()
+        return function(*args, **kwargs)
+    return wrapper
+
+
+@initialize_handlers
 def input(question: str,
           password: bool = False,
           default: Optional[str] = '',
@@ -546,15 +560,11 @@ def input(question: str,
         an answer.
     :param force: Automatically use the default
     """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
-    data = ui.input(question, password=password, default=default, force=force)
-    return data
+    return ui.input(question, password=password, default=default, force=force)
 
 
+@initialize_handlers
 def input_choice(question: str,
                  answers: ANSWER_TYPE,
                  default: Optional[str] = None,
@@ -579,10 +589,6 @@ def input_choice(question: str,
         selected, it does not return the shortcut and the default is not a
         valid shortcut.
     """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
     return ui.input_choice(question, answers, default, return_shortcut,
                            automatic_quit=automatic_quit, force=force)
@@ -619,6 +625,7 @@ def input_yn(question: str,
                         automatic_quit=automatic_quit, force=force) == 'y'
 
 
+@initialize_handlers
 def input_list_choice(question: str,
                       answers: ANSWER_TYPE,
                       default: Union[int, str, None] = None,
@@ -633,9 +640,6 @@ def input_list_choice(question: str,
     :param force: Automatically use the default
     :return: The selected answer.
     """
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
     return ui.input_list_choice(question, answers, default=default,
                                 force=force)
