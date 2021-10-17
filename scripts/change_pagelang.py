@@ -15,6 +15,10 @@ Furthermore, the following command line parameters are supported:
 
 -never            If a language is already set for a page, never change it to
                   the one set in -setlang (keep the current language).
+
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
 # (C) Pywikibot team, 2018-2021
@@ -23,7 +27,7 @@ Furthermore, the following command line parameters are supported:
 #
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ConfigParserBot, SingleSiteBot
 from pywikibot.tools.formatter import color_format
 
 
@@ -32,9 +36,13 @@ docuReplacements = {  # noqa: N816
 }
 
 
-class ChangeLangBot(SingleSiteBot):
+class ChangeLangBot(ConfigParserBot, SingleSiteBot):
 
-    """Change page language bot."""
+    """Change page language bot.
+
+    .. versionchanged:: 7.0
+       ChangeLangBot is a ConfigParserBot
+    """
 
     update_options = {
         'never': False,

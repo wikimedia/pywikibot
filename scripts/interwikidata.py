@@ -13,6 +13,9 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
+-always           If used, the bot won't ask if it should add the specified
+                  text
+
 -clean            Clean pages.
 
 -create           Create items.
@@ -20,6 +23,10 @@ Furthermore, the following command line parameters are supported:
 -merge            Merge items.
 
 -summary:         Use your own edit summary for cleaning the page.
+
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 
 # (C) Pywikibot team, 2015-2021
@@ -34,7 +41,12 @@ import pywikibot.i18n
 import pywikibot.textlib
 from pywikibot import output, pagegenerators, warning
 from pywikibot.backports import Set
-from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
+from pywikibot.bot import (
+    ConfigParserBot,
+    ExistingPageBot,
+    SingleSiteBot,
+    suggest_help,
+)
 from pywikibot.exceptions import APIError, NoPageError
 
 
@@ -49,9 +61,13 @@ NAMESPACES = (0, 4, 10, 14)
 # should cause the bot to skip the page, see T134497
 
 
-class IWBot(ExistingPageBot, SingleSiteBot):
+class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
-    """The bot for interwiki."""
+    """The bot for interwiki.
+
+    .. versionchanged:: 7.0
+       IWBot is a ConfigParserBot
+    """
 
     update_options = {
         'clean': False,

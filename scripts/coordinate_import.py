@@ -31,7 +31,14 @@ Example:
 
 The following command line parameters are supported:
 
+-always           If used, the bot won't ask if it should add the specified
+                  text
+
 -create           Create items for pages without one.
+
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 
 &params;
 """
@@ -43,16 +50,22 @@ The following command line parameters are supported:
 from typing import Optional
 
 import pywikibot
-from pywikibot import WikidataBot, pagegenerators
+
+from pywikibot import pagegenerators
+from pywikibot.bot import ConfigParserBot, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownError
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class CoordImportRobot(WikidataBot):
+class CoordImportRobot(ConfigParserBot, WikidataBot):
 
-    """A bot to import coordinates to Wikidata."""
+    """A bot to import coordinates to Wikidata.
+
+    .. versionchanged:: 7.0
+       CoordImportRobot is a ConfigParserBot
+    """
 
     use_from_page = None
 

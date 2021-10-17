@@ -38,12 +38,9 @@ Example
 
     python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
-Todo
-----
-Please fix these if you are capable and motivated:
-
-- if a file marked nowcommons is not present on Wikimedia Commons, the bot
-  will exit.
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
 # (C) Pywikibot team, 2006-2021
@@ -54,7 +51,8 @@ import sys
 from itertools import chain
 
 import pywikibot
-from pywikibot import Bot, i18n
+from pywikibot import i18n
+from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot import pagegenerators as pg
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.tools import filter_unique
@@ -175,9 +173,13 @@ namespace_in_template = [
 ]
 
 
-class NowCommonsDeleteBot(Bot):
+class NowCommonsDeleteBot(Bot, ConfigParserBot):
 
-    """Bot to delete migrated files."""
+    """Bot to delete migrated files.
+
+    .. versionchanged:: 7.0
+       NowCommonsDeleteBot is a ConfigParserBot
+    """
 
     update_options = {
         'replace': False,

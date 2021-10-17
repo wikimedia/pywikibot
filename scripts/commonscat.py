@@ -9,14 +9,18 @@ You could probably use it at articles as well, but this isn't tested.
 
 The following parameters are supported:
 
+-checkcurrent     Work on all category pages that use the primary commonscat
+                  template.
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
 -always           Don't prompt you for each replacement. Warning message
                   has not to be confirmed. ATTENTION: Use this with care!
 
 -summary:XYZ      Set the action summary message for the edit to XYZ,
                   otherwise it uses messages from add_text.py as default.
-
--checkcurrent     Work on all category pages that use the primary commonscat
-                  template.
 
 This bot uses pagegenerators to get a list of pages. The following options are
 supported:
@@ -43,7 +47,7 @@ import re
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import ConfigParserBot, ExistingPageBot, NoRedirectPageBot
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import add_text
 
@@ -222,11 +226,15 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(ExistingPageBot, NoRedirectPageBot):
+class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
 
-    """Commons categorisation bot."""
+    """Commons categorisation bot.
 
-    update_options = {'summary': None}
+    .. versionchanged:: 7.0
+       CommonscatBot is a ConfigParserBot
+    """
+
+    update_options = {'summary': ''}
 
     def skip_page(self, page):
         """Skip category redirects or disambigs."""
