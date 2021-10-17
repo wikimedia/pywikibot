@@ -716,6 +716,12 @@ class GeneratorFactory:
         Return generator based on Category defined by category and gen_func.
 
         :param category: category name with start parameter
+        :param recurse: if not False or 0, also iterate articles in
+            subcategories. If an int, limit recursion to this number of
+            levels. (Example: recurse=1 will iterate articles in first-level
+            subcats, but no deeper.)
+        :param content: if True, retrieve the content of the current version
+            of each page (default False)
         """
         if gen_func is None:
             raise ValueError('getCategoryGen requires a gen_func argument')
@@ -1538,24 +1544,23 @@ def LanguageLinksPageGenerator(page: 'pywikibot.page.Page',
 
 def CategorizedPageGenerator(category: pywikibot.page.Category,
                              recurse: Union[int, bool] = False,
-                             start: Optional[int] = None,
+                             start: Optional[str] = None,
                              total: Optional[int] = None,
                              content: bool = False,
                              namespaces: Optional[Sequence[int]] = None
                              ) -> Iterable['pywikibot.page.Page']:
     """Yield all pages in a specific category.
 
-    If recurse is True, pages in subcategories are included as well; if
-    recurse is an int, only subcategories to that depth will be included
-    (e.g., recurse=2 will get pages in subcats and sub-subcats, but will
-    not go any further).
-
-    If start is a string value, only pages whose sortkey comes after start
-    alphabetically are included.
-
-    If content is True (default is False), the current page text of each
-    retrieved page will be downloaded.
-
+    :param recurse: if not False or 0, also iterate articles in
+        subcategories. If an int, limit recursion to this number of
+        levels. (Example: recurse=1 will iterate articles in first-level
+        subcats, but no deeper.)
+    :param start: if provided, only generate pages >= this title
+        lexically
+    :param total: iterate no more than this number of pages in
+        total (at all levels)
+    :param content: if True, retrieve the content of the current version
+        of each page (default False)
     """
     kwargs = {
         'content': content,
@@ -1569,22 +1574,22 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
 
 def SubCategoriesPageGenerator(category: 'pywikibot.page.Category',
                                recurse: Union[int, bool] = False,
-                               start: Optional[int] = None,
+                               start: Optional[str] = None,
                                total: Optional[int] = None,
                                content: bool = False
                                ) -> Iterable['pywikibot.page.Page']:
     """Yield all subcategories in a specific category.
 
-    If recurse is True, pages in subcategories are included as well; if
-    recurse is an int, only subcategories to that depth will be included
-    (e.g., recurse=2 will get pages in subcats and sub-subcats, but will
-    not go any further).
-
-    If start is a string value, only categories whose sortkey comes after
-    start alphabetically are included.
-
-    If content is True (default is False), the current page text of each
-    category description page will be downloaded.
+    :param recurse: if not False or 0, also iterate articles in
+        subcategories. If an int, limit recursion to this number of
+        levels. (Example: recurse=1 will iterate articles in first-level
+        subcats, but no deeper.)
+    :param start: if provided, only generate pages >= this title
+        lexically
+    :param total: iterate no more than this number of pages in
+        total (at all levels)
+    :param content: if True, retrieve the content of the current version
+        of each page (default False)
     """
     # TODO: page generator could be modified to use cmstartsortkey ...
     for s in category.subcategories(recurse=recurse,
