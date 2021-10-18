@@ -15,7 +15,7 @@ args[0] to see if it callable. Therefore, a decorator must not accept
 only one arg, and that arg be a callable, as it will be detected as
 a deprecator without any arguments.
 
-.. versionchanged 6.4:
+.. versionchanged:: 6.4
    deprecation decorators moved to _deprecate module
 """
 #
