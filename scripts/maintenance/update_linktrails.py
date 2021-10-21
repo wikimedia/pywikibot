@@ -142,7 +142,7 @@ def update_family_file():
             text += yield
     except GeneratorExit:
         text += '    }'
-        # write lintrails to family file
+        # write linktrails to family file
         pywikibot.output('Writing family file...')
         family_file_name = join('pywikibot', 'family.py')
         with codecs.open(family_file_name, 'r', 'utf8') as family_file:
