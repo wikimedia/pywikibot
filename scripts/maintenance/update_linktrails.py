@@ -25,15 +25,22 @@ from pywikibot.tools import suppress_warnings
 
 def format_string(code: str, pattern: str) -> str:
     """Format a single pattern line."""
-    fmt = ' ' * 8 + "'{}': '{}'"
+    fmt = ' ' * 8 + "'{}': {!r}"
     code_len = len(code)
     pattern_len = len(pattern)
-    if pattern_len > 63 - code_len:
+
+    if pattern_len > 64 - code_len:
         index = pattern_len // 2
         result = fmt.format(code, pattern[:index]) + '\n'
-        result += ' ' * (code_len + 12) + "'{}',\n".format(pattern[index:])
+        result += ' ' * (code_len + 12) + repr(pattern[index:])
     else:
-        result = fmt.format(code, pattern) + ',\n'
+        result = fmt.format(code, pattern)
+
+    result += ',\n'
+    # convert escape sequences of unprintable characters to unicode
+    result = re.sub(r'\\u([a-f0-9]{4})',
+                    lambda match: chr(int(match.group(1), 16)), result)
+
     return result
 
 
@@ -57,7 +64,7 @@ def update_sites(fam):
             'Site wikipedia:[{}]+ instantiated using different code'
             .format(CODE_CHARACTERS),
             category=UserWarning,
-                filename=r'.+pywikibot.tools._deprecate\.py'):
+                filename=r'.+update_linktrails\.py'):
             site = pywikibot.Site(code, 'wikipedia')
 
         if isinstance(site, pywikibot.site.RemovedSite):
