@@ -9,17 +9,6 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--always           Don't prompt to protect pages, just do it.
-
--summary:         Supply a custom edit summary. Tries to generate summary from
-                  the page selector. If no summary is supplied or couldn't
-                  determine one from the selector it'll ask for one.
-
--expiry:          Supply a custom protection expiry, which defaults to
-                  indefinite. Any string understandable by MediaWiki, including
-                  relative and absolute, is acceptable. See:
-                  https://www.mediawiki.org/wiki/API:Protect#Parameters
-
 -unprotect        Acts like "default:all"
 
 -default:         Sets the default protection level (default 'sysop'). If no
@@ -34,6 +23,21 @@ For all protection types (edit, move, etc.) it chooses the default protection
 level. This is "sysop" or "all" if -unprotect was selected. If multiple
 parameters -unprotect or -default are used, only the last occurrence
 is applied.
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
+-always           Don't prompt to protect pages, just do it.
+
+-summary:         Supply a custom edit summary. Tries to generate summary from
+                  the page selector. If no summary is supplied or couldn't
+                  determine one from the selector it'll ask for one.
+
+-expiry:          Supply a custom protection expiry, which defaults to
+                  indefinite. Any string understandable by MediaWiki, including
+                  relative and absolute, is acceptable. See:
+                  https://www.mediawiki.org/wiki/API:Protect#Parameters
 
 Usage:
 
@@ -59,7 +63,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import CurrentPageBot, SingleSiteBot
+from pywikibot.bot import ConfigParserBot, CurrentPageBot, SingleSiteBot
 
 
 # This is required for the text that is shown when you run this script
@@ -67,9 +71,13 @@ from pywikibot.bot import CurrentPageBot, SingleSiteBot
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class ProtectionRobot(SingleSiteBot, CurrentPageBot):
+class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
 
-    """This bot allows protection of pages en masse."""
+    """This bot allows protection of pages en masse.
+
+    .. versionchanged:: 7.0
+       CheckerBot is a ConfigParserBot
+    """
 
     update_options = {
         'summary': '',

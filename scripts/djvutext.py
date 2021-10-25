@@ -19,6 +19,11 @@ The following parameters are supported:
                      A-  -> pages A until number of images
                      A   -> just page A
                      -B  -> pages 1 until B
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default:
+
     -summary:      custom edit summary.
                    Use quotes if edit summary contains spaces.
     -force         overwrites existing text
@@ -48,6 +53,9 @@ class DjVuTextBot(SingleSiteBot):
     A bot that uploads text-layer from djvu files to Page:namespace.
 
     Works only on sites with Proofread Page extension installed.
+
+    .. versionchanged:: 7.0
+       CheckerBot is a ConfigParserBot
     """
 
     update_options = {

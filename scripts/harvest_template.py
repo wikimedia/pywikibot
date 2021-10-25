@@ -22,6 +22,9 @@ These command line parameters can be used to specify which pages to work on:
 
 You can also use additional parameters:
 
+-always             If used, the bot won't ask if it should add the specified
+                    text
+
 -create             Create missing items before importing.
 
 The following command line parameters can be used to change the bot's behavior.
@@ -85,6 +88,10 @@ will not add duplicate claims for the same member:
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox musical artist" current_members P527 -exists:p \
         -multi
+
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
 # (C) Pywikibot team, 2013-2021
@@ -99,7 +106,7 @@ import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
 from pywikibot.backports import List
-from pywikibot.bot import OptionHandler, WikidataBot
+from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import InvalidTitleError, NoPageError
 
 
@@ -132,9 +139,13 @@ class PropertyOptionHandler(OptionHandler):
     }
 
 
-class HarvestRobot(WikidataBot):
+class HarvestRobot(ConfigParserBot, WikidataBot):
 
-    """A bot to add Wikidata claims."""
+    """A bot to add Wikidata claims.
+
+    .. versionchanged:: 7.0
+       HarvestRobot is a ConfigParserBot
+    """
 
     update_options = {
         'always': True,

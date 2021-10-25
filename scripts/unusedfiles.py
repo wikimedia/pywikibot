@@ -4,13 +4,18 @@ This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
 
--always         Don't be asked every time.
--nouserwarning  Do not warn uploader about orphaned file.
--filetemplate:  Use a custom template on unused file pages.
--usertemplate:  Use a custom template to warn the uploader.
 -limit          Specify number of pages to work on with "-limit:n" where
                 n is the maximum number of articles to work on.
                 If not used, all pages are used.
+-always         Don't be asked every time.
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
+-nouserwarning  Do not warn uploader about orphaned file.
+-filetemplate:  Use a custom template on unused file pages.
+-usertemplate:  Use a custom template to warn the uploader.
 """
 #
 # (C) Pywikibot team, 2007-2021
@@ -21,7 +26,12 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ConfigParserBot,
+    ExistingPageBot,
+    SingleSiteBot,
+)
 from pywikibot.exceptions import Error, NoPageError, TranslationError
 from pywikibot.flow import Board
 
@@ -41,9 +51,16 @@ template_to_the_user = {
 }
 
 
-class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
+class UnusedFilesBot(SingleSiteBot,
+                     AutomaticTWSummaryBot,
+                     ConfigParserBot,
+                     ExistingPageBot):
 
-    """Unused files bot."""
+    """Unused files bot.
+
+    .. versionchanged:: 7.0
+       UnusedFilesBot is a ConfigParserBot
+    """
 
     summary_key = 'unusedfiles-comment'
     update_options = {

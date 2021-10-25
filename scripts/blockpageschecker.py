@@ -175,7 +175,11 @@ ParsedTemplate = namedtuple('ParsedTemplate', 'blocktype, regex, msgtype')
 
 class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
-    """Bot to remove stale protection templates from unprotected pages."""
+    """Bot to remove stale protection templates from unprotected pages.
+
+    .. versionchanged:: 7.0
+       CheckerBot is a ConfigParserBot
+    """
 
     update_options = {
         'show': False,

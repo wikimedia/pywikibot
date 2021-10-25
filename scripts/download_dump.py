@@ -11,6 +11,9 @@ This script supports the following command line parameters:
     -dumpdate:#     The dumpdate date of the dump (default to `latest`)
                     formatted as YYYYMMDD.
 
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
 # (C) Pywikibot team, 2017-2021
@@ -23,13 +26,17 @@ from http import HTTPStatus
 from os import remove, replace, symlink, urandom
 
 import pywikibot
-from pywikibot import Bot
+from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot.comms.http import fetch
 
 
-class DownloadDumpBot(Bot):
+class DownloadDumpBot(Bot, ConfigParserBot):
 
-    """Download dump bot."""
+    """Download dump bot.
+
+    .. versionchanged:: 7.0
+       DownloadDumpBot is a ConfigParserBot
+    """
 
     available_options = {
         'wikiname': '',

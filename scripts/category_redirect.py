@@ -11,6 +11,9 @@ are taken into account.
 
 The following parameters are supported:
 
+-always           If used, the bot won't ask if it should add the specified
+                  text
+
 -delay:#          Set an amount of days. If the category is edited more recenty
                   than given days, ignore it. Default is 7.
 
@@ -22,6 +25,9 @@ Usage:
 
     python pwb.py category_redirect [options]
 
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
 # (C) Pywikibot team, 2008-2021
@@ -36,7 +42,7 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import ConfigParserBot, SingleSiteBot
 from pywikibot.exceptions import (
     CircularRedirectError,
     Error,
@@ -45,9 +51,13 @@ from pywikibot.exceptions import (
 )
 
 
-class CategoryRedirectBot(SingleSiteBot):
+class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
 
-    """Page category update bot."""
+    """Page category update bot.
+
+    .. versionchanged:: 7.0
+       CategoryRedirectBot is a ConfigParserBot
+    """
 
     update_options = {
         'tiny': False,  # use Non-empty category redirects only
