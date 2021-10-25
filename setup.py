@@ -75,6 +75,7 @@ extra_deps = {
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.9.1',
+        'darglint',
         'pydocstyle>=4.0.0',
         'flake8-bugbear!=21.4.1',
         'flake8-coding',

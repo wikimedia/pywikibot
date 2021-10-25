@@ -1210,7 +1210,7 @@ def interwikiFormat(links: dict, insite=None) -> str:
 
     :param links: interwiki links to be formatted
     :type links: dict with the Site objects as keys, and Page
-        or Link objects as values.
+        or Link objects as values.  # noqa: DAR103
     :param insite: site the interwiki links will be formatted for
         (defaulting to the current site).
     :type insite: BaseSite
@@ -1272,13 +1272,12 @@ def interwikiSort(sites, insite=None):
 
 def getCategoryLinks(text: str, site=None,
                      include: Optional[List[str]] = None,
-                     expand_text: bool = False) -> list:
+                     expand_text: bool = False) -> List['pywikibot.Category']:
     """Return a list of category links found in text.
 
     :param include: list of tags which should not be removed by
         removeDisabledParts() and where CategoryLinks can be searched.
     :return: all category links found
-    :rtype: list of Category objects
     """
     result = []
     if site is None:

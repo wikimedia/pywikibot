@@ -571,7 +571,7 @@ class ProofreadPage(pywikibot.Page):
         :return: file url of the scan ProofreadPage or None.
 
         :raises Exception: in case of http errors
-        :raise ImportError: if bs4 is not installed, _bs4_soup() will raise
+        :raises ImportError: if bs4 is not installed, _bs4_soup() will raise
         :raises ValueError: in case of no prp_page_image src found for scan
         """
         # wrong link fails with various possible Exceptions.

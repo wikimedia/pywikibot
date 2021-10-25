@@ -131,7 +131,7 @@ class Board(FlowPage):
         :param reverse: Whether to reverse the topic ordering.
         :param include_offset: Whether to include the offset topic.
         :param toc_only: Whether to only include information for the TOC.
-        :return: A generator of this board's topics.
+        :yield: A generator of this board's topics.
         """
         data = self.site.load_topiclist(self, content_format=content_format,
                                         limit=limit, sortby=sort_by,
