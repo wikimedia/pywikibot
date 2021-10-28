@@ -11,7 +11,7 @@ from time import strftime
 
 
 __name__ = 'pywikibot'
-__version__ = '6.6.1'
+__version__ = '6.6.2'
 __description__ = 'Python MediaWiki Bot Framework'
 __maintainer__ = 'The Pywikibot team'
 __maintainer_email__ = 'pywikibot@lists.wikimedia.org'
