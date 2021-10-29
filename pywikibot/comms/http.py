@@ -51,7 +51,6 @@ from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecated,
     file_mode_checker,
-    issue_deprecation_warning,
 )
 
 
@@ -243,13 +242,6 @@ def request(site,
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
-    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
-    if old_validation is not None:
-        issue_deprecation_warning('disable_ssl_certificate_validation',
-                                  instead='verify',
-                                  since='20201220')
-        kwargs.update(verify=not old_validation)
-
     if not headers:
         headers = {}
         format_string = None
@@ -399,12 +391,6 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
             auth = requests_oauthlib.OAuth1(*auth)
 
     timeout = config.socket_timeout
-    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
-    if old_validation is not None:
-        issue_deprecation_warning('disable_ssl_certificate_validation',
-                                  instead='verify',
-                                  since='20201220')
-        kwargs.update(verify=not old_validation)
 
     try:
         # Note that the connections are pooled which mean that a future
