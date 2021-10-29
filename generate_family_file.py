@@ -277,8 +277,7 @@ class Family(family.Family):  # noqa: D101
 
 def _import_with_no_user_config(*import_args):
     """Return __import__(*import_args) without loading user-config.py."""
-    orig_no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG') or getenv(
-        'PYWIKIBOT2_NO_USER_CONFIG')
+    orig_no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG')
     environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
     result = __import__(*import_args)
     # Reset this flag

@@ -53,7 +53,7 @@ from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.backports import (DefaultDict, Dict, FrozenSet, List, Mapping,
                                  Tuple, removesuffix)
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import deprecated
 
 
 _DabComDict = DefaultDict[str, Dict[str, str]]
@@ -64,22 +64,6 @@ OSWIN32 = (sys.platform == 'win32')
 
 if OSWIN32:
     import winreg
-
-
-# Normalize old PYWIKIBOT2 environment variables and issue a deprecation warn.
-for env_name in (
-    'PYWIKIBOT2_DIR', 'PYWIKIBOT2_DIR_PWB', 'PYWIKIBOT2_NO_USER_CONFIG',
-):
-    if env_name not in environ:
-        continue
-    env_value = environ[env_name]
-    new_env_name = env_name.replace('PYWIKIBOT2_', 'PYWIKIBOT_')
-    del environ[env_name]
-    if new_env_name not in environ:
-        environ[new_env_name] = env_value
-    issue_deprecation_warning(
-        env_name + ' environment variable', new_env_name, 0, since='20180803')
-
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
