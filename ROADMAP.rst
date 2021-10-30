@@ -4,6 +4,8 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Raise a generic ServerError if the http status code is unofficial (T293208)
+* Add support for Wikimedia OCR engine with proofreadpage
 * Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (T85623, T293276)
 * The cached output functionality from compat release was re-implemented (T151727, T73646, T74942, T132135, T144698, T196039, T280466)
 * L10N updates
@@ -20,6 +22,16 @@ Breaking changes
 Code cleanups
 -------------
 
+* version.ParseError was removed in favour of exceptions.VersionParseError
+* specialbots.EditReplacement and specialbots.EditReplacementError were removed in favour of exceptions.EditReplacementError
+* site.PageInUse exception was removed in favour of exceptions.PageInUseError
+* page.UnicodeToAsciiHtml and page.unicode2html were removed in favour of tools.chars.string_to_ascii_html and tools.chars.string2html
+* interwiki_graph.GraphImpossible and login.OAuthImpossible exception were removed in favour of ImportError
+* i18n.TranslationError was removed in favour of exceptions.TranslationError
+* WikiaFamily was removed in favour of FandomFamily
+* data.api exceptions were removed in favour of exceptions module
+* cosmetic_changes CANCEL_ALL/PAGE/METHOD/MATCH constants were removed in favour of CANCEL enum
+* pywikibot.__release__ was removed in favour of pywikibot.__version__
 * TextfilePageGenerator was replaced by TextIOPageGenerator
 * PreloadingItemGenerator was replaced by PreloadingEntityGenerator
 * DuplicateFilterPageGenerator was replaced by tools.filter_unique

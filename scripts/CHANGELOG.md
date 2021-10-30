@@ -3,6 +3,9 @@
 ## 7.0.0
 *In development*
 
+### general
+*  Provide ConfigParserBot for several scripts (T223778)
+
 ### add_text
 * Provide -create and -createonly options (T291354)
 * Deprecated function get_text() was removed in favour of Page.text and BaseBot.skip_page()
