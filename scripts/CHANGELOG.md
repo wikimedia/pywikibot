@@ -1,4 +1,4 @@
-# Schripts Changelog
+# Scripts Changelog
 
 ## 7.0.0
 *In development*
