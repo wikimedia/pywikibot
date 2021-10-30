@@ -24,7 +24,6 @@ from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import issue_deprecation_warning
 
 
 try:
@@ -585,9 +584,8 @@ def expandmarker(text: str, marker: str = '', separator: str = '') -> str:
     return marker
 
 
-def replace_links(text: str, replace, site=None) -> str:
-    """
-    Replace wikilinks selectively.
+def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
+    """Replace wikilinks selectively.
 
     The text is searched for a link and on each link it replaces the text
     depending on the result for that link. If the result is just None it skips
@@ -605,6 +603,9 @@ def replace_links(text: str, replace, site=None) -> str:
     function which returns a Link instance and copies the value which should
     remaining.
 
+    .. versionchanged:: 7.0
+       `site` parameter is mandatory
+
     :param text: the text in which to replace links
     :param replace: either a callable which reacts like described above.
         The callable must accept four parameters link, text, groups, rng and
@@ -620,9 +621,12 @@ def replace_links(text: str, replace, site=None) -> str:
         in that case it will apply the second value from the sequence.
     :type replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
-    :param site: a Site object to use. It should match the origin
-        or target site of the text
-    :type site: pywikibot.site.APISite
+    :param site: a Site object to use. It should match the origin or
+        target site of the text
+    :raises TypeError: missing positional argument 'site'
+    :raises ValueError: Wrong site type
+    :raises ValueError: Wrong replacement number
+    :raises ValueError: Wrong replacement types
     """
     def to_link(source):
         """Return the link from source when it's a Page otherwise itself."""
@@ -650,6 +654,10 @@ def replace_links(text: str, replace, site=None) -> str:
             title += '#' + link.section
         return title
 
+    if not isinstance(site, pywikibot.site.BaseSite):
+        raise ValueError('The "site" argument must be a BaseSite not {}.'
+                         .format(type(site).__name__))
+
     if isinstance(replace, Sequence):
         if len(replace) != 2:
             raise ValueError('When used as a sequence, the "replace" '
@@ -664,13 +672,6 @@ def replace_links(text: str, replace, site=None) -> str:
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
             check_classes(replace_list[0])
         replace = replace_callable
-        if site is None:
-            issue_deprecation_warning(
-                'site=None',
-                'a valid site for list or tuple parameter "replace"',
-                2, since='20190223')
-    elif site is None:
-        raise ValueError('The "site" argument must be provided.')
 
     linktrail = site.linktrail()
     link_pattern = re.compile(
