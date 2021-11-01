@@ -60,16 +60,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
             self.assertFalse(page.isRedirectPage())
         self.assertOneDeprecation()
 
-    def test_namespace_shortcuts(self):
-        """Test namespace shortcuts."""
-        self.assertEqual(self.site.image_namespace(), self.site.namespace(6))
-        self.assertEqual(self.site.mediawiki_namespace(),
-                         self.site.namespace(8))
-        self.assertEqual(self.site.template_namespace(),
-                         self.site.namespace(10))
-        self.assertEqual(self.site.category_namespace(),
-                         self.site.namespace(14))
-
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
                                      DeprecationTestCase):
