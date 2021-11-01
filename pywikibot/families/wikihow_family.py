@@ -15,7 +15,7 @@ class Family(family.SubdomainFamily):
 
     """Family class for Wikihow Wiki.
 
-    .. versionaddded: 3.0
+    .. versionadded:: 3.0
     """
 
     name = 'wikihow'
@@ -25,7 +25,11 @@ class Family(family.SubdomainFamily):
         'ar', 'cs', 'de', 'en', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'nl',
         'pt', 'ru', 'th', 'tr', 'vi', 'zh',
     )
+
     removed_wikis = ['ca', 'cy', 'fa', 'he', 'pl', 'ur']
+
+    title_delimiter_and_aliases = '- '
+    """.. versionadded:: 7.0"""
 
     @classproperty
     def domains(cls):
