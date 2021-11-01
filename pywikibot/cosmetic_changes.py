@@ -58,7 +58,7 @@ or by adding a list to the given one::
 import re
 
 from enum import IntEnum
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import pywikibot
 from pywikibot import textlib
@@ -69,12 +69,7 @@ from pywikibot.textlib import (
     MultiTemplateMatchBuilder,
     _get_regexes,
 )
-from pywikibot.tools import (
-    deprecated,
-    first_lower,
-    first_upper,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
 
 
@@ -221,47 +216,33 @@ def _reformat_ISBNs(text: str, strict: bool = True) -> str:
 
 class CosmeticChangesToolkit:
 
-    """Cosmetic changes toolkit."""
+    """Cosmetic changes toolkit.
+
+    .. versionchanged:: 7.0
+       `from_page()` method was removed
+    """
 
     def __init__(self, page: 'pywikibot.page.BasePage', *,
                  show_diff: bool = False,
-                 namespace: Optional[int] = None,
-                 pageTitle: Optional[str] = None,
                  ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
 
+        .. versionchanged:: 5.2
+           instantiate the CosmeticChangesToolkit from a page object;
+           only allow keyword arguments except for page parameter;
+           `namespace` and `pageTitle` parameters are deprecated
+
+        .. versionchanged:: 7.0
+           `namespace` and `pageTitle` parameters were removed
+
         :param page: the Page object containing the text to be modified
         :param show_diff: show difference after replacements
-        :param namespace: DEPRECATED namespace parameter
-        :param pageTitle: DEPRECATED page title parameter
         :param ignore: ignores if an error occurred and either skips the page
             or only that method. It can be set one of the CANCEL constants
         """
-        if isinstance(page, pywikibot.BaseSite):
-            self.site = page
-            self.title = pageTitle
-
-            class_name = type(self).__name__
-            if self.title is None:
-                raise ValueError('Page title required for ' + class_name)
-
-            try:
-                self.namespace = self.site.namespaces.resolve(namespace).pop(0)
-            except (KeyError, TypeError, IndexError):
-                raise ValueError('{} needs a valid namespace'
-                                 .format(class_name))
-            issue_deprecation_warning(
-                'site parameter of ' + class_name,
-                'a pywikibot.Page object as first parameter',
-                since='20201102')
-        else:
-            if namespace is not None or pageTitle is not None:
-                raise TypeError(
-                    "'namespace' and 'pageTitle' arguments are invalid with "
-                    'a given Page object')
-            self.site = page.site
-            self.title = page.title()
-            self.namespace = page.namespace()
+        self.site = page.site
+        self.title = page.title()
+        self.namespace = page.namespace()
 
         self.show_diff = show_diff
         self.template = (self.namespace == 10)
@@ -293,27 +274,6 @@ class CosmeticChangesToolkit:
         ]
         if stdnum_isbn:
             self.common_methods.append(self.fix_ISBN)
-
-    @property  # type: ignore[misc]
-    @deprecated('show_diff', since='20200415')
-    def diff(self) -> bool:
-        """CosmeticChangesToolkit.diff attribute getter."""
-        return self.show_diff
-
-    @diff.setter  # type: ignore[misc]
-    @deprecated('show_diff', since='20200415')
-    def diff(self, value: bool) -> None:
-        """CosmeticChangesToolkit.diff attribute setter."""
-        self.show_diff = bool(value)
-
-    @classmethod
-    @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
-                since='20200415')
-    def from_page(cls, page: 'pywikibot.page.BasePage',
-                  show_diff: bool = False,
-                  ignore: IntEnum = CANCEL.ALL) -> 'CosmeticChangesToolkit':
-        """Create toolkit based on the page."""
-        return cls(page, show_diff=show_diff, ignore=ignore)
 
     def safe_execute(self, method: Callable[[str], str], text: str) -> str:
         """Execute the method and catch exceptions if enabled."""
