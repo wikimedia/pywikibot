@@ -44,6 +44,7 @@ from pywikibot.bot import (
     NoRedirectPageBot,
 )
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
+from pywikibot.exceptions import InvalidPageError
 
 
 warning = """
@@ -72,12 +73,22 @@ class CosmeticChangesBot(AutomaticTWSummaryBot,
     }
 
     def treat_page(self) -> None:
-        """Treat page with the cosmetic toolkit."""
+        """Treat page with the cosmetic toolkit.
+
+        .. versionchanged:: 7.0
+           skip if InvalidPageError is raised
+        """
         cc_toolkit = CosmeticChangesToolkit(self.current_page,
                                             ignore=self.opt.ignore)
-        changed_text = cc_toolkit.change(self.current_page.text)
-        if changed_text is not False:
-            self.put_current(new_text=changed_text,
+        try:
+            old_text = self.current_page.text
+        except InvalidPageError:
+            pywikibot.exception()
+            return
+
+        new_text = cc_toolkit.change(old_text)
+        if new_text is not False:
+            self.put_current(new_text=new_text,
                              summary=self.opt.summary,
                              asynchronous=self.opt['async'])
 
