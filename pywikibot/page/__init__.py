@@ -1266,23 +1266,6 @@ class BasePage(ComparableMixin):
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
-    @deprecated('put(asynchronous=True) or save(asynchronous=True)',
-                since='20180501')
-    def put_async(self, newtext, summary=None, watch=None, minor=True,
-                  botflag=None, force=False, callback=None,
-                  **kwargs):  # pragma: no cover
-        """
-        Put page on queue to be saved to wiki asynchronously.
-
-        Asynchronous version of put (takes the same arguments), which places
-        pages on a queue to be saved by a daemon thread. All arguments are
-        the same as for .put(). This version is maintained solely for
-        backwards-compatibility.
-        """
-        self.put(newtext, summary=summary, watch=watch,
-                 minor=minor, botflag=botflag, force=force,
-                 asynchronous=True, callback=callback, **kwargs)
-
     def watch(self, unwatch: bool = False) -> bool:
         """
         Add or remove this page to/from bot account's watchlist.
