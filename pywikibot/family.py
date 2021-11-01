@@ -650,11 +650,6 @@ class Family:
                     cr_set.add(newtitle)
         self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)
 
-    @deprecated('site.category_redirects()', since='20170608')
-    def get_cr_templates(self, code, fallback):
-        """DEPRECATED: Build list of category redirect templates."""
-        self._get_cr_templates(code, fallback)
-
     def get_edit_restricted_templates(self, code):
         """Return tuple of edit restricted templates.
 
