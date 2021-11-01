@@ -89,7 +89,7 @@ class HttpsCertificateTestCase(TestCase):
     hostname = 'testssl-expire-r2i2.disig.sk'
 
     def test_https_cert_error(self):
-        """Test if http.fetch respects disable_ssl_certificate_validation."""
+        """Test if http.fetch respects disabled ssl certificate validation."""
         with self.assertRaisesRegex(
                 FatalServerError,
                 self.CERT_VERIFY_FAILED_RE):
