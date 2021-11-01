@@ -649,7 +649,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         @param page: Page to be treated.
         @type page: pywikibot.page.BasePage
         """
-        if self._treat_counter >= self.opt.limit:
+        if self.counter['read'] >= self.opt.limit:
             pywikibot.output('\nNumber of pages reached the limit. '
                              'Script terminated.')
             self.generator.close()

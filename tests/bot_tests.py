@@ -75,7 +75,7 @@ class FakeSaveBotTestCase(TestCase):
         self._bot.opt.always = True
         self._original = self._bot._save_page
         self._bot._save_page = self.bot_save
-        self._old_counter = self._bot._save_counter
+        self._old_counter = self._bot.counter['write']
 
     def setUp(self):
         """Set up test by resetting the counters."""
@@ -85,20 +85,20 @@ class FakeSaveBotTestCase(TestCase):
 
     def tearDown(self):
         """Tear down by asserting the counters."""
-        self.assertEqual(self._bot._save_counter,
+        self.assertEqual(self._bot.counter['write'],
                          self._old_counter + self.assert_saves)
         self.assertEqual(self.save_called, self.assert_saves)
         super().tearDown()
 
     def bot_save(self, page, func, *args, **kwargs):
         """Handle when bot's userPut was called."""
-        self.assertGreaterEqual(self._bot._save_counter, 0)
-        old_counter = self._bot._save_counter
+        self.assertGreaterEqual(self._bot.counter['write'], 0)
+        old_counter = self._bot.counter['write']
         old_local_cnt = self.save_called
         result = self._original(page, self.page_save, *args, **kwargs)
-        self.assertEqual(self._bot._save_counter, old_counter + 1)
+        self.assertEqual(self._bot.counter['write'], old_counter + 1)
         self.assertEqual(self.save_called, old_local_cnt + 1)
-        self.assertGreater(self._bot._save_counter, self._old_counter)
+        self.assertGreater(self._bot.counter['write'], self._old_counter)
         return result
 
     def page_save(self, *args, **kwargs):
@@ -168,8 +168,8 @@ class TestBotTreatExit:
                 # assertions as they are invalid anyway and hide the actual
                 # failed assertion
                 return
-            self.assertEqual(self.bot._treat_counter, treated)
-            self.assertEqual(self.bot._save_counter, written)
+            self.assertEqual(self.bot.counter['read'], treated)
+            self.assertEqual(self.bot.counter['write'], written)
             if exception:
                 self.assertIs(exc, exception)
             else:

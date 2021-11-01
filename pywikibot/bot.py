@@ -99,6 +99,7 @@ import time
 import warnings
 import webbrowser
 
+from collections import Counter
 from collections.abc import Generator
 from contextlib import closing
 from functools import wraps
@@ -1246,6 +1247,10 @@ class BaseBot(OptionHandler):
     treat() or run(), NotImplementedError is raised.
 
     For bot options handling refer OptionHandler class above.
+
+    .. versionchanged:: 7.0
+       A counter attribute is provided which is a collections.Counter;
+       The default counters are 'read', 'write' and 'skip'.
     """
 
     # Handler configuration.
@@ -1279,11 +1284,39 @@ class BaseBot(OptionHandler):
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
-        self._treat_counter = 0
-        self._save_counter = 0
-        self._skip_counter = 0
+        self.counter = Counter()
         self._generator_completed = False
         self.treat_page_type = pywikibot.page.BasePage  # default type
+
+    @property
+    @deprecated("self.counter['read']", since='7.0.0')
+    def _treat_counter(self):
+        return self.counter['read']
+
+    @_treat_counter.setter
+    @deprecated("self.counter['read']", since='7.0.0')
+    def _treat_counter(self, value):
+        self.counter['read'] = value
+
+    @property
+    @deprecated("self.counter['write']", since='7.0.0')
+    def _save_counter(self):
+        return self.counter['write']
+
+    @_save_counter.setter
+    @deprecated("self.counter['write']", since='7.0.0')
+    def _save_counter(self, value):
+        self.counter['write'] = value
+
+    @property
+    @deprecated("self.counter['skip']", since='7.0.0')
+    def _skip_counter(self):
+        return self.counter['skip']
+
+    @_skip_counter.setter
+    @deprecated("self.counter['skip']", since='7.0.0')
+    def _skip_counter(self, value):
+        self.counter['skip'] = value
 
     @property
     def current_page(self) -> 'pywikibot.page.BasePage':
@@ -1408,7 +1441,7 @@ class BaseBot(OptionHandler):
 
         try:
             func(*args, **kwargs)
-            self._save_counter += 1
+            self.counter['save'] += 1
         except PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
@@ -1464,12 +1497,10 @@ class BaseBot(OptionHandler):
         # wait until pending threads finished but don't close the queue
         pywikibot.stopme()
 
-        pywikibot.output('\n{} pages read'
-                         '\n{} pages written'
-                         '\n{} pages skipped'
-                         .format(self._treat_counter,
-                                 self._save_counter,
-                                 self._skip_counter))
+        pywikibot.output('\n{read} pages read'
+                         '\n{write} pages written'
+                         '\n{skip} pages skipped'
+                         .format_map(self.counter))
 
         if hasattr(self, '_start_ts'):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
@@ -1481,12 +1512,14 @@ class BaseBot(OptionHandler):
             else:
                 pywikibot.output('Execution time: {} seconds'
                                  .format(write_delta.seconds))
-            if self._treat_counter:
+
+            if self.counter['read']:
                 pywikibot.output('Read operation time: {:.1f} seconds'
-                                 .format(read_seconds / self._treat_counter))
-            if self._save_counter:
-                pywikibot.output('Write operation time: {:.1f} seconds'
-                                 .format(write_seconds / self._save_counter))
+                                 .format(read_seconds / self.counter['read']))
+            if self.counter['write']:
+                pywikibot.output(
+                    'Write operation time: {:.1f} seconds'
+                    .format(write_seconds / self.counter['write']))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1578,12 +1611,12 @@ class BaseBot(OptionHandler):
                                             page.__class__.__name__))
 
                 if self.skip_page(page):
-                    self._skip_counter += 1
+                    self.counter['skip'] += 1
                     continue
 
                 # Process the page
                 self.treat(page)
-                self._treat_counter += 1
+                self.counter['read'] += 1
 
             self._generator_completed = True
         except QuitKeyboardInterrupt:
