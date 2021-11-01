@@ -22,7 +22,6 @@ from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
     SelfCallString,
-    deprecated,
     first_upper,
     normalize_username,
 )
@@ -401,33 +400,6 @@ class BaseSite(ComparableMixin):
             name1 = first_upper(name1)
             name2 = first_upper(name2)
         return name1 == name2
-
-    # namespace shortcuts for backwards-compatibility
-
-    @deprecated('namespaces.SPECIAL.custom_name', since='20160407')
-    def special_namespace(self):
-        """Return local name for the Special: namespace."""
-        return self.namespace(-1)
-
-    @deprecated('namespaces.FILE.custom_name', since='20160407')
-    def image_namespace(self):
-        """Return local name for the File namespace."""
-        return self.namespace(6)
-
-    @deprecated('namespaces.MEDIAWIKI.custom_name', since='20160407')
-    def mediawiki_namespace(self):
-        """Return local name for the MediaWiki namespace."""
-        return self.namespace(8)
-
-    @deprecated('namespaces.TEMPLATE.custom_name', since='20160407')
-    def template_namespace(self):
-        """Return local name for the Template namespace."""
-        return self.namespace(10)
-
-    @deprecated('namespaces.CATEGORY.custom_name', since='20160407')
-    def category_namespace(self):
-        """Return local name for the Category namespace."""
-        return self.namespace(14)
 
     # site-specific formatting preferences
 
