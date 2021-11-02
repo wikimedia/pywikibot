@@ -25,7 +25,6 @@ from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import deprecated
 
 
 _logger = 'version'
@@ -340,21 +339,6 @@ def getversion_onlinerepo(path='branches/master'):
         return hsh
     except Exception as e:
         raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
-
-
-@deprecated('pywikibot.__version__', since='20201003')
-def get_module_version(module) -> Optional[str]:  # pragma: no cover
-    """
-    Retrieve __version__ variable from an imported module.
-
-    :param module: The module instance.
-    :type module: module
-    :return: The version hash without the surrounding text. If not present
-        return None.
-    """
-    if hasattr(module, '__version__'):
-        return module.__version__
-    return None
 
 
 def get_module_filename(module) -> Optional[str]:
