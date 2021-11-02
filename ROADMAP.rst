@@ -4,6 +4,8 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Update invisible characters from unicodedata 14.0.0
+* Make site parameter of textlib.replace_links() mandatory (T294649)
 * Raise a generic ServerError if the http status code is unofficial (T293208)
 * Add support for Wikimedia OCR engine with proofreadpage
 * Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (T85623, T293276)
@@ -22,6 +24,13 @@ Breaking changes
 Code cleanups
 -------------
 
+* Remove deprecated BaseSite namespace shortcuts
+* Remove deprecated Family.get_cr_templates method in favour of Site.category_redirects()
+* Remove deprecated Page.put_async() method (T193494)
+* Ignore baserevid parameter for several DataSite methods
+* Remove deprecated preloaditempages method
+* Remove disable_ssl_certificate_validation kwargs in http functions in favour of verify parameter (T265206)
+* Deprecated PYWIKIBOT2 environment variables were removed
 * version.ParseError was removed in favour of exceptions.VersionParseError
 * specialbots.EditReplacement and specialbots.EditReplacementError were removed in favour of exceptions.EditReplacementError
 * site.PageInUse exception was removed in favour of exceptions.PageInUseError
@@ -57,9 +66,9 @@ Code cleanups
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.4.0: Pywikibot `began using semantic versioning
   <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,
   all deprecated code will be removed in Pywikibot version 7.0.0.
-* 5.0.0: Methods deprecated for 5 years or longer will be removed
