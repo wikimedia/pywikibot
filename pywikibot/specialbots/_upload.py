@@ -374,7 +374,7 @@ class UploadRobot(BaseBot):
         """
         return self.ignore_warning is True or warn_code in self.ignore_warning
 
-    def upload_file(self, file_url, _file_key=None, _offset=0):
+    def upload_file(self, file_url):
         """
         Upload the image at file_url to the target wiki.
 
@@ -414,8 +414,6 @@ class UploadRobot(BaseBot):
                 success = imagepage.upload(file_url,
                                            ignore_warnings=ignore_warnings,
                                            chunk_size=self.chunk_size,
-                                           _file_key=_file_key,
-                                           _offset=_offset,
                                            asynchronous=self.asynchronous,
                                            comment=self.summary)
             except APIError as error:
