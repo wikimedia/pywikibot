@@ -1641,11 +1641,7 @@ class APISite(
                                 exception.format_map(errdata)
                             ) from None
                         if issubclass(exception, AbuseFilterDisallowedError):
-                            errdata = {
-                                'info': err.info,
-                                'other': err.other,
-                            }
-                            raise exception(page, **errdata) from None
+                            raise exception(page, info=err.info) from None
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
