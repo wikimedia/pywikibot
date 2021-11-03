@@ -2863,26 +2863,35 @@ class APISite(
 
             if result['result'] == 'Warning':
                 assert 'warnings' in result and not ignore_all_warnings
-                if 'filekey' in result:
-                    _file_key = result['filekey']
-                elif 'sessionkey' in result:
-                    # TODO: Probably needs to be reflected in the API call
-                    # above
-                    _file_key = result['sessionkey']
-                    pywikibot.warning('Using sessionkey instead of filekey.')
+
+                if source_filename:
+                    if 'filekey' in result:
+                        _file_key = result['filekey']
+                    elif 'sessionkey' in result:
+                        # TODO: Probably needs to be reflected in the API call
+                        # above
+                        _file_key = result['sessionkey']
+                        pywikibot.warning(
+                            'Using sessionkey instead of filekey.')
+                    else:
+                        _file_key = None
+                        pywikibot.warning('No filekey defined.')
                 else:
                     _file_key = None
-                    pywikibot.warning('No filekey defined.')
 
                 if not report_success:
-                    result.setdefault('offset', True)
+                    if source_filename:
+                        offset = result.setdefault('offset', True)
+                    else:
+                        offset = False
+
                     if ignore_warnings(create_warnings_list(result)):
                         return self.upload(
                             filepage, source_filename=source_filename,
                             source_url=source_url, comment=comment,
                             text=text, watch=watch, ignore_warnings=True,
                             chunk_size=chunk_size, asynchronous=asynchronous,
-                            _file_key=_file_key, _offset=result['offset'],
+                            _file_key=_file_key, _offset=offset,
                             report_success=False)
                     return False
 
