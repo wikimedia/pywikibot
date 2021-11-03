@@ -77,6 +77,9 @@ class TestNamespaceObject(TestCase):
                             for val in ns.values()
                             for name in val))
 
+        # test boolean
+        self.assertTrue(all(x for x in ns.values()))
+
         # Use a namespace object as a dict key
         self.assertEqual(ns[ns[6]], ns[6])
 

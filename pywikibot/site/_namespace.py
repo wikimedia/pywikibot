@@ -144,11 +144,20 @@ class Namespace(Iterable, ComparableMixin):
 
         return self._contains_lowercase_name(name.lower())
 
+    def __bool__(self) -> bool:
+        """Obtain boolean method for Namepace class.
+
+        This method is implemented to be independent from __len__ method.
+
+        .. versionadded:: 7.0
+
+        :return: Always return True like generic object class.
+        """
+        return True
+
     def __len__(self):
         """Obtain length of the iterable."""
-        if self.custom_name == self.canonical_name:
-            return len(self.aliases) + 1
-        return len(self.aliases) + 2
+        return len(self._distinct())
 
     def __iter__(self):
         """Return an iterator."""
