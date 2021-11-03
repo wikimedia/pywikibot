@@ -395,14 +395,27 @@ def register_family_file(family_name: str, file_path: str) -> None:
     family_files[family_name] = file_path
 
 
-def register_families_folder(folder_path: str) -> None:
+def register_families_folder(folder_path: str,
+                             not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
+
+    .. versionadded:: 7.0
+       The *not_exists_ok* parameter
 
     :param folder_path: The path of a folder containing family files.
         The families may also be inside a zip archive structure.
+    :param not_exists_ok: When true, ignore FileNotFoundError
+    :raises FileNotFoundError: Family folder does not exist
     :raises NotADirectoryError: folder_path is not a directory
     """
     suffix = '_family.py'
+
+    if not os.path.exists(folder_path):
+        if not_exists_ok:
+            return
+        raise FileNotFoundError('Family folder {!r} does not exist'
+                                .format(folder_path))
+
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
             if file_name.endswith(suffix):
@@ -435,6 +448,9 @@ def register_families_folder(folder_path: str) -> None:
 # Get the names of all known families, and initialize with empty dictionaries.
 # ‘families/’ is a subdirectory of the directory in which config.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
+# ‘families/’ can also be stored in the base directory
+register_families_folder(os.path.join(base_dir, 'families'),
+                         not_exists_ok=True)
 
 
 # ############# USER INTERFACE SETTINGS ##############
