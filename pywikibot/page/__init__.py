@@ -1132,15 +1132,20 @@ class BasePage(ComparableMixin):
 
     def save(self,
              summary: Optional[str] = None,
-             watch: Union[str, bool, None] = None,
+             watch: Optional[str] = None,
              minor: bool = True,
              botflag: Optional[bool] = None,
              force: bool = False,
              asynchronous: bool = False,
-             callback=None, apply_cosmetic_changes=None,
-             quiet: bool = False, **kwargs):
+             callback=None,
+             apply_cosmetic_changes: Optional[bool] = None,
+             quiet: bool = False,
+             **kwargs):
         """
         Save the current contents of page's text to the wiki.
+
+        .. versionchanged:: 7.0
+           boolean watch parameter is deprecated
 
         :param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
@@ -1151,11 +1156,6 @@ class BasePage(ComparableMixin):
             * preferences: use the preference settings (Default)
             * nochange: don't change the watchlist
             If None (default), follow bot account's default settings
-
-            For backward compatibility watch parameter may also be boolean:
-            if True, add or if False, remove this Page to/from bot
-            user's watchlist.
-        :type watch: str, bool (deprecated) or None
         :param minor: if True, mark this edit as minor
         :param botflag: if True, mark this edit as made by a bot (default:
             True if user has bot status, False if not)
@@ -1170,7 +1170,6 @@ class BasePage(ComparableMixin):
             successful.
         :param apply_cosmetic_changes: Overwrites the cosmetic_changes
             configuration value to this value unless it's None.
-        :type apply_cosmetic_changes: bool or None
         :param quiet: enable/disable successful save operation message;
             defaults to False.
             In asynchronous mode, if True, it is up to the calling bot to
@@ -1178,10 +1177,14 @@ class BasePage(ComparableMixin):
         """
         if not summary:
             summary = config.default_edit_summary
-        if watch is True:
-            watch = 'watch'
-        elif watch is False:
-            watch = 'unwatch'
+
+        if isinstance(watch, bool):
+            issue_deprecation_warning(
+                'boolean watch parameter',
+                '"watch", "unwatch", "preferences" or "nochange" value',
+                since='7.0.0')
+            watch = ('unwatch', 'watch')[watch]
+
         if not force and not self.botMayEdit():
             raise OtherPageSaveError(
                 self, 'Editing restricted by {{bots}}, {{nobots}} '
