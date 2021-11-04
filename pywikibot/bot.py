@@ -1134,10 +1134,6 @@ class _OptionDict(dict):
             super().__setattr__(name, value)
 
 
-_DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
-                   'or Optionhandler.opt[option] item'
-
-
 class OptionHandler:
 
     """Class to get and set options.
@@ -1195,11 +1191,6 @@ class OptionHandler:
         """
         self.set_options(**kwargs)
 
-    @deprecated('set_options', since='20201006')
-    def setOptions(self, **options: Any) -> None:  # pragma: no cover
-        """DEPRECATED. Set the instance options."""
-        self.set_options(**options)
-
     def set_options(self, **options: Any) -> None:
         """Set the instance options."""
         valid_options = set(self.available_options)
@@ -1213,16 +1204,6 @@ class OptionHandler:
         for opt in received_options - valid_options:
             pywikibot.warning('{} is not a valid option. It was ignored.'
                               .format(opt))
-
-    @deprecated(_DEPRECATION_MSG, since='20201006')
-    def getOption(self, option: str) -> Any:  # pragma: no cover
-        """DEPRECATED. Get the current value of an option.
-
-        :param option: key defined in OptionHandler.available_options
-        :raise pywikibot.exceptions.Error: No valid option is given with
-            option parameter
-        """
-        return self.opt[option]
 
 
 class BaseBot(OptionHandler):

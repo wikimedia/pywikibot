@@ -84,7 +84,7 @@ class MovePagesBot(CurrentPageBot):
 
     def skip_page(self, page):
         """Treat only non-redirect pages if 'skipredirects' is set."""
-        if self.getOption('skipredirects') and page.isRedirectPage():
+        if self.opt.skipredirects and page.isRedirectPage():
             pywikibot.warning(
                 'Page {page} on {page.site} is a redirect; skipping'
                 .format(page=page))
