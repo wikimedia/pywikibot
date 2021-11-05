@@ -20,7 +20,7 @@ import requests
 
 import pywikibot
 import pywikibot.comms.http as http
-import pywikibot.data.api
+
 from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
@@ -383,6 +383,10 @@ class UploadRobot(BaseBot):
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.
         If the user chooses not to retry, return None.
+
+        .. versionchanged:: 7.0
+           If 'copyuploadbaddomain' API error occurred in first step,
+           download the file and upload it afterwards
         """
         filename = self.process_filename(file_url)
         if not filename:
@@ -395,35 +399,50 @@ class UploadRobot(BaseBot):
         pywikibot.output('Uploading file to {}...'.format(site))
 
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
-        if '://' in file_url and not site.has_right('upload_by_url'):
-            try:
-                file_url = self.read_file_content(file_url)
-            except FatalServerError:
-                return None
 
-        try:
-            success = imagepage.upload(file_url,
-                                       ignore_warnings=ignore_warnings,
-                                       chunk_size=self.chunk_size,
-                                       _file_key=_file_key, _offset=_offset,
-                                       asynchronous=self.asynchronous,
-                                       comment=self.summary)
-        except APIError as error:
-            if error.code == 'uploaddisabled':
-                pywikibot.error(
-                    'Upload error: Local file uploads are disabled on {}.'
-                    .format(site))
-            else:
+        download = False
+        while True:
+            if '://' in file_url \
+               and (not site.has_right('upload_by_url') or download):
+                try:
+                    file_url = self.read_file_content(file_url)
+                except FatalServerError:
+                    pywikibot.exception()
+                    return None
+
+            try:
+                success = imagepage.upload(file_url,
+                                           ignore_warnings=ignore_warnings,
+                                           chunk_size=self.chunk_size,
+                                           _file_key=_file_key,
+                                           _offset=_offset,
+                                           asynchronous=self.asynchronous,
+                                           comment=self.summary)
+            except APIError as error:
+                if error.code == 'uploaddisabled':
+                    pywikibot.error(
+                        'Upload error: Local file uploads are disabled on {}.'
+                        .format(site))
+                elif error.code == 'copyuploadbaddomain' and not download \
+                        and '://' in file_url:
+                    pywikibot.exception()
+                    pywikibot.output('Downloading the file and retry...')
+                    download = True
+                    continue
+                else:
+                    pywikibot.error('Upload error: ', exc_info=True)
+            except Exception:
                 pywikibot.error('Upload error: ', exc_info=True)
-        except Exception:
-            pywikibot.error('Upload error: ', exc_info=True)
-        else:
-            if success:
-                # No warning, upload complete.
-                pywikibot.output('Upload of {} successful.'.format(filename))
-                self._save_counter += 1
-                return filename  # data['filename']
-            pywikibot.output('Upload aborted.')
+            else:
+                if success:
+                    # No warning, upload complete.
+                    pywikibot.output('Upload of {} successful.'
+                                     .format(filename))
+                    self._save_counter += 1
+                    return filename  # data['filename']
+                pywikibot.output('Upload aborted.')
+            break
+
         return None
 
     def skip_run(self):

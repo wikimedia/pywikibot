@@ -2850,7 +2850,7 @@ class APISite(
                 try:
                     result = final_request.submit()
                     self._uploaddisabled = False
-                except api.APIError as error:
+                except APIError as error:
                     # TODO: catch and process foreseeable errors
                     if error.code == 'uploaddisabled':
                         self._uploaddisabled = True
