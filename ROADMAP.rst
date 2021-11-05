@@ -4,6 +4,9 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* BaseBot has a public collections.Counter for reading, writing and skipping a page
+* Upload: Retry upload if 'copyuploadbaddomain' API error occurs (T294825)
+* Upload: Only set filekey/offset for files with names (T294916)
 * Update invisible characters from unicodedata 14.0.0
 * Make site parameter of textlib.replace_links() mandatory (T294649)
 * Raise a generic ServerError if the http status code is unofficial (T293208)
@@ -24,6 +27,11 @@ Breaking changes
 Code cleanups
 -------------
 
+* Deprecated version.get_module_version() function was removed
+* Deprecated setOptions/getOptions OptionHandler methods were removed
+* Deprecated from_page() method of CosmeticChangesToolkit was removed
+* Deprecated diff attribute of CosmeticChangesToolkit  was removed in favour of show_diff
+* Deprecated namespace and pageTitle parameter of CosmeticChangesToolkit were removed
 * Remove deprecated BaseSite namespace shortcuts
 * Remove deprecated Family.get_cr_templates method in favour of Site.category_redirects()
 * Remove deprecated Page.put_async() method (T193494)
@@ -66,6 +74,8 @@ Code cleanups
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
+* 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
