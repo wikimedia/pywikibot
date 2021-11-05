@@ -732,15 +732,15 @@ class ReferencesRobot(SingleSiteBot,
                      ignore_save_related_errors=True,
                      ignore_server_errors=True)
 
-        if not self._save_counter:
+        if not self.counter['write']:
             return
 
-        if self.opt.limit and self._save_counter >= self.opt.limit:
+        if self.opt.limit and self.counter['write'] >= self.opt.limit:
             pywikibot.output('Edited {} pages, stopping.'
                              .format(self.opt.limit))
             self.generator.close()
 
-        if self.site_stop_page and self._save_counter % 20 == 0:
+        if self.site_stop_page and self.counter['write'] % 20 == 0:
             self.stop_page = pywikibot.Page(self.site, self.site_stop_page)
             if self.stop_page.exists():
                 pywikibot.output(color_format(

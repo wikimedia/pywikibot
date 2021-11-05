@@ -364,8 +364,8 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                 pywikibot.output(str(e[0]))
                 continue
             else:
-                self._treat_counter += 1
-        if not self._treat_counter:
+                self.counter['read'] += 1
+        if not self.counter['read']:
             pywikibot.output('No transcluded files found for {}.'
                              .format(self.nc_templates_list()[0]))
         self.exit()

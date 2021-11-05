@@ -438,7 +438,7 @@ class UploadRobot(BaseBot):
                     # No warning, upload complete.
                     pywikibot.output('Upload of {} successful.'
                                      .format(filename))
-                    self._save_counter += 1
+                    self.counter['write'] += 1
                     return filename  # data['filename']
                 pywikibot.output('Upload aborted.')
             break
@@ -471,7 +471,7 @@ class UploadRobot(BaseBot):
         try:
             for file_url in self.url:
                 self.upload_file(file_url)
-                self._treat_counter += 1
+                self.counter['read'] += 1
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit {} bot run...'
                              .format(self.__class__.__name__))
