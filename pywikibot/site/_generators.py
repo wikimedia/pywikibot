@@ -1296,27 +1296,23 @@ class GeneratorsMixin:
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        where_types = ['nearmatch', 'text', 'title', 'titles']
+        where_types = ['nearmatch', 'text', 'title']
         if not searchstring:
             raise Error('search: searchstring cannot be empty')
         if where not in where_types:
             raise Error("search: unrecognized 'where' value: {}".format(where))
-        if where in ('title', 'titles'):
-            if where == 'titles':
-                issue_deprecation_warning("where='titles'", "where='title'",
-                                          since='20160224')
-                where = 'title'
 
-            if self.has_extension('CirrusSearch') and \
-               isinstance(self.family, pywikibot.family.WikimediaFamily):
-                # 'title' search was disabled, use intitle instead
-                searchstring = 'intitle:' + searchstring
-                issue_deprecation_warning(
-                    "where='{}'".format(where),
-                    "searchstring='{}'".format(searchstring),
-                    since='20160224')
+        if where == 'title' \
+           and self.has_extension('CirrusSearch') \
+           and isinstance(self.family, pywikibot.family.WikimediaFamily):
+            # 'title' search was disabled, use intitle instead
+            searchstring = 'intitle:' + searchstring
+            issue_deprecation_warning(
+                "where='{}'".format(where),
+                "searchstring='{}'".format(searchstring),
+                since='20160224')
 
-                where = None  # default
+            where = None  # default
 
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
