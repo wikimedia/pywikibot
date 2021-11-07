@@ -4,6 +4,8 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Add `title_delimiter_and_aliases` attribute to family files to support WikiHow family (T294761)
+* Only handle query limit if query module is limited (T294836)
 * BaseBot has a public collections.Counter for reading, writing and skipping a page
 * Upload: Retry upload if 'copyuploadbaddomain' API error occurs (T294825)
 * Upload: Only set filekey/offset for files with names (T294916)
@@ -27,6 +29,7 @@ Breaking changes
 Code cleanups
 -------------
 
+* Raise an Error exception if 'titles' is still used as where parameter in Site.search()
 * Deprecated version.get_module_version() function was removed
 * Deprecated setOptions/getOptions OptionHandler methods were removed
 * Deprecated from_page() method of CosmeticChangesToolkit was removed
