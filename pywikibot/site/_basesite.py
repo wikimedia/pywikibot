@@ -377,10 +377,14 @@ class BaseSite(ComparableMixin):
                 return default_ns, title
             return ns, name
 
-        # Replace underscores with spaces and multiple combinations of them
-        # with only one space
-        title1 = re.sub(r'[_ ]+', ' ', title1)
-        title2 = re.sub(r'[_ ]+', ' ', title2)
+        # Replace alias characters like underscores with title
+        # delimiters like spaces and multiple combinations of them with
+        # only one delimiter
+        sep = self.family.title_delimiter_and_aliases[0]
+        pattern = re.compile('[{}]+'
+                             .format(self.family.title_delimiter_and_aliases))
+        title1 = pattern.sub(sep, title1)
+        title2 = pattern.sub(sep, title2)
         if title1 == title2:
             return True
 

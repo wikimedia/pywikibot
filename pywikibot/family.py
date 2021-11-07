@@ -542,6 +542,21 @@ class Family:
     # site. This value can specify this last one with (lang, family) tuple.
     shared_urlshortner_wiki = None  # type: Optional[Tuple[str, str]]
 
+    title_delimiter_and_aliases = ' _'
+    """Titles usually are delimited by a space and the alias is replaced
+    to this delimiter; e.g. "Main page" is the title with spaces as
+    delimiters but "Main_page" also works. Other families may have
+    different settings.
+
+    .. note:: The first character is used as delimiter, the others are
+       aliases.
+
+    .. warning:: This attribute is used within ``re.sub()`` method. Use
+       escape sequence if necessary
+
+    .. versionadded:: 7.0
+    """
+
     _families = {}
 
     @staticmethod

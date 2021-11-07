@@ -5235,6 +5235,8 @@ class Link(BaseLink):
         else:
             self._anchor = None
 
+        self._text = self._text.strip()
+
         # Convert URL-encoded characters to unicode
         self._text = pywikibot.tools.chars.url2string(
             self._text, encodings=self._source.encodings())
@@ -5253,9 +5255,11 @@ class Link(BaseLink):
                 '{!r} contains illegal char {!r}'.format(t, '\ufffd'))
 
         # Cleanup whitespace
+        sep = self._source.family.title_delimiter_and_aliases[0]
         t = re.sub(
-            '[_ \xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+',
-            ' ', t)
+            '[{}\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+'
+            .format(self._source.family.title_delimiter_and_aliases),
+            sep, t)
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.
