@@ -2477,7 +2477,7 @@ class QueryGenerator(_RequestWrapper):
 
     def _handle_query_limit(self, prev_limit, new_limit, had_data):
         """Handle query limit."""
-        if self.query_limit is None:
+        if self.query_limit is None or self.limited_module is None:
             return prev_limit, new_limit
 
         prev_limit = new_limit
