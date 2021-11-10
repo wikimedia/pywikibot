@@ -2449,10 +2449,10 @@ class APISite(
                ignore_warnings=False,
                chunk_size: int = 0,
                asynchronous: bool = False,
+               report_success: Optional[bool] = None,
                _file_key: Optional[str] = None,
                _offset: Union[bool, int] = 0,
-               _verify_stash: Optional[bool] = None,
-               report_success: Optional[bool] = None) -> bool:
+               _verify_stash: Optional[bool] = None) -> bool:
         """
         Upload a file to the wiki.
 
@@ -2492,22 +2492,25 @@ class APISite(
             but lower than the file size.
         :param asynchronous: Make potentially large file operations
             asynchronous on the server side when possible.
-        :param _file_key: Reuses an already uploaded file using the filekey. If
-            None (default) it will upload the file.
-        :param _offset: When file_key is not None this can be an integer to
-            continue a previously canceled chunked upload. If False it treats
-            that as a finished upload. If True it requests the stash info from
-            the server to determine the offset. By default starts at 0.
-        :param _verify_stash: Requests the SHA1 and file size uploaded and
-            compares it to the local file. Also verifies that _offset is
-            matching the file size if the _offset is an int. If _offset is
-            False if verifies that the file size match with the local file. If
-            None it'll verifies the stash when a file key and offset is given.
         :param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadError if a warning occurred. If it's None
             (default) it'll be True if ignore_warnings is a bool and False
             otherwise. If it's True or None ignore_warnings must be a bool.
+        :param _file_key: Private parameter for upload recurion. Reuses
+            an already uploaded file using the filekey. If None (default)
+            it will upload the file.
+        :param _offset: Private parameter for upload recurion. When
+            file_key is not None this can be an integer to continue a
+            previously canceled chunked upload. If False it treats that
+            as a finished upload. If True it requests the stash info from
+            the server to determine the offset. By default starts at 0.
+        :param _verify_stash: Private parameter for upload recurion.
+            Requests the SHA1 and file size uploaded and compares it to
+            the local file. Also verifies that _offset is matching the
+            file size if the _offset is an int. If _offset is False if
+            verifies that the file size match with the local file. If
+            None it'll verifies the stash when a file key and offset is given.
         :return: It returns True if the upload was successful and False
             otherwise.
         """

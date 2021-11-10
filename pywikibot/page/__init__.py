@@ -2383,20 +2383,6 @@ class FilePage(Page):
             will only upload in chunks, if the chunk size is positive but lower
             than the file size.
         :type chunk_size: int
-        :keyword _file_key: Reuses an already uploaded file using the filekey.
-            If None (default) it will upload the file.
-        :type _file_key: str or None
-        :keyword _offset: When file_key is not None this can be an integer to
-            continue a previously canceled chunked upload. If False it treats
-            that as a finished upload. If True it requests the stash info from
-            the server to determine the offset. By default starts at 0.
-        :type _offset: int or bool
-        :keyword _verify_stash: Requests the SHA1 and file size uploaded and
-            compares it to the local file. Also verifies that _offset is
-            matching the file size if the _offset is an int. If _offset is
-            False if verifies that the file size match with the local file. If
-            None it'll verifies the stash when a file key and offset is given.
-        :type _verify_stash: bool or None
         :keyword report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadError if a warning occurred. If it's
