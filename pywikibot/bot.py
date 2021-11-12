@@ -1575,15 +1575,7 @@ class BaseBot(OptionHandler):
         try:
             for item in self.generator:
                 # preprocessing of the page
-                initialized_page = self.init_page(item)
-                if initialized_page is None:
-                    issue_deprecation_warning(
-                        'Returning None from init_page() method',
-                        'return a pywikibot.page.BasePage object',
-                        since='20200406')
-                    page = item
-                else:
-                    page = initialized_page
+                page = self.init_page(item)
 
                 # validate page type
                 if not isinstance(page, self.treat_page_type):
