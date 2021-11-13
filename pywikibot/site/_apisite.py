@@ -14,12 +14,12 @@ from collections import OrderedDict, defaultdict, namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -109,11 +109,12 @@ class APISite(
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
         super().__init__(code, fam, user)
-        self._msgcache = {}
-        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
-        self._siteinfo = Siteinfo(self)
-        self._paraminfo = api.ParamInfo(self)
+        self._globaluserinfo = {}
         self._interwikimap = _InterwikiMap(self)
+        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
+        self._msgcache = {}
+        self._paraminfo = api.ParamInfo(self)
+        self._siteinfo = Siteinfo(self)
         self.tokens = TokenWallet(self)
 
     def __getstate__(self):
@@ -450,7 +451,9 @@ class APISite(
         To force retrieving userinfo ignoring cache, just delete this
         property.
 
-        self._userinfo will be a dict with the following keys and values:
+        .. seealso:: https://www.mediawiki.org/wiki/API:Userinfo
+
+        :return: A dict with the following keys and values:
 
           - id: user id (numeric str)
           - name: username (if user is logged in)
@@ -460,7 +463,6 @@ class APISite(
           - message: present if user has a new message on talk page
           - blockinfo: present if user is blocked (dict)
 
-        https://www.mediawiki.org/wiki/API:Userinfo
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self._simple_request(
@@ -481,15 +483,24 @@ class APISite(
 
     @userinfo.deleter
     def userinfo(self):
-        """Delete cached userinfo."""
+        """Delete cached userinfo.
+
+        ..versionadded:: 5.5
+        """
         if hasattr(self, '_userinfo'):
             del self._userinfo
 
-    @property
-    def globaluserinfo(self):
+    def get_globaluserinfo(self,
+                           user: Union[str, int, None] = None,
+                           force: bool = False) -> Dict[str, Any]:
         """Retrieve globaluserinfo from site and cache it.
 
-        self._globaluserinfo will be a dict with the following keys and values:
+        .. versionadded:: 7.0
+
+        :param user: The user name or user ID whose global info is
+            retrieved. Defaults to the current user.
+        :param force: Whether the cache should be discarded.
+        :return: A dict with the following keys and values:
 
           - id: user id (numeric str)
           - home: dbname of home wiki
@@ -497,35 +508,86 @@ class APISite(
           - groups: list of groups (could be empty)
           - rights: list of rights (could be empty)
           - editcount: global editcount
+
+        :raises TypeError: Inappropriate argument type of 'user'
         """
-        if not hasattr(self, '_globaluserinfo'):
-            uirequest = self._simple_request(
+        if user is None:
+            user = self.username
+            param = {}
+        elif isinstance(user, str):
+            param = {'guiuser': user}
+        elif isinstance(user, int):
+            param = {'guiid': user}
+        else:
+            raise TypeError("Inappropriate argument type of 'user' ({})"
+                            .format(type(user).__name__))
+
+        if force or user not in self._globaluserinfo:
+            param.update(
                 action='query',
                 meta='globaluserinfo',
-                guiprop='groups|rights|editcount'
+                guiprop='groups|rights|editcount',
             )
+            uirequest = self._simple_request(**param)
             uidata = uirequest.submit()
             assert 'query' in uidata, \
                    "API userinfo response lacks 'query' key"
             assert 'globaluserinfo' in uidata['query'], \
-                   "API userinfo response lacks 'userinfo' key"
-            self._globaluserinfo = uidata['query']['globaluserinfo']
-            ts = self._globaluserinfo['registration']
-            iso_ts = pywikibot.Timestamp.fromISOformat(ts)
-            self._globaluserinfo['registration'] = iso_ts
-        return self._globaluserinfo
+                   "API userinfo response lacks 'globaluserinfo' key"
+            data = uidata['query']['globaluserinfo']
+            ts = data['registration']
+            data['registration'] = pywikibot.Timestamp.fromISOformat(ts)
+            self._globaluserinfo[user] = data
+        return self._globaluserinfo[user]
 
-    def is_blocked(self):
+    @property
+    def globaluserinfo(self) -> Dict[str, Any]:
+        """Retrieve globaluserinfo of the current user from site.
+
+        To get globaluserinfo for a given user or user ID use
+        :meth:`get_globaluserinfo` method instead
+
+        .. versionadded:: 3.0
         """
-        Return True when logged in user is blocked.
+        return self.get_globaluserinfo()
+
+    @globaluserinfo.deleter
+    def globaluserinfo(self):
+        """Delete cached globaluserinfo of current user.
+
+        ..versionadded:: 7.0
+        """
+        with suppress(KeyError):
+            del self._globaluserinfo[self.username]
+
+    def is_blocked(self, force: bool = False) -> bool:
+        """Return True when logged in user is blocked.
 
         To check whether a user can perform an action,
         the method has_right should be used.
         https://www.mediawiki.org/wiki/API:Userinfo
 
-        :rtype: bool
+        .. versionadded:: 7.0
+           The *force* parameter
+
+        :param force: Whether the cache should be discarded.
         """
+        if force:
+            del self.userinfo
         return 'blockinfo' in self.userinfo
+
+    def is_locked(self,
+                  user: Union[str, int, None] = None,
+                  force: bool = False) -> bool:
+        """Return True when given user is locked globally.
+
+        .. versionadded:: 7.0
+
+        :param user: The user name or user ID. Defaults to the current
+            user.
+        :param force: Whether the cache should be discarded.
+        """
+        return 'locked' in self.get_globaluserinfo(user, force)
 
     def get_searched_namespaces(self, force=False):
         """

@@ -2871,13 +2871,35 @@ class User(Page):
         """
         return self.getprops(force).get('editcount', 0)
 
-    def isBlocked(self, force: bool = False) -> bool:
-        """
-        Determine whether the user is currently blocked.
+    def is_blocked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently blocked.
+
+        .. versionchanged:: 7.0
+           renamed from :meth:`isBlocked` method
 
         :param force: if True, forces reloading the data from API
         """
         return 'blockedby' in self.getprops(force)
+
+    @deprecated('is_blocked', since='7.0.0')
+    def isBlocked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently blocked.
+
+        .. deprecated:: 7.0
+           use :meth:`is_blocked` instead
+
+        :param force: if True, forces reloading the data from API
+        """
+        return self.is_blocked(force)
+
+    def is_locked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently locked globally.
+
+        .. versionadded:: 7.0
+
+        :param force: if True, forces reloading the data from API
+        """
+        return self.site.is_locked(self.username, force)
 
     def isEmailable(self, force: bool = False) -> bool:
         """

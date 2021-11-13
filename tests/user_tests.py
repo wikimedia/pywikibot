@@ -56,7 +56,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isAnonymous())
         self.assertIsInstance(user.registration(), pywikibot.Timestamp)
         self.assertGreater(user.editCount(), 0)
-        self.assertFalse(user.isBlocked())
+        self.assertFalse(user.is_blocked())
         # self.assertTrue(user.isEmailable())
         self.assertEqual(user.gender(), 'unknown')
         self.assertIn('userid', user.getprops())
@@ -81,6 +81,7 @@ class TestUserClass(TestCase):
                             for contrib in contribs))
         self.assertIn('user', user.groups())
         self.assertIn('edit', user.rights())
+        self.assertFalse(user.is_locked())
 
     def test_registered_user_without_timestamp(self):
         """Test registered user when registration timestamp is None."""
@@ -154,6 +155,11 @@ class TestUserClass(TestCase):
                 AutoblockUserError,
                 'This is an autoblock ID'):
             user.getUserTalkPage()
+
+    def test_locked_user(self):
+        """Test global lock."""
+        user = User(self.site, 'TonjaHeritage2')
+        self.assertTrue(user.is_locked())
 
 
 class TestUserMethods(DefaultSiteTestCase):
