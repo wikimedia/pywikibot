@@ -141,13 +141,16 @@ def handle_args(pwb_py, *args):
     fname = None
     index = 0
     for arg in args:
-        if arg.startswith('-'):
+        if arg in ('-version', '--version'):
+            fname = 'version.py'
+        elif arg.startswith('-'):
             index += 1
+            continue
         else:
             fname = arg
             if not fname.endswith('.py'):
                 fname += '.py'
-            break
+        break
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
