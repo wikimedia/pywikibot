@@ -7,7 +7,8 @@
 import re
 import unittest
 
-import generate_user_files as guf
+from pywikibot.scripts import generate_user_files as guf
+
 from tests.aspects import TestCase
 
 

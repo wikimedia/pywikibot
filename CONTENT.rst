@@ -18,13 +18,11 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | generate_family_file.py   | Creates a new family file                                 |
     +---------------------------+-----------------------------------------------------------+
-    | generate_user_files.py    | Creates user-config.py or user-fixes.py                   |
-    +---------------------------+-----------------------------------------------------------+
     | HISTORY.rst               | PyPI version history file                                 |
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
-    | pwb.py                    | Wrapper script to use Pywikibot in 'directory' mode       |
+    | pwb.py                    | Code entry wrapper script (directory mode only)           |
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |
     +---------------------------+-----------------------------------------------------------+

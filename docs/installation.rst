@@ -15,7 +15,7 @@ the configuration file is mandatory. A minimal sample is shown below.
 
 This sample is shipped with the repository but is not available with
 the site-package. For more settings use :mod:`generate_user_files` script
-(not available with site-package) or refer :mod:`pywikibot.config`.
+or refer :mod:`pywikibot.config`.
 
 .. note::
    Please also see the documentation at :manpage:`Installation`
