@@ -43,6 +43,7 @@
 * Deprecated "acceptall" and "addedCat" parameters were replaced by "always" and "addcat"
 
 ### revertbot
+* Add support for translated dates/times (T102174)
 * Deprecated "max" parameter was replaced by "total"
 
 ### solve_disambiguation
