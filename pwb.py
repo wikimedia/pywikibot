@@ -439,7 +439,7 @@ def execute():
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)
-    if check_modules(filename) or help_option:
+    if site_package or check_modules(filename) or help_option:
         run_python_file(filename,
                         [filename] + script_args,
                         [Path(filename).stem] + argvu[1:],
