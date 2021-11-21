@@ -1,5 +1,9 @@
 #!/usr/bin/python
-"""Script to determine the Pywikibot version (tag, revision and date)."""
+"""Script to determine the Pywikibot version (tag, revision and date).
+
+.. versionchanged:: 7.0
+   version script was moved to the framework scripts folder
+"""
 #
 # (C) Pywikibot team, 2007-2021
 #

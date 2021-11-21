@@ -145,9 +145,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | upload.py              | Upload an image to a wiki.                              |
     +------------------------+---------------------------------------------------------+
-    | version.py             | Outputs Pywikibot's revision number, Python's version   |
-    |                        | and OS used.                                            |
-    +------------------------+---------------------------------------------------------+
     | watchlists.py          | Allows access to the account's watchlist.               |
     +------------------------+---------------------------------------------------------+
     | weblinkchecker.py      | Check if external links are still working.              |

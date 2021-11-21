@@ -2,9 +2,26 @@
 # -*- coding: utf-8 -*-
 """Wrapper script to invoke pywikibot-based scripts.
 
+This wrapper script invokes script by its name in this search order:
+
+1. Scripts listed in `user_script_paths` list inside your `user-config.py`
+   settings file in the given order. Refer
+   :ref:`External Script Path Settings<external-script-path-settings>`.
+2. User scripts residing in `scripts/userscripts` (directory mode only).
+3. Scripts residing in `scripts` folder (directory mode only).
+4. Maintenance scripts residing in `scripts/maintenance` (directory mode only).
+5. Framework scripts residing in `pywikibot/scripts`.
+
+This wrapper script is able to invoke scripts even the script name is
+missspelled. In directory mode it also checks package dependencies.
+
 Run scripts with pywikibot in directory mode using::
 
     python pwb.py <pwb options> <name_of_script> <options>
+
+or run scripts with pywikibot installed as a site package using::
+
+    pwb <pwb options> <name_of_script> <options>
 
 This wrapper script uses the package directory to store all user files,
 will fix up search paths so the package does not need to be installed, etc.
@@ -13,6 +30,9 @@ Currently `<pwb options>` are :ref:`global options`. This can be used
 for tests to set the default site (see T216825)::
 
     python pwb.py -lang:de bot_tests -v
+
+.. versionchanged:: 7.0
+   pwb wrapper was added to the Python site package lib
 """
 # (C) Pywikibot team, 2012-2021
 #
@@ -32,6 +52,7 @@ from warnings import warn
 
 
 pwb = None
+site_package = False
 
 
 def check_pwb_versions(package):
@@ -238,12 +259,6 @@ def check_modules(script=None):
     return not missing_requirements
 
 
-try:
-    if not check_modules():
-        raise RuntimeError('')  # no further output needed
-except RuntimeError as e:  # setup.py may also raise RuntimeError
-    sys.exit(e)
-
 from pathlib import Path  # noqa: E402
 
 
@@ -336,9 +351,15 @@ def find_filename(filename):
     """Search for the filename in the given script paths."""
     from pywikibot import config
 
-    script_paths = ['scripts.userscripts',
-                    'scripts',
-                    'scripts.maintenance']
+    if site_package:
+        script_paths = [_pwb_dir]
+    else:
+        script_paths = [
+            'scripts.userscripts',
+            'scripts',
+            'scripts.maintenance',
+            'pywikibot.scripts',
+        ]
 
     if config.user_script_paths:
         if isinstance(config.user_script_paths, list):
@@ -352,7 +373,7 @@ def find_filename(filename):
     for file_package in script_paths:
         package = file_package.split('.')
         paths = package + [filename]
-        testpath = os.path.join(_pwb_dir, *paths)
+        testpath = os.path.join(config.base_dir, *paths)
         if os.path.exists(testpath):
             filename = testpath
             break
@@ -362,8 +383,12 @@ def find_filename(filename):
     return filename
 
 
-def main():
-    """Command line entry point."""
+def execute():
+    """Parse arguments, extract filename and run the script.
+
+    .. versionadded:: 7.0
+       renamed from :func:`main`
+    """
     global filename
 
     if global_args:  # don't use sys.argv
@@ -422,6 +447,32 @@ def main():
     return True
 
 
-if __name__ == '__main__':
-    if not main():
+def main():
+    """Script entry point. Print doc if necessary.
+
+    .. versionchanged:: 7.0
+       previous implementation was renamed to :func:`execute`
+    """
+    try:
+        if not check_modules():
+            raise RuntimeError('')  # no further output needed
+    except RuntimeError as e:  # setup.py may also raise RuntimeError
+        sys.exit(e)
+
+    if not execute():
         print(__doc__)
+
+
+def run():
+    """Site package entry point. Print doc if necessary.
+
+    .. versionadded:: 7.0
+    """
+    global site_package
+    site_package = True
+    if not execute():
+        print(__doc__)
+
+
+if __name__ == '__main__':
+    main()

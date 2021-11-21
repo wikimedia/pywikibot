@@ -14,6 +14,8 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     |  pywikibot/page           | Module with classes for MediaWiki page content       |
     +---------------------------+------------------------------------------------------+
+    |  pywikibot/scripts        | Framework helper scripts                             |
+    +---------------------------+------------------------------------------------------+
     |  pywikibot/site           | Module with classes for MediaWiki sites              |
     +---------------------------+------------------------------------------------------+
     |  pywikibot/specialbots    | Module containing special bots reusable by scripts   |

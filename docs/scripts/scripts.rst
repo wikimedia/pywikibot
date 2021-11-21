@@ -252,11 +252,6 @@ upload script
 
 .. automodule:: scripts.upload
 
-version script
---------------
-
-.. automodule:: scripts.version
-
 watchlist script
 ----------------
 

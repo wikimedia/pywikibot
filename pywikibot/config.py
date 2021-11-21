@@ -572,15 +572,18 @@ debug_log = []  # type: List[str]
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
 #
-# Your private script path must be located inside the
-# framework folder, subfolders must be delimited by '.'.
-# every folder must contain an (empty) __init__.py file.
+# Your private script path is relative to your base directory.
+# Subfolders must be delimited by '.'. every folder must contain
+# an (empty) __init__.py file.
 #
 # The search order is
 # 1. user_script_paths in the given order
 # 2. scripts/userscripts
 # 3. scripts
 # 4. scripts/maintenance
+# 5. pywikibot/scripts
+#
+# 2. - 4. are available in directory mode only
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
