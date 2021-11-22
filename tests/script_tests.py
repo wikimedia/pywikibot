@@ -42,7 +42,7 @@ failed_dep_script_set = {name for name in script_deps
                          if not check_script_deps(name)}
 
 # scripts which cannot be tested
-unrunnable_script_set = set()
+unrunnable_script_set = {'commonscat'}
 
 
 def list_scripts(path, exclude=None):
@@ -152,17 +152,17 @@ def collector(loader=unittest.loader.defaultTestLoader):
     test_list = ['tests.script_tests.TestScriptHelp.' + name
                  for name in tests]
 
-    tests = (['test__login']
-             + ['test_' + name
-                 for name in sorted(script_list)
-                 if name != 'login'
-                 and name not in failed_dep_script_set
-                 and name not in unrunnable_script_set
-                 and (enable_autorun_tests or name not in auto_run_script_list)
-                ])
-
-    test_list += ['tests.script_tests.TestScriptSimulate.' + name
-                  for name in tests]
+##    tests = (['test__login']
+##             + ['test_' + name
+##                 for name in sorted(script_list)
+##                 if name != 'login'
+##                 and name not in failed_dep_script_set
+##                 and name not in unrunnable_script_set
+##                 and (enable_autorun_tests or name not in auto_run_script_list)
+##                ])
+##
+##    test_list += ['tests.script_tests.TestScriptSimulate.' + name
+##                  for name in tests]
 
     tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
