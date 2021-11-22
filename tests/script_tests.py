@@ -54,8 +54,9 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-script_list = (['login']
-               + list_scripts(scripts_path, 'login.py'))
+##script_list = (['login']
+##               + list_scripts(scripts_path, 'login.py'))
+script_list = ['login', 'add_text', 'archivebot', 'basic', 'blockpageschecker']
 
 runnable_script_list = (
     ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
