@@ -17,7 +17,7 @@ werkzeug>=0.15.5
 cffi >= 1.0.0, < 1.15.0 ;python_version=="3.5"
 pytest-httpbin
 
-pep257>=0.6
+pydocstyle>=4.0.0
 pyflakes>=2.1.0
 flake8>=3.9.1
 flake8-docstrings>=0.2.6
