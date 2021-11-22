@@ -1,6 +1,6 @@
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 
 WARN_SELF_CALL = (r'Referencing this attribute like a function '
-                  r'is deprecated for .*; use it directly instead')
+                  r'is deprecated .+; use it directly instead')
 
 
 class TestBaseSiteProperties(TestCase):
