@@ -57,9 +57,6 @@ def list_scripts(path, exclude=None):
 script_list = (['login']
                + list_scripts(scripts_path, 'login.py'))
 
-runnable_script_list = (
-    ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
-
 script_input = {
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
