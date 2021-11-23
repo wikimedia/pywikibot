@@ -10,11 +10,14 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.tools import has_module
+from pywikibot import config
+
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
+saved_pwb_close_matches = config.pwb_close_matches
 scripts_path = join_root_path('scripts')
 
 # These dependencies are not always the package name which is in setup.py.
@@ -54,9 +57,8 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-##script_list = (['login']
-##               + list_scripts(scripts_path, 'login.py'))
-script_list = ['login', 'add_text', 'archivebot', 'basic', 'blockpageschecker']
+script_list = (['login']
+               + list_scripts(scripts_path, 'login.py'))
 
 script_input = {
     'interwiki': 'Test page that should not exist\n',
@@ -150,17 +152,17 @@ def collector(loader=unittest.loader.defaultTestLoader):
     test_list = ['tests.script_tests.TestScriptHelp.' + name
                  for name in tests]
 
-##    tests = (['test__login']
-##             + ['test_' + name
-##                 for name in sorted(script_list)
-##                 if name != 'login'
-##                 and name not in failed_dep_script_set
-##                 and name not in unrunnable_script_set
-##                 and (enable_autorun_tests or name not in auto_run_script_list)
-##                ])
-##
-##    test_list += ['tests.script_tests.TestScriptSimulate.' + name
-##                  for name in tests]
+    tests = (['test__login']
+             + ['test_' + name
+                 for name in sorted(script_list)
+                 if name != 'login'
+                 and name not in failed_dep_script_set
+                 and name not in unrunnable_script_set
+                 and (enable_autorun_tests or name not in auto_run_script_list)
+                ])
+
+    test_list += ['tests.script_tests.TestScriptSimulate.' + name
+                  for name in tests]
 
     tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
@@ -193,7 +195,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{}"'
                     .format(script_name))
 
-            def testScript(self):
+            def test_script(self):
                 global_args = 'For global options use -help:global or run pwb'
 
                 cmd = [script_name] + args
@@ -279,7 +281,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
             if not enable_autorun_tests and is_autorun:
                 return test_skip_script
-            return testScript
+            return test_script
 
         arguments = dct['_arguments']
 
@@ -364,6 +366,16 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _arguments = '-simulate'
     _results = no_args_expected_results
+
+
+def setUpModule():  # noqa: N802
+    """Only find one alternative script (T296204)."""
+    config.pwb_close_matches = 1
+
+
+def tearDownModule():  # noqa: N802
+    """Restore pwb_close_matches setting."""
+    config.pwb_close_matches = saved_pwb_close_matches
 
 
 if __name__ == '__main__':  # pragma: no cover
