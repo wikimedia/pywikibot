@@ -12,8 +12,8 @@ import pickle
 import pprint
 import re
 import traceback
+
 from collections.abc import Container, MutableMapping, Sized
-from contextlib import suppress
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
@@ -1933,13 +1933,14 @@ class CachedRequest(Request):
     def _make_dir(dir_name: str) -> str:
         """Create directory if it does not exist already.
 
-        The directory name (dir_name) is returned unmodified.
+        .. versionchanged:: 7.0
+           Only `FileExistsError` is ignored but other OS exceptions can
+           be still raised
 
         :param dir_name: directory path
-        :return: directory name
+        :return: unmodified directory name for test purpose
         """
-        with suppress(OSError):  # directory already exists
-            os.makedirs(dir_name)
+        os.makedirs(dir_name, exist_ok=True)
         return dir_name
 
     def _uniquedescriptionstr(self) -> str:
