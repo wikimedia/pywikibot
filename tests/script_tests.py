@@ -10,14 +10,12 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.tools import has_module
-from pywikibot import config
 
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
-saved_pwb_close_matches = config.pwb_close_matches
 scripts_path = join_root_path('scripts')
 
 # These dependencies are not always the package name which is in setup.py.
@@ -45,7 +43,7 @@ failed_dep_script_set = {name for name in script_deps
                          if not check_script_deps(name)}
 
 # scripts which cannot be tested
-unrunnable_script_set = {'commonscat'}
+unrunnable_script_set = set()
 
 
 def list_scripts(path, exclude=None):
@@ -57,8 +55,7 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-script_list = (['login']
-               + list_scripts(scripts_path, 'login.py'))
+script_list = ['login'] + list_scripts(scripts_path, exclude='login.py')
 
 script_input = {
     'interwiki': 'Test page that should not exist\n',
@@ -196,9 +193,11 @@ class TestScriptMeta(MetaTestCaseClass):
                     .format(script_name))
 
             def test_script(self):
-                global_args = 'For global options use -help:global or run pwb'
+                global_args_msg = \
+                    'For global options use -help:global or run pwb'
+                global_args = ['-pwb_close_matches:1']
 
-                cmd = [script_name] + args
+                cmd = global_args + [script_name] + args
                 data_in = script_input.get(script_name)
                 timeout = 5 if is_autorun else None
 
@@ -238,7 +237,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 elif not is_autorun:
                     if not stderr_other:
-                        self.assertIn(global_args, out_result)
+                        self.assertIn(global_args_msg, out_result)
                     else:
                         self.assertIn('Use -help for further information.',
                                       stderr_other)
@@ -267,7 +266,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertNotIn('deprecated', err_result.lower())
 
                 # If stdout doesn't include global help..
-                if global_args not in out_result:
+                if global_args_msg not in out_result:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', out_result.lower())
                     # But also complain if there is any stdout
@@ -366,16 +365,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _arguments = '-simulate'
     _results = no_args_expected_results
-
-
-def setUpModule():  # noqa: N802
-    """Only find one alternative script (T296204)."""
-    config.pwb_close_matches = 1
-
-
-def tearDownModule():  # noqa: N802
-    """Restore pwb_close_matches setting."""
-    config.pwb_close_matches = saved_pwb_close_matches
 
 
 if __name__ == '__main__':  # pragma: no cover
