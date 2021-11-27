@@ -768,8 +768,12 @@ class WelcomeBot(SingleSiteBot):
         return self._randomSignature
 
     def skip_page(self, user) -> bool:
-        """Check whether the user is to be skipped."""
-        if user.isBlocked():
+        """Check whether the user is to be skipped.
+
+        .. versionchanged:: 7.0
+           also skip if user is locked globally
+        """
+        if user.is_blocked() or user.is_locked():
             self.show_status(Msg.SKIP)
             pywikibot.output('{} has been blocked!'.format(user.username))
 
