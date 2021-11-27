@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Script that forms part of pwb_tests."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import sys
 from pywikibot.tools import first_upper
 
 
-def main():
+def main() -> None:
     """Print environment variables."""
     _pwb_dir = os.path.abspath(os.path.join(
         os.path.split(__file__)[0], '..', '..'))
