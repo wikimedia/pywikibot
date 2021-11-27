@@ -292,7 +292,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                                 local_file_page.title(with_ns=False),
                                 commons_file_page.title(with_ns=False)))
                             bot = ImageBot(
-                                pg.FileLinksGenerator(local_file_page),
+                                local_file_page.usingPages(),
                                 local_file_page.title(with_ns=False),
                                 commons_file_page.title(with_ns=False),
                                 always=self.opt.replacealways,
@@ -305,7 +305,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                                 page.title()).using_pages(total=1)))
                             if is_used and self.opt.replaceloose:
                                 bot = ImageBot(
-                                    pg.FileLinksGenerator(local_file_page),
+                                    local_file_page.usimgPages(),
                                     local_file_page.title(with_ns=False,
                                                           as_url=True),
                                     commons_file_page.title(with_ns=False),
