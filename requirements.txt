@@ -50,7 +50,7 @@ google >= 1.7
 sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
 # The mysql generator in pagegenerators depends on PyMySQL
-PyMySQL >= 0.6.7, < 1.0.0 ; python_version < '3.6'
+PyMySQL >= 0.7.11, < 1.0.0 ; python_version < '3.6'
 PyMySQL >= 1.0.0 ; python_version >= '3.6'
 
 # core HTML comparison parser in diff module
