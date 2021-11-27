@@ -114,12 +114,15 @@ class TestPwb(PwbTestCase):
             'The most similar scripts are:',
             '1 - interwikidata',
             '2 - interwiki',
+            '3 - illustrate_wikidata',
         ]
         stderr = io.StringIO(
             execute_pwb(['inter_wikidata'], data_in='q')['stderr'])
         for line in result:
             with self.subTest(line=line):
                 self.assertEqual(stderr.readline().strip(), line)
+        remaining = stderr.readlines()
+        self.assertLength(remaining, 3)  # always 3 lines remaining after list
 
 
 if __name__ == '__main__':  # pragma: no cover
