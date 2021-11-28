@@ -350,8 +350,24 @@ def find_alternates(filename, script_paths):
 
 
 def find_filename(filename):
-    """Search for the filename in the given script paths."""
+    """Search for the filename in the given script paths.
+
+    .. versionchanged:: 7.0
+       Search users_scripts_paths in config.base_dir
+    """
     from pywikibot import config
+    path_list = []  # paths to find misspellings
+
+    def test_paths(paths, root):
+        """Search for filename in given paths within 'root' base directory."""
+        for file_package in paths:
+            package = file_package.split('.')
+            path = package + [filename]
+            testpath = os.path.join(root, *path)
+            if os.path.exists(testpath):
+                return testpath
+            path_list.append(package)
+        return None
 
     if site_package:
         script_paths = [_pwb_dir]
@@ -363,26 +379,24 @@ def find_filename(filename):
             'pywikibot.scripts',
         ]
 
+    user_script_paths = []
     if config.user_script_paths:
         if isinstance(config.user_script_paths, list):
-            script_paths = config.user_script_paths + script_paths
+            user_script_paths = config.user_script_paths
         else:
             warn("'user_script_paths' must be a list,\n"
                  'found: {}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
-    path_list = []
-    for file_package in script_paths:
-        package = file_package.split('.')
-        paths = package + [filename]
-        testpath = os.path.join(config.base_dir, *paths)
-        if os.path.exists(testpath):
-            filename = testpath
-            break
-        path_list.append(package)
-    else:
-        filename = find_alternates(filename, path_list)
-    return filename
+    found = test_paths(user_script_paths, config.base_dir)
+    if found:
+        return found
+
+    found = test_paths(script_paths, _pwb_dir)
+    if found:
+        return found
+
+    return find_alternates(filename, path_list)
 
 
 def execute():
