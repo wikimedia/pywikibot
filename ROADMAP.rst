@@ -4,6 +4,14 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* pywikibot.argv has been fixed for pwb.py wrapper if called with global args (T254435)
+* A new method User.is_locked() was added to determine whether the user is currently locked globally (T249392)
+* A new method APISite.is_locked() was added to determine whether a given user or user id is locked globally (T249392)
+* APISite.get_globaluserinfo() method was added to retrieve globaluserinfo for any user or user id (T163629)
+* APISite.globaluserinfo attribute may be deleted to force reload
+* APISite.is_blocked() method has a force parameter to reload that info
+* Allow family files in base_dir by default
+* Only ignore FileExistsError when creating the api cache (T295924)
 * Make pwb wrapper script a pywikibot entry point for scripts (T139143, T270480)
 * Enable -version and --version with pwb wrapper or code entry point (T101828)
 * Retry upload if 'copyuploadbaddomain' API error occurs (T294825)
@@ -82,6 +90,8 @@ Code cleanups
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
+* 7.0.0: Require mysql >= 0.7.11 (T216741)
 * 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
