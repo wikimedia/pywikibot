@@ -1,5 +1,9 @@
 #!/usr/bin/python
-"""Script to create user-config.py."""
+"""Script to create user-config.py.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts folder
+"""
 #
 # (C) Pywikibot team, 2010-2021
 #
@@ -9,14 +13,16 @@ import codecs
 import os
 import re
 import sys
+
 from collections import namedtuple
+from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
-from generate_family_file import _import_with_no_user_config
+from pywikibot.scripts import _import_with_no_user_config
 
-
-if sys.version_info[:2] >= (3, 9):
+PYTHON_VERSION = sys.version_info[:2]
+if PYTHON_VERSION >= (3, 9):
     Tuple = tuple
 else:
     from typing import Tuple
@@ -41,9 +47,6 @@ try:
 # unittests fails with "StringIO instance has no attribute 'encoding'"
 except AttributeError:
     console_encoding = None
-
-# the directory in which generate_user_files.py is located
-pywikibot_dir = sys.path[0]
 
 if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = 'iso-8859-1'
@@ -217,21 +220,22 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
-def parse_sections():
+def parse_sections() -> list:
     """Parse sections from config.py file.
 
-    config.py will be in the pywikibot/ directory relative to this
-    generate_user_files script.
+    config.py will be in the pywikibot/ directory whereas
+    generate_user_files script is in pywikibot/scripts.
 
     :return: a list of ConfigSection named tuples.
-    :rtype: list
     """
     data = []
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
-    install = os.path.dirname(os.path.abspath(__file__))
-    with codecs.open(os.path.join(install, 'pywikibot', 'config.py'),
-                     'r', 'utf-8') as config_f:
+    config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
+    if PYTHON_VERSION < (3, 6):
+        config_path = str(config_path)
+
+    with codecs.open(config_path, 'r', 'utf-8') as config_f:
         config_file = config_f.read()
 
     result = re.findall(

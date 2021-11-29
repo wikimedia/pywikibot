@@ -19,4 +19,4 @@ generate\_family\_file script
 generate\_user\_files script
 ----------------------------
 
-.. automodule:: generate_user_files
+.. automodule:: pywikibot.scripts.generate_user_files

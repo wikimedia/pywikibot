@@ -75,7 +75,7 @@ script:
       python -m generate_family_file 'https://theportalwiki.com/wiki/Main_Page' 'portalwiki' 'y' 'y';
     fi
 
-  - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"
+  - python -W error::UserWarning -m pwb generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT_USERNAME"
 
   - if [[ -n "$USER_PASSWORD" && -n "$PYWIKIBOT_USERNAME" ]]; then
       printf "usernames['wikipedia']['en'] = '%q'\n" "$PYWIKIBOT_USERNAME" >> ~/.pywikibot/user-config.py ;

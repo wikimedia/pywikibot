@@ -29,7 +29,6 @@ import os
 import string
 import sys
 
-from os import environ, getenv
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -63,6 +62,7 @@ class FamilyFileGenerator:
             pass `Y` or `y` to disable certificate validaton `N` or `n`
             to keep it enabled.
         """
+        from pywikibot.scripts import _import_with_no_user_config
         # from pywikibot.site_detect import MWSite
         # when required but disable user-config checks
         # so the family can be created first,
@@ -273,19 +273,6 @@ class Family(family.Family):  # noqa: D101
             %(code_protocol_pairs)s
         }[code]
 """
-
-
-def _import_with_no_user_config(*import_args):
-    """Return __import__(*import_args) without loading user-config.py."""
-    orig_no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG')
-    environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
-    result = __import__(*import_args)
-    # Reset this flag
-    if not orig_no_user_config:
-        del environ['PYWIKIBOT_NO_USER_CONFIG']
-    else:
-        environ['PYWIKIBOT_NO_USER_CONFIG'] = orig_no_user_config
-    return result
 
 
 def main():
