@@ -16,8 +16,6 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | Dockerfile-dev            | Docker image including developement dependencies          |
     +---------------------------+-----------------------------------------------------------+
-    | generate_family_file.py   | Creates a new family file                                 |
-    +---------------------------+-----------------------------------------------------------+
     | HISTORY.rst               | PyPI version history file                                 |
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |

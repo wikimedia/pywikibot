@@ -1,9 +1,11 @@
 #!/usr/bin/python
 """This script generates a family file from a given URL.
 
+This script must be invoked with the pwb wrapper script/code entry point.
+
 Usage::
 
-    generate_family_file.py [<url>] [<name>] [<dointerwiki>] [<verify>]
+    pwb generate_family_file.py [<url>] [<name>] [<dointerwiki>] [<verify>]
 
 Parameters are optional. They must be given consecutively but may be
 omitted if there is no successor parameter. The parameters are::
@@ -15,9 +17,14 @@ omitted if there is no successor parameter. The parameters are::
 
 Example::
 
-    generate_family_file.py https://www.mywiki.bogus/wiki/Main_Page mywiki
+    pwb generate_family_file.py https://www.mywiki.bogus/wiki/Main_Page mywiki
 
-This will create the file mywiki_family.py in pywikibot/families folder
+This will create the file mywiki_family.py in families folder of your
+base directory.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts folder; create family files in families
+   folder of your base directory instead of pywikibot/families.
 """
 #
 # (C) Pywikibot team, 2010-2021
@@ -63,12 +70,15 @@ class FamilyFileGenerator:
             to keep it enabled.
         """
         from pywikibot.scripts import _import_with_no_user_config
-        # from pywikibot.site_detect import MWSite
+        # from pywikibot.site_detect import MWSite and
+        # from pywikibot.config import base_dir
         # when required but disable user-config checks
         # so the family can be created first,
         # and then used when generating the user-config
         self.Wiki = _import_with_no_user_config(
             'pywikibot.site_detect').site_detect.MWSite
+        self.base_dir = _import_with_no_user_config(
+            'pywikibot.config').config.base_dir
 
         self.base_url = url
         self.name = name
@@ -200,8 +210,7 @@ class FamilyFileGenerator:
 
     def writefile(self, verify):
         """Write the family file."""
-        fn = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                          'pywikibot', 'families',
+        fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
         print('Writing %s... ' % fn)
         try:
@@ -239,6 +248,7 @@ class FamilyFileGenerator:
     def verify_SSL_certificate(self, code: str) -> bool:
         return False
 """
+        os.makedirs(os.path.dirname(fn), exist_ok=True)
         with codecs.open(fn, 'w', 'utf-8') as fh:
             fh.write(content)
 
