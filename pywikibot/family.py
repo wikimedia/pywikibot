@@ -555,7 +555,7 @@ class Family:
        escape sequence if necessary
 
     .. versionadded:: 7.0
-    """
+    """  # noqa: B018
 
     _families = {}
 
