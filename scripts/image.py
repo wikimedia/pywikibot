@@ -70,7 +70,7 @@ class ImageRobot(ReplaceBot):
             'loose': False,
         })
 
-        SingleSiteBot.__init__(self, generator=generator, **kwargs)
+        SingleSiteBot.__init__(self, **kwargs)
 
         self.old_image = old_image
         self.new_image = new_image
@@ -114,7 +114,7 @@ class ImageRobot(ReplaceBot):
         else:
             replacements.append((image_regex, ''))
 
-        super().__init__(self.generator, replacements,
+        super().__init__(generator, replacements,
                          always=self.opt.always,
                          site=self.site,
                          summary=summary)
