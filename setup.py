@@ -77,7 +77,7 @@ extra_deps = {
         'flake8>=3.9.1',
         'darglint',
         'pydocstyle>=4.0.0',
-        'flake8-bugbear!=21.4.1',
+        'flake8-bugbear!=21.4.1,!=21.11.28',
         'flake8-coding',
         'flake8-colors>=0.1.9',
         'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
