@@ -4,6 +4,8 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Enable move generate_user_files.py with site-package (T107629)
+* Only search user_script_paths inside config.base_dir (T296204)
 * pywikibot.argv has been fixed for pwb.py wrapper if called with global args (T254435)
 * A new method User.is_locked() was added to determine whether the user is currently locked globally (T249392)
 * A new method APISite.is_locked() was added to determine whether a given user or user id is locked globally (T249392)
@@ -35,6 +37,7 @@ Breaking changes
 ----------------
 
 * Support of Python 3.5.0 - 3.5.2 has been dropped (T286867)
+* generate_user_files.py must be used with pwb wrapper script
 
 
 Code cleanups
