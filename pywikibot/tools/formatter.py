@@ -5,6 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 import math
+import platform
+
 from string import Formatter
 from typing import Any, Mapping, Sequence
 
@@ -136,4 +138,7 @@ def color_format(text: str, *args, **kwargs) -> str:
     :param text: The format template string
     :return: The formatted string
     """
+    if platform.python_implementation() == 'PyPy' \
+       and isinstance(text, bytes):  # T296830
+        raise TypeError("'text' parameter must be a str not bytes")
     return _ColorFormatter().format(text, *args, **kwargs)
