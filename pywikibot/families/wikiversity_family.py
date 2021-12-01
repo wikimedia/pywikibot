@@ -17,7 +17,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'de', 'en', 'fr', 'zh', 'it', 'ru', 'cs', 'pt', 'es', 'sl', 'ar', 'sv',
-        'fi', 'el', 'ko', 'hi', 'ja',
+        'fi', 'el', 'hi', 'ko', 'ja',
     ]
 
     test_codes = ['beta']
