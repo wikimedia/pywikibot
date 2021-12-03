@@ -18,6 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
+        site: ["wikipedia:en", "wikisource:zh"]
+        include:
+          - python-version: "3.7"
+            site: "wikipedia:test"
+          - python-version: "3.7"
+            site: "wikidata:test"
+          - python-version: "3.9"
+            site: "wiktionary:ar"
+          - python-version: "3.6"
+            site: "wikidata:wikidata"
+          - python-version: "3.8"
+            site: "wowwiki:uk"
 
     steps:
     - uses: actions/checkout@v2
@@ -31,10 +43,17 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip --version
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -U setuptools
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
-        python -Werror::UserWarning -m pwb generate_user_files -family:wikipedia -lang:test -v -debug
+        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+    - name: Generate user files
+      run: |
+        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug
+        echo "max_retries = 3" >> user-config.py
+        echo "maximum_GET_length = 5000" >> user-config.py
+        echo "console_encoding = 'utf8'" >> user-config.py
     - name: Test with unittest
       run: |
         coverage run -m unittest discover -vv -p \"*_tests.py\"
