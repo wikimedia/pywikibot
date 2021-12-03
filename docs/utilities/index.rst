@@ -1,3 +1,5 @@
+.. _utility_scripts:
+
 Utility scripts
 ===============
 
@@ -5,11 +7,6 @@ pwb wrapper script
 ------------------
 
 .. automodule:: pwb
-
-version script
---------------
-
-.. automodule:: pywikibot.scripts.version
 
 generate\_family\_file script
 -----------------------------
@@ -20,3 +17,13 @@ generate\_user\_files script
 ----------------------------
 
 .. automodule:: pywikibot.scripts.generate_user_files
+
+shell script
+------------
+
+.. automodule:: pywikibot.scripts.shell
+
+version script
+--------------
+
+.. automodule:: pywikibot.scripts.version

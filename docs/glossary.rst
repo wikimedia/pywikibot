@@ -9,7 +9,8 @@ Glossary
       The default Python prompt of the interactive Pywikibot shell.
       Often seen for code examples which can be executed interactively
       in the interpreter. The :mod:`pywikibot` module is preloaded. The
-      :mod:`scripts.shell` script is part of the :mod:`scripts` module.
+      :mod:`pywikibot.scripts.shell` script is part of the
+      :ref:`Pywikibot Utility Scripts<utility_scripts>`.
 
    compat
       The first Pywikibot package formerly known as *Pywikipediabot*

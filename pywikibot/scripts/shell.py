@@ -12,6 +12,9 @@ Usage:
     python pwb.py shell [args]
 
 If no arguments are given, the pywikibot library will not be loaded.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts
 """
 # (C) Pywikibot team, 2014-2021
 #
