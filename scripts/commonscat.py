@@ -334,8 +334,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
-            newtemplate='', newcat='', linktitle='',
-            description=NotImplemented):
+            newtemplate='', newcat='', linktitle=''):
         """Change the current commonscat template and target."""
         if '3=S' in (oldcat, linktitle):
             return  # TODO: handle additional param on de-wiki
