@@ -943,7 +943,7 @@ class _WbDataPage(_WbRepresentation):
         :param page: page containing the data
         :param site: The Wikibase site
         """
-        site = site or Site().data_repository()
+        site = site or page.site.data_repository()
         specifics = type(self)._get_type_specifics(site)
         _WbDataPage._validate(page, specifics['data_site'],
                               specifics['ending'], specifics['label'])
