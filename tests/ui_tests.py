@@ -212,7 +212,11 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
                          "    raise TestExceptionError('Testing Exception')")
-        self.assertTrue(stderrlines[4].endswith(': Testing Exception'))
+        end_str = ': Testing Exception'
+        traceback_line = stderrlines[4]
+        self.assertTrue(traceback_line.endswith(end_str),
+                        '\n{!r} does not end with {!r}'
+                        .format(traceback_line, end_str))
 
         self.assertNotEqual(stderrlines[-1], '\n')
 
