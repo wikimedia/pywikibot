@@ -36,8 +36,17 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
     familyname = 'testgff'
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """Set up tests class."""
+        super().setUpClass()
+        # test fails on wowwiki (T297042)
+        if cls.site.family.name == 'wowwiki':
+            raise unittest.SkipTest('skipping {} due to T297042'
+                                    .format(cls.site))
+
+    def setUp(self):
+        """Set up tests."""
         super().setUp()
         self.generator_instance = FamilyTestGenerator(
             url=self.site.base_url(''), name=self.familyname, dointerwiki='y')
