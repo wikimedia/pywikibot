@@ -109,31 +109,6 @@ configuration in .appveyor.yml file. To do this:
 
 The 'user' tests are not yet enabled on AppVeyor builds.
 
-CircleCI
-========
-
-After changes are published into a GitHub repository, tests may be run on
-CircleCI Ubuntu servers.
-
-1. create a GitHub and CircleCI account
-2. fork the main GitHub repository
-3. create a project in circleci.com
-4. go to https://circleci.com/gh/<username>/pywikibot/edit#env-vars
-   and add the following variables:
-
-     - PYWIKIBOT_NO_USER_CONFIG=2
-     - TOXENV=py27,py34
-
-5. push changes into the forked git repository
-6. watch the build at https://circleci.com/gh/<username>/pywikibot
-
-PYWIKIBOT_NO_USER_CONFIG=2 is needed because 'python -m unittest' is run.
-
-TOXENV=py27,py34 is a workaround because CircleCI runs 'tox',
-but there is a bug in the CircleCI default 'py26' implementation.
-
-This approach does not include 'user' tests.
-
 Environment variables
 =====================
 
