@@ -1405,7 +1405,6 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         unittest.case._AssertRaisesContext,
         TestCase.assertRaises,
         TestCase.assertRaisesRegex,
-        TestCase.assertRaisesRegexp,
     ]
 
     # Require no instead string
