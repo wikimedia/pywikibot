@@ -14,22 +14,32 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
         site: ["wikipedia:en", "wikisource:zh"]
+        experimental: [false]
         include:
           - python-version: "3.7"
             site: "wikipedia:test"
+            experimental: false
           - python-version: "3.7"
             site: "wikidata:test"
+            experimental: false
           - python-version: "3.9"
             site: "wiktionary:ar"
+            experimental: false
           - python-version: "3.6"
             site: "wikidata:wikidata"
+            experimental: false
           - python-version: "3.8"
             site: "wowwiki:uk"
+            experimental: true
+          - python-version: "3.11.0-alpha.2"
+            site: "wikipedia:test"
+            experimental: true
 
     steps:
     - uses: actions/checkout@v2
