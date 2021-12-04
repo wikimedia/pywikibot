@@ -1293,8 +1293,8 @@ class checkImagesBot:
         if skip_number == 0:
             pywikibot.output('\t\t>> No files to skip...<<')
             return False
-        if skip_number > limit:
-            skip_number = limit
+
+        skip_number = min(skip_number, limit)
         # Print a starting message only if no images has been skipped
         if not self.skip_list:
             pywikibot.output(
