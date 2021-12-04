@@ -65,7 +65,30 @@ OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
 
 
-class TestCaseBase(unittest.TestCase):
+class TestTimerMixin(unittest.TestCase):
+
+    """Time each test and report excessive durations."""
+
+    # Number of seconds each test may consume
+    # before a note is added after the test.
+    test_duration_warning_interval = 10
+
+    def setUp(self):
+        """Set up test."""
+        self.test_start = time.time()
+        super().setUp()
+
+    def tearDown(self):
+        """Tear down test."""
+        super().tearDown()
+        self.test_completed = time.time()
+        duration = self.test_completed - self.test_start
+        if duration > self.test_duration_warning_interval:
+            unittest_print(' {0:.3f}s'.format(duration), end=' ')
+            sys.stdout.flush()
+
+
+class TestCaseBase(TestTimerMixin):
 
     """Base class for all tests."""
 
@@ -266,31 +289,6 @@ class TestCaseBase(unittest.TestCase):
         msg = kwargs.pop('msg', None)
         return AssertAPIErrorContextManager(
             code, info, msg, self).handle(callable_obj, args, kwargs)
-
-
-class TestTimerMixin(TestCaseBase):
-
-    """Time each test and report excessive durations."""
-
-    # Number of seconds each test may consume
-    # before a note is added after the test.
-    test_duration_warning_interval = 10
-
-    def setUp(self):
-        """Set up test."""
-        super().setUp()
-        self.test_start = time.time()
-
-    def tearDown(self):
-        """Tear down test."""
-        self.test_completed = time.time()
-        duration = self.test_completed - self.test_start
-
-        if duration > self.test_duration_warning_interval:
-            unittest_print(' {0:.3f}s'.format(duration), end=' ')
-            sys.stdout.flush()
-
-        super().tearDown()
 
 
 def require_modules(*required_modules):
@@ -835,7 +833,7 @@ class MetaTestCaseClass(type):
             dct[test_name].__doc__ = doc
 
 
-class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
+class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     """Run tests on pre-defined sites."""
 
