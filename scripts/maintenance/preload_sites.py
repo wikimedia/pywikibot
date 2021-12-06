@@ -8,7 +8,7 @@ The following parameters are supported:
 
 Usage:
 
-    python pwb.py preload_sites [{<family>}] [-worker{<num>}]
+    python pwb.py preload_sites [{<family>}] [-worker:{<num>}]
 
 To force preloading, change the global expiry value to 0:
 
