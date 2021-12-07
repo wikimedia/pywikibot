@@ -864,10 +864,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             interface = DrySite
 
         for data in cls.sites.values():
+            prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
             if (data.get('code') in ('test', 'mediawiki')
-                    and 'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
+                    and prod_only and not dry):
                 raise unittest.SkipTest(
-                    'Site code "{}" and PYWIKIBOT_TEST_PROD_ONLY is set.'
+                    'Site code {!r} and PYWIKIBOT_TEST_PROD_ONLY is set.'
                     .format(data['code']))
 
             if 'site' not in data and 'code' in data and 'family' in data:
@@ -1370,7 +1371,8 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
     def setUpClass(cls):
         """Set up test class."""
         if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
-            raise unittest.SkipTest('RecentChanges tests disabled.')
+            raise unittest.SkipTest(
+                'PYWIKIBOT_TEST_NO_RC is set; RecentChanges tests disabled.')
 
         super().setUpClass()
 

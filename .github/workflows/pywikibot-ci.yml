@@ -10,30 +10,31 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  PYWIKIBOT_TESTS_RUNNING: 1
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.experimental || false }}
+
     strategy:
       fail-fast: false
+
       matrix:
         python-version: ["3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
         site: ["wikipedia:en", "wikisource:zh"]
-        experimental: [false]
+        test_prod_only: [true]
         include:
           - python-version: "3.7"
             site: "wikipedia:test"
-            experimental: false
           - python-version: "3.7"
             site: "wikidata:test"
-            experimental: false
           - python-version: "3.9"
             site: "wiktionary:ar"
-            experimental: false
+            test_no_rc: true
           - python-version: "3.6"
             site: "wikidata:wikidata"
-            experimental: false
           - python-version: "3.8"
             site: "wowwiki:uk"
             experimental: true
@@ -45,10 +46,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -58,12 +61,19 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+
     - name: Generate user files
       run: |
         python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug
         echo "max_retries = 3" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
+
     - name: Test with unittest
+      env:
+        PYWIKIBOT_TEST_NO_RC:
+          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
+        python pwb.py version
         coverage run -m unittest discover -vv -p \"*_tests.py\"
