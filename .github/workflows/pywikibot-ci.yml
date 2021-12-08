@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
 
     strategy:
@@ -41,6 +41,9 @@ jobs:
           - python-version: "3.11.0-alpha.2"
             site: "wikipedia:test"
             experimental: true
+          - python-version: 3
+            site: "wikipedia:de"
+            os: macOS-latest
 
     steps:
     - uses: actions/checkout@v2
