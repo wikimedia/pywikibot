@@ -123,8 +123,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | revertbot.py           | Script that can be used for reverting certain edits.    |
     +------------------------+---------------------------------------------------------+
-    | shell.py               | Spawns an interactive Python shell.                     |
-    +------------------------+---------------------------------------------------------+
     | solve_disambiguation.py| Interactive robot doing disambiguation.                 |
     +------------------------+---------------------------------------------------------+
     | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |

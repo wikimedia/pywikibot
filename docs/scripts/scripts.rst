@@ -207,11 +207,6 @@ revertbot script
 
 .. automodule:: scripts.revertbot
 
-shell script
-------------
-
-.. automodule:: scripts.shell
-
 solve\_disambiguation script
 ----------------------------
 

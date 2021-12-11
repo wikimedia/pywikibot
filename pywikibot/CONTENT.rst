@@ -121,6 +121,9 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | pwb.py                     | Code entry wrapper script (site-package only)        |
     +----------------------------+------------------------------------------------------+
+    | shell.py                   | Spawns an interactive Python shell with pywikibot    |
+    |                            | imported                                             |
+    +----------------------------+------------------------------------------------------+
     | version.py                 | Outputs Pywikibot's revision number, Python's        |
     |                            | version and OS used.                                 |
     +----------------------------+------------------------------------------------------+

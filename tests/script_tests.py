@@ -17,6 +17,7 @@ from tests.utils import execute_pwb
 
 
 scripts_path = join_root_path('scripts')
+framework_scripts = ['shell']
 
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
@@ -55,7 +56,8 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-script_list = ['login'] + list_scripts(scripts_path, exclude='login.py')
+script_list = ['login'] + list_scripts(scripts_path,
+                                       exclude='login.py') + framework_scripts
 
 script_input = {
     'interwiki': 'Test page that should not exist\n',
