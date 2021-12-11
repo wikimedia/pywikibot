@@ -95,7 +95,7 @@ class TextEditor:
                     tempFile.write(text)
                 creationDate = os.stat(tempFilename).st_mtime
                 cmd = self._command(tempFilename, text, jumpIndex)
-                subprocess.run(cmd, shell=platform == 'win32')
+                subprocess.run(cmd, shell=platform == 'win32', check=True)
                 lastChangeDate = os.stat(tempFilename).st_mtime
                 if lastChangeDate == creationDate:
                     # Nothing changed

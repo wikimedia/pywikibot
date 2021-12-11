@@ -52,7 +52,8 @@ if __name__ == '__main__':
         import platform
         import subprocess
         subprocess.run('title Python {} Shell'
-                       .format(platform.python_version()), shell=True)
+                       .format(platform.python_version()),
+                       shell=True, check=True)
         del subprocess
         del platform
     args = []
