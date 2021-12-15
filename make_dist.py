@@ -3,6 +3,10 @@
 
 The following options are supported:
 
+pywikibot  The pywikibot repository to build (default)
+
+scripts    The pywikibot-scripts repository to build
+
 -help      Print documentation of this file and of setup.py
 
 -local     Install the distribution as a local site-package. If a
@@ -21,7 +25,7 @@ The following options are supported:
 
 Usage::
 
-    [pwb] make_dist [options]
+    [pwb] make_dist [repo] [options]
 
 .. versionadded:: 7.3
 .. versionchanged:: 7.4
@@ -43,6 +47,9 @@ Usage::
 .. versionchanged:: 8.2
    Build frontend was changed from setuptools to build. ``-upgrade``
    option also installs packages if necessary.
+
+.. versionchanged:: 9.4
+   The pywikibot-scripts distribution can be created.
 """
 #
 # (C) Pywikibot team, 2022-2024
@@ -54,6 +61,7 @@ from __future__ import annotations
 import abc
 import shutil
 import sys
+from contextlib import suppress
 from dataclasses import dataclass, field
 from importlib import import_module
 from pathlib import Path
@@ -76,6 +84,8 @@ class SetupBase(abc.ABC):
     remote: bool
     clear: bool
     upgrade: bool
+
+    build_opt: str = field(init=False)
     folder: Path = field(init=False)
 
     def __post_init__(self) -> None:
@@ -91,6 +101,8 @@ class SetupBase(abc.ABC):
         shutil.rmtree(self.folder / 'build', ignore_errors=True)
         shutil.rmtree(self.folder / 'dist', ignore_errors=True)
         shutil.rmtree(self.folder / 'pywikibot.egg-info', ignore_errors=True)
+        shutil.rmtree(self.folder / 'scripts' / 'pywikibot_scripts.egg-info',
+                      ignore_errors=True)
         info('<<lightyellow>>done')
 
     @abc.abstractmethod
@@ -139,7 +151,7 @@ class SetupBase(abc.ABC):
         self.copy_files()
         info('<<lightyellow>>Build package')
         try:
-            check_call('python -m build')
+            check_call(f'python -m build {self.build_opt}')
         except Exception as e:
             error(e)
             return False
@@ -152,10 +164,9 @@ class SetupBase(abc.ABC):
 
         if self.local:
             info('<<lightyellow>>Install locally')
-            check_call('pip uninstall pywikibot -y', shell=True)
-            check_call(
-                'pip install --no-index --pre --find-links=dist pywikibot',
-                shell=True)
+            check_call(f'pip uninstall {self.package} -y', shell=True)
+            check_call(f'pip install --no-cache-dir --no-index --pre '
+                       f'--find-links=dist {self.package}', shell=True)
 
         if self.remote and input_yn(
                 '<<lightblue>>Upload dist to pypi', automatic_quit=False):
@@ -169,6 +180,9 @@ class SetupPywikibot(SetupBase):
 
     .. versionadded:: 8.0
     """
+
+    build_opt = ''  # defaults to current directory
+    package = 'pywikibot'
 
     def __init__(self, *args) -> None:
         """Set source and target directories."""
@@ -203,6 +217,36 @@ class SetupPywikibot(SetupBase):
         info('<<lightyellow>>done')
 
 
+class SetupScripts(SetupBase):
+
+    """Setup pywikibot-scripts distribution.
+
+    .. versionadded:: 9.4
+    """
+
+    build_opt = '-w'  # only wheel (yet)
+    package = 'pywikibot_scripts'
+    replace = 'MANIFEST.in', 'pyproject.toml', 'setup.py'
+
+    def copy_files(self) -> None:
+        """Ignore copy files yet."""
+        info('<<lightyellow>>Copy files ...', newline=False)
+        for filename in self.replace:
+            file = self.folder / filename
+            file.rename(self.folder / (filename + '.saved'))
+            with suppress(FileNotFoundError):
+                shutil.copy(self.folder / 'scripts' / filename, self.folder)
+        info('<<lightyellow>>done')
+
+    def cleanup(self) -> None:
+        """Ignore cleanup yet."""
+        info('<<lightyellow>>Copy files ...', newline=False)
+        for filename in self.replace:
+            file = self.folder / (filename + '.saved')
+            file.replace(self.folder / filename)
+        info('<<lightyellow>>done')
+
+
 def handle_args() -> tuple[bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
 
@@ -223,19 +267,21 @@ def handle_args() -> tuple[bool, bool, bool, bool]:
     remote = '-remote' in sys.argv
     clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
+    scripts = 'scripts' in sys.argv
 
     if remote and 'dev' in __version__:  # pragma: no cover
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
     sys.argv = [sys.argv[0]]
-    return local, remote, clear, upgrade
+    return local, remote, clear, upgrade, scripts
 
 
 def main() -> None:
     """Script entry point."""
-    args = handle_args()
-    return SetupPywikibot(*args).run()
+    *args, scripts = handle_args()
+    installer = SetupScripts if scripts else SetupPywikibot
+    return installer(*args).run()
 
 
 if __name__ == '__main__':

@@ -58,6 +58,7 @@ needs_sphinx = '8.0.2'
 extensions = [
     'notfound.extension',
     'sphinx_copybutton',
+    'sphinx_tabs.tabs',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',

@@ -1,6 +1,15 @@
+.. image:: https://img.shields.io/github/languages/top/wikimedia/pywikibot
+   :alt: Top language
+   :target: https://www.python.org/downloads/
+.. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
+   :alt: Last commit
+   :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
+
 ###########################################################################
 **This is a package to include robots for MediaWiki wikis like Wikipedia.**
 ###########################################################################
+
+.. role:: api
 
 *********************************
 Some example robots are included.
@@ -179,18 +188,6 @@ Maintenance
 | unidata.py             | Updates _first_upper_exception_dict in tools.unidata    |
 +------------------------+---------------------------------------------------------+
 
-Others
-======
-
-+------------------------+---------------------------------------------------------+
-| Others                 |                                                         |
-+========================+=========================================================+
-| i18n (folder)          | Contains i18n translations for bot edit summaries.      |
-+------------------------+---------------------------------------------------------+
-| userscripts (folder)   | Empty folder for user scripts.                          |
-+------------------------+---------------------------------------------------------+
-| README.rst             | This file (Short info of all scripts).                  |
-+------------------------+---------------------------------------------------------+
 
 **External packages could be required with Pywikibot:**
 

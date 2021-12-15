@@ -9,7 +9,8 @@ This wrapper script invokes script by its name in this search order:
 2. User scripts residing in `scripts/userscripts` (directory mode only).
 3. Scripts residing in `scripts` folder (directory mode only).
 4. Maintenance scripts residing in `scripts/maintenance` (directory mode only).
-5. Framework scripts residing in `pywikibot/scripts`.
+5. Site-package scripts (site-package only)
+6. Framework scripts residing in `pywikibot/scripts`.
 
 This wrapper script is able to invoke scripts even if the script name is
 misspelled. In directory mode it also checks package dependencies.
@@ -38,6 +39,8 @@ for tests to set the default site (see :phab:`T216825`)::
    see :ref:`Environment variables`.
 .. versionchanged:: 8.0
    renamed to wrapper.py.
+.. versionchanged:: 9.4
+   enable external scripts via entry points.
 """
 #
 # (C) Pywikibot team, 2012-2024
@@ -382,6 +385,8 @@ def find_filename(filename):
        Search users_scripts_paths in config.base_dir
     .. versionchanged:: 9.0
        Add config.base_dir to search path
+    .. versionchanged:: 9.4
+       Search in entry point paths
     """
     from pywikibot import config
     path_list = []  # paths to find misspellings
@@ -397,6 +402,7 @@ def find_filename(filename):
             path_list.append(testpath.parent)
         return None
 
+    # search through user scripts paths
     user_script_paths = ['']
     if config.user_script_paths:  # pragma: no cover
         if isinstance(config.user_script_paths, list):
@@ -410,7 +416,22 @@ def find_filename(filename):
     if found:  # pragma: no cover
         return found
 
-    if not site_package:
+    if site_package:  # search for entry points
+        import importlib
+        from importlib.metadata import entry_points
+
+        from pywikibot.i18n import set_messages_package
+
+        for ep in entry_points(name='scriptspath', group='pywikibot'):
+            path = ep.load()
+            found = test_paths([''], path)
+            if found:
+                i18n_package = path.stem + '.i18n'
+                if importlib.import_module(i18n_package).__file__ is not None:
+                    set_messages_package(i18n_package)
+                return found
+
+    else:  # search in scripts folder
         script_paths = [
             'scripts.userscripts',
             'scripts',
