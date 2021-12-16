@@ -176,15 +176,6 @@ class FailingSiteTestCase(SiteDetectionTestCase):
         self.assertNoSite('http://wiki.animutationportal.com/index.php/$1')
 
 
-class APIDisabledTestCase(SiteDetectionTestCase):
-
-    """Test MediaWiki sites without an enabled API."""
-
-    def test_linuxquestions(self):
-        """Test detection of MediaWiki sites for wiki.linuxquestions.org."""
-        self.assertNoSite('http://wiki.linuxquestions.org/wiki/$1')
-
-
 class NoSiteTestCase(SiteDetectionTestCase):
 
     """Test detection of non-wiki sites."""
