@@ -26,6 +26,17 @@ jobs:
         site: ["wikipedia:en", "wikisource:zh"]
         test_prod_only: [true]
         include:
+          - python-version: "3.6"
+            family: wpbeta
+            code: en
+            experimental: true
+          - python-version: "3.6"
+            family: wpbeta
+            code: zh
+            experimental: true
+          - python-version: "3.5"
+            site: wsbeta:en
+            experimental: true
           - python-version: "3.7"
             site: "wikipedia:test"
           - python-version: "3.7"
@@ -65,9 +76,22 @@ jobs:
         pip install wikitextparser
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
+    - name: Generate family files
+      run: |
+          if  [ ${{matrix.family || 0}} == wpbeta ]; then
+            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmflabs.org/ wpbeta y
+          fi
+          if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
+            python pwb.py generate_family_file http://en.wikisource.beta.wmflabs.org/ wsbeta y
+          fi
+
     - name: Generate user files
       run: |
-        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug
+        if [ ${{matrix.site}} ]; then
+          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug
+        else
+          python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -v -debug
+        fi
         echo "max_retries = 3" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
