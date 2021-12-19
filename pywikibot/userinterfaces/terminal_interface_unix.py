@@ -51,3 +51,7 @@ class UnixUI(terminal_interface_base.UI):
         if bg is not None:
             bg = unixColors[bg]
             self._write(self.make_unix_bg_color(bg), target_stream)
+
+    def _write(self, text, target_stream):
+        """Optionally encode and write the text to the target stream."""
+        target_stream.write(text)
