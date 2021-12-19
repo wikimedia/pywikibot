@@ -481,9 +481,11 @@ class ReferencesRobot(SingleSiteBot,
                                   .format(self.stop_page.title(as_link=True)))
 
         # Regex to grasp content-type meta HTML tag in HTML source
-        self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
+        self.META_CONTENT = re.compile(
+            br'(?i)<meta[^>]*(?:content\-type|charset)[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
+        self.CHARSET = re.compile(
+            r'(?i)charset\s*=\s*(?P<enc>(?P<q>[\'"]?)[^\'",;>/]*(?P=q))')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
