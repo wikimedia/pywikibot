@@ -291,6 +291,12 @@ def error_handling_callback(response):
         if SSL_CERT_VERIFY_FAILED_MSG in str(response):
             raise FatalServerError(str(response))
 
+    if isinstance(response, requests.ConnectionError):
+        msg = str(response)
+        if 'NewConnectionError' in msg \
+           and re.search(r'\[Errno (-2|11001)\]', msg):
+            raise ConnectionError(response)
+
     if isinstance(response, Exception):
         with suppress(Exception):
             # request exception may contain response and request attribute

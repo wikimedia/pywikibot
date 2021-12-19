@@ -1,6 +1,6 @@
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,7 +143,7 @@ class TestHttpStatus(HttpbinTestCase):
     def test_server_not_found(self):
         """Test server not found exception."""
         with self.assertRaisesRegex(
-                requests.exceptions.ConnectionError,
+                ConnectionError,
                 'Max retries exceeded with url: /w/api.php'):
             http.fetch('http://ru-sib.wikipedia.org/w/api.php',
                        default_error_handling=True)
