@@ -1,6 +1,20 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.6.3
+-----
+*01 December 2021*
+
+* L10N updates
+
+
+6.6.2
+-----
+*28 October 2021*
+
+* L10N updates (T292423, T294526, T294527)
+
+
 6.6.1
 -----
 *21 September 2021*
