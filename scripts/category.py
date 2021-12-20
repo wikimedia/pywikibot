@@ -83,7 +83,9 @@ Options for several actions:
  -summary:    - Pick a custom edit summary for the bot.
  -inplace     - Use this flag to change categories in place rather than
                 rearranging them.
- -recurse     - Recurse through all subcategories of categories.
+ -recurse[:<depth>]
+              - Recurse through subcategories of the category to
+                optional depth.
  -pagesonly   - While removing pages from a category, keep the subpage links
                 and do not remove them.
  -match       - Only work on pages whose titles match the given regex (for
@@ -909,7 +911,7 @@ class CategoryListifyRobot:
                  overwrite: bool = False,
                  show_images: bool = False, *,
                  talk_pages: bool = False,
-                 recurse: bool = False,
+                 recurse: Union[int, bool] = False,
                  prefix: str = '*',
                  namespaces=None) -> None:
         """Initializer."""
@@ -1326,6 +1328,7 @@ def main(*args: str) -> None:
 
     :param args: command line arguments.
     """
+    options = {}
     from_given = False
     to_given = False
     batch = False
@@ -1335,7 +1338,6 @@ def main(*args: str) -> None:
     overwrite = False
     showimages = False
     talkpages = False
-    recurse = False
     title_regex = None
     pagesonly = False
     wikibase = True
@@ -1403,7 +1405,7 @@ def main(*args: str) -> None:
         elif option == 'talkpages':
             talkpages = True
         elif option == 'recurse':
-            recurse = True
+            options[option] = True if value == '' else int(value)
         elif option == 'pagesonly':
             pagesonly = True
         elif option == 'nowb':
@@ -1514,7 +1516,8 @@ def main(*args: str) -> None:
                 'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
                                    append, overwrite, showimages,
-                                   talk_pages=talkpages, recurse=recurse,
+                                   talk_pages=talkpages,
+                                   recurse=options.get('recurse', False),
                                    prefix=prefix,
                                    namespaces=gen_factory.namespaces)
 
