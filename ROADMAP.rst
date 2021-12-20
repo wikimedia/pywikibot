@@ -4,11 +4,12 @@ Current release changes
 Improvements and Bugfixes
 -------------------------
 
+* Enable shell script with Pywikibot site package
+* Enable generate_user_files.py and generate_family_file with site-package (T107629)
 * Add support for Python 3.11
 * Use page.site.data_repository when creating a _WbDataPage (T296985)
 * Fix mysql AttributeError for sock.close() on toolforge (T216741)
 * Pywikibot supports PyPy 3 (T101592)
-* Enable move generate_user_files.py with site-package (T107629)
 * Only search user_script_paths inside config.base_dir (T296204)
 * pywikibot.argv has been fixed for pwb.py wrapper if called with global args (T254435)
 * A new method User.is_locked() was added to determine whether the user is currently locked globally (T249392)
