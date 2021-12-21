@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -624,12 +624,26 @@ class APISite(
                 in ['1', True]}
 
     @property
+    @deprecated('articlepath', since='7.0.0')
     def article_path(self):
-        """Get the nice article path without $1."""
-        # Assert and remove the trailing $1 and assert that it'll end in /
-        assert self.siteinfo['general']['articlepath'].endswith('/$1'), \
-            'articlepath must end with /$1'
-        return self.siteinfo['general']['articlepath'][:-2]
+        """Get the nice article path without $1.
+
+        .. deprecated:: 7.0
+           Replaced by :py:meth:`articlepath`
+        """
+        return self.articlepath[:-2]
+
+    @property
+    def articlepath(self):
+        """Get the nice article path with placeholder.
+
+        .. versionadded:: 7.0
+           Replaces :py:meth:`article_path`
+        """
+        # Assert $1 placeholder is present
+        path = self.siteinfo['general']['articlepath']
+        assert '$1' in path, 'articlepath must contain "$1" placeholder'
+        return path.replace('$1', '{}')
 
     @staticmethod
     def assert_valid_iter_params(msg_prefix, start, end, reverse,

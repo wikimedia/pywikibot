@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -821,12 +821,12 @@ class Family:
         return config.site_interface
 
     def from_url(self, url: str) -> Optional[str]:
-        """
-        Return whether this family matches the given url.
+        """Return whether this family matches the given url.
 
         It is first checking if a domain of this family is in the domain of
         the URL. If that is the case it's checking all codes and verifies that
-        a path generated via :py:obj:`APISite.article_path` and
+        a path generated via
+        :py:obj:`APISite.articlepath<pywikibot.site.APISite.articlepath>` and
         :py:obj:`Family.path` matches the path of the URL together with
         the hostname for that code.
 
@@ -835,13 +835,11 @@ class Family:
         determine which code applies.
 
         :param url: the URL which may contain a ``$1``. If it's missing it is
-            assumed to be at the end and if it's present nothing is allowed
-            after it.
+            assumed to be at the end.
         :return: The language code of the url. None if that url is not from
             this family.
         :raises RuntimeError: When there are multiple languages in this family
             which would work with the given URL.
-        :raises ValueError: When text is present after $1.
         """
         parsed = urlparse.urlparse(url)
         if not re.match('(https?)?$', parsed.scheme):
@@ -852,10 +850,7 @@ class Family:
             path += '?' + parsed.query
 
         # Discard $1 and everything after it
-        path, _, suffix = path.partition('$1')
-        if suffix:
-            raise ValueError('Url: {}\nText {} after the $1 placeholder is '
-                             'not supported (T111513).'.format(url, suffix))
+        path, *_ = path.partition('$1')
 
         for domain in self.domains:
             if domain in parsed.netloc:
@@ -875,6 +870,7 @@ class Family:
                 pywikibot.log('Found candidate {}'.format(site))
 
                 for iw_url in site._interwiki_urls():
+                    iw_url, *_ = iw_url.partition('{}')
                     if path.startswith(iw_url):
                         matched_sites.add(site)
                         break

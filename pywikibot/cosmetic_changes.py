@@ -51,7 +51,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,6 +59,7 @@ import re
 
 from enum import IntEnum
 from typing import Any, Union
+from urllib.parse import urlparse, urlunparse
 
 import pywikibot
 from pywikibot import textlib
@@ -519,11 +520,7 @@ class CosmeticChangesToolkit:
             trailingChars = match.group('linktrail')
             newline = match.group('newline')
 
-            try:
-                is_interwiki = self.site.isInterwikiLink(titleWithSection)
-            except ValueError:  # T111513
-                is_interwiki = True
-
+            is_interwiki = self.site.isInterwikiLink(titleWithSection)
             if is_interwiki:
                 return match.group()
 
@@ -826,6 +823,7 @@ class CosmeticChangesToolkit:
 
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
                       'syntaxhighlight']
+
         # link to the wiki working on
         # Only use suffixes for article paths
         for suffix in self.site._interwiki_urls(True):
@@ -834,31 +832,43 @@ class CosmeticChangesToolkit:
                 https_url = None
             else:
                 https_url = self.site.base_url(suffix, 'https')
+
             # compare strings without the protocol, if they are empty support
             # also no prefix (//en.wikipedia.org/…)
-            if https_url is not None and http_url[4:] == https_url[5:]:
-                urls = ['(?:https?:)?' + re.escape(http_url[5:])]
+            http = urlparse(http_url)
+            https = urlparse(https_url)
+            if https_url is not None and http.netloc == https.netloc:
+                urls = ['(?:https?:)?'
+                        + re.escape(urlunparse(('', *http[1:])))]
             else:
                 urls = [re.escape(url) for url in (http_url, https_url)
                         if url is not None]
+
             for url in urls:
-                # Only include links which don't include the separator as
-                # the wikilink won't support additional parameters
-                separator = '?'
-                if '?' in suffix:
-                    separator += '&'
+                # unescape {} placeholder
+                url = url.replace(r'\{\}', '{title}')
+
+                # Only include links which don't include the separator
+                # as the wikilink won't support additional parameters
+                separator = '?&' if '?' in suffix else '?'
+
                 # Match first a non space in the title to prevent that multiple
                 # spaces at the end without title will be matched by it
+                title_regex = (r'(?P<link>[^{sep}]+?)'
+                               r'(\s+(?P<title>[^\s].*?))'
+                               .format(sep=separator))
+                url_regex = r'\[\[?{url}?\s*\]\]?'.format(url=url)
                 text = textlib.replaceExcept(
                     text,
-                    r'\[\[?' + url + r'(?P<link>[^' + separator + r']+?)'
-                    r'(\s+(?P<title>[^\s].*?))?\s*\]\]?',
+                    url_regex.format(title=title_regex),
                     replace_link, exceptions, site=self.site)
+
         # external link in/starting with double brackets
         text = textlib.replaceExcept(
             text,
             r'\[\[(?P<url>https?://[^\]]+?)\]\]?',
             r'[\g<url>]', exceptions, site=self.site)
+
         # external link and description separated by a pipe, with
         # whitespace in front of the pipe, so that it is clear that
         # the dash is not a legitimate part of the URL.
@@ -866,6 +876,7 @@ class CosmeticChangesToolkit:
             text,
             r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
             r'[\g<url> \g<label>]', exceptions)
+
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.

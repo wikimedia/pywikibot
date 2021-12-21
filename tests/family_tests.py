@@ -1,6 +1,6 @@
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -160,14 +160,14 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(code, self.current_code)
         self.assertEqual(fam, self.current_family)
         site = DrySite(code, fam, None)
-        site._siteinfo._cache['general'] = ({'articlepath': self.article_path},
+        site._siteinfo._cache['general'] = ({'articlepath': self.articlepath},
                                             True)
         return site
 
     def setUp(self):
         """Setup default article path."""
         super().setUp()
-        self.article_path = '/wiki/$1'
+        self.articlepath = '/wiki/$1'
 
     def test_from_url_wikipedia_extra(self):
         """Test various URLs against wikipedia regex."""
@@ -191,12 +191,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(f.from_url(prefix + '/wiki/Main_page'), 'vo')
         self.assertEqual(f.from_url(prefix + '/w/index.php?title=Foo'), 'vo')
 
-        # Text after $1 is not allowed
-        with self.assertRaisesRegex(
-                ValueError,
-                'Url: .+\nText /foo after the '
-                r'\$1 placeholder is not supported \(T111513\)\.'):
-            f.from_url('//vo.wikipedia.org/wiki/$1/foo')
+        # Text after $1 is allowed
+        self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1/foo'), 'vo')
 
         # the IWM may contain the wrong protocol, but it's only used to
         # determine a site so using HTTP or HTTPS is not an issue
@@ -216,20 +212,20 @@ class TestFamilyUrlRegex(PatchingTestCase):
     def test_each_family(self):
         """Test each family builds a working regex."""
         for family in pywikibot.config.family_files:
-            with self.subTest(family=family):
-                if family == 'wowwiki':
-                    self.skipTest(
-                        'Family.from_url() does not work for {} (T215077)'
-                        .format(family))
-                self.current_family = family
-                family = Family.load(family)
-                for code in family.codes:
-                    self.current_code = code
-                    url = ('{}://{}{}/$1'.format(family.protocol(code),
-                                                 family.hostname(code),
-                                                 family.path(code)))
-                    # Families can switch off if they want to be detected using
-                    # URL. This applies for test:test (there is test:wikipedia)
+            if family == 'wowwiki':
+                self.skipTest(
+                    'Family.from_url() does not work for {} (T215077)'
+                    .format(family))
+            self.current_family = family
+            family = Family.load(family)
+            for code in family.codes:
+                self.current_code = code
+                url = ('{}://{}{}/$1'.format(family.protocol(code),
+                                             family.hostname(code),
+                                             family.path(code)))
+                # Families can switch off if they want to be detected using
+                # URL. This applies for test:test (there is test:wikipedia)
+                with self.subTest(url=url):
                     self.assertEqual(family.from_url(url), code)
 
 
