@@ -519,8 +519,7 @@ class MediaWikiVersion:
 
         if self.version != other.version:
             return self.version < other.version
-        else:
-            return self._dev_version < other._dev_version
+        return self._dev_version < other._dev_version
 
 
 class RLock:

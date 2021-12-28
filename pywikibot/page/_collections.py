@@ -87,8 +87,7 @@ class LanguageDict(BaseDataDict):
         """Construct a new LanguageDict from JSON."""
         if data != []:  # workaround for T222159
             return cls({key: value['value'] for key, value in data.items()})
-        else:
-            return cls()
+        return cls()
 
     @classmethod
     def normalizeData(cls, data: dict):

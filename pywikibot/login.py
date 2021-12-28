@@ -424,8 +424,7 @@ class OauthLoginManager(LoginManager):
                 pywikibot.error(e)
                 if retry:
                     return self.login(retry=True, force=force)
-                else:
-                    return False
+                return False
         else:
             pywikibot.output('Logged in to {site} via consumer {key}'
                              .format(key=self.consumer_token[0],
