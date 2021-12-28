@@ -20,6 +20,8 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
+    | MANIFEST.in               | Setup file for package data                               |
+    +---------------------------+-----------------------------------------------------------+
     | pwb.py                    | Code entry wrapper script (directory mode only)           |
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |

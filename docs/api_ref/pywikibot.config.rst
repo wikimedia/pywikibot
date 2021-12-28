@@ -18,6 +18,9 @@ Account Settings
    :start-at: # ############# ACCOUNT SETTINGS
    :end-before: # #############
 
+
+.. _user-interface-settings:
+
 User Interface Settings
 +++++++++++++++++++++++
 
@@ -38,6 +41,7 @@ Logfile Settings
 .. literalinclude:: ../../pywikibot/config.py
    :start-at: # ############# LOGFILE SETTINGS
    :end-before: # #############
+
 
 .. _external-script-path-settings:
 

@@ -685,9 +685,7 @@ class GeneratorFactory:
         :param category: category name with start parameter
         """
         if not category:
-            category = i18n.input(
-                'pywikibot-enter-category-name',
-                fallback_prompt='Please enter the category name:')
+            category = i18n.input('pywikibot-enter-category-name')
         category = category.replace('#', '|')
 
         startfrom = None  # type: Optional[str]
@@ -800,10 +798,7 @@ class GeneratorFactory:
     def _handle_filelinks(self, value: str) -> HANDLER_RETURN_TYPE:
         """Handle `-filelinks` argument."""
         if not value:
-            value = i18n.input(
-                'pywikibot-enter-file-links-processing',
-                fallback_prompt='Links to which file page should be '
-                                'processed?')
+            value = i18n.input('pywikibot-enter-file-links-processing')
         if not value.startswith(self.site.namespace(6) + ':'):
             value = 'Image:' + value
         file_page = pywikibot.FilePage(self.site, value)
@@ -930,9 +925,7 @@ class GeneratorFactory:
     def _handle_interwiki(self, value: str) -> HANDLER_RETURN_TYPE:
         """Handle `-interwiki` argument."""
         if not value:
-            value = i18n.input(
-                'pywikibot-enter-page-processing',
-                fallback_prompt='Which page should be processed?')
+            value = i18n.input('pywikibot-enter-page-processing')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
         return InterwikiPageGenerator(page)
 

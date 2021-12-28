@@ -6,10 +6,13 @@ To create a new distribution:
 
 - replace the developmental version string in ``pywikibot.__metadata__.py``
   by the corresponing final release
+- copy pwb.py to pywikibot/scripts folder
+- copy scripts/i18n/pywikibot folder to pywikibot/scripts/i18n/pywikibot
 - create the package with::
 
     python setup.py sdist
 
+- remove copied files
 - push the change to Gerrit and merge it to the repository
 - upload the package to PyPy by::
 
@@ -256,6 +259,7 @@ def main():
         download_url=metadata.__download_url__,
         test_suite='tests.collector',
         tests_require=test_deps,
+        include_package_data=True,
         entry_points={
             'console_scripts': [
                 'pwb = pywikibot.scripts.pwb:run',
@@ -266,7 +270,65 @@ def main():
             'Environment :: Console',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: MIT License',
+            'Natural Language :: Afrikaans',
+            'Natural Language :: Arabic',
+            'Natural Language :: Basque',
+            'Natural Language :: Bengali',
+            'Natural Language :: Bosnian',
+            'Natural Language :: Bulgarian',
+            'Natural Language :: Cantonese',
+            'Natural Language :: Catalan',
+            'Natural Language :: Chinese (Simplified)',
+            'Natural Language :: Chinese (Traditional)',
+            'Natural Language :: Croatian',
+            'Natural Language :: Czech',
+            'Natural Language :: Danish',
+            'Natural Language :: Dutch',
             'Natural Language :: English',
+            'Natural Language :: Esperanto',
+            'Natural Language :: Finnish',
+            'Natural Language :: French',
+            'Natural Language :: Galician',
+            'Natural Language :: German',
+            'Natural Language :: Greek',
+            'Natural Language :: Hebrew',
+            'Natural Language :: Hindi',
+            'Natural Language :: Hungarian',
+            'Natural Language :: Icelandic',
+            'Natural Language :: Indonesian',
+            'Natural Language :: Irish',
+            'Natural Language :: Italian',
+            'Natural Language :: Japanese',
+            'Natural Language :: Javanese',
+            'Natural Language :: Korean',
+            'Natural Language :: Latin',
+            'Natural Language :: Latvian',
+            'Natural Language :: Lithuanian',
+            'Natural Language :: Macedonian',
+            'Natural Language :: Malay',
+            'Natural Language :: Marathi',
+            'Natural Language :: Nepali',
+            'Natural Language :: Norwegian',
+            'Natural Language :: Panjabi',
+            'Natural Language :: Persian',
+            'Natural Language :: Polish',
+            'Natural Language :: Portuguese',
+            'Natural Language :: Portuguese (Brazilian)',
+            'Natural Language :: Romanian',
+            'Natural Language :: Russian',
+            'Natural Language :: Serbian',
+            'Natural Language :: Slovak',
+            'Natural Language :: Slovenian',
+            'Natural Language :: Spanish',
+            'Natural Language :: Swedish',
+            'Natural Language :: Tamil',
+            'Natural Language :: Telugu',
+            'Natural Language :: Thai',
+            'Natural Language :: Tibetan',
+            'Natural Language :: Turkish',
+            'Natural Language :: Ukrainian',
+            'Natural Language :: Urdu',
+            'Natural Language :: Vietnamese',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
