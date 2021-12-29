@@ -5,7 +5,6 @@ API reference
 ^^^^^^^^^^^^^
 
 .. automodule:: pywikibot.config
-   :noindex:
 
 Option setting
 ^^^^^^^^^^^^^^
