@@ -394,17 +394,23 @@ def init_handlers() -> None:
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
         pid = ''
-        if pywikibot.Site.__doc__ != 'TEST':  # set by aspects.DisableSiteMixin
-            try:  # T286848
-                site = pywikibot.Site()
-                if site is None:  # T289427
-                    raise ValueError('Running script_test with net=False')
-            except ValueError:
-                pass
-            else:  # get PID
-                throttle = site.throttle  # initialize a Throttle obj
-                pid_int = throttle.get_pid(module_name)  # get the global PID
-                pid = str(pid_int) + '-' if pid_int > 1 else ''
+
+        try:  # T286848
+            site = pywikibot.Site()
+            if pywikibot.Site.__doc__ == 'TEST':
+                raise ValueError('Running test with aspects.DisableSiteMixin')
+            if site is None:  # T289427
+                raise ValueError('Running script_test with net=False')
+        except ValueError:
+            pass
+        except AttributeError:
+            # Insufficient import, pywikibot.Site not available (T298384)
+            pass
+        else:  # get PID
+            throttle = site.throttle  # initialize a Throttle obj
+            pid_int = throttle.get_pid(module_name)  # get the global PID
+            pid = str(pid_int) + '-' if pid_int > 1 else ''
+
         if config.logfilename:
             # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
