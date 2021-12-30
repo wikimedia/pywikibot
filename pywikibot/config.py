@@ -540,7 +540,7 @@ tkvertsize = 1000
 # ############# EXTERNAL EDITOR SETTINGS ##############
 # The command for the editor you want to use. If set to None, a simple Tkinter
 # editor will be used.
-editor = os.environ.get('EDITOR', None)
+editor = os.environ.get('EDITOR')
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!

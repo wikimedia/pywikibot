@@ -95,9 +95,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
 
         mw_ver = self.site.mw_version
 
-        if mw_ver.version >= (1, 27):
-            if mw_ver >= '1.27.0-wmf.4' or mw_ver.suffix == 'alpha':
-                known.append('categorize')
+        if mw_ver.version >= (1, 27) \
+           and (mw_ver >= '1.27.0-wmf.4' or mw_ver.suffix == 'alpha'):
+            known.append('categorize')
 
         self._check_param_values(self.site, 'query+watchlist', 'type', known)
 

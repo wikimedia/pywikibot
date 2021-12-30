@@ -729,12 +729,11 @@ class MetaTestCaseClass(type):
             # test class dependencies are declarative, this requires the
             # test writer explicitly sets 'site=False' so code reviewers
             # check that the script invoked by pwb will not load a site.
-            if dct.get('pwb'):
-                if 'site' not in dct:
-                    raise Exception(
-                        '{}: Test classes using pwb must set "site"; add '
-                        'site=False if the test script will not use a site'
-                        .format(name))
+            if dct.get('pwb') and 'site' not in dct:
+                raise Exception(
+                    '{}: Test classes using pwb must set "site"; add '
+                    'site=False if the test script will not use a site'
+                    .format(name))
 
             # If the 'site' attribute is a false value,
             # remove it so it matches 'not site' in pytest.

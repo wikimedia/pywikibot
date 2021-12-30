@@ -26,8 +26,8 @@ class OAuthSiteTestCase(TestCase):
     def _get_oauth_tokens(self):
         """Get valid OAuth tokens from environment variables."""
         tokens_env = 'OAUTH_TOKENS_' + self.family.upper()
-        tokens = os.environ.get(tokens_env + '_' + self.code.upper(), None)
-        tokens = tokens or os.environ.get(tokens_env, None)
+        tokens = os.environ.get(tokens_env + '_' + self.code.upper())
+        tokens = tokens or os.environ.get(tokens_env)
         return tuple(tokens.split(':')) if tokens is not None else None
 
     def setUp(self):
