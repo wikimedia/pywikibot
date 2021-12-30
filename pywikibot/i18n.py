@@ -26,6 +26,7 @@ import re
 
 from collections import abc, defaultdict
 from contextlib import suppress
+from pathlib import Path
 from textwrap import fill
 from typing import Optional, Union
 
@@ -35,6 +36,7 @@ from pywikibot import __url__, config
 from pywikibot.backports import (
     cache,
     Dict,
+    Generator,
     Iterable,
     Iterator,
     List,
@@ -412,6 +414,24 @@ def _altlang(lang: str) -> List[str]:
 
 
 @cache
+def _get_bundle(lang: str, dirname: str) -> Dict[str, str]:
+    """Return json data of certain bundle if exists.
+
+    For internal use, don't use it directly.
+
+    .. versionadded:: 7.0
+    """
+    filename = '{}/{}.json'.format(dirname, lang)
+    try:
+        data = pkgutil.get_data(_messages_package_name, filename)
+        assert data is not None
+        trans_text = data.decode('utf-8')
+    except OSError:  # file open can cause several exceptions
+        return {}
+
+    return json.loads(trans_text)
+
+
 def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     """
     Return message of certain twtitle if exists.
@@ -419,15 +439,7 @@ def _get_translation(lang: str, twtitle: str) -> Optional[str]:
     For internal use, don't use it directly.
     """
     message_bundle = twtitle.split('-')[0]
-    filename = '{}/{}.json'.format(message_bundle, lang)
-    try:
-        data = pkgutil.get_data(_messages_package_name, filename)
-        assert data is not None
-        trans_text = data.decode('utf-8')
-    except OSError:  # file open can cause several exceptions
-        return None
-
-    transdict = json.loads(trans_text)
+    transdict = _get_bundle(lang, message_bundle)
     return transdict.get(twtitle)
 
 
@@ -799,6 +811,34 @@ def twget_keys(twtitle: str) -> List[str]:
     # i.e. an incomplete set of translated messages.
     return [lang for lang in langs
             if lang != 'qqq' and _get_translation(lang, twtitle)]
+
+
+def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
+    """A generator which yields message bundle names or its path objects.
+
+    :param stem: yield the Path.stem if True and the Path object otherwise
+
+    .. versionadded:: 7.0
+    """
+    for dirpath in Path(*_messages_package_name.split('.')).iterdir():
+        if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache
+            if stem:
+                yield dirpath.stem
+            else:
+                yield dirpath
+
+
+def known_languages() -> List[str]:
+    """All languages we have localizations for.
+
+    .. versionadded:: 7.0
+    """
+    langs = set()
+    for dirpath in bundles():
+        for fname in dirpath.iterdir():
+            if fname.suffix == '.json':
+                langs.add(fname.stem)
+    return sorted(langs)
 
 
 def input(twtitle: str,
