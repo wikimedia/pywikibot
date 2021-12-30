@@ -6,6 +6,7 @@
 #
 import unittest
 from contextlib import suppress
+from itertools import chain
 
 import pywikibot
 from pywikibot import i18n
@@ -98,26 +99,20 @@ class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
                                     .format(i18n._messages_package_name))
 
 
-class TestSites(TestCase):
+class TestPackages(TestCase):
 
     """Other test L10N cases processed by unittest."""
 
-    family = 'wikipedia'
-    code = 'en'
+    net = False
 
-    def test_valid_sites(self):
-        """Test whether language key has a corresponding site."""
-        codes = self.site.family.languages_by_size
-        languages = {pywikibot.Site(code, self.family).lang for code in codes}
-        # langs used by foreign wikis
-        languages.update(('pt-br', 'zh-tw'))
-        for package in PACKAGES:
+    def test_valid_package(self):
+        """Test whether package has entries."""
+        for package in chain(['cosmetic_changes-standalone',
+                              'pywikibot-cosmetic-changes'], PACKAGES):
             keys = i18n.twget_keys(package)
-            for key in keys:
-                with self.subTest(package=package, key=key):
-                    self.assertIn(key, languages,
-                                  "json key '{}' is not a site language"
-                                  .format(key))
+            with self.subTest(package=package):
+                self.assertIsNotEmpty(keys)
+                self.assertIn('en', keys)
 
 
 if __name__ == '__main__':  # pragma: no cover
