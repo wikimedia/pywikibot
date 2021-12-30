@@ -14,8 +14,6 @@ class RemovedSite(BaseSite):
 
     """Site removed from a family."""
 
-    pass
-
 
 class ClosedSite(APISite):
     """Site closed to read-only mode."""

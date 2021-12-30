@@ -222,7 +222,7 @@ class ParamInfo(Sized, Container):
         """Emulate the pageset module, which existed until MW 1.24."""
         # pageset isn't a module in the new system, so it is emulated, with
         # the paraminfo from the query module.
-        assert('query' in self._paraminfo)
+        assert 'query' in self._paraminfo
 
         self._paraminfo['pageset'] = {
             'name': 'pageset',

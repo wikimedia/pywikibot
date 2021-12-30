@@ -108,7 +108,7 @@ class DjVuFile:
         def wrapper(obj, *args, **kwargs):
             n = args[0]
             force = kwargs.get('force', False)
-            if not (1 <= n <= obj.number_of_images(force=force)):
+            if not 1 <= n <= obj.number_of_images(force=force):
                 raise ValueError('Page {} not in file {} [{}-{}]'
                                  .format(int(n), obj.file, int(n),
                                          int(obj.number_of_images())))

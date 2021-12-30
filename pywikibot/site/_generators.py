@@ -1506,7 +1506,7 @@ class GeneratorsMixin:
         self._check_view_deleted('deletedrevs', prop)
 
         revids = kwargs.pop('revids', None)
-        if not (bool(titles) ^ (revids is not None)):
+        if not bool(titles) ^ (revids is not None):
             raise Error('deletedrevs: either "titles" or "revids" parameter '
                         'must be given.')
         if revids and self.mw_version < '1.25':

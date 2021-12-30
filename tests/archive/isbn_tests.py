@@ -249,7 +249,6 @@ def setTarget_dummy(self, value):
 
 def editEntity_dummy(self, data=None, **kwargs):
     """Avoid that editEntity writes."""
-    pass
 
 
 def setUpModule():  # noqa: N802
