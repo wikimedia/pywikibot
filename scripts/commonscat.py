@@ -305,7 +305,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
                 self.changeCommonscat(page, currentCommonscatTemplate,
                                       currentCommonscatTarget,
                                       primaryCommonscat,
-                                      checkedCommonscatTarget, LinkText, Note)
+                                      checkedCommonscatTarget, LinkText)
                 return
 
             # Commonscat link is wrong
