@@ -22,10 +22,6 @@ from typing import Optional
 from pywikibot.scripts import _import_with_no_user_config
 
 PYTHON_VERSION = sys.version_info[:2]
-if PYTHON_VERSION >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
 
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
@@ -410,7 +406,7 @@ def ask_for_dir_change(force):
     return userfile, passfile
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and generate user-config.
 

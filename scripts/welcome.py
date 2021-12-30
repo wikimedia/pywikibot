@@ -170,11 +170,10 @@ from datetime import timedelta
 from enum import Enum
 from random import choice
 from textwrap import fill
-from typing import Generator
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import List
+from pywikibot.backports import Dict, Generator, List
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 from pywikibot.tools.formatter import color_format
@@ -468,9 +467,9 @@ class WelcomeBot(SingleSiteBot):
         """Initializer."""
         super().__init__(**kwargs)
         self.check_managed_sites()
-        self.bname = {}
+        self.bname = {}  # type: Dict[str, str]
 
-        self.welcomed_users = []
+        self.welcomed_users = []  # type: List[str]
         self.log_name = i18n.translate(self.site, logbook)
 
         if not self.log_name:
@@ -740,7 +739,7 @@ class WelcomeBot(SingleSiteBot):
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
                 globalvar.randomSign = False
-                return None
+                return []
 
             sign_page = pywikibot.Page(self.site, sign_page_name)
             if sign_page.exists():

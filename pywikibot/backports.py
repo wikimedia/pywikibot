@@ -63,6 +63,7 @@ if PYTHON_VERSION < (3, 9):
     from typing import (
         Dict,
         FrozenSet,
+        Generator,
         Iterable,
         Iterator,
         List,
@@ -75,7 +76,9 @@ if PYTHON_VERSION < (3, 9):
         Type,
     )
 else:
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import (
+        Generator, Iterable, Iterator, Mapping, Sequence,
+    )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
     FrozenSet = frozenset  # type: ignore[misc]
