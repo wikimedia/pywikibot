@@ -74,8 +74,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                         'was found, but langdetect thinks {after!r} is the '
                         'most appropriate with a probability of {prob}:'
                         '\03{{default}}\n{text}'
-                        .format(before=tmp_page.title(withNamespace=False),
-                                after=tmp_page2.title(withNamespace=False),
+                        .format(before=tmp_page.title(with_ns=False),
+                                after=tmp_page2.title(with_ns=False),
                                 prob=langs[0].prob,
                                 text=lang_tmp_val))
                     choice = pywikibot.input_choice(

@@ -634,7 +634,7 @@ class ThreadedGenerator(threading.Thread):
 
     def __iter__(self):
         """Iterate results from the queue."""
-        if not self.is_alive() and not self.finished.isSet():
+        if not self.is_alive() and not self.finished.is_set():
             self.start()
         # if there is an item in the queue, yield it, otherwise wait
         while not self.finished.is_set():
