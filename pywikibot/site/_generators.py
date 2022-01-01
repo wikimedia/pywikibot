@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1703,9 +1703,8 @@ class GeneratorsMixin:
         """
         # If patrol is not enabled, attr will be set the first time a
         # request is done.
-        if hasattr(self, '_patroldisabled'):
-            if self._patroldisabled:
-                return
+        if hasattr(self, '_patroldisabled') and self._patroldisabled:
+            return
 
         if all(_ is None for _ in [rcid, revid, revision]):
             raise Error('No rcid, revid or revision provided.')

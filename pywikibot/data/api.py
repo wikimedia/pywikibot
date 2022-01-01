@@ -1,6 +1,6 @@
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1233,10 +1233,10 @@ class Request(MutableMapping):
                 uiprop = self._params.get('uiprop', [])
                 uiprop = set(uiprop + ['blockinfo', 'hasmsg'])
                 self['uiprop'] = sorted(uiprop)
-            if 'prop' in self._params:
-                if self.site.has_extension('ProofreadPage'):
-                    prop = set(self['prop'] + ['proofread'])
-                    self['prop'] = sorted(prop)
+            if 'prop' in self._params \
+               and self.site.has_extension('ProofreadPage'):
+                prop = set(self['prop'] + ['proofread'])
+                self['prop'] = sorted(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'
@@ -2548,9 +2548,9 @@ class QueryGenerator(_RequestWrapper):
         """Extract results from resultdata."""
         for item in resultdata:
             result = self.result(item)
-            if self._namespaces:
-                if not self._check_result_namespace(result):
-                    continue
+            if self._namespaces and not self._check_result_namespace(result):
+                continue
+
             yield result
             if isinstance(item, dict) \
                     and set(self.continuekey) & set(item.keys()):
@@ -2884,13 +2884,13 @@ class LoginManager(login.LoginManager):
         takes care of all the cookie stuff. Throws exception on failure.
         """
         self.below_mw_1_27 = False
-        if hasattr(self, '_waituntil'):
-            if datetime.datetime.now() < self._waituntil:
-                diff = self._waituntil - datetime.datetime.now()
-                pywikibot.warning(
-                    'Too many tries, waiting {} seconds before retrying.'
-                    .format(diff.seconds))
-                pywikibot.sleep(diff.seconds)
+        if hasattr(self, '_waituntil') \
+           and datetime.datetime.now() < self._waituntil:
+            diff = self._waituntil - datetime.datetime.now()
+            pywikibot.warning(
+                'Too many tries, waiting {} seconds before retrying.'
+                .format(diff.seconds))
+            pywikibot.sleep(diff.seconds)
 
         self.site._loginstatus = LoginStatus.IN_PROGRESS
 
@@ -3017,11 +3017,10 @@ def _update_pageid(page, pagedict: dict):
         page._pageid = 0  # Non-existent page
     else:
         # Something is wrong.
-        if page.site.sametitle(page.title(), pagedict['title']):
-            if 'invalid' in pagedict:
-                raise InvalidTitleError('{}: {}'
-                                        .format(page,
-                                                pagedict['invalidreason']))
+        if page.site.sametitle(page.title(), pagedict['title']) \
+           and 'invalid' in pagedict:
+            raise InvalidTitleError('{}: {}'
+                                    .format(page, pagedict['invalidreason']))
         if int(pagedict['ns']) < 0:
             raise UnsupportedPageError(page)
         raise RuntimeError(

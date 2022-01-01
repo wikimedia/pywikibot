@@ -43,7 +43,7 @@ Example
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -385,9 +385,11 @@ def main(*args: str) -> None:
         if arg == '-replacealways':
             options['replace'] = True
             options['replacealways'] = True
-        elif arg.startswith('-'):
-            if arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
-                options[arg[1:]] = True
+        elif arg.startswith('-') and arg[1:] in ('always',
+                                                 'replace',
+                                                 'replaceloose',
+                                                 'replaceonly'):
+            options[arg[1:]] = True
 
     bot = NowCommonsDeleteBot(**options)
     bot.run()

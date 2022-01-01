@@ -1,6 +1,6 @@
 """Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -101,7 +101,7 @@ class Siteinfo(Container):
         # query this method to actually get the version number
 
         # Convert boolean props from empty strings to actual boolean values
-        if prop in Siteinfo.BOOLEAN_PROPS.keys():
+        if prop in Siteinfo.BOOLEAN_PROPS:
             # siprop=namespaces and
             # magicwords has properties per item in result
             if prop in ('namespaces', 'magicwords'):

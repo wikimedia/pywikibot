@@ -42,7 +42,7 @@ Commandline parameters:
 
 """
 #
-# (C) Pywikibot team, 2011-2021
+# (C) Pywikibot team, 2011-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -307,11 +307,11 @@ class PatrolBot(BaseBot):
                                .format(username, title))
                 choice = True
 
-        if not choice and username in self.whitelist:
-            if self.in_list(self.whitelist[username], title):
-                verbose_output('{} is whitelisted to modify {}'
-                               .format(username, title))
-                choice = True
+        if not choice and username in self.whitelist \
+           and self.in_list(self.whitelist[username], title):
+            verbose_output('{} is whitelisted to modify {}'
+                           .format(username, title))
+            choice = True
 
         if self.opt.ask:
             choice = pywikibot.input_yn(
@@ -426,10 +426,9 @@ def main(*args: str) -> None:
             options['whitelist'] = arg[len('-whitelist:'):]
         else:
             generator = gen_factory.handle_arg(arg)
-            if not generator:
-                if ':' in arg:
-                    m = arg.split(':')
-                    options[m[0]] = m[1]
+            if not generator and ':' in arg:
+                m = arg.split(':')
+                options[m[0]] = m[1]
 
     if usercontribs:
         user = pywikibot.User(site, usercontribs)

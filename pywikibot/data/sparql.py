@@ -1,6 +1,6 @@
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ from urllib.parse import quote
 from requests.exceptions import Timeout
 
 from pywikibot import Site, config, sleep, warning
+from pywikibot.backports import Dict, List
 from pywikibot.comms import http
 from pywikibot.exceptions import Error, TimeoutError
 
@@ -89,8 +90,11 @@ class SparqlQuery:
         """
         return self.last_response
 
-    def select(self, query: str, full_data: bool = False,
-               headers=DEFAULT_HEADERS):
+    def select(self,
+               query: str,
+               full_data: bool = False,
+               headers: Optional[Dict[str, str]] = None
+               ) -> Optional[List[Dict[str, str]]]:
         """
         Run SPARQL query and return the result.
 
@@ -99,37 +103,43 @@ class SparqlQuery:
 
         :param query: Query text
         :param full_data: Whether return full data objects or only values
-        :return: List of query results or None if query failed
         """
-        data = self.query(query, headers=headers)
-        if data and 'results' in data:
-            result = []
-            qvars = data['head']['vars']
-            for row in data['results']['bindings']:
-                values = {}
-                for var in qvars:
-                    if var not in row:
-                        # var is not available (OPTIONAL is probably used)
-                        values[var] = None
-                    elif full_data:
-                        if row[var]['type'] not in VALUE_TYPES:
-                            raise ValueError('Unknown type: {}'
-                                             .format(row[var]['type']))
-                        valtype = VALUE_TYPES[row[var]['type']]
-                        values[var] = valtype(row[var],
-                                              entity_url=self.entity_url)
-                    else:
-                        values[var] = row[var]['value']
-                result.append(values)
-            return result
-        return None
+        if headers is None:
+            headers = DEFAULT_HEADERS
 
-    def query(self, query: str, headers=DEFAULT_HEADERS):
+        data = self.query(query, headers=headers)
+        if not data or 'results' not in data:
+            return None
+
+        result = []
+        qvars = data['head']['vars']
+        for row in data['results']['bindings']:
+            values = {}
+            for var in qvars:
+                if var not in row:
+                    # var is not available (OPTIONAL is probably used)
+                    values[var] = None
+                elif full_data:
+                    if row[var]['type'] not in VALUE_TYPES:
+                        raise ValueError('Unknown type: {}'
+                                         .format(row[var]['type']))
+                    valtype = VALUE_TYPES[row[var]['type']]
+                    values[var] = valtype(row[var],
+                                          entity_url=self.entity_url)
+                else:
+                    values[var] = row[var]['value']
+            result.append(values)
+        return result
+
+    def query(self, query: str, headers: Optional[Dict[str, str]] = None):
         """
         Run SPARQL query and return parsed JSON result.
 
         :param query: Query text
         """
+        if headers is None:
+            headers = DEFAULT_HEADERS
+
         url = '{}?query={}'.format(self.endpoint, quote(query))
         while True:
             try:
@@ -137,12 +147,16 @@ class SparqlQuery:
             except Timeout:
                 self.wait()
                 continue
+
             if not self.last_response.text:
-                return None
+                break
+
             try:
                 return json.loads(self.last_response.text)
             except ValueError:
-                return None
+                break
+
+        return None
 
     def wait(self):
         """Determine how long to wait after a failed request."""
@@ -154,12 +168,15 @@ class SparqlQuery:
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
-    def ask(self, query: str, headers=DEFAULT_HEADERS) -> bool:
+    def ask(self, query: str,
+            headers: Optional[Dict[str, str]] = None) -> bool:
         """
         Run SPARQL ASK query and return boolean result.
 
         :param query: Query text
         """
+        if headers is None:
+            headers = DEFAULT_HEADERS
         data = self.query(query, headers=headers)
         return data['boolean']
 

@@ -328,7 +328,7 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2414,9 +2414,8 @@ def main(*args: str) -> None:
         elif arg.startswith('-until:'):
             until = arg[7:]
         else:
-            if not genFactory.handle_arg(arg):
-                if not singlePageTitle:
-                    singlePageTitle = arg
+            if not genFactory.handle_arg(arg) and not singlePageTitle:
+                singlePageTitle = arg
 
     # Do not use additional summary with autonomous mode
     if iwconf.autonomous:

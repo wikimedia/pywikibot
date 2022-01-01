@@ -29,7 +29,7 @@ build paths relative to base_dir:
    config2 was renamed to config
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1130,23 +1130,24 @@ if __name__ == '__main__':
             _all = False
         else:
             warning('Unknown arg {} ignored'.format(_arg))
+
     for _name in sorted(globals().keys()):
-        if _name[0] != '_':
-            if not type(globals()[_name]) in [types.FunctionType,
-                                              types.ModuleType]:
-                if _all or _name in _modified:
-                    _value = globals()[_name]
-                    if _name in _private_values and _value:
-                        if isinstance(_value, dict):
-                            _value = '{ ...xxxxxxxx... }'
-                        elif hasattr(_value, '__dict__'):
-                            _value = (_value.__class__.__name__
-                                      + '( ...xxxxxxxx... )')
-                        else:
-                            _value = repr('xxxxxxxx')
-                    else:
-                        _value = repr(_value)
-                    output('{}={}'.format(_name, _value))
+        if _name[0] != '_' \
+           and not type(globals()[_name]) in [types.FunctionType,
+                                              types.ModuleType] \
+           and (_all or _name in _modified):
+            _value = globals()[_name]
+
+            if _name not in _private_values or not _value:
+                _value = repr(_value)
+            elif isinstance(_value, dict):
+                _value = '{ ...xxxxxxxx... }'
+            elif hasattr(_value, '__dict__'):
+                _value = (_value.__class__.__name__
+                          + '( ...xxxxxxxx... )')
+            else:
+                _value = repr('xxxxxxxx')
+            output('{}={}'.format(_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):

@@ -1,6 +1,6 @@
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -326,5 +326,4 @@ class Throttle:
 
     def get_pid(self, module: str) -> int:
         """Get the global pid if the module is running multiple times."""
-        global pid
         return pid if self.modules[self._module_hash(module)] > 1 else 0

@@ -66,7 +66,7 @@ Furthermore the following options are provided:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,10 +155,11 @@ class RedirectGenerator(OptionHandler):
             # always print status message after 10000 pages
             if readPagesCount % 10000 == 0:
                 pywikibot.output('{} pages read...'.format(readPagesCount))
-            if self.opt.namespaces:
-                if pywikibot.Page(self.site, entry.title).namespace() \
-                        not in self.opt.namespaces:
-                    continue
+            if self.opt.namespaces and pywikibot.Page(
+                    self.site,
+                    entry.title).namespace() not in self.opt.namespaces:
+                continue
+
             if alsoGetPageTitles:
                 pageTitles.add(space_to_underscore(pywikibot.Link(entry.title,
                                                                   self.site)))
