@@ -686,10 +686,9 @@ class DisambiguationRobot(SingleSiteBot):
         # Currently scripts may have its own options set
         added_keys = []
         for key in keys:
-            if key != 'generator':
-                if key not in self.available_options:
-                    added_keys.append(key)
-                    self.available_options[key] = self.disambig_options[key]
+            if key != 'generator' and key not in self.available_options:
+                added_keys.append(key)
+                self.available_options[key] = self.disambig_options[key]
         if added_keys:
             pywikibot.warning("""\
 The following keys were added to available_options:
@@ -1285,9 +1284,9 @@ or press enter to quit:""")
         )
         gen = pagegenerators.PreloadingGenerator(gen)
         for ref_page in gen:
-            if not self.primaryIgnoreManager.isIgnored(ref_page):
-                if not self.treat_links(ref_page, page):
-                    break  # next disambig
+            if not self.primaryIgnoreManager.isIgnored(ref_page) \
+               and not self.treat_links(ref_page, page):
+                break  # next disambig
 
         # clear alternatives before working on next disambiguation page
         self.opt.pos = []

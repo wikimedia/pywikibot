@@ -99,10 +99,6 @@ class TestInterwikiMap(TestCase):
             iw_site = site.interwiki(prefix)
             self.assertEqual(iw_site.family, site.family)
 
-    def test_interwiki_prefix(self, key):
-        """Test site.interwiki_prefix method."""
-        self.assertTrue(True)
-
 
 class TestInterwikiMapPrefix(TestCase):
 
