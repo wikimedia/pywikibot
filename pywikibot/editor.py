@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Text editor class for your favourite editor."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -69,7 +69,7 @@ class TextEditor:
 
     @staticmethod
     def _concat(command: Sequence[str]) -> str:
-        return ' '.join("'{}'".format(part) if ' ' in part else part
+        return ' '.join('{!r}'.format(part) if ' ' in part else part
                         for part in command)
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,
