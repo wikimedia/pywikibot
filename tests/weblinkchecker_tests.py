@@ -28,10 +28,11 @@ class MementoTestCase(TestCase):
         else:
             when = datetime.datetime.strptime(date_string, '%Y%m%d')
         try:
-            return weblinkchecker._get_closest_memento_url(
+            result = weblinkchecker._get_closest_memento_url(
                 url, when, self.timegate_uri)
         except (RequestsConnectionError, MementoClientException) as e:
             self.skipTest(e)
+        return result
 
 
 class TestMementoWebCite(MementoTestCase):

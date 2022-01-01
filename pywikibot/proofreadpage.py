@@ -1021,7 +1021,7 @@ class IndexPage(pywikibot.Page):
         if end is None:
             end = self.num_pages
 
-        if not (1 <= start <= end <= self.num_pages):
+        if not 1 <= start <= end <= self.num_pages:
             raise ValueError('start={}, end={} are not in valid range (1, {})'
                              .format(start, end, self.num_pages))
 

@@ -167,7 +167,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             if issubclass(warn_msg.category, ResourceWarning) \
                and str(warn_msg.message).startswith(
                    ('unclosed <ssl.SSLSocket', 'unclosed <socket.socket')):
-                return None
+                return
 
             log.append(warn_msg)
 
@@ -395,6 +395,7 @@ class DrySite(pywikibot.site.APISite):
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
                                   interface=DryDataSite)
+        return None
 
 
 class DryDataSite(DrySite, pywikibot.site.DataSite):

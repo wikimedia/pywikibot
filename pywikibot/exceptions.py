@@ -506,8 +506,6 @@ class SectionError(Error):
 
     """The section specified by # does not exist."""
 
-    pass
-
 
 class NoCreateError(PageSaveRelatedError):
 
