@@ -326,4 +326,4 @@ def get_unicode_console() -> Tuple[IO, IO, IO, List[str]]:
         _complain('exception {!r} while fixing up sys.stdout and sys.stderr'
                   .format(e))
 
-    return stdin, stdout, stderr
+    return stdin, stdout, stderr, argv
