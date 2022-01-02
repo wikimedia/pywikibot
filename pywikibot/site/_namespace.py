@@ -12,6 +12,10 @@ from pywikibot.backports import List
 from pywikibot.tools import ComparableMixin, SelfCallMixin
 
 
+NamespaceIDType = 'Union[int, str, Namespace]'
+NamespaceArgType = 'Union[NamespaceIDType, Iterable[NamespaceIDType], None]'
+
+
 class BuiltinNamespace(IntEnum):
 
     """Builtin namespace enum."""

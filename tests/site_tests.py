@@ -369,6 +369,56 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertLessEqual(no_redirs, embedded_ns_0)
         self.assertLessEqual(embedded_ns_0, embedded_ns_0_2)
 
+    def test_page_redirects(self):
+        """Test Site.page_redirects."""
+        if self.get_site().mw_version < '1.24':
+            self.skipTest('site.page_redirects() needs mw 1.24')
+
+        redirects_ns_0 = set(self.site.page_redirects(
+            self.mainpage,
+            namespaces=0,
+        ))
+        redirects_ns_0_4 = set(self.site.page_redirects(
+            self.mainpage,
+            namespaces=[0, 4],
+        ))
+        redirects_ns_0_frag = set(self.site.page_redirects(
+            self.mainpage,
+            filter_fragments=True,
+            namespaces=0,
+        ))
+        redirects_ns_0_nofrag = set(self.site.page_redirects(
+            self.mainpage,
+            filter_fragments=False,
+            namespaces=0,
+        ))
+
+        self.assertLessEqual(redirects_ns_0, redirects_ns_0_4)
+        self.assertLessEqual(redirects_ns_0_frag, redirects_ns_0)
+        self.assertLessEqual(redirects_ns_0_nofrag, redirects_ns_0)
+
+        for redirect in redirects_ns_0_4:
+            self.assertIsInstance(redirect, pywikibot.Page)
+            self.assertIn(redirect.namespace(), [0, 4])
+            self.assertTrue(redirect.isRedirectPage())
+
+        for redirect in redirects_ns_0:
+            self.assertEqual(redirect.namespace(), 0)
+
+        for redirect in redirects_ns_0_frag:
+            redirect_target = redirect.getRedirectTarget()
+            self.assertIsNotNone(redirect_target.section())
+            redirect_target = pywikibot.Page(
+                redirect_target.site,
+                redirect_target.title(with_section=False)
+            )
+            self.assertEqual(redirect_target, self.mainpage)
+
+        for redirect in redirects_ns_0_nofrag:
+            redirect_target = redirect.getRedirectTarget()
+            self.assertIsNone(redirect_target.section())
+            self.assertEqual(redirect_target, self.mainpage)
+
     def test_pagecategories(self):
         """Test Site.pagecategories."""
         for cat in self.site.pagecategories(self.mainpage):

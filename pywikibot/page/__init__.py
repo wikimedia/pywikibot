@@ -65,7 +65,7 @@ from pywikibot.page._collections import (
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._revision import Revision
-from pywikibot.site import DataSite, Namespace
+from pywikibot.site import DataSite, Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     compute_file_hash,
@@ -962,6 +962,34 @@ class BasePage(ComparableMixin):
             namespaces=namespaces,
             total=total,
             content=content
+        )
+
+    def redirects(
+        self,
+        *,
+        filter_fragments: Optional[bool] = None,
+        namespaces: NamespaceArgType = None,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> 'Iterable[pywikibot.Page]':
+        """
+        Return an iterable of redirects to this page.
+
+        :param filter_fragments: If True, only return redirects with fragments.
+            If False, only return redirects without fragments. If None, return
+            both (no filtering).
+        :param namespaces: only return redirects from these namespaces
+        :param total: maximum number of redirects to retrieve in total
+        :param content: load the current content of each redirect
+
+        .. versionadded:: 7.0
+        """
+        return self.site.page_redirects(
+            self,
+            filter_fragments=filter_fragments,
+            namespaces=namespaces,
+            total=total,
+            content=content,
         )
 
     def protection(self) -> dict:

@@ -8,6 +8,7 @@ from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._datasite import DataSite
 from pywikibot.site._namespace import Namespace, NamespacesDict
+from pywikibot.site._namespace import NamespaceArgType  # noqa: F401
 from pywikibot.site._obsoletesites import ClosedSite, RemovedSite
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet

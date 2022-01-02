@@ -14,7 +14,7 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.backports import Dict, List
+from pywikibot.backports import Dict, Iterable, List
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -25,6 +25,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import (
     deprecated,
     filter_unique,
@@ -287,6 +288,39 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, type_arg='embeddedin',
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
+
+    @need_version('1.24')
+    def page_redirects(
+        self,
+        page: 'pywikibot.Page',
+        *,
+        filter_fragments: Optional[bool] = None,
+        namespaces: NamespaceArgType = None,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> 'Iterable[pywikibot.Page]':
+        """Iterale all redirects to the given page.
+
+        :see: https://www.mediawiki.org/wiki/API:Redirects
+
+        :param page: The Page to get redirects for.
+        :param filter_fragments: If True, only return redirects with fragments.
+            If False, only return redirects without fragments. If None, return
+            both (no filtering).
+        :param namespaces: Only return redirects from the namespaces
+        :param total: maximum number of redirects to retrieve in total
+        :param content: load the current content of each redirect
+
+        .. versionadded:: 7.0
+        """
+        rdargs = {
+            'titles': page.title(with_section=False).encode(self.encoding()),
+        }
+        if filter_fragments is not None:
+            rdargs['grdshow'] = ('' if filter_fragments else '!') + 'fragment'
+        return self._generator(api.PageGenerator, type_arg='redirects',
+                               namespaces=namespaces, total=total,
+                               g_content=content, **rdargs)
 
     def pagereferences(self, page, *, follow_redirects=False,
                        filter_redirects=None, with_template_inclusion=True,
