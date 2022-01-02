@@ -27,7 +27,7 @@ To create a new distribution:
 - upload this patchset to Gerrit and merge it.
 """
 #
-# (C) Pywikibot team, 2009-2021
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,7 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.16'],
+    'isbn': ['python-stdnum>=1.17'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],

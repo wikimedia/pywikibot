@@ -40,7 +40,7 @@ mwoauth>=0.2.4,!=0.3.1
 pydot >= 1.2
 
 # cosmetic_changes
-python-stdnum >= 1.16
+python-stdnum >= 1.17
 
 # GUI
 Pillow >= 8.1.1 ; python_version >= '3.6'
