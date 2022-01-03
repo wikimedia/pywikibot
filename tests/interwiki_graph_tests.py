@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Test Interwiki Graph functionality."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(TestWiktionaryGraph, cls).setUpClass()
+        super().setUpClass()
 
         cls.pages = {
             'en': DryPage(cls.enwikt, 'origin'),

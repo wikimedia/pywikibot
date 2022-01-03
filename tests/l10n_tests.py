@@ -1,6 +1,6 @@
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,7 +93,7 @@ class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
     @classmethod
     def setUpClass(cls):
         """Skip test gracefully if i18n package is missing."""
-        super(TestValidTemplate, cls).setUpClass()
+        super().setUpClass()
         if not i18n.messages_available():
             raise unittest.SkipTest("i18n messages package '{}' not available."
                                     .format(i18n._messages_package_name))
