@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Insert a language template into the description field."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
 
     def __init__(self, **kwargs):
         """Initialzer."""
-        super(InformationBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
         self.lang_tmps = lang_tmp_cat.articles(namespaces=[10])
 

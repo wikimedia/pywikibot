@@ -1,6 +1,6 @@
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -842,7 +842,7 @@ class TestLazyLoginBase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up steward Family."""
-        super(TestLazyLoginBase, cls).setUpClass()
+        super().setUpClass()
         fam = pywikibot.family.AutoFamily(
             'steward', 'https://steward.wikimedia.org/w/api.php')
         cls.site = pywikibot.site.APISite('steward', fam)
