@@ -1354,8 +1354,7 @@ class BasePage(ComparableMixin):
         if self.exists():
             # ensure always get the page text and not to change it.
             del self.text
-            summary = i18n.twtranslate(self.site, 'pywikibot-touch',
-                                       fallback_prompt='Pywikibot touch edit')
+            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
             self.save(summary=summary, watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,

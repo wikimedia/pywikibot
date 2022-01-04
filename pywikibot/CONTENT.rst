@@ -127,6 +127,8 @@ The contents of the package
     | version.py                 | Outputs Pywikibot's revision number, Python's        |
     |                            | version and OS used.                                 |
     +----------------------------+------------------------------------------------------+
+    | i18n (folder)              | Contains i18n translations (site-package only)       |
+    +----------------------------+------------------------------------------------------+
 
 
     +----------------------------+------------------------------------------------------+

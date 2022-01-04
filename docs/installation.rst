@@ -18,5 +18,26 @@ the site-package. For more settings use
 :mod:`generate_user_files<pywikibot.scripts.generate_user_files>` script
 or refer :py:mod:`pywikibot.config` module.
 
-.. note::
-   Please also see the documentation at :manpage:`Installation`
+.. seealso:: :manpage:`Installation` Manual
+
+
+Internationalisation (i18n)
+---------------------------
+
+Some of the framework input interaction is translated. The user interface
+language to be used can be set as follows:
+
+#. set the `userinterface_lang` in your :ref:`user-config.py<user-interface-settings>` to your preferred language
+#. set environment variable `PYWIKIBOT_USERINTERFACE_LANG` to your preferred language
+#. default is obtained from `locale.getdefaultlocale`
+#. fallback is `'en'` for english if all other options fails
+
+.. note:: The preferred language code must follow ISO 639.
+.. versionadded:: 7.0
+   Added to site-package distribution
+.. seealso::
+   * :manpage:`i18n` Manual
+   * `MediaWiki Language Codes <https://www.mediawiki.org/wiki/Manual:Language#Language_code>`_
+   * :ref:`User Interface Settings<user-interface-settings>`
+   * :py:mod:`pywikibot.i18n`
+

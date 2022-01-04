@@ -826,3 +826,7 @@ def input(twtitle: str,
             'Unable to load messages package {} for bundle {}'
             .format(_messages_package_name, twtitle))
     return pywikibot.input(prompt, password)
+
+
+if not messages_available():
+    set_messages_package('pywikibot.scripts.i18n')
