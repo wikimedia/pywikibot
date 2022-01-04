@@ -1496,7 +1496,7 @@ class Request(MutableMapping):
                 pywikibot.warning('Caught HTTP 414 error, although not '
                                   'using GET.')
                 raise
-        except FatalServerError:
+        except (ConnectionError, FatalServerError):
             # This error is not going to be fixed by just waiting
             pywikibot.error(traceback.format_exc())
             raise
