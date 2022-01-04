@@ -114,6 +114,24 @@ class TestPackages(TestCase):
                 self.assertIsNotEmpty(keys)
                 self.assertIn('en', keys)
 
+    def test_package_bundles(self):
+        """Test whether package bundles has valid entries."""
+        langs = i18n.known_languages()
+        self.assertIsInstance(langs, list)
+        self.assertIsNotEmpty(langs)
+        for dirname in i18n.bundles(stem=True):
+            for lang in langs:
+                with self.subTest(bundle=dirname, lang=lang):
+                    bundle = i18n._get_bundle(lang, dirname)
+                    if lang in ('en', 'qqq'):
+                        self.assertIsNotEmpty(bundle)
+                    for key in bundle.keys():
+                        if key == '@metadata':
+                            continue
+                        self.assertTrue(key.startswith(dirname),
+                                        '{!r} does not start with {!r}'
+                                        .format(key, dirname))
+
 
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
