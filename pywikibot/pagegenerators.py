@@ -13,7 +13,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -442,16 +442,8 @@ NAMESPACE_OR_STR_TYPE = Union[str, 'pywikibot.site.Namespace']
 ITEM_CLAIM_FILTER_CLASS = Type['ItemClaimFilter']
 REGEX_FILTER_CLASS = Type['RegexFilter']
 
-# The following should be...
-#
 PATTERN_STR_OR_SEQ_TYPE = Union[str, Pattern[str],
                                 Sequence[str], Sequence[Pattern[str]]]
-#
-# Doing so fails under Python 3.5.0 with...
-#
-#   TypeError: cannot create weak reference to '_TypeAlias' object
-
-# PATTERN_STR_OR_SEQ_TYPE = Any
 
 # if a bot uses GeneratorFactory, the module should include the line
 #   docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
