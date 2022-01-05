@@ -1,6 +1,6 @@
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,8 @@ from contextlib import suppress
 
 from pywikibot import Page
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit
+from pywikibot.site._namespace import NamespacesDict
+
 from tests.aspects import TestCase
 
 
@@ -22,7 +24,7 @@ class TestCosmeticChanges(TestCase):
     @classmethod
     def setUpClass(cls):
         """Setup class for all tests."""
-        super(TestCosmeticChanges, cls).setUpClass()
+        super().setUpClass()
         cls.cct = CosmeticChangesToolkit(Page(cls.site, 'Test'))
 
 
@@ -137,100 +139,6 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
                 '{{Quellen_fehlen|foo}}'
             ))
 
-    def test_fixSyntaxSave(self):
-        """Test fixSyntaxSave method."""
-        # necessary as the fixer needs the article path to fix it
-        self.cct.site._siteinfo._cache['general'] = (
-            {'articlepath': '/wiki/$1'}, True)
-        self.cct.site._namespaces = {
-            6: ['Datei', 'File'],
-            14: ['Kategorie', 'Category'],
-        }
-        self.assertEqual(
-            '[[Example|Page]]\n[[Example|Page]]\n[[Example|Page]]\n'
-            '[[Example]]\n[[Example]]\n[[Example]]\n'
-            '[https://de.wikipedia.org/w/index.php?title=Example&'
-            'oldid=68181978 Page]\n'
-            '[https://de.wikipedia.org/w/index.php?title=Example&'
-            'oldid=68181978&diff=next Page]\n'
-            '[https://en.wikipedia.org/w/index.php?title=Example]\n'
-            '[https://de.wiktionary.org/w/index.php?title=Example]\n',
-            self.cct.fixSyntaxSave(
-                '[https://de.wikipedia.org/w/index.php?title=Example Page]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example Page ]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example  Page ]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example ]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example  ]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example&'
-                'oldid=68181978 Page]\n'
-                '[https://de.wikipedia.org/w/index.php?title=Example&'
-                'oldid=68181978&diff=next Page]\n'
-                '[https://en.wikipedia.org/w/index.php?title=Example]\n'
-                '[https://de.wiktionary.org/w/index.php?title=Example]\n'
-            ))
-        self.assertEqual(
-            '[[Example]]\n[[Example]]\n[[Example]]\n'
-            '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
-            '[https://de.wikipedia.org/wiki/Example?'
-            'oldid=68181978&diff=next Page]\n'
-            '[[Example]]\n[[Example]]\n[[Example]]\n'
-            '[https://de.wikipedia.org/w/index.php/Example?'
-            'oldid=68181978 Page]\n'
-            '[https://de.wikipedia.org/w/index.php/Example?'
-            'oldid=68181978&diff=next Page]\n'
-            '[[&]]\n[[&]]\n',
-            self.cct.fixSyntaxSave(
-                '[https://de.wikipedia.org/wiki/Example]\n'
-                '[https://de.wikipedia.org/wiki/Example ]\n'
-                '[https://de.wikipedia.org/wiki/Example  ]\n'
-                '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
-                '[https://de.wikipedia.org/wiki/Example?'
-                'oldid=68181978&diff=next Page]\n'
-                '[https://de.wikipedia.org/w/index.php/Example]\n'
-                '[https://de.wikipedia.org/w/index.php/Example ]\n'
-                '[https://de.wikipedia.org/w/index.php/Example  ]\n'
-                '[https://de.wikipedia.org/w/index.php/Example?'
-                'oldid=68181978 Page]\n'
-                '[https://de.wikipedia.org/w/index.php/Example?'
-                'oldid=68181978&diff=next Page]\n'
-                '[https://de.wikipedia.org/wiki/&]\n'
-                '[https://de.wikipedia.org/w/index.php/&]\n'
-            ))
-        self.assertEqual(
-            '[https://de.wikipedia.org]',
-            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))
-        self.assertEqual(
-            '[https://de.wikipedia.org]',
-            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]'))
-        self.assertEqual(
-            '[https://de.wikipedia.org/w/api.php API]',
-            self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
-        self.assertEqual(
-            '[[:Kategorie:Example]]\n'
-            '[[:Category:Example|Description]]\n'
-            '[[:Datei:Example.svg]]\n'
-            '[[:File:Example.svg|Description]]\n'
-            '[[:Category:Example]]\n'
-            '[[:Kategorie:Example|Description]]\n'
-            '[[:File:Example.svg]]\n'
-            '[[:Datei:Example.svg|Description]]\n',
-            self.cct.fixSyntaxSave(
-                '[https://de.wikipedia.org/wiki/Kategorie:Example]\n'
-                '[https://de.wikipedia.org/wiki/Category:Example '
-                'Description]\n'
-                '[https://de.wikipedia.org/wiki/Datei:Example.svg]\n'
-                '[https://de.wikipedia.org/wiki/File:Example.svg '
-                'Description]\n'
-                '[[https://de.wikipedia.org/wiki/Category:Example]]\n'
-                '[[https://de.wikipedia.org/wiki/Kategorie:Example '
-                'Description]]\n'
-                '[[https://de.wikipedia.org/wiki/File:Example.svg]]\n'
-                '[[https://de.wikipedia.org/wiki/Datei:Example.svg '
-                'Description]]\n'
-            ))
-        del self.cct.site._namespaces
-
     def test_fixHtml(self):
         """Test fixHtml method."""
         self.assertEqual("'''Foo''' bar",
@@ -271,6 +179,126 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         text = '1234,كىي'
         # fixArabicLetters must not change text when site is not fa or ckb
         self.assertEqual(text, self.cct.fixArabicLetters(text))
+
+
+class TestDryFixSyntaxSave(TestCosmeticChanges):
+
+    """Test fixSyntaxSave not requiring a live wiki."""
+
+    dry = True
+
+    @classmethod
+    def setUpClass(cls):
+        """Setup class for all tests."""
+        super().setUpClass()
+        cls.cct.site._siteinfo._cache['general'] = (
+            {'articlepath': '/wiki/$1'}, True)
+        cls.cct.site._namespaces = NamespacesDict({
+            6: ['Datei', 'File'],
+            14: ['Kategorie', 'Category'],
+        })
+
+    def test_title_param(self):
+        """Test fixing url with title parameter."""
+        # necessary as the fixer needs the article path to fix it
+        self.assertEqual(
+            '[[Example|Page]]\n[[Example|Page]]\n[[Example|Page]]\n'
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/w/index.php?title=Example&'
+            'oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/w/index.php?title=Example&'
+            'oldid=68181978&diff=next Page]\n'
+            '[https://en.wikipedia.org/w/index.php?title=Example]\n'
+            '[https://de.wiktionary.org/w/index.php?title=Example]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/w/index.php?title=Example Page]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example Page ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example  Page ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example  ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example&'
+                'oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example&'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://en.wikipedia.org/w/index.php?title=Example]\n'
+                '[https://de.wiktionary.org/w/index.php?title=Example]\n'
+            ))
+
+    def test_fix_url(self):
+        """Test fixing urls."""
+        self.assertEqual(
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/wiki/Example?'
+            'oldid=68181978&diff=next Page]\n'
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/w/index.php/Example?'
+            'oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/w/index.php/Example?'
+            'oldid=68181978&diff=next Page]\n'
+            '[[&]]\n[[&]]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/wiki/Example]\n'
+                '[https://de.wikipedia.org/wiki/Example ]\n'
+                '[https://de.wikipedia.org/wiki/Example  ]\n'
+                '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/wiki/Example?'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://de.wikipedia.org/w/index.php/Example]\n'
+                '[https://de.wikipedia.org/w/index.php/Example ]\n'
+                '[https://de.wikipedia.org/w/index.php/Example  ]\n'
+                '[https://de.wikipedia.org/w/index.php/Example?'
+                'oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/w/index.php/Example?'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://de.wikipedia.org/wiki/&]\n'
+                '[https://de.wikipedia.org/w/index.php/&]\n'
+            ))
+
+    def test_fix_brackets(self):
+        """Test fixing brackets."""
+        self.assertEqual(
+            '[https://de.wikipedia.org]',
+            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))
+
+    def test_fix_missing_bracket(self):
+        """Test fixing missing bracket."""
+        self.assertEqual(
+            '[https://de.wikipedia.org]',
+            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]'))
+
+    def test_fix_link_text(self):
+        """Test fixing link text."""
+        self.assertEqual(
+            '[https://de.wikipedia.org/w/api.php API]',
+            self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
+
+    def test_fix_files_and_categories(self):
+        """Test files and categories fix."""
+        self.assertEqual(
+            '[[:Kategorie:Example]]\n'
+            '[[:Category:Example|Description]]\n'
+            '[[:Datei:Example.svg]]\n'
+            '[[:File:Example.svg|Description]]\n'
+            '[[:Category:Example]]\n'
+            '[[:Kategorie:Example|Description]]\n'
+            '[[:File:Example.svg]]\n'
+            '[[:Datei:Example.svg|Description]]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/wiki/Kategorie:Example]\n'
+                '[https://de.wikipedia.org/wiki/Category:Example '
+                'Description]\n'
+                '[https://de.wikipedia.org/wiki/Datei:Example.svg]\n'
+                '[https://de.wikipedia.org/wiki/File:Example.svg '
+                'Description]\n'
+                '[[https://de.wikipedia.org/wiki/Category:Example]]\n'
+                '[[https://de.wikipedia.org/wiki/Kategorie:Example '
+                'Description]]\n'
+                '[[https://de.wikipedia.org/wiki/File:Example.svg]]\n'
+                '[[https://de.wikipedia.org/wiki/Datei:Example.svg '
+                'Description]]\n'
+            ))
 
 
 class TestLiveCosmeticChanges(TestCosmeticChanges):

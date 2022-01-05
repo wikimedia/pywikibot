@@ -2749,17 +2749,20 @@ class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
         yield from google.search(query)
 
     def __iter__(self):
-        """Iterate results."""
+        """Iterate results.
+
+        Google contains links in the format:
+        https://de.wikipedia.org/wiki/en:Foobar
+        """
         # restrict query to local site
         localQuery = '{} site:{}'.format(self.query, self.site.hostname())
         base = 'http://{}{}'.format(self.site.hostname(),
-                                    self.site.article_path)
+                                    self.site.articlepath)
+        pattern = base.replace('{}', '(.+)')
         for url in self.queryGoogle(localQuery):
-            if url[:len(base)] == base:
-                title = url[len(base):]
-                page = pywikibot.Page(pywikibot.Link(title, self.site))
-                # Google contains links in the format
-                # https://de.wikipedia.org/wiki/en:Foobar
+            m = re.search(pattern, url)
+            if m:
+                page = pywikibot.Page(pywikibot.Link(m.group(1), self.site))
                 if page.site == self.site:
                     yield page
 

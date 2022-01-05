@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -233,10 +233,10 @@ class BaseSite(ComparableMixin):
     def _interwiki_urls(self, only_article_suffixes=False):
         base_path = self.path()
         if not only_article_suffixes:
-            yield base_path
-        yield base_path + '/'
-        yield base_path + '?title='
-        yield self.article_path
+            yield base_path + '{}'
+        yield base_path + '/{}'
+        yield base_path + '?title={}'
+        yield self.articlepath
 
     def _build_namespaces(self):
         """Create default namespaces."""

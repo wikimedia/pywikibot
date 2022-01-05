@@ -385,8 +385,8 @@ class BasePage(ComparableMixin):
 
     def full_url(self):
         """Return the full URL."""
-        return self.site.base_url(self.site.article_path
-                                  + self.title(as_url=True))
+        return self.site.base_url(
+            self.site.articlepath.format(self.title(as_url=True)))
 
     def autoFormat(self):
         """

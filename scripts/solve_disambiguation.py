@@ -898,7 +898,7 @@ DisambiguationRobot""".format(options=added_keys,
                     foundlink = pywikibot.Link(m.group('title'),
                                                disamb_page.site)
                     foundlink.parse()
-                except (Error, ValueError):  # T111513
+                except Error:
                     continue
 
                 # ignore interwiki links
