@@ -34,14 +34,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'eu', 'uk', 'skr', 'br', 'ast', 'da', 'lo', 'simple', 'bn', 'la', 'is',
         'hr', 'fj', 'tg', 'sk', 'ky', 'bg', 'wa', 'ur', 'ps', 'cy', 'shn',
         'vo', 'sl', 'he', 'af', 'zh-min-nan', 'scn', 'om', 'tl', 'pa', 'sw',
-        'fy', 'nn', 'ka', 'lv', 'lmo', 'min', 'sq', 'ms', 'nds', 'co', 'mn',
-        'pnb', 'lb', 'bs', 'nah', 'yue', 'mnw', 'sa', 'kk', 'km', 'diq', 'vec',
-        'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd', 'ga', 'an',
-        'wo', 'mr', 'mni', 'gom', 'su', 'ia', 'ang', 'mt', 'fo', 'tt', 'sd',
-        'gn', 'ie', 'so', 'csb', 'ug', 'bcl', 'si', 'st', 'roa-rup', 'hif',
-        'zu', 'kl', 'mi', 'ay', 'ha', 'jbo', 'ln', 'yi', 'gu', 'na', 'gv',
-        'kw', 'tpi', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu', 'dv',
-        'ti', 'tn', 'sg',
+        'fy', 'nn', 'ka', 'lv', 'lmo', 'ms', 'min', 'sq', 'nds', 'co', 'mn',
+        'pnb', 'lb', 'mnw', 'bs', 'nah', 'yue', 'sg', 'sa', 'kk', 'km', 'diq',
+        'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd', 'ga',
+        'mr', 'an', 'wo', 'gom', 'mni', 'su', 'ia', 'ang', 'mt', 'fo', 'tt',
+        'sd', 'gn', 'ie', 'so', 'csb', 'ug', 'bcl', 'si', 'st', 'roa-rup',
+        'hif', 'zu', 'kl', 'mi', 'ay', 'ha', 'jbo', 'ln', 'yi', 'gu', 'na',
+        'gv', 'kw', 'tpi', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu',
+        'dv', 'ti', 'tn',
     ]
 
     category_redirect_templates = {
