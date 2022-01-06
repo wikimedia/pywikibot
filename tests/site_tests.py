@@ -670,22 +670,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertTrue(impage.exists())
             self.assertLessEqual(impage.latest_file_info['size'], 2000)
 
-    def test_newfiles(self):
-        """Test the site.newfiles() method."""
-        my_site = self.get_site()
-        with suppress_warnings(category=FutureWarning):
-            gen = my_site.newfiles(total=10)
-        the_list = list(gen)
-        self.assertLessEqual(len(the_list), 10)
-        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 4
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[0], pywikibot.FilePage)
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp)
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[2], str) for tup in the_list))
-        self.assertTrue(all(isinstance(tup[3], str) for tup in the_list))
-
     def test_querypage(self):
         """Test the site.querypage() method."""
         mysite = self.get_site()
