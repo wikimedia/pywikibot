@@ -1326,37 +1326,6 @@ def _int_none(v: Optional[str]) -> Optional[int]:
     return None if not v else int(v)
 
 
-@deprecated('Site.allpages()', since='20180512')
-def AllpagesPageGenerator(
-    start: str = '!',
-    namespace: int = 0,
-    includeredirects: Union[str, bool] = True,
-    site: OPT_SITE_TYPE = None,
-    total: Optional[int] = None, content: bool = False
-) -> Iterable['pywikibot.page.Page']:  # pragma: no cover
-    """
-    Iterate Page objects for all titles in a single namespace.
-
-    If includeredirects is False, redirects are not included. If
-    includeredirects equals the string 'only', only redirects are added.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param content: If True, load current version of each page (default False)
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-
-    filterredir = None  # type: Optional[bool]
-    if not includeredirects:
-        filterredir = False
-    elif includeredirects == 'only':
-        filterredir = True
-
-    return site.allpages(start=start, namespace=namespace,
-                         filterredir=filterredir, total=total, content=content)
-
-
 def PrefixingPageGenerator(prefix: str,
                            namespace: NAMESPACE_OR_INT_TYPE = None,
                            includeredirects: Union[None, bool, str] = True,
@@ -1475,23 +1444,6 @@ def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
     if _filter_unique:
         gen = _filter_unique(gen)
     return gen
-
-
-@deprecated('site.unconnected_pages()', since='20180512')
-def UnconnectedPageGenerator(site: OPT_SITE_TYPE = None,
-                             total: Optional[int] = None
-                             ) -> Iterable['pywikibot.page.Page']:
-    """
-    Iterate Page objects for all unconnected pages to a Wikibase repository.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    if not site.data_repository():
-        raise ValueError('The given site does not have Wikibase repository.')
-    return site.unconnected_pages(total=total)
 
 
 @deprecated('File.usingPages()', since='20200515')
@@ -2145,13 +2097,6 @@ def UserEditFilterGenerator(generator: Iterable['pywikibot.page.Page'],
             pywikibot.output('Skipping {}'.format(page.title(as_link=True)))
 
 
-@deprecated('itertools.chain(*iterables)', since='20180513')
-def CombinedPageGenerator(generators: Sequence[Iterable['pywikibot.page.Page']]
-                          ) -> Iterator['pywikibot.page.Page']:
-    """Yield from each iterable until exhausted, then proceed with the next."""
-    return itertools.chain(*generators)  # pragma: no cover
-
-
 def PageClassGenerator(generator: Iterable['pywikibot.page.Page']
                        ) -> Iterator['pywikibot.page.Page']:
     """
@@ -2510,21 +2455,6 @@ def page_with_property_generator(name: str,  # pragma: no cover
     if site is None:
         site = pywikibot.Site()
     return site.pages_with_property(name, total=total)
-
-
-@deprecated('Site.wantedpages', since='20180803')
-def WantedPagesPageGenerator(total: int = 100,  # pragma: no cover
-                             site: OPT_SITE_TYPE = None
-                             ) -> Iterable['pywikibot.page.Page']:
-    """
-    Wanted page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.wantedpages(total=total)
 
 
 def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
