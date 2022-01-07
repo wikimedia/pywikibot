@@ -156,7 +156,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
 badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -441,22 +441,22 @@ class Global:
 
     """Container class for global settings."""
 
-    attachEditCount = 1     # edit count that an user required to be welcomed
-    dumpToLog = 15          # number of users that are required to add the log
-    offset = None           # skip users newer than that timestamp
-    timeoffset = 0          # skip users newer than # minutes
-    recursive = True        # define if the Bot is recursive or not
-    timeRecur = 3600        # how much time (sec.) the bot waits before restart
-    makeWelcomeLog = True   # create the welcome log or not
-    confirm = False         # should bot ask to add user to bad-username list
-    welcomeAuto = False     # should bot welcome auto-created users
-    filtBadName = False     # check if the username is ok or not
-    randomSign = False      # should signature be random or not
-    saveSignIndex = False   # should save the signature index or not
-    signFileName = None     # File name, default: None
-    defaultSign = '--~~~~'  # default signature
-    queryLimit = 50         # number of users that the bot load to check
-    quiet = False           # Users without contributions aren't displayed
+    attach_edit_count = 1    # edit count that an user required to be welcomed
+    dump_to_log = 15         # number of users that are required to add the log
+    offset = None            # skip users newer than that timestamp
+    timeoffset = 0           # skip users newer than # minutes
+    recursive = True         # define if the Bot is recursive or not
+    time_recur = 3600        # seconds the bot waits before restart
+    make_welcome_log = True  # create the welcome log or not
+    confirm = False          # should bot ask to add user to bad-username list
+    welcome_auto = False     # should bot welcome auto-created users
+    filt_bad_name = False    # check if the username is ok or not
+    random_sign = False      # should signature be random or not
+    save_sign_index = False  # should save the signature index or not
+    sign_file_name = None    # File name, default: None
+    default_sign = '--~~~~'  # default signature
+    query_limit = 50         # number of users that the bot load to check
+    quiet = False            # Users without contributions aren't displayed
 
 
 class WelcomeBot(SingleSiteBot):
@@ -473,9 +473,9 @@ class WelcomeBot(SingleSiteBot):
         self.log_name = i18n.translate(self.site, logbook)
 
         if not self.log_name:
-            globalvar.makeWelcomeLog = False
-        if globalvar.randomSign:
-            self.defineSign(True)
+            globalvar.make_welcome_log = False
+        if globalvar.random_sign:
+            self.define_sign(True)
 
     def check_managed_sites(self) -> None:
         """Check that site is managed by welcome.py."""
@@ -487,9 +487,9 @@ class WelcomeBot(SingleSiteBot):
                 .format(self.site))
         self.welcome_text = site_netext
 
-    def badNameFilter(self, name, force=False) -> bool:
+    def bad_name_filer(self, name, force=False) -> bool:
         """Check for bad names."""
-        if not globalvar.filtBadName:
+        if not globalvar.filt_bad_name:
             return False
 
         # initialize blacklist
@@ -605,7 +605,7 @@ class WelcomeBot(SingleSiteBot):
             else:
                 self._BAQueue = [name]
 
-        if len(self._BAQueue) >= globalvar.dumpToLog:
+        if len(self._BAQueue) >= globalvar.dump_to_log:
             self.report_bad_account()
 
     def report_bad_account(self) -> None:
@@ -648,7 +648,7 @@ class WelcomeBot(SingleSiteBot):
 
     def makelogpage(self):
         """Make log page."""
-        if not globalvar.makeWelcomeLog or not self.welcomed_users:
+        if not globalvar.make_welcome_log or not self.welcomed_users:
             return
 
         if self.site.code == 'it':
@@ -702,10 +702,10 @@ class WelcomeBot(SingleSiteBot):
             else:
                 start = globalvar.offset
             for ue in self.site.logevents('newusers',
-                                          total=globalvar.queryLimit,
+                                          total=globalvar.query_limit,
                                           start=start):
                 if ue.action() == 'create' \
-                   or ue.action() == 'autocreate' and globalvar.welcomeAuto:
+                   or ue.action() == 'autocreate' and globalvar.welcome_auto:
                     try:
                         user = ue.page()
                     except HiddenKeyError:
@@ -721,24 +721,24 @@ class WelcomeBot(SingleSiteBot):
             self.show_status()
             strfstr = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
             pywikibot.output('Sleeping {} seconds before rerun. {}'
-                             .format(globalvar.timeRecur, strfstr))
-            pywikibot.sleep(globalvar.timeRecur)
+                             .format(globalvar.time_recur, strfstr))
+            pywikibot.sleep(globalvar.time_recur)
 
-    def defineSign(self, force=False) -> List[str]:
+    def define_sign(self, force=False) -> List[str]:
         """Setup signature."""
-        if hasattr(self, '_randomSignature') and not force:
-            return self._randomSignature
+        if hasattr(self, '_random_signature') and not force:
+            return self._random_signature
 
         sign_text = ''
         creg = re.compile(r'^\* ?(.*?)$', re.M)
-        if not globalvar.signFileName:
+        if not globalvar.sign_file_name:
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
                 self.show_status(Msg.WARN)
                 pywikibot.output(
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
-                globalvar.randomSign = False
+                globalvar.random_sign = False
                 return []
 
             sign_page = pywikibot.Page(self.site, sign_page_name)
@@ -748,23 +748,24 @@ class WelcomeBot(SingleSiteBot):
             else:
                 pywikibot.output('The signature list page does not exist, '
                                  'random signature will be disabled.')
-                globalvar.randomSign = False
+                globalvar.random_sign = False
         else:
             try:
                 f = codecs.open(
-                    pywikibot.config.datafilepath(globalvar.signFileName), 'r',
+                    pywikibot.config.datafilepath(globalvar.sign_file_name),
+                    'r',
                     encoding=config.console_encoding)
             except LookupError:
                 f = codecs.open(pywikibot.config.datafilepath(
-                    globalvar.signFileName), 'r', encoding='utf-8')
+                    globalvar.sign_file_name), 'r', encoding='utf-8')
             except IOError:
                 pywikibot.error('No fileName!')
                 raise FilenameNotSet('No signature filename specified.')
 
             sign_text = f.read()
             f.close()
-        self._randomSignature = creg.findall(sign_text)
-        return self._randomSignature
+        self._random_signature = creg.findall(sign_text)
+        return self._random_signature
 
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped.
@@ -785,7 +786,7 @@ class WelcomeBot(SingleSiteBot):
             pywikibot.output('{} might be a global bot!'
                              .format(user.username))
 
-        elif user.editCount() < globalvar.attachEditCount:
+        elif user.editCount() < globalvar.attach_edit_count:
             if not user.editCount() == 0:
                 self.show_status(Msg.IGNORE)
                 pywikibot.output('{} has only {} contributions.'
@@ -811,18 +812,18 @@ class WelcomeBot(SingleSiteBot):
                              .format(user.username))
             return
 
-        if self.badNameFilter(user.username):
+        if self.bad_name_filer(user.username):
             self.collect_bad_accounts(user.username)
             return
 
         welcome_text = self.welcome_text
-        if globalvar.randomSign:
+        if globalvar.random_sign:
             if self.site.family.name != 'wikinews':
-                welcome_text = welcome_text % choice(self.defineSign())
+                welcome_text = welcome_text % choice(self.define_sign())
             if self.site.sitename != 'wiktionary:it':
                 welcome_text += timeselected
         elif self.site.sitename != 'wikinews:it':
-            welcome_text = welcome_text % globalvar.defaultSign
+            welcome_text = welcome_text % globalvar.default_sign
 
         final_text = i18n.translate(self.site, final_new_text_additions)
         if final_text:
@@ -839,7 +840,7 @@ class WelcomeBot(SingleSiteBot):
             self.welcomed_users.append(user)
 
         welcomed_count = len(self.welcomed_users)
-        if globalvar.makeWelcomeLog:
+        if globalvar.make_welcome_log:
             self.show_status(Msg.DONE)
             if welcomed_count == 0:
                 count = 'No users have'
@@ -849,13 +850,13 @@ class WelcomeBot(SingleSiteBot):
                 count = '{} users have'.format(welcomed_count)
             pywikibot.output(count + ' been welcomed.')
 
-            if welcomed_count >= globalvar.dumpToLog:
+            if welcomed_count >= globalvar.dump_to_log:
                 self.makelogpage()
 
     def write_log(self):
         """Write logfile."""
         welcomed_count = len(self.welcomed_users)
-        if globalvar.makeWelcomeLog and welcomed_count > 0:
+        if globalvar.make_welcome_log and welcomed_count > 0:
             self.show_status()
             if welcomed_count == 1:
                 pywikibot.output('Putting the log of the latest user...')
@@ -886,7 +887,7 @@ class WelcomeBot(SingleSiteBot):
             self.makelogpage()
 
         # If there is the savedata, the script must save the number_user.
-        if globalvar.randomSign and globalvar.saveSignIndex \
+        if globalvar.random_sign and globalvar.save_sign_index \
            and self.welcomed_users:
             # Filename and Pywikibot path
             # file where is stored the random signature index
@@ -938,19 +939,19 @@ def handle_args(args):
     mapping = {
         # option: (attribute, value),
         '-break': ('recursive', False),
-        '-nlog': ('makeWelcomeLog', False),
+        '-nlog': ('make_welcome_log', False),
         '-ask': ('confirm', True),
-        '-filter': ('filtBadName', True),
-        '-savedata': ('saveSignIndex', True),
-        '-random': ('randomSign', True),
-        '-sul': ('welcomeAuto', True),
+        '-filter': ('filt_bad_name', True),
+        '-savedata': ('save_sign_index', True),
+        '-random': ('random_sign', True),
+        '-sul': ('welcome_auto', True),
         '-quiet': ('quiet', True),
     }
 
     for arg in pywikibot.handle_args(args):
         arg, _, val = arg.partition(':')
         if arg == '-edit':
-            globalvar.attachEditCount = int(
+            globalvar.attach_edit_count = int(
                 val if val.isdigit() else pywikibot.input(
                     'After how many edits would you like to welcome new users?'
                     ' (0 is allowed)'))
@@ -960,27 +961,27 @@ def handle_args(args):
                     'Which time offset (in minutes) for new users would you '
                     'like to use?'))
         elif arg == '-time':
-            globalvar.timeRecur = int(
+            globalvar.time_recur = int(
                 val if val.isdigit() else pywikibot.input(
                     'For how many seconds would you like to bot to sleep '
                     'before checking again?'))
         elif arg == '-offset':
             _handle_offset(val)
         elif arg == '-file':
-            globalvar.randomSign = True
-            globalvar.signFileName = val or pywikibot.input(
+            globalvar.random_sign = True
+            globalvar.sign_file_name = val or pywikibot.input(
                 'Where have you saved your signatures?')
         elif arg == '-sign':
-            globalvar.defaultSign = val or pywikibot.input(
+            globalvar.default_sign = val or pywikibot.input(
                 'Which signature to use?')
-            globalvar.defaultSign += timeselected
+            globalvar.default_sign += timeselected
         elif arg == '-limit':
-            globalvar.queryLimit = int(
+            globalvar.query_limit = int(
                 val if val.isdigit() else pywikibot.input(
                     'How many of the latest new users would you like to '
                     'load?'))
         elif arg == '-numberlog':
-            globalvar.dumpToLog = int(
+            globalvar.dump_to_log = int(
                 val if val.isdigit() else pywikibot.input(
                     'After how many welcomed users would you like to update '
                     'the welcome log?'))
