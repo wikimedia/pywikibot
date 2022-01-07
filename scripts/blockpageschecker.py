@@ -44,7 +44,7 @@ Examples::
 
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,13 +65,13 @@ from pywikibot.exceptions import Error
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
+docuReplacements = {  # noqa: N816
     '&params;': pagegenerators.parameterHelp,
 }
 
 # PREFERENCES
 
-templateSemiProtection = {
+template_semi_protection = {
     'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(حماية\sجزئية)\}\}'],
     'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]p|[Pp])'
            r'olozamčeno(|[^\}]*)\}\}\s*'],
@@ -86,7 +86,7 @@ templateSemiProtection = {
     'ur': [r'\{\{(?:[Tt]emplate:|سانچہ:|)(نیم\sمحفوظ)\}\}']
 }
 # Regex to get the total-protection template
-templateTotalProtection = {
+template_total_protection = {
     'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(حماية\sكاملة)\}\}'],
     'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]z|[Zz])'
            r'amčeno(|[^\}]*)\}\}\s*'],
@@ -105,7 +105,7 @@ templateTotalProtection = {
 }
 
 # Regex to get the semi-protection move template
-templateSemiMoveProtection = {
+template_semi_move_protection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?'
            r'|\|.*?)\}\}'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動半保護'
@@ -113,7 +113,7 @@ templateSemiMoveProtection = {
 }
 
 # Regex to get the total-protection move template
-templateTotalMoveProtection = {
+template_total_move_protection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?'
            r'|\|.*?)\}\}'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動保護'
@@ -123,14 +123,14 @@ templateTotalMoveProtection = {
 # If you use only one template for all the type of protection, put it here.
 # You may use only one template or an unique template and some other "old"
 # template that the script should still check (as on it.wikipedia)
-templateUnique = {
+template_unique = {
     'ar': [r'\{\{(?:[Tt]emplate:|قالب:|)(محمية)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Pp]rotetta\}\}'],
 }
 
 # Array: 0 => Semi-block, 1 => Total Block, 2 => Semi-Move, 3 => Total-Move,
 #        4 => template-unique
-templateNoRegex = {
+template_no_regex = {
     'ar': ['{{حماية جزئية}}', '{{حماية كاملة}}', None, None, '{{محمية}}'],
     'cs': ['{{Polozamčeno}}', '{{Zamčeno}}', None, None, None],
     'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
@@ -142,7 +142,7 @@ templateNoRegex = {
 }
 
 # Category where the bot will check
-categoryToCheck = {
+category_to_check = {
     'ar': ['تصنيف:صفحات محمية'],
     'cs': ['Kategorie:Wikipedie:Zamčené stránky',
            'Kategorie:Wikipedie:Polozamčené stránky',
@@ -228,7 +228,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
     def skip_page(self, page):
         """Skip if the user has not permission to edit."""
         # FIXME: This check does not work :
-        # PreloadingGenerator cannot set correctly page.editRestriction
+        # PreloadingGenerator cannot set correctly page.edit_restrictioniction
         # (see bug T57322)
         # if not page.has_permission():
         #    pywikibot.output(
@@ -250,39 +250,39 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         def understand_block():
             """Understand if the page is blocked has the right template."""
             results = 'sysop-total', 'autoconfirmed-total', 'unique'
-            for index, template in enumerate((TTP, TSP, TU)):
+            for index, template in enumerate((ttp, tsp, tu)):
                 if not template:
                     continue
 
-                for catchRegex in template:
-                    resultCatch = re.findall(catchRegex, text)
-                    if resultCatch:
+                for catch_regex in template:
+                    result_catch = re.findall(catch_regex, text)
+                    if result_catch:
                         return ParsedTemplate(
-                            results[index], catchRegex, 'modifying')
+                            results[index], catch_regex, 'modifying')
 
-            if TSMP and TTMP and TTP != TTMP and TSP != TSMP:
-                for catchRegex in TTMP:
-                    resultCatch = re.findall(catchRegex, text)
-                    if resultCatch:
+            if tsmp and ttmp and ttp != ttmp and tsp != tsmp:
+                for catch_regex in ttmp:
+                    result_catch = re.findall(catch_regex, text)
+                    if result_catch:
                         return ParsedTemplate(
-                            'sysop-move', catchRegex, 'modifying')
+                            'sysop-move', catch_regex, 'modifying')
 
-                for catchRegex in TSMP:
-                    resultCatch = re.findall(catchRegex, text)
-                    if resultCatch:
+                for catch_regex in tsmp:
+                    result_catch = re.findall(catch_regex, text)
+                    if result_catch:
                         return ParsedTemplate(
-                            'autoconfirmed-move', catchRegex, 'modifying')
+                            'autoconfirmed-move', catch_regex, 'modifying')
 
             # If editable means that we have no regex, won't change anything
             # with this regex
             return ParsedTemplate('editable', r'\A', 'adding')
 
-        TSP = i18n.translate(self.site, templateSemiProtection)
-        TTP = i18n.translate(self.site, templateTotalProtection)
-        TSMP = i18n.translate(self.site, templateSemiMoveProtection)
-        TTMP = i18n.translate(self.site, templateTotalMoveProtection)
-        TNR = i18n.translate(self.site, templateNoRegex)
-        TU = i18n.translate(self.site, templateUnique)
+        tsp = i18n.translate(self.site, template_semi_protection)
+        ttp = i18n.translate(self.site, template_total_protection)
+        tsmp = i18n.translate(self.site, template_semi_move_protection)
+        ttmp = i18n.translate(self.site, template_total_move_protection)
+        tnr = i18n.translate(self.site, template_no_regex)
+        tu = i18n.translate(self.site, template_unique)
 
         while True:
             text, restrictions = yield
@@ -291,7 +291,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
             # Understand, according to the template in the page, what should
             # be the protection and compare it with what there really is.
-            TemplateInThePage = understand_block()
+            template_in_page = understand_block()
 
             # Only to see if the text is the same or not...
             oldtext = text
@@ -299,84 +299,84 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             changes = -1
 
             msg_type = None  # type: Optional[str]
-            editRestr = restrictions.get('edit')
-            if not editRestr:
+            edit_restriction = restrictions.get('edit')
+            if not edit_restriction:
                 # page is not edit-protected
                 # Deleting the template because the page doesn't need it.
-                if not (TTP or TSP):
+                if not (ttp or tsp):
                     raise Error(
                         'This script is not localized to use it on {}.\n'
-                        'Missing "templateSemiProtection" or'
-                        '"templateTotalProtection"'.format(self.site.sitename))
+                        'Missing "template_semi_protection" or'
+                        '"template_total_protection"'
+                        .format(self.site.sitename))
 
-                if TU:
-                    replaceToPerform = '|'.join(TTP + TSP + TU)
+                if tu:
+                    replacement = '|'.join(ttp + tsp + tu)
                 else:
-                    replaceToPerform = '|'.join(TTP + TSP)
+                    replacement = '|'.join(ttp + tsp)
                 text, changes = re.subn(
-                    '<noinclude>({})</noinclude>'.format(replaceToPerform),
+                    '<noinclude>({})</noinclude>'.format(replacement),
                     '', text)
                 if not changes:
                     text, changes = re.subn(
-                        '({})'.format(replaceToPerform), '', text)
+                        '({})'.format(replacement), '', text)
                 msg = 'The page is editable for all'
                 if not self.opt.move:
                     msg += ', deleting the template..'
                 pywikibot.output(msg + '.')
                 msg_type = 'deleting'
 
-            elif editRestr[0] == 'sysop':
+            elif edit_restriction[0] == 'sysop':
                 # total edit protection
-                if TemplateInThePage.blocktype == 'sysop-total' and TTP \
-                   or TemplateInThePage.blocktype == 'unique' and TU:
+                if template_in_page.blocktype == 'sysop-total' and ttp \
+                   or template_in_page.blocktype == 'unique' and tu:
                     msg = 'The page is protected to the sysop'
                     if not self.opt.move:
                         msg += ', skipping...'
                     pywikibot.output(msg)
                 else:
-                    if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
+                    if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
                         raise Error(
                             'This script is not localized to use it on \n{}. '
-                            'Missing "templateNoRegex"'
+                            'Missing "template_no_regex"'
                             .format(self.site.sitename))
 
                     pywikibot.output(
                         'The page is protected to the sysop, but the template '
                         'seems not correct. Fixing...')
-                    if TU:
+                    if tu:
                         text, changes = re.subn(
-                            TemplateInThePage.regex, TNR[4], text)
+                            template_in_page.regex, tnr[4], text)
                     else:
                         text, changes = re.subn(
-                            TemplateInThePage.regex, TNR[1], text)
-                    msg_type = TemplateInThePage.msgtype
+                            template_in_page.regex, tnr[1], text)
+                    msg_type = template_in_page.msgtype
 
-            elif TSP or TU:
-                # implicitly
-                # editRestr[0] = 'autoconfirmed', edit-Semi-protection
-                if TemplateInThePage.blocktype in ('autoconfirmed-total',
-                                                   'unique'):
+            elif tsp or tu:
+                # implicitly edit semi-protection
+                if template_in_page.blocktype in ('autoconfirmed-total',
+                                                  'unique'):
                     msg = ('The page is editable only for the autoconfirmed '
                            'users')
                     if not self.opt.move:
                         msg += ', skipping...'
                     pywikibot.output(msg)
                 else:
-                    if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
+                    if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
                         raise Error(
                             'This script is not localized to use it on \n'
-                            '{}. Missing "templateNoRegex"'
+                            '{}. Missing "template_no_regex"'
                             .format(self.site.sitename))
                     pywikibot.output(
                         'The page is editable only for the autoconfirmed '
                         'users, but the template seems not correct. Fixing...')
-                    if TU:
+                    if tu:
                         text, changes = re.subn(
-                            TemplateInThePage.regex, TNR[4], text)
+                            template_in_page.regex, tnr[4], text)
                     else:
                         text, changes = re.subn(
-                            TemplateInThePage.regex, TNR[0], text)
-                    msg_type = TemplateInThePage.msgtype
+                            template_in_page.regex, tnr[0], text)
+                    msg_type = template_in_page.msgtype
 
             if not changes:
                 # We tried to fix edit-protection templates, but it did
@@ -385,53 +385,52 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
             if self.opt.move and changes > -1:
                 # checking move protection now
-                moveRestr = restrictions.get('move')
+                move_restriction = restrictions.get('move')
                 changes = -1
 
-                if not moveRestr:
+                if not move_restriction:
                     pywikibot.output('The page is movable for all, deleting '
                                      'the template...')
                     # Deleting the template because the page doesn't need it.
-                    if TU:
-                        replaceToPerform = '|'.join(TSMP + TTMP + TU)
+                    if tu:
+                        replacement = '|'.join(tsmp + ttmp + tu)
                     else:
-                        replaceToPerform = '|'.join(TSMP + TTMP)
+                        replacement = '|'.join(tsmp + ttmp)
                     text, changes = re.subn(
-                        '<noinclude>({})</noinclude>'.format(replaceToPerform),
+                        '<noinclude>({})</noinclude>'.format(replacement),
                         '', text)
                     if not changes:
                         text, changes = re.subn(
-                            '({})'.format(replaceToPerform), '', text)
+                            '({})'.format(replacement), '', text)
                     msg_type = 'deleting'
-                elif moveRestr[0] == 'sysop':
+                elif move_restriction[0] == 'sysop':
                     # move-total-protection
-                    if TemplateInThePage.blocktype == 'sysop-move' and TTMP \
-                       or TemplateInThePage.blocktype == 'unique' and TU:
+                    if template_in_page.blocktype == 'sysop-move' and ttmp \
+                       or template_in_page.blocktype == 'unique' and tu:
                         pywikibot.output('The page is protected from moving '
                                          'to the sysop, skipping...')
-                        if TU:
+                        if tu:
                             # no changes needed, better to revert the old text.
                             text = oldtext
                     else:
                         pywikibot.output(
                             'The page is protected from moving to the sysop, '
                             'but the template seems not correct. Fixing...')
-                        if TU:
+                        if tu:
                             text, changes = re.subn(
-                                TemplateInThePage.regex, TNR[4], text)
+                                template_in_page.regex, tnr[4], text)
                         else:
                             text, changes = re.subn(
-                                TemplateInThePage.regex, TNR[3], text)
-                        msg_type = TemplateInThePage.msgtype
+                                template_in_page.regex, tnr[3], text)
+                        msg_type = template_in_page.msgtype
 
-                elif TSMP or TU:
-                    # implicitly
-                    # moveRestr[0] = 'autoconfirmed', move-semi-protection
-                    if TemplateInThePage.blocktype in ('autoconfirmed-move',
-                                                       'unique'):
+                elif tsmp or tu:
+                    # implicitly move semi-protection
+                    if template_in_page.blocktype in ('autoconfirmed-move',
+                                                      'unique'):
                         pywikibot.output('The page is movable only for the '
                                          'autoconfirmed users, skipping...')
-                        if TU:
+                        if tu:
                             # no changes needed, better to revert the old text.
                             text = oldtext
                     else:
@@ -439,13 +438,13 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                             'The page is movable only for the autoconfirmed '
                             'users, but the template seems not correct. '
                             'Fixing...')
-                        if TU:
+                        if tu:
                             text, changes = re.subn(
-                                TemplateInThePage.regex, TNR[4], text)
+                                template_in_page.regex, tnr[4], text)
                         else:
                             text, changes = re.subn(
-                                TemplateInThePage.regex, TNR[2], text)
-                        msg_type = TemplateInThePage.msgtype
+                                template_in_page.regex, tnr[2], text)
+                        msg_type = template_in_page.msgtype
 
                 if not changes:
                     # We tried to fix move-protection templates
@@ -465,7 +464,7 @@ def main(*args: str) -> None:
     :param args: command line arguments
     """
     # Loading the comments
-    global categoryToCheck, project_inserted
+    global category_to_check, project_inserted
 
     options = {}
     generator = None
@@ -500,7 +499,7 @@ def main(*args: str) -> None:
     if not generator:
         # Define the category if no other generator has been set
         gen = []
-        categories = i18n.translate(site, categoryToCheck)
+        categories = i18n.translate(site, category_to_check)
         for category_name in categories:
             cat = pywikibot.Category(site, category_name)
             # Define the generator
