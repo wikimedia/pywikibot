@@ -1219,11 +1219,6 @@ class APISite(
                                 **args)
         self._update_page(page, query, verify_imageinfo=True)
 
-    @deprecated('page.exists()', since='20180218')
-    def page_exists(self, page):
-        """Return True if and only if page is an existing page on site."""
-        return page.pageid > 0
-
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""
         if not hasattr(page, '_protection'):
