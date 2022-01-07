@@ -1,6 +1,6 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -216,6 +216,7 @@ class AssertAPIErrorContextManager:
             return self
         with self:
             callable_obj(*args, **kwargs)
+        return None
 
 
 class DryParamInfo(dict):
@@ -375,6 +376,7 @@ class DrySite(pywikibot.site.APISite):
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
                                   interface=self.__class__)
+        return None
 
     def data_repository(self):
         """Return Site object for data repository e.g. Wikidata."""

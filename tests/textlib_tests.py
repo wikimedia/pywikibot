@@ -1,6 +1,6 @@
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2021
+# (C) Pywikibot team, 2011-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -703,6 +703,9 @@ class TestReplaceLinks(TestCase):
                 return pywikibot.Link('Homeworld', link.site)
             if link.title.lower() == 'you':
                 return False
+
+            return None
+
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
@@ -716,8 +719,10 @@ class TestReplaceLinks(TestCase):
                     return pywikibot.Link(
                         '{0}#{1}'
                         .format(self._count, link.section), link.site)
-                return pywikibot.Link('{0}'
-                                      .format(self._count), link.site)
+                return pywikibot.Link('{0}'.format(self._count), link.site)
+
+            return None
+
         self._count = 0  # buffer number of found instances
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
@@ -904,6 +909,8 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a unicode instance not bytes
                 return 'homewörlder'
+            return None
+
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello homewörlder, [[how|are]] [[you#section|you]]? '
@@ -916,6 +923,7 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
+            return None
 
         with self.assertRaisesRegex(ValueError,
                                     r'The result must be str and not bytes\.'):

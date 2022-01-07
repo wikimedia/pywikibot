@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 import decimal
@@ -379,7 +379,7 @@ class ProcessAgainList(set):
         if item in self.process_again_list:
             return
 
-        return super().add(item)
+        super().add(item)
 
 
 class ContainsStopList(set):
