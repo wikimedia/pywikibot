@@ -27,7 +27,6 @@ from pywikibot.exceptions import (
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import (
-    deprecated,
     filter_unique,
     is_ip_address,
     issue_deprecation_warning,
@@ -1834,27 +1833,6 @@ class GeneratorsMixin:
             else:
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        '', pageitem['user'], pageitem['comment'])
-
-    @deprecated('APISite.logevents(logtype="upload")', since='20170619')
-    def newfiles(self, user=None, start=None, end=None, reverse=False,
-                 total=None):
-        """Yield information about newly uploaded files.
-
-        DEPRECATED: Use logevents(logtype='upload') instead.
-
-        Yields a tuple of FilePage, Timestamp, user(str), comment(str).
-
-        N.B. the API does not provide direct access to Special:Newimages, so
-        this is derived from the "upload" log events instead.
-        """
-        for event in self.logevents(logtype='upload', user=user,
-                                    start=start, end=end, reverse=reverse,
-                                    total=total):
-            filepage = event.page()
-            date = event.timestamp()
-            user = event.user()
-            comment = event.comment() or ''
-            yield (filepage, date, user, comment)
 
     def querypage(self, special_page, total=True):
         """Yield Page objects retrieved from Special:{special_page}.

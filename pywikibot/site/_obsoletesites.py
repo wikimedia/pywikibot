@@ -52,7 +52,3 @@ class ClosedSite(APISite):
     def newpages(self, **kwargs):
         """An error instead of pointless API call."""
         self._closed_error('No new pages can be returned.')
-
-    def newfiles(self, **kwargs):
-        """An error instead of pointless API call."""
-        self._closed_error('No new files can be returned.')
