@@ -23,9 +23,6 @@ Options for "add" action:
  -create      - If a page doesn't exist, do not skip it, create it instead.
  -redirect    - Follow redirects.
 
-If action is "add", the following options are supported:
-
-&params;
 
 Options for "listify" action:
 
@@ -94,6 +91,10 @@ Options for several actions:
  -depth:      - The max depth limit beyond which no subcategories will be
                 listed.
 
+If action is "add", the following additional options are supported:
+
+&params;
+
 For the actions tidy and tree, the bot will store the category structure
 locally in category.dump. This saves time and server load, but if it uses
 these data later, they may be outdated; use the -rebuild parameter in this
@@ -112,7 +113,7 @@ Or to do it all from the command-line, use the following syntax:
 This will move all pages in the category US to the category United States.
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1347,7 +1348,6 @@ def main(*args: str) -> None:
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    gen_factory = pagegenerators.GeneratorFactory()
 
     # When this is True then the custom edit summary given for removing
     # categories from articles will also be used as the deletion reason.
@@ -1359,6 +1359,7 @@ def main(*args: str) -> None:
     follow_redirects = False
     delete_empty_cat = True
     unknown = []
+    pg_options = []
     for arg in local_args:
         if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify'):
             action = arg
@@ -1423,17 +1424,23 @@ def main(*args: str) -> None:
         elif option == 'prefix':
             prefix = value
         else:
-            gen_factory.handle_arg(arg)
+            pg_options.append(arg)
 
-    bot = None  # type: Optional[BaseBot]
+    enabled = ['namespace'] if action in ('tidy', 'listify') else None
+    if action in ('add', 'listify', 'tidy'):
+        gen_factory = pagegenerators.GeneratorFactory(enabled_options=enabled)
+        unknown += gen_factory.handle_args(pg_options)
+    else:
+        unknown += pg_options
+    suggest_help(unknown_parameters=unknown)
 
     cat_db = CategoryDatabase(rebuild=rebuild)
-    gen = gen_factory.getCombinedGenerator()
 
     if action == 'add':
         if not to_given:
             new_cat_title = pywikibot.input(
                 'Category to add (do not give namespace):')
+        gen = gen_factory.getCombinedGenerator()
         if not gen:
             # default for backwards compatibility
             gen_factory.handle_arg('-links')
@@ -1510,9 +1517,8 @@ def main(*args: str) -> None:
                                    prefix=prefix,
                                    namespaces=gen_factory.namespaces)
 
-    if bot:
+    if not suggest_help(missing_action=not action):
         pywikibot.Site().login()
-        suggest_help(unknown_parameters=unknown)
         try:
             bot.run()
         except Error:
@@ -1520,8 +1526,6 @@ def main(*args: str) -> None:
         finally:
             if cat_db:
                 cat_db.dump()
-    else:
-        suggest_help(missing_action=True, unknown_parameters=unknown)
 
 
 if __name__ == '__main__':
