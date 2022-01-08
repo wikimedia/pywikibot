@@ -181,7 +181,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
 
     def treat_page(self):
         """Change all redirects from the current page to actual links."""
-        links = self.current_page.linked_pages()
+        links = self.current_page.linkedPages()
         try:
             newtext = self.current_page.text
         except InvalidPageError:
