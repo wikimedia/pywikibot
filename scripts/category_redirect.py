@@ -30,7 +30,7 @@ Usage:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,6 +49,9 @@ from pywikibot.exceptions import (
     NoPageError,
     ServerError,
 )
+
+
+LOG_SIZE = 7  # Number of items to keep in active log
 
 
 class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
@@ -133,34 +136,34 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                                                              self.site))
         return self.cat is not None
 
-    def move_contents(self, oldCatTitle, newCatTitle, editSummary):
+    def move_contents(self, old_cat_title, new_cat_title, edit_summary):
         """The worker function that moves pages out of oldCat into newCat."""
         while True:
             try:
-                oldCat = pywikibot.Category(self.site,
-                                            self.catprefix + oldCatTitle)
-                newCat = pywikibot.Category(self.site,
-                                            self.catprefix + newCatTitle)
+                old_cat = pywikibot.Category(self.site,
+                                             self.catprefix + old_cat_title)
+                new_cat = pywikibot.Category(self.site,
+                                             self.catprefix + new_cat_title)
 
                 param = {
-                    'oldCatLink': oldCat.title(),
-                    'oldCatTitle': oldCatTitle,
-                    'newCatLink': newCat.title(),
-                    'newCatTitle': newCatTitle,
+                    'oldCatLink': old_cat.title(),
+                    'oldCatTitle': old_cat_title,
+                    'newCatLink': new_cat.title(),
+                    'newCatTitle': new_cat_title,
                 }
-                summary = editSummary % param
+                summary = edit_summary % param
                 # Move articles
                 found, moved = 0, 0
-                for article in oldCat.members():
+                for article in old_cat.members():
                     found += 1
-                    changed = article.change_category(oldCat, newCat,
+                    changed = article.change_category(old_cat, new_cat,
                                                       summary=summary)
                     if changed:
                         moved += 1
 
                 # pass 2: look for template doc pages
                 for item in pywikibot.data.api.ListGenerator(
-                        'categorymembers', cmtitle=oldCat.title(),
+                        'categorymembers', cmtitle=old_cat.title(),
                         cmprop='title|sortkey', cmnamespace='10',
                         cmlimit='max'):
                     doc = pywikibot.Page(pywikibot.Link(item['title']
@@ -169,14 +172,14 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                         doc.get()
                     except Error:
                         continue
-                    changed = doc.change_category(oldCat, newCat,
+                    changed = doc.change_category(old_cat, new_cat,
                                                   summary=summary)
                     if changed:
                         moved += 1
 
                 if found:
                     pywikibot.output('{}: {} found, {} moved'
-                                     .format(oldCat.title(), found, moved))
+                                     .format(old_cat.title(), found, moved))
                 return (found, moved)
             except ServerError:
                 pywikibot.output('Server error: retrying in 5 seconds...')
@@ -185,7 +188,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
             except Exception:
                 return (None, None)
 
-    def readyToEdit(self, cat):
+    def ready_to_edit(self, cat):
         """Return True if cat not edited during cooldown period, else False."""
         today = pywikibot.Timestamp.now()
         deadline = today + timedelta(days=-self.opt.delay)
@@ -195,7 +198,6 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
 
     def get_log_text(self):
         """Rotate log text and return the most recent text."""
-        LOG_SIZE = 7  # Number of items to keep in active log
         try:
             log_text = self.log_page.get()
         except NoPageError:
@@ -390,7 +392,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                 self.log_text.append(message)
                 continue
             cat_title = cat.title(with_ns=False)
-            if not self.readyToEdit(cat):
+            if not self.ready_to_edit(cat):
                 counts[cat_title] = None
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-skipping',
@@ -450,7 +452,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
 
             found, moved = self.move_contents(cat_title,
                                               dest.title(with_ns=False),
-                                              editSummary=comment)
+                                              edit_summary=comment)
             if found is None:
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-move-error', {
