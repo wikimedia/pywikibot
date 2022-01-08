@@ -13,7 +13,7 @@ Can be used with:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -47,7 +47,7 @@ from pywikibot.tools.formatter import color_format
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 # Featured articles categories
-featured_articles = 'Q4387444'
+FEATURED_ARTICLES = 'Q4387444'
 
 
 class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
@@ -60,19 +60,19 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     summary_key = 'fixing_redirects-fixing'
     update_options = {'overwrite': False}
 
-    def replace_links(self, text, linkedPage, targetPage):
+    def replace_links(self, text, linked_page, target_page):
         """Replace all source links by target."""
         mysite = pywikibot.Site()
         linktrail = mysite.linktrail()
 
         # make a backup of the original text so we can show the changes later
-        linkR = re.compile(
+        link_regex = re.compile(
             r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
             r'(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
         curpos = 0
         # This loop will run until we have finished the current page
         while True:
-            m = linkR.search(text, pos=curpos)
+            m = link_regex.search(text, pos=curpos)
             if not m:
                 break
             # Make sure that next time around we will not find this same hit.
@@ -86,14 +86,15 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                     or is_interwikilink
                     or isDisabled(text, m.start())):
                 continue
-            actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
+            actual_link_page = pywikibot.Page(target_page.site,
+                                              m.group('title'))
             # Check whether the link found is to page.
             try:
-                actualLinkPage.title()
+                actual_link_page.title()
             except InvalidTitleError:
                 pywikibot.exception()
                 continue
-            if actualLinkPage != linkedPage:
+            if actual_link_page != linked_page:
                 continue
 
             # The link looks like this:
@@ -108,10 +109,10 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 section = ''
             else:
                 section = m.group('section')
-            if section and targetPage.section():
+            if section and target_page.section():
                 pywikibot.warning(
                     'Source section {} and target section {} found. '
-                    'Skipping.'.format(section, targetPage))
+                    'Skipping.'.format(section, target_page))
                 continue
             trailing_chars = m.group('linktrail')
             if trailing_chars:
@@ -121,9 +122,9 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             if link_text[0] == ':':
                 link_text = link_text[1:]
             if link_text[0].isupper() or link_text[0].isdigit():
-                new_page_title = targetPage.title()
+                new_page_title = target_page.title()
             else:
-                new_page_title = first_lower(targetPage.title())
+                new_page_title = first_lower(target_page.title())
 
             # remove preleading ":"
             if new_page_title[0] == ':':
@@ -180,7 +181,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
 
     def treat_page(self):
         """Change all redirects from the current page to actual links."""
-        links = self.current_page.linkedPages()
+        links = self.current_page.linked_pages()
         try:
             newtext = self.current_page.text
         except InvalidPageError:
@@ -219,14 +220,14 @@ def main(*args: str) -> None:
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg == '-featured':
             featured = True
         elif arg == '-overwrite':
             options['overwrite'] = True
-        elif genFactory.handle_arg(arg):
+        elif gen_factory.handle_arg(arg):
             pass
 
     mysite = pywikibot.Site()
@@ -237,7 +238,7 @@ def main(*args: str) -> None:
         return
 
     if featured:
-        ref = mysite.page_from_repository(featured_articles)
+        ref = mysite.page_from_repository(FEATURED_ARTICLES)
         if ref is not None:
             gen = ref.articles(namespaces=0, content=True)
         if not gen:
@@ -246,7 +247,7 @@ def main(*args: str) -> None:
                 additional_text='Option is not available for this site.')
             return
     else:
-        gen = genFactory.getCombinedGenerator(preload=True)
+        gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         bot = FixingRedirectBot(generator=gen, **options)
         bot.run()
