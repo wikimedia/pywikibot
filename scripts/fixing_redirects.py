@@ -10,6 +10,9 @@ Can be used with:
                   This parameters sets the script to completly overwrite the
                   link text ([[Foo]] -> [[Bar]]).
 
+-ignoremoves      Do not try to solve deleted pages after page move.
+                  This decreases processing time upto 95 %.
+
 &params;
 """
 #
@@ -58,7 +61,10 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     ignore_save_related_errors = True
     ignore_server_errors = True
     summary_key = 'fixing_redirects-fixing'
-    update_options = {'overwrite': False}
+    update_options = {
+        'overwrite': False,
+        'ignoremoves': False,
+    }
 
     def replace_links(self, text, linked_page, target_page):
         """Replace all source links by target."""
@@ -150,15 +156,15 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             continue
         return text
 
-    @staticmethod
-    def get_target(page):
+    def get_target(self, page):
         """Get the target page for a given page."""
         target = None
         if not page.exists():
-            with suppress(NoMoveTargetError,
-                          CircularRedirectError,
-                          InvalidTitleError):
-                target = page.moved_target()
+            if not self.opt.ignoremoves:
+                with suppress(NoMoveTargetError,
+                              CircularRedirectError,
+                              InvalidTitleError):
+                    target = page.moved_target()
         elif page.isRedirectPage():
             try:
                 target = page.getRedirectTarget()
@@ -219,16 +225,20 @@ def main(*args: str) -> None:
     gen = None
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
+    local_args = pywikibot.handle_args(args)
+    local_args = gen_factory.handle_args(local_args)
 
+    unknown = []
     for arg in local_args:
         if arg == '-featured':
             featured = True
-        elif arg == '-overwrite':
-            options['overwrite'] = True
-        elif gen_factory.handle_arg(arg):
-            pass
+        elif arg in ('-ignoremoves', '-overwrite'):
+            options[arg[1:]] = True
+        else:
+            unknown.append(arg)
+
+    suggest_help(unknown_parameters=unknown)
 
     mysite = pywikibot.Site()
     if mysite.sitename == 'wikipedia:nl':
