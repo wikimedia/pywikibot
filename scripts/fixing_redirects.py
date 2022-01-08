@@ -11,7 +11,6 @@ Can be used with:
                   link text ([[Foo]] -> [[Bar]]).
 
 -ignoremoves      Do not try to solve deleted pages after page move.
-                  This decreases processing time upto 95 %.
 
 &params;
 """
@@ -21,6 +20,7 @@ Can be used with:
 # Distributed under the terms of the MIT license.
 #
 import re
+from concurrent.futures import as_completed, ThreadPoolExecutor
 from contextlib import suppress
 
 import pywikibot
@@ -183,30 +183,30 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                         .format(section, target.title(as_link=True,
                                                       with_section=False)))
                     target = None
-        return target
+
+        if target is not None \
+           and target.namespace() in [2, 3] and page.namespace() not in [2, 3]:
+            target = None
+        return page, target
 
     def treat_page(self):
         """Change all redirects from the current page to actual links."""
-        links = self.current_page.linkedPages()
         try:
             newtext = self.current_page.text
         except InvalidPageError:
             pywikibot.exception()
             return
 
-        i = None
-        for i, page in enumerate(links):
-            target = self.get_target(page)
+        with ThreadPoolExecutor() as executor:
+            futures = {executor.submit(self.get_target, p)
+                       for p in self.current_page.linkedPages()}
+            for future in as_completed(futures):
+                page, target = future.result()
+                if not target:
+                    continue
+                newtext = self.replace_links(newtext, page, target)
 
-            if target is None:
-                continue
-
-            # no fix to user namespaces
-            if target.namespace() in [2, 3] and page.namespace() not in [2, 3]:
-                continue
-            newtext = self.replace_links(newtext, page, target)
-
-        if i is None:
+        if not futures:
             pywikibot.output('Nothing left to do.')
         else:
             self.put_current(newtext)
