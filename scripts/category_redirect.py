@@ -166,16 +166,17 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                         'categorymembers', cmtitle=old_cat.title(),
                         cmprop='title|sortkey', cmnamespace='10',
                         cmlimit='max'):
-                    doc = pywikibot.Page(pywikibot.Link(item['title']
-                                                        + '/doc', self.site))
-                    try:
-                        doc.get()
-                    except Error:
-                        continue
-                    changed = doc.change_category(old_cat, new_cat,
-                                                  summary=summary)
-                    if changed:
-                        moved += 1
+                    for subpage in self.site.doc_subpage:
+                        doc = pywikibot.Page(self.site,
+                                             item['title'] + subpage)
+                        try:
+                            doc.get()
+                        except Error:
+                            continue
+                        changed = doc.change_category(old_cat, new_cat,
+                                                      summary=summary)
+                        if changed:
+                            moved += 1
 
                 if found:
                     pywikibot.output('{}: {} found, {} moved'
