@@ -1,35 +1,29 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Improvements and Bugfixes
--------------------------
+Improvements
+------------
 
+* i18n.bundles(), i18n.known_languages and  i18n._get_bundle() functions were added
+* Raise ConnectionError immediately if urllib3.NewConnectionError occurs (T297994)
+* Make pywikibot messages available with site package (T57109, T275981)
+* Add support for API:Redirects
 * Enable shell script with Pywikibot site package
 * Enable generate_user_files.py and generate_family_file with site-package (T107629)
 * Add support for Python 3.11
-* Use page.site.data_repository when creating a _WbDataPage (T296985)
-* Fix mysql AttributeError for sock.close() on toolforge (T216741)
 * Pywikibot supports PyPy 3 (T101592)
-* Only search user_script_paths inside config.base_dir (T296204)
-* pywikibot.argv has been fixed for pwb.py wrapper if called with global args (T254435)
 * A new method User.is_locked() was added to determine whether the user is currently locked globally (T249392)
 * A new method APISite.is_locked() was added to determine whether a given user or user id is locked globally (T249392)
 * APISite.get_globaluserinfo() method was added to retrieve globaluserinfo for any user or user id (T163629)
 * APISite.globaluserinfo attribute may be deleted to force reload
 * APISite.is_blocked() method has a force parameter to reload that info
 * Allow family files in base_dir by default
-* Only ignore FileExistsError when creating the api cache (T295924)
 * Make pwb wrapper script a pywikibot entry point for scripts (T139143, T270480)
 * Enable -version and --version with pwb wrapper or code entry point (T101828)
-* Retry upload if 'copyuploadbaddomain' API error occurs (T294825)
 * Add `title_delimiter_and_aliases` attribute to family files to support WikiHow family (T294761)
-* Only handle query limit if query module is limited (T294836)
 * BaseBot has a public collections.Counter for reading, writing and skipping a page
 * Upload: Retry upload if 'copyuploadbaddomain' API error occurs (T294825)
-* Upload: Only set filekey/offset for files with names (T294916)
 * Update invisible characters from unicodedata 14.0.0
-* Make site parameter of textlib.replace_links() mandatory (T294649)
-* Raise a generic ServerError if the http status code is unofficial (T293208)
 * Add support for Wikimedia OCR engine with proofreadpage
 * Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (T85623, T293276)
 * The cached output functionality from compat release was re-implemented (T151727, T73646, T74942, T132135, T144698, T196039, T280466)
@@ -38,16 +32,35 @@ Improvements and Bugfixes
 * New "maxlimit" property was added to APISite (T291770)
 
 
+Bugfixes
+--------
+
+* Don't assert login result (T298761)
+* Allow title placeholder $1 in the middle of an url (T111513, T298078)
+* Don't create a Site object if pywikibot is not fully imported (T298384)
+* Use page.site.data_repository when creating a _WbDataPage (T296985)
+* Fix mysql AttributeError for sock.close() on toolforge (T216741)
+* Only search user_script_paths inside config.base_dir (T296204)
+* pywikibot.argv has been fixed for pwb.py wrapper if called with global args (T254435)
+* Only ignore FileExistsError when creating the api cache (T295924)
+* Only handle query limit if query module is limited (T294836)
+* Upload: Only set filekey/offset for files with names (T294916)
+* Make site parameter of textlib.replace_links() mandatory (T294649)
+* Raise a generic ServerError if the http status code is unofficial (T293208)
+
+
 Breaking changes
 ----------------
 
 * Support of Python 3.5.0 - 3.5.2 has been dropped (T286867)
-* generate_user_files.py must be used with pwb wrapper script
+* generate_user_files.py, generate_user_files.py, shell.py and version.py were moved to pywikibot/scripts and must be used with pwb wrapper script
 
 
 Code cleanups
 -------------
 
+* Remove APISite.newfiles() method (T168339)
+* Remove APISite.page_exists() method
 * Raise a TypeError if BaseBot.init_page return None
 * Remove private upload parameters in UploadRobot.upload_file(), FilePage.upload() and APISite.upload() methods
 * Raise an Error exception if 'titles' is still used as where parameter in Site.search()
@@ -91,13 +104,14 @@ Code cleanups
 * tools.concat_options() function was removed in favour of bot_choice.Option
 * tools.is_IP was be removed in favour of tools.is_ip_address()
 * textlib.unescape() function was be removed in favour of html.unescape()
-* APISite.deletepage() and APISite.deleteoldimage() methods were removed in favour of APISite.delete() 
+* APISite.deletepage() and APISite.deleteoldimage() methods were removed in favour of APISite.delete()
 * APISite.undeletepage() and APISite.undelete_file_versions() were be removed in favour of APISite.undelete() method
 
 
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
 * 7.0.0: Require mysql >= 0.7.11 (T216741)
 * 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute

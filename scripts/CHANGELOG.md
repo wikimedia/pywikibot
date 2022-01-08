@@ -18,6 +18,7 @@
 * Derive CheckerBot from CurrentPageBot (T196851, T171713)
 
 ### category
+* Show a warning if a pagegenerator option is not enabled (T298522)
 * Deprecated code parts were removed
 
 ### commonscat
@@ -28,6 +29,10 @@
 
 ### djvutext
 * pass site arg only once (T292367)
+
+### fixing_redirects
+* Use concurrent.futures to retrieve redirect or moved targets (T298789)
+* Add an option to ignore solving moved targets (T298789)
 
 ### newitem
 * Do not pass OtherPageSaveRelatedError silently
