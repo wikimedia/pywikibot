@@ -206,10 +206,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                     continue
                 newtext = self.replace_links(newtext, page, target)
 
-        if not futures:
-            pywikibot.output('Nothing left to do.')
-        else:
-            self.put_current(newtext)
+        self.put_current(newtext)
 
 
 def main(*args: str) -> None:
