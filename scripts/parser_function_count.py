@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Used to find expensive templates that are subject to be converted to Lua.
 
@@ -43,7 +44,7 @@ Should you specify neither first nor atleast, all templates using parser
 functions will be listed.
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #

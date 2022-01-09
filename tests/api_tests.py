@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """API test module."""
 #
 # (C) Pywikibot team, 2007-2022

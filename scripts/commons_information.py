@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Insert a language template into the description field."""
 #
 # (C) Pywikibot team, 2015-2022

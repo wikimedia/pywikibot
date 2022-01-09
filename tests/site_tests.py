@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Tests for the site module."""
 #
 # (C) Pywikibot team, 2008-2022

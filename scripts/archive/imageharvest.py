@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Bot for getting multiple images from an external site.
 
@@ -17,7 +18,7 @@ Other options:
 -justshown  Choose _only_ images shown on the page, not those linked
 """
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #

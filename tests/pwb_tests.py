@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Test pwb.py.
 
@@ -6,7 +7,7 @@ should be added locally.
 https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #

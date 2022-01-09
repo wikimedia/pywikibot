@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Tests for edit failures.
 
@@ -7,7 +8,7 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #

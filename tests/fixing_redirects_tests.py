@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test fixing redirects bot module."""
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #

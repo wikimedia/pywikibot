@@ -3019,8 +3019,3 @@ class PetScanPageGenerator:
             page = pywikibot.Page(self.site, raw_page['title'],
                                   int(raw_page['namespace']))
             yield page
-
-
-if __name__ == '__main__':  # pragma: no cover
-    pywikibot.output('Pagegenerators cannot be run as script - are you '
-                     'looking for listpages.py?')

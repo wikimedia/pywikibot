@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Unit tests for checkimages script."""
 #
 # (C) Pywikibot team, 2015-2021

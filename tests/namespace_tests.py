@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #

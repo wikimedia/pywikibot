@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to upload the mappings of Freebase to Wikidata.
 

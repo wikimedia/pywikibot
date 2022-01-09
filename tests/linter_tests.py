@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2018-2021
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #

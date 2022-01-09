@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Correct all redirect links in featured pages or only one page of each wiki.
 

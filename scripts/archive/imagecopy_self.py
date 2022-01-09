@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Script to copy self published files from English Wikipedia to Commons.
 
@@ -31,7 +32,7 @@ Use -nochecktemplate if you don't want to add the check template. Be sure to
 check it yourself.
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #

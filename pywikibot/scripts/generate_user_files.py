@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Script to create user-config.py.
 
 .. versionchanged:: 7.0

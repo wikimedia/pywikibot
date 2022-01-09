@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to resolve double redirects, and to delete broken redirects.
 

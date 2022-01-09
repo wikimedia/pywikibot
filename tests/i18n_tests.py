@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #

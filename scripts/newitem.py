@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This script creates new items on Wikidata based on certain criteria.
 

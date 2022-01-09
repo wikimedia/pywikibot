@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Tests for the Wikidata parts of the page module."""
 #
 # (C) Pywikibot team, 2019-2021

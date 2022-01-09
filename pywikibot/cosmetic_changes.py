@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 This module can do slight modifications to tidy a wiki page's source code.
 

@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test OAuth functionality."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #

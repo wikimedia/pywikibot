@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Tests for the tests package."""
 #
 # (C) Pywikibot team, 2014-2021

@@ -1,7 +1,6 @@
-#!/usr/bin/python
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #

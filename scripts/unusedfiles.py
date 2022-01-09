@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot appends some text to all unused images and notifies uploaders.
 

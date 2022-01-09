@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test cases for the SPARQL API."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
