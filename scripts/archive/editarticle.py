@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Edit a Wikipedia article with your favourite editor.
 

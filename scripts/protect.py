@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This script can be used to protect and unprotect pages en masse.
 

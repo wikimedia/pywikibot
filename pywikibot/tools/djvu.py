@@ -1,7 +1,6 @@
-#!/usr/bin/python
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #

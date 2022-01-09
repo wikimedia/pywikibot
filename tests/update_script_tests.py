@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """update_script.py tests."""
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #

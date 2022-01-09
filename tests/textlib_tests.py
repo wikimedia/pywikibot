@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Test textlib module."""
 #
 # (C) Pywikibot team, 2011-2022

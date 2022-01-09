@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Nifty script to convert HTML-tables to MediaWiki's own syntax.
 

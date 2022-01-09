@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to copy images to Wikimedia Commons, or to another wiki.
 

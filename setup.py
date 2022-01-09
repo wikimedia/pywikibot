@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot framework.
 
@@ -27,7 +28,7 @@ To create a new distribution:
 - upload this patchset to Gerrit and merge it.
 """
 #
-# (C) Pywikibot team, 2009-2021
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 #

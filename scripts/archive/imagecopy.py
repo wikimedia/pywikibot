@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Script to copy files from a local Wikimedia wiki to Wikimedia Commons.
 
@@ -56,7 +57,7 @@ deletion):
 By default the bot works on your home wiki (set in user-config)
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to help a human solve disambiguations by presenting a set of options.
 

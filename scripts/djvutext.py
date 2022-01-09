@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot uploads text from djvu files onto pages in the "Page" namespace.
 

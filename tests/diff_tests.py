@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Test diff module."""
 #
 # (C) Pywikibot team, 2016-2021

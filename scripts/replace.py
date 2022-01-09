@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This bot will make direct text replacements.
 

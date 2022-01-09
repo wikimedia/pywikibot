@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This is a Bot to add text to the top or bottom of a page.
 

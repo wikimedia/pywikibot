@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Script that updates the linktrails in family.py file.
 
 linktrails contains a regex for each site code which holds letters that

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 Script to delete files that are also present on Wikimedia Commons.
 

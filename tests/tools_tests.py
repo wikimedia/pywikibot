@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Test tools package alone which don't fit into other tests."""
 #
 # (C) Pywikibot team, 2015-2022

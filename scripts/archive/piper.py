@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This bot uses external filtering programs for munging text.
 

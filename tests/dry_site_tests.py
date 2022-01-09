@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #

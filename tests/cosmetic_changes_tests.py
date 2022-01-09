@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Test cosmetic_changes module."""
 #
 # (C) Pywikibot team, 2015-2022

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This script runs commands on each entry in the API caches.
 

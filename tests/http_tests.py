@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """Tests for http module."""
 #
 # (C) Pywikibot team, 2014-2022

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot downloads dump from dumps.wikimedia.org.
 
