@@ -919,7 +919,7 @@ class GeneratorFactory:
         if not value:
             value = i18n.input('pywikibot-enter-page-processing')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return InterwikiPageGenerator(page)
+        return LanguageLinksPageGenerator(page)
 
     def _handle_randomredirect(self, value: str) -> HANDLER_RETURN_TYPE:
         """Handle `-randomredirect` argument."""
