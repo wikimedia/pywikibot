@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Wrapper script to invoke pywikibot-based scripts.
 
@@ -34,7 +34,7 @@ for tests to set the default site (see T216825)::
 .. versionchanged:: 7.0
    pwb wrapper was added to the Python site package lib
 """
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,6 +50,12 @@ from importlib import import_module
 from time import sleep
 from warnings import warn
 
+try:
+    from pathlib import Path
+except ImportError as e:
+    from setup import PYTHON_VERSION, VERSIONS_REQUIRED_MESSAGE
+    print(VERSIONS_REQUIRED_MESSAGE.format(version=PYTHON_VERSION))
+    sys.exit(e)
 
 pwb = None
 site_package = False
@@ -261,9 +267,6 @@ def check_modules(script=None):
             return False
 
     return not missing_requirements
-
-
-from pathlib import Path  # noqa: E402
 
 
 filename, script_args, global_args = handle_args(*sys.argv)
