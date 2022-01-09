@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2021
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 import calendar
@@ -1669,42 +1669,6 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         for key in ['type', 'namespace', 'title', 'comment',
                     'timestamp', 'user', 'bot']:
             self.assertIn(key, rcinfo.keys())
-
-
-class TestUnconnectedPageGenerator(DefaultSiteTestCase):
-
-    """Test UnconnectedPageGenerator."""
-
-    cached = True
-
-    def test_unconnected_with_repo(self):
-        """Test UnconnectedPageGenerator."""
-        if not self.site.data_repository():
-            self.skipTest('Site is not using a Wikibase repository')
-        with suppress_warnings(
-                'pywikibot.pagegenerators.UnconnectedPageGenerator is '
-                'deprecated', FutureWarning):
-            upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
-        self.assertDictEqual(
-            upgen.request._params, {
-                'gqppage': ['UnconnectedPages'],
-                'prop': ['info', 'imageinfo', 'categoryinfo'],
-                'inprop': ['protection'],
-                'iilimit': ['max'],
-                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                           'sha1', 'metadata'],
-                'generator': ['querypage'], 'action': ['query'],
-                'indexpageids': [True], 'continue': [True]})
-        self.assertLessEqual(len(tuple(upgen)), 3)
-
-    def test_unconnected_without_repo(self):
-        """Test that it raises a ValueError on sites without repository."""
-        if self.site.data_repository():
-            self.skipTest('Site is using a Wikibase repository')
-        with self.assertRaises(ValueError):
-            for _ in pagegenerators.UnconnectedPageGenerator(self.site,
-                                                             total=5):
-                raise AssertionError("this shouldn't be reached")
 
 
 class TestLinksearchPageGenerator(TestCase):
