@@ -202,9 +202,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                        for p in self.current_page.linkedPages()}
             for future in as_completed(futures):
                 page, target = future.result()
-                if not target:
-                    continue
-                newtext = self.replace_links(newtext, page, target)
+                if target:
+                    newtext = self.replace_links(newtext, page, target)
 
         self.put_current(newtext)
 
