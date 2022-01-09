@@ -21,9 +21,9 @@ class TestSettings(TestCase):
 
     def test_load(self):
         """Test loading settings."""
-        b = checkimages.checkImagesBot(self.get_site())
+        b = checkimages.CheckImagesBot(self.get_site())
         b.takesettings()
-        rv = b.settingsData
+        rv = b.settings_data
         item1 = rv[0]
         self.assertEqual(item1[0], 1)
         self.assertEqual(item1[1], 'a deprecated template')
