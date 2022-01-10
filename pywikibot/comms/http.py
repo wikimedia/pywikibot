@@ -294,7 +294,7 @@ def error_handling_callback(response):
     if isinstance(response, requests.ConnectionError):
         msg = str(response)
         if 'NewConnectionError' in msg \
-           and re.search(r'\[Errno (-2|11001)\]', msg):
+           and re.search(r'\[Errno (-2|8|11001)\]', msg):
             raise ConnectionError(response)
 
     if isinstance(response, Exception):
