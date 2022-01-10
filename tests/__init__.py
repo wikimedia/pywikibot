@@ -1,6 +1,6 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,6 +29,7 @@ import requests  # noqa: F401
 
 import pywikibot.data.api
 from pywikibot import config
+from pywikibot.backports import Dict, List
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
@@ -172,11 +173,7 @@ disabled_test_modules = {
     'l10n',  # pywikibot-i18n repository runs it
 }
 
-disabled_tests = {
-    'textlib': [
-        'test_interwiki_format',  # example; very slow test
-    ],
-}
+disabled_tests = {}  # type: Dict[str, List[str]]
 
 
 def _unknown_test_modules():
