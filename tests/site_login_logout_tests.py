@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import os
 import unittest
 from contextlib import suppress
 
@@ -48,6 +49,12 @@ class TestLoginLogout(DefaultSiteTestCase):
             self.assertNotIn('_userinfo', site.__dict__.keys())
 
             self.assertIsNone(site.user())
+
+
+def setUpModule():  # noqa: N802
+    """Skip tests if PYWIKIBOT_LOGIN_LOGOUT variable is not set."""
+    if os.environ.get('PYWIKIBOT_LOGIN_LOGOUT', '0') != '1':
+        raise unittest.SkipTest('login/logout tests ar disabled')
 
 
 if __name__ == '__main__':  # pragma: no cover

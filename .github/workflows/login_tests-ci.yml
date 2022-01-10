@@ -6,13 +6,14 @@ name: Login CI
 
 on:
   workflow_run:
-    workflows: [ "pywikibot-ci" ]
+    workflows: [ "Pywikibot CI" ]
     branches: [ master, stable ]
     types:
       - completed
 
 env:
   PYWIKIBOT_TESTS_RUNNING: 1
+  PYWIKIBOT_LOGIN_LOGOUT: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
