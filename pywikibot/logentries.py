@@ -1,13 +1,13 @@
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
 from collections import UserDict
 from contextlib import suppress
 import datetime
-from typing import Any, Optional
+from typing import Any, Optional, Type, Union
 
 import pywikibot
 from pywikibot.backports import Dict, List, Tuple
@@ -15,14 +15,6 @@ from pywikibot.exceptions import Error, HiddenKeyError
 
 
 _logger = 'wiki'
-
-# TODO: replace these after T286867
-
-PAGE_OR_INT_TYPE = Any  # Union[int, 'pywikibot.page.Page']
-OPT_TIMESTAMP_TYPE = Any  # Optional['pywikibot.Timestamp']
-
-LOG_ENTRY_CLASS = Any  # Type['LogEntry']
-LOG_ENTRY_FACTORY_CLASS = Any  # Type['LogEntryFactory']
 
 
 class LogEntry(UserDict):
@@ -107,7 +99,7 @@ class LogEntry(UserDict):
 
         return self[self._expected_type]
 
-    def page(self) -> PAGE_OR_INT_TYPE:
+    def page(self) -> Union[int, 'pywikibot.page.Page']:
         """
         Page on which action was performed.
 
@@ -169,7 +161,7 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             self._blockid = int(self['title'][pos + 1:])
 
-    def page(self) -> PAGE_OR_INT_TYPE:
+    def page(self) -> Union[int, 'pywikibot.page.Page']:
         """
         Return the blocked account or IP.
 
@@ -217,7 +209,7 @@ class BlockEntry(LogEntry):
                 self._duration = self.expiry() - self.timestamp()
         return self._duration
 
-    def expiry(self) -> OPT_TIMESTAMP_TYPE:
+    def expiry(self) -> Optional['pywikibot.Timestamp']:
         """Return a Timestamp representing the block expiry date."""
         if not hasattr(self, '_expiry'):
             details = self._params.get('expiry')
@@ -374,7 +366,7 @@ class LogEntryFactory:
         """
         return self._creator(logdata)
 
-    def get_valid_entry_class(self, logtype: str) -> LOG_ENTRY_CLASS:
+    def get_valid_entry_class(self, logtype: str) -> 'LogEntry':
         """
         Return the class corresponding to the @logtype string parameter.
 
@@ -387,8 +379,8 @@ class LogEntryFactory:
         return LogEntryFactory.get_entry_class(logtype)
 
     @classmethod
-    def get_entry_class(cls: LOG_ENTRY_FACTORY_CLASS,
-                        logtype: str) -> LOG_ENTRY_CLASS:
+    def get_entry_class(cls: Type['LogEntryFactory'],
+                        logtype: str) -> 'LogEntry':
         """
         Return the class corresponding to the @logtype string parameter.
 
@@ -398,7 +390,7 @@ class LogEntryFactory:
             or use the get_valid_entry_class instance method instead.
         """
         if logtype not in cls._logtypes:
-            bases = (OtherLogEntry, )  # type: Tuple[LOG_ENTRY_CLASS, ...]
+            bases = (OtherLogEntry, )  # type: Tuple['LogEntry', ...]
             if logtype in ('newusers', 'thanks'):
                 bases = (UserTargetLogEntry, OtherLogEntry)
 

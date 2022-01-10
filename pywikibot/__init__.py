@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ import time
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Optional, Type, Union
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -71,24 +71,9 @@ from pywikibot.tools import classproperty
 from pywikibot.tools import normalize_username
 from pywikibot.tools.formatter import color_format
 
-TO_DECIMAL_TYPE = Union[int, float, str, 'Decimal', None]
 
-# TODO: replace these after T286867
-
-STR_OR_TIMESTAMP = Any  # Union[str, 'Timestamp']
-OPT_STR_OR_SITE = Any  # Union[str, 'pywikibot.site.BaseSite', None]
-OPT_STR_OR_ITEM_PAGE = Any  # Union[str, 'pywikibot.page.ItemPage', None]
-OPT_STR_OR_FAMILY = Any  # Union[str, 'pywikibot.family.Family', None]
-
-TIMESTAMP_CLASS = Any  # Type['Timestamp']
-COORDINATE_CLASS = Any  # Type['Coordinate']
-WB_TIME_CLASS = Any  # Type['WbTime']
-WB_QUANTITY_CLASS = Any  # Type['WbQuantity']
-WB_MONOLINGUAL_TEXT_CLASS = Any  # Type['WbMonolingualText']
-WB_DATA_PAGE_CLASS = Any  # Type['_WbDataPage']
-WB_GEO_SHAPE_CLASS = Any  # Type['WbGeoShape']
-WB_TABULAR_DATA_CLASS = Any  # Type['WbTabularData']
-WB_UNKNOWN_CLASS = Any  # Type['WbUnknown']
+ItemPageStrNoneType = Union[str, 'ItemPage', None]
+ToDecimalType = Union[int, float, str, 'Decimal', None]
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
@@ -138,12 +123,12 @@ class Timestamp(datetime.datetime):
         return self.replace(microsecond=self.microsecond)
 
     @classproperty
-    def ISO8601Format(cls: TIMESTAMP_CLASS) -> str:
+    def ISO8601Format(cls: Type['Timestamp']) -> str:
         """ISO8601 format string class property for compatibility purpose."""
         return cls._ISO8601Format()
 
     @classmethod
-    def _ISO8601Format(cls: TIMESTAMP_CLASS, sep: str = 'T') -> str:
+    def _ISO8601Format(cls: Type['Timestamp'], sep: str = 'T') -> str:
         """ISO8601 format string.
 
         :param sep: one-character separator, placed between the date and time
@@ -153,7 +138,7 @@ class Timestamp(datetime.datetime):
         return '%Y-%m-%d{}%H:%M:%SZ'.format(sep)
 
     @classmethod
-    def fromISOformat(cls: TIMESTAMP_CLASS, ts: STR_OR_TIMESTAMP,
+    def fromISOformat(cls: Type['Timestamp'], ts: Union[str, 'Timestamp'],
                       sep: str = 'T') -> 'Timestamp':
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
@@ -168,7 +153,7 @@ class Timestamp(datetime.datetime):
         return cls.strptime(ts, cls._ISO8601Format(sep))
 
     @classmethod
-    def fromtimestampformat(cls: TIMESTAMP_CLASS, ts: STR_OR_TIMESTAMP
+    def fromtimestampformat(cls: Type['Timestamp'], ts: Union[str, 'Timestamp']
                             ) -> 'Timestamp':
         """Convert a MediaWiki internal timestamp to a Timestamp object."""
         # If inadvertently passed a Timestamp object, use replace()
@@ -228,7 +213,7 @@ class Coordinate(_WbRepresentation):
                  globe: Optional[str] = None, typ: str = '',
                  name: str = '', dim: Optional[int] = None,
                  site: Optional[DataSite] = None,
-                 globe_item: OPT_STR_OR_ITEM_PAGE = None,
+                 globe_item: ItemPageStrNoneType = None,
                  primary: bool = False) -> None:
         """
         Represent a geo coordinate.
@@ -295,7 +280,7 @@ class Coordinate(_WbRepresentation):
                 }
 
     @classmethod
-    def fromWikibase(cls: COORDINATE_CLASS, data: Dict[str, Any],
+    def fromWikibase(cls: Type['Coordinate'], data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'Coordinate':
         """
         Constructor to create an object from Wikibase's JSON output.
@@ -537,7 +522,7 @@ class WbTime(_WbRepresentation):
                 raise ValueError('Invalid precision: "{}"'.format(precision))
 
     @classmethod
-    def fromTimestr(cls: WB_TIME_CLASS,
+    def fromTimestr(cls: Type['WbTime'],
                     datetimestr: str,
                     precision: Union[int, str] = 14,
                     before: int = 0,
@@ -575,7 +560,7 @@ class WbTime(_WbRepresentation):
                    precision, before, after, timezone, calendarmodel, site)
 
     @classmethod
-    def fromTimestamp(cls: WB_TIME_CLASS, timestamp: 'Timestamp',
+    def fromTimestamp(cls: Type['WbTime'], timestamp: 'Timestamp',
                       precision: Union[int, str] = 14,
                       before: int = 0, after: int = 0,
                       timezone: int = 0, calendarmodel: Optional[str] = None,
@@ -643,7 +628,7 @@ class WbTime(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls: WB_TIME_CLASS, data: Dict[str, Any],
+    def fromWikibase(cls: Type['WbTime'], data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbTime':
         """
         Create a WbTime from the JSON data given by the Wikibase API.
@@ -679,7 +664,7 @@ class WbQuantity(_WbRepresentation):
         return site.mw_version < '1.29.0-wmf.2'
 
     @staticmethod
-    def _todecimal(value: TO_DECIMAL_TYPE) -> Optional[Decimal]:
+    def _todecimal(value: ToDecimalType) -> Optional[Decimal]:
         """
         Convert a string to a Decimal for use in WbQuantity.
 
@@ -704,10 +689,10 @@ class WbQuantity(_WbRepresentation):
         """
         return format(value, '+g') if value is not None else None
 
-    def __init__(self, amount: TO_DECIMAL_TYPE,
-                 unit: OPT_STR_OR_ITEM_PAGE = None,
-                 error: Union[TO_DECIMAL_TYPE,
-                              Tuple[TO_DECIMAL_TYPE, TO_DECIMAL_TYPE]] = None,
+    def __init__(self, amount: ToDecimalType,
+                 unit: ItemPageStrNoneType = None,
+                 error: Union[ToDecimalType,
+                              Tuple[ToDecimalType, ToDecimalType]] = None,
                  site: Optional[DataSite] = None) -> None:
         """
         Create a new WbQuantity object.
@@ -791,7 +776,7 @@ class WbQuantity(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls: WB_QUANTITY_CLASS, data: Dict[str, Any],
+    def fromWikibase(cls: Type['WbQuantity'], data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbQuantity':
         """
         Create a WbQuantity from the JSON data given by the Wikibase API.
@@ -842,7 +827,7 @@ class WbMonolingualText(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls: WB_MONOLINGUAL_TEXT_CLASS, data: Dict[str, Any],
+    def fromWikibase(cls: Type['WbMonolingualText'], data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbMonolingualText':
         """
         Create a WbMonolingualText from the JSON data given by Wikibase API.
@@ -865,7 +850,7 @@ class _WbDataPage(_WbRepresentation):
     _items = ('page', )
 
     @classmethod
-    def _get_data_site(cls: WB_DATA_PAGE_CLASS, repo_site: DataSite
+    def _get_data_site(cls: Type['_WbDataPage'], repo_site: DataSite
                        ) -> APISite:
         """
         Return the site serving as a repository for a given data type.
@@ -877,7 +862,7 @@ class _WbDataPage(_WbRepresentation):
         raise NotImplementedError
 
     @classmethod
-    def _get_type_specifics(cls: WB_DATA_PAGE_CLASS, site: DataSite
+    def _get_type_specifics(cls: Type['_WbDataPage'], site: DataSite
                             ) -> Dict[str, Any]:
         """
         Return the specifics for a given data type.
@@ -962,7 +947,7 @@ class _WbDataPage(_WbRepresentation):
         return self.page.title()
 
     @classmethod
-    def fromWikibase(cls: WB_DATA_PAGE_CLASS, page_name: str,
+    def fromWikibase(cls: Type['_WbDataPage'], page_name: str,
                      site: Optional[DataSite]) -> '_WbDataPage':
         """
         Create a _WbDataPage from the JSON data given by the Wikibase API.
@@ -983,7 +968,7 @@ class WbGeoShape(_WbDataPage):
     """A Wikibase geo-shape representation."""
 
     @classmethod
-    def _get_data_site(cls: WB_GEO_SHAPE_CLASS, site: DataSite) -> APISite:
+    def _get_data_site(cls: Type['WbGeoShape'], site: DataSite) -> APISite:
         """
         Return the site serving as a geo-shape repository.
 
@@ -992,7 +977,7 @@ class WbGeoShape(_WbDataPage):
         return site.geo_shape_repository()
 
     @classmethod
-    def _get_type_specifics(cls: WB_GEO_SHAPE_CLASS, site: DataSite
+    def _get_type_specifics(cls: Type['WbGeoShape'], site: DataSite
                             ) -> Dict[str, Any]:
         """
         Return the specifics for WbGeoShape.
@@ -1011,7 +996,7 @@ class WbTabularData(_WbDataPage):
     """A Wikibase tabular-data representation."""
 
     @classmethod
-    def _get_data_site(cls: WB_TABULAR_DATA_CLASS, site: DataSite) -> APISite:
+    def _get_data_site(cls: Type['WbTabularData'], site: DataSite) -> APISite:
         """
         Return the site serving as a tabular-data repository.
 
@@ -1020,7 +1005,7 @@ class WbTabularData(_WbDataPage):
         return site.tabular_data_repository()
 
     @classmethod
-    def _get_type_specifics(cls: WB_TABULAR_DATA_CLASS, site: DataSite
+    def _get_type_specifics(cls: Type['WbTabularData'], site: DataSite
                             ) -> Dict[str, Any]:
         """
         Return the specifics for WbTabularData.
@@ -1066,7 +1051,7 @@ class WbUnknown(_WbRepresentation):
         return self.json
 
     @classmethod
-    def fromWikibase(cls: WB_UNKNOWN_CLASS, data: Dict[str, Any],
+    def fromWikibase(cls: Type['WbUnknown'], data: Dict[str, Any],
                      site: Optional[DataSite] = None) -> 'WbUnknown':
         """
         Create a WbUnknown from the JSON data given by the Wikibase API.
@@ -1112,9 +1097,9 @@ def _code_fam_from_url(url: str, name: Optional[str] = None
 
 
 def Site(code: Optional[str] = None,
-         fam: OPT_STR_OR_FAMILY = None,
+         fam: Union[str, 'Family', None] = None,
          user: Optional[str] = None, *,
-         interface: OPT_STR_OR_SITE = None,
+         interface: Union[str, 'BaseSite', None] = None,
          url: Optional[str] = None) -> BaseSite:
     """A factory method to obtain a Site object.
 

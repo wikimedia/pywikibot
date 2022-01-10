@@ -57,7 +57,7 @@ Additionally there is the :py:obj:`AutomaticTWSummaryBot` which subclasses
 ``put_current`` is used.
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -181,18 +181,14 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
 
-ANSWER = Union[
-    Tuple[str, str],
-    'pywikibot.bot_choice.Option']
+if False:  # typing.TYPE_CHECKING
+    from pywikibot.site import BaseSite
 
-ANSWER_TYPE = Union[Iterable[ANSWER], 'pywikibot.bot_choice.Option']
-
-# TODO: We should change this to the following after T286867...
-
-PAGE_OR_LINK_TYPE = Any  # Union['pywikibot.page.Link', 'pywikibot.page.Page']
-OPT_SITE_TYPE = Any  # Optional['pywikibot.site.BaseSite']
-OPT_CLAIM_TYPE = Any  # Optional['pywikibot.page.Claim']
-OPT_ITEM_PAGE_TYPE = Any  # Optional['pywikibot.page.ItemPage']
+AnswerType = Union[
+    Iterable[Union[Tuple[str, str], 'pywikibot.bot_choice.Option']],
+    'pywikibot.bot_choice.Option',
+]
+PageLinkType = Union['pywikibot.page.Link', 'pywikibot.page.Page']
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -573,7 +569,7 @@ def input(question: str,
 
 @initialize_handlers
 def input_choice(question: str,
-                 answers: ANSWER_TYPE,
+                 answers: AnswerType,
                  default: Optional[str] = None,
                  return_shortcut: bool = True,
                  automatic_quit: bool = True,
@@ -634,7 +630,7 @@ def input_yn(question: str,
 
 @initialize_handlers
 def input_list_choice(question: str,
-                      answers: ANSWER_TYPE,
+                      answers: AnswerType,
                       default: Union[int, str, None] = None,
                       force: bool = False) -> str:
     """
@@ -678,8 +674,8 @@ class InteractiveReplace:
     """
 
     def __init__(self,
-                 old_link: PAGE_OR_LINK_TYPE,
-                 new_link: Union[PAGE_OR_LINK_TYPE, bool],
+                 old_link: PageLinkType,
+                 new_link: Union[PageLinkType, bool],
                  default: Optional[str] = None,
                  automatic_quit: bool = True) -> None:
         """
@@ -707,7 +703,7 @@ class InteractiveReplace:
         self._quit = automatic_quit
 
         current_match_type = Optional[Tuple[
-            PAGE_OR_LINK_TYPE,
+            PageLinkType,
             str,
             Mapping[str, str],
             Tuple[int, int]
@@ -749,7 +745,7 @@ class InteractiveReplace:
 
         raise ValueError('Invalid choice "{}"'.format(choice))
 
-    def __call__(self, link: PAGE_OR_LINK_TYPE,
+    def __call__(self, link: PageLinkType,
                  text: str, groups: Mapping[str, str],
                  rng: Tuple[int, int]) -> Any:
         """Ask user how the selected link should be replaced."""
@@ -815,7 +811,7 @@ class InteractiveReplace:
         return self.handle_answer(choice)
 
     @property
-    def current_link(self) -> PAGE_OR_LINK_TYPE:
+    def current_link(self) -> PageLinkType:
         """Get the current link when it's handling one currently."""
         if self._current_match is None:
             raise ValueError('No current link')
@@ -1011,7 +1007,7 @@ def show_help(module_name: Optional[str] = None,
         module = import_module(module_name)  # type: ignore
         help_text = module.__doc__  # type: str # type: ignore[assignment]
         if hasattr(module, 'docuReplacements'):
-            for key, value in module.docuReplacements.items():  # type: ignore
+            for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
     except Exception:
         if module_name:
@@ -1113,7 +1109,7 @@ def open_webbrowser(page: 'pywikibot.page.BasePage') -> None:
     i18n.input('pywikibot-enter-finished-browser')
 
 
-class _OptionDict(dict):
+class _OptionDict(Dict[str, Any]):
 
     """The option dict which holds the options of OptionHandler.
 
@@ -1621,7 +1617,7 @@ class Bot(BaseBot):
     instead which specifically handle multiple or single sites.
     """
 
-    def __init__(self, site: OPT_SITE_TYPE = None,
+    def __init__(self, site: Optional['BaseSite'] = None,
                  **kwargs: Any) -> None:
         """Create a Bot instance and initialize cached sites."""
         # TODO: add warning if site is specified and generator
@@ -1632,7 +1628,7 @@ class Bot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    def site(self) -> 'pywikibot.site.BaseSite':
+    def site(self) -> Optional['BaseSite']:
         """Get the current site."""
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
@@ -1642,7 +1638,7 @@ class Bot(BaseBot):
         return self._site
 
     @site.setter
-    def site(self, site: OPT_SITE_TYPE) -> None:
+    def site(self, site: Optional['BaseSite']) -> None:
         """
         Set the Site that the bot is using.
 
@@ -1704,7 +1700,7 @@ class SingleSiteBot(BaseBot):
     """
 
     def __init__(self,
-                 site: Union[OPT_SITE_TYPE, bool] = True,
+                 site: Union['BaseSite', bool, None] = True,
                  **kwargs: Any) -> None:
         """
         Create a SingleSiteBot instance.
@@ -1713,7 +1709,7 @@ class SingleSiteBot(BaseBot):
             pywikibot.Site.
         """
         if site is True:
-            self._site = pywikibot.Site()
+            self._site = pywikibot.Site()  # type: Optional[BaseSite]
         elif site is False:
             raise ValueError("'site' must be a site, True, or None")
         else:
@@ -1721,14 +1717,14 @@ class SingleSiteBot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    def site(self) -> OPT_SITE_TYPE:
+    def site(self) -> 'BaseSite':
         """Site that the bot is using."""
         if not self._site:
             raise ValueError('The site has not been defined yet.')
         return self._site
 
     @site.setter
-    def site(self, value: OPT_SITE_TYPE) -> None:
+    def site(self, value: Optional['BaseSite']) -> None:
         """Set the current site but warns if different."""
         if self._site:
             # Warn in any case where the site is (probably) changed after
@@ -2108,7 +2104,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     def user_add_claim(self, item: 'pywikibot.page.ItemPage',
                        claim: 'pywikibot.page.Claim',
-                       source: OPT_SITE_TYPE = None,
+                       source: Optional['BaseSite'] = None,
                        bot: bool = True, **kwargs: Any) -> bool:
         """
         Add a claim to an item, with user confirmation as required.
@@ -2134,8 +2130,7 @@ class WikidataBot(Bot, ExistingPageBot):
                                                    claim.getTarget()))
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
-    def getSource(self, site: 'pywikibot.site.BaseSite'
-                  ) -> OPT_CLAIM_TYPE:
+    def getSource(self, site: 'BaseSite') -> Optional['pywikibot.page.Claim']:
         """
         Create a Claim usable as a source for Wikibase statements.
 
@@ -2154,7 +2149,7 @@ class WikidataBot(Bot, ExistingPageBot):
             self, item: 'pywikibot.page.ItemPage',
             claim: 'pywikibot.page.Claim',
             exists_arg: str = '',
-            source: OPT_SITE_TYPE = None,
+            source: Optional['BaseSite'] = None,
             logger_callback: Callable[[str], Any] = log,
             **kwargs: Any) -> bool:
         """
@@ -2227,7 +2222,7 @@ class WikidataBot(Bot, ExistingPageBot):
                              data: Optional[Dict[str, Any]] = None,
                              summary: Optional[str] = None,
                              **kwargs: Any
-                             ) -> OPT_ITEM_PAGE_TYPE:
+                             ) -> Optional['pywikibot.page.ItemPage']:
         """
         Create an ItemPage with the provided page as the sitelink.
 

@@ -281,7 +281,7 @@ class PageRelatedError(Error):
     # Override this in subclasses.
     message = ''
 
-    def __init__(self, page: 'pywikibot.page.Page',
+    def __init__(self, page: 'pywikibot.page.BasePage',
                  message: Optional[str] = None) -> None:
         """
         Initializer.

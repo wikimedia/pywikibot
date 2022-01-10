@@ -11,7 +11,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -100,6 +100,12 @@ __all__ = (
     'unicode2html',
     'url2unicode',
 )
+
+PageSourceType = Union[
+    'pywikibot.site.BaseLink',
+    'pywikibot.page.BaseSite',
+    'pywikibot.page.Page',
+]
 
 logger = logging.getLogger('pywiki.wiki.page')
 
