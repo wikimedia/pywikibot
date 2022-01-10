@@ -1,0 +1,120 @@
+# This workflow will install Python dependencies, run Pywikibot tests
+# with a variety of Python versions. For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Login CI
+
+on:
+  workflow_run:
+    workflows: [ "pywikibot-ci" ]
+    branches: [ master, stable ]
+    types:
+      - completed
+
+env:
+  PYWIKIBOT_TESTS_RUNNING: 1
+  PYWIKIBOT_USERNAME: Pywikibot-test
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.experimental || false }}
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+
+      matrix:
+        python-version: ["pypy3", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
+        site: ["wikipedia:en", "wikisource:zh"]
+        test_prod_only: [true]
+        include:
+          - python-version: "3.6"
+            site: False
+            family: wpbeta
+            code: en
+            experimental: true
+          - python-version: "3.6"
+            site: False
+            family: wpbeta
+            code: zh
+            experimental: true
+          - python-version: "3.5"
+            site: wsbeta:en
+            experimental: true
+          - python-version: "3.7"
+            site: "wikipedia:test"
+          - python-version: "3.7"
+            site: "wikidata:test"
+          - python-version: "3.9"
+            site: "wiktionary:ar"
+            test_no_rc: true
+          - python-version: "3.6"
+            site: "wikidata:wikidata"
+          - python-version: "3.8"
+            site: "wowwiki:uk"
+            experimental: true
+          - python-version: "3.11.0-alpha.2"
+            site: "wikipedia:test"
+            experimental: true
+          - python-version: 3
+            site: "wikipedia:de"
+            os: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip --version
+        pip install -U setuptools
+        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install wikitextparser
+        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+
+    - name: Generate family files
+      run: |
+          if  [ ${{matrix.family || 0}} == wpbeta ]; then
+            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmflabs.org/ wpbeta y
+          fi
+          if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
+            python pwb.py generate_family_file http://en.wikisource.beta.wmflabs.org/ wsbeta y
+          fi
+
+    - name: Generate user files
+      run: |
+        if [ ${{matrix.site}} != 'False' ]; then
+          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        else
+          python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        fi
+        echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "max_retries = 3" >> user-config.py
+        echo "maximum_GET_length = 5000" >> user-config.py
+        echo "console_encoding = 'utf8'" >> user-config.py
+        echo "import os" >> user-config.py
+        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
+        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
+
+    - name: Test with unittest
+      env:
+        PYWIKIBOT_TEST_NO_RC:
+          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
+      run: |
+        python pwb.py version
+        coverage run -m unittest discover -vv -p \"login_logout_tests.py\"
