@@ -3580,42 +3580,6 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
         self.assertIsNone(page)
 
 
-class TestLoginLogout(DefaultSiteTestCase):
-
-    """Test for login and logout methods."""
-
-    login = True
-
-    def test_login_logout(self):
-        """Validate login and logout methods by toggling the state."""
-        site = self.get_site()
-        loginstatus = pywikibot.login.LoginStatus
-
-        self.assertTrue(site.logged_in())
-        self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
-                                          loginstatus.AS_USER))
-        self.assertIn('_userinfo', site.__dict__.keys())
-
-        self.assertIsNone(site.login())
-
-        if site.is_oauth_token_available():
-            with self.assertRaisesRegex(APIError, 'cannotlogout.*OAuth'):
-                site.logout()
-            self.assertTrue(site.logged_in())
-            self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
-                                              loginstatus.AS_USER))
-            self.assertIn('_userinfo', site.__dict__.keys())
-
-        # Fandom family wikis don't support API action=logout
-        elif 'fandom.com' not in site.hostname():
-            site.logout()
-            self.assertFalse(site.logged_in())
-            self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
-            self.assertNotIn('_userinfo', site.__dict__.keys())
-
-            self.assertIsNone(site.user())
-
-
 class TestClearCookies(TestCase):
     """Test cookies are cleared after logout."""
 
