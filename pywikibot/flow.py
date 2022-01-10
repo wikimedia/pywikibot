@@ -1,13 +1,13 @@
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import abc
 import datetime
 import logging
-from typing import Any, Union
+from typing import Any, Type, Union
 from urllib.parse import parse_qs, urlparse
 
 import pywikibot
@@ -17,19 +17,10 @@ from pywikibot.exceptions import (
     NoPageError,
     UnknownExtensionError,
 )
-from pywikibot.page import BasePage, User
+from pywikibot.page import BasePage, PageSourceType, User
 
 
 logger = logging.getLogger('pywiki.wiki.flow')
-
-# TODO: replace these after T286867
-
-TOPIC_CLASS_TYPE = Any  # Type['Topic']
-
-# Union['pywikibot.site.BaseSite', 'pywikibot.page.Link',
-#       'pywikibot.page.Page']
-
-SOURCE_TYPE = Any
 
 
 # Flow page-like objects (boards and topics)
@@ -40,7 +31,7 @@ class FlowPage(BasePage, abc.ABC):
     It cannot be instantiated directly.
     """
 
-    def __init__(self, source: SOURCE_TYPE, title: str = '') -> None:
+    def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Initializer.
 
         :param source: A Flow-enabled site or a Link or Page on such a site
@@ -178,7 +169,7 @@ class Topic(FlowPage):
         self.root._load(load_from_topic=True)
 
     @classmethod
-    def create_topic(cls: TOPIC_CLASS_TYPE, board: 'Board', title: str,
+    def create_topic(cls: Type['Topic'], board: 'Board', title: str,
                      content: str, content_format: str = 'wikitext'
                      ) -> 'Topic':
         """Create and return a Topic object for a new topic on a Board.
@@ -195,7 +186,7 @@ class Topic(FlowPage):
         return cls(board.site, data['topic-page'])
 
     @classmethod
-    def from_topiclist_data(cls: TOPIC_CLASS_TYPE, board: 'Board',
+    def from_topiclist_data(cls: Type['Topic'], board: 'Board',
                             root_uuid: str,
                             topiclist_data: Dict[str, Any]) -> 'Topic':
         """Create a Topic object from API data.
@@ -422,7 +413,7 @@ class Post:
         return self._current_revision['isModerated']
 
     @property
-    def creator(self) -> str:
+    def creator(self) -> User:
         """The creator of this post."""
         if not hasattr(self, '_current_revision'):
             self._load()

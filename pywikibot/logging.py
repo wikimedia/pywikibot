@@ -11,7 +11,7 @@ from typing import Any
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import AnyStr, Optional
+from typing import Optional
 
 from pywikibot.backports import Callable, List
 
@@ -62,7 +62,7 @@ def _init() -> None:
 # string indicating the debugging layer.
 
 
-def logoutput(text: Any, decoder: Optional[str] = None,
+def logoutput(text: object, decoder: Optional[str] = None,
               newline: bool = True, _level: int = INFO, _logger: str = '',
               **kwargs: Any) -> None:
     """Format output and send to the logging module.
@@ -108,7 +108,7 @@ def logoutput(text: Any, decoder: Optional[str] = None,
     logger.log(_level, decoded_text, extra=context, **kwargs)
 
 
-def output(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def output(text: object, decoder: Optional[str] = None, newline: bool = True,
            **kwargs: Any) -> None:
     r"""Output a message to the user via the userinterface.
 
@@ -133,7 +133,7 @@ def output(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, INFO, **kwargs)
 
 
-def stdout(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def stdout(text: object, decoder: Optional[str] = None, newline: bool = True,
            **kwargs: Any) -> None:
     """Output script results to the user via the userinterface.
 
@@ -151,7 +151,7 @@ def stdout(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
 
-def warning(text: AnyStr, decoder: Optional[str] = None,
+def warning(text: object, decoder: Optional[str] = None,
             newline: bool = True, **kwargs: Any) -> None:
     """Output a warning message to the user via the userinterface.
 
@@ -165,7 +165,7 @@ def warning(text: AnyStr, decoder: Optional[str] = None,
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
 
-def error(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def error(text: object, decoder: Optional[str] = None, newline: bool = True,
           **kwargs: Any) -> None:
     """Output an error message to the user via the userinterface.
 
@@ -179,7 +179,7 @@ def error(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
 
-def log(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def log(text: object, decoder: Optional[str] = None, newline: bool = True,
         **kwargs: Any) -> None:
     """Output a record to the log file.
 
@@ -193,7 +193,7 @@ def log(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
 
-def critical(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def critical(text: object, decoder: Optional[str] = None, newline: bool = True,
              **kwargs: Any) -> None:
     """Output a critical record to the user via the userinterface.
 
@@ -207,7 +207,7 @@ def critical(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
 
-def debug(text: AnyStr, layer: str, decoder: Optional[str] = None,
+def debug(text: object, layer: str, decoder: Optional[str] = None,
           newline: bool = True, **kwargs: Any) -> None:
     """Output a debug record to the log file.
 

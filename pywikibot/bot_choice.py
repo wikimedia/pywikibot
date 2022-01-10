@@ -1,6 +1,6 @@
 """Options and Choices for :py:meth:`pywikibot.input_choice`."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,10 +15,6 @@ import pywikibot
 from pywikibot.backports import Iterable, Sequence
 
 from pywikibot.tools import deprecated, issue_deprecation_warning
-
-# TODO: replace these after T286867
-
-OPT_REPLACE_TYPE = Any  # Optional['pywikibot.bot.InteractiveReplace']
 
 
 class Option(ABC):
@@ -281,14 +277,18 @@ class Choice(StandardOption):
 
     """A simple choice consisting of an option, shortcut and handler."""
 
-    def __init__(self, option: str, shortcut: str,
-                 replacer: OPT_REPLACE_TYPE) -> None:
+    def __init__(
+        self,
+        option: str,
+        shortcut: str,
+        replacer: Optional['pywikibot.bot.InteractiveReplace']
+    ) -> None:
         """Initializer."""
         super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
-    def replacer(self) -> OPT_REPLACE_TYPE:
+    def replacer(self) -> Optional['pywikibot.bot.InteractiveReplace']:
         """The replacer."""
         return self._replacer
 
@@ -320,8 +320,14 @@ class LinkChoice(Choice):
 
     """A choice returning a mix of the link new and current link."""
 
-    def __init__(self, option: str, shortcut: str, replacer: OPT_REPLACE_TYPE,
-                 replace_section: bool, replace_label: bool) -> None:
+    def __init__(
+        self,
+        option: str,
+        shortcut: str,
+        replacer: Optional['pywikibot.bot.InteractiveReplace'],
+        replace_section: bool,
+        replace_label: bool
+    ) -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
         self._section = replace_section
@@ -361,7 +367,7 @@ class AlwaysChoice(Choice):
 
     """Add an option to always apply the default."""
 
-    def __init__(self, replacer: OPT_REPLACE_TYPE,
+    def __init__(self, replacer: Optional['pywikibot.bot.InteractiveReplace'],
                  option: str = 'always', shortcut: str = 'a') -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)

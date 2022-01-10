@@ -33,7 +33,7 @@ from functools import partial
 from http import HTTPStatus
 from typing import Any, Optional, Union
 
-from requests.exceptions import ReadTimeout  # type: ignore[import]
+from requests.exceptions import ReadTimeout
 
 import pywikibot
 from pywikibot import textlib
@@ -49,16 +49,7 @@ from pywikibot.backports import (
 from pywikibot.comms import http
 from pywikibot.data.api import Request
 from pywikibot.exceptions import Error, OtherPageSaveError
-
-PAGES_FROM_LABEL_TYPE = Dict[str, Set['pywikibot.page.Page']]
-
-# TODO: replace these after T286867
-
-OPT_INDEX_PAGE_TYPE = Any  # Optional['IndexPage']
-OPT_INDEX_PAGE_LIST_TYPE = Any  # Optional[List['IndexPage']]
-
-INDEX_TYPE = Optional[Tuple[OPT_INDEX_PAGE_TYPE,
-                            OPT_INDEX_PAGE_LIST_TYPE]]
+from pywikibot.page import PageSourceType
 
 try:
     from bs4 import BeautifulSoup
@@ -79,6 +70,10 @@ else:
 
 
 _logger = 'proofreadpage'
+
+
+PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
+_IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 
 
 def decompose(fn: Callable) -> Callable:  # type: ignore # noqa: N805
@@ -198,7 +193,7 @@ class ProofreadPage(pywikibot.Page):
                  }
     _OCR_METHODS = list(_OCR_CMDS.keys())
 
-    def __init__(self, source, title: str = '') -> None:
+    def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Instantiate a ProofreadPage object.
 
         :raise UnknownExtensionError: source Site has no ProofreadPage
@@ -263,7 +258,7 @@ class ProofreadPage(pywikibot.Page):
         return base, ext, num
 
     @property
-    def index(self) -> OPT_INDEX_PAGE_TYPE:
+    def index(self) -> Optional['IndexPage']:
         """Get the Index page which contains ProofreadPage.
 
         If there are many Index pages link to this ProofreadPage, and
@@ -281,7 +276,7 @@ class ProofreadPage(pywikibot.Page):
                                set(self.getReferences(namespaces=index_ns))]
 
             if not what_links_here:
-                self._index = (None, [])
+                self._index = (None, [])  # type: _IndexType
             elif len(what_links_here) == 1:
                 self._index = (what_links_here.pop(), [])
             else:
@@ -294,28 +289,28 @@ class ProofreadPage(pywikibot.Page):
                             self._index = (page, what_links_here)
                             break
 
-        page, others = self._index
+        index_page, others = self._index
         if others:
             pywikibot.warning('{} linked to several Index pages.'.format(self))
-            pywikibot.output('{}{!s}'.format(' ' * 9, [page] + others))
+            pywikibot.output('{}{!s}'.format(' ' * 9, [index_page] + others))
 
-            if page:
+            if index_page:
                 pywikibot.output(
-                    '{}Selected Index: {}'.format(' ' * 9, page))
+                    '{}Selected Index: {}'.format(' ' * 9, index_page))
                 pywikibot.output('{}remaining: {!s}'.format(' ' * 9, others))
 
-        if not page:
+        if not index_page:
             pywikibot.warning('Page {} is not linked to any Index page.'
                               .format(self))
 
-        return page
+        return index_page
 
     @index.setter
     def index(self, value: 'IndexPage') -> None:
         if not isinstance(value, IndexPage):
             raise TypeError('value {} must be an IndexPage object.'
                             .format(value))
-        self._index = (value, None)
+        self._index = (value, [])
 
     @index.deleter
     def index(self) -> None:
@@ -453,7 +448,7 @@ class ProofreadPage(pywikibot.Page):
         """
         # Text is already cached.
         if getattr(self, '_text', None) is not None:
-            return self._text
+            return self._text  # type: ignore[return-value]
 
         if self.exists():
             # If page exists, load it.
@@ -547,13 +542,12 @@ class ProofreadPage(pywikibot.Page):
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
         """Save page content after recomposing the page."""
-        summary = kwargs.pop('summary', '')
-        summary = self.pre_summary + summary
+        kwargs['summary'] = self.pre_summary + kwargs.get('summary', '')
         # Save using contentformat='application/json'.
         kwargs['contentformat'] = 'application/json'
         kwargs['contentmodel'] = 'proofread-page'
         text = self._page_to_json()
-        super().save(*args, text=text, summary=summary, **kwargs)
+        super().save(*args, text=text, **kwargs)
 
     @property
     def pre_summary(self) -> str:
@@ -649,7 +643,7 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.warning('retrying in {} seconds ...'.format(retry))
             time.sleep(retry)
         else:
-            return True, ReadTimeout
+            return True, ReadTimeout('ReadTimeout: Could not perform OCR')
 
         if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
             return True, 'Http response status {}'.format(response.status_code)
@@ -797,7 +791,7 @@ class IndexPage(pywikibot.Page):
 
     INDEX_TEMPLATE = ':MediaWiki:Proofreadpage_index_template'
 
-    def __init__(self, source, title: str = '') -> None:
+    def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Instantiate an IndexPage object.
 
         In this class:
@@ -900,7 +894,7 @@ class IndexPage(pywikibot.Page):
         self._page_from_numbers = {}
         self._numbers_from_page = {}  # type: Dict[pywikibot.page.Page, int]
         self._page_numbers_from_label = {}  # type: Dict[str, Set[int]]
-        self._pages_from_label = {}  # type: PAGES_FROM_LABEL_TYPE
+        self._pages_from_label = {}  # type: PagesFromLabelType
         self._labels_from_page_number = {}  # type: Dict[int, str]
         self._labels_from_page = {}  # type: Dict[pywikibot.page.Page, str]
         if hasattr(self, '_parsed_text'):

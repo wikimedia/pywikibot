@@ -1,29 +1,26 @@
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import itertools
 import threading
 from collections import Counter
-from typing import Any, Optional
+from typing import Optional
 
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Set
-
-FOUND_IN_TYPE = Dict['pywikibot.page.Page', List['pywikibot.page.Page']]
-
-# TODO: replace these after T286867
-
-OPT_PAGE_TYPE = Any  # Optional['pywikibot.page.Page']
 
 try:
     import pydot
     PYDOT_ERROR = None
 except ImportError as e:
     PYDOT_ERROR = e
+
+
+FoundInType = Dict['pywikibot.page.Page', List['pywikibot.page.Page']]
 
 
 class GraphSavingThread(threading.Thread):
@@ -61,7 +58,7 @@ class Subject:
 
     """Data about a page with translations on multiple wikis."""
 
-    def __init__(self, origin: OPT_PAGE_TYPE = None) -> None:
+    def __init__(self, origin: Optional['pywikibot.page.Page'] = None) -> None:
         """Initializer.
 
         :param origin: the page on the 'origin' wiki
@@ -73,17 +70,17 @@ class Subject:
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.found_in = {}  # type: FOUND_IN_TYPE
+        self.found_in = {}  # type: FoundInType
         if origin:
             self.found_in = {origin: []}
 
     @property
-    def origin(self) -> OPT_PAGE_TYPE:
+    def origin(self) -> Optional['pywikibot.page.Page']:
         """Page on the origin wiki."""
         return self._origin
 
     @origin.setter
-    def origin(self, value: OPT_PAGE_TYPE) -> None:
+    def origin(self, value: Optional['pywikibot.page.Page']) -> None:
         self._origin = value
 
 
