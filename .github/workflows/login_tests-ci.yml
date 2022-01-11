@@ -77,9 +77,9 @@ jobs:
         python -m pip install --upgrade pip
         pip --version
         pip install -U setuptools
-        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install wikitextparser
+        pip install requests
+        pip install mwparserfromhell
+        pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
@@ -118,4 +118,4 @@ jobs:
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
-        coverage run -m unittest discover -vv -p \"login_logout_tests.py\"
+        coverage run -m unittest -vv tests/site_login_logout_tests.py
