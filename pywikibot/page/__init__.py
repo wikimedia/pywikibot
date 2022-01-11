@@ -734,9 +734,7 @@ class BasePage(ComparableMixin):
             static_keys = self.site.getmagicwords('staticredirect')
             text = self.get(get_redirect=True, force=force)
             if static_keys:
-                for key in static_keys:
-                    if key in text:
-                        return True
+                return any(key in text for key in static_keys)
         return False
 
     def isCategoryRedirect(self) -> bool:

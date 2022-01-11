@@ -138,7 +138,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -467,9 +467,8 @@ class XmlDumpReplacePageGenerator:
         :rtype: bool
         """
         if 'text-contains' in self.exceptions:
-            for exc in self.exceptions['text-contains']:
-                if exc.search(text):
-                    return True
+            return any(exc.search(text)
+                       for exc in self.exceptions['text-contains'])
         return False
 
 
@@ -565,9 +564,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     def isTextExcepted(self, original_text) -> bool:
         """Return True iff one of the exceptions applies for the given text."""
         if 'text-contains' in self.exceptions:
-            for exc in self.exceptions['text-contains']:
-                if exc.search(original_text):
-                    return True
+            return any(exc.search(original_text)
+                       for exc in self.exceptions['text-contains'])
         return False
 
     def apply_replacements(self, original_text, applied, page=None):
