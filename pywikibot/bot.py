@@ -106,7 +106,7 @@ from functools import wraps
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
-from typing import Any, Optional, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 from warnings import warn
 
 import pywikibot
@@ -181,7 +181,7 @@ from pywikibot.tools import (
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
 
-if False:  # typing.TYPE_CHECKING
+if TYPE_CHECKING:
     from pywikibot.site import BaseSite
 
 AnswerType = Union[

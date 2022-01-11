@@ -6,11 +6,11 @@
 #
 import abc
 import json
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from pywikibot.backports import Dict
 
-if False:  # typing.TYPE_CHECKING
+if TYPE_CHECKING:
     from pywikibot.site import DataSite
 
 
