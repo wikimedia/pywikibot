@@ -31,7 +31,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, i18n, textlib
-from pywikibot.backports import Dict, Iterable, List, Tuple
+from pywikibot.backports import Dict, Generator, Iterable, List, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     APIError,
@@ -1366,27 +1366,51 @@ class BasePage(ComparableMixin):
         else:
             raise NoPageError(self)
 
-    def linkedPages(self, namespaces=None,
-                    total: Optional[int] = None,
-                    content: bool = False):
-        """
-        Iterate Pages that this Page links to.
+    def linkedPages(
+        self, *args, **kwargs
+    ) -> Generator['pywikibot.Page', None, None]:
+        """Iterate Pages that this Page links to.
 
-        Only returns pages from "normal" internal links. Image and category
-        links are omitted unless prefixed with ":". Embedded templates are
-        omitted (but links within them are returned). All interwiki and
-        external links are omitted.
+        Only returns pages from "normal" internal links. Embedded
+        templates are omitted but links within them are returned. All
+        interwiki and external links are omitted.
 
-        :param namespaces: only iterate links in these namespaces
-        :param namespaces: int, or list of ints
-        :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each linked page (default False)
-        :return: a generator that yields Page objects.
-        :rtype: generator
+        For the parameters refer
+        :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
+
+        .. versionadded:: 7.0.0
+           the `follow_redirects` keyword argument
+        .. deprecated:: 7.0.0
+           the positional arguments
+
+        .. seealso:: https://www.mediawiki.org/wiki/API:Links
+
+        :keyword namespaces: Only iterate pages in these namespaces
+            (default: all)
+        :type namespaces: iterable of str or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+        :keyword follow_redirects: if True, yields the target of any redirects,
+            rather than the redirect page
+        :keyword total: iterate no more than this number of pages in total
+        :keyword content: if True, load the current content of each page
         """
-        return self.site.pagelinks(self, namespaces=namespaces,
-                                   total=total, content=content)
+        # Deprecate positional arguments and synchronize with Site.pagelinks
+        keys = ('namespaces', 'total', 'content')
+        for i, arg in enumerate(args):
+            key = keys[i]
+            issue_deprecation_warning(
+                'Positional argument {} ({})'.format(i + 1, arg),
+                'keyword argument "{}={}"'.format(key, arg),
+                since='7.0.0')
+            if key in kwargs:
+                pywikibot.warning('{!r} is given as keyword argument {!r} '
+                                  'already; ignoring {!r}'
+                                  .format(key, arg, kwargs[key]))
+            else:
+                kwargs[key] = arg
+
+        return self.site.pagelinks(self, **kwargs)
 
     def interwiki(self, expand=True):
         """

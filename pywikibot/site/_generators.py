@@ -14,7 +14,7 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.backports import Dict, Iterable, List
+from pywikibot.backports import Dict, Generator, Iterable, List
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -359,11 +359,16 @@ class GeneratorsMixin:
                     namespaces=namespaces, content=content)
             ), total)
 
-    def pagelinks(self, page, *, namespaces=None, follow_redirects=False,
-                  total=None, content=False):
+    def pagelinks(
+        self, page, *,
+        namespaces=None,
+        follow_redirects: bool = False,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> Generator['pywikibot.Page', None, None]:
         """Iterate internal wikilinks contained (or transcluded) on page.
 
-        :see: https://www.mediawiki.org/wiki/API:Links
+        .. seealso:: https://www.mediawiki.org/wiki/API:Links
 
         :param namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -372,8 +377,8 @@ class GeneratorsMixin:
             list of namespace identifiers.
         :param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
+        :param total: iterate no more than this number of pages in total
         :param content: if True, load the current content of each iterated page
-            (default False)
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
