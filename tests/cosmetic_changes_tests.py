@@ -9,7 +9,9 @@ import unittest
 from contextlib import suppress
 
 from pywikibot import Page
-from pywikibot.cosmetic_changes import CosmeticChangesToolkit
+from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
+from pywikibot.tools import has_module
+
 from pywikibot.site._namespace import NamespacesDict
 
 from tests.aspects import TestCase
@@ -544,6 +546,80 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
                          'کی')
 
         # Once numbering fixes are enabled we can add tests.
+
+
+class TestCosmeticChangesISBN(TestCosmeticChanges):
+
+    """Test CosmeticChanges ISBN fix."""
+
+    dry = True
+
+    ISBN_DIGITERROR_RE = 'ISBN [0-9]+ is not [0-9]+ digits long'
+    ISBN_INVALIDERROR_RE = 'Invalid ISBN found'
+    ISBN_CHECKSUMERROR_RE = 'ISBN checksum of [0-9]+ is incorrect'
+    ISBN_INVALIDCHECKERROR_RE = 'checksum or check digit is invalid'
+    ISBN_INVALIDCHARERROR_RE = 'ISBN [0-9a-zA-Z]+ contains invalid characters'
+    ISBN_INVALIDLENGTHERROR_RE = 'The number has an invalid length'
+
+    @classmethod
+    def setUpClass(cls):  # noqa: N802
+        """Skip tests if isbn libraries are missing."""
+        if not has_module('stdnum', version='1.17'):
+            raise unittest.SkipTest('python-stdnum is not available.')
+        super().setUpClass()
+
+    def test_valid_isbn(self):
+        """Test ISBN."""
+        text = self.cct.fix_ISBN(' ISBN 097522980x ')
+        self.assertEqual(text, ' ISBN 0-9752298-0-X ')
+
+        text = self.cct.fix_ISBN(' ISBN 9780975229804 ')
+        self.assertEqual(text, ' ISBN 978-0-9752298-0-4 ')
+
+        text = self.cct.fix_ISBN(' ISBN 9783955390631 ')
+        self.assertEqual(text, ' ISBN 978-3-95539-063-1 ')
+
+        text = self.cct.fix_ISBN(' ISBN 9791091447034 ')
+        self.assertEqual(text, ' ISBN 979-10-91447-03-4 ')
+
+    def test_invalid_isbn(self):
+        """Test that it'll fail when the ISBN is invalid."""
+        from stdnum.exceptions import ValidationError
+        # Invalid characters
+        with self.assertRaisesRegex(
+                ValidationError,
+                '|'.join((self.ISBN_DIGITERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE))):
+            self.cct.fix_ISBN('ISBN 0975229LOL')
+        # Invalid checksum
+        with self.assertRaisesRegex(
+                ValidationError,
+                '|'.join((self.ISBN_CHECKSUMERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE,
+                          self.ISBN_INVALIDCHECKERROR_RE))):
+            self.cct.fix_ISBN('ISBN 0975229801')
+        # Invalid length
+        with self.assertRaisesRegex(
+                ValidationError,
+                '|'.join((self.ISBN_DIGITERROR_RE,
+                          self.ISBN_INVALIDERROR_RE,
+                          self.ISBN_INVALIDLENGTHERROR_RE))):
+            self.cct.fix_ISBN('ISBN 09752298')
+        # X in the middle
+        with self.assertRaisesRegex(
+            ValidationError,
+            '|'.join((self.ISBN_INVALIDCHARERROR_RE,
+                      self.ISBN_INVALIDERROR_RE,
+                      self.ISBN_INVALIDLENGTHERROR_RE))):
+            self.cct.fix_ISBN('ISBN 09752X9801')
+
+    def test_ignore_invalid_isbn(self):
+        """Test fixing ISBN numbers with an invalid ISBN."""
+        self.cct.ignore = CANCEL.MATCH
+        text = self.cct.fix_ISBN(' ISBN 0975229LOL ISBN 9780975229804 ')
+        self.assertEqual(text, ' ISBN 0975229LOL ISBN 978-0-9752298-0-4 ')
 
 
 if __name__ == '__main__':  # pragma: no cover
