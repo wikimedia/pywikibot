@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 """Test diff module."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 from contextlib import suppress
+from unittest.mock import patch
 
 from pywikibot.diff import PatchManager, cherry_pick, html_comparator
-from tests import join_html_data_path, patch
+from tests import join_html_data_path
 from tests.aspects import TestCase, require_modules, unittest
 
 

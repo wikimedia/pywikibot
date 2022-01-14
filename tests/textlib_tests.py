@@ -12,6 +12,7 @@ import re
 import unittest
 from collections import OrderedDict
 from contextlib import suppress
+from unittest import mock
 
 import pywikibot
 from pywikibot import textlib
@@ -20,7 +21,6 @@ from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import has_module
-from tests import mock
 from tests.aspects import (
     DefaultDrySiteTestCase,
     SiteAttributeTestCase,

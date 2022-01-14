@@ -8,11 +8,11 @@
 import json
 import unittest
 from contextlib import suppress
+from unittest import mock
 
 from pywikibot import config
 from pywikibot.comms.eventstreams import EventSource, EventStreams
 from pywikibot.family import WikimediaFamily
-from tests import mock
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 

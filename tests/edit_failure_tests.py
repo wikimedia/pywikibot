@@ -14,6 +14,7 @@ These tests use special code 'write = -1' for edit failures.
 #
 import unittest
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import config
@@ -28,7 +29,6 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     TitleblacklistError,
 )
-from tests import patch
 from tests.aspects import TestCase, WikibaseTestCase
 
 

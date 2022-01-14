@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 import datetime
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot.data.api import (
@@ -18,7 +19,7 @@ from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
 from pywikibot.tools import suppress_warnings
-from tests import join_images_path, patch
+from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,
     SiteAttributeTestCase,

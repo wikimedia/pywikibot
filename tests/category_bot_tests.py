@@ -7,11 +7,11 @@
 #
 import unittest
 from contextlib import suppress
+from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot import BaseSite
 from scripts.category import CategoryMoveRobot, CategoryPreprocess
-from tests import Mock, patch
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 

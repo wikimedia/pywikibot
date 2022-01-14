@@ -181,7 +181,7 @@ avoided.
 
 ::
 
-  from tests import patch
+  from unittest.mock import patch
 
 
   def fake_ping(url):
