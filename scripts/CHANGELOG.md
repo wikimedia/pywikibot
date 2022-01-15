@@ -18,6 +18,7 @@
 * Derive CheckerBot from CurrentPageBot (T196851, T171713)
 
 ### category
+* Recurse CategoryListifyRobot with depth
 * Show a warning if a pagegenerator option is not enabled (T298522)
 * Deprecated code parts were removed
 
@@ -31,6 +32,7 @@
 * pass site arg only once (T292367)
 
 ### fixing_redirects
+* Let only put_current show the message "No changes were needed"
 * Use concurrent.futures to retrieve redirect or moved targets (T298789)
 * Add an option to ignore solving moved targets (T298789)
 

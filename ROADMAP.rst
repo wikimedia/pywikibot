@@ -4,8 +4,12 @@ Current release changes
 Improvements
 ------------
 
+* Avoid non-deteministic behavior in removeDisableParts
+* Update isbn dependency and require python-stdnum >= 1.17
+* Synchronize Page.linkedPages() parameters with Site.pagelinks() parameters
+* Scripts hash bang was changed from python to python3
 * i18n.bundles(), i18n.known_languages and  i18n._get_bundle() functions were added
-* Raise ConnectionError immediately if urllib3.NewConnectionError occurs (T297994)
+* Raise ConnectionError immediately if urllib3.NewConnectionError occurs (T297994, 298859)
 * Make pywikibot messages available with site package (T57109, T275981)
 * Add support for API:Redirects
 * Enable shell script with Pywikibot site package
@@ -35,6 +39,8 @@ Improvements
 Bugfixes
 --------
 
+* Remove question mark character from forbidden file name characters (T93482)
+* Enable -interwiki option with pagegenerators (T57099)
 * Don't assert login result (T298761)
 * Allow title placeholder $1 in the middle of an url (T111513, T298078)
 * Don't create a Site object if pywikibot is not fully imported (T298384)
@@ -54,11 +60,14 @@ Breaking changes
 
 * Support of Python 3.5.0 - 3.5.2 has been dropped (T286867)
 * generate_user_files.py, generate_user_files.py, shell.py and version.py were moved to pywikibot/scripts and must be used with pwb wrapper script
+* *See also Code cleanups below*
 
 
 Code cleanups
 -------------
 
+* Remove AllpagesPageGenerator, UnconnectedPageGenerator, CombinedPageGenerator, WantedPagesPageGenerator pagegenerators
+* Remove deprecated echo.Notification.id
 * Remove APISite.newfiles() method (T168339)
 * Remove APISite.page_exists() method
 * Raise a TypeError if BaseBot.init_page return None
