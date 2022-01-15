@@ -657,6 +657,23 @@ class TestDisabledParts(DefaultDrySiteTestCase):
                 self.assertEqual(
                     textlib.removeDisabledParts(pattern, tags=[test]), '')
 
+    def test_remove_disabled_parts_include(self):
+        """Test removeDisabledParts function with the include argument."""
+        text = 'text <nowiki>tag</nowiki> text'
+        self.assertEqual(
+            textlib.removeDisabledParts(text, include=['nowiki']), text)
+
+    def test_remove_disabled_parts_order(self):
+        """Test the order of the replacements in removeDisabledParts."""
+        text = 'text <ref>This is a reference.</ref> text'
+        regex = re.compile('</?ref>')
+        self.assertEqual(
+            textlib.removeDisabledParts(text, tags=['ref', regex]),
+            'text  text')
+        self.assertEqual(
+            textlib.removeDisabledParts(text, tags=[regex, 'ref']),
+            'text This is a reference. text')
+
 
 class TestReplaceLinks(TestCase):
 
