@@ -9,10 +9,10 @@ import re
 import unittest
 from contextlib import suppress
 from datetime import datetime
+from unittest.mock import MagicMock, patch
 
 import pywikibot
 from pywikibot import async_request, page_put_queue
-from tests import MagicMock, patch
 from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase
 from tests.utils import entered_loop
 

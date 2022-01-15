@@ -6,11 +6,11 @@
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUserError
-from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 

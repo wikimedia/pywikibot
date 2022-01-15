@@ -8,6 +8,7 @@
 import pickle
 import re
 from contextlib import suppress
+from unittest import mock
 
 import pywikibot
 import pywikibot.page
@@ -21,7 +22,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE, mock
+from tests import WARN_SITE_CODE
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,

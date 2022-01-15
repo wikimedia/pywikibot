@@ -11,10 +11,10 @@ e.g. used to test password-file based login.
 #
 from collections import defaultdict
 from io import StringIO
+from unittest import mock
 
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
-from tests import mock
 from tests.aspects import DefaultDrySiteTestCase, unittest
 
 

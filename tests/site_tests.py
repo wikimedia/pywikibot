@@ -13,6 +13,7 @@ import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from http import HTTPStatus
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import config
@@ -29,7 +30,7 @@ from pywikibot.exceptions import (
     UnknownSiteError,
 )
 from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE, patch, unittest_print
+from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,

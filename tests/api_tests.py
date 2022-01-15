@@ -9,6 +9,7 @@ import datetime
 import types
 from collections import defaultdict
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot.family
 import pywikibot.login
@@ -18,7 +19,6 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-from tests import patch
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,

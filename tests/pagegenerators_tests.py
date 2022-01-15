@@ -11,6 +11,7 @@ import sys
 import unittest
 from contextlib import suppress
 from typing import Optional
+from unittest import mock
 
 import pywikibot
 from pywikibot import date, pagegenerators
@@ -22,7 +23,7 @@ from pywikibot.pagegenerators import (
     WikibaseItemFilterPageGenerator,
 )
 from pywikibot.tools import has_module, suppress_warnings
-from tests import join_data_path, mock
+from tests import join_data_path
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
