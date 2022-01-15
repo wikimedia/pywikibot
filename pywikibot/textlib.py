@@ -457,13 +457,20 @@ def removeDisabledParts(text: str, tags=None, include=None, site=None) -> str:
     :type site: pywikibot.Site
 
     :return: text stripped from disabled parts.
+    .. note:: the order of removals will correspond to the tags argument
+        if provided as an ordered sequence (list, tuple)
     """
     if not tags:
-        tags = {'comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight'}
-    else:
-        tags = set(tags)
+        tags = ['comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight']
+    # avoid set(tags) because sets are internally ordered using the hash
+    # which for strings is salted per Python process => the output of
+    # this function would likely be different per script run because
+    # the replacements would be done in different order and the disabled
+    # parts may overlap and suppress each other
+    # see https://docs.python.org/3/reference/datamodel.html#object.__hash__
+    # ("Note" at the end of the section)
     if include:
-        tags -= set(include)
+        tags = [tag for tag in tags if tag not in include]
     regexes = _get_regexes(tags, site)
     for regex in regexes:
         text = regex.sub('', text)
