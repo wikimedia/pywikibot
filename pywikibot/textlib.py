@@ -6,7 +6,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,9 +19,8 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import List
+from pywikibot.backports import Container, Iterable, List, Tuple
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 
@@ -433,32 +432,32 @@ def replaceExcept(text: str, old, new, exceptions: list,
     return text
 
 
-def removeDisabledParts(text: str, tags=None, include=None, site=None) -> str:
+def removeDisabledParts(text: str,
+                        tags: Optional[Iterable] = None,
+                        include: Optional[Container] = None,
+                        site: Optional['pywikibot.site.BaseSite'] = None
+                        ) -> str:
     """
     Return text without portions where wiki markup is disabled.
 
-    Parts that will be removed by default are
+    Parts that will be removed by default are:
+
     * HTML comments
     * nowiki tags
     * pre tags
     * includeonly tags
     * source and syntaxhighlight tags
 
+    .. versionchanged:: 7.0
+       the order of removals will correspond to the tags argument
+       if provided as an ordered collection (list, tuple)
     :param tags: The exact set of parts which should be removed using
         keywords from textlib._get_regexes().
-    :type tags: list, set, tuple or None
-
     :param include: Or, in alternative, default parts that shall not
         be removed.
-    :type include: list, set, tuple or None
-
     :param site: Site to be used for site-dependent regexes. Default
         disabled parts listed above do not need it.
-    :type site: pywikibot.Site
-
     :return: text stripped from disabled parts.
-    .. note:: the order of removals will correspond to the tags argument
-        if provided as an ordered sequence (list, tuple)
     """
     if not tags:
         tags = ['comment', 'includeonly', 'nowiki', 'pre', 'syntaxhighlight']

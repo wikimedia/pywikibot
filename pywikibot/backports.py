@@ -1,6 +1,6 @@
 """This module contains backports to support older Python versions."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,6 +61,7 @@ else:
 
 if PYTHON_VERSION < (3, 9):
     from typing import (
+        Container,
         Dict,
         FrozenSet,
         Generator,
@@ -77,7 +78,7 @@ if PYTHON_VERSION < (3, 9):
     )
 else:
     from collections.abc import (
-        Generator, Iterable, Iterator, Mapping, Sequence,
+        Container, Generator, Iterable, Iterator, Mapping, Sequence,
     )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
