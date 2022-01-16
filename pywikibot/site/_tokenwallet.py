@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot import log
+from pywikibot import debug
 from pywikibot.exceptions import Error
 
 
@@ -60,7 +60,7 @@ class TokenWallet:
         if self.site.mw_version >= '1.24wmf19' \
            and key in {'edit', 'delete', 'protect', 'move', 'block', 'unblock',
                        'email', 'import', 'options'}:
-            log('Token {!r} was replaced by {!r}'.format(key, 'csrf'))
+            debug('Token {!r} was replaced by {!r}'.format(key, 'csrf'))
             key = 'csrf'
 
         try:
