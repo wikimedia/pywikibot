@@ -196,7 +196,6 @@ class GraphDrawer:
                          .format(self.subject.origin.title()))
         # create empty graph
         self.graph = pydot.Dot()
-        # self.graph.set('concentrate', 'true')
 
         self.octagon_sites = self._octagon_site_set()
 

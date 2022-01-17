@@ -755,16 +755,12 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         return True
 
 
-def prepareRegexForMySQL(pattern):
+def prepareRegexForMySQL(pattern: str) -> str:
     """Convert regex to MySQL syntax."""
     pattern = pattern.replace(r'\s', '[:space:]')
     pattern = pattern.replace(r'\d', '[:digit:]')
     pattern = pattern.replace(r'\w', '[:alnum:]')
-
     pattern = pattern.replace("'", '\\' + "'")
-    # pattern = pattern.replace('\\', '\\\\')
-    # for char in ['[', ']', "'"]:
-    #    pattern = pattern.replace(char, '\%s' % char)
     return pattern
 
 

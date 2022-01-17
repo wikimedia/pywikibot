@@ -5164,7 +5164,6 @@ class BaseLink(ComparableMixin):
                     name = namespace.custom_name
                     break
             else:
-                # not found
                 raise Error(
                     'No corresponding namespace found for namespace {} on {}.'
                     .format(self.namespace, onsite))
