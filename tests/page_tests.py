@@ -963,14 +963,22 @@ class TestPageRedirects(TestCase):
     'R2' is a normal page and 'R3' does not exist.
     """
 
-    family = 'wikipedia'
-    code = 'en'
+    sites = {
+        'en': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'test': {
+            'family': 'wikipedia',
+            'code': 'test',
+        },
+    }
 
     cached = True
 
     def testIsRedirect(self):
         """Test ``Page.isRedirectPage()`` and ``Page.getRedirectTarget``."""
-        site = self.get_site()
+        site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R1')
         p2 = pywikibot.Page(site, 'User:Legoktm/R2')
         self.assertTrue(p1.isRedirectPage())
@@ -978,9 +986,18 @@ class TestPageRedirects(TestCase):
         self.assertEqual(p3, p2)
         self.assertIsInstance(p3, pywikibot.User)
 
+    def testIsStaticRedirect(self):
+        """Test ``Page.isStaticRedirect()``."""
+        site = self.get_site('test')
+        page = pywikibot.Page(site, 'Static Redirect')
+        self.assertTrue(page.isRedirectPage())
+        self.assertTrue(page.isStaticRedirect())
+        self.assertIn('staticredirect', page.properties())
+        self.assertIn('__STATICREDIRECT__', page.text)
+
     def testPageGet(self):
         """Test ``Page.get()`` on different types of pages."""
-        site = self.get_site()
+        site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')
         p3 = pywikibot.Page(site, 'User:Legoktm/R3')
@@ -1001,7 +1018,7 @@ class TestPageRedirects(TestCase):
     def test_set_redirect_target(self):
         """Test set_redirect_target method."""
         # R1 redirects to R2 and R3 doesn't exist.
-        site = self.get_site()
+        site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')
         p3 = pywikibot.Page(site, 'User:Legoktm/R3')
