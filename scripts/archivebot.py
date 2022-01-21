@@ -88,7 +88,7 @@ Options (may be omitted):
   -salt:SALT      specify salt
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -111,9 +111,10 @@ from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
-    TimeStripper,
+    case_escape,
     extract_sections,
     findmarker,
+    TimeStripper,
     to_local_digits,
 )
 
@@ -297,12 +298,7 @@ def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
     ns = tpl_page.site.namespaces[tpl_page.namespace()]
     marker = '?' if ns.id == 10 else ''
     title = tpl_page.title(with_ns=False)
-    if ns.case != 'case-sensitive':
-        title = '[{}{}]{}'.format(re.escape(title[0].upper()),
-                                  re.escape(title[0].lower()),
-                                  re.escape(title[1:]))
-    else:
-        title = re.escape(title)
+    title = case_escape(ns.case, title)
 
     return re.compile(r'(?:(?:%s):)%s%s' % ('|'.join(ns), marker, title))
 

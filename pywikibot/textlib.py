@@ -148,6 +148,24 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     return phrase
 
 
+def case_escape(case: str, string: str) -> str:
+    """Return an escaped regex pattern which depends on 'first-letter' case.
+
+    .. versionadded:: 7.0
+
+    :param case: if `case` is 'first-letter' the regex contains an
+        upper/lower case set for the first letter
+    """
+    first = string[0]
+    if first.isalpha() and case == 'first-letter':
+        pattern = '[{}{}]{}'.format(first.upper(),
+                                    first.lower(),
+                                    re.escape(string[1:]))
+    else:
+        pattern = re.escape(string)
+    return pattern
+
+
 class MultiTemplateMatchBuilder:
 
     """Build template matcher."""
@@ -174,12 +192,7 @@ class MultiTemplateMatchBuilder:
             raise ValueError(
                 '{!r} is not a valid template'.format(template))
 
-        if namespace.case == 'first-letter':
-            pattern = '[{}{}]{}'.format(re.escape(old[0].upper()),
-                                        re.escape(old[0].lower()),
-                                        re.escape(old[1:]))
-        else:
-            pattern = re.escape(old)
+        pattern = case_escape(namespace.case, old)
         # namespaces may be any mixed case
         namespaces = [_ignore_case(ns) for ns in namespace]
         namespaces.append(_ignore_case('msg'))
@@ -1395,11 +1408,9 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     title = oldcat.title(with_ns=False)
     if not title:
         return oldtext
+
     # title might contain regex special characters
-    title = re.escape(title)
-    # title might not be capitalized correctly on the wiki
-    if title[0].isalpha() and site.namespaces[14].case == 'first-letter':
-        title = '[{}{}]'.format(title[0].upper(), title[0].lower()) + title[1:]
+    title = case_escape(site.namespaces[14].case, title)
     # spaces and underscores in page titles are interchangeable and collapsible
     title = title.replace(r'\ ', '[ _]+').replace(r'\_', '[ _]+')
     categoryR = re.compile(r'\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'

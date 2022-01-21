@@ -37,16 +37,17 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import re
-from typing import Optional
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
+from pywikibot.textlib import case_escape
+
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -55,7 +56,7 @@ class ImageRobot(ReplaceBot):
     """This bot will replace or remove all occurrences of an old image."""
 
     def __init__(self, generator, old_image: str,
-                 new_image: Optional[str] = None, **kwargs):
+                 new_image: str = '', **kwargs) -> None:
         """
         Initializer.
 
@@ -85,12 +86,7 @@ class ImageRobot(ReplaceBot):
             param)
 
         namespace = self.site.namespaces[6]
-        if namespace.case == 'first-letter':
-            case = re.escape(self.old_image[0].upper()
-                             + self.old_image[0].lower())
-            escaped = '[' + case + ']' + re.escape(self.old_image[1:])
-        else:
-            escaped = re.escape(self.old_image)
+        escaped = case_escape(namespace.case, self.old_image)
 
         # Be careful, spaces and _ have been converted to '\ ' and '\_'
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
@@ -102,17 +98,14 @@ class ImageRobot(ReplaceBot):
             image_regex = re.compile(r'' + escaped)
 
         replacements = []
-        if self.new_image:
-            if not self.opt.loose:
-                replacements.append((image_regex,
-                                     '[[{}:{}\\g<parameters>]]'
-                                     .format(
-                                         self.site.namespaces.FILE.custom_name,
-                                         self.new_image)))
-            else:
-                replacements.append((image_regex, self.new_image))
+        if not self.opt.loose and self.new_image:
+            replacements.append((image_regex,
+                                 '[[{}:{}\\g<parameters>]]'
+                                 .format(
+                                     self.site.namespaces.FILE.custom_name,
+                                     self.new_image)))
         else:
-            replacements.append((image_regex, ''))
+            replacements.append((image_regex, self.new_image))
 
         super().__init__(generator, replacements,
                          always=self.opt.always,
@@ -128,21 +121,17 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    old_image = None
-    new_image = None
+    old_image = ''
+    new_image = ''
     options = {}
 
-    for arg in pywikibot.handle_args(args):
-        if arg == '-always':
-            options['always'] = True
-        elif arg == '-loose':
-            options['loose'] = True
-        elif arg.startswith('-summary'):
-            if len(arg) == len('-summary'):
-                options['summary'] = pywikibot.input(
-                    'Choose an edit summary: ')
-            else:
-                options['summary'] = arg[len('-summary:'):]
+    for argument in pywikibot.handle_args(args):
+        arg, _, value = argument.partition(':')
+        if arg in ('-always', '-loose'):
+            options[arg[1:]] = True
+        elif arg == '-summary':
+            options[arg[1:]] = value or pywikibot.input(
+                'Choose an edit summary: ')
         elif old_image:
             new_image = arg
         else:
