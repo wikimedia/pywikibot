@@ -53,7 +53,7 @@ The following parameters are supported:
     -always     don't bother asking to confirm any of the changes.
 """
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -252,11 +252,8 @@ def main(*args):
     pages = pages.split(',')
     for interval in range(len(pages)):
         start, sep, end = pages[interval].partition('-')
-        start = 1 if not start else int(start)
-        if not sep:
-            end = start
-        else:
-            end = int(end) if end else index.num_pages
+        start = int(start or 1)
+        end = int(end or index.num_pages) if sep else start
         pages[interval] = (start, end)
 
     # gen yields ProofreadPage objects.
