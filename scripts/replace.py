@@ -146,9 +146,11 @@ import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
+from typing import Optional
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
+from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
@@ -764,6 +766,113 @@ def prepareRegexForMySQL(pattern: str) -> str:
     return pattern
 
 
+EXC_KEYS = {
+    '-excepttitle': 'title',
+    '-requiretitle:': 'require-title',
+    '-excepttext': 'text-contains',
+    '-exceptinside': 'inside',
+    '-exceptinsidetag': 'inside-tags'
+}
+"""Dictionary to convert exceptions command line options to exceptions keys.
+
+    .. versionadded:: 7.0
+"""
+
+
+def handle_exceptions(*args: str) -> Tuple[List[str], Dict[str, str]]:
+    """Handle exceptions args to ignore pages which contain certain texts.
+
+    .. versionadded:: 7.0
+    """
+    exceptions = {key: [] for key in EXC_KEYS.values()}
+    local_args = []
+    for argument in args:
+        arg, _, value = argument.partition(':')
+        if arg in EXC_KEYS:
+            exceptions[EXC_KEYS[arg]].append(value)
+        else:
+            local_args.append(argument)
+    return local_args, exceptions
+
+
+def handle_pairsfile(filename: str) -> List[str]:
+    """Handle -pairsfile argument.
+
+    .. versionadded:: 7.0
+    """
+    if not filename:
+        filename = pywikibot.input(
+            'Please enter the filename to read replacements from:')
+
+    try:
+        with codecs.open(filename, 'r', 'utf-8') as f:
+            # strip newlines, but not other characters
+            replacements = f.read().splitlines()
+        if not replacements:
+            raise OSError('{} is empty.'.format(filename))
+    except OSError as e:
+        pywikibot.error('Error loading {}: {}'.format(filename, e))
+        return None
+
+    if len(replacements) % 2:
+        pywikibot.error(
+            '{} contains an incomplete pattern replacement pair.'.format(
+                filename))
+        return None
+
+    # Strip BOM from first line
+    replacements[0].lstrip('\uFEFF')
+    return replacements
+
+
+def handle_manual() -> List[str]:
+    """Handle manual input.
+
+    .. versionadded:: 7.0
+    """
+    pairs = []
+    old = pywikibot.input('Please enter the text that should be replaced:')
+    while old:
+        new = pywikibot.input('Please enter the new text:')
+        pairs += [old, new]
+        old = pywikibot.input(
+            'Please enter another text that should be replaced,\n'
+            'or press Enter to start:')
+    return pairs
+
+
+def handle_sql(sql: str,
+               replacements: List[Pattern],
+               exceptions: List[Pattern]) -> Generator:
+    """Handle default sql query.
+
+    .. versionadded:: 7.0
+    """
+    if not sql:
+        where_clause = 'WHERE ({})'.format(' OR '.join(
+            "old_text RLIKE '{}'"
+            .format(prepareRegexForMySQL(repl.old_regex.pattern))
+            for repl in replacements))
+
+        if exceptions:
+            except_clause = 'AND NOT ({})'.format(' OR '.join(
+                "old_text RLIKE '{}'"
+                .format(prepareRegexForMySQL(exc.pattern))
+                for exc in exceptions))
+        else:
+            except_clause = ''
+
+        sql = """
+SELECT page_namespace, page_title
+FROM page
+JOIN text ON (page_id = old_id)
+{}
+{}
+LIMIT 200""".format(where_clause, except_clause)
+
+    return pagegenerators.MySQLPageGenerator(sql)
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -779,16 +888,9 @@ def main(*args: str) -> None:
     # Array which will collect commandline parameters.
     # First element is original text, second element is replacement text.
     commandline_replacements = []
+    file_replacements = []
     # A list of 2-tuples of original text and replacement text.
     replacements = []
-    # Don't edit pages which contain certain texts.
-    exceptions = {
-        'title': [],
-        'text-contains': [],
-        'inside': [],
-        'inside-tags': [],
-        'require-title': [],  # using a separate requirements dict needs some
-    }                         # major refactoring of code.
 
     # Should the elements of 'replacements' and 'exceptions' be interpreted
     # as regular expressions?
@@ -798,53 +900,36 @@ def main(*args: str) -> None:
     # the dump's path, either absolute or relative, which will be used
     # if -xml flag is present
     xmlFilename = None
-    useSql = False
-    sql_query = None
+    xmlStart = None
+    sql_query = None  # type: Optional[str]
     # Set the default regular expression flags
     flags = 0
     # Request manual replacements even if replacements are already defined
     manual_input = False
-    # Replacements loaded from a file
-    replacement_file = None
-    replacement_file_arg_misplaced = False
 
     # Read commandline parameters.
+    genFactory = pagegenerators.GeneratorFactory(
+        disabled_options=['mysqlquery'])
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
     local_args = genFactory.handle_args(local_args)
+    local_args, exceptions = handle_exceptions(*local_args)
 
-    for arg in local_args:
+    for argument in local_args:
+        arg, _, value = argument.partition(':')
         if arg == '-regex':
             regex = True
-        elif arg.startswith('-xmlstart'):
-            if len(arg) == 9:
-                xmlStart = pywikibot.input(
-                    'Please enter the dumped article to start with:')
-            else:
-                xmlStart = arg[10:]
-        elif arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
-            else:
-                xmlFilename = arg[5:]
-        elif arg.startswith('-mysqlquery'):
-            useSql = True
-            sql_query = arg.partition(':')[2]
-        elif arg.startswith('-excepttitle:'):
-            exceptions['title'].append(arg[13:])
-        elif arg.startswith('-requiretitle:'):
-            exceptions['require-title'].append(arg[14:])
-        elif arg.startswith('-excepttext:'):
-            exceptions['text-contains'].append(arg[12:])
-        elif arg.startswith('-exceptinside:'):
-            exceptions['inside'].append(arg[14:])
-        elif arg.startswith('-exceptinsidetag:'):
-            exceptions['inside-tags'].append(arg[17:])
-        elif arg.startswith('-fix:'):
-            fixes_set += [arg[5:]]
-        elif arg.startswith('-sleep:'):
-            options['sleep'] = float(arg[7:])
-        elif arg in ('-always', '-recursive', '-allowoverlap'):
+        elif arg == '-xmlstart':
+            xmlStart = value or pywikibot.input(
+                'Please enter the dumped article to start with:')
+        elif arg == '-xml':
+            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
+        elif arg == '-mysqlquery':
+            sql_query = value
+        elif arg == '-fix':
+            fixes_set.append(value)
+        elif arg == '-sleep':
+            options['sleep'] = float(value)
+        elif arg in ('-allowoverlap', '-always', '-recursive'):
             options[arg[1:]] = True
         elif arg == '-nocase':
             flags |= re.IGNORECASE
@@ -852,67 +937,32 @@ def main(*args: str) -> None:
             flags |= re.DOTALL
         elif arg == '-multiline':
             flags |= re.MULTILINE
-        elif arg.startswith('-addcat:'):
-            options['addcat'] = arg[8:]
-        elif arg.startswith('-summary:'):
-            edit_summary = arg[9:]
-        elif arg.startswith('-automaticsummary'):
+        elif arg == '-addcat':
+            options['addcat'] = value
+        elif arg == '-summary':
+            edit_summary = value
+        elif arg == '-automaticsummary':
             edit_summary = True
-        elif arg.startswith('-manualinput'):
+        elif arg == '-manualinput':
             manual_input = True
-        elif arg.startswith('-pairsfile'):
-            if len(commandline_replacements) % 2:
-                replacement_file_arg_misplaced = True
-
-            if arg == '-pairsfile':
-                replacement_file = pywikibot.input(
-                    'Please enter the filename to read replacements from:')
-            else:
-                replacement_file = arg[len('-pairsfile:'):]
+        elif arg == '-pairsfile':
+            file_replacements = handle_pairsfile(value)
         else:
             commandline_replacements.append(arg)
 
-    site = pywikibot.Site()
+    if file_replacements is None:
+        return
 
     if len(commandline_replacements) % 2:
         pywikibot.error('Incomplete command line pattern replacement pair.')
         return
 
-    if replacement_file_arg_misplaced:
-        pywikibot.error(
-            '-pairsfile used between a pattern replacement pair.')
-        return
-
-    if replacement_file:
-        try:
-            with codecs.open(replacement_file, 'r', 'utf-8') as f:
-                # strip newlines, but not other characters
-                file_replacements = f.read().splitlines()
-        except OSError as e:
-            pywikibot.error('Error loading {}: {}'.format(
-                replacement_file, e))
-            return
-
-        if len(file_replacements) % 2:
-            pywikibot.error(
-                '{} contains an incomplete pattern replacement pair.'.format(
-                    replacement_file))
-            return
-
-        # Strip BOM from first line
-        file_replacements[0].lstrip('\uFEFF')
-        commandline_replacements.extend(file_replacements)
-
+    commandline_replacements += file_replacements
     if not(commandline_replacements or fixes_set) or manual_input:
-        old = pywikibot.input('Please enter the text that should be replaced:')
-        while old:
-            new = pywikibot.input('Please enter the new text:')
-            commandline_replacements += [old, new]
-            old = pywikibot.input(
-                'Please enter another text that should be replaced,'
-                '\nor press Enter to start:')
+        commandline_replacements += handle_manual()
 
     # The summary stored here won't be actually used but is only an example
+    site = pywikibot.Site()
     single_summary = None
     for i in range(0, len(commandline_replacements), 2):
         replacement = Replacement(commandline_replacements[i],
@@ -1025,33 +1075,12 @@ def main(*args: str) -> None:
     precompile_exceptions(exceptions, regex, flags)
 
     if xmlFilename:
-        try:
-            xmlStart
-        except NameError:
-            xmlStart = None
         gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
                                           replacements, exceptions, site)
-    elif useSql:
-        if not sql_query:
-            whereClause = 'WHERE ({})'.format(' OR '.join(
-                "old_text RLIKE '{}'"
-                .format(prepareRegexForMySQL(old_regexp.pattern))
-                for (old_regexp, new_text) in replacements))
-            if exceptions:
-                exceptClause = 'AND NOT ({})'.format(' OR '.join(
-                    "old_text RLIKE '{}'"
-                    .format(prepareRegexForMySQL(exc.pattern))
-                    for exc in exceptions))
-            else:
-                exceptClause = ''
-        query = sql_query or """
-SELECT page_namespace, page_title
-FROM page
-JOIN text ON (page_id = old_id)
-{}
-{}
-LIMIT 200""".format(whereClause, exceptClause)
-        gen = pagegenerators.MySQLPageGenerator(query)
+    elif sql_query is not None:
+        # Only -excepttext option is considered by the query. Other
+        # exceptions are taken into account by the ReplaceRobot
+        gen = handle_sql(sql_query, replacements, exceptions['text-contains'])
 
     gen = genFactory.getCombinedGenerator(gen, preload=True)
     if pywikibot.bot.suggest_help(missing_generator=not gen):
