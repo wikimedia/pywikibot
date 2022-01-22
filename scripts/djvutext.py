@@ -32,7 +32,7 @@ by default:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,11 +182,8 @@ def main(*args: str) -> None:
     pages = pages.split(',')
     for i, page_interval in enumerate(pages):
         start, sep, end = page_interval.partition('-')
-        start = 1 if not start else int(start)
-        if not sep:
-            end = start
-        else:
-            end = int(end) if end else djvu.number_of_images()
+        start = int(start or 1)
+        end = int(end or djvu.number_of_images()) if sep else start
         pages[i] = (start, end)
 
     site = pywikibot.Site()
