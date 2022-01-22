@@ -860,13 +860,21 @@ class IndexPage(pywikibot.Page):
 
     def has_valid_content(self) -> bool:
         """Test page only contains a single call to the index template."""
-        if (not self.text.startswith('{{' + self.INDEX_TEMPLATE)
-                or not self.text.endswith('}}')):
+        text = self.text
+
+        if not text.startswith('{{' + self.INDEX_TEMPLATE):
+            return False
+
+        # Discard possible categories after INDEX_TEMPLATE
+        categories = textlib.getCategoryLinks(text, self.site)
+        for cat in categories:
+            text = text.replace('\n' + cat.title(as_link=True), '')
+
+        if not text.endswith('}}'):
             return False
 
         # Discard all inner templates as only top-level ones matter
-        templates = textlib.extract_templates_and_params_regex_simple(
-            self.text)
+        templates = textlib.extract_templates_and_params_regex_simple(text)
         if len(templates) != 1 or templates[0][0] != self.INDEX_TEMPLATE:
             # Only a single call to the INDEX_TEMPLATE is allowed
             return False
