@@ -1187,7 +1187,7 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             lastpart = parts[-1]
             if re.match(r'\s*{}'.format(marker), lastpart):
                 # Put the langlinks back into the noinclude's
-                regexp = re.compile(r'{}\s*{}'.formar(includeOff, marker))
+                regexp = re.compile(r'{}\s*{}'.format(includeOff, marker))
                 newtext = regexp.sub(s + includeOff, s2)
             else:
                 # Put the langlinks at the end, inside noinclude's
