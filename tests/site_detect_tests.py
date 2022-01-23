@@ -120,7 +120,7 @@ class Pre119SiteTestCase(SiteDetectionTestCase):
 
         api.php is not available. Anyway the wiki is outdated.
         """
-        self.assertNoSite('http://www.ecoreality.org/wiki/$1')  # v1.16.2
+        self.assertNoSite('http://ecoreality.org/wiki/$1')  # v1.16.2
 
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
@@ -162,7 +162,7 @@ class APIHiddenTestCase(SiteDetectionTestCase):
         api.php is not available. HTML looks like it has an API, but redirect
         rules prevent access.
         """
-        self.assertNoSite('http://www.EcoReality.org/wiki/$1')
+        self.assertNoSite('http://EcoReality.org/wiki/$1')
 
 
 class FailingSiteTestCase(SiteDetectionTestCase):
