@@ -1423,7 +1423,7 @@ class BaseBot(OptionHandler):
 
         try:
             func(*args, **kwargs)
-            self.counter['save'] += 1
+            self.counter['write'] += 1
         except PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
