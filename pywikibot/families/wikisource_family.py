@@ -1,6 +1,6 @@
 """Family module for Wikisource."""
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,11 +26,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'uk', 'ar', 'cs',
-        'mul', 'gu', 'pt', 'sr', 'fa', 'sv', 'hu', 'ko', 'ml', 'bn', 'sa',
-        'ta', 'te', 'sl', 'hy', 'el', 'tr', 'vi', 'la', 'ro', 'fi', 'ja',
-        'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'eo', 'hi',
-        'be', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
-        'as', 'mr', 'bg', 'li', 'lt', 'wa', 'cy', 'jv', 'pa', 'or', 'eu', 'gl',
+        'mul', 'gu', 'pt', 'sr', 'sv', 'fa', 'hu', 'ko', 'ml', 'bn', 'sa',
+        'ta', 'te', 'sl', 'hy', 'tr', 'el', 'la', 'vi', 'ro', 'ja', 'fi',
+        'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'be', 'hi',
+        'eo', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
+        'as', 'mr', 'bg', 'cy', 'li', 'lt', 'wa', 'jv', 'pa', 'or', 'eu', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 

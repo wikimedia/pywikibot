@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -169,7 +169,7 @@ class Family:
     # methods instead
     linktrails = {
         '_default': '[a-z]*',
-        'ab': '[a-zабвгҕдежзӡикқҟлмнопҧрстҭуфхҳцҵчҷҽҿшыҩџьә]*',
+        'ab': '[a-zабвгӷҕдежзӡикқҟлмнопԥҧрстҭуфхҳцҵчҷҽҿшыҩџьә]*',
         'ady': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӀ]*',
         'als': '[äöüßa-z]*',
         'alt': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяјҥӧӱ]*',
