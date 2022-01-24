@@ -1,6 +1,6 @@
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,26 +39,26 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'jv', 'pnb', 'ht', 'su', 'lb', 'ba', 'ga', 'szl', 'is', 'ku', 'lmo',
         'cv', 'fy', 'tl', 'wuu', 'an', 'sco', 'diq', 'ckb', 'pa', 'yo', 'ne',
         'bar', 'io', 'gu', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn', 'avk',
-        'xmf', 'nv', 'si', 'bat-smg', 'or', 'gd', 'cdo', 'ilo', 'yi', 'am',
-        'sd', 'bug', 'os', 'frr', 'nap', 'crh', 'hsb', 'ha', 'map-bms', 'mai',
-        'fo', 'sah', 'li', 'mzn', 'ps', 'eml', 'gor', 'ace', 'bcl', 'sa',
-        'ban', 'wa', 'zh-classical', 'lij', 'zu', 'mhr', 'mrj', 'shn', 'hif',
-        'mni', 'as', 'hak', 'roa-tara', 'hyw', 'pam', 'km', 'ie', 'nso', 'rue',
-        'se', 'bh', 'nds-nl', 'vls', 'sn', 'so', 'mi', 'myv', 'nah', 'sat',
-        'sc', 'vep', 'lld', 'gan', 'glk', 'kab', 'tk', 'co', 'fiu-vro', 'bo',
+        'nv', 'xmf', 'si', 'bat-smg', 'or', 'gd', 'cdo', 'ilo', 'yi', 'crh',
+        'am', 'os', 'sd', 'bug', 'frr', 'nap', 'ha', 'hsb', 'sah', 'map-bms',
+        'mai', 'fo', 'li', 'mzn', 'ps', 'eml', 'gor', 'ace', 'bcl', 'sa',
+        'ban', 'wa', 'zh-classical', 'lij', 'lld', 'zu', 'mhr', 'shn', 'mrj',
+        'hif', 'mni', 'as', 'hak', 'roa-tara', 'hyw', 'pam', 'km', 'ie', 'nso',
+        'rue', 'se', 'bh', 'nds-nl', 'vls', 'so', 'sn', 'myv', 'mi', 'nah',
+        'sat', 'sc', 'vep', 'gan', 'glk', 'kab', 'tk', 'co', 'fiu-vro', 'bo',
         'ab', 'kv', 'csb', 'frp', 'pcd', 'kw', 'ug', 'udm', 'gv', 'ay', 'ary',
         'zea', 'nrm', 'gn', 'bjn', 'mt', 'lez', 'lfn', 'stq', 'smn', 'lo',
         'mwl', 'skr', 'olo', 'rm', 'lad', 'fur', 'gom', 'ang', 'koi', 'ext',
         'tyv', 'dsb', 'dty', 'ln', 'cbk-zam', 'dv', 'ksh', 'rw', 'gag', 'bxr',
-        'pfl', 'ig', 'av', 'pi', 'pag', 'awa', 'haw', 'tay', 'pap', 'krc',
-        'xal', 'szy', 'za', 'pdc', 'kaa', 'inh', 'atj', 'to', 'arc', 'jam',
-        'tpi', 'kbp', 'na', 'wo', 'kbd', 'tcy', 'mdf', 'nov', 'ki', 'tet',
-        'dag', 'lg', 'bi', 'jbo', 'roa-rup', 'fj', 'kg', 'tw', 'lbe', 'xh',
-        'ty', 'mnw', 'nqo', 'trv', 'shi', 'srn', 'om', 'gcr', 'sm', 'ks',
-        'chr', 'ltg', 'alt', 'cu', 'nia', 'pih', 'ny', 'got', 'st', 'mad',
-        'ami', 'kl', 'rmy', 'tn', 'bm', 'ts', 'chy', 've', 'rn', 'tum', 'iu',
-        'ak', 'ss', 'ch', 'pnt', 'ady', 'ik', 'ee', 'ff', 'din', 'sg', 'dz',
-        'ti', 'pwn', 'cr',
+        'pfl', 'ig', 'av', 'pag', 'pi', 'awa', 'haw', 'tay', 'pap', 'krc',
+        'xal', 'szy', 'za', 'inh', 'pdc', 'kaa', 'atj', 'to', 'arc', 'kbp',
+        'jam', 'tpi', 'na', 'wo', 'kbd', 'tcy', 'mdf', 'tw', 'nov', 'ki',
+        'tet', 'dag', 'lg', 'bi', 'jbo', 'roa-rup', 'fj', 'kg', 'xh', 'lbe',
+        'ty', 'mnw', 'nqo', 'shi', 'trv', 'srn', 'om', 'cu', 'gcr', 'sm', 'ks',
+        'alt', 'ltg', 'chr', 'nia', 'pih', 'ny', 'got', 'st', 'mad', 'ami',
+        'kl', 'rmy', 'tn', 'bm', 'ts', 'chy', 've', 'rn', 'tum', 'iu', 'ak',
+        'ss', 'ch', 'pnt', 'ady', 'ik', 'ee', 'ff', 'din', 'sg', 'dz', 'ti',
+        'pwn', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages

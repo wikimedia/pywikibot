@@ -1,6 +1,6 @@
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2021
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,16 +31,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ku', 'lt', 'it', 'ca', 'fi', 'hu', 'ta', 'tr', 'io', 'hy', 'ko', 'ja',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'et', 'id', 'cs', 'ml',
         'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'gl', 'ar', 'jv', 'oc', 'az',
-        'eu', 'uk', 'skr', 'br', 'ast', 'da', 'lo', 'simple', 'bn', 'la', 'is',
-        'hr', 'fj', 'tg', 'sk', 'ky', 'wa', 'bg', 'ur', 'ps', 'cy', 'shn',
-        'vo', 'sl', 'he', 'af', 'zh-min-nan', 'scn', 'om', 'tl', 'pa', 'sw',
-        'fy', 'nn', 'ka', 'lv', 'lmo', 'mnw', 'ms', 'min', 'sq', 'nds', 'co',
-        'mn', 'pnb', 'lb', 'bs', 'nah', 'sg', 'yue', 'sa', 'kk', 'km', 'diq',
+        'eu', 'skr', 'uk', 'br', 'ast', 'da', 'lo', 'simple', 'bn', 'la', 'is',
+        'hr', 'fj', 'tg', 'sk', 'ky', 'wa', 'bg', 'ur', 'ps', 'shn', 'cy',
+        'vo', 'sl', 'he', 'af', 'zh-min-nan', 'om', 'scn', 'tl', 'pa', 'sw',
+        'fy', 'nn', 'ka', 'lmo', 'lv', 'mnw', 'ms', 'min', 'sq', 'sg', 'nds',
+        'co', 'mn', 'pnb', 'lb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km', 'diq',
         'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd', 'ga',
         'mr', 'an', 'gom', 'wo', 'mni', 'su', 'ia', 'ang', 'mt', 'fo', 'sd',
         'tt', 'gn', 'ie', 'so', 'csb', 'ug', 'bcl', 'si', 'st', 'roa-rup',
         'hif', 'zu', 'kl', 'mi', 'ay', 'ha', 'jbo', 'ln', 'yi', 'gu', 'na',
-        'gv', 'kw', 'tpi', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu',
+        'tpi', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu',
         'dv', 'ti', 'tn',
     ]
 

@@ -1,6 +1,6 @@
 """Family module for Wikisource."""
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,7 +30,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ta', 'te', 'sl', 'hy', 'tr', 'el', 'la', 'vi', 'ro', 'ja', 'fi',
         'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'be', 'hi',
         'eo', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
-        'as', 'mr', 'bg', 'li', 'cy', 'lt', 'wa', 'jv', 'pa', 'or', 'eu', 'gl',
+        'as', 'mr', 'bg', 'cy', 'li', 'lt', 'wa', 'jv', 'pa', 'or', 'eu', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
