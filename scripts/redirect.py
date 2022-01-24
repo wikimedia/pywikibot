@@ -213,21 +213,27 @@ class RedirectGenerator(OptionHandler):
 
     def _next_redirect_group(self) -> Generator[List[pywikibot.Page], None,
                                                 None]:
-        """Generator that yields batches of 500 redirects as a list."""
-        apiQ = []
+        """Generator that yields batches of 50 redirects as a list."""
+        chunk = []
+        chunks = 0
         for page in self.get_redirect_pages_via_api():
-            apiQ.append(str(page.pageid))
-            if len(apiQ) >= 500:
-                pywikibot.output('.', newline=False)
-                yield apiQ
-                apiQ = []
-        if apiQ:
-            yield apiQ
+            chunk.append(str(page.pageid))
+            if len(chunk) >= 50:  # T299859
+                chunks += 1
+                if not chunks % 10:
+                    pywikibot.output('.', newline=False)
+                yield chunk
+                chunk.clear()
+        if chunk:
+            yield chunk
 
     def get_redirects_via_api(self, maxlen=8) -> Generator[Tuple[
             str, Optional[int], str, Optional[str]], None, None]:
         r"""
         Return a generator that yields tuples of data about redirect Pages.
+
+        .. versionchanged:: 7.0
+           only yield tuple if type of redirect is not 1 (normal redirect)
 
         The description of returned tuple items is as follows:
 
@@ -281,7 +287,9 @@ class RedirectGenerator(OptionHandler):
                             result += 1
                             final = redirects[final]
 
-                yield (redirect, result, target, final)
+                # only yield multiple or broken redirects
+                if result != 1:
+                    yield redirect, result, target, final
 
     def retrieve_broken_redirects(self) -> Generator[
             Union[str, pywikibot.Page], None, None]:
