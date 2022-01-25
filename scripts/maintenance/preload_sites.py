@@ -4,7 +4,7 @@
 The following parameters are supported:
 
 -worker:<num>     The number of parallel tasks to be run. Default is the
-                  number of precessors on the machine
+                  number of processors on the machine
 
 Usage:
 
@@ -16,7 +16,7 @@ To force preloading, change the global expiry value to 0:
 
 """
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2022
 #
 # Distributed under the terms of the MIT license.
 #
