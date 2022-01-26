@@ -117,11 +117,11 @@
 * compat2core script was restored and renamed to update_script
 
 ### version
-* Show all mandatory dependecies 
+* Show all mandatory dependecies
 
 
 ## 6.3.0
-*31 May 2021* 
+*31 May 2021*
 
 ### addtext
 * -except option was removed in favour of commonly used -grepnot
