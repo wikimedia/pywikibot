@@ -13,7 +13,7 @@ This wrapper script invokes script by its name in this search order:
 5. Framework scripts residing in `pywikibot/scripts`.
 
 This wrapper script is able to invoke scripts even the script name is
-missspelled. In directory mode it also checks package dependencies.
+misspelled. In directory mode it also checks package dependencies.
 
 Run scripts with pywikibot in directory mode using::
 
@@ -26,7 +26,7 @@ or run scripts with pywikibot installed as a site package using::
 This wrapper script uses the package directory to store all user files,
 will fix up search paths so the package does not need to be installed, etc.
 
-Currently `<pwb options>` are :ref:`global options`. This can be used
+Currently, `<pwb options>` are :ref:`global options`. This can be used
 for tests to set the default site (see T216825)::
 
     python pwb.py -lang:de bot_tests -v
@@ -66,7 +66,7 @@ def check_pwb_versions(package):
 
     Rules:
         - Pywikibot version must not be older than scrips version
-        - Scripts version must not be older than previous Pyvikibot version
+        - Scripts version must not be older than previous Pywikibot version
           due to deprecation policy
     """
     from pywikibot.tools import Version
@@ -206,7 +206,7 @@ def _print_requirements(requirements, script, variant):
 def check_modules(script=None):
     """Check whether mandatory modules are present.
 
-    This also checks Python version when importing deptendencies from setup.py
+    This also checks Python version when importing dependencies from setup.py
 
     :param script: The script name to be checked for dependencies
     :type script: str or None
