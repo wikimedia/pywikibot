@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -238,7 +238,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
     """Structure to hold values where the key is given by the value itself.
 
     A structure like a defaultdict but the key is given by the value
-    itselfvand cannot be assigned directly. It returns the number of all
+    itself and cannot be assigned directly. It returns the number of all
     items with len() but not the number of keys.
 
     Samples:

@@ -545,8 +545,8 @@ class InterwikiBotConfig:
             self.summary = value or pywikibot.input(
                 'What summary do you want to use?')
         elif arg == 'lack':
-            self.lacklanguage, sep, minlinks = value.partition(':')
-            self.minlinks = int(minlinks) if minlinks.isdigit() else 1
+            self.lacklanguage, _, minlinks = value.partition(':')
+            self.minlinks = int(minlinks or 1)
         elif arg in ('cleanup', 'confirm', 'force', 'hintnobracket',
                      'hintsareright', 'initialredirect', 'localonly', 'quiet',
                      'repository', 'same', 'select', 'skipauto',
@@ -557,36 +557,6 @@ class InterwikiBotConfig:
         else:
             return False
         return True
-
-
-class PageTree(SizedKeyCollection):
-
-    """
-    Structure to manipulate a set of pages.
-
-    Allows filtering efficiently by Site.
-    """
-
-    def __init__(self):
-        """Initializer.
-
-        While using dict values would be faster for the remove() operation,
-        keeping list values is important, because the order in which the pages
-        were found matters: the earlier a page is found, the closer it is to
-        the Subject.origin. Chances are that pages found within 2 interwiki
-        distance from the origin are more related to the original topic
-        than pages found later on, after 3, 4, 5 or more interwiki hops.
-
-        Keeping this order is hence important to display an ordered
-        list of pages to the user when he'll be asked to resolve
-        conflicts.
-
-        :ivar data: dictionary with Site as keys and list of page as values.
-            All pages found within Site are kept in self.data[site].
-
-        :type data: defaultdict(list)
-        """
-        super().__init__('site')
 
 
 class Subject(interwiki_graph.Subject):
@@ -667,16 +637,16 @@ class Subject(interwiki_graph.Subject):
         self.repoPage = None
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
-        self.todo = PageTree()
+        self.todo = SizedKeyCollection('site')
         if origin:
             self.todo.append(origin)
 
         # done is a list of all pages that have been analyzed and that
         # are known to belong to this subject.
-        self.done = PageTree()
+        self.done = SizedKeyCollection('site')
         # This is a list of all pages that are currently scheduled for
         # download.
-        self.pending = PageTree()
+        self.pending = SizedKeyCollection('site')
         if self.conf.hintsareright:
             # This is a set of sites that we got hints to
             self.hintedsites = set()
