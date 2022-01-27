@@ -78,7 +78,8 @@ import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.bot import ExistingPageBot, OptionHandler, RedirectPageBot
+from pywikibot.bot import (
+    ExistingPageBot, OptionHandler, RedirectPageBot, suggest_help)
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
@@ -679,6 +680,7 @@ def main(*args: str) -> None:
     # redirs)
     action = None
     source = set()
+    unknown = []
     gen_factory = pagegenerators.GeneratorFactory()
 
     local_args = pywikibot.handle_args(args)
@@ -714,17 +716,13 @@ def main(*args: str) -> None:
         elif gen_factory.handle_arg(argument):
             pass
         else:
-            pywikibot.output('Unknown argument: ' + arg)
+            unknown.append(arg)
 
-    if len(source) > 1:
-        problem = 'You can only use one of {} options.'.format(
-            ' or '.join(source))
-        pywikibot.bot.suggest_help(additional_text=problem,
-                                   missing_action=not action)
-        return
-
-    if not action:
-        pywikibot.bot.suggest_help(missing_action=True)
+    problem = 'You can only use one of {} options.'.format(
+        ' or '.join(source)) if len(source) > 1 else ''
+    if suggest_help(additional_text=problem,
+                    unknown_parameters=unknown,
+                    missing_action=not action):
         return
 
     gen = None
