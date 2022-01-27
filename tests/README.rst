@@ -27,6 +27,7 @@ setup.py
 
 ::
 
+    pip install pytest
     pip install pytest-runner
     python setup.py pytest
 
