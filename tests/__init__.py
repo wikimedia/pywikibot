@@ -149,6 +149,7 @@ script_test_modules = {
     'cache',
     'category_bot',
     'checkimages',
+    'data_ingestion',
     'deletionbot',
     'fixing_redirects',
     'generate_family_file',

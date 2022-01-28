@@ -93,7 +93,7 @@ Warning! Put it in one line, otherwise it won't work correctly.
 
 """
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -104,10 +104,13 @@ import hashlib
 import io
 import os
 import posixpath
+
+from typing import Any, BinaryIO, Optional
 from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot.backports import Dict, List
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import NoPageError
 from pywikibot.specialbots import UploadRobot
@@ -117,45 +120,43 @@ class Photo(pywikibot.FilePage):
 
     """Represents a Photo (or other file), with metadata, to be uploaded."""
 
-    def __init__(self, URL: str, metadata: dict, site=None):
+    def __init__(self, url: str, metadata: Dict[str, Any],
+                 site: Optional[pywikibot.site.APISite] = None):
         """
         Initializer.
 
-        :param URL: URL of photo
+        :param url: URL of photo
         :param metadata: metadata about the photo that can be referred to
             from the title & template
         :param site: target site
-        :type site: pywikibot.site.APISite
-
         """
-        self.URL = URL
+        self.URL = url
         self.metadata = metadata
-        self.metadata['_url'] = URL
+        self.metadata['_url'] = url
         self.metadata['_filename'] = filename = posixpath.split(
-            urlparse(URL)[2])[1]
-        self.metadata['_ext'] = ext = filename.split('.')[-1]
-        if ext == filename:
-            self.metadata['_ext'] = None
+            urlparse(url)[2])[1]
+        ext = filename.split('.')[-1]
+        self.metadata['_ext'] = None if ext == filename else ext
         self.contents = None
 
         if not site:
-            site = pywikibot.Site('commons', 'commons')
+            site = pywikibot.Site('commons:commons')
 
         # default title
-        super().__init__(site, self.getTitle('%(_filename)s.%(_ext)s'))
+        super().__init__(site, self.get_title('%(_filename)s.%(_ext)s'))
 
-    def downloadPhoto(self):
+    def download_photo(self) -> BinaryIO:
         """
         Download the photo and store it in an io.BytesIO object.
 
         TODO: Add exception handling
         """
         if not self.contents:
-            imageFile = fetch(self.URL).content
-            self.contents = io.BytesIO(imageFile)
+            image_file = fetch(self.URL).content
+            self.contents = io.BytesIO(image_file)
         return self.contents
 
-    def findDuplicateImages(self):
+    def find_duplicate_images(self) -> List[str]:
         """
         Find duplicates of the photo.
 
@@ -164,13 +165,13 @@ class Photo(pywikibot.FilePage):
 
         TODO: Add exception handling, fix site thing
         """
-        hashObject = hashlib.sha1()
-        hashObject.update(self.downloadPhoto().getvalue())
-        return [page.title(with_ns=False) for page in
-                self.site.allimages(
-                    sha1=base64.b16encode(hashObject.digest()))]
+        hash_object = hashlib.sha1()
+        hash_object.update(self.download_photo().getvalue())
+        return [page.title(with_ns=False)
+                for page in self.site.allimages(
+                    sha1=base64.b16encode(hash_object.digest()))]
 
-    def getTitle(self, fmt: str) -> str:
+    def get_title(self, fmt: str) -> str:
         """
         Populate format string with %(name)s entries using metadata.
 
@@ -183,7 +184,8 @@ class Photo(pywikibot.FilePage):
         # FIXME: normalise the title so it is usable as a MediaWiki title.
         return fmt % self.metadata
 
-    def getDescription(self, template, extraparams=None):
+    def get_description(self, template,
+                        extraparams: Optional[Dict[str, str]] = None) -> str:
         """Generate a description for a file."""
         params = {}
         params.update(self.metadata)
@@ -192,18 +194,18 @@ class Photo(pywikibot.FilePage):
         for key in sorted(params.keys()):
             value = params[key]
             if not key.startswith('_'):
-                description += ('|{}={}\n'.format(
-                    key, self._safeTemplateValue(value)))
+                description += '|{}={}\n'.format(
+                    key, self._safe_template_value(value))
         description += '}}'
 
         return description
 
-    def _safeTemplateValue(self, value):
+    def _safe_template_value(self, value: str) -> str:
         """Replace pipe (|) with {{!}}."""
         return value.replace('|', '{{!}}')
 
 
-def CSVReader(fileobj, urlcolumn, site=None, *args, **kwargs):
+def CSVReader(fileobj, urlcolumn, site=None, *args, **kwargs):  # noqa: N802
     """Yield Photo objects for each row of a CSV file."""
     reader = csv.DictReader(fileobj, *args, **kwargs)
     for line in reader:
@@ -218,52 +220,45 @@ class DataIngestionBot(pywikibot.Bot):
         """
         Initializer.
 
-        :param reader: Generator of Photos to process.
-        :type reader: Photo page generator
         :param titlefmt: Title format
         :param pagefmt: Page format
         """
         super().__init__(**kwargs)
-
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
-    def treat(self, photo):
-        """
-        Process each page.
+    def treat(self, page):
+        """Process each page.
 
         1. Check for existing duplicates on the wiki specified in self.site.
         2. If duplicates are found, then skip uploading.
         3. Download the file from photo.URL and upload the file to self.site.
         """
-        duplicates = photo.findDuplicateImages()
+        duplicates = page.find_duplicate_images()
         if duplicates:
-            pywikibot.output('Skipping duplicate of {!r}'
-                             .format(duplicates))
-            return duplicates[0]
+            pywikibot.output('Skipping duplicate of {!r}'.format(duplicates))
+            return
 
-        title = photo.getTitle(self.titlefmt)
-        description = photo.getDescription(self.pagefmt)
+        title = page.get_title(self.titlefmt)
+        description = page.get_description(self.pagefmt)
 
-        bot = UploadRobot(url=photo.URL,
+        bot = UploadRobot(url=page.URL,
                           description=description,
                           use_filename=title,
                           keep_filename=True,
                           verify_description=False,
                           target_site=self.site)
-        bot._contents = photo.downloadPhoto().getvalue()
+        bot._contents = page.download_photo().getvalue()
         bot._retrieved = True
         bot.run()
 
-        return title
-
     @classmethod
-    def parseConfigurationPage(cls, configurationPage):
+    def parse_configuration_page(cls, configuration_page) -> Dict[str, str]:
         """
         Parse a Page which contains the configuration.
 
-        :param configurationPage: page with configuration
-        :type configurationPage: :py:obj:`pywikibot.Page`
+        :param configuration_page: page with configuration
+        :type configuration_page: :py:obj:`pywikibot.Page`
         """
         configuration = {}
         # Set a bunch of defaults
@@ -271,7 +266,7 @@ class DataIngestionBot(pywikibot.Bot):
         configuration['csvDelimiter'] = ';'
         configuration['csvEncoding'] = 'Windows-1252'  # FIXME: Encoding hell
 
-        templates = configurationPage.templatesWithParams()
+        templates = configuration_page.templatesWithParams()
         for (template, params) in templates:
             if template.title(with_ns=False) == 'Data ingestion':
                 for param in params:
@@ -295,26 +290,30 @@ def main(*args: str):
 
     :param args: command line arguments
     """
-    # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
+    csv_dir = None
+    unknown = []
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
-    csv_dir = None
+    gen_factory = pagegenerators.GeneratorFactory()
 
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handle_args(args)
+    local_args = gen_factory.handle_args(local_args)
     for arg in local_args:
-        if arg.startswith('-csvdir:'):
-            csv_dir = arg[8:]
+        opt, _, value = arg.partition(':')
+        if opt == '-csvdir:':
+            csv_dir = value
         else:
-            genFactory.handle_arg(arg)
+            unknown.append(arg)
 
-    config_generator = genFactory.getCombinedGenerator()
+    config_generator = gen_factory.getCombinedGenerator()
 
     if pywikibot.bot.suggest_help(
-            missing_parameters=[] if csv_dir else ['-csvdir'],
-            missing_generator=not config_generator):
+            missing_parameters=None if csv_dir else ['-csvdir'],
+            missing_generator=not config_generator,
+            unknown_parameters=unknown):
         return
 
     for config_page in config_generator:
@@ -324,7 +323,7 @@ def main(*args: str):
             pywikibot.error('{} does not exist'.format(config_page))
             continue
 
-        configuration = DataIngestionBot.parseConfigurationPage(config_page)
+        configuration = DataIngestionBot.parse_configuration_page(config_page)
 
         filename = os.path.join(csv_dir, configuration['csvFile'])
         try:

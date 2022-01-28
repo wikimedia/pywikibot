@@ -54,6 +54,8 @@ The contents of the package
     | cosmetic_changes.py    | Can do slight modifications to a wiki page source code  |
     |                        | such that the code looks cleaner.                       |
     +------------------------+---------------------------------------------------------+
+    | data_ingestion.py      | A generic bot to do batch uploading to Commons.         |
+    +------------------------+---------------------------------------------------------+
     | delete.py              | This script can be used to delete pages en masse.       |
     +------------------------+---------------------------------------------------------+
     | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
@@ -167,8 +169,6 @@ The contents of the package
     |                        | and your wiki project.                                  |
     +------------------------+---------------------------------------------------------+
     | create_categories.py   | Program to batch create categories.                     |
-    +------------------------+---------------------------------------------------------+
-    | data_ingestion.py      | A generic bot to do batch uploading to Commons.         |
     +------------------------+---------------------------------------------------------+
     | disambredir.py         | Changing redirect names in disambiguation pages.        |
     +------------------------+---------------------------------------------------------+
