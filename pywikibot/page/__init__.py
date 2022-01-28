@@ -5149,8 +5149,8 @@ class BaseLink(ComparableMixin):
             if specified, present title using onsite local namespace,
             otherwise use self canonical namespace.
 
-        :raise pywikibot.exceptions.Error: no corresponding namespace is found
-            in onsite
+        :raise pywikibot.exceptions.InvalidTitleError: no corresponding
+            namespace is found in onsite
         """
         if onsite is None:
             name = self.namespace.canonical_name
@@ -5162,8 +5162,8 @@ class BaseLink(ComparableMixin):
                     name = namespace.custom_name
                     break
             else:
-                raise Error(
-                    'No corresponding namespace found for namespace {} on {}.'
+                raise InvalidTitleError(
+                    'No corresponding title found for namespace {} on {}.'
                     .format(self.namespace, onsite))
 
         if self.namespace != Namespace.MAIN:

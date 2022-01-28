@@ -166,8 +166,8 @@ class TestLinkObject(SiteAttributeTestCase):
                                  source=self.enws)
         self.assertEqual(l3.ns_title(), 'Translation:Albert Einstein')
         with self.assertRaisesRegex(
-                Error,
-                'No corresponding namespace found for '
+                InvalidTitleError,
+                'No corresponding title found for '
                 'namespace Translation: on wikisource:it.'):
             l3.ns_title(onsite=self.itws)
 

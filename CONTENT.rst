@@ -14,7 +14,7 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | Dockerfile                | Assemble a Docker image, install all dependencies via pip |
     +---------------------------+-----------------------------------------------------------+
-    | Dockerfile-dev            | Docker image including developement dependencies          |
+    | Dockerfile-dev            | Docker image including development dependencies           |
     +---------------------------+-----------------------------------------------------------+
     | HISTORY.rst               | PyPI version history file                                 |
     +---------------------------+-----------------------------------------------------------+
