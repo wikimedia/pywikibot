@@ -74,7 +74,6 @@ from pywikibot.tools import (
     MediaWikiVersion,
     compute_file_hash,
     deprecated,
-    issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
 )
@@ -2640,11 +2639,6 @@ class APISite(
             if not isinstance(ignore_warnings, bool):
                 raise ValueError('report_success may only be set to True when '
                                  'ignore_warnings is a boolean')
-            issue_deprecation_warning('"ignore_warnings" as a boolean and '
-                                      '"report_success" is True or None',
-                                      '"report_success=False" or define '
-                                      '"ignore_warnings" as callable/iterable',
-                                      3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
