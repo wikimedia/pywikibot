@@ -4,6 +4,9 @@ Current release changes
 Improvements
 ------------
 
+* Allow categories when saving IndexPage (T299806)
+* Add a new function case_escape to textlib
+* Support inheritance of the __STATICREDIRECT__
 * Avoid non-deteministic behavior in removeDisableParts
 * Update isbn dependency and require python-stdnum >= 1.17
 * Synchronize Page.linkedPages() parameters with Site.pagelinks() parameters

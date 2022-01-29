@@ -47,6 +47,7 @@
 * L10N updates
 
 ### replace
+* Enable default behaviour with -mysqlquery (T299306)
 * Deprecated "acceptall" and "addedCat" parameters were replaced by "always" and "addcat"
 
 ### revertbot
