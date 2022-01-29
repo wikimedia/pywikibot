@@ -12,7 +12,7 @@ This wrapper script invokes script by its name in this search order:
 4. Maintenance scripts residing in `scripts/maintenance` (directory mode only).
 5. Framework scripts residing in `pywikibot/scripts`.
 
-This wrapper script is able to invoke scripts even the script name is
+This wrapper script is able to invoke scripts even if the script name is
 misspelled. In directory mode it also checks package dependencies.
 
 Run scripts with pywikibot in directory mode using::
