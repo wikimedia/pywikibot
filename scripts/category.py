@@ -14,6 +14,7 @@ where action can be one of these
  * tidy         - tidy up a category by moving its pages into subcategories.
  * tree         - show a tree of subcategories of a given category.
  * listify      - make a list of all of the articles that are in a category.
+ * clean        - automatically clean specified category.
 
 and option can be one of these
 
@@ -65,6 +66,10 @@ Options for "listify" and "tidy" actions:
  -namespace     multiple namespace numbers or names with commas. Examples:
  -ns            -ns:0,2,4
                 -ns:Help,MediaWiki
+
+Options for "clean" action:
+
+ -always
 
 Options for several actions:
 
@@ -1320,6 +1325,74 @@ class CategoryTreeRobot:
             pywikibot.stdout(tree)
 
 
+class CleanBot(Bot):
+
+    """Automatically cleans up specified category.
+
+    Removes redundant grandchildren from specified category by
+    removing direct link to grandparent.
+
+    In another words a grandchildren should not be also a children.
+
+    Stubs categories are exception.
+
+    For details please read:
+    https://en.wikipedia.org/wiki/WP:SUBCAT
+    https://en.wikipedia.org/wiki/WP:DIFFUSE
+
+    """
+
+    update_options = {
+        'recurse': False
+    }
+
+    def __init__(self, cat: Optional[str], **kwargs) -> None:
+        """Initializer."""
+        site = pywikibot.Site()
+        if not cat:
+            cat = pywikibot.input(
+                'Please enter the name of the category to clean:')
+        self.cat = pywikibot.Category(site, cat)
+        self.subcats = set(self.cat.subcategories())
+        self.children = self.subcats | set(self.cat.articles())
+        # Using sorted for reproducible data sequence
+        super().__init__(generator=pagegenerators.PreloadingGenerator(
+            sorted(self.subcats)), **kwargs)
+
+    def skip_page(self, cat) -> bool:
+        """Check whether the category should be processed."""
+        return cat.title().endswith('stubs')
+
+    def treat(self, child) -> None:
+        """Process the category."""
+        grandchildren = set(child.articles(self.opt.recurse))
+        # For advanced usage uncomment the next line to
+        # check not only grandchildren articles but
+        # grandchildren categories too:
+        # grandchildren |= set(child.subcategories(self.opt.recurse))
+        overcategorized = sorted(grandchildren & self.children)
+        if not overcategorized:
+            return
+        if config.verbose_output:
+            pywikibot.output('Subcategory "{}" is parent for:'.format(
+                format(child.title(with_ns=False))))
+            for grandchild in overcategorized:
+                pywikibot.output('\t{}'. format(grandchild.title()))
+        for grandchild in overcategorized:
+            pywikibot.output(color_format(
+                'Remove "{lightpurple}{}{default}" from "{}" '
+                'because it is already under '
+                'subcategory "{green}{}{default}"?',
+                grandchild.title(with_ns=False),
+                self.cat.title(with_ns=False), child.title(with_ns=False)))
+            if not self.user_confirm('') or config.simulate:
+                # Treat 'simulate' here to be keep output quiet and nice
+                continue
+            summary = ('Already in [[:{}]]'
+                       .format(child.title()))
+            grandchild.change_category(self.cat, None, summary)
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -1330,6 +1403,7 @@ def main(*args: str) -> None:
     """
     options = {}
     from_given = False
+    old_cat_title = None
     to_given = False
     batch = False
     summary = ''
@@ -1364,7 +1438,8 @@ def main(*args: str) -> None:
     unknown = []
     pg_options = []
     for arg in local_args:
-        if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify'):
+        if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify',
+                   'clean'):
             action = arg
             continue
 
@@ -1426,6 +1501,8 @@ def main(*args: str) -> None:
             keep_sortkey = True
         elif option == 'prefix':
             prefix = value
+        elif option == 'always':
+            options[option] = True
         else:
             pg_options.append(arg)
 
@@ -1520,6 +1597,8 @@ def main(*args: str) -> None:
                                    recurse=options.get('recurse', False),
                                    prefix=prefix,
                                    namespaces=gen_factory.namespaces)
+    elif action == 'clean':
+        bot = CleanBot(old_cat_title, **options)
 
     if not suggest_help(missing_action=not action):
         pywikibot.Site().login()
