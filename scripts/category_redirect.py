@@ -42,13 +42,9 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
+from pywikibot.backports import Tuple
 from pywikibot.bot import ConfigParserBot, SingleSiteBot
-from pywikibot.exceptions import (
-    CircularRedirectError,
-    Error,
-    NoPageError,
-    ServerError,
-)
+from pywikibot.exceptions import CircularRedirectError, Error, NoPageError
 
 
 LOG_SIZE = 7  # Number of items to keep in active log
@@ -136,58 +132,44 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                                                              self.site))
         return self.cat is not None
 
-    def move_contents(self, old_cat_title, new_cat_title, edit_summary):
+    def move_contents(self, old_cat_title: str, new_cat_title: str,
+                      edit_summary: str) -> Tuple[int, int]:
         """The worker function that moves pages out of oldCat into newCat."""
-        while True:
-            try:
-                old_cat = pywikibot.Category(self.site,
-                                             self.catprefix + old_cat_title)
-                new_cat = pywikibot.Category(self.site,
-                                             self.catprefix + new_cat_title)
+        old_cat = pywikibot.Category(self.site, self.catprefix + old_cat_title)
+        new_cat = pywikibot.Category(self.site, self.catprefix + new_cat_title)
 
-                param = {
-                    'oldCatLink': old_cat.title(),
-                    'oldCatTitle': old_cat_title,
-                    'newCatLink': new_cat.title(),
-                    'newCatTitle': new_cat_title,
-                }
-                summary = edit_summary % param
-                # Move articles
-                found, moved = 0, 0
-                for article in old_cat.members():
-                    found += 1
-                    changed = article.change_category(old_cat, new_cat,
-                                                      summary=summary)
-                    if changed:
-                        moved += 1
+        param = {
+            'oldCatLink': old_cat.title(),
+            'oldCatTitle': old_cat_title,
+            'newCatLink': new_cat.title(),
+            'newCatTitle': new_cat_title,
+        }
+        summary = edit_summary % param
 
-                # pass 2: look for template doc pages
-                for item in pywikibot.data.api.ListGenerator(
-                        'categorymembers', cmtitle=old_cat.title(),
-                        cmprop='title|sortkey', cmnamespace='10',
-                        cmlimit='max'):
-                    for subpage in self.site.doc_subpage:
-                        doc = pywikibot.Page(self.site,
-                                             item['title'] + subpage)
-                        try:
-                            doc.get()
-                        except Error:
-                            continue
-                        changed = doc.change_category(old_cat, new_cat,
-                                                      summary=summary)
-                        if changed:
-                            moved += 1
+        # Move articles
+        found, moved = 0, 0
+        for article in old_cat.members():
+            found += 1
+            moved += article.change_category(old_cat, new_cat, summary=summary)
 
-                if found:
-                    pywikibot.output('{}: {} found, {} moved'
-                                     .format(old_cat.title(), found, moved))
-                return (found, moved)
-            except ServerError:
-                pywikibot.output('Server error: retrying in 5 seconds...')
-                time.sleep(5)
+            if article.namespace() != 10:
                 continue
-            except Exception:
-                return (None, None)
+
+            # pass 2: look for template doc pages
+            for subpage in self.site.doc_subpage:
+                doc = pywikibot.Page(self.site, article.title() + subpage)
+                try:
+                    doc.get()
+                except Error:
+                    pass
+                else:
+                    moved += doc.change_category(old_cat, new_cat,
+                                                 summary=summary)
+
+        if found:
+            pywikibot.output('{}: {} found, {} moved'
+                             .format(old_cat, found, moved))
+        return found, moved
 
     def ready_to_edit(self, cat):
         """Return True if cat not edited during cooldown period, else False."""
@@ -451,16 +433,9 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                         self.log_text.append(message)
                 continue
 
-            found, moved = self.move_contents(cat_title,
-                                              dest.title(with_ns=False),
-                                              edit_summary=comment)
-            if found is None:
-                message = i18n.twtranslate(
-                    self.site, 'category_redirect-log-move-error', {
-                        'oldcat': cat.title(as_link=True, textlink=True)
-                    })
-                self.log_text.append(message)
-            elif found:
+            found, moved = self.move_contents(
+                cat_title, dest.title(with_ns=False), comment)
+            if found:
                 self.record[cat_title][today] = found
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-moved', {
