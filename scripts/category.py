@@ -1402,9 +1402,8 @@ def main(*args: str) -> None:
     :param args: command line arguments.
     """
     options = {}
-    from_given = False
     old_cat_title = None
-    to_given = False
+    new_cat_title = None
     batch = False
     summary = ''
     inplace = False
@@ -1456,10 +1455,8 @@ def main(*args: str) -> None:
             rebuild = True
         elif option == 'from':
             old_cat_title = value.replace('_', ' ')
-            from_given = True
         elif option == 'to':
             new_cat_title = value.replace('_', ' ')
-            to_given = True
         elif option == 'batch':
             batch = True
         elif option == 'inplace':
@@ -1517,7 +1514,7 @@ def main(*args: str) -> None:
     cat_db = CategoryDatabase(rebuild=rebuild)
 
     if action == 'add':
-        if not to_given:
+        if not new_cat_title:
             new_cat_title = pywikibot.input(
                 'Category to add (do not give namespace):')
         gen = gen_factory.getCombinedGenerator()
@@ -1535,7 +1532,7 @@ def main(*args: str) -> None:
                              comment=summary,
                              follow_redirects=follow_redirects)
     elif action == 'remove':
-        if not from_given:
+        if not old_cat_title:
             old_cat_title = pywikibot.input('Please enter the name of the '
                                             'category that should be removed:')
         bot = CategoryMoveRobot(oldcat=old_cat_title,
@@ -1548,10 +1545,10 @@ def main(*args: str) -> None:
                                 pagesonly=pagesonly,
                                 deletion_comment=use_deletion_summary)
     elif action == 'move':
-        if not from_given:
+        if not old_cat_title:
             old_cat_title = pywikibot.input(
                 'Please enter the old name of the category:')
-        if not to_given:
+        if not new_cat_title:
             new_cat_title = pywikibot.input(
                 'Please enter the new name of the category:')
         if use_deletion_summary:
@@ -1585,10 +1582,10 @@ def main(*args: str) -> None:
             '\nor press enter to simply show the tree:')
         bot = CategoryTreeRobot(cat_title, cat_db, filename, depth)
     elif action == 'listify':
-        if not from_given:
+        if not old_cat_title:
             old_cat_title = pywikibot.input(
                 'Please enter the name of the category to listify:')
-        if not to_given:
+        if not new_cat_title:
             new_cat_title = pywikibot.input(
                 'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
