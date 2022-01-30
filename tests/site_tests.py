@@ -1460,7 +1460,6 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
                               .format(mysite, e))
 
-    @suppress_warnings("where='title' is deprecated", FutureWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
@@ -1468,27 +1467,15 @@ class SearchTestCase(DefaultSiteTestCase):
         expected_params = {
             'prop': ['info', 'imageinfo', 'categoryinfo'],
             'inprop': ['protection'],
-            'iiprop': [
-                'timestamp', 'user', 'comment', 'url', 'size', 'sha1',
-                'metadata'],
+            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1',
+                       'metadata'],
             'iilimit': ['max'], 'generator': ['search'], 'action': ['query'],
-            'indexpageids': [True], 'continue': [True], 'gsrnamespace': [0]}
-        if self.site.has_extension('CirrusSearch'):
-            expected_params.update({
-                'gsrsearch': ['intitle:wiki'], 'gsrwhat': [None]})
-        else:
-            expected_params.update({
-                'gsrsearch': ['wiki'], 'gsrwhat': ['title']})
+            'indexpageids': [True], 'continue': [True],
+            'gsrnamespace': [0], 'gsrsearch': ['wiki'], 'gsrwhat': ['title']}
         self.assertEqual(search_gen.request._params, expected_params)
-        try:
-            for hit in search_gen:
-                self.assertIsInstance(hit, pywikibot.Page)
-                self.assertEqual(hit.namespace(), 0)
-        except APIError as e:
-            if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
-                self.skipTest(
-                    'Title search disabled on site: {}'.format(self.site))
-            raise
+        for hit in search_gen:
+            self.assertIsInstance(hit, pywikibot.Page)
+            self.assertEqual(hit.namespace(), 0)
 
 
 class TestUserContribsAsUser(DefaultSiteTestCase):

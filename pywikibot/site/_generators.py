@@ -1311,7 +1311,7 @@ class GeneratorsMixin:
 
     def search(self, searchstring: str, *,
                namespaces=None,
-               where: str = 'text',
+               where: Optional[str] = None,
                total: Optional[int] = None,
                content: bool = False):
         """Iterate Pages that contain the searchstring.
@@ -1319,11 +1319,18 @@ class GeneratorsMixin:
         Note that this may include non-existing Pages if the wiki's database
         table contains outdated entries.
 
-        :see: https://www.mediawiki.org/wiki/API:Search
+        .. versionchanged:: 7.0
+           Default of `where` parameter has been changed from 'text' to
+           None. The behaviour depends on the installed search engine
+           which is 'text' on CirrusSearch'.
+           raises APIError instead of Error if searchstring is not set
+           or what parameter is wrong.
+
+        .. seealso:: https://www.mediawiki.org/wiki/API:Search
 
         :param searchstring: the text to search for
-        :param where: Where to search; value must be "text", "title" or
-            "nearmatch" (many wikis do not support title or nearmatch search)
+        :param where: Where to search; value must be "text", "title",
+            "nearmatch" or None (many wikis do not support all search types)
         :param namespaces: search only in these namespaces (defaults to all)
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
@@ -1333,25 +1340,11 @@ class GeneratorsMixin:
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises APIError: The "gsrsearch" parameter must be set:
+            searchstring parameter is not set
+        :raises APIError: Unrecognized value for parameter "gsrwhat":
+            wrong where parameter is given
         """
-        where_types = ['nearmatch', 'text', 'title']
-        if not searchstring:
-            raise Error('search: searchstring cannot be empty')
-        if where not in where_types:
-            raise Error("search: unrecognized 'where' value: {}".format(where))
-
-        if where == 'title' \
-           and self.has_extension('CirrusSearch') \
-           and isinstance(self.family, pywikibot.family.WikimediaFamily):
-            # 'title' search was disabled, use intitle instead
-            searchstring = 'intitle:' + searchstring
-            issue_deprecation_warning(
-                "where='{}'".format(where),
-                "searchstring='{}'".format(searchstring),
-                since='20160224')
-
-            where = None  # default
-
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         srgen = self._generator(api.PageGenerator, type_arg='search',
