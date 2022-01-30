@@ -1,6 +1,26 @@
-"""Logging functions."""
+"""User output/logging functions.
+
+Six output functions are defined. Each requires a string argument
+All of these functions generate a message to the log file if
+logging is enabled (`-log` or `-debug` command line arguments).
+
+The functions :func:`output()`, :func:`stdout()`, :func:`warning()` and
+:func:`error()` all display a message to the user through the logger
+object; the only difference is the priority level, which can be used by
+the application layer to alter the display. The :func:`stdout()`
+function should be used only for data that is the "result" of a script,
+as opposed to information messages to the user.
+
+The function :func:`log()` by default does not display a message to the
+user, but this can be altered by using the `-verbose` command line
+option.
+
+The function :func:`debug()` only logs its messages, they are never
+displayed on the user console. :func:`debug()` takes a required second
+argument, which is a string indicating the debugging layer.
+"""
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,9 +36,9 @@ from typing import Optional
 from pywikibot.backports import Callable, List
 
 
-STDOUT = 16
-VERBOSE = 18
-INPUT = 25
+STDOUT = 16  #:
+VERBOSE = 18  #:
+INPUT = 25  #:
 
 _init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
@@ -39,27 +59,6 @@ def _init() -> None:
 
     # Clear the list of routines to be inited
     _init_routines[:] = []  # the global variable is used with slice operator
-
-
-# User output/logging functions
-
-# Six output functions are defined. Each requires a string argument
-# All of these functions generate a message to the log file if
-# logging is enabled ("-log" or "-debug" command line arguments).
-
-# The functions output(), stdout(), warning(), and error() all display a
-# message to the user through the logger object; the only difference is the
-# priority level, which can be used by the application layer to alter the
-# display. The stdout() function should be used only for data that is
-# the "result" of a script, as opposed to information messages to the
-# user.
-
-# The function log() by default does not display a message to the user, but
-# this can be altered by using the "-verbose" command line option.
-
-# The function debug() only logs its messages, they are never displayed on
-# the user console. debug() takes a required second argument, which is a
-# string indicating the debugging layer.
 
 
 def logoutput(text: object, decoder: Optional[str] = None,
