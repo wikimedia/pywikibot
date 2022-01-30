@@ -1286,8 +1286,16 @@ class BasePage(ComparableMixin):
                                         fallback_prompt=old_i18n)
         return summary
 
-    def put(self, newtext, summary=None, watch=None, minor=True, botflag=None,
-            force=False, asynchronous=False, callback=None, **kwargs):
+    def put(self, newtext: str,
+            summary: Optional[str] = None,
+            watch: Optional[str] = None,
+            minor: bool = True,
+            botflag: Optional[bool] = None,
+            force: bool = False,
+            asynchronous: bool = False,
+            callback=None,
+            show_diff: bool = False,
+            **kwargs):
         """
         Save the page with the contents of the first argument as the text.
 
@@ -1295,9 +1303,15 @@ class BasePage(ComparableMixin):
         For new code, using Page.save() is preferred. See save() method
         docs for all parameters not listed here.
 
+        .. versionadded:: 7.0
+           The `show_diff` parameter
+
         :param newtext: The complete text of the revised page.
-        :type newtext: str
+        :param show_diff: show changes between oldtext and newtext
+            (default: False)
         """
+        if show_diff:
+            pywikibot.showDiff(self.text, newtext)
         self.text = newtext
         self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
                   force=force, asynchronous=asynchronous, callback=callback,
@@ -1935,12 +1949,17 @@ class BasePage(ComparableMixin):
 
         self.site.protect(self, protections, reason, **kwargs)
 
-    def change_category(
-        self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
-        include=None
-    ) -> bool:
+    def change_category(self, old_cat, new_cat,
+                        summary: Optional[str] = None,
+                        sort_key=None,
+                        in_place: bool = True,
+                        include: Optional[List[str]] = None,
+                        show_diff: bool = False) -> bool:
         """
         Remove page from oldCat and add it to newCat.
+
+        .. versionadded:: 7.0
+           The `show_diff` parameter
 
         :param old_cat: category to be removed
         :type old_cat: pywikibot.page.Category
@@ -1954,11 +1973,12 @@ class BasePage(ComparableMixin):
             If sortKey=True, the sortKey used for oldCat will be used.
 
         :param in_place: if True, change categories in place rather than
-                      rearranging them.
+            rearranging them.
 
         :param include: list of tags not to be disabled by default in relevant
             textlib functions, where CategoryLinks can be searched.
-        :type include: list
+        :param show_diff: show changes between oldtext and newtext
+            (default: False)
 
         :return: True if page was saved changed, otherwise False.
         """
@@ -2016,14 +2036,16 @@ class BasePage(ComparableMixin):
 
         if oldtext != newtext:
             try:
-                self.put(newtext, summary)
-                return True
+                self.put(newtext, summary, show_diff=show_diff)
             except PageSaveRelatedError as error:
                 pywikibot.output('Page {} not saved: {}'
                                  .format(self.title(as_link=True), error))
             except NoUsernameError:
                 pywikibot.output('Page {} not saved; sysop privileges '
                                  'required.'.format(self.title(as_link=True)))
+            else:
+                return True
+
         return False
 
     def is_flow_page(self) -> bool:
