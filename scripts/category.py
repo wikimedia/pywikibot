@@ -427,7 +427,8 @@ class CategoryAddBot(CategoryPreprocess):
         """Initializer."""
         super().__init__()
         self.generator = generator
-        self.newcat = newcat
+        self.newcat = newcat or pywikibot.input(
+            'Category to add (do not give namespace):')
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
@@ -911,7 +912,8 @@ class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
 
-    def __init__(self, cat_title: str, list_title: str, edit_summary: str,
+    def __init__(self, cat_title: Optional[str], list_title: Optional[str],
+                 edit_summary: str,
                  append: bool = False,
                  overwrite: bool = False,
                  show_images: bool = False, *,
@@ -925,7 +927,13 @@ class CategoryListifyRobot:
         self.overwrite = overwrite
         self.show_images = show_images
         self.site = pywikibot.Site()
+        if not cat_title:
+            cat_title = pywikibot.input(
+                'Please enter the name of the category to listify:')
         self.cat = pywikibot.Category(self.site, cat_title)
+        if not list_title:
+            list_title = pywikibot.input(
+                'Please enter the name of the list to create:')
         self.list = pywikibot.Page(self.site, list_title)
         self.talk_pages = talk_pages
         self.recurse = recurse
@@ -998,17 +1006,18 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     :param comment: a custom summary for edits.
     """
 
-    def __init__(self, cat_title: str, cat_db, namespaces=None,
+    def __init__(self, cat_title: Optional[str], cat_db, namespaces=None,
                  comment: Optional[str] = None) -> None:
         """Initializer."""
-        self.cat_title = cat_title
+        self.cat_title = cat_title or \
+            pywikibot.input('Which category do you want to tidy up?')
         self.cat_db = cat_db
         self.edit_summary = comment
         if not comment:
-            self.template_vars = {'oldcat': cat_title}
+            self.template_vars = {'oldcat': self.cat_title}
 
         site = pywikibot.Site()
-        self.cat = pywikibot.Category(site, cat_title)
+        self.cat = pywikibot.Category(site, self.cat_title)
         super().__init__(generator=pagegenerators.PreloadingGenerator(
             self.cat.articles(namespaces=namespaces)))
 
@@ -1254,8 +1263,15 @@ class CategoryTreeRobot:
 
     def __init__(self, cat_title, cat_db, filename=None, max_depth=10) -> None:
         """Initializer."""
-        self.cat_title = cat_title
+        self.cat_title = cat_title or \
+            pywikibot.input(
+                'For which category do you want to create a tree view?')
         self.cat_db = cat_db
+        if filename is None:
+            filename = pywikibot.input(
+                'Please enter the name of the file '
+                'where the tree should be saved,\n'
+                'or press enter to simply show the tree:')
         if filename and not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
@@ -1514,9 +1530,6 @@ def main(*args: str) -> None:
     cat_db = CategoryDatabase(rebuild=rebuild)
 
     if action == 'add':
-        if not new_cat_title:
-            new_cat_title = pywikibot.input(
-                'Category to add (do not give namespace):')
         gen = gen_factory.getCombinedGenerator()
         if not gen:
             # default for backwards compatibility
@@ -1571,23 +1584,11 @@ def main(*args: str) -> None:
                                 move_together=move_together,
                                 keep_sortkey=keep_sortkey)
     elif action == 'tidy':
-        cat_title = pywikibot.input('Which category do you want to tidy up?')
-        bot = CategoryTidyRobot(cat_title, cat_db, gen_factory.namespaces,
+        bot = CategoryTidyRobot(old_cat_title, cat_db, gen_factory.namespaces,
                                 summary)
     elif action == 'tree':
-        cat_title = pywikibot.input(
-            'For which category do you want to create a tree view?')
-        filename = pywikibot.input(
-            'Please enter the name of the file where the tree should be saved,'
-            '\nor press enter to simply show the tree:')
-        bot = CategoryTreeRobot(cat_title, cat_db, filename, depth)
+        bot = CategoryTreeRobot(old_cat_title, cat_db, new_cat_title, depth)
     elif action == 'listify':
-        if not old_cat_title:
-            old_cat_title = pywikibot.input(
-                'Please enter the name of the category to listify:')
-        if not new_cat_title:
-            new_cat_title = pywikibot.input(
-                'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
                                    append, overwrite, showimages,
                                    talk_pages=talkpages,
