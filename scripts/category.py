@@ -1352,10 +1352,11 @@ class CleanBot(Bot):
 
     Stubs categories are exception.
 
+    .. versionadded:: 7.0
+
     For details please read:
     https://en.wikipedia.org/wiki/WP:SUBCAT
     https://en.wikipedia.org/wiki/WP:DIFFUSE
-
     """
 
     update_options = {
@@ -1389,23 +1390,30 @@ class CleanBot(Bot):
         overcategorized = sorted(grandchildren & self.children)
         if not overcategorized:
             return
+
         if config.verbose_output:
-            pywikibot.output('Subcategory "{}" is parent for:'.format(
-                format(child.title(with_ns=False))))
+            pywikibot.output('Subcategory "{}" is parent for:'
+                             .format(child.title(with_ns=False)))
+
             for grandchild in overcategorized:
-                pywikibot.output('\t{}'. format(grandchild.title()))
+                pywikibot.output('\t{}'.format(grandchild.title()))
+
         for grandchild in overcategorized:
-            pywikibot.output(color_format(
+            msg = color_format(
                 'Remove "{lightpurple}{}{default}" from "{}" '
                 'because it is already under '
                 'subcategory "{green}{}{default}"?',
                 grandchild.title(with_ns=False),
-                self.cat.title(with_ns=False), child.title(with_ns=False)))
-            if not self.user_confirm('') or config.simulate:
-                # Treat 'simulate' here to be keep output quiet and nice
+                self.cat.title(with_ns=False),
+                child.title(with_ns=False))
+
+            if not self.user_confirm(msg):
                 continue
-            summary = ('Already in [[:{}]]'
-                       .format(child.title()))
+
+            opts = {'as_link': True, 'textlink': True}
+            summary = i18n.twtranslate(grandchild.site, 'category-clean',
+                                       {'category': self.cat.title(**opts),
+                                        'child': child.title(**opts)})
             grandchild.change_category(self.cat, None, summary)
 
 
