@@ -13,7 +13,7 @@ from pywikibot import Site, config
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase
+from tests.aspects import AlteredDefaultSiteTestCase
 from tests.aspects import (
     DefaultDrySiteTestCase,
     TestCase,
@@ -232,6 +232,12 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
+class LinkTestCase(AlteredDefaultSiteTestCase):
+
+    """Cached API test for link tests."""
+
+    cache = True
+
 
 class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
 
@@ -239,7 +245,6 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -286,7 +291,6 @@ class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -317,7 +321,6 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -348,7 +351,6 @@ class TestFullyQualifiedSameNamespaceFamilyParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def test_namespace_vs_family(self):
         """Test namespace is selected before family."""
@@ -372,7 +374,6 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -411,7 +412,6 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
             'code': 'en'
         }
     }
-    cached = True
 
     PATTERN = '{colon}{first}:{second}:{title}'
 
@@ -472,7 +472,6 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
             'code': 'en'
         }
     }
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -531,7 +530,6 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
             'code': 'test'
         },
     }
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -579,7 +577,6 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
 
     family = 'species'
     code = 'species'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -613,7 +610,6 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -660,7 +656,6 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -691,7 +686,6 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -722,7 +716,6 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
 
     family = 'wikipedia'
     code = 'en'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -761,7 +754,6 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
             'code': 'en'
         }
     }
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -808,7 +800,6 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
 
     family = 'wikidata'
     code = 'test'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
@@ -847,7 +838,6 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
 
     family = 'species'
     code = 'species'
-    cached = True
 
     def setUp(self):
         """Setup tests."""
