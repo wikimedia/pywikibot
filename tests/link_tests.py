@@ -239,9 +239,9 @@ class LinkTestCase(AlteredDefaultSiteTestCase):
     cache = True
 
 
-class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
+class LinkTestWikiEn(LinkTestCase):
 
-    """Link tests."""
+    """Link tests on wikipedia:en."""
 
     family = 'wikipedia'
     code = 'en'
@@ -251,6 +251,11 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
+
+
+class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestWikiEn):
+
+    """Link tests."""
 
     def test_partially_qualified_NS0_code(self):
         """Test ':wikipedia:Main Page' on enwp is namespace 4."""
@@ -285,18 +290,9 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(LinkTestCase):
+class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(LinkTestWikiEn):
 
     """Link tests."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikipedia'
 
     def test_partially_qualified_NS0_family(self):
         """Test ':en:Main Page' on dewp is namespace 0."""
@@ -368,18 +364,9 @@ class TestFullyQualifiedSameNamespaceFamilyParser(LinkTestCase):
         self.assertEqual(link.namespace, 4)
 
 
-class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestCase):
+class TestFullyQualifiedExplicitLinkSameFamilyParser(LinkTestWikiEn):
 
     """Link tests."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikipedia'
 
     def test_fully_qualified_NS0_code(self):
         """Test ':en:wikipedia:Main Page' on enwp is namespace 4."""
@@ -604,18 +591,9 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
 # ---- Tests of a Link without colons, which shouldn't be interwikis, follow.
 
 
-class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
+class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestWikiEn):
 
     """Test partially qualified links to same site."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikipedia'
 
     def test_partially_qualified_NS0_code(self):
         """Test 'wikipedia:Main Page' on enwp is namespace 4."""
@@ -650,18 +628,9 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
+class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestWikiEn):
 
     """Test partially qualified links to different code."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikipedia'
 
     def test_partially_qualified_NS0_family(self):
         """Test 'en:Main Page' on dewp is namespace 0."""
@@ -710,18 +679,9 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestCase):
+class TestFullyQualifiedImplicitLinkSameFamilyParser(LinkTestWikiEn):
 
     """Link tests."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def setUp(self):
-        """Setup tests."""
-        super().setUp()
-        config.mylang = 'en'
-        config.family = 'wikipedia'
 
     def test_fully_qualified_NS0_code(self):
         """Test 'en:wikipedia:Main Page' on enwp is namespace 4."""
