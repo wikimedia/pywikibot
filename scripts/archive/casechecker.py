@@ -198,7 +198,7 @@ class CaseChecker:
 
         # TODO: handle "continue"
         if self.site.code in self.whitelists:
-            wlpage = self.whitelists[self.site.code]
+            wlpage = i18n.translate(self.site.code, self.whitelists)
             pywikibot.output('Loading whitelist from {}'.format(wlpage))
             wlparams = {
                 'action': 'query',
