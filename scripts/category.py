@@ -1363,9 +1363,10 @@ class CleanBot(Bot):
         'recurse': False
     }
 
-    def __init__(self, cat: Optional[str], **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         site = pywikibot.Site()
+        cat = kwargs.pop('from', None)
         if not cat:
             cat = pywikibot.input(
                 'Please enter the name of the category to clean:')
@@ -1426,8 +1427,7 @@ def main(*args: str) -> None:
     :param args: command line arguments.
     """
     options = {}
-    old_cat_title = None
-    new_cat_title = None
+    # TODO: use options instead following variables:
     batch = False
     summary = ''
     inplace = False
@@ -1477,10 +1477,8 @@ def main(*args: str) -> None:
             sort_by_last_name = True
         elif option == 'rebuild':
             rebuild = True
-        elif option == 'from':
-            old_cat_title = value.replace('_', ' ')
-        elif option == 'to':
-            new_cat_title = value.replace('_', ' ')
+        elif option in ('from', 'to'):
+            options[option] = value.replace('_', ' ')
         elif option == 'batch':
             batch = True
         elif option == 'inplace':
@@ -1547,16 +1545,17 @@ def main(*args: str) -> None:
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
         bot = CategoryAddBot(gen,
-                             newcat=new_cat_title,
+                             newcat=options.get('to'),
                              sort_by_last_name=sort_by_last_name,
                              create=create_pages,
                              comment=summary,
                              follow_redirects=follow_redirects)
     elif action == 'remove':
-        if not old_cat_title:
-            old_cat_title = pywikibot.input('Please enter the name of the '
-                                            'category that should be removed:')
-        bot = CategoryMoveRobot(oldcat=old_cat_title,
+        if 'from' not in options:
+            options['from'] = \
+                pywikibot.input('Please enter the name of the '
+                                'category that should be removed:')
+        bot = CategoryMoveRobot(oldcat=options.get('from'),
                                 batch=batch,
                                 comment=summary,
                                 inplace=inplace,
@@ -1566,19 +1565,19 @@ def main(*args: str) -> None:
                                 pagesonly=pagesonly,
                                 deletion_comment=use_deletion_summary)
     elif action == 'move':
-        if not old_cat_title:
-            old_cat_title = pywikibot.input(
+        if 'from' not in options:
+            options['from'] = pywikibot.input(
                 'Please enter the old name of the category:')
-        if not new_cat_title:
-            new_cat_title = pywikibot.input(
+        if 'to' not in options:
+            options['to'] = pywikibot.input(
                 'Please enter the new name of the category:')
         if use_deletion_summary:
             deletion_comment = \
                 CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
-        bot = CategoryMoveRobot(oldcat=old_cat_title,
-                                newcat=new_cat_title,
+        bot = CategoryMoveRobot(oldcat=options.get('from'),
+                                newcat=options.get('to'),
                                 batch=batch,
                                 comment=summary,
                                 inplace=inplace,
@@ -1592,19 +1591,21 @@ def main(*args: str) -> None:
                                 move_together=move_together,
                                 keep_sortkey=keep_sortkey)
     elif action == 'tidy':
-        bot = CategoryTidyRobot(old_cat_title, cat_db, gen_factory.namespaces,
-                                summary)
+        bot = CategoryTidyRobot(options.get('from'), cat_db,
+                                gen_factory.namespaces, summary)
     elif action == 'tree':
-        bot = CategoryTreeRobot(old_cat_title, cat_db, new_cat_title, depth)
+        bot = CategoryTreeRobot(options.get('from'), cat_db,
+                                options.get('to'), depth)
     elif action == 'listify':
-        bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
+        bot = CategoryListifyRobot(options.get('from'),
+                                   options.get('to'), summary,
                                    append, overwrite, showimages,
                                    talk_pages=talkpages,
                                    recurse=options.get('recurse', False),
                                    prefix=prefix,
                                    namespaces=gen_factory.namespaces)
     elif action == 'clean':
-        bot = CleanBot(old_cat_title, **options)
+        bot = CleanBot(**options)
 
     if not suggest_help(missing_action=not action):
         pywikibot.Site().login()
