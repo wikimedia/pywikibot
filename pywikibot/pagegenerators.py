@@ -2132,7 +2132,6 @@ def PageWithTalkPageGenerator(generator: Iterable['pywikibot.page.Page'],
             yield page.toggleTalkPage()
 
 
-@deprecated('LiveRCPageGenerator or EventStreams', since='20180415')
 def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
                        key_func: Callable[[Any], Any] = lambda x: x,
                        sleep_duration: int = 60,
