@@ -135,6 +135,8 @@ class DjVuFile:
         """
         Return a tuple (id, (size, dpi)) for page n of djvu file.
 
+        :param n: page n of djvu file
+        :type n: int
         :param force: if True, refresh the cached data
         :type force: bool
         """
@@ -206,6 +208,8 @@ class DjVuFile:
         """Remove djvu format control characters.
 
         See http://djvu.sourceforge.net/doc/man/djvused.html for control chars.
+
+        :param data: the data checked for djvu format control characters
         """
         txt = data.decode('utf-8')
         # vertical tab (\013=\x0b): remove
@@ -224,6 +228,8 @@ class DjVuFile:
         """
         Get page n for djvu file.
 
+        :param n: page n of djvu file
+        :type n: int
         :param force: if True, refresh the cached data
         :type force: bool
         """
@@ -238,7 +244,11 @@ class DjVuFile:
 
     @check_page_number
     def whiten_page(self, n):
-        """Replace page 'n' of djvu file with a blank page."""
+        """Replace page 'n' of djvu file with a blank page.
+
+        :param n: page n of djvu file
+        :type n: int
+        """
         # tmp files for creation/insertion of a white page.
         white_ppm = os.path.join(self.dirname, 'white_page.ppm')
         white_djvu = os.path.join(self.dirname, 'white_page.djvu')
@@ -285,7 +295,11 @@ class DjVuFile:
 
     @check_page_number
     def delete_page(self, n):
-        """Delete page 'n' of djvu file ."""
+        """Delete page 'n' of djvu file.
+
+        :param n: page n of djvu file
+        :type n: int
+        """
         n_tot = self.number_of_images()
 
         # Check n is in valid range and set ref_page number for final checks.

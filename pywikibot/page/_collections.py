@@ -67,7 +67,11 @@ class BaseDataDict(MutableMapping):
 
     @staticmethod
     def normalizeKey(key) -> str:
-        """Helper function to return language codes of a site object."""
+        """Helper function to return language codes of a site object.
+
+        :param key: input key to be normalized
+        :type key: pywikibot.site.BaseSite or str
+        """
         if isinstance(key, BaseSite):
             key = key.lang
         return key
