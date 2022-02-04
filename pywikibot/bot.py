@@ -75,7 +75,7 @@ __all__ = (
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
     'calledModuleName', 'handle_args',
-    'show_help', 'showHelp', 'suggest_help',
+    'show_help', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
@@ -1022,12 +1022,6 @@ def show_help(module_name: Optional[str] = None,
         pywikibot.stdout(_GLOBAL_HELP_NOTE)
 
 
-@deprecated('show_help', since='20200705')
-def showHelp(module_name: Optional[str] = None) -> None:  # pragma: no cover
-    """DEPRECATED. Show help for the Bot."""
-    return show_help(module_name)
-
-
 def suggest_help(missing_parameters: Optional[Sequence[str]] = None,
                  missing_generator: bool = False,
                  unknown_parameters: Optional[Sequence[str]] = None,
@@ -1447,16 +1441,6 @@ class BaseBot(OptionHandler):
         else:
             return True
         return False
-
-    @deprecated('generator.close()', since='20200804')
-    def stop(self) -> None:  # pragma: no cover
-        """Stop iterating.
-
-        .. deprecated::
-           Use generator.close() instead.
-        """
-        pywikibot.output('Generator has been stopped.')
-        self.generator.close()
 
     def quit(self) -> None:
         """Cleanup and quit processing."""
