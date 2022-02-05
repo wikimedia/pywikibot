@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1860,7 +1860,7 @@ for i in (3, 7, 9):
 # Brazil uses '1añ' for the 1st of every month, and number without suffix for
 # all other days
 brMonthNames = makeMonthNamedList('br', '%s', True)
-for i in range(0, 12):
+for i in range(12):
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
         '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '

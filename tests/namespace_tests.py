@@ -68,7 +68,7 @@ class TestNamespaceObject(TestCase):
         ns = Namespace.builtin_namespaces()
 
         self.assertIsInstance(ns, dict)
-        self.assertTrue(all(x in ns for x in range(0, 16)))
+        self.assertTrue(all(x in ns for x in range(16)))
 
         self.assertTrue(all(isinstance(key, int)
                             for key in ns))

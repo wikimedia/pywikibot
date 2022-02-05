@@ -1905,7 +1905,7 @@ class TimeStripper:
     def fix_digits(self, line):
         """Make non-latin digits like Persian to latin to parse."""
         for system in NON_LATIN_DIGITS.values():
-            for i in range(0, 10):
+            for i in range(10):
                 line = line.replace(system[i], str(i))
         return line
 
