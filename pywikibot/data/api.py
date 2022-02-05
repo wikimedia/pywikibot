@@ -1849,6 +1849,17 @@ The text message is:
                 self.wait()
                 continue
 
+            if code in ('search-title-disabled', 'search-text-disabled'):
+                prefix = 'gsr' if 'gsrsearch' in self._params else 'sr'
+                del self._params[prefix + 'what']
+                # use intitle: search instead
+                if code == 'search-title-disabled' \
+                   and self.site.has_extension('CirrusSearch'):
+                    key = prefix + 'search'
+                    self._params[key] = ['intitle:' + search
+                                         for search in self._params[key]]
+                continue
+
             if code == 'urlshortener-blocked':  # T244062
                 # add additional informations to result['error']
                 result['error']['current site'] = self.site
