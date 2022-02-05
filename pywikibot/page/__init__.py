@@ -5871,10 +5871,12 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
 
 @deprecated('pywikibot.tools.chars.url2string', since='6.2.0')
 def url2unicode(title: str, encodings='utf-8') -> str:
-    """
-    DEPRECATED. Convert URL-encoded text to unicode using several encoding.
+    """Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error.
+
+    .. deprecated:: 6.2.0
+       Use :func:`pywikibot.tools.chars.url2string` instead.
 
     :param title: URL-encoded character data to convert
     :param encodings: Encodings to attempt to use during conversion.
@@ -5887,7 +5889,7 @@ def url2unicode(title: str, encodings='utf-8') -> str:
         encodings = encodings.encodings()
         issue_deprecation_warning(
             'Passing BaseSite object to encodings parameter',
-            'BaseSite.endcodings()',
+            'BaseSite.encodings()',
             depth=1,
             since='6.2.0'
         )
