@@ -200,7 +200,8 @@ class Photo(pywikibot.FilePage):
 
         return description
 
-    def _safe_template_value(self, value: str) -> str:
+    @staticmethod
+    def _safe_template_value(value: str) -> str:
         """Replace pipe (|) with {{!}}."""
         return value.replace('|', '{{!}}')
 
