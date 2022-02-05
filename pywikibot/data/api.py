@@ -373,67 +373,65 @@ class ParamInfo(Sized, Container):
                     del normalized_result[path]
 
             self._paraminfo.update(normalized_result)
-            self._generate_submodules(mod['path']
-                                      for mod in normalized_result.values())
+            for mod in normalized_result.values():
+                self._generate_submodules(mod['path'])
 
         if 'pageset' in modules and 'pageset' not in self._paraminfo:
             self._emulate_pageset()
 
-    def _generate_submodules(self, modules):
-        """Check and generate submodules for the given modules."""
-        for module in modules:
-            parameters = self._paraminfo[module].get('parameters', [])
-            submodules = set()
-            # Advanced submodule into added to MW API in df80f1ea
-            if self.site.mw_version >= '1.26wmf9':
-                # This is supplying submodules even if they aren't submodules
-                # of the given module so skip those
-                for param in parameters:
-                    if ((module == 'main' and param['name'] == 'format')
-                            or 'submodules' not in param):
-                        continue
-                    for submodule in param['submodules'].values():
-                        if '+' in submodule:
-                            parent, child = submodule.rsplit('+', 1)
-                        else:
-                            parent = 'main'
-                            child = submodule
-                        if parent == module:
-                            submodules.add(child)
-            else:
-                # Boolean submodule info added to MW API in afa153ae
-                if self.site.mw_version < '1.24wmf18':
-                    if module == 'main':
-                        params = {'action'}
-                    elif module == 'query':
-                        params = {'prop', 'list', 'meta'}
+    def _generate_submodules(self, module):
+        """Check and generate submodules for the given module."""
+        parameters = self._paraminfo[module].get('parameters', [])
+        submodules = set()
+        # Advanced submodule into added to MW API in df80f1ea
+        if self.site.mw_version >= '1.26wmf9':
+            # This is supplying submodules even if they aren't submodules
+            # of the given module so skip those
+            for param in parameters:
+                if module == 'main' and param['name'] == 'format' \
+                   or 'submodules' not in param:
+                    continue
+
+                for submodule in param['submodules'].values():
+                    if '+' in submodule:
+                        parent, child = submodule.rsplit('+', 1)
                     else:
-                        params = set()
-                    for param in parameters:
-                        if param['name'] in params:
-                            param['submodules'] = ''
-
-                for param in parameters:
-                    # Do not add format modules
-                    if ('submodules' in param
-                        and (module != 'main'
-                             or param['name'] != 'format')):
-                        submodules |= set(param['type'])
-
-            if submodules:
-                self._add_submodules(module, submodules)
-            if module == 'query':
-                # Previously also modules from generator were used as query
-                # modules, but verify that those are just a subset of the
-                # prop/list/meta modules. There is no sanity check as this
-                # needs to be revisited if query has no generator parameter
-                for param in parameters:
-                    if param['name'] == 'generator':
-                        break
+                        parent, child = 'main', submodule
+                    if parent == module:
+                        submodules.add(child)
+        else:
+            # Boolean submodule info added to MW API in afa153ae
+            if self.site.mw_version < '1.24wmf18':
+                if module == 'main':
+                    params = {'action'}
+                elif module == 'query':
+                    params = {'prop', 'list', 'meta'}
                 else:
-                    param = {}
-                assert param['name'] == 'generator' \
-                    and submodules >= set(param['type'])
+                    params = set()
+                for param in parameters:
+                    if param['name'] in params:
+                        param['submodules'] = ''
+
+            for param in parameters:
+                # Do not add format modules
+                if 'submodules' in param \
+                   and (module != 'main' or param['name'] != 'format'):
+                    submodules |= set(param['type'])
+
+        if submodules:
+            self._add_submodules(module, submodules)
+        if module == 'query':
+            # Previously also modules from generator were used as query
+            # modules, but verify that those are just a subset of the
+            # prop/list/meta modules. There is no sanity check as this
+            # needs to be revisited if query has no generator parameter
+            for param in parameters:
+                if param['name'] == 'generator':
+                    break
+            else:
+                param = {}
+            assert param['name'] == 'generator' \
+                and submodules >= set(param['type'])
 
     def _normalize_modules(self, modules) -> set:
         """Add query+ to any query module name not also in action modules."""
