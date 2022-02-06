@@ -30,6 +30,8 @@ from pywikibot.userinterfaces import (
     terminal_interface_unix,
     terminal_interface_win32,
 )
+from pywikibot.userinterfaces.transliteration import _trans, NON_LATIN_DIGITS
+
 from tests.aspects import TestCase, TestCaseBase
 from tests.utils import FakeModule
 
@@ -384,6 +386,28 @@ class TestTransliterationUnix(UITestCase):
             '\x1b[93mD\x1b[0m \x1b[93ma\x1b[0m\x1b[93mb\x1b[0m\x1b[93mg'
             '\x1b[0m\x1b[93md\x1b[0m \x1b[93ma\x1b[0m\x1b[93mi\x1b[0m'
             '\x1b[93mu\x1b[0m\x1b[93me\x1b[0m\x1b[93mo\x1b[0m\n')
+
+
+class TestTransliterationTable(TestCase):
+
+    """Test transliteration table."""
+
+    net = False
+
+    def test_latin_digits(self):
+        """Test that non latin digits are in transliteration table."""
+        for lang, digits in NON_LATIN_DIGITS.items():
+            with self.subTest(lang=lang):
+                for char in digits:
+                    self.assertIn(char, _trans,
+                                  '{!r} not in transliteration table'
+                                  .format(char))
+
+    def test_transliteration_table(self):
+        """Test transliteration table consistency."""
+        for k, v in _trans.items():
+            with self.subTest():
+                self.assertNotEqual(k, v)
 
 
 # TODO: add tests for background colors.
