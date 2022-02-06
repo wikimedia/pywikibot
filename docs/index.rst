@@ -26,13 +26,6 @@ Pywikibot and this documentation are licensed under the
 :ref:`MIT license <licenses-MIT>`;
 manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.
 
-The documentation consists of four major parts:
-
-#. :doc:`installation`
-#. :doc:`scripts/index`
-#. :doc:`library_usage`
-#. :doc:`api_ref/index`
-
 See also: `Pywikibot Manual`_ at https://www.mediawiki.org
 
 
