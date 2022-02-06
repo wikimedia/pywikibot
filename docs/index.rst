@@ -69,6 +69,7 @@ For framework developers:
    :maxdepth: 1
 
    scripts/scripts.maintenance
+   scripts_ref/index
 
 
 Miscellaneous

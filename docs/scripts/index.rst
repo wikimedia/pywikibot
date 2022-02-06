@@ -1,18 +1,28 @@
-Scripts reference
------------------
+Scripts package
+---------------
 
-Provided scripts by Pywikibot
-=============================
+.. automodule:: scripts
+   :no-members:
 
-Pywikibot framework has a lot of ready-to-use scripts for several tasks.
-In general the usage and options of all scripts may be shown by using the command
-``<scriptname> -help``
+.. include:: ../../scripts/README.rst
+   :start-after: included.
+   :end-before: More precise
 
-
-Contents
-========
+Scripts descriptions
+--------------------
 
 .. toctree::
-   :glob:
+   :maxdepth: 1
 
-   *
+   global
+   main
+   auxiliary
+   administrative
+   general
+   categories
+   images
+   templates
+   wikibase
+   nonedit
+   other
+   unsorted
