@@ -1,6 +1,13 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.6.5
+-----
+*07 February 2022*
+
+* L10N updates
+
+
 6.6.4
 -----
 *27 January 2022*
@@ -872,7 +879,6 @@ Other changes
 * Use API's retry-after value (T144023)
 * Provide startprefix parameter for Category.articles() (T74101, T143120)
 * Page.put_async() is marked as deprecated (T193494)
-* pagegenerators.RepeatingGenerator is marked as deprecated (T192229)
 * Deprecate requests-requirements.txt (T193476)
 * Bugfixes and improvements
 * New mediawiki projects were provided

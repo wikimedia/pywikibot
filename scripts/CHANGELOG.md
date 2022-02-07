@@ -18,6 +18,7 @@
 * Derive CheckerBot from CurrentPageBot (T196851, T171713)
 
 ### category
+* CleanBot was added which can be invoked by clean action option
 * Recurse CategoryListifyRobot with depth
 * Show a warning if a pagegenerator option is not enabled (T298522)
 * Deprecated code parts were removed

@@ -4,6 +4,9 @@ Current release changes
 Improvements
 ------------
 
+* to_latin_digits() function was added to textlib as counterpart of to_local_digits() function
+* api.Request.submit now handles search-title-disabled and search-text-disabled API Errors
+* A show_diff parameter was added to Page.put() and Page.change_category()
 * Allow categories when saving IndexPage (T299806)
 * Add a new function case_escape to textlib
 * Support inheritance of the __STATICREDIRECT__
@@ -69,6 +72,8 @@ Breaking changes
 Code cleanups
 -------------
 
+* BaseBot.stop() method were removed in favour of BaseBot.generator.close()
+* showHelp() function was remove in favour of show_help
 * Remove AllpagesPageGenerator, UnconnectedPageGenerator, CombinedPageGenerator, WantedPagesPageGenerator pagegenerators
 * Remove deprecated echo.Notification.id
 * Remove APISite.newfiles() method (T168339)
