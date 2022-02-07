@@ -21,8 +21,10 @@ from typing import NamedTuple, Optional, Union
 import pywikibot
 from pywikibot.backports import Container, Iterable, List, Tuple
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Sequence as SequenceType
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
+from pywikibot.tools import deprecated
 
 
 try:
@@ -143,8 +145,32 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     digits = NON_LATIN_DIGITS.get(lang)
     if digits:
         phrase = str(phrase)
-        for i, digit in enumerate(digits):
-            phrase = phrase.replace(str(i), digit)
+        trans = str.maketrans('0123456789', digits)
+        phrase = phrase.translate(trans)
+    return phrase
+
+
+def to_latin_digits(phrase: str,
+                    langs: Union[SequenceType[str], str, None] = None) -> str:
+    """Change non-latin digits to latin digits.
+
+    .. versionadded:: 7.0
+
+    :param phrase: The phrase to convert to latin numerical.
+    :param langs: Language codes. If langs parameter is None, use all
+        known languages to convert.
+    :return: The string with latin digits
+    """
+    if langs is None:
+        langs = NON_LATIN_DIGITS.keys()
+    elif isinstance(langs, str):
+        langs = [langs]
+
+    digits = [NON_LATIN_DIGITS[key] for key in langs
+              if key in NON_LATIN_DIGITS]
+    if digits:
+        trans = str.maketrans(''.join(digits), '0123456789' * len(digits))
+        phrase = phrase.translate(trans)
     return phrase
 
 
@@ -1902,12 +1928,15 @@ class TimeStripper:
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
 
-    def fix_digits(self, line):
-        """Make non-latin digits like Persian to latin to parse."""
-        for system in NON_LATIN_DIGITS.values():
-            for i in range(10):
-                line = line.replace(system[i], str(i))
-        return line
+    @staticmethod
+    @deprecated('to_latin_digits() function', since='7.0.0')
+    def fix_digits(line):
+        """Make non-latin digits like Persian to latin to parse.
+
+        .. deprecated:: 7.0.0
+           Use :func:`to_latin_digits` instead.
+        """
+        return to_latin_digits(line)
 
     def _last_match_and_replace(self, txt: str, pat):
         """
@@ -2019,7 +2048,7 @@ class TimeStripper:
         # to reduce false positives.
         line = removeDisabledParts(line)
 
-        line = self.fix_digits(line)
+        line = to_latin_digits(line)
         for pat in self.patterns:
             line, match_obj = self._last_match_and_replace(line, pat)
             if match_obj:

@@ -993,7 +993,7 @@ class TestReplaceLinksNonDry(TestCase):
             link)
 
 
-class TestLocalDigits(TestCase):
+class TestDigitsConversion(TestCase):
 
     """Test to verify that local digits are correctly being handled."""
 
@@ -1010,6 +1010,22 @@ class TestLocalDigits(TestCase):
         self.assertEqual(
             textlib.to_local_digits(
                 '299792458', 'km'), '២៩៩៧៩២៤៥៨')
+
+    def test_to_latin(self):
+        """Test converting local digits to Latin digits."""
+        self.assertEqual(textlib.to_latin_digits('299792458'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸', 'fa'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸ flash'), '299792458 flash')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', 'km'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['km', 'en']), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
 
 
 class TestReplaceExcept(DefaultDrySiteTestCase):
