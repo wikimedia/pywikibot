@@ -1,6 +1,6 @@
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2021
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,12 +27,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'it', 'en', 'pl', 'ru', 'cs', 'fa', 'et', 'pt', 'de', 'uk', 'fr', 'es',
-        'he', 'sk', 'tr', 'bs', 'ca', 'eo', 'fi', 'az', 'sl', 'lt', 'zh', 'ar',
+        'it', 'en', 'pl', 'ru', 'cs', 'et', 'fa', 'pt', 'de', 'uk', 'fr', 'es',
+        'he', 'tr', 'sk', 'bs', 'ca', 'eo', 'fi', 'az', 'sl', 'lt', 'zh', 'ar',
         'bg', 'hy', 'hr', 'el', 'su', 'nn', 'id', 'sv', 'li', 'hu', 'ko', 'nl',
         'ja', 'la', 'ta', 'sah', 'sr', 'gu', 'gl', 'ur', 'te', 'be', 'cy',
-        'no', 'ml', 'sq', 'vi', 'kn', 'ro', 'eu', 'ku', 'uz', 'th', 'hi', 'ka',
-        'da', 'sa', 'is', 'br', 'mr', 'af', 'wo', 'ky',
+        'no', 'vi', 'ml', 'sq', 'kn', 'ro', 'eu', 'ku', 'uz', 'hi', 'ka', 'da',
+        'sa', 'is', 'th', 'br', 'mr', 'af', 'wo', 'ky',
     ]
 
     category_redirect_templates = {
