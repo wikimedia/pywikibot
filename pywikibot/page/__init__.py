@@ -2919,7 +2919,7 @@ class User(Page):
         if not hasattr(self, '_userprops'):
             self._userprops = list(self.site.users([self.username, ]))[0]
             if self.isAnonymous():
-                r = list(self.site.blocks(users=self.username))
+                r = list(self.site.blocks(iprange=self.username, total=1))
                 if r:
                     self._userprops['blockedby'] = r[0]['by']
                     self._userprops['blockreason'] = r[0]['reason']
@@ -2954,7 +2954,8 @@ class User(Page):
         """Determine whether the user is currently blocked.
 
         .. versionchanged:: 7.0
-           renamed from :meth:`isBlocked` method
+           renamed from :meth:`isBlocked` method,
+           can also detect range blocks.
 
         :param force: if True, forces reloading the data from API
         """
