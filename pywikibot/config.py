@@ -159,8 +159,6 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
 fake_user_agent_exceptions = {}  # type: Dict[str, Union[bool, str]]
-# This following option is deprecated in favour of finer control options above.
-fake_user_agent = False
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!

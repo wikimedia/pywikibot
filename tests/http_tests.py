@@ -303,43 +303,6 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         self._test_fetch_use_fake_user_agent()
 
 
-class GetFakeUserAgentTestCase(TestCase):
-
-    """Test the deprecated get_fake_user_agent()."""
-
-    net = False
-
-    def setUp(self):
-        """Set up unit test."""
-        self.orig_fake_user_agent = config.fake_user_agent
-        super().setUp()
-
-    def tearDown(self):
-        """Tear down unit test."""
-        config.fake_user_agent = self.orig_fake_user_agent
-        super().tearDown()
-
-    def _test_config_settings(self):
-        """Test if method honours configuration toggle."""
-        with suppress_warnings(r'.*?get_fake_user_agent is deprecated'):
-            # ON: True and None in config are considered turned on.
-            config.fake_user_agent = True
-            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
-            config.fake_user_agent = None
-            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
-
-            # OFF: All other values won't make it return random UA.
-            config.fake_user_agent = False
-            self.assertEqual(http.get_fake_user_agent(), http.user_agent())
-            config.fake_user_agent = 'ARBITRARY'
-            self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
-
-    @require_modules('fake_useragent')
-    def test_with_fake_useragent(self):
-        """Test method with fake_useragent module."""
-        self._test_config_settings()
-
-
 class CharsetTestCase(TestCase):
 
     """Test that HttpRequest correct handles the charsets given."""
