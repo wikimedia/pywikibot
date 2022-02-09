@@ -1,6 +1,6 @@
 """Object representing page revision."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -103,7 +103,7 @@ class Revision(Mapping):
                              .format(self.__class__.__name__, key))
 
     @property
-    @deprecated('parentid property', since='20200802')
+    @deprecated('parentid property', since='4.0.0')
     def parent_id(self) -> int:
         """DEPRECATED. Return id of parent/previous revision.
 
@@ -115,7 +115,7 @@ class Revision(Mapping):
         return self.parentid
 
     @property
-    @deprecated('contentmodel', since='20200802')
+    @deprecated('contentmodel', since='4.0.0')
     def content_model(self) -> str:
         """DEPRECATED. Return content model of the revision.
 

@@ -16,10 +16,10 @@ only one arg, and that arg be a callable, as it will be detected as
 a deprecator without any arguments.
 
 .. versionchanged:: 6.4
-   deprecation decorators moved to _deprecate module
+   deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,7 +29,6 @@ import re
 import sys
 import types
 from contextlib import suppress
-from datetime import datetime
 from importlib import import_module
 from inspect import getfullargspec
 from typing import Any, Optional
@@ -164,59 +163,41 @@ def add_full_name(obj):
     return outer_wrapper
 
 
-def _build_msg_string(instead, since):
+def _build_msg_string(instead: str, since: str) -> str:
     """Build a deprecation warning message format string.
 
     .. versionadded:: 3.0
+
+    .. versionchanged:: 7.0
+       `since`parameter must be a release number, not a timestamp.
+
+    :param instead: suggested replacement for the deprecated object
+    :param since: a version string string when the method was deprecated
     """
-    if not since:
-        since = ''
-    elif '.' in since:
-        since = ' since release ' + since
-    else:
-        year_str = month_str = day_str = ''
-        days = (datetime.utcnow() - datetime.strptime(since, '%Y%m%d')).days
-        years = days // 365
-        days = days % 365
-        months = days // 30
-        days = days % 30
-        if years == 1:
-            years = 0
-            months += 12
-        if years:
-            year_str = '{} years'.format(years)
-        else:
-            day_str = '{} day{}'.format(days, 's' if days != 1 else '')
-        if months:
-            month_str = '{} month{}'.format(
-                months, 's' if months != 1 else '')
-        if year_str and month_str:
-            year_str += ' and '
-        if month_str and day_str:
-            month_str += ' and '
-        since = ' for {}{}{}'.format(year_str, month_str, day_str)
+    if since and '.' not in since:
+        raise ValueError('{} is not a valid release number'.format(since))
+
     if instead:
         msg = '{{0}} is deprecated{since}; use {{1}} instead.'
     else:
         msg = '{{0}} is deprecated{since}.'
-    return msg.format(since=since)
+    return msg.format(since=' since release ' + since if since else '')
 
 
-def issue_deprecation_warning(name: str, instead=None, depth=2,
-                              warning_class=None, since=None):
+def issue_deprecation_warning(name: str, instead: str = '', depth: int = 2,
+                              warning_class=None, since: str = ''):
     """Issue a deprecation warning.
+
+    .. versionchanged:: 7.0
+       `since` parameter must be a release number, not a timestamp.
 
     :param name: the name of the deprecated object
     :param instead: suggested replacement for the deprecated object
-    :type instead: str or None
     :param depth: depth + 1 will be used as stacklevel for the warnings
-    :type depth: int
     :param warning_class: a warning class (category) to be used, defaults to
         FutureWarning
     :type warning_class: type
-    :param since: a timestamp string of the date when the method was
-        deprecated (form 'YYYYMMDD') or a version string.
-    :type since: str or None
+    :param since: a version string string when the method was deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -229,10 +210,12 @@ def issue_deprecation_warning(name: str, instead=None, depth=2,
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
+    .. versionchanged:: 7.0
+       `since` keyword must be a release number, not a timestamp.
+
     :keyword instead: if provided, will be used to specify the replacement
     :type instead: str
-    :keyword since: a timestamp string of the date when the method was
-        deprecated (form 'YYYYMMDD') or a version string.
+    :keyword since: a version string string when the method was deprecated
     :type since: str
     :keyword future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
@@ -298,7 +281,7 @@ def deprecated(*args, **kwargs):
 
         return wrapper
 
-    since = kwargs.pop('since', None)
+    since = kwargs.pop('since', '')
     future_warning = kwargs.pop('future_warning', True)
     without_parameters = len(args) == 1 and not kwargs and callable(args[0])
     if 'instead' in kwargs:
@@ -509,13 +492,16 @@ def redirect_func(target, source_module: Optional[str] = None,
                   target_module: Optional[str] = None,
                   old_name: Optional[str] = None,
                   class_name: Optional[str] = None,
-                  since: Optional[str] = None,
-                  future_warning=True):
+                  since: str = '',
+                  future_warning: bool = True):
     """
     Return a function which can be used to redirect to 'target'.
 
     It also acts like marking that function deprecated and copies all
     parameters.
+
+    .. versionchanged:: 7.0
+       `since`parameter must be a release number, not a timestamp.
 
     :param target: The targeted function which is to be executed.
     :type target: callable
@@ -529,11 +515,9 @@ def redirect_func(target, source_module: Optional[str] = None,
         new function.
     :param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
-    :param since: a timestamp string of the date when the method was
-        deprecated (form 'YYYYMMDD') or a version string.
+    :param since: a version string string when the method was deprecated
     :param future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
-    :type future_warning: bool
     :return: A new function which adds a warning prior to each execution.
     :rtype: callable
     """
@@ -590,10 +574,13 @@ class ModuleDeprecationWrapper(types.ModuleType):
     def add_deprecated_attr(self, name: str, replacement: Any = None, *,
                             replacement_name: Optional[str] = None,
                             warning_message: Optional[str] = None,
-                            since: Optional[str] = None,
+                            since: str = '',
                             future_warning: bool = True):
         """
         Add the name to the local deprecated names dict.
+
+        .. versionchanged:: 7.0
+           `since`parameter must be a release number, not a timestamp.
 
         :param name: The name of the deprecated class or variable. It may not
             be already deprecated.
@@ -606,8 +593,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             object name, and evaluated when the deprecated object is needed.
         :param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
-        :param since: a timestamp string of the date when the method was
-            deprecated (form 'YYYYMMDD') or a version string.
+        :param since: a version string string when the method was deprecated
         :param future_warning: if True a FutureWarning will be thrown,
             otherwise it provides a DeprecationWarning
         """

@@ -162,7 +162,7 @@ UserWarning: warnings targeted at users
    removed.
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -303,7 +303,7 @@ class PageRelatedError(Error):
         elif re.search(r'%\(\w+\)s', self.message):
             issue_deprecation_warning("'%' style messages are deprecated, "
                                       'please use str.format() style instead',
-                                      since='20210504')
+                                      since='6.2.0')
             msg = self.message % self.__dict__
         elif '%s' in self.message:
             msg = self.message % page

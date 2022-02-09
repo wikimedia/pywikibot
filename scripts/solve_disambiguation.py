@@ -665,7 +665,7 @@ class DisambiguationRobot(SingleSiteBot):
             issue_deprecation_warning(
                 'Positional argument {} ({})'.format(i + 1, arg),
                 'keyword argument "{}={}"'.format(key, arg),
-                since='20210303')
+                since='6.0.0')
             if key in kwargs:
                 pywikibot.warning('{!r} is given as keyword argument {!r} '
                                   'already; ignoring {!r}'
@@ -679,7 +679,7 @@ class DisambiguationRobot(SingleSiteBot):
                 newkey = keymap[key]
                 issue_deprecation_warning(
                     '{!r} argument of {}'.format(key, self.__class__.__name__),
-                    repr(newkey), since='20210303')
+                    repr(newkey), since='6.0.0')
                 kwargs[newkey] = kwargs.pop(key)
 
         # Expand available_options

@@ -385,7 +385,7 @@ for arg in sys.argv[1:]:
 family_files = {}
 
 
-@deprecated('family_files[family_name] = file_path', since='20210305')
+@deprecated('family_files[family_name] = file_path', since='6.0.0')
 def register_family_file(family_name: str, file_path: str) -> None:
     """Register a single family class file.
 

@@ -904,7 +904,7 @@ class APISite(
         # return the magic word without the preceding '#' character
         return self.getmagicwords('redirect')[0].lstrip('#')
 
-    @deprecated('redirect_regex', since='20210103')
+    @deprecated('redirect_regex', since='5.5.0')
     def redirectRegex(self):  # noqa: N802
         """Return a compiled regular expression matching on redirect pages."""
         return self.redirect_regex
