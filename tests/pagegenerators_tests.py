@@ -22,7 +22,7 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-from pywikibot.tools import has_module, suppress_warnings
+from pywikibot.tools import has_module
 from tests import join_data_path
 from tests.aspects import (
     DefaultSiteTestCase,
@@ -32,13 +32,6 @@ from tests.aspects import (
     WikidataTestCase,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
-
-
-LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
-                  r'is deprecated for .*; use Site\.exturlusage')
-
-PAGES_ID_GEN_MSG = (r'.*pywikibot\.pagegenerators\.PagesFromPageidGenerator .*'
-                    r'is deprecated for .*; use site\.load_pages_from_pageids')
 
 
 en_wp_page_titles = (
@@ -207,21 +200,6 @@ class BasetitleTestCase(TestCase):
         super().setUp()
         self.site = self.get_site()
         self.titles = [self.base_title.format(i) for i in range(1, 11)]
-
-
-class TestPagesFromPageidGenerator(BasetitleTestCase):
-
-    """Test PagesFromPageidGenerator method."""
-
-    def test_PagesFromPageidGenerator(self):
-        """Test PagesFromPageidGenerator."""
-        gen_pages = pagegenerators.PagesFromTitlesGenerator(self.titles,
-                                                            self.site)
-        pageids = [page.pageid for page in gen_pages]
-
-        with suppress_warnings(PAGES_ID_GEN_MSG, category=FutureWarning):
-            gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
-            self.assertPageTitlesEqual(gen, self.titles)
 
 
 class TestCategoryFilterPageGenerator(BasetitleTestCase):
@@ -1669,55 +1647,6 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         for key in ['type', 'namespace', 'title', 'comment',
                     'timestamp', 'user', 'bot']:
             self.assertIn(key, rcinfo.keys())
-
-
-class TestLinksearchPageGenerator(TestCase):
-
-    """Tests for pagegenerators.LinksearchPageGenerator."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    def test_weblink(self):
-        """Test -weblink."""
-        cases = (('wikipedia.org', 'http://wikipedia.org'),
-                 ('en.wikipedia.org', 'http://en.wikipedia.org'),
-                 ('https://fr.wikipedia.org', 'https://fr.wikipedia.org'),
-                 ('ftp://*', 'ftp://'))
-
-        for search, expected in cases:
-            gf = pagegenerators.GeneratorFactory(site=self.site)
-            gf.handle_arg('-weblink:{}'.format(search))
-            gf.handle_arg('-ns:2')
-            gf.handle_arg('-limit:1')
-            gen = gf.getCombinedGenerator()
-            genlist = list(gen)
-            self.assertLength(genlist, 1)
-
-            page = genlist[0]
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 2)
-            self.assertIn(expected, page.text)
-
-    def test_double_opposite_protocols(self):
-        """Test LinksearchPageGenerator with two opposite protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
-            with self.assertRaises(ValueError):
-                pagegenerators.LinksearchPageGenerator(
-                    'http://w.wiki',
-                    protocol='https',
-                    site=self.site)
-
-    def test_double_same_protocols(self):
-        """Test LinksearchPageGenerator with two same protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
-            gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
-                                                         protocol='https',
-                                                         site=self.site,
-                                                         total=1)
-            self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
-            self.assertLength(list(gen), 1)
 
 
 if __name__ == '__main__':  # pragma: no cover

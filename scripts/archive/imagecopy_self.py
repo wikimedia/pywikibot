@@ -1001,7 +1001,7 @@ class uploader(threading.Thread):  # noqa: N801
     def replaceUsage(self, imagepage, filename):
         """Replace all usage if image is uploaded under a different name."""
         if imagepage.title(with_ns=False) != filename:
-            gen = pagegenerators.FileLinksGenerator(imagepage)
+            gen = imagepage.usingPages()
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
 
             moveSummary = i18n.twtranslate(
