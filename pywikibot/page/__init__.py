@@ -1035,11 +1035,6 @@ class BasePage(ComparableMixin):
         """
         return self.site.page_can_be_edited(self, action)
 
-    @deprecated("Page.has_permission('edit')", since='3.0.20200508')
-    def canBeEdited(self):  # pragma: no cover
-        """DEPRECATED. Determine whether the page may be edited."""
-        return self.has_permission()
-
     def botMayEdit(self) -> bool:
         """
         Determine whether the active bot is allowed to edit the page.
@@ -2390,11 +2385,6 @@ class FilePage(Page):
                                 url_width=url_width, url_height=url_height,
                                 url_param=url_param)
         return self.latest_file_info.thumburl
-
-    @deprecated('file_is_shared', since='3.0.20200703')
-    def fileIsShared(self) -> bool:  # pragma: no cover
-        """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
-        return self.file_is_shared()
 
     def file_is_shared(self) -> bool:
         """Check if the file is stored on any known shared repository."""

@@ -312,7 +312,7 @@ class imageTransfer(threading.Thread):  # noqa: N801
             pywikibot.showDiff(self.imagePage.get(), imtxt + addTemplate)
             self.imagePage.put(imtxt + addTemplate, comment=commentText)
 
-            self.gen = pagegenerators.FileLinksGenerator(self.imagePage)
+            self.gen = self.imagePage.usingPages()
             self.preloadingGen = pagegenerators.PreloadingGenerator(self.gen)
 
             moveSummary = i18n.twtranslate(

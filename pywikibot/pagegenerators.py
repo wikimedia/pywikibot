@@ -61,7 +61,6 @@ from pywikibot.exceptions import (
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
     DequeGenerator,
-    deprecated,
     filter_unique,
     intersect_generators,
     itergroup,
@@ -1446,26 +1445,6 @@ def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
     return gen
 
 
-@deprecated('File.usingPages()', since='3.0.20200609')
-def FileLinksGenerator(referredFilePage: 'pywikibot.page.FilePage',
-                       total: Optional[int] = None,
-                       content: bool = False
-                       ) -> Iterable['pywikibot.page.Page']:
-    """DEPRECATED. Yield Pages on which referredFilePage file is displayed."""
-    return referredFilePage.usingPages(total=total,
-                                       content=content)  # pragma: no cover
-
-
-@deprecated('Page.imagelinks()', since='3.0.20200609')
-def ImagesPageGenerator(pageWithImages: 'pywikibot.page.Page',
-                        total: Optional[int] = None,
-                        content: bool = False
-                        ) -> Iterable['pywikibot.page.Page']:
-    """DEPRECATED. Yield FilePages displayed on pageWithImages."""
-    return pageWithImages.imagelinks(total=total,
-                                     content=content)  # pragma: no cover
-
-
 def InterwikiPageGenerator(page: 'pywikibot.page.Page'
                            ) -> Iterable['pywikibot.page.Page']:
     """Iterate over all interwiki (non-language) links on a page."""
@@ -1533,25 +1512,6 @@ def SubCategoriesPageGenerator(category: 'pywikibot.page.Category',
                                     total=total, content=content):
         if start is None or s.title(with_ns=False) >= start:
             yield s
-
-
-@deprecated('Page.linkedPages()', since='3.0.20200609')
-def LinkedPageGenerator(linkingPage: 'pywikibot.page.Page',
-                        total: Optional[int] = None,
-                        content: bool = False
-                        ) -> Iterable['pywikibot.page.Page']:
-    """DEPRECATED. Yield all pages linked from a specific page.
-
-    See :py:obj:`pywikibot.page.BasePage.linkedPages` for details.
-
-    :param linkingPage: the page that links to the pages we want
-    :param total: the total number of pages to iterate
-    :param content: if True, retrieve the current content of each linked page
-    :return: a generator that yields Page objects of pages linked to
-        linkingPage
-    """
-    return linkingPage.linkedPages(total=total,
-                                   content=content)  # pragma: no cover
 
 
 def _yield_titles(f: Union[codecs.StreamReaderWriter, io.StringIO],
@@ -1628,27 +1588,6 @@ def PagesFromTitlesGenerator(iterable: Iterable[str],
         if not isinstance(title, str):
             break
         yield pywikibot.Page(pywikibot.Link(title, site))
-
-
-@deprecated('site.load_pages_from_pageids()', since='3.0.20200609')
-def PagesFromPageidGenerator(pageids: Iterable[str],
-                             site: OPT_SITE_TYPE = None
-                             ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Return a page generator from pageids.
-
-    Pages are iterated in the same order than in the underlying pageids.
-    Pageids are filtered and only one page is returned in case of
-    duplicate pageid.
-
-    :param pageids: an iterable that returns pageids, or a comma-separated
-                    string of pageids (e.g. '945097,1483753,956608')
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-
-    return site.load_pages_from_pageids(pageids)
 
 
 def UserContributionsGenerator(username: str,
@@ -2319,143 +2258,6 @@ def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
         yield page
 
 
-@deprecated('Site.unusedfiles()', since='3.0.20200609')
-def UnusedFilesGenerator(total: Optional[int] = None,  # pragma: no cover
-                         site: OPT_SITE_TYPE = None
-                         ) -> Iterable['pywikibot.page.FilePage']:
-    """
-    DEPRECATED. Unused files generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.unusedfiles(total=total)
-
-
-@deprecated('Site.withoutinterwiki()', since='3.0.20200609')
-def WithoutInterwikiPageGenerator(total: Optional[int] = None,
-                                  site: OPT_SITE_TYPE = None
-                                  ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Page lacking interwikis generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.withoutinterwiki(total=total)
-
-
-@deprecated('Site.uncategorizedcategories()', since='3.0.20200609')
-def UnCategorizedCategoryGenerator(total: Optional[int] = 100,
-                                   site: OPT_SITE_TYPE = None
-                                   ) -> Iterable['pywikibot.Category']:
-    """
-    DEPRECATED. Uncategorized category generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.uncategorizedcategories(total=total)
-
-
-@deprecated('Site.uncategorizedimages()', since='3.0.20200609')
-def UnCategorizedImageGenerator(total: int = 100,  # pragma: no cover
-                                site: OPT_SITE_TYPE = None
-                                ) -> Iterable['pywikibot.page.FilePage']:
-    """
-    DEPRECATED. Uncategorized file generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.uncategorizedimages(total=total)
-
-
-@deprecated('Site.uncategorizedpages()', since='3.0.20200609')
-def UnCategorizedPageGenerator(total: int = 100,  # pragma: no cover
-                               site: OPT_SITE_TYPE = None
-                               ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Uncategorized page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.uncategorizedpages(total=total)
-
-
-@deprecated('Site.uncategorizedtemplates()', since='3.0.20200609')
-def UnCategorizedTemplateGenerator(total: int = 100,  # pragma: no cover
-                                   site: OPT_SITE_TYPE = None
-                                   ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Uncategorized template generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.uncategorizedtemplates(total=total)
-
-
-@deprecated('Site.lonelypages()', since='3.0.20200609')
-def LonelyPagesPageGenerator(total: Optional[int] = None,  # pragma: no cover
-                             site: OPT_SITE_TYPE = None
-                             ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Lonely page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.lonelypages(total=total)
-
-
-@deprecated('Site.unwatchedpages()', since='3.0.20200609')
-def UnwatchedPagesPageGenerator(total: Optional[int] = None,
-                                site: OPT_SITE_TYPE = None
-                                ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Unwatched page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.unwatchedpages(total=total)
-
-
-@deprecated('Site.pages_with_property()', since='3.0.20200609')
-def page_with_property_generator(name: str,  # pragma: no cover
-                                 total: Optional[int] = None,
-                                 site: OPT_SITE_TYPE = None
-                                 ) -> Iterable['pywikibot.page.Page']:
-    """
-    Special:PagesWithProperty page generator.
-
-    :param name: Property name of pages to be retrieved
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.pages_with_property(name, total=total)
-
-
 def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
                               site: OPT_SITE_TYPE = None
                               ) -> Iterator['pywikibot.page.Page']:
@@ -2468,21 +2270,6 @@ def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
     if site is None:
         site = pywikibot.Site()
     return (page for page, _ in site.ancientpages(total=total))
-
-
-@deprecated('Site.deadendpages()', since='3.0.20200609')
-def DeadendPagesPageGenerator(total: int = 100,  # pragma: no cover
-                              site: OPT_SITE_TYPE = None
-                              ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Dead-end page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.deadendpages(total=total)
 
 
 def LongPagesPageGenerator(total: int = 100,
@@ -2511,83 +2298,6 @@ def ShortPagesPageGenerator(total: int = 100,
     if site is None:
         site = pywikibot.Site()
     return (page for page, _ in site.shortpages(total=total))
-
-
-@deprecated('Site.randompages()', since='3.0.20200609')
-def RandomPageGenerator(total: Optional[int] = None,  # pragma: no cover
-                        site: OPT_SITE_TYPE = None,
-                        namespaces: Optional[
-                            Sequence[NAMESPACE_OR_STR_TYPE]] = None
-                        ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Random page generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.randompages(total=total, namespaces=namespaces)
-
-
-@deprecated('Site.randompages()', since='3.0.20200609')
-def RandomRedirectPageGenerator(total: Optional[int] = None,
-                                site: OPT_SITE_TYPE = None,
-                                namespaces: Optional[
-                                    Sequence[NAMESPACE_OR_STR_TYPE]] = None
-                                ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Random redirect generator.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.randompages(total=total, namespaces=namespaces,
-                            redirects=True)
-
-
-@deprecated('Site.exturlusage()', since='3.0.20200609')
-def LinksearchPageGenerator(url: str,
-                            namespaces: Optional[List[int]] = None,
-                            total: Optional[int] = None,
-                            site: OPT_SITE_TYPE = None,
-                            protocol: Optional[str] = None
-                            ) -> Iterable['pywikibot.page.Page']:
-    """DEPRECATED. Yield all pages that link to a certain URL.
-
-    :param url: The URL to search for (with ot without the protocol prefix);
-            this may include a '*' as a wildcard, only at the start of the
-            hostname
-    :param namespaces: list of namespace numbers to fetch contribs from
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results
-    :param protocol: Protocol to search for, likely http or https, http by
-            default. Full list shown on Special:LinkSearch wikipage
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.exturlusage(url, namespaces=namespaces, protocol=protocol,
-                            total=total, content=False)
-
-
-@deprecated('Site.search()', since='3.0.20200609')
-def SearchPageGenerator(query: str,  # pragma: no cover
-                        total: Optional[int] = None,
-                        namespaces: Optional[
-                            Sequence[NAMESPACE_OR_STR_TYPE]] = None,
-                        site: OPT_SITE_TYPE = None
-                        ) -> Iterable['pywikibot.page.Page']:
-    """
-    DEPRECATED. Yield pages from the MediaWiki internal search engine.
-
-    :param total: Maximum number of pages to retrieve in total
-    :param site: Site for generator results.
-    """
-    if site is None:
-        site = pywikibot.Site()
-    return site.search(query, total=total, namespaces=namespaces)
 
 
 def LiveRCPageGenerator(site: OPT_SITE_TYPE = None,
