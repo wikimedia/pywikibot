@@ -1837,30 +1837,30 @@ addFmt1('vi', False, makeMonthList('%%d tháng %d'))
 addFmt1('zh', False, makeMonthList('%d月%%d日'))
 
 # Walloon names depend on the day number, thus we must generate various
-# different patterns
+# different patterns:
 
 # For month names beginning with a consonant...
-for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
-    formats[dayMnthFmts[i]]['wa'] = eval(
-        'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), '
-        'lambda p: p in [2,3,20,22,23]), '
-        '(lambda v: dh_dayOfMnth(v, "%d di {mname}"), alwaysTrue)])'
-        .format(mname=waMonthNames[i]))
-
+_consonant_pattern = (
+    'lambda m: multi(m, ['
+    '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+    '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), '
+    'lambda p: p in [2,3,20,22,23]), '
+    '(lambda v: dh_dayOfMnth(v, "%d di {mname}"), alwaysTrue)])'
+)
 # For month names beginning with a vowel...
-for i in (3, 7, 9):
-    formats[dayMnthFmts[i]]['wa'] = eval(
-        'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
-        .format(mname=waMonthNames[i]))
+_vowel_pattern = (
+    'lambda m: multi(m, ['
+    '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+    '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
+)
 
 # Brazil uses '1añ' for the 1st of every month, and number without suffix for
 # all other days
 brMonthNames = makeMonthNamedList('br', '%s', True)
+
 for i in range(12):
+    pattern = _vowel_pattern if i in (3, 7, 9) else _consonant_pattern
+    formats[dayMnthFmts[i]]['wa'] = eval(pattern.format(mname=waMonthNames[i]))
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
         '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '
