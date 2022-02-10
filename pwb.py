@@ -316,12 +316,13 @@ def find_alternates(filename, script_paths):
 
     script_paths = [['.']] + script_paths  # add current directory
     for path in script_paths:
-        for script_name in os.listdir(os.path.join(*path)):
-            # remove .py for better matching
-            name, _, suffix = script_name.rpartition('.')
-            if suffix == 'py' and not name.startswith('__'):
-                scripts[name] = os.path.join(*(path + [script_name]))
+        folder = Path(_pwb_dir).joinpath(*path)
+        for script_name in folder.iterdir():
+            name, suffix = script_name.stem, script_name.suffix
+            if suffix == '.py' and not name.startswith('__'):
+                scripts[name] = script_name
 
+    # remove .py for better matching
     filename = filename[:-3]
     similar_scripts = get_close_matches(filename, scripts,
                                         config.pwb_close_matches,
@@ -350,7 +351,7 @@ def find_alternates(filename, script_paths):
         except QuitKeyboardInterrupt:
             return None
         print()
-    return scripts[script]
+    return str(scripts[script])
 
 
 def find_filename(filename):
