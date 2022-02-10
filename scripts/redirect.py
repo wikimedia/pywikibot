@@ -214,15 +214,12 @@ class RedirectGenerator(OptionHandler):
 
     def _next_redirect_group(self) -> Generator[List[pywikibot.Page], None,
                                                 None]:
-        """Generator that yields batches of 50 redirects as a list."""
+        """Generator that yields batches of redirects as a list."""
         chunk = []
-        chunks = 0
         for page in self.get_redirect_pages_via_api():
             chunk.append(str(page.pageid))
-            if len(chunk) >= 50:  # T299859
-                chunks += 1
-                if not chunks % 10:
-                    pywikibot.output('.', newline=False)
+            if len(chunk) >= self.site.maxlimit:
+                pywikibot.output('.', newline=False)
                 yield chunk
                 chunk.clear()
         if chunk:
