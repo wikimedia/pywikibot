@@ -36,7 +36,6 @@ To create a new distribution:
 import os
 import sys
 
-from pkg_resources import parse_version, safe_version
 from setuptools import setup
 
 
@@ -167,6 +166,7 @@ def get_validated_version():  # pragma: no cover
         return version
 
     # validate version for sdist
+    from pkg_resources import parse_version, safe_version
     from contextlib import suppress
     from subprocess import PIPE, run
     try:
