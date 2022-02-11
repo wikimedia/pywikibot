@@ -496,7 +496,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         redir_page = self.current_page
         done = not self.opt.delete
         try:
-            targetPage = redir_page.getRedirectTarget()
+            targetPage = self.get_redirect_target(redir_page)
         except InvalidTitleError:
             pywikibot.exception()
             targetPage = None
@@ -566,7 +566,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
                              .format(newRedir.site.lang,
                                      newRedir.title(with_section=False)))
             try:
-                targetPage = newRedir.getRedirectTarget()
+                targetPage = self.get_redirect_target(newRedir)
             except IsNotRedirectPageError:
                 if len(redirList) == 2:
                     pywikibot.output(
