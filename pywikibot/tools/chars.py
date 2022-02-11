@@ -44,7 +44,10 @@ def replace_invisible(text):
 
 
 def string_to_ascii_html(string: str) -> str:
-    """Convert unicode chars of str to HTML entities if chars are not ASCII."""
+    """Convert unicode chars of str to HTML entities if chars are not ASCII.
+
+    :param string: String to update
+    """
     html = []
     for c in string:
         cord = ord(c)

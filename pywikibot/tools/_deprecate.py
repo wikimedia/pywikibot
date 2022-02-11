@@ -49,7 +49,7 @@ def add_decorated_full_name(obj, stacklevel=1):
     This must be done on all decorators that are chained together, otherwise
     the second decorator will have the wrong full name.
 
-    :param obj: A object being decorated
+    :param obj: An object being decorated
     :type obj: object
     :param stacklevel: level to use
     :type stacklevel: int
