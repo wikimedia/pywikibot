@@ -5,7 +5,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -588,18 +588,25 @@ class RequireLoginMixin(TestCaseBase):
         Login to the site if it is not logged in.
         """
         super().setUp()
-        self._reset_login()
+        self._reset_login(True)
 
     def tearDown(self):
         """Log back into the site."""
         super().tearDown()
         self._reset_login()
 
-    def _reset_login(self):
-        """Login to all sites."""
-        # There may be many sites, and setUp doesn't know
-        # which site is to be tested; ensure they are all
-        # logged in.
+    def _reset_login(self, skip_if_login_fails: bool = False):
+        """Login to all sites.
+
+        There may be many sites, and setUp doesn't know which site is to
+        be tested; ensure they are all logged in.
+
+        .. versionadded:: 7.0
+           The `skip_if_login_fails` parameter.
+
+        :param skip_if_login_fails: called with setUp(); if True, skip
+            the current current test.
+        """
         for site in self.sites.values():
             site = site['site']
 
@@ -608,7 +615,10 @@ class RequireLoginMixin(TestCaseBase):
 
             if not site.logged_in():
                 site.login()
-            assert site.user()
+
+            if skip_if_login_fails and not site.user():  # during setUp() only
+                self.skipTest('{}: Not able to re-login to {}'
+                              .format(type(self).__name__, site))
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
