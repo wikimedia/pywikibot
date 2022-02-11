@@ -1234,6 +1234,9 @@ class TestShortLink(TestCase):
         meta = pywikibot.Site('meta:meta')
         if not meta.logged_in():
             meta.login()
+        if not meta.user():
+            self.skipTest('{}: Not able to login to {}'
+                          .format(type(self).__name__, meta))
 
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
