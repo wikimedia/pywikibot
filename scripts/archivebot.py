@@ -74,7 +74,7 @@ of the year. So up to three days are still counted as the year before.
 
 See also:
  - https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
- - https://docs.python.org/3.4/library/datetime.html#datetime.date.isocalendar
+ - https://docs.python.org/3/library/datetime.html#datetime.date.isocalendar
 
 Options (may be omitted):
 
