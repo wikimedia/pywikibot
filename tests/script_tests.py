@@ -122,6 +122,11 @@ no_args_expected_results = {
     'upload': 'ERROR: Upload error',
 }
 
+# skip test if result is unexpected in this way
+skip_on_results = {
+    'speedy_delete': 'No user is logged in on site'  # T301555
+}
+
 
 enable_autorun_tests = (
     os.environ.get('PYWIKIBOT_TEST_AUTORUN', '0') == '1')
@@ -234,8 +239,12 @@ class TestScriptMeta(MetaTestCaseClass):
                 if result['exit_code'] == -9:
                     unittest_print(' killed', end='  ')
 
+                skip_result = self._skip_results.get(script_name)
+                if skip_result and skip_result in err_result:
+                    self.skipTest(skip_result)
+
                 if error:
-                    self.assertIn(error, result['stderr'])
+                    self.assertIn(error, err_result)
                     exit_codes = [0, 1, 2, -9]
 
                 elif not is_autorun:
@@ -340,6 +349,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
     _arguments = '-help'
     _results = None
+    _skip_results = {}
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
@@ -368,6 +378,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _arguments = '-simulate'
     _results = no_args_expected_results
+    _skip_results = skip_on_results
 
 
 if __name__ == '__main__':  # pragma: no cover
