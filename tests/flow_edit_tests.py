@@ -135,7 +135,7 @@ class TestFlowReply(TestCase):
 
         # Nested reply
         old_nested_replies = first_reply_post.replies(force=True)[:]
-        self.assertListEqual(old_nested_replies, [])
+        self.assertEqual(old_nested_replies, [])
         second_reply_post = first_reply_post.reply(second_content,
                                                    'wikitext')
         # Test nested reply's content
@@ -151,7 +151,7 @@ class TestFlowReply(TestCase):
         # self.assertLength(new_nested_replies, len(old_nested_replies) + 1)
 
         # Current test for nested reply list
-        self.assertListEqual(old_nested_replies, [])
+        self.assertEqual(old_nested_replies, [])
         more_root_replies = topic_root.replies(force=True)
         self.assertLength(more_root_replies, len(new_root_replies) + 1)
 
