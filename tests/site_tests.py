@@ -3568,30 +3568,6 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
         self.assertIsNone(page)
 
 
-class TestClearCookies(TestCase):
-    """Test cookies are cleared after logout."""
-
-    login = True
-
-    family = 'wikisource'
-    code = 'zh'
-
-    def test_clear_cookies(self):
-        """Test cookies are cleared (T224712)."""
-        site = self.get_site()
-        site.login()
-        site2 = pywikibot.Site('mul', 'wikisource', user=site.username())
-        site2.login()
-        site.logout()
-
-        raised = False
-        try:
-            site.login()
-        except Exception as e:
-            raised = e
-        self.assertFalse(raised)
-
-
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
         unittest.main()

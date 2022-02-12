@@ -1,5 +1,10 @@
 #!/usr/bin/python3
-"""Test for login and logout methods."""
+"""Test for login and logout methods.
+
+These tests are separated from others because they should not be runned
+in paralled CI test tasks. Any logout could lead other parallel tests
+to fail.
+"""
 #
 # (C) Pywikibot team, 2022
 #
@@ -12,7 +17,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot.exceptions import APIError
 
-from tests.aspects import DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class TestLoginLogout(DefaultSiteTestCase):
@@ -51,10 +56,34 @@ class TestLoginLogout(DefaultSiteTestCase):
             self.assertIsNone(site.user())
 
 
+class TestClearCookies(TestCase):
+    """Test cookies are cleared after logout."""
+
+    login = True
+
+    family = 'wikisource'
+    code = 'zh'
+
+    def test_clear_cookies(self):
+        """Test cookies are cleared (T224712)."""
+        site = self.get_site()
+        site.login()
+        site2 = pywikibot.Site('mul', 'wikisource', user=site.username())
+        site2.login()
+        site.logout()
+
+        raised = False
+        try:
+            site.login()
+        except Exception as e:
+            raised = e
+        self.assertFalse(raised)
+
+
 def setUpModule():  # noqa: N802
     """Skip tests if PYWIKIBOT_LOGIN_LOGOUT variable is not set."""
     if os.environ.get('PYWIKIBOT_LOGIN_LOGOUT', '0') != '1':
-        raise unittest.SkipTest('login/logout tests ar disabled')
+        raise unittest.SkipTest('login/logout tests are disabled')
 
 
 if __name__ == '__main__':  # pragma: no cover
