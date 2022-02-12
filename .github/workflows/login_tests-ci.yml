@@ -93,7 +93,7 @@ jobs:
 
     - name: Generate user files
       run: |
-        if [ ${{matrix.site}} != 'False' ]; then
+        if [ ${{matrix.site}} != false ]; then
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
         else
           python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
