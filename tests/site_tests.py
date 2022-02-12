@@ -896,8 +896,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         if not self.site.data_repository():
             self.skipTest('Site is not using a Wikibase repository')
         upgen = self.site.unconnected_pages(total=3)
-        self.assertDictEqual(
-            upgen.request._params, {
+        self.assertEqual(
+            upgen.request._params,
+            {
                 'gqppage': ['UnconnectedPages'],
                 'prop': ['info', 'imageinfo', 'categoryinfo'],
                 'inprop': ['protection'],
@@ -905,7 +906,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                            'sha1', 'metadata'],
                 'generator': ['querypage'], 'action': ['query'],
-                'indexpageids': [True], 'continue': [True]})
+                'indexpageids': [True], 'continue': [True]
+            }
+        )
         self.assertLessEqual(len(tuple(upgen)), 3)
 
     def test_assert_valid_iter_params(self):

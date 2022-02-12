@@ -558,7 +558,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {})
+        self.assertEqual(content['args'], {})
 
     def test_unencoded_params(self):
         """
@@ -577,7 +577,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
+        self.assertEqual(content['args'], {'fish&chips': 'delicious'})
 
     def test_encoded_params(self):
         """
@@ -596,7 +596,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
+        self.assertEqual(content['args'], {'fish%26chips': 'delicious'})
 
 
 class DataBodyParameterTestCase(HttpbinTestCase):
@@ -625,7 +625,7 @@ class DataBodyParameterTestCase(HttpbinTestCase):
             r_data['headers'].pop(tracker_id, None)
             r_body['headers'].pop(tracker_id, None)
 
-        self.assertDictEqual(r_data, r_body)
+        self.assertEqual(r_data, r_body)
 
 
 if __name__ == '__main__':  # pragma: no cover

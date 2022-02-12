@@ -106,12 +106,12 @@ class TestSparql(WikidataTestCase):
         self.assertIsInstance(res, list, 'Result is not a list')
         self.assertLength(res, 2)
 
-        self.assertDictEqual(
+        self.assertEqual(
             res[0],
             {'cat': 'http://www.wikidata.org/entity/Q498787',
              'catLabel': 'Muezza', 'd': '1955-01-01T00:00:00Z'},
             'Bad result')
-        self.assertDictEqual(
+        self.assertEqual(
             res[1],
             {'cat': 'http://www.wikidata.org/entity/Q677525',
              'catLabel': 'Orangey', 'd': '2015-06-22T00:00:00Z'},
@@ -156,7 +156,7 @@ class TestSparql(WikidataTestCase):
         with skipping(pywikibot.exceptions.TimeoutError):
             q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
-        self.assertSetEqual(res, {'Q498787', 'Q677525'})
+        self.assertEqual(res, {'Q498787', 'Q677525'})
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat',
                           result_type=list)
         self.assertEqual(res, ['Q498787', 'Q677525', 'Q677525'])
