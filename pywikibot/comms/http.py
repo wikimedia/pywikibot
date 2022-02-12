@@ -22,7 +22,7 @@ If required you can use your own Session object passing it to the
 :py:obj:`flush()` can be called to close the session object.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,10 +48,7 @@ from pywikibot.exceptions import (
     Server504Error,
 )
 from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import (
-    deprecated,
-    file_mode_checker,
-)
+from pywikibot.tools import file_mode_checker
 
 
 try:
@@ -192,22 +189,6 @@ def user_agent(site=None, format_string: str = None) -> str:
     # clean up after any blank components
     formatted = formatted.replace('()', '').replace('  ', ' ').strip()
     return formatted
-
-
-@deprecated('pywikibot.comms.http.fake_user_agent', since='20161205')
-def get_fake_user_agent():
-    """
-    Return a fake user agent depending on `fake_user_agent` option in config.
-
-    Deprecated, use fake_user_agent() instead.
-
-    :rtype: str
-    """
-    if isinstance(config.fake_user_agent, str):
-        return config.fake_user_agent
-    if config.fake_user_agent is False:
-        return user_agent()
-    return fake_user_agent()
 
 
 def fake_user_agent() -> str:
