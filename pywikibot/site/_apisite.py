@@ -2954,11 +2954,8 @@ class APISite(
                     _file_key = None
 
                 if not report_success:
-                    if source_filename:
-                        offset = result.setdefault('offset', True)
-                    else:
-                        offset = False
-
+                    result.setdefault('offset', bool(source_filename))
+                    offset = result['offset'] if source_filename else False
                     if ignore_warnings(create_warnings_list(result)):
                         return self.upload(
                             filepage, source_filename=source_filename,
