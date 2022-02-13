@@ -22,6 +22,10 @@ The following parameters are supported:
   -force_if_shared  Upload the file to the target, even if it exists on that
                     wiki's shared repo
 
+  -asynchronous     Upload to stash.
+
+  -chunk_size:n     Upload in chunks of n bytes.
+
   -file:z           Upload many files from textfile: [[Image:x]]
                                                      [[Image:y]]
 
@@ -144,6 +148,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         'keepname': False,
         'target': None,
         'force_if_shared': False,
+        'asynchronous': False,
+        'chunk_size': 0,
     }
 
     def __init__(self, **kwargs):
@@ -162,6 +168,10 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
             shared to the target site (e.g. when moving from Commons to another
             wiki)
         :type force_if_shared: boolean
+        :keyword asynchronous: Upload to stash.
+        :type asynchronous: boolean
+        :keyword chunk_size: Upload in chunks of this size bytes.
+        :type chunk_size: integer
         """
         super().__init__(**kwargs)
         if self.opt.target is None:
@@ -217,7 +227,9 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                               keep_filename=self.opt.keepname,
                               verify_description=not self.opt.keepname,
                               ignore_warning=self.opt.ignore_warning,
-                              force_if_shared=self.opt.force_if_shared)
+                              force_if_shared=self.opt.force_if_shared,
+                              asynchronous=self.opt.asynchronous,
+                              chunk_size=self.opt.chunk_size)
 
             # try to upload
             if bot.skip_run():
@@ -347,7 +359,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         opt, _, value = arg.partition(':')
         if opt in ('-ignore_warning', '-interwiki', '-keepname',
-                   '-force_if_shared'):
+                   '-force_if_shared', '-asynchronous'):
             options[opt[1:]] = True
         elif opt == '-tolang':
             target_code = value
@@ -355,6 +367,8 @@ def main(*args: str) -> None:
             target_family = value
         elif opt == '-tosite':
             options['target'] = value
+        elif opt == '-chunk_size':
+            options['chunk_size'] = value
         else:
             generator_factory.handle_arg(arg)
 
