@@ -25,6 +25,7 @@ from pywikibot.backports import Sequence as SequenceType
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import deprecated
+from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
 try:
@@ -113,17 +114,6 @@ FILE_LINK_REGEX = r"""
     )??
     \]\]
 """
-
-NON_LATIN_DIGITS = {
-    'ckb': '٠١٢٣٤٥٦٧٨٩',
-    'fa': '۰۱۲۳۴۵۶۷۸۹',
-    'hi': '०१२३४५६७८९',
-    'km': '០១២៣៤៥៦៧៨៩',
-    'kn': '೦೧೨೩೪೫೬೭೮೯',
-    'bn': '০১২৩৪৫৬৭৮৯',
-    'gu': '૦૧૨૩૪૫૬૭૮૯',
-    'or': '୦୧୨୩୪୫୬୭୮୯',
-}
 
 # Used in TimeStripper. When a timestamp-like line has longer gaps
 # than this between year, month, etc in it, then the line will not be
