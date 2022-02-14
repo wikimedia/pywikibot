@@ -597,6 +597,8 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
     day_formats = {
         'af': ('%d {}', True),
         'ang': ('%d {}', True),
+        'ar': ('%d {}', True),
+        'arz': ('%d {}', True),
         'bg': ('%d {}', False),
         'bn': ('{} %%B', None),
         'ceb': ('{} %d', True),
@@ -645,7 +647,6 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
     }
 
     year_formats = {
-        'ar': ('{} %d', None),
         'cs': ('{} %d', None),
         'eo': ('{} de %d', None),
         'es': ('{} de %d', True),
@@ -706,6 +707,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 formats = {
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
+        'ary': lambda v: dh_number(v, '%d'),
         'be': lambda v: dh_number(v, '%d (лік)'),
         'bg': lambda v: dh_number(v, '%d (число)'),
         'bs': lambda v: dh_number(v, '%d (broj)'),
@@ -764,6 +766,7 @@ formats = {
 
     'YearBC': {
         'af': lambda v: dh_yearBC(v, '%d v.C.'),
+        'ar': lambda v: dh_yearBC(v, '%d ق م'),
         'ast': lambda v: dh_yearBC(v, '%d edC'),
         'be': lambda v: dh_yearBC(v, '%d да н.э.'),
         'bg': lambda v: dh_yearBC(v, '%d г. пр.н.е.'),
@@ -973,6 +976,7 @@ formats = {
     },
 
     'DecadeBC': {
+        'ar': lambda v: dh_decBC(v, 'عقد %d ق م'),
         'de': lambda v: dh_decBC(v, '%der v. Chr.'),
         'da': lambda v: dh_decBC(v, "%d'erne f.Kr."),
         'en': lambda v: dh_decBC(v, '%ds BC'),
@@ -1037,7 +1041,7 @@ formats = {
              lambda p: p in (1, 8) or (p >= 20)),
             (lambda v: dh_centuryAD(v, '%dde eeu'), alwaysTrue)]),
         'ang': lambda v: dh_centuryAD(v, '%de gēarhundred'),
-        'ar': lambda v: dh_centuryAD(v, 'قرن %d'),
+        'ar': lambda v: dh_centuryAD(v, 'القرن %d'),
         'ast': lambda v: dh_centuryAD(v, 'Sieglu %R'),
         'be': lambda v: dh_centuryAD(v, '%d стагодзьдзе'),
         'bg': lambda v: dh_centuryAD(v, '%d век'),
@@ -1410,6 +1414,7 @@ formats = {
     },
 
     'Cat_Year_MusicAlbums': {
+        'ar': lambda v: dh_yearAD(v, 'ألبومات %d'),
         'cs': lambda v: dh_yearAD(v, 'Alba roku %d'),
         'en': lambda v: dh_yearAD(v, '%d albums'),
         'fa': lambda v: dh_yearAD(v, 'آلبوم‌های %d (میلادی)'),
@@ -1425,6 +1430,7 @@ formats = {
     'Cat_BirthsAD': {
         'an': lambda v: dh_yearAD(v, '%d (naixencias)'),
         'ar': lambda v: dh_yearAD(v, 'مواليد %d'),
+        'ary': lambda v: dh_yearAD(v, 'زيادة %d'),
         'arz': lambda v: dh_yearAD(v, 'مواليد %d'),
         'bar': lambda v: dh_yearAD(v, 'Geboren %d'),
         'be': lambda v: dh_yearAD(v, 'Нарадзіліся ў %d годзе'),
@@ -1596,10 +1602,14 @@ formats = {
     },
 
     'Cat_BirthsBC': {
+        'ar': lambda v: dh_yearBC(v, 'مواليد %d ق م'),
+        'arz': lambda v: dh_yearBC(v, 'مواليد %d ق م'),
         'en': lambda v: dh_yearBC(v, '%d BC births'),
         'nb': lambda v: dh_yearBC(v, 'Fødsler i %d f.Kr.'),
     },
     'Cat_DeathsBC': {
+        'ar': lambda v: dh_yearBC(v, 'وفيات %d ق م'),
+        'arz': lambda v: dh_yearBC(v, 'وفيات %d ق م'),
         'en': lambda v: dh_yearBC(v, '%d BC deaths'),
         'fr': lambda v: dh_yearBC(v, 'Décès en -%d'),
         'nb': lambda v: dh_yearBC(v, 'Dødsfall i %d f.Kr.'),
@@ -1609,6 +1619,7 @@ formats = {
         'an': lambda v: dh_singVal(v, 'Autualidá'),
         'ang': lambda v: dh_singVal(v, 'Efenealde belimpas'),
         'ar': lambda v: dh_singVal(v, 'أحداث جارية'),
+        'ary': lambda v: dh_singVal(v, 'آخر الأحداث'),
         'arz': lambda v: dh_singVal(v, 'احداث دلوقتى'),
         'be': lambda v: dh_singVal(v, 'Бягучыя падзеі'),
         'bg': lambda v: dh_singVal(v, 'Текущи събития'),
