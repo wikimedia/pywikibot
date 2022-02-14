@@ -1325,6 +1325,35 @@ def _int_none(v: Optional[str]) -> Optional[int]:
     return None if not v else int(v)
 
 
+def AllpagesPageGenerator(
+    start: str = '!',
+    namespace: int = 0,
+    includeredirects: Union[str, bool] = True,
+    site: OPT_SITE_TYPE = None,
+    total: Optional[int] = None, content: bool = False
+) -> Iterable['pywikibot.page.Page']:
+    """Iterate Page objects for all titles in a single namespace.
+
+    If includeredirects is False, redirects are not included. If
+    includeredirects equals the string 'only', only redirects are added.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param content: If True, load current version of each page (default False)
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+
+    filterredir = None  # type: Optional[bool]
+    if not includeredirects:
+        filterredir = False
+    elif includeredirects == 'only':
+        filterredir = True
+
+    return site.allpages(start=start, namespace=namespace,
+                         filterredir=filterredir, total=total, content=content)
+
+
 def PrefixingPageGenerator(prefix: str,
                            namespace: NAMESPACE_OR_INT_TYPE = None,
                            includeredirects: Union[None, bool, str] = True,
@@ -1445,6 +1474,40 @@ def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
     return gen
 
 
+def UnconnectedPageGenerator(
+    site: OPT_SITE_TYPE = None,
+    total: Optional[int] = None
+) -> Iterable['pywikibot.page.Page']:
+    """Iterate Page objects for all unconnected pages to a Wikibase repository.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    if not site.data_repository():
+        raise ValueError('The given site does not have Wikibase repository.')
+    return site.unconnected_pages(total=total)
+
+
+def FileLinksGenerator(
+    referredFilePage: 'pywikibot.page.FilePage',
+    total: Optional[int] = None,
+    content: bool = False
+) -> Iterable['pywikibot.page.Page']:
+    """Yield Pages on which referredFilePage file is displayed."""
+    return referredFilePage.usingPages(total=total, content=content)
+
+
+def ImagesPageGenerator(
+    pageWithImages: 'pywikibot.page.Page',
+    total: Optional[int] = None,
+    content: bool = False
+) -> Iterable['pywikibot.page.Page']:
+    """Yield FilePages displayed on pageWithImages."""
+    return pageWithImages.imagelinks(total=total, content=content)
+
+
 def InterwikiPageGenerator(page: 'pywikibot.page.Page'
                            ) -> Iterable['pywikibot.page.Page']:
     """Iterate over all interwiki (non-language) links on a page."""
@@ -1512,6 +1575,24 @@ def SubCategoriesPageGenerator(category: 'pywikibot.page.Category',
                                     total=total, content=content):
         if start is None or s.title(with_ns=False) >= start:
             yield s
+
+
+def LinkedPageGenerator(
+    linkingPage: 'pywikibot.page.Page',
+    total: Optional[int] = None,
+    content: bool = False
+) -> Iterable['pywikibot.page.Page']:
+    """Yield all pages linked from a specific page.
+
+    See :py:obj:`pywikibot.page.BasePage.linkedPages` for details.
+
+    :param linkingPage: the page that links to the pages we want
+    :param total: the total number of pages to iterate
+    :param content: if True, retrieve the current content of each linked page
+    :return: a generator that yields Page objects of pages linked to
+        linkingPage
+    """
+    return linkingPage.linkedPages(total=total, content=content)
 
 
 def _yield_titles(f: Union[codecs.StreamReaderWriter, io.StringIO],
@@ -1588,6 +1669,26 @@ def PagesFromTitlesGenerator(iterable: Iterable[str],
         if not isinstance(title, str):
             break
         yield pywikibot.Page(pywikibot.Link(title, site))
+
+
+def PagesFromPageidGenerator(
+    pageids: Iterable[str],
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Return a page generator from pageids.
+
+    Pages are iterated in the same order than in the underlying pageids.
+    Pageids are filtered and only one page is returned in case of
+    duplicate pageid.
+
+    :param pageids: an iterable that returns pageids, or a comma-separated
+                    string of pageids (e.g. '945097,1483753,956608')
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+
+    return site.load_pages_from_pageids(pageids)
 
 
 def UserContributionsGenerator(username: str,
@@ -1966,7 +2067,7 @@ def EdittimeFilterPageGenerator(
 
         msg = '{prefix} edit on {page} was on {time}.\n' \
               'Too {{when}}. Skipping.' \
-              .format(prefix=edit.__class__.__name__,  # prefix = Class name.
+              .format(prefix=type(edit).__name__,
                       page=page,
                       time=edit_time.isoformat())
 
@@ -2258,9 +2359,10 @@ def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
         yield page
 
 
-def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
-                              site: OPT_SITE_TYPE = None
-                              ) -> Iterator['pywikibot.page.Page']:
+def AncientPagesPageGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterator['pywikibot.page.Page']:
     """
     Ancient page generator.
 
@@ -2270,6 +2372,162 @@ def AncientPagesPageGenerator(total: int = 100,  # pragma: no cover
     if site is None:
         site = pywikibot.Site()
     return (page for page, _ in site.ancientpages(total=total))
+
+
+def UnusedFilesGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.FilePage']:
+    """Unused files generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.unusedfiles(total=total)
+
+
+def WithoutInterwikiPageGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Page lacking interwikis generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.withoutinterwiki(total=total)
+
+
+def UnCategorizedCategoryGenerator(
+    total: Optional[int] = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.Category']:
+    """Uncategorized category generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.uncategorizedcategories(total=total)
+
+
+def UnCategorizedImageGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.FilePage']:
+    """Uncategorized file generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.uncategorizedimages(total=total)
+
+
+def UnCategorizedPageGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Uncategorized page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.uncategorizedpages(total=total)
+
+
+def UnCategorizedTemplateGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Uncategorized template generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.uncategorizedtemplates(total=total)
+
+
+def LonelyPagesPageGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Lonely page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.lonelypages(total=total)
+
+
+def UnwatchedPagesPageGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Unwatched page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.unwatchedpages(total=total)
+
+
+def page_with_property_generator(
+    name: str,
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Special:PagesWithProperty page generator.
+
+    :param name: Property name of pages to be retrieved
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.pages_with_property(name, total=total)
+
+
+def WantedPagesPageGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Wanted page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.wantedpages(total=total)
+
+
+def DeadendPagesPageGenerator(
+    total: int = 100,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Dead-end page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.deadendpages(total=total)
 
 
 def LongPagesPageGenerator(total: int = 100,
@@ -2298,6 +2556,78 @@ def ShortPagesPageGenerator(total: int = 100,
     if site is None:
         site = pywikibot.Site()
     return (page for page, _ in site.shortpages(total=total))
+
+
+def RandomPageGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None,
+    namespaces: Optional[Sequence[NAMESPACE_OR_STR_TYPE]] = None
+) -> Iterable['pywikibot.page.Page']:
+    """Random page generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.randompages(total=total, namespaces=namespaces)
+
+
+def RandomRedirectPageGenerator(
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None,
+    namespaces: Optional[
+        Sequence[NAMESPACE_OR_STR_TYPE]] = None
+) -> Iterable['pywikibot.page.Page']:
+    """Random redirect generator.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.randompages(total=total, namespaces=namespaces,
+                            redirects=True)
+
+
+def LinksearchPageGenerator(
+    url: str,
+    namespaces: Optional[List[int]] = None,
+    total: Optional[int] = None,
+    site: OPT_SITE_TYPE = None,
+    protocol: Optional[str] = None
+) -> Iterable['pywikibot.page.Page']:
+    """Yield all pages that link to a certain URL.
+
+    :param url: The URL to search for (with ot without the protocol prefix);
+            this may include a '*' as a wildcard, only at the start of the
+            hostname
+    :param namespaces: list of namespace numbers to fetch contribs from
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results
+    :param protocol: Protocol to search for, likely http or https, http by
+        default. Full list shown on Special:LinkSearch wikipage
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.exturlusage(url, namespaces=namespaces, protocol=protocol,
+                            total=total, content=False)
+
+
+def SearchPageGenerator(
+    query: str,
+    total: Optional[int] = None,
+    namespaces: Optional[Sequence[NAMESPACE_OR_STR_TYPE]] = None,
+    site: OPT_SITE_TYPE = None
+) -> Iterable['pywikibot.page.Page']:
+    """Yield pages from the MediaWiki internal search engine.
+
+    :param total: Maximum number of pages to retrieve in total
+    :param site: Site for generator results.
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.search(query, total=total, namespaces=namespaces)
 
 
 def LiveRCPageGenerator(site: OPT_SITE_TYPE = None,
