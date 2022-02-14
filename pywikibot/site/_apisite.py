@@ -2966,10 +2966,6 @@ class APISite(
                             report_success=False)
                     return False
 
-                warn('When ignore_warnings=False in APISite.upload will '
-                     'change from raising an UploadWarning into behaving like '
-                     'being a callable returning False.',
-                     DeprecationWarning, 3)
                 if len(result['warnings']) > 1:
                     warn('The upload returned {} warnings: {}'
                          .format(len(result['warnings']),
