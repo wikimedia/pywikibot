@@ -4,8 +4,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import pywikibot
 from typing import Any, Optional, Type
+
+import pywikibot
 from pywikibot.backports import Dict
 
 NOTIFICATION_CLASS_TYPE = Type['Notification']
