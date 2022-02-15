@@ -196,6 +196,7 @@ locale.setlocale(locale.LC_ALL, '')
 #
 # ATTENTION: Projects not listed won't write a log to the wiki.
 logbook = {
+    'ar': 'Project:سجل الترحيب',
     'fr': ('Wikipedia:Prise de décision/'
            'Accueil automatique des nouveaux par un robot/log'),
     'ga': 'Project:Log fáilte',
@@ -215,9 +216,9 @@ netext = {
     'commons': '{{subst:welcome}} %s',
     'wikipedia': {
         'am': '{{subst:Welcome}} %s',
-        'ar': '{{subst:ترحيب}} %s',
-        'ary': '{{subst:welcome}} %s',
-        'arz': '{{subst:ترحيب}} %s',
+        'ar': '{{subst:أهلا ومرحبا}} %s',
+        'ary': '{{subst:ترحيب جديد}} %s',
+        'arz': '{{subst:اهلا و سهلا}} %s',
         'as': '{{subst:আদৰণি}} %s',
         'ba': '{{Hello}} %s',
         'bn': '{{subst:স্বাগতম/বট}} %s',
