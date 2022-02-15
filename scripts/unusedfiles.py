@@ -18,7 +18,7 @@ by default::
 -usertemplate:  Use a custom template to warn the uploader.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,15 +39,25 @@ from pywikibot.flow import Board
 template_to_the_image = {
     'meta': '{{Orphan file}}',
     'test': '{{Orphan file}}',
-    'it': '{{immagine orfana}}',
+    'ar': '{{صورة يتيمة}}',
+    'arz': '{{صوره يتيمه}}',
+    'en': '{{Orphan image}}',
     'fa': '{{تصاویر بدون استفاده}}',
+    'id': '{{Berkas yatim}}',
+    'it': '{{immagine orfana}}',
+    'mk': '{{Слика сираче}}',
+    'te': '{{Orphan image}}',
     'ur': '{{غیر مستعمل تصاویر}}',
+    'uz': '{{Yetim tasvir}}',
+    'vec': '{{Imaxine orfana}}',
+    'vi': '{{Hình mồ côi}}',
 }
 
 template_to_the_user = {
-    'fa': '{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
-    'ur': '{{جا:اطلاع برائے غیر مستعمل تصاویر}}',
     'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
+    'ar': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
+    'fa': '{{subst:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
+    'ur': '{{subst:اطلاع برائے غیر مستعمل تصاویر|%(title)s}}',
 }
 
 
