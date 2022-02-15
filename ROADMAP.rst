@@ -74,7 +74,7 @@ Code cleanups
 
 * BaseBot.stop() method were removed in favour of BaseBot.generator.close()
 * showHelp() function was remove in favour of show_help
-* Remove AllpagesPageGenerator, UnconnectedPageGenerator, CombinedPageGenerator, WantedPagesPageGenerator pagegenerators
+* CombinedPageGenerator pagegenerator was removed in favour of itertools.chain
 * Remove deprecated echo.Notification.id
 * Remove APISite.newfiles() method (T168339)
 * Remove APISite.page_exists() method
