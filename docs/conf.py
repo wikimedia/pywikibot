@@ -351,6 +351,9 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
+# Other settings
+autodoc_typehints = 'description'
+
 
 TOKENS_WITH_PARAM = [
     # sphinx
