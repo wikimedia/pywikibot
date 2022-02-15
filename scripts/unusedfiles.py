@@ -117,7 +117,7 @@ class UnusedFilesBot(SingleSiteBot,
             self.append_text(image, '\n\n' + self.opt.filetemplate)
             if self.opt.nouserwarning:
                 return
-            uploader = image.get_file_history().pop(0)['user']
+            uploader = image.oldest_file_info.user
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
             template2uploader = self.opt.usertemplate \
