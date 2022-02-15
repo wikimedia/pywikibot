@@ -29,6 +29,11 @@ manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.
 See also: `Pywikibot Manual`_ at https://www.mediawiki.org
 
 
+Framework Modules Overview
+--------------------------
+.. image:: framework.png
+
+
 For bot users:
 --------------
 
