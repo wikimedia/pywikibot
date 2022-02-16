@@ -75,7 +75,7 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
