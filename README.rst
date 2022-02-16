@@ -114,7 +114,7 @@ Pywikibot provides bot classes to develop your own script easily:
 
         update_options = {
             'text': 'This is a test text',
-            'summary: 'Bot: a bot test edit with Pywikbot.'
+            'summary: 'Bot: a bot test edit with Pywikibot.'
         }
 
         def treat_page(self):
