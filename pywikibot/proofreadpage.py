@@ -51,6 +51,7 @@ from pywikibot.data.api import Request
 from pywikibot.exceptions import Error, OtherPageSaveError
 from pywikibot.page import PageSourceType
 
+
 try:
     from bs4 import BeautifulSoup
 except ImportError as e:

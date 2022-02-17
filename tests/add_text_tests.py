@@ -10,9 +10,7 @@ from unittest.mock import ANY, MagicMock, Mock, mock_open, patch
 
 import pywikibot
 import pywikibot.pagegenerators
-
 from scripts.add_text import AddTextBot, main, parse
-
 from tests.aspects import TestCase
 
 

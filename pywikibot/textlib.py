@@ -19,9 +19,10 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Container, Iterable, List, Tuple
+from pywikibot.backports import Container, Iterable, List
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Sequence as SequenceType
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.tools import deprecated
@@ -1769,7 +1770,7 @@ def glue_template_and_params(template_and_params) -> str:
     for items in params.items():
         text += '|{}={}\n'.format(*items)
 
-    return '{{%s\n%s}}' % (template, text)
+    return '{{{{{}\n{}}}}}'.format(template, text)
 
 
 # --------------------------

@@ -104,7 +104,6 @@ import hashlib
 import io
 import os
 import posixpath
-
 from typing import Any, BinaryIO, Optional
 from urllib.parse import urlparse
 

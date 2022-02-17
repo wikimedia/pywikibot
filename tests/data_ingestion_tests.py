@@ -8,7 +8,6 @@
 import unittest
 
 from scripts import data_ingestion
-
 from tests import join_data_path, join_images_path
 from tests.aspects import ScriptMainTestCase, TestCase
 from tests.utils import empty_sites
@@ -64,14 +63,14 @@ class TestPhoto(TestCase):
     def test_get_description(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.get_description('CrystalTemplate'),
-                         str("""{{CrystalTemplate
+                         """{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
 |name=Sound icon
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
-}}"""))
+}}""")
 
 
 class TestCSVReader(TestCase):
@@ -103,7 +102,7 @@ class TestCSVReader(TestCase):
     def test_get_description(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.get_description('CrystalTemplate'),
-                         str("""{{CrystalTemplate
+                         """{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
@@ -111,7 +110,7 @@ class TestCSVReader(TestCase):
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
 |url=http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png
-}}"""))
+}}""")
 
 
 class TestDataIngestionBot(ScriptMainTestCase):

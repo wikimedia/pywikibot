@@ -24,7 +24,6 @@ import os
 import re
 import sys
 import warnings
-
 from os.path import abspath, dirname, join
 
 

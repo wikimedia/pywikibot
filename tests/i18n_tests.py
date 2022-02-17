@@ -10,12 +10,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import bot, config, i18n
 from pywikibot.exceptions import TranslationError
-from tests.aspects import (
-    DefaultSiteTestCase,
-    PwbTestCase,
-    TestCase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, PwbTestCase, TestCase, unittest
 
 
 class Site:

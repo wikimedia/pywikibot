@@ -43,7 +43,6 @@ and override its `callback` method. Here is a sample:
 from typing import Union
 
 import pywikibot
-
 from pywikibot import i18n
 from pywikibot.bot import OptionHandler
 from pywikibot.date import format_date, formatYear

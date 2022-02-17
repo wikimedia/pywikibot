@@ -751,7 +751,7 @@ class CaseChecker:
         """Open logfile."""
         try:
             return codecs.open(filename, 'a', 'utf-8')
-        except IOError:
+        except OSError:
             return codecs.open(filename, 'w', 'utf-8')
 
     def AppendLineToLog(self, filename, text):

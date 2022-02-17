@@ -735,9 +735,9 @@ class TestReplaceLinks(TestCase):
                 self._count += 1
                 if link.section:
                     return pywikibot.Link(
-                        '{0}#{1}'
+                        '{}#{}'
                         .format(self._count, link.section), link.site)
-                return pywikibot.Link('{0}'.format(self._count), link.site)
+                return pywikibot.Link('{}'.format(self._count), link.site)
 
             return None
 

@@ -25,7 +25,6 @@ from pywikibot.exceptions import (
 from pywikibot.page import ItemPage, Page, PropertyPage, WikibasePage
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
-
 from tests import WARN_SITE_CODE, join_pages_path
 from tests.aspects import TestCase, WikidataTestCase
 from tests.basepage import (

@@ -10,9 +10,8 @@ from contextlib import suppress
 from random import sample
 from urllib.parse import urlparse
 
-from pywikibot.scripts import generate_family_file
 from pywikibot import Site
-
+from pywikibot.scripts import generate_family_file
 from tests.aspects import DefaultSiteTestCase
 
 

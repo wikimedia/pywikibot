@@ -50,13 +50,11 @@ Examples::
 #
 import re
 import webbrowser
-
 from collections import namedtuple
 from itertools import chain
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.editor import TextEditor

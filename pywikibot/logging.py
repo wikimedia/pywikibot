@@ -27,11 +27,10 @@ argument, which is a string indicating the debugging layer.
 import logging
 import os
 import sys
-from typing import Any
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import Optional
+from typing import Any, Optional
 
 from pywikibot.backports import Callable, List
 

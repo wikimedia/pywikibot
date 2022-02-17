@@ -4,9 +4,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import datetime
 from collections import UserDict
 from contextlib import suppress
-import datetime
 from typing import Any, Optional, Type, Union
 
 import pywikibot

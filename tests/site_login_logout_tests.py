@@ -16,7 +16,6 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot.exceptions import APIError
-
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 

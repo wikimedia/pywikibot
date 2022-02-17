@@ -79,7 +79,11 @@ import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
 from pywikibot.bot import (
-    ExistingPageBot, OptionHandler, RedirectPageBot, suggest_help)
+    ExistingPageBot,
+    OptionHandler,
+    RedirectPageBot,
+    suggest_help,
+)
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,

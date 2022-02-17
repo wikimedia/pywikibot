@@ -9,12 +9,11 @@ import os.path
 import subprocess
 import tempfile
 import unittest
-from unittest import mock
-
 from collections import Counter, OrderedDict
 from collections.abc import Mapping
 from contextlib import suppress
 from importlib import import_module
+from unittest import mock
 
 from pywikibot import tools
 from pywikibot.tools import (

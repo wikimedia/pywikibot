@@ -10,7 +10,6 @@ import logging
 import os
 import sys
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
@@ -30,8 +29,7 @@ from pywikibot.userinterfaces import (
     terminal_interface_unix,
     terminal_interface_win32,
 )
-from pywikibot.userinterfaces.transliteration import _trans, NON_LATIN_DIGITS
-
+from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS, _trans
 from tests.aspects import TestCase, TestCaseBase
 from tests.utils import FakeModule
 

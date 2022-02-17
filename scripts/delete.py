@@ -175,7 +175,7 @@ class DeletionRobot(CurrentPageBot):
                     ns_name, ns_id, n_pages_in_ns, width=width, pl=plural))
             if show_n_pages:  # do not show marker if 0 pages are requested.
                 for page in islice_with_ellipsis(refs[ns], show_n_pages):
-                    pywikibot.output('      {0!s}'.format(page.title()))
+                    pywikibot.output('      {!s}'.format(page.title()))
 
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""

@@ -51,10 +51,8 @@ import http.client as httplib
 import itertools
 import os
 import re
-import socket
 import subprocess
 import tempfile
-
 from contextlib import suppress
 from enum import IntEnum
 from functools import partial
@@ -79,9 +77,8 @@ from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
 from pywikibot.textlib import replaceExcept
-from pywikibot.tools.formatter import color_format
 from pywikibot.tools.chars import string2html
-
+from pywikibot.tools.formatter import color_format
 from scripts import noreferences
 
 
@@ -540,7 +537,7 @@ class ReferencesRobot(SingleSiteBot,
         try:
             with codecs.open(listof404pages, 'r', 'latin_1') as f:
                 self.dead_links = f.read()
-        except IOError:
+        except OSError:
             raise NotImplementedError(
                 '404-links.txt is required for reflinks.py\n'
                 'You need to download\n'
@@ -641,8 +638,7 @@ class ReferencesRobot(SingleSiteBot,
                 continue
 
             except (ValueError,  # urllib3.LocationParseError derives from it
-                    socket.error,
-                    IOError,
+                    OSError,
                     httplib.error,
                     FatalServerError,
                     Server414Error,

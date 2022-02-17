@@ -637,7 +637,8 @@ class WelcomeBot(SingleSiteBot):
                 rep_text += i18n.translate(self.site,
                                            report_text) % username
                 if self.site.code == 'it':
-                    rep_text = '%s%s}}' % (rep_text, self.bname[username])
+                    rep_text = '{}{}}}}}'.format(rep_text,
+                                                 self.bname[username])
 
         com = i18n.twtranslate(self.site, 'welcome-bad_username')
         if rep_text != '':
@@ -759,7 +760,7 @@ class WelcomeBot(SingleSiteBot):
             except LookupError:
                 f = codecs.open(pywikibot.config.datafilepath(
                     globalvar.sign_file_name), 'r', encoding='utf-8')
-            except IOError:
+            except OSError:
                 pywikibot.error('No fileName!')
                 raise FilenameNotSet('No signature filename specified.')
 

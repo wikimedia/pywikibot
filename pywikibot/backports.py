@@ -7,6 +7,7 @@
 import sys
 from typing import Any
 
+
 PYTHON_VERSION = sys.version_info[:3]
 
 # functools.cache
@@ -48,7 +49,7 @@ if PYTHON_VERSION < (3, 9):
     from typing import DefaultDict  # type: ignore[misc]
 else:
     from collections import (  # type: ignore[misc] # noqa: N812
-        defaultdict as DefaultDict
+        defaultdict as DefaultDict,
     )
 
 
@@ -78,7 +79,12 @@ if PYTHON_VERSION < (3, 9):
     )
 else:
     from collections.abc import (
-        Container, Generator, Iterable, Iterator, Mapping, Sequence,
+        Container,
+        Generator,
+        Iterable,
+        Iterator,
+        Mapping,
+        Sequence,
     )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]

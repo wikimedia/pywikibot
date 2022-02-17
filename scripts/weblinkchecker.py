@@ -381,7 +381,7 @@ class History:
         try:
             with open(self.datfilename, 'rb') as datfile:
                 self.history_dict = pickle.load(datfile)
-        except (IOError, EOFError):
+        except (OSError, EOFError):
             # no saved history exists yet, or history dump broken
             self.history_dict = {}
 

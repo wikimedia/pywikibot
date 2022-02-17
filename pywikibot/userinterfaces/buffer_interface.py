@@ -12,6 +12,7 @@ from pywikibot import config
 from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
 
+
 BAD_BUFFER_TYPE = 'BUG: bufffer can only contain logs and strings, had {}'
 
 

@@ -5,15 +5,12 @@
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from abc import ABC, abstractmethod
 from textwrap import fill
 from typing import Any, Optional
 
 import pywikibot
-
 from pywikibot.backports import Iterable, Sequence
-
 from pywikibot.tools import deprecated, issue_deprecation_warning
 
 

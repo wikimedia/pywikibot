@@ -17,7 +17,6 @@ import subprocess
 import sys
 import threading
 import time
-
 from collections.abc import Container, Iterable, Iterator, Mapping, Sized
 from contextlib import suppress
 from functools import total_ordering, wraps
@@ -30,20 +29,20 @@ import pkg_resources
 
 from pywikibot.logging import debug
 from pywikibot.tools._deprecate import (  # noqa: F401
+    ModuleDeprecationWrapper,
     add_decorated_full_name,
     add_full_name,
-    deprecated,
     deprecate_arg,
+    deprecated,
     deprecated_args,
     get_wrapper_depth,
     issue_deprecation_warning,
     manage_wrapping,
-    ModuleDeprecationWrapper,
     redirect_func,
     remove_last_args,
 )
-
 from pywikibot.tools._unidata import _first_upper_exception
+
 
 pkg_Version = pkg_resources.packaging.version.Version  # noqa: N816
 

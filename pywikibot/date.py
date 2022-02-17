@@ -7,7 +7,6 @@
 import calendar
 import datetime
 import re
-
 from collections import abc, defaultdict
 from contextlib import suppress
 from functools import singledispatch
@@ -16,9 +15,6 @@ from typing import Optional, Union
 
 import pywikibot.site
 from pywikibot import Site
-from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper
-
 from pywikibot.backports import (
     Any,
     Callable,
@@ -30,6 +26,9 @@ from pywikibot.backports import (
     Sequence,
     Tuple,
 )
+from pywikibot.textlib import NON_LATIN_DIGITS
+from pywikibot.tools import first_lower, first_upper
+
 
 #
 # Different collections of well known formats
@@ -407,7 +406,7 @@ def escapePattern2(pattern: str
 
         if len(subpattern) == 3:
             # enforce mandatory field size
-            newpattern += '([%s]{%s})' % (dec[0], subpattern[1])
+            newpattern += '([{}]{{{}}})'.format(dec[0], subpattern[1])
             # add the number of required digits as the last (4th)
             # part of the tuple
             decoders.append(dec + (int(s[1]),))  # type: ignore

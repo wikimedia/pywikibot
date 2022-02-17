@@ -1073,7 +1073,7 @@ class TestImageUsage(DefaultSiteTestCase):
         page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
         with skipping(
             StopIteration,
-                msg='No images on the main page of site {0!r}'.format(mysite)):
+                msg='No images on the main page of site {!r}'.format(mysite)):
             imagepage = next(iter(page.imagelinks()))  # 1st image of page
 
         pywikibot.output('site_tests.TestImageUsage found {} on {}'
@@ -1242,7 +1242,7 @@ class TestRecentChanges(DefaultSiteTestCase):
             # 1st image on main page
             imagepage = next(iter(mysite.allimages()))
         except StopIteration:
-            unittest_print('No images on site {0!r}'.format(mysite))
+            unittest_print('No images on site {!r}'.format(mysite))
             imagepage = None
         cls.imagepage = imagepage
 

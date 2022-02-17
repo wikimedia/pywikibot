@@ -12,7 +12,6 @@ import pickle
 import pprint
 import re
 import traceback
-
 from collections.abc import Container, MutableMapping, Sized
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
@@ -1096,7 +1095,7 @@ class Request(MutableMapping):
             args |= set(getfullargspec(super_cls.__init__).args)
         else:
             raise ValueError('Request was not a super class of '
-                             '{0!r}'.format(cls))
+                             '{!r}'.format(cls))
         args -= {'self'}
         old_kwargs = set(kwargs)
         # all kwargs defined above but not in args indicate 'kwargs' mode
@@ -1933,7 +1932,7 @@ class CachedRequest(Request):
         :return: base directory path for cache entries
         """
         path = os.path.join(config.base_dir,
-                            'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
+                            'apicache-py{:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
@@ -2011,7 +2010,7 @@ class CachedRequest(Request):
                             .format(self.__class__.__name__, filename,
                                     uniquedescr), _logger)
             return True
-        except IOError:
+        except OSError:
             # file not found
             return False
         except Exception as e:

@@ -75,6 +75,7 @@ from pywikibot.backports import Tuple
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 
+
 CTX_ATTR = '_content_ctx'
 
 
@@ -208,7 +209,7 @@ class PageFromFileReader(OptionHandler):
                              encoding=config.textfile_encoding) as f:
                 text = f.read()
 
-        except IOError:
+        except OSError:
             pywikibot.exception()
             return
 

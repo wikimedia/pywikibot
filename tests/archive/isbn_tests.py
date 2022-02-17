@@ -8,7 +8,6 @@
 import pywikibot
 from pywikibot import Bot, Claim, ItemPage
 from pywikibot.tools import has_module
-
 from scripts.isbn import InvalidIsbnException as IsbnExc
 from scripts.isbn import convertIsbn10toIsbn13, hyphenateIsbnNumbers, main
 from tests.aspects import (
@@ -17,7 +16,6 @@ from tests.aspects import (
     WikibaseTestCase,
     unittest,
 )
-
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
 

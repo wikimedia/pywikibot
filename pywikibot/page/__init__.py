@@ -1264,10 +1264,7 @@ class BasePage(ComparableMixin):
         pywikibot.log('Cosmetic changes for {}-{} enabled.'
                       .format(family, self.site.lang))
         # cc depends on page directly and via several other imports
-        from pywikibot.cosmetic_changes import (
-            CANCEL,
-            CosmeticChangesToolkit,
-        )
+        from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
 
@@ -2501,7 +2498,7 @@ class FilePage(Page):
                 with open(filename, 'wb') as f:
                     for chunk in req.iter_content(chunk_size):
                         f.write(chunk)
-            except IOError as e:
+            except OSError as e:
                 raise e
 
             sha1 = compute_file_hash(filename)
@@ -5094,7 +5091,7 @@ class BaseLink(ComparableMixin):
         assert isinstance(self._items, tuple)
         assert all(isinstance(item, (bytes, str)) for item in self._items)
 
-        attrs = ('{0!r}'.format(getattr(self, attr)) for attr in self._items)
+        attrs = ('{!r}'.format(getattr(self, attr)) for attr in self._items)
         return 'pywikibot.page.{}({})'.format(
             self.__class__.__name__, ', '.join(attrs))
 

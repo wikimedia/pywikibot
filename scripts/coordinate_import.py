@@ -50,7 +50,6 @@ The following command line parameters are supported:
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import pagegenerators
 from pywikibot.bot import ConfigParserBot, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownError

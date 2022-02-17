@@ -81,7 +81,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     doc_suffix='{} and language {}'.format(
                         package, code))
 
-        return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):

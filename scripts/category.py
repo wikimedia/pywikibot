@@ -129,7 +129,6 @@ import math
 import os
 import pickle
 import re
-
 from contextlib import suppress
 from operator import methodcaller
 from textwrap import fill

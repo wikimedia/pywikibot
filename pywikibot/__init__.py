@@ -11,7 +11,6 @@ import re
 import sys
 import threading
 import time
-
 from contextlib import suppress
 from decimal import Decimal
 from queue import Queue
@@ -34,12 +33,12 @@ from pywikibot.__metadata__ import (
 )
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.backports import (
-    cache,
-    removesuffix,
     Callable,
     Dict,
     List,
     Tuple,
+    cache,
+    removesuffix,
 )
 from pywikibot.bot import (
     Bot,
@@ -67,8 +66,7 @@ from pywikibot.logging import (
     warning,
 )
 from pywikibot.site import APISite, BaseSite, DataSite
-from pywikibot.tools import classproperty
-from pywikibot.tools import normalize_username
+from pywikibot.tools import classproperty, normalize_username
 from pywikibot.tools.formatter import color_format
 
 

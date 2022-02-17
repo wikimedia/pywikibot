@@ -17,10 +17,7 @@ from pywikibot import __url__, config
 from pywikibot.backports import Dict, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-from pywikibot.tools import (
-    file_mode_checker,
-    normalize_username,
-)
+from pywikibot.tools import file_mode_checker, normalize_username
 
 
 try:

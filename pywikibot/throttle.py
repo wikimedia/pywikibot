@@ -8,16 +8,14 @@ import itertools
 import math
 import threading
 import time
-
-from collections import namedtuple, Counter
+from collections import Counter, namedtuple
 from contextlib import suppress
 from typing import Optional, Union
 
 import pywikibot
-
 from pywikibot import config
+from pywikibot.tools import PYTHON_VERSION, deprecated
 
-from pywikibot.tools import deprecated, PYTHON_VERSION
 
 if PYTHON_VERSION < (3, 6):
     from hashlib import md5
@@ -111,9 +109,9 @@ class Throttle:
     def _read_file(self, raise_exc=False):
         """Yield process entries from file."""
         try:
-            with open(self.ctrlfilename, 'r') as f:
+            with open(self.ctrlfilename) as f:
                 lines = f.readlines()
-        except IOError:
+        except OSError:
             if raise_exc and pid:
                 raise
             return

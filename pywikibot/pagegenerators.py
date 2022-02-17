@@ -45,8 +45,8 @@ from pywikibot.backports import (
     Iterator,
     List,
     Pattern,
-    Set,
     Sequence,
+    Set,
     Tuple,
     Type,
 )

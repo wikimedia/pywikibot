@@ -20,7 +20,7 @@ Can be used with:
 # Distributed under the terms of the MIT license.
 #
 import re
-from concurrent.futures import as_completed, ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import suppress
 
 import pywikibot

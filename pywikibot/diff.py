@@ -8,7 +8,7 @@ import difflib
 import math
 from collections import abc
 from difflib import (  # type: ignore[attr-defined]
-    _format_range_unified as format_range_unified
+    _format_range_unified as format_range_unified,
 )
 from itertools import zip_longest
 from typing import Optional, Union
@@ -530,7 +530,7 @@ class PatchManager:
             else:  # choice == '?':
                 pywikibot.output(color_format(
                     '{purple}{0}{default}', '\n'.join(
-                        '{0} -> {1}'.format(answer, help_msg[answer])
+                        '{} -> {}'.format(answer, help_msg[answer])
                         for answer in answers)))
 
     def apply(self) -> List[str]:

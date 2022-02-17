@@ -19,7 +19,6 @@ import requests
 
 import pywikibot
 import pywikibot.comms.http as http
-
 from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt

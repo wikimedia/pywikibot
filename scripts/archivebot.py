@@ -111,10 +111,10 @@ from pywikibot.backports import List, Set, Tuple
 from pywikibot.date import apply_month_delta
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
+    TimeStripper,
     case_escape,
     extract_sections,
     findmarker,
-    TimeStripper,
     to_local_digits,
 )
 
@@ -300,7 +300,7 @@ def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
     title = tpl_page.title(with_ns=False)
     title = case_escape(ns.case, title)
 
-    return re.compile(r'(?:(?:%s):)%s%s' % ('|'.join(ns), marker, title))
+    return re.compile(r'(?:(?:{}):){}{}'.format('|'.join(ns), marker, title))
 
 
 def calc_md5_hexdigest(txt, salt) -> str:
@@ -591,8 +591,8 @@ class PageArchiver:
 
     def load_config(self) -> None:
         """Load and validate archiver template."""
-        pywikibot.output('Looking for: {{%s}} in %s' % (self.tpl.title(),
-                                                        self.page))
+        pywikibot.output('Looking for: {{{{{}}}}} in {}'.format(
+            self.tpl.title(), self.page))
         for tpl, params in self.page.raw_extracted_templates:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
@@ -893,7 +893,7 @@ def main(*args: str) -> None:
                                                follow_redirects=False,
                                                namespaces=ns))
         if filename:
-            for pg in open(filename, 'r').readlines():
+            for pg in open(filename).readlines():
                 pagelist.append(pywikibot.Page(site, pg, ns=10))
         if pagename:
             pagelist.append(pywikibot.Page(site, pagename, ns=3))

@@ -6,7 +6,6 @@
 #
 import math
 import platform
-
 from string import Formatter
 from typing import Any, Mapping, Sequence
 

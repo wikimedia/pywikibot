@@ -2873,11 +2873,11 @@ class APISite(
                             if 'offset' in data:
                                 new_offset = int(data['offset'])
                                 if offset + len(chunk) != new_offset:
-                                    pywikibot.log('Old offset: {0}; Returned '
-                                                  'offset: {1}; Chunk size: '
-                                                  '{2}'.format(offset,
-                                                               new_offset,
-                                                               len(chunk)))
+                                    pywikibot.log('Old offset: {}; Returned '
+                                                  'offset: {}; Chunk size: '
+                                                  '{}'.format(offset,
+                                                              new_offset,
+                                                              len(chunk)))
                                     pywikibot.warning('Unexpected offset.')
                                 offset = new_offset
                             else:

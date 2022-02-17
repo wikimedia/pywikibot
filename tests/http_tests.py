@@ -380,7 +380,7 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data='<?xml version="1.0" encoding="UTF-8"?>'.encode('utf-8'))
+            data=b'<?xml version="1.0" encoding="UTF-8"?>')
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('UTF-8', resp.encoding)
 
@@ -389,8 +389,8 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data='<?xml version="1.0" encoding="UTF-8" '
-                 'someparam="ignored"?>'.encode('utf-8'))
+            data=b'<?xml version="1.0" encoding="UTF-8" '
+                 b'someparam="ignored"?>')
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('UTF-8', resp.encoding)
 
@@ -399,7 +399,7 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data="<?xml version='1.0' encoding='latin1'?>".encode('latin1'))
+            data=b"<?xml version='1.0' encoding='latin1'?>")
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('latin1', resp.encoding)
 

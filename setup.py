@@ -36,6 +36,7 @@ To create a new distribution:
 import os
 import sys
 
+
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
@@ -166,9 +167,10 @@ def get_validated_version():  # pragma: no cover
         return version
 
     # validate version for sdist
-    from pkg_resources import parse_version, safe_version
     from contextlib import suppress
     from subprocess import PIPE, run
+
+    from pkg_resources import parse_version, safe_version
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()

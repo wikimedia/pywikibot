@@ -13,6 +13,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Set
 
+
 try:
     import pydot
     PYDOT_ERROR = None

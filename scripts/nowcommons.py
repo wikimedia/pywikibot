@@ -52,8 +52,8 @@ from itertools import chain
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot import pagegenerators as pg
+from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.tools import filter_unique
 from pywikibot.tools.formatter import color_format

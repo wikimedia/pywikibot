@@ -22,7 +22,6 @@
 #
 ################################################
 import sys
-
 from contextlib import suppress
 from ctypes import Structure, byref
 from ctypes import c_void_p as LPVOID
@@ -136,7 +135,7 @@ class UnicodeOutput(IOBase):
                     if 0 in (retval, n.value):
                         msg = 'WriteConsoleW returned {!r}, n.value = {!r}' \
                               .format(retval, n.value)
-                        raise IOError(msg)
+                        raise OSError(msg)
                     remaining -= n.value
                     if remaining == 0:
                         break

@@ -15,7 +15,6 @@ This module requires sseclient to be installed::
 # Distributed under the terms of the MIT license.
 #
 import json
-import socket
 from functools import partial
 from typing import Optional
 
@@ -295,7 +294,7 @@ class EventStreams:
                         "Install it with 'pip install \"sseclient>=0.0.18\"'")
             try:
                 event = next(self.source)
-            except (ProtocolError, socket.error, httplib.IncompleteRead) as e:
+            except (ProtocolError, OSError, httplib.IncompleteRead) as e:
                 warning('Connection error: {}.\n'
                         'Try to re-establish connection.'.format(e))
                 del self.source

@@ -7,6 +7,7 @@
 from pywikibot import debug
 from pywikibot.exceptions import Error
 
+
 _logger = 'site.tokenwallet'
 
 

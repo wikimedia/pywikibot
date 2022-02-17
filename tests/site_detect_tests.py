@@ -282,7 +282,7 @@ class PrivateWikiTestCase(PatchingTestCase):
         self.assertEqual(parsed_url.netloc, self.NETLOC)
         self.assertIn(parsed_url.path, self._responses)
 
-        return type(str('Response'),
+        return type('Response',
                     (object,),
                     {'status_code': HTTPStatus.OK.value,
                      'text': self._responses[parsed_url.path],

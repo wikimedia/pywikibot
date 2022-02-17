@@ -15,8 +15,8 @@ from pywikibot.bot import (
     InteractiveReplace,
     NoRedirectPageBot,
 )
-from pywikibot.editor import TextEditor
 from pywikibot.bot_choice import UnhandledAnswer
+from pywikibot.editor import TextEditor
 from pywikibot.textlib import replace_links
 
 

@@ -13,13 +13,13 @@ import codecs
 import os
 import re
 import sys
-
 from collections import namedtuple
 from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
 from pywikibot.scripts import _import_with_no_user_config
+
 
 PYTHON_VERSION = sys.version_info[:2]
 
@@ -368,8 +368,8 @@ def save_botpasswords(botpasswords, _fncpass):
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
                 file_mode_checker(_fncpass, mode=0o600)
-                pywikibot.output("'{0}' written.".format(_fncpass))
-        except EnvironmentError:
+                pywikibot.output("'{}' written.".format(_fncpass))
+        except OSError:
             os.remove(_fncpass)
             raise
 

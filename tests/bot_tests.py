@@ -11,7 +11,6 @@ from contextlib import suppress
 import pywikibot
 import pywikibot.bot
 from pywikibot import i18n
-
 from tests.aspects import (
     DefaultSiteTestCase,
     SiteAttributeTestCase,

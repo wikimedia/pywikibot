@@ -35,7 +35,6 @@ import codecs
 import os
 import string
 import sys
-
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -70,6 +69,7 @@ class FamilyFileGenerator:
             to keep it enabled.
         """
         from pywikibot.scripts import _import_with_no_user_config
+
         # from pywikibot.site_detect import MWSite and
         # from pywikibot.config import base_dir
         # when required but disable user-config checks
@@ -219,7 +219,7 @@ class FamilyFileGenerator:
                      .format(fn)).lower() == 'n':
                 print('Terminating.')
                 sys.exit(1)
-        except IOError:  # file not found
+        except OSError:  # file not found
             pass
 
         code_hostname_pairs = '\n        '.join(

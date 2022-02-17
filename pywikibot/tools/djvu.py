@@ -78,13 +78,13 @@ class DjVuFile:
 
     def __repr__(self) -> str:
         """Return a more complete string representation."""
-        return str("{}.{}('{}')").format(self.__module__,
-                                         self.__class__.__name__,
-                                         self._filename)
+        return "{}.{}('{}')".format(self.__module__,
+                                    self.__class__.__name__,
+                                    self._filename)
 
     def __str__(self) -> str:
         """Return a string representation."""
-        return str("{}('{}')").format(self.__class__.__name__, self._filename)
+        return "{}('{}')".format(self.__class__.__name__, self._filename)
 
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""

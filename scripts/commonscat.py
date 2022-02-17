@@ -45,7 +45,6 @@ For example to go through all categories:
 import re
 
 import pywikibot
-
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ConfigParserBot, ExistingPageBot, NoRedirectPageBot
 from pywikibot.exceptions import InvalidTitleError
@@ -325,8 +324,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
                 if commonscatLink == page.title():
                     text_to_add = '{{%s}}' % primaryCommonscat
                 else:
-                    text_to_add = '{{%s|%s}}' % (primaryCommonscat,
-                                                 commonscatLink)
+                    text_to_add = '{{{{{}|{}}}}}'.format(primaryCommonscat,
+                                                         commonscatLink)
                 summary = self.opt.summary or i18n.twtranslate(
                     page.site, 'add_text-adding', {'adding': text_to_add})
                 self.put_current(add_text(page.text, text_to_add),
@@ -346,7 +345,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
         if linktitle and newcat != page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
-                             '{{%s|%s|%s}}' % (newtemplate, newcat, linktitle),
+                             '{{{{{}|{}|{}}}}}'.format(newtemplate, newcat,
+                                                       linktitle),
                              page.get())
         elif newcat == page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
@@ -356,7 +356,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
         elif oldcat.strip() != newcat:  # strip trailing white space
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
-                             '{{%s|%s}}' % (newtemplate, newcat),
+                             '{{{{{}|{}}}}}'.format(newtemplate, newcat),
                              page.get())
         else:  # nothing left to do
             return

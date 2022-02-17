@@ -63,11 +63,9 @@ Example
 #
 import codecs
 import re
-
 from typing import Union
 
 import pywikibot
-
 from pywikibot import config, pagegenerators, textlib
 from pywikibot.backports import Dict, Sequence
 from pywikibot.bot import (
@@ -75,6 +73,7 @@ from pywikibot.bot import (
     ExistingPageBot,
     NoRedirectPageBot,
 )
+
 
 ARGS_TYPE = Dict[str, Union[bool, str]]
 DEFAULT_ARGS = {

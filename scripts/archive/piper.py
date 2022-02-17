@@ -93,7 +93,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
             file.write(text)
 
         # Now retrieve the munged text
-        with open(temp_filename, 'r') as file:
+        with open(temp_filename) as file:
             text = file.read()
 
         # clean up

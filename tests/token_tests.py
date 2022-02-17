@@ -8,8 +8,8 @@
 from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
-from pywikibot.tools import MediaWikiVersion
 from pywikibot.site import TokenWallet
+from pywikibot.tools import MediaWikiVersion
 from tests.aspects import DefaultSiteTestCase, TestCase, TestCaseBase, unittest
 
 

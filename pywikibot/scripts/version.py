@@ -74,7 +74,7 @@ def main(*args: str) -> None:
             if WMF_CACERT in text:
                 has_wikimedia_cert = True
         pywikibot.output('    certificate test: {}'
-                         .format(('ok' if has_wikimedia_cert else 'not ok')))
+                         .format('ok' if has_wikimedia_cert else 'not ok'))
     if not has_wikimedia_cert:
         pywikibot.output('  Please reinstall requests!')
 

@@ -23,7 +23,6 @@ import json
 import os
 import pkgutil
 import re
-
 from collections import abc, defaultdict
 from contextlib import suppress
 from pathlib import Path
@@ -31,10 +30,8 @@ from textwrap import fill
 from typing import Optional, Union
 
 import pywikibot
-
 from pywikibot import __url__, config
 from pywikibot.backports import (
-    cache,
     Dict,
     Generator,
     Iterable,
@@ -43,8 +40,10 @@ from pywikibot.backports import (
     Mapping,
     Match,
     Sequence,
+    cache,
 )
 from pywikibot.plural import plural_rule
+
 
 STR_OR_SITE_TYPE = Union[str, 'pywikibot.site.BaseSite']
 
@@ -382,7 +381,7 @@ def messages_available() -> bool:
     if _messages_available is not None:
         return _messages_available
     try:
-        mod = __import__(_messages_package_name, fromlist=[str('__path__')])
+        mod = __import__(_messages_package_name, fromlist=['__path__'])
     except ImportError:
         _messages_available = False
         return False
@@ -799,7 +798,7 @@ def twget_keys(twtitle: str) -> List[str]:
     """
     # obtain the directory containing all the json files for this package
     package = twtitle.split('-')[0]
-    mod = __import__(_messages_package_name, fromlist=[str('__file__')])
+    mod = __import__(_messages_package_name, fromlist=['__file__'])
     pathname = os.path.join(next(iter(mod.__path__)), package)
 
     # build a list of languages in that directory

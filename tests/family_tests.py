@@ -113,7 +113,7 @@ class TestFamily(TestCase):
     def test_set_obsolete(self):
         """Test obsolete can be set."""
         # Construct a temporary family and instantiate it
-        family = type(str('TempFamily'), (Family,), {})()
+        family = type('TempFamily', (Family,), {})()
 
         self.assertEqual(family.obsolete, {})
         self.assertEqual(family.interwiki_replacements, {})

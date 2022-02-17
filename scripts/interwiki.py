@@ -335,7 +335,6 @@ that you have to break it off, use "-continue" next time.
 import codecs
 import os
 import re
-import socket
 import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
@@ -1756,7 +1755,7 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.output('ERROR putting page: {}'
                                  .format(error.args,))
                 raise SaveError('PageSaveRelatedError')
-            except (socket.error, IOError) as error:
+            except OSError as error:
                 if timeout > 3600:
                     raise
                 pywikibot.output('ERROR putting page: {}'
@@ -1834,7 +1833,7 @@ class Subject(interwiki_graph.Subject):
                                           .format(page.site.family.name,
                                                   page, linkedPage))
 
-        except (socket.error, IOError):
+        except OSError:
             pywikibot.output('ERROR: could not report backlinks')
 
 

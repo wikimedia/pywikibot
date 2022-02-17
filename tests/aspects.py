@@ -84,7 +84,7 @@ class TestTimerMixin(unittest.TestCase):
         self.test_completed = time.time()
         duration = self.test_completed - self.test_start
         if duration > self.test_duration_warning_interval:
-            unittest_print(' {0:.3f}s'.format(duration), end=' ')
+            unittest_print(' {:.3f}s'.format(duration), end=' ')
             sys.stdout.flush()
 
 

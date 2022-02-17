@@ -13,8 +13,8 @@ from pywikibot import Site, config
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
-from tests.aspects import AlteredDefaultSiteTestCase
 from tests.aspects import (
+    AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,

@@ -70,7 +70,7 @@ class DataSite(APISite):
         if entity_type in self._entity_namespaces:
             return self._entity_namespaces[entity_type]
         raise EntityTypeUnknownError(
-            '{0!r} does not support entity type "{1}"'
+            '{!r} does not support entity type "{}"'
             .format(self, entity_type))
 
     @property

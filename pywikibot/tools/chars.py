@@ -6,7 +6,6 @@
 #
 import re
 import sys
-
 from contextlib import suppress
 from typing import Union
 from urllib.parse import unquote_to_bytes
@@ -38,7 +37,7 @@ def replace_invisible(text):
             codepoint = (ord(match[0]) & mask) << 10 | (ord(match[1]) & mask)
         else:
             codepoint = ord(match)
-        return '<{0:x}>'.format(codepoint)
+        return '<{:x}>'.format(codepoint)
 
     return INVISIBLE_REGEX.sub(replace, text)
 

@@ -233,7 +233,7 @@ class SandboxBot(Bot, ConfigParserBot):
                                              'sandbox cleaned.')
                         else:  # wait for the rest
                             pywikibot.output(
-                                'Sandbox edited {0:.1f} minutes ago...'
+                                'Sandbox edited {:.1f} minutes ago...'
                                 .format(edit_delta.seconds / 60.0))
                             pywikibot.output('Sleeping for {} minutes.'
                                              .format(delta.seconds // 60))

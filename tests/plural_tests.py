@@ -48,7 +48,7 @@ class MetaPluralRulesTest(MetaTestCaseClass):
             cls.add_method(dct, 'test_{}'.format(lang.replace('-', '_')),
                            create_test(rule),
                            doc_suffix='for "{}"'.format(lang))
-        return super(MetaPluralRulesTest, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestPluralRules(TestCase, metaclass=MetaPluralRulesTest):

@@ -10,10 +10,8 @@ from contextlib import suppress
 
 from pywikibot import Page
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
-from pywikibot.tools import has_module
-
 from pywikibot.site._namespace import NamespacesDict
-
+from pywikibot.tools import has_module
 from tests.aspects import TestCase
 
 
@@ -585,6 +583,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
     def test_invalid_isbn(self):
         """Test that it'll fail when the ISBN is invalid."""
         from stdnum.exceptions import ValidationError
+
         # Invalid characters
         with self.assertRaisesRegex(
                 ValidationError,

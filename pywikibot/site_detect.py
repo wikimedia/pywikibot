@@ -6,7 +6,6 @@
 #
 import json
 import re
-
 from contextlib import suppress
 from html.parser import HTMLParser
 from http import HTTPStatus

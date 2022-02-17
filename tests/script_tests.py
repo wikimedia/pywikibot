@@ -11,7 +11,6 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.tools import has_module
-
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
@@ -330,7 +329,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
                 dct[test_name].__test__ = False
 
-        return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):

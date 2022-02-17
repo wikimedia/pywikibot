@@ -50,7 +50,8 @@ colors = [
 ]
 
 _color_pat = '{}|previous'.format('|'.join(colors))
-colorTagR = re.compile('\03{((:?%s);?(:?%s)?)}' % (_color_pat, _color_pat))
+colorTagR = re.compile('\03{{((:?{});?(:?{})?)}}'.format(_color_pat,
+                                                         _color_pat))
 
 
 class UI(ABUIC):

@@ -293,7 +293,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         try:
             with open(self.datafile, 'rb') as inp:
                 self.record = pickle.load(inp)
-        except IOError:
+        except OSError:
             self.record = {}
         if self.record:
             with open(self.datafile + '.bak', 'wb') as f:
@@ -303,15 +303,15 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         # note that any templates containing optional "category:" are
         # incorrect and will be fixed by the bot
         template_regex = re.compile(
-            r"""{{\s*(?:%(prefix)s\s*:\s*)?  # optional "template:"
-                     (?:%(template)s)\s*\|   # catredir template name
-                     (\s*%(catns)s\s*:\s*)?  # optional "category:"
-                     ([^|}]+)                # redirect target cat
-                     (?:\|[^|}]*)*}}         # optional arguments 2+, ignored
-             """ % {'prefix': self.site.namespace(10).lower(),
-                    'template': '|'.join(item.replace(' ', '[ _]+')
-                                         for item in self.template_list),
-                    'catns': self.site.namespace(14)},
+            r"""{{{{\s*(?:{prefix}\s*:\s*)?  # optional "template:"
+                     (?:{template})\s*\|     # catredir template name
+                     (\s*{catns}\s*:\s*)?    # optional "category:"
+                     ([^|}}]+)               # redirect target cat
+                     (?:\|[^|}}]*)*}}}}      # optional arguments 2+, ignored
+             """.format(prefix=self.site.namespace(10).lower(),
+                        template='|'.join(item.replace(' ', '[ _]+')
+                                          for item in self.template_list),
+                        catns=self.site.namespace(14)),
             re.I | re.X)
 
         self.check_hard_redirect()
