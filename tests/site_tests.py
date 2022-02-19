@@ -2938,11 +2938,10 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test basic preloading with pageids."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
         # preloadpages will send the page ids,
         # as they have already been loaded by pagelinks
-        for page in mysite.preloadpages(links):
+        for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
@@ -2951,7 +2950,6 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertIn(page._revid, page._revisions)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
             if count >= 5:
                 break
 
@@ -2959,7 +2957,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test basic preloading with titles."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
 
         # remove the pageids that have already been loaded above by pagelinks
@@ -2969,14 +2966,13 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertEqual(page.pageid, page._pageid)
             del page._pageid
 
-        for page in mysite.preloadpages(links):
+        for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
             if count >= 5:
                 break
 
@@ -2984,17 +2980,15 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test preloading continuation works."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, groupsize=5):
+        for count, page in enumerate(mysite.preloadpages(links, groupsize=5)):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count >= 6:
+            if count >= 5:
                 break
 
     def test_preload_high_groupsize(self):
@@ -3051,7 +3045,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test sending pageids with unnormalized titles, causing warnings."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3065,22 +3058,20 @@ class TestPagePreloading(DefaultSiteTestCase):
             page._link._text += ' '
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count > 5:
+            if count >= 5:
                 break
 
     def test_preload_unexpected_titles_using_titles(self):
         """Test sending unnormalized titles, causing warnings."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3094,22 +3085,20 @@ class TestPagePreloading(DefaultSiteTestCase):
             del page._pageid
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count > 5:
+            if count >= 5:
                 break
 
     def test_preload_invalid_titles_without_pageids(self):
         """Test sending invalid titles. No warnings issued, but it should."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3119,12 +3108,11 @@ class TestPagePreloading(DefaultSiteTestCase):
             del page._pageid
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertFalse(page.exists())
-            count += 1
-            if count > 5:
+            self.assertFalse(page.exists(), 'page {} exists'.format(page))
+            if count >= 5:
                 break
 
     def test_preload_langlinks_normal(self):
