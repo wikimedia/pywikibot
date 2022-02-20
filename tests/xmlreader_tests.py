@@ -89,25 +89,25 @@ class ExportDotTenTestCase(TestCase):
         """Test reading the main page/user talk page pair file."""
         entries = get_entries('pair-0.10.xml', allrevisions=True)
         self.assertLength(entries, 4)
-        self.assertTrue(all(entry.username == 'Carlossuarez46'
-                            for entry in entries))
-        self.assertTrue(all(entry.isredirect is False for entry in entries))
+        for entry in entries:
+            self.assertEqual(entry.username, 'Carlossuarez46')
+            self.assertFalse(entry.isredirect)
 
         articles = entries[0:2]
         talks = entries[2:4]
 
         self.assertLength(articles, 2)
-        self.assertTrue(all(entry.id == '19252820' for entry in articles))
-        self.assertTrue(all(entry.title == 'Çullu, Agdam'
-                            for entry in articles))
-        self.assertTrue(all('Çullu, Quzanlı' in entry.text
-                            for entry in articles))
-        self.assertEqual(articles[0].text, '#REDIRECT [[Çullu, Quzanlı]]')
+        for entry in articles:
+            self.assertEqual(entry.id, '19252820')
+            self.assertEqual(entry.title, 'Çullu, Agdam')
+            self.assertIn('Çullu, Quzanlı', entry.text)
 
         self.assertLength(talks, 2)
-        self.assertTrue(all(entry.id == '19252824' for entry in talks))
-        self.assertTrue(all(entry.title == 'Talk:Çullu, Agdam'
-                            for entry in talks))
+        for entry in talks:
+            self.assertEqual(entry.id, '19252824')
+            self.assertEqual(entry.title, 'Talk:Çullu, Agdam')
+
+        self.assertEqual(articles[0].text, '#REDIRECT [[Çullu, Quzanlı]]')
         self.assertEqual(talks[1].text, '{{DisambigProject}}')
         self.assertEqual(talks[1].comment, 'proj')
 

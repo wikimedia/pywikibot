@@ -1541,12 +1541,12 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         if msg:
             self.assertNotIn(msg, self.deprecation_messages)
         else:
-            self.assertEqual([], self.deprecation_messages)
+            self.assertIsEmpty(self.deprecation_messages)
 
     def assertDeprecationClass(self, cls):
         """Assert that all deprecation warning are of one class."""
-        self.assertTrue(all(isinstance(item.message, cls)
-                            for item in self.warning_log))
+        for item in self.warning_log:
+            self.assertIsInstance(item.message, cls)
 
     def assertDeprecationFile(self, filename):
         """Assert that all deprecation warning are of one filename."""

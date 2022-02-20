@@ -279,12 +279,12 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         self.assertPageTitlesEqual(gen, titles=expect, site=self.site)
 
         gen = PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.EdittimeFilterPageGenerator(
+        opposite_pages = pagegenerators.EdittimeFilterPageGenerator(
             gen, first_edit_start=datetime.datetime(2006, 1, 1))
-        opposite_pages = list(gen)
-        self.assertTrue(all(isinstance(p, pywikibot.Page)
-                            for p in opposite_pages))
-        self.assertTrue(all(p.title not in expect for p in opposite_pages))
+
+        for p in opposite_pages:
+            self.assertIsInstance(p, pywikibot.Page)
+            self.assertNotIn(p.title(), expect)
 
     def test_last_edit(self):
         """Test last edit."""
@@ -411,8 +411,13 @@ class TestRepeatingGenerator(RecentChangesTestCase):
         timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
                       for item in items]
         self.assertEqual(sorted(timestamps), timestamps)
-        self.assertTrue(all(item['ns'] == 0 for item in items))
-        self.assertLength({item['revid'] for item in items}, self.length)
+
+        itemsset = set()
+        for item in items:
+            self.assertEqual(item['ns'], 0)
+            revid = item['revid']
+            self.assertNotIn(revid, itemsset)
+            itemsset.add(revid)
 
 
 class TestTextIOPageGenerator(DefaultSiteTestCase):
@@ -622,12 +627,12 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
             if not page.isTalkPage():
                 pages.extend([page.toggleTalkPage()])
 
-        self.assertTrue(all(isinstance(page,
-                                       pywikibot.Page) for page in pages_out))
         self.assertIn(mainpage, pages_out)
         self.assertIn(mainpage.toggleTalkPage(), pages_out)
         self.assertLength(pages_out, 2)
         self.assertTrue(pages_out[1].isTalkPage())
+        for page in pages_out:
+            self.assertIsInstance(page, pywikibot.Page)
 
 
 class TestPreloadingEntityGenerator(WikidataTestCase):
@@ -640,8 +645,8 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
         page = pywikibot.Page(site, 'Property:P31')
         ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-        is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
-        self.assertTrue(is_all_type)
+        for ipage in gen:
+            self.assertIsInstance(ipage, pywikibot.ItemPage)
 
 
 class WikibaseItemFilterPageGeneratorTestCase(TestCase):
@@ -1559,8 +1564,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertIsNotEmpty(pages)
-        self.assertTrue(all(isinstance(item, pywikibot.User)
-                            for item in pages))
+        for item in pages:
+            self.assertIsInstance(item, pywikibot.User)
 
     def test_logevents_with_start_and_end_timestamp(self):
         """Test -logevents which uses timestamps for start and end."""
@@ -1580,8 +1585,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLength(pages, 1)
-        self.assertTrue(all(isinstance(item, pywikibot.User)
-                            for item in pages))
+        for item in pages:
+            self.assertIsInstance(item, pywikibot.User)
 
 
 class PageGeneratorIntersectTestCase(GeneratorIntersectTestCase,

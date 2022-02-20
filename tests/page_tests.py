@@ -648,8 +648,9 @@ class TestFilePage(DefaultSiteTestCase):
         gen = page.globalusage(total=3)
         pages = list(gen)
         self.assertLength(pages, 3)
-        self.assertTrue(any(isinstance(p), pywikibot.Page) for p in pages)
-        self.assertTrue(any(p.site != self.site for p in pages))
+        for p in pages:
+            self.assertIsInstance(p, pywikibot.Page)
+            self.assertNotEqual(p.site, self.site)
 
 
 class TestPageRepr(TestPageBaseUnicode):

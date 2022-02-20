@@ -235,8 +235,8 @@ class TestFlowTopic(TestCase):
         self.assertEqual(topic.root.uuid, 'u5y4l1rzitlplyc5')
         replies = topic.replies()
         self.assertLength(replies, 4)
-        self.assertTrue(all(isinstance(reply, Post)
-                            for reply in replies))
+        for reply in replies:
+            self.assertIsInstance(reply, Post)
         self.assertEqual(replies[1].uuid, 'u5y5lysqcvyne4k1')
 
     def test_topic_moderation(self):

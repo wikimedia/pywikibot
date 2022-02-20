@@ -1818,7 +1818,8 @@ class TestPreloadingEntityGenerator(TestCase):
         page = pywikibot.Page(site, 'Property:P31')
         ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
+        for item in gen:
+            self.assertIsInstance(item, ItemPage)
 
     def test_foreign_page_item_gen(self):
         """Test PreloadingEntityGenerator with connected pages."""
@@ -1826,7 +1827,8 @@ class TestPreloadingEntityGenerator(TestCase):
         page_gen = [pywikibot.Page(site, 'Main Page'),
                     pywikibot.Page(site, 'New York City')]
         gen = pagegenerators.PreloadingEntityGenerator(page_gen)
-        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
+        for item in gen:
+            self.assertIsInstance(item, ItemPage)
 
 
 class TestNamespaces(WikidataTestCase):
