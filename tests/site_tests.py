@@ -2235,10 +2235,13 @@ class TestSiteSysopWrite(TestCase):
                         reason='pywikibot unit tests',
                         target='File:T276726.png')
 
+        ts1 = pywikibot.Timestamp(2021, 3, 14, 18, 43, 57)
+        ts2 = pywikibot.Timestamp(2021, 3, 14, 18, 44, 17)
+
         fp1 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp1, history=True)
         for idx, v in fp1._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+            if v['timestamp'] == ts1:
                 self.assertTrue(hasattr(v, 'userhidden'))
 
         # Multiple revisions
@@ -2249,9 +2252,7 @@ class TestSiteSysopWrite(TestCase):
         fp2 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp2, history=True)
         for idx, v in fp2._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
-                self.assertTrue(hasattr(v, 'commenthidden'))
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+            if v['timestamp'] in (ts1, ts2):
                 self.assertTrue(hasattr(v, 'commenthidden'))
 
         # Concurrently show and hide
@@ -2263,11 +2264,7 @@ class TestSiteSysopWrite(TestCase):
         fp3 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp3, history=True)
         for idx, v in fp3._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
-                self.assertFalse(hasattr(v, 'commenthidden'))
-                self.assertFalse(hasattr(v, 'userhidden'))
-                self.assertFalse(hasattr(v, 'filehidden'))
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+            if v['timestamp'] in (ts1, ts2):
                 self.assertFalse(hasattr(v, 'commenthidden'))
                 self.assertFalse(hasattr(v, 'userhidden'))
                 self.assertFalse(hasattr(v, 'filehidden'))
