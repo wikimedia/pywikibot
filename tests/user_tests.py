@@ -75,11 +75,12 @@ class TestUserClass(TestCase):
         self.assertTrue(user.is_thankable)
         contribs = user.contributions(total=10)
         self.assertLength(list(contribs), 10)
-        self.assertTrue(all(isinstance(contrib, tuple)
-                            for contrib in contribs))
-        self.assertTrue(all('user' in contrib
-                            and contrib['user'] == user.username
-                            for contrib in contribs))
+
+        for contrib in contribs:
+            self.assertIsInstance(contrib, tuple)
+            self.assertIn('user', contrib)
+            self.assertIsEqual(contrib['user'], user.username)
+
         self.assertIn('user', user.groups())
         self.assertIn('edit', user.rights())
         self.assertFalse(user.is_locked())
@@ -199,8 +200,9 @@ class TestUserMethods(DefaultSiteTestCase):
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(le), 10)
         last = le[0]
-        self.assertTrue(all(event.user() == user.username for event in le))
         self.assertEqual(last, user.last_event)
+        for event in le:
+            self.assertEqual(event.user(), user.username)
 
 
 if __name__ == '__main__':  # pragma: no cover
