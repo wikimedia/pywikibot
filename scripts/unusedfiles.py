@@ -56,6 +56,7 @@ template_to_the_image = {
 template_to_the_user = {
     'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
     'ar': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
+    'arz': '{{subst:تنبيه صوره يتيمه|%(title)s}}',
     'fa': '{{subst:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
     'ur': '{{subst:اطلاع برائے غیر مستعمل تصاویر|%(title)s}}',
 }

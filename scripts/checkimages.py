@@ -121,7 +121,7 @@ N_TXT = {
     'ar': '{{subst:لم}}',
     'de': '{{Dateiüberprüfung}}',
     'en': '{{subst:nld}}',
-    'fa': '{{جا:حق تکثیر تصویر نامعلوم}}',
+    'fa': '{{subst:حق تکثیر تصویر نامعلوم}}',
     'fr': '{{subst:lid}}',
     'ga': '{{subst:Ceadúnas de dhíth}}',
     'hr': '{{Bez licence}}',
@@ -172,10 +172,10 @@ TXT_FIND = {
 EMPTY = {
     'commons': '{{subst:welcome}}\n~~~~\n',
     'meta': '{{subst:Welcome}}\n~~~~\n',
-    'ar': '{{ترحيب}}\n~~~~\n',
+    'ar': '{{subst:أهلا ومرحبا}}\n~~~~\n',
     'de': '{{subst:willkommen}} ~~~~',
-    'en': '{{welcome}}\n~~~~\n',
-    'fa': '{{جا:خوشامدید|%s}}',
+    'en': '{{subst:welcome}}\n~~~~\n',
+    'fa': '{{subst:خوشامدید|%s}}',
     'fr': '{{Bienvenue nouveau\n~~~~\n',
     'ga': '{{subst:Fáilte}} - ~~~~\n',
     'hr': '{{subst:dd}}--~~~~\n',
@@ -229,7 +229,7 @@ NOTHING_NOTIFICATION = {
     'meta': '{{subst:No license notice|File:%s}}',
     'ar': '{{subst:مصدر الصورة|File:%s}} --~~~~',
     'en': '{{subst:image source|File:%s}} --~~~~',
-    'fa': '{{جا:اخطار نگاره|%s}}',
+    'fa': '{{subst:اخطار نگاره|%s}}',
     'ga': '{{subst:Foinse na híomhá|File:%s}} --~~~~',
     'hu': '{{subst:adjforrást|Kép:%s}}\n Ezt az üzenetet ~~~ automatikusan '
           'helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy '
