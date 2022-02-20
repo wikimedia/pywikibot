@@ -739,37 +739,39 @@ class BasePage(ComparableMixin):
         """Return True if this is a category redirect page, False otherwise."""
         if not self.is_categorypage():
             return False
+
         if not hasattr(self, '_catredirect'):
             self._catredirect = False
             catredirs = self.site.category_redirects()
             for template, args in self.templatesWithParams():
-                if template.title(with_ns=False) in catredirs:
-                    if args:
-                        # Get target (first template argument)
-                        target_title = args[0].strip()
-                        p = pywikibot.Page(
-                            self.site, target_title, Namespace.CATEGORY)
-                        try:
-                            p.title()
-                        except pywikibot.exceptions.InvalidTitleError:
-                            target_title = self.site.expand_text(
-                                text=target_title,
-                                title=self.title(),
-                            )
-                            p = pywikibot.Page(self.site, target_title,
-                                               Namespace.CATEGORY)
-                        if p.namespace() == Namespace.CATEGORY:
-                            self._catredirect = p.title()
-                        else:
-                            pywikibot.warning(
-                                'Category redirect target {} on {} is not a '
-                                'category'.format(p.title(as_link=True),
-                                                  self.title(as_link=True)))
+                if template.title(with_ns=False) not in catredirs:
+                    continue
+
+                if args:
+                    # Get target (first template argument)
+                    target_title = args[0].strip()
+                    p = pywikibot.Page(
+                        self.site, target_title, Namespace.CATEGORY)
+                    try:
+                        p.title()
+                    except pywikibot.exceptions.InvalidTitleError:
+                        target_title = self.site.expand_text(
+                            text=target_title, title=self.title())
+                        p = pywikibot.Page(self.site, target_title,
+                                           Namespace.CATEGORY)
+                    if p.namespace() == Namespace.CATEGORY:
+                        self._catredirect = p.title()
                     else:
                         pywikibot.warning(
-                            'No target found for category redirect on '
-                            + self.title(as_link=True))
-                    break
+                            'Category redirect target {} on {} is not a '
+                            'category'.format(p.title(as_link=True),
+                                              self.title(as_link=True)))
+                else:
+                    pywikibot.warning(
+                        'No target found for category redirect on '
+                        + self.title(as_link=True))
+                break
+
         return bool(self._catredirect)
 
     def getCategoryRedirectTarget(self):
