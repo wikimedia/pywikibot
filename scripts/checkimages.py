@@ -118,7 +118,8 @@ N_TXT = {
     'commons': '{{subst:nld}}',
     'meta': '{{No license}}',
     'test': '{{No license}}',
-    'ar': '{{subst:لم}}',
+    'ar': '{{subst:ملم}}',
+    'arz': '{{subst:ملم}}',
     'de': '{{Dateiüberprüfung}}',
     'en': '{{subst:nld}}',
     'fa': '{{subst:حق تکثیر تصویر نامعلوم}}',
@@ -149,6 +150,7 @@ TXT_FIND = {
     'meta': ['{{no license', '{{nolicense', '{{nld'],
     'test': ['{{no license'],
     'ar': ['{{لت', '{{لا ترخيص'],
+    'arz': ['{{nld', '{{no license'],
     'de': ['{{DÜP', '{{Düp', '{{Dateiüberprüfung'],
     'en': ['{{nld', '{{no license'],
     'fa': ['{{حق تکثیر تصویر نامعلوم۲'],
@@ -173,6 +175,7 @@ EMPTY = {
     'commons': '{{subst:welcome}}\n~~~~\n',
     'meta': '{{subst:Welcome}}\n~~~~\n',
     'ar': '{{subst:أهلا ومرحبا}}\n~~~~\n',
+    'arz': '{{subst:اهلا و سهلا}}\n~~~~\n',
     'de': '{{subst:willkommen}} ~~~~',
     'en': '{{subst:welcome}}\n~~~~\n',
     'fa': '{{subst:خوشامدید|%s}}',
@@ -199,6 +202,7 @@ DELETE_IMMEDIATELY = {
                'Is it ok? Please check.}}',
     'meta': '{{Delete|The file has .%s as extension.}}',
     'ar': '{{شطب|الملف له .%s كامتداد.}}',
+    'arz': '{{مسح|الملف له .%s كامتداد.}}',
     'en': '{{db-meta|The file has .%s as extension.}}',
     'fa': '{{حذف سریع|تصویر %s اضافی است.}}',
     'ga': '{{scrios|Tá iarmhír .%s ar an comhad seo.}}',
@@ -227,8 +231,9 @@ NOTHING_NOTIFICATION = {
                "'''[[Commons:Help desk|->]][[Commons:Help desk]]''' in any "
                "language you like to use.'' --~~~~",
     'meta': '{{subst:No license notice|File:%s}}',
-    'ar': '{{subst:مصدر الصورة|File:%s}} --~~~~',
-    'en': '{{subst:image source|File:%s}} --~~~~',
+    'ar': '{{subst:مصدر الملف|File:%s}} --~~~~',
+    'arz': '{{subst:file source|File:%s}} --~~~~',
+    'en': '{{subst:file source|File:%s}} --~~~~',
     'fa': '{{subst:اخطار نگاره|%s}}',
     'ga': '{{subst:Foinse na híomhá|File:%s}} --~~~~',
     'hu': '{{subst:adjforrást|Kép:%s}}\n Ezt az üzenetet ~~~ automatikusan '
@@ -253,6 +258,7 @@ BOT_LIST = {
                 'ABFbot'],
     'meta': ['MABot'],
     'ar': ['MenoBot'],
+    'arz': ['MenoBot'],
     'de': ['Xqbot'],
     'en': ['OrphanBot'],
     'fa': ['Amirobot'],
@@ -295,6 +301,7 @@ REPORT_PAGE = {
     'meta': 'User:MABot/Report',
     'test': 'User:Pywikibot-test/Report',
     'ar': 'User:MenoBot/Report',
+    'arz': 'User:MenoBot/Report',
     'de': 'Benutzer:Xqbot/Report',
     'en': 'User:Filnik/Report',
     'fa': 'کاربر:Amirobot/گزارش تصویر',
@@ -326,6 +333,7 @@ HIDDEN_TEMPLATE = {
     'meta': ['Template:Information'],
     'test': ['Template:Information'],
     'ar': ['Template:معلومات'],
+    'arz': ['Template:معلومات'],
     'de': ['Template:Information'],
     'en': ['Template:Information'],
     'fa': ['الگو:اطلاعات'],
@@ -417,6 +425,7 @@ CATEGORY_WITH_LICENSES = {
     'meta': 'Category:License templates',
     'test': 'Category:CC license tags',
     'ar': 'تصنيف:قوالب حقوق الصور',
+    'arz': 'تصنيف:Wikipedia image copyright templates',
     'de': 'Kategorie:Vorlage:Lizenz für Bilder',
     'en': 'Category:Wikipedia file copyright templates',
     'fa': 'رده:الگو:حق تکثیر پرونده',
@@ -459,8 +468,9 @@ SERVICE_TEMPLATES = {
 }
 
 # Add your project (in alphabetical order) if you want that the bot starts
-PROJECT_INSERTED = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
-                    'ko', 'ru', 'meta', 'sd', 'sr', 'ta', 'test', 'ur', 'zh']
+PROJECT_INSERTED = ['ar', 'arz', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it',
+                    'ja', 'ko', 'ru', 'meta', 'sd', 'sr', 'ta', 'test', 'ur',
+                    'zh']
 
 # END OF CONFIGURATION.
 
