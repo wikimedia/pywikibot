@@ -99,6 +99,8 @@ from pywikibot.exceptions import (
     NoPageError,
     NotEmailableError,
     PageRelatedError,
+    PageSaveRelatedError,
+    ServerError,
     TranslationError,
 )
 from pywikibot.family import Family
@@ -501,6 +503,9 @@ class CheckImagesBot:
 
     """A robot to check recently uploaded files."""
 
+    ignore_save_related_errors = True
+    ignore_server_errors = False
+
     def __init__(self, site, log_full_number=25000, sendemail_active=False,
                  duplicates_report=False, log_full_error=True,
                  max_user_notify=None) -> None:
@@ -726,11 +731,22 @@ class CheckImagesBot:
 
         try:
             self.talk_page.put(new_text, summary=commentox, minor=False)
-        except LockedPageError:
-            pywikibot.output('Talk page blocked, skip.')
+        except PageSaveRelatedError as e:
+            if not self.ignore_save_related_errors:
+                raise
+            err = e
+        except ServerError as e:
+            if not self.ignore_server_errors:
+                raise
+            err = e
         else:
             if self.num_notify is not None:
                 self.num_notify[self.talk_page.title()] -= 1
+            err = None
+        if err:
+            pywikibot.exception(err)
+            pywikibot.output('Skipping saving talk page {}'
+                             .format(self.talk_page))
 
         if email_page_name and email_subj:
             email_page = pywikibot.Page(self.site, email_page_name)
