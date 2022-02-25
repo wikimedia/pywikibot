@@ -55,7 +55,7 @@ jobs:
           - python-version: "3.8"
             site: "wowwiki:uk"
             experimental: true
-          - python-version: "3.11.0-alpha.2"
+          - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
             experimental: true
           - python-version: 3
