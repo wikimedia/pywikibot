@@ -172,6 +172,7 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
+from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     PYTHON_VERSION,
     deprecated,
@@ -389,23 +390,11 @@ def init_handlers() -> None:
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
-        pid = ''
-
-        try:  # T286848
-            site = pywikibot.Site()
-            if pywikibot.Site.__doc__ == 'TEST':
-                raise ValueError('Running test with aspects.DisableSiteMixin')
-            if site is None:  # T289427
-                raise ValueError('Running script_test with net=False')
-        except ValueError:
-            pass
-        except AttributeError:
-            # Insufficient import, pywikibot.Site not available (T298384)
-            pass
-        else:  # get PID
-            throttle = site.throttle  # initialize a Throttle obj
-            pid_int = throttle.get_pid(module_name)  # get the global PID
-            pid = str(pid_int) + '-' if pid_int > 1 else ''
+        # Use a dummy Throttle to get a PID.
+        # This is necessary because tests may have site disabled.
+        throttle = Throttle('')
+        pid_int = throttle.get_pid(module_name)  # get the global PID
+        pid = str(pid_int) + '-' if pid_int > 1 else ''
 
         if config.logfilename:
             # keep config.logfilename unchanged

@@ -47,9 +47,14 @@ class Throttle:
     Each Site initiates one Throttle object (`site.throttle`) to control
     the rate of access.
 
+    :param site: site or sitename for this Throttle. If site is an empty
+        string, it will not be written to the throttle.ctrl file.
+    :param mindelay: The minimal delay, also used for read access
+    :param maxdelay: The maximal delay
+    :param writedelay: The write delay
     """
 
-    def __init__(self, site, *,
+    def __init__(self, site: Union['pywikibot.site.BaseSite', str], *,
                  mindelay: Optional[int] = None,
                  maxdelay: Optional[int] = None,
                  writedelay: Union[int, float, None] = None):
@@ -146,7 +151,11 @@ class Throttle:
                 f.write(FORMAT_LINE.format_map(p._asdict()))
 
     def checkMultiplicity(self):
-        """Count running processes for site and set process_multiplicity."""
+        """Count running processes for site and set process_multiplicity.
+
+        .. versionchanged:: 7.0
+           process is not written to throttle.ctrl file is site is empty
+        """
         global pid
         mysite = self.mysite
         pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid),
@@ -165,7 +174,7 @@ class Throttle:
                    and proc.site == mysite \
                    and proc.pid != pid:
                     count += 1
-                if proc.site != self.mysite or proc.pid != pid:
+                if proc.site != mysite or proc.pid != pid:
                     processes.append(proc)
 
             free_pid = (i for i in itertools.count(start=1)
@@ -178,6 +187,9 @@ class Throttle:
                 ProcEntry(module_id=self._module_hash(), pid=pid,
                           time=self.checktime, site=mysite))
             self.modules = Counter(p.module_id for p in processes)
+
+            if not mysite:
+                del processes[-1]
 
             self._write_file(sorted(processes, key=lambda p: p.pid))
 

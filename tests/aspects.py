@@ -326,7 +326,6 @@ class DisableSiteMixin(TestCaseBase):
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
             '{}: Site() not permitted'.format(self.__class__.__name__))
-        pywikibot.Site.__doc__ = 'TEST'
 
         super().setUp()
 
