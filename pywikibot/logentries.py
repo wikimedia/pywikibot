@@ -62,7 +62,7 @@ class LogEntry(UserDict):
                 "Log entry ({}) has a hidden '{}' key and you don't have "
                 'permission to view it.'.format(self['type'], key))
 
-        raise KeyError("Log entry ({}) has no '{}' key"
+        raise KeyError('Log entry ({}) has no {!r} key'
                        .format(self['type'], key))
 
     def __repr__(self) -> str:
@@ -95,9 +95,8 @@ class LogEntry(UserDict):
     def _params(self) -> Dict[str, Any]:
         """Additional data for some log entry types."""
         with suppress(KeyError):
-            return self['params']
-
-        return self[self._expected_type]
+            return self[self._expected_type]  # old behaviour
+        return self.get('params', {})
 
     def page(self) -> Union[int, 'pywikibot.page.Page']:
         """
@@ -156,7 +155,7 @@ class BlockEntry(LogEntry):
         super().__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
         # See bug T19781
-        pos = self['title'].find('#')
+        pos = self.get('title', '').find('#')
         self.isAutoblockRemoval = pos > 0
         if self.isAutoblockRemoval:
             self._blockid = int(self['title'][pos + 1:])
@@ -186,13 +185,10 @@ class BlockEntry(LogEntry):
         if self.action() == 'unblock':
             return []
         if not hasattr(self, '_flags'):
-            self._flags = self._params['flags']
+            self._flags = self._params.get('flags', [])
             # pre mw 1.25 returned a delimited string.
             if isinstance(self._flags, str):
-                if self._flags:
-                    self._flags = self._flags.split(',')
-                else:
-                    self._flags = []
+                self._flags = self._flags.split(',') if self._flags else []
         return self._flags
 
     def duration(self) -> Optional[datetime.timedelta]:
