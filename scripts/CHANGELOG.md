@@ -4,7 +4,8 @@
 *In development*
 
 ### general
-*  Provide ConfigParserBot for several scripts (T223778)
+* L10N updates
+* Provide ConfigParserBot for several scripts (T223778)
 
 ### add_text
 * Provide -create and -createonly options (T291354)
@@ -23,6 +24,9 @@
 * Show a warning if a pagegenerator option is not enabled (T298522)
 * Deprecated code parts were removed
 
+### checkimages
+* Skip PageSaveRelatedError and ServerError when putting talk page (T302174)
+
 ### commonscat
 * Ignore InvalidTitleError in CommonscatBot.findCommonscatLink (T291783)
 
@@ -37,6 +41,9 @@
 * Use concurrent.futures to retrieve redirect or moved targets (T298789)
 * Add an option to ignore solving moved targets (T298789)
 
+### imagetransfer
+* Add support for chunked uploading (T300531)
+
 ### newitem
 * Do not pass OtherPageSaveRelatedError silently
 
@@ -44,8 +51,8 @@
 * Preload pages instead of reading them one by one before putting changes
 * Don't ask for confirmation by default (T291757)
 
-### reflinks
-* L10N updates
+### redirect
+* Use site.maxlimit to determine the highest limit to load (T299859)
 
 ### replace
 * Enable default behaviour with -mysqlquery (T299306)
@@ -60,6 +67,9 @@
 
 ### touch
 *Do not pass OtherPageSaveRelatedError silently
+
+### unusedfiles
+* Use oldest_file_info.user as uploader (T301768)
 
 
 ## 6.6.1
@@ -236,6 +246,7 @@
 
 ### solve_disambiguation
 * Deprecated methods were removed
+* Positional arguments of DisambiguationRobot are deprecated, also some keywords were replaced
 
 ### unusedfiles
 * Update unusedfiles.py to add custom templates

@@ -4,9 +4,12 @@ Current release changes
 Improvements
 ------------
 
+* i18n updates for date.py
+* Add number transliteration of 'lo', 'ml', 'pa', 'te' to NON_LATIN_DIGITS
+* Detect range blocks with Page.is_blocked() method (T301282)
 * to_latin_digits() function was added to textlib as counterpart of to_local_digits() function
 * api.Request.submit now handles search-title-disabled and search-text-disabled API Errors
-* A show_diff parameter was added to Page.put() and Page.change_category()
+* A show_diff parameter  was added to Page.put() and Page.change_category()
 * Allow categories when saving IndexPage (T299806)
 * Add a new function case_escape to textlib
 * Support inheritance of the __STATICREDIRECT__
@@ -45,6 +48,9 @@ Improvements
 Bugfixes
 --------
 
+* Don't raise an exception if BlockEntry initializer found a hidden title (T78152)
+* Fix KeyError in create_warnings_list (T301610)
+* Enable similar script call of pwb.py on toolforge (T298846)
 * Remove question mark character from forbidden file name characters (T93482)
 * Enable -interwiki option with pagegenerators (T57099)
 * Don't assert login result (T298761)
@@ -72,6 +78,9 @@ Breaking changes
 Code cleanups
 -------------
 
+* Deprecated  http.get_fake_user_agent() function was removed
+* FilePage.fileIsShared() was removed in favour of FilePage.file_is_shared()
+* Page.canBeEdited() was removed in favour of Page.has_permission()
 * BaseBot.stop() method were removed in favour of BaseBot.generator.close()
 * showHelp() function was remove in favour of show_help
 * CombinedPageGenerator pagegenerator was removed in favour of itertools.chain
@@ -136,6 +145,16 @@ Deprecations
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
-* 6.4.0: Pywikibot `began using semantic versioning
-  <https://www.mediawiki.org/wiki/Manual:Pywikibot/Development/Guidelines#Deprecation_Policy>`_,
-  all deprecated code will be removed in Pywikibot version 7.0.0.
+* 6.5.0: Infinite rotating file handler with logfilecount of -1 is deprecated
+* 6.4.0: 'allow_duplicates' parameter of tools.intersect_generators as positional argument is deprecated, use keyword argument instead
+* 6.4.0: 'iterables' of tools.intersect_generators given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
+* 6.2.0: outputter of OutputProxyOption without out property is deprecated
+* 6.2.0: ContextOption.output_range() and HighlightContextOption.output_range() are deprecated
+* 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style
+* 6.2.0: page.url2unicode() function is deprecated in favour of tools.chars.url2string()
+* 6.2.0: Throttle.multiplydelay attribute is deprecated
+* 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
+* 6.0.0: config.register_family_file() is deprecated
+* 5.5.0: APISite.redirectRegex() is deprecated in favour of APISite.redirect_regex()
+* 4.0.0: Revision.parent_id is deprecated in favour of Revision.parentid
+* 4.0.0: Revision.content_model is deprecated in favour of Revision.contentmodel
