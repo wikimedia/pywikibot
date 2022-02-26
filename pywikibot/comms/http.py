@@ -78,7 +78,7 @@ session.cookies = cookie_jar
 
 
 # Prepare flush on quit
-def flush():
+def flush():  # pragma: no cover
     """Close the session object. This is called when the module terminates."""
     log('Closing network session.')
     session.close()

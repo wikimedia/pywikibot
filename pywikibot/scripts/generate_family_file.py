@@ -27,7 +27,7 @@ base directory.
    folder of your base directory instead of pywikibot/families.
 """
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license
 #
@@ -88,7 +88,7 @@ class FamilyFileGenerator:
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
-    def get_params(self):
+    def get_params(self):  # pragma: no cover
         """Ask for parameters if necessary."""
         if self.base_url is None:
             self.base_url = input('Please insert URL to wiki: ')
@@ -115,7 +115,7 @@ class FamilyFileGenerator:
         for verify in (True, False):
             try:
                 w = self.Wiki(self.base_url, verify=verify)
-            except FatalServerError:
+            except FatalServerError:  # pragma: no cover
                 print('ERROR: '
                       + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()
@@ -153,7 +153,7 @@ class FamilyFileGenerator:
         try:
             self.langs = w.langs
             print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             self.langs = []
             print(e, '; continuing...')
 
@@ -203,7 +203,7 @@ class FamilyFileGenerator:
                 try:
                     self.wikis[key] = self.Wiki(lang['url'])
                     print('downloaded')
-                except Exception as e:
+                except Exception as e:  # pragma: no cover
                     print(e)
             else:
                 print('in cache')
