@@ -14,9 +14,6 @@ from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import Error, HiddenKeyError
 
 
-_logger = 'wiki'
-
-
 class LogEntry(UserDict):
 
     """Generic log entry.
@@ -52,8 +49,7 @@ class LogEntry(UserDict):
 
         It also logs debugging information when a key is missing.
         """
-        pywikibot.debug('API log entry received:\n{!r}'.format(self),
-                        _logger)
+        pywikibot.debug('API log entry received:\n{!r}'.format(self))
         hidden = {
             'actionhidden': [
                 'action', 'logpage', 'ns', 'pageid', 'params', 'title',
@@ -84,9 +80,9 @@ class LogEntry(UserDict):
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
             pywikibot.debug("'{}' cannot be compared with '{}'"
-                            .format(type(self).__name__, type(other).__name__),
-                            _logger)
+                            .format(type(self).__name__, type(other).__name__))
             return False
+
         return self.logid() == other.logid() and self.site == other.site
 
     def __getattr__(self, item: str) -> Any:
@@ -412,8 +408,7 @@ class LogEntryFactory:
         try:
             logtype = logdata['type']
         except KeyError:
-            pywikibot.debug('API log entry received:\n{}'.format(logdata),
-                            _logger)
+            pywikibot.debug('API log entry received:\n{}'.format(logdata))
             raise Error("Log entry has no 'type' key")
 
         return LogEntryFactory.get_entry_class(logtype)(logdata, self._site)

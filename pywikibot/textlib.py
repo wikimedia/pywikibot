@@ -49,8 +49,6 @@ or
 
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
-_logger = 'textlib'
-
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}
 
@@ -1696,7 +1694,7 @@ def extract_templates_and_params(text: str,
         text = removeDisabledParts(text)
 
     parser_name = wikitextparser.__name__
-    pywikibot.debug('Using {!r} wikitext parser'.format(parser_name), _logger)
+    pywikibot.debug('Using {!r} wikitext parser'.format(parser_name))
 
     result = []
     parsed = wikitextparser.parse(text)

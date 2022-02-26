@@ -30,9 +30,6 @@ class _PasswordFileWarning(UserWarning):
     """The format of password file is incorrect."""
 
 
-_logger = 'wiki.login'
-
-
 # On some wikis you are only allowed to run a bot if there is a link to
 # the bot's user page in a specific list.
 # If bots are listed in a template, the templates name must be given as

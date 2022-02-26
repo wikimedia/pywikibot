@@ -1152,8 +1152,6 @@ def Site(code: Optional[str] = None,
     :raises ValueError: Missing Site code
     :raises ValueError: Missing Site family
     """
-    _logger = 'wiki'
-
     if url:
         # Either code and fam or url with optional fam for AutoFamily name
         if code:
@@ -1207,7 +1205,7 @@ def Site(code: Optional[str] = None,
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
         debug("Instantiated {} object '{}'"
-              .format(interface.__name__, _sites[key]), _logger)
+              .format(interface.__name__, _sites[key]))
 
         if _sites[key].code != code:
             warn('Site {} instantiated using different code "{}"'
@@ -1282,9 +1280,7 @@ def _flush(stop: bool = True) -> None:
     Wait for the page-putter to flush its queue. Also drop this process from
     the throttle log. Called automatically at Python exit.
     """
-    _logger = 'wiki'
-
-    debug('_flush() called', _logger)
+    debug('_flush() called')
 
     def remaining() -> Tuple[int, datetime.timedelta]:
         remainingPages = page_put_queue.qsize()

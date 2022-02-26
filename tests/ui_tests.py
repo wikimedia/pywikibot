@@ -149,7 +149,7 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(self.strerr.getvalue(), 'CRITICAL: critical\n')
 
     def test_debug(self):
-        pywikibot.debug('debug', 'test')
+        pywikibot.debug('debug', layer='test')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), '')
 

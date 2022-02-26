@@ -16,9 +16,6 @@ from pywikibot.exceptions import APIError
 from pywikibot.tools import EMPTY_DEFAULT
 
 
-_logger = 'wiki.siteinfo'
-
-
 class Siteinfo(Container):
 
     """
@@ -228,7 +225,7 @@ class Siteinfo(Container):
         :rtype: various (the value), bool (if the default value is used)
         """
         if 'general' not in self._cache:
-            pywikibot.debug('general siteinfo not loaded yet.', _logger)
+            pywikibot.debug('general siteinfo not loaded yet.')
             force = True
             props = ['namespaces', 'namespacealiases']
         else:
@@ -239,7 +236,7 @@ class Siteinfo(Container):
             if props:
                 pywikibot.debug(
                     "Load siteinfo properties '{}' along with 'general'"
-                    .format("', '".join(props)), _logger)
+                    .format("', '".join(props)))
             props += ['general']
             default_info = self._get_siteinfo(props, expiry)
             for prop in props:

@@ -61,17 +61,15 @@ except ImportError as e:
 # 'certificate verify failed' is a commonly detectable string
 SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
-_logger = 'comms.http'
-
 cookie_file_path = config.datafilepath('pywikibot.lwp')
 file_mode_checker(cookie_file_path, create=True)
 cookie_jar = cookiejar.LWPCookieJar(cookie_file_path)
 try:
     cookie_jar.load(ignore_discard=True)
 except cookiejar.LoadError:
-    debug('Loading cookies failed.', _logger)
+    debug('Loading cookies failed.')
 else:
-    debug('Loaded cookies from file.', _logger)
+    debug('Loaded cookies from file.')
 
 session = requests.Session()
 session.cookies = cookie_jar

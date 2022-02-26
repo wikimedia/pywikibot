@@ -66,8 +66,6 @@ from pywikibot.tools import (
 )
 
 
-_logger = 'pagegenerators'
-
 # ported from version 1 for backwards-compatibility
 # most of these functions just wrap a Site or Page method that returns
 # a generator

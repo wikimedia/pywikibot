@@ -203,18 +203,21 @@ def critical(text: object, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
 
-def debug(text: object, layer: str, decoder: Optional[str] = None,
+def debug(text: object, layer: str = '', decoder: Optional[str] = None,
           newline: bool = True, **kwargs: Any) -> None:
     """Output a debug record to the log file.
 
+    .. versionchanged:: 7.2
+       `layer` parameter is optional.
+
     :param text: the message of the debug record to be logged to the log file.
-    :param layer: logger to record this message upon
+    :param layer: dot-separated logger suffix to record this message
+        upon. If not given only 'pywiki' is used as logger name.
     :param decoder: If None, text should be a unicode string else it should
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
         https://docs.python.org/3/howto/logging-cookbook.html
-    :param layer: The name of the logger that text will be sent to.
     """
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
 

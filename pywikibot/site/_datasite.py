@@ -26,7 +26,6 @@ from pywikibot.tools import itergroup, merge_unique_dicts, remove_last_args
 
 
 __all__ = ('DataSite', )
-_logger = 'wiki.datasite'
 
 
 class DataSite(APISite):
