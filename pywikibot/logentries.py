@@ -54,13 +54,19 @@ class LogEntry(UserDict):
         """
         pywikibot.debug('API log entry received:\n{!r}'.format(self),
                         _logger)
-        hidden = {'action', 'logpage', 'ns', 'pageid', 'params', 'title'}
-        if ((key in hidden and 'actionhidden' in self)
-            or (key == 'comment' and 'commenthidden' in self)
-                or (key == 'user' and 'userhidden' in self)):
-            raise HiddenKeyError(
-                "Log entry ({}) has a hidden '{}' key and you don't have "
-                'permission to view it.'.format(self['type'], key))
+        hidden = {
+            'actionhidden': [
+                'action', 'logpage', 'ns', 'pageid', 'params', 'title',
+            ],
+            'commenthidden': ['comment'],
+            'userhidden': ['user'],
+        }
+        for hidden_key, hidden_types in hidden.items():
+            if hidden_key in self and key in hidden_types:
+                raise HiddenKeyError(
+                    "Log entry ({}) has a hidden '{}' key and you don't have "
+                    "permission to view it due to '{}'"
+                    .format(self['type'], key, hidden_key))
 
         raise KeyError('Log entry ({}) has no {!r} key'
                        .format(self['type'], key))
